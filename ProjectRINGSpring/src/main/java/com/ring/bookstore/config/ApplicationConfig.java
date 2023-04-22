@@ -24,10 +24,10 @@ public class ApplicationConfig {
 	@Bean
 	public UserDetailsService userDetailsService() {
 		return userName -> accountRepo.findByUserName(userName)
-                .orElseThrow(() -> new UsernameNotFoundException("Account not found!"));
+                .orElseThrow(() -> new UsernameNotFoundException("User does not exists!"));
 	}
 	
-	 @Bean
+	@Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());

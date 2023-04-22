@@ -2,6 +2,8 @@ package com.ring.bookstore.service.impl;
 
 import java.util.List;
 
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.exception.ResourceNotFoundException;
@@ -9,31 +11,28 @@ import com.ring.bookstore.model.Account;
 import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.service.AccountService;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 public class AccountServiceImpl implements AccountService {
 	
-	private AccountRepository accountRepository;
+	private final AccountRepository accRepo;
 	
-	//if class has only 1 constructor, autowired is not needed (use constructor instead)
-	public AccountServiceImpl(AccountRepository accountRepository) {
-		super();
-		this.accountRepository = accountRepository;
-	}
-
 	//Tạo acc
 	public Account saveAccount(Account account) {
-		return accountRepository.save(account);
+		return accRepo.save(account);
 	}
 
 	//Lấy tất cả acc
 	public List<Account> getAllAccounts() {
-		return accountRepository.findAll();
+		return accRepo.findAll();
 	}
 
 	//Lấy acc theo id
 	public Account getAccountById(long id) {
-		return accountRepository.findById(id).orElseThrow(() -> 
-					new ResourceNotFoundException("Account", "Id", id)); //exception nếu ko tồn tại
+		return accRepo.findById(id).orElseThrow(() -> 
+					new ResourceNotFoundException("User does not exists!")); //exception nếu ko tồn tại
 	}
 
 	//Chỉnh sửa acc
@@ -48,7 +47,7 @@ public class AccountServiceImpl implements AccountService {
 		currAcc.setEmail(account.getEmail());
 		
 		//save
-		accountRepository.save(currAcc);
+		accRepo.save(currAcc);
 		return currAcc;
 	}
 
@@ -58,7 +57,7 @@ public class AccountServiceImpl implements AccountService {
 		getAccountById(id);
 		
 		//delete
-		accountRepository.deleteById(id);
+		accRepo.deleteById(id);
 	}
 
 }

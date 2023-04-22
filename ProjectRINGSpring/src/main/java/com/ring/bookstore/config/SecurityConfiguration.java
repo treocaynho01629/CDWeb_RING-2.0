@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ public class SecurityConfiguration {
 	        .csrf()
 	        .disable()
 	        .authorizeHttpRequests()
-	        .requestMatchers("/api/v1/auth/**", "/api/books/**")
+	        .requestMatchers("/api/v1/auth/**", "/api/store/**")
 	        .permitAll()
 	        .anyRequest()
 	        .authenticated()
@@ -56,10 +57,14 @@ public class SecurityConfiguration {
 	        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 	        .addFilterBefore(chainExceptionHandlerFilter, JwtAuthenticationFilter.class)
 	        .logout()
-	            .logoutUrl("/api/v1/auth/logout")
+		        .invalidateHttpSession(true)
+	            .clearAuthentication(true)
+	            .logoutRequestMatcher(new AntPathRequestMatcher("/api/v1/auth/logout"))
+//	            .logoutUrl("/api/v1/auth/logout")
 	            .addLogoutHandler(logoutHandler)
 	            .logoutSuccessHandler((request, response, authentication)
 	            -> SecurityContextHolder.clearContext())
+	            .permitAll()
         ;;
 		
 		return http.build();

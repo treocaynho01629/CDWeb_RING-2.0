@@ -1,5 +1,6 @@
 package com.ring.bookstore.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuthenticationRequest {
 
-  private String userName;
-  private String pass;
+	@NotNull(message = "Tên đăng nhập không được để trống!")	
+	private String userName;
+	@NotNull(message = "Mật khẩu không được để trống!")
+	private String pass;
 }

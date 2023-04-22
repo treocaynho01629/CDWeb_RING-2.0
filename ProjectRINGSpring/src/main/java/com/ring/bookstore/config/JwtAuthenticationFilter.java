@@ -45,16 +45,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 		}
 		
 		jwt = authHeader.substring(7); //Sau "Bearer "
-		userName = jwtService.extractUsername(jwt);
+		
+		try {
+			userName = jwtService.extractUsername(jwt);
+		} catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write(e.getMessage());
+            response.getWriter().flush();
+            return;
+        }
 		
 		if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) { //Check người dùng tồn tại, và người dùng đã được cấp quyền chưa
 			UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
-
+			
             //check xem token còn sử dụng được ko
             var isTokenValid = tokenRepo.findByToken(jwt)
                     .map(t -> !t.isExpired() && !t.isRevoked()) //map sang boolean
                     .orElse(false);
-
+            
             if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
             	
             	//Tạo quyền
