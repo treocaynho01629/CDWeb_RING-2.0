@@ -3,31 +3,21 @@ package com.ring.bookstore.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND)
-public class ResourceNotFoundException extends RuntimeException { //Exception khi không tìm thấy dữ liệu
+import java.util.HashMap;
 
-	private static final long serialVersionUID = 1L;
+@ResponseStatus(code = HttpStatus.NOT_FOUND)
+public class ResourceNotFoundException extends RuntimeException{
 	
-	private String resourceName;
-	private String fieldName;
-	private Object fieldValue;
-	
-	public ResourceNotFoundException(String resourceName, String fieldName, Object fieldValue) {
-		super(String.format("%s not found with %s : '%s'", resourceName, fieldName, fieldValue));
-		this.resourceName = resourceName;
-		this.fieldName = fieldName;
-		this.fieldValue = fieldValue;
-	}
+    private ExceptionMessage exceptionMessage;
+    private String message;
+    
+    public ResourceNotFoundException(String message) {
+        super(message);
+        this.message = message;
+        this.exceptionMessage = new ExceptionMessage(HttpStatus.NOT_FOUND.value(), message,new HashMap<>());
+    }
 
-	public String getResourceName() {
-		return resourceName;
-	}
-
-	public String getFieldName() {
-		return fieldName;
-	}
-
-	public Object getFieldValue() {
-		return fieldValue;
-	}
+    public ExceptionMessage getExceptionMessage() {
+        return exceptionMessage;
+    }
 }

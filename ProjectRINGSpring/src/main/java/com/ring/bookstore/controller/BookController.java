@@ -12,37 +12,66 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ring.bookstore.dtos.BookDTO;
 import com.ring.bookstore.model.Book;
+import com.ring.bookstore.model.Category;
 import com.ring.bookstore.service.BookService;
+import com.ring.bookstore.service.CategoryService;
+import com.ring.bookstore.service.ReviewService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @CrossOrigin("http://localhost:5173")
-@RequestMapping("/api/books")
+@RequestMapping("/api/store")
+@RequiredArgsConstructor
 public class BookController {
 	
-	private BookService bookService;
-	
-	public BookController(BookService bookService) {
-		super();
-		this.bookService = bookService;
-	}
-
-	//Lấy tất cả sách
-	@GetMapping()
-	public List<Book> getAllBooks(){
-		return bookService.getAllBooks();
-	}
+	private final BookService bookService;
+	private final ReviewService reviewService;
+	private final CategoryService cateService;
 	
 	//Lấy sách theo trang
-	@GetMapping("/pages/{pageNo}")
-    public Page<Book> getBooksPaging(@RequestParam(value = "pSize", required = false, defaultValue = "15") Integer pageSize,
-    		@PathVariable("pageNo") int pageNo){
-        return bookService.getBooksPaging(pageNo, pageSize);
+	@GetMapping("/books")
+    public ResponseEntity<?> getAllBooks(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo){
+        Page<BookDTO> books =  bookService.getAllBooks(pageNo, pageSize);
+        return new ResponseEntity< >(books, HttpStatus.OK);
+    }
+	
+	//Test
+	@GetMapping("/books/filters")
+    public ResponseEntity<?> getBooksByFilter(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+    										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+    										@RequestParam(value = "keyword", defaultValue = "") String keyword,
+    										@RequestParam(value = "cateId", defaultValue = "0") Long cateId,
+    										@RequestParam(value = "pubId", defaultValue = "0") Long pubId,
+    										@RequestParam(value = "type", defaultValue = "") String type,
+    										@RequestParam(value = "fromRange", defaultValue = "0") Double fromRange,
+    										@RequestParam(value = "toRange", defaultValue = "45000") Double toRange){
+        Page<BookDTO> books =  bookService.getBooksByFilter(pageNo, pageSize, keyword, cateId, pubId, type, fromRange, toRange);
+        return new ResponseEntity< >(books, HttpStatus.OK);
     }
 	
 	//Lấy sách theo {id}
-	@GetMapping("{id}")
-	public ResponseEntity<Book> getEmployeeById(@PathVariable("id") long bookId){
+	@GetMapping("/books/{id}")
+	public ResponseEntity<Book> getBookById(@PathVariable("id") long bookId){
 		return new ResponseEntity<Book>(bookService.getBookById(bookId), HttpStatus.OK);
+	}
+	
+	//Lấy Review theo sách
+	@GetMapping("/books/{id}/review/{pageNo}")
+	public ResponseEntity<?> getReviewByBookId(@PathVariable("id") long bookId,
+											@RequestParam(value = "pSize", required = false, defaultValue = "5") Integer pageSize,
+											@PathVariable("pageNo") int pageNo){
+		return new ResponseEntity< >(reviewService.getReviewsByBookId(bookId, pageNo, pageSize), HttpStatus.OK);
+	}
+	
+	//Lấy tất Danh mục
+	@GetMapping("/categories")
+	public ResponseEntity<?> getAllCategories(){
+		System.out.println("test");
+		List<Category> categories =  cateService.getAllCategories();
+		return new ResponseEntity< >(categories, HttpStatus.OK);
 	}
 }

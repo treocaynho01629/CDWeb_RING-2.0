@@ -59,7 +59,6 @@ public class Review {
     	@JoinColumn(name = "user_id", referencedColumnName = "id"),	
     	@JoinColumn(name = "user_name", referencedColumnName = "userName")
 	})
-    @JsonIgnore
     private Account user;
 
 }

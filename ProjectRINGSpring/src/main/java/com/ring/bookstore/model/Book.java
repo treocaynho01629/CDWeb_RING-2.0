@@ -9,20 +9,21 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
+
 import java.util.Set;
 
 import org.hibernate.annotations.Nationalized;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 
 @Entity
-@Getter
-@Setter
+@Data
 public class Book {
 
     @Id
@@ -64,12 +65,13 @@ public class Book {
     @Nationalized 
     private String author;
 
-    @Column
-    private Integer sellId;
-
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sell_id")
+    @JsonIgnore 
+    private Account user;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "publisher_id")
-    @JsonIgnore
     private Publisher publisher;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -77,12 +79,11 @@ public class Book {
     @JsonIgnore
     private Category cate;
 
-    @OneToMany(mappedBy = "book")
-    @JsonIgnore
-    private Set<BookDetail> bookBookDetails;
+    @OneToOne(mappedBy = "book")
+    private BookDetail bookDetail;
 
     @OneToMany(mappedBy = "book")
-    @JsonIgnore
+    @JsonIgnore 
     private Set<Review> bookReviews;
 
     @OneToMany(mappedBy = "book")
