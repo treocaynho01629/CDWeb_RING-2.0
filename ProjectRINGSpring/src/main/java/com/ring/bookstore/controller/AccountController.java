@@ -36,13 +36,13 @@ public class AccountController {
 	
 	//Lấy acc theo {id}
 	@GetMapping("{id}")
-	public ResponseEntity<Account> getEmployeeById(@PathVariable("id") long accountId){
+	public ResponseEntity<Account> getEmployeeById(@PathVariable("id") Integer accountId){
 		return new ResponseEntity<Account>(accountService.getAccountById(accountId), HttpStatus.OK);
 	}
 	
 	//Chỉnh sửa acc {id}
 	@PostMapping("{id}")
-	public ResponseEntity<Account> updateEmployee(@PathVariable("id") long accountId,
+	public ResponseEntity<Account> updateEmployee(@PathVariable("id") Integer accountId,
 			@RequestBody Account account){
 		return new ResponseEntity<Account>(accountService.updateAccount(account, accountId), HttpStatus.OK);
 	}
@@ -55,7 +55,7 @@ public class AccountController {
 	
 	//Xoá acc {id}
 	@DeleteMapping("{id}")
-	public ResponseEntity<String> deleteAccount(@PathVariable("id") long accountId){
+	public ResponseEntity<String> deleteAccount(@PathVariable("id") Integer accountId){
 		
 		//Xoá khỏi DB
 		accountService.deleteAccount(accountId);

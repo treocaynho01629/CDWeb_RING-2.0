@@ -23,7 +23,7 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	//Lấy Mục theo Id
-	public Category getCategoryById(long id) {
+	public Category getCategoryById(Integer id) {
 		return cateRepo.findById(id).orElseThrow(() -> 
 		new ResourceNotFoundException("Category does not exists!")); //exception nếu ko tồn tại
 	}

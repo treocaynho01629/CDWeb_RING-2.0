@@ -6,5 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.ring.bookstore.model.OrderDetail;
 
 @Repository
-public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long>{
+public interface OrderDetailRepository extends JpaRepository<OrderDetail, Integer>{
+	
+	void deleteByBook_Id(Integer id);
 }

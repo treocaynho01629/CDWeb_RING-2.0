@@ -2,6 +2,7 @@ package com.ring.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,10 +11,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PreRemove;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 
@@ -22,6 +25,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class OrderDetail {
 
     @Id
@@ -44,7 +48,7 @@ public class OrderDetail {
     @Column
     private Double price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     @JsonIgnore
     private OrderReceipt order;
@@ -53,5 +57,10 @@ public class OrderDetail {
     @JoinColumn(name = "book_id")
     @JsonIgnore
     private Book book;
-
+    
+    @PreRemove
+    public void preRemove() {
+        this.book.getBookOrderDetails().clear(); //of course this is just an example and probably you should have more complicated logic here
+        this.book = null;
+    }
 }

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.ring.bookstore.model.OrderReceipt;
 
 @Repository
-public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long>{
+public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Integer>{
 }

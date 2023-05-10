@@ -1,14 +1,10 @@
 package com.ring.bookstore.service.impl;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.exception.HttpResponseException;
@@ -17,13 +13,13 @@ import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.CartItem;
 import com.ring.bookstore.model.OrderDetail;
 import com.ring.bookstore.model.OrderReceipt;
-import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.repository.BookRepository;
 import com.ring.bookstore.repository.OrderDetailRepository;
 import com.ring.bookstore.repository.OrderReceiptRepository;
 import com.ring.bookstore.request.OrderRequest;
 import com.ring.bookstore.service.OrderService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -33,14 +29,10 @@ public class OrderServiceImpl implements OrderService {
 	private final OrderReceiptRepository orderRepo;
 	private final OrderDetailRepository orderDetailRepo;
 	private final BookRepository bookRepo;
-	private final AccountRepository accountRepo;
 	
-	public OrderReceipt checkout(OrderRequest request) {
-		
-		//Lấy User đang Order
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		var user = accountRepo.findByUserName(auth.getName())
-	            .orElseThrow(()-> new ResourceNotFoundException("User does not exists!"));
+	//Đặt sách
+	@Transactional
+	public OrderReceipt checkout(OrderRequest request, Account user) {
 		
 		//Xử lý data từ request
 		String fullName = request.getFirstName() + " " + request.getLastName();
@@ -57,7 +49,7 @@ public class OrderServiceImpl implements OrderService {
 			var book = bookRepo.findById(i.getId())
 			            .orElseThrow(()-> new ResourceNotFoundException("Product does not exists!"));
 			
-			total += (i.getQuantity() * book.getPrice());
+			total += (i.getQuantity() * book.getPrice()) * 1.1 + 10000;
 			
 			var orderDetail = OrderDetail.builder()
 					.amount(i.getQuantity())

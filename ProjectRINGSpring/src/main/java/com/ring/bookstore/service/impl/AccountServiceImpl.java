@@ -30,13 +30,13 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	//Lấy acc theo id
-	public Account getAccountById(long id) {
+	public Account getAccountById(Integer id) {
 		return accRepo.findById(id).orElseThrow(() -> 
 					new ResourceNotFoundException("User does not exists!")); //exception nếu ko tồn tại
 	}
 
 	//Chỉnh sửa acc
-	public Account updateAccount(Account account, long id) {
+	public Account updateAccount(Account account, Integer id) {
 		
 		//kiểm tra + lấy acc có tồn tại trong DB?
 		Account currAcc = getAccountById(id);
@@ -51,7 +51,7 @@ public class AccountServiceImpl implements AccountService {
 		return currAcc;
 	}
 
-	public void deleteAccount(long id) {
+	public void deleteAccount(Integer id) {
 		
 		//kiểm tra acc có tồn tại trong DB?
 		getAccountById(id);

@@ -27,24 +27,10 @@ public class ReviewServiceImpl implements ReviewService {
 	@Autowired
 	private ReviewMapper reviewMapper;
 
-	public Page<ReviewDTO> getReviewsByBookId(long id, int pageNo, int pageSize) {
+	public Page<ReviewDTO> getReviewsByBookId(Integer id, Integer pageNo, Integer pageSize) {
 		Pageable pageable = PageRequest.of(pageNo, pageSize);
-        List<Review> reviewsList = reviewRepo.findAllByBookId(id);
+		Page<Review> reviewsList = reviewRepo.findAllByBook_Id(id, pageable);
         List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList());
-        Page<ReviewDTO> reviewsPage = toPage(reviewDtos, pageable);
-        return reviewsPage;
+        return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements());
 	}
-	
-	//Trang
-	private Page<ReviewDTO> toPage(List<ReviewDTO> list, Pageable pageable){
-        if(pageable.getOffset() >= list.size()){
-            return Page.empty();
-        }
-        int startIndex = (int) pageable.getOffset();
-        int endIndex = ((pageable.getOffset() + pageable.getPageSize()) > list.size())
-                ? list.size()
-                : (int) (pageable.getOffset() + pageable.getPageSize());
-        List<ReviewDTO> subList = list.subList(startIndex, endIndex);
-        return new PageImpl<ReviewDTO>(subList, pageable, list.size());
-    }
 }
