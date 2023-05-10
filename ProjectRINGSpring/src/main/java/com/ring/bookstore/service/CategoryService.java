@@ -7,5 +7,5 @@ import com.ring.bookstore.model.Category;
 public interface CategoryService {
 	
 	List<Category> getAllCategories();
-	Category getCategoryById(long id);
+	Category getCategoryById(Integer id);
 }

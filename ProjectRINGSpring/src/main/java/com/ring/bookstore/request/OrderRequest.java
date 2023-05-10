@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ring.bookstore.model.CartItem;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,13 +19,13 @@ public class OrderRequest {
 	
 	@NotNull(message = "Cart can not be empty")
 	private List<CartItem> cart;
-	@NotNull(message = "First name is required")
+	@NotBlank(message = "First name is required")
 	private String firstName;
-	@NotNull(message = "Last name is required")
+	@NotBlank(message = "Last name is required")
 	private String lastName;
-	@NotNull(message = "Phone number is required")
+	@NotBlank(message = "Phone number is required")
 	private String phone;
-	@NotNull(message = "Address is required")
+	@NotBlank(message = "Address is required")
 	private String address;
 	private String message;
 }

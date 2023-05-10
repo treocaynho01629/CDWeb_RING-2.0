@@ -2,6 +2,7 @@ package com.ring.bookstore.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -29,7 +30,7 @@ public class Category {
     @Nationalized 
     private String categoryName;
 
-    @OneToMany(mappedBy = "cate")
+    @OneToMany(mappedBy = "cate", fetch = FetchType.LAZY)
     private Set<Sub> cateSubs;
 
     @OneToMany(mappedBy = "cate")

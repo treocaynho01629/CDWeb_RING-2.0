@@ -8,5 +8,5 @@ import com.ring.bookstore.dtos.ReviewDTO;
 @Service
 public interface ReviewService {
 	
-	Page<ReviewDTO> getReviewsByBookId(long id, int pageNo, int pageSize);
+	Page<ReviewDTO> getReviewsByBookId(Integer id, Integer pageNo, Integer pageSize);
 }

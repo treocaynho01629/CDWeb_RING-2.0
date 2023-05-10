@@ -2,17 +2,39 @@ package com.ring.bookstore.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.ring.bookstore.dtos.IBookDisplay;
 import com.ring.bookstore.model.Book;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book, Long>{
+public interface BookRepository extends JpaRepository<Book, Integer>{
 	
-	@Query(value = "select b.* from Book b where concat (b.title, b.author) like %?1% and b.cate_id like %?2% and b.publisher_id like %?3% and b.type like %?4% and b.price between ?5 and ?6"
-			, nativeQuery = true)
-	public List<Book> findBooksWithFilter(String keyword, String cateId, String pubId, String type, Double fromRange, Double toRange);
+	@Query("""
+	select b.id as id, b.title as title, b.description as description, b.image as image, b.price as price, 
+	count(r.id) as rateAmount, isnull(sum(r.rating), 0) as rateTotal 
+	from Book b left join Review r on b.id = r.book.id 
+	where concat (b.title, b.author) like %:keyword%
+	and cast(b.cate.id as string) like %:cateId%
+	and cast(b.publisher.id as string) not in :pubId
+	and b.type like %:type%
+	and b.price between :fromRange and :toRange
+	group by b.id, b.title, b.description, b.image, b.price 
+	""")
+	public Page<IBookDisplay> findBooksWithFilter(String keyword, String cateId, String[] pubId, String type, Double fromRange, Double toRange, Pageable pageable);
+	
+	@Query("select b from Book b order by newid() limit :amount")
+	public List<Book> findRandomBooks(int amount);
+	
+	@Query("""
+	select b.id as id, b.title as title, b.description as description, b.image as image, b.price as price, count(r.id) as rateAmount, sum(r.rating) as rateTotal 
+	from Book b left join Review r on b.id = r.book.id 
+	group by b.id, b.title, b.description, b.image, b.price 
+	""")
+	List<IBookDisplay> testStuff();
 
 }

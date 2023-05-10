@@ -8,7 +8,7 @@ public interface AccountService {
 	
 	Account saveAccount(Account account);
 	List<Account> getAllAccounts();
-	Account getAccountById(long id);
-	Account updateAccount(Account account, long id);
-	void deleteAccount(long id);
+	Account getAccountById(Integer id);
+	Account updateAccount(Account account, Integer id);
+	void deleteAccount(Integer id);
 }

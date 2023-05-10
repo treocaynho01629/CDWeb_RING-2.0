@@ -1,7 +1,7 @@
 package com.ring.bookstore.repository;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -9,11 +9,14 @@ import org.springframework.stereotype.Repository;
 import com.ring.bookstore.model.Review;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long>{
+public interface ReviewRepository extends JpaRepository<Review, Integer>{
+	
+	Page<Review> findAllByBook_Id(Integer id, Pageable pageable);
 	
 	@Query("""
-    select r from Review r inner join Book b on r.book.id = b.id
-    where b.id = :id
+    select coalesce(sum(r.rating), 0) from Review r where r.book.id = :id
     """)
-	List<Review> findAllByBookId(long id);
+	int findTotalRatingByBookId(Integer id);
+	
+	void deleteByBook_Id(Integer id);
 }

@@ -16,6 +16,7 @@ import org.hibernate.annotations.Nationalized;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +24,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Review {
 
     @Id
@@ -59,6 +61,7 @@ public class Review {
     	@JoinColumn(name = "user_id", referencedColumnName = "id"),	
     	@JoinColumn(name = "user_name", referencedColumnName = "userName")
 	})
+    @JsonIgnore
     private Account user;
 
 }

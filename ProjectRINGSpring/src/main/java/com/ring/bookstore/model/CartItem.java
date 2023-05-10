@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CartItem {
 	
-	private long id;
+	private Integer id;
 	private String title;
-	private int quantity;
-	private double price;
+	private Integer quantity;
+	private Double price;
 }
