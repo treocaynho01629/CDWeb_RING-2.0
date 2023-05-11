@@ -52,9 +52,11 @@ public class Book {
             generator = "primary_sequence"
     )
     private Integer id;
-
-    @Column(length = 500)
-    private String image;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_id")
+    @JsonIgnore 
+    private Image images;
 
     @Column
     private Double price;

@@ -1,5 +1,6 @@
 package com.ring.bookstore.service.impl;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,13 +11,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ring.bookstore.dtos.BookDTO;
 import com.ring.bookstore.dtos.BookDetailDTO;
 import com.ring.bookstore.dtos.IBookDisplay;
+import com.ring.bookstore.dtos.ImageDTO;
 import com.ring.bookstore.dtos.mappers.BookDetailMapper;
 import com.ring.bookstore.dtos.mappers.BookDisplayMapper;
 import com.ring.bookstore.dtos.mappers.BookMapper;
@@ -27,16 +32,19 @@ import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.Book;
 import com.ring.bookstore.model.BookDetail;
 import com.ring.bookstore.model.Category;
+import com.ring.bookstore.model.Image;
 import com.ring.bookstore.model.OrderDetail;
 import com.ring.bookstore.model.Publisher;
 import com.ring.bookstore.repository.BookDetailRepository;
 import com.ring.bookstore.repository.BookRepository;
 import com.ring.bookstore.repository.CategoryRepository;
+import com.ring.bookstore.repository.ImageRepository;
 import com.ring.bookstore.repository.OrderDetailRepository;
 import com.ring.bookstore.repository.PublisherRepository;
 import com.ring.bookstore.repository.ReviewRepository;
 import com.ring.bookstore.request.BookRequest;
 import com.ring.bookstore.service.BookService;
+import com.ring.bookstore.service.ImageService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +59,7 @@ public class BookServiceImpl implements BookService {
 	private final CategoryRepository cateRepo;
 	private final OrderDetailRepository orderDetailRepo;
 	private final ReviewRepository reviewRepo;
+	private final ImageRepository imageRepo;
 	
 	@Autowired
 	private BookMapper bookMapper;
@@ -109,7 +118,18 @@ public class BookServiceImpl implements BookService {
 	
 	//Thêm sách
 	@Transactional
-	public Book addBook(BookRequest request, Account seller) {
+	public Book addBook(BookRequest request, MultipartFile file, Account seller) throws IOException {
+		//Kiểm tra ảnh
+		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+	    var image = Image.builder()
+	    		.name(fileName)
+	    		.type(file.getContentType())
+	    		.image(file.getBytes())
+				.build();
+	    		
+	    Image savedImage = imageRepo.save(image);
+		
+	    //Kiểm tra thông tin
 		Category cate = cateRepo.findById(request.getCateId()).orElseThrow(()-> new ResourceNotFoundException("Category not found"));
 		Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(()-> new ResourceNotFoundException("Publisher not found"));
 		
@@ -117,7 +137,7 @@ public class BookServiceImpl implements BookService {
         var book = Book.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .image(request.getImage())
+                .images(savedImage)
                 .price(request.getPrice())
                 .publisher(pub)
                 .cate(cate)
@@ -146,7 +166,18 @@ public class BookServiceImpl implements BookService {
 
 	//Sửa sách
 	@Transactional
-	public Book updateBook(BookRequest request, Integer id, Account seller) {
+	public Book updateBook(BookRequest request, MultipartFile file, Integer id, Account seller) throws IOException {
+		//Kiểm tra ảnh
+		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+	    var image = Image.builder()
+	    		.name(fileName)
+	    		.type(file.getContentType())
+	    		.image(file.getBytes())
+				.build();
+	    		
+	    Image savedImage = imageRepo.save(image);
+		
+	    //Kiểm tra thông tin
 		Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found"));
 		Category cate = cateRepo.findById(request.getCateId()).orElseThrow(()-> new ResourceNotFoundException("Category not found"));
 		Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(()-> new ResourceNotFoundException("Publisher not found"));
@@ -165,7 +196,7 @@ public class BookServiceImpl implements BookService {
 		
 		book.setTitle(request.getTitle());
 		book.setDescription(request.getDescription());
-		book.setImage(request.getImage());
+		book.setImages(savedImage);
 		book.setPrice(request.getPrice());
 		book.setPublisher(pub);
 		book.setCate(cate);

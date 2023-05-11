@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ring.bookstore.dtos.BookDetailDTO;
 import com.ring.bookstore.model.Book;
@@ -19,11 +20,18 @@ public class BookDetailMapper implements Function<Book, BookDetailDTO> {
 	
     @Override
     public BookDetailDTO apply(Book book) {
+    	
+    	String fileDownloadUri = ServletUriComponentsBuilder
+    	          .fromCurrentContextPath()
+    	          .path("/api/images/")
+    	          .path(book.getImages().getName())
+    	          .toUriString();
+    	
     	Category cate = book.getCate();
     	BookDetail detail = book.getBookDetail();
     	
         return new BookDetailDTO(book.getId(),
-        		book.getImage(),
+        		fileDownloadUri,
         		book.getPrice(),
         		book.getTitle(),
         		book.getDescription(),

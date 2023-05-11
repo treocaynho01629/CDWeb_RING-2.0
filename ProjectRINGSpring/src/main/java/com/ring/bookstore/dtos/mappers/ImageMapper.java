@@ -5,26 +5,25 @@ import java.util.function.Function;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.ring.bookstore.dtos.BookDTO;
-import com.ring.bookstore.dtos.IBookDisplay;
+import com.ring.bookstore.dtos.ImageDTO;
+import com.ring.bookstore.model.Image;
 
 @Service
-public class BookDisplayMapper implements Function<IBookDisplay, BookDTO> {
+public class ImageMapper implements Function<Image, ImageDTO> {
+	
+	
     @Override
-    public BookDTO apply(IBookDisplay book) {
+    public ImageDTO apply(Image image) {
     	
     	String fileDownloadUri = ServletUriComponentsBuilder
   	          .fromCurrentContextPath()
   	          .path("/api/images/")
-  	          .path(book.getImage())
+  	          .path(image.getName())
   	          .toUriString();
     	
-        return new BookDTO(book.getId()
-        		,book.getTitle()
-        		,book.getDescription()
+        return new ImageDTO(image.getName()
         		,fileDownloadUri
-        		,book.getPrice()
-        		,book.getRateTotal()
-        		,book.getRateAmount());
+        		,image.getType()
+        		,image.getImage().length);
     }
 }

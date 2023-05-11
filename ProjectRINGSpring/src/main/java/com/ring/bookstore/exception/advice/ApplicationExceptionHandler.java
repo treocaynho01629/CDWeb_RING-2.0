@@ -1,17 +1,16 @@
 package com.ring.bookstore.exception.advice;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.ring.bookstore.exception.ExceptionMessage;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.exception.HttpResponseException;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,5 +48,13 @@ public class ApplicationExceptionHandler{
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionMessage processResourceNotFoundException(ResourceNotFoundException e) {
         return e.getExceptionMessage();
+    }
+    
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+    public ExceptionMessage handleMaxSizeException(MaxUploadSizeExceededException e) {
+    	Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("errorMessage", e.getMessage());
+        return new ExceptionMessage(HttpStatus.EXPECTATION_FAILED.value() , "File to large!", errorMap);
     }
 }
