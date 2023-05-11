@@ -18,9 +18,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BookRequest {
 	
-	@NotNull(message = "Image is required")
-	private String image;
-	
 	@NotNull(message = "Price is required")
 	private Double price;
 	

@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ring.bookstore.dtos.BookDTO;
 import com.ring.bookstore.model.Book;
@@ -18,10 +19,16 @@ public class BookMapper implements Function<Book, BookDTO> {
     @Override
     public BookDTO apply(Book book) {
     	
+    	String fileDownloadUri = ServletUriComponentsBuilder
+    	          .fromCurrentContextPath()
+    	          .path("/api/images/")
+    	          .path(book.getImages().getName())
+    	          .toUriString();
+    	
         return new BookDTO(book.getId()
         		,book.getTitle()
         		,book.getDescription()
-        		,book.getImage()
+        		,fileDownloadUri
         		,book.getPrice()
         		,reviewRepo.findTotalRatingByBookId(book.getId())
         		,book.getBookReviews().size());

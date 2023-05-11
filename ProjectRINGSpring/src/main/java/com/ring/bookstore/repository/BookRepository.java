@@ -15,15 +15,16 @@ import com.ring.bookstore.model.Book;
 public interface BookRepository extends JpaRepository<Book, Integer>{
 	
 	@Query("""
-	select b.id as id, b.title as title, b.description as description, b.image as image, b.price as price, 
+	select b.id as id, b.title as title, b.description as description, i.name as image, b.price as price, 
 	count(r.id) as rateAmount, isnull(sum(r.rating), 0) as rateTotal 
-	from Book b left join Review r on b.id = r.book.id 
+	from Book b left join Review r on b.id = r.book.id
+	left join Image i on i.id = b.images.id
 	where concat (b.title, b.author) like %:keyword%
 	and cast(b.cate.id as string) like %:cateId%
 	and cast(b.publisher.id as string) not in :pubId
 	and b.type like %:type%
 	and b.price between :fromRange and :toRange
-	group by b.id, b.title, b.description, b.image, b.price 
+	group by b.id, b.title, b.description, i.name, b.price 
 	""")
 	public Page<IBookDisplay> findBooksWithFilter(String keyword, String cateId, String[] pubId, String type, Double fromRange, Double toRange, Pageable pageable);
 	
@@ -31,9 +32,7 @@ public interface BookRepository extends JpaRepository<Book, Integer>{
 	public List<Book> findRandomBooks(int amount);
 	
 	@Query("""
-	select b.id as id, b.title as title, b.description as description, b.image as image, b.price as price, count(r.id) as rateAmount, sum(r.rating) as rateTotal 
-	from Book b left join Review r on b.id = r.book.id 
-	group by b.id, b.title, b.description, b.image, b.price 
+	select b from Book b
 	""")
 	List<IBookDisplay> testStuff();
 
