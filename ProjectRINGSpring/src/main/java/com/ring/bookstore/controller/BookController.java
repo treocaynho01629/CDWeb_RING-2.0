@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -64,18 +63,19 @@ public class BookController {
     										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
     										@RequestParam(value = "keyword", defaultValue = "") String keyword,
     										@RequestParam(value = "cateId", defaultValue = "0") Integer cateId,
-    										@RequestParam(value = "pubId", defaultValue = "0") Integer pubId,
+    										@RequestParam(value = "pubId", defaultValue = "") List<Integer> pubId,
+    										@RequestParam(value = "seller", defaultValue = "") String seller,
     										@RequestParam(value = "type", defaultValue = "") String type,
     										@RequestParam(value = "fromRange", defaultValue = "1000") Double fromRange,
     										@RequestParam(value = "toRange", defaultValue = "100000000") Double toRange){
-        Page<BookDTO> books =  bookService.getBooksByFilter(pageNo, pageSize, sortBy, sortDir, keyword, cateId, pubId, type, fromRange, toRange);
+        Page<BookDTO> books =  bookService.getBooksByFilter(pageNo, pageSize, sortBy, sortDir, keyword, cateId, pubId, seller, type, fromRange, toRange);
         return new ResponseEntity< >(books, HttpStatus.OK);
     }
 	
-	//Lấy sách theo {id}
+	//Lấy sách hiển thị theo {id}
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getBookById(@PathVariable("id") Integer bookId) {
-		return new ResponseEntity< >(bookService.getBookById(bookId), HttpStatus.OK);
+	public ResponseEntity<?> getBookDetailById(@PathVariable("id") Integer bookId) {
+		return new ResponseEntity< >(bookService.getBookDetailById(bookId), HttpStatus.OK);
 	}
 	
 	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -95,7 +95,7 @@ public class BookController {
     @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> updateBook(@Valid @RequestPart("request") BookRequest request, 
-    									@RequestPart("image") MultipartFile file,
+    									@RequestPart(name="image", required=false) MultipartFile file,
     									@PathVariable("id") Integer id,
     									@CurrentAccount Account currUser) {
     	

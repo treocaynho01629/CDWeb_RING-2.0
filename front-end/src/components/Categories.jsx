@@ -121,15 +121,11 @@ const Categories = () => {
     <Container>
       <Wrapper draggable={true} ref={slideRef}>
         {(loading ? Array.from(new Array(15)) : catesList)?.map((cate, index) => (
-            <div>
+            <div key={index}>
                 {cate ? (
-                    <div key={index}>
-                        <CateItem cate={cate}/>
-                    </div>
+                    <CateItem cate={cate}/>
                 ) : (
-                    <div key={index}>
-                        <Skeleton key={index} variant="rectangular" animation="wave" width={150} height={50} sx={{ mx: '3px' }} />
-                    </div>
+                    <Skeleton variant="rectangular" animation="wave" width={150} height={50} sx={{ mx: '3px' }} />
                 )}
             </div>
         ))}

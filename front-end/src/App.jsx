@@ -8,6 +8,7 @@ import SignPage from './pages/SignPage';
 import Unauthorized from './pages/Unauthorized';
 import Missing from './pages/Missing';
 import Admin from './pages/Admin';
+import DashBoard from './pages/DashBoard';
 
 import Layout from './components/Layout';
 import RequireAuth from './components/RequireAuth';
@@ -40,6 +41,7 @@ function App() {
 
           //SELLER
           <Route element={<RequireAuth allowedRoles={['ROLE_SELLER']} />}>
+            <Route path="/management" element={<DashBoard/>}/>
           </Route>
 
           //ADMIN

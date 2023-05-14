@@ -52,6 +52,7 @@ public class Account implements UserDetails {
     private String userName;
 
     @Column(nullable = false, length = 500)
+    @JsonIgnore
     private String pass;
 
     @Column(length = 1000)
@@ -70,10 +71,6 @@ public class Account implements UserDetails {
     
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Token> tokens;
-    
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @JsonIgnore
     private Set<Review> userReviews;
     
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
@@ -87,6 +84,7 @@ public class Account implements UserDetails {
 	}
 
 	@Override
+	@JsonIgnore
 	public String getPassword() {
 		return this.pass;
 	}
@@ -97,21 +95,25 @@ public class Account implements UserDetails {
 	}
 	
 	@Override
+	@JsonIgnore
 	public boolean isAccountNonExpired() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isAccountNonLocked() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isEnabled() {
 		return true;
 	}

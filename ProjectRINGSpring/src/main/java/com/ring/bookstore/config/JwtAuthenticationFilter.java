@@ -11,7 +11,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.ring.bookstore.repository.TokenRepository;
 import com.ring.bookstore.service.impl.JwtService;
 
 import jakarta.servlet.FilterChain;
@@ -26,7 +25,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 	
 	private final JwtService jwtService;
 	private final UserDetailsService userDetailsService;
-    private final TokenRepository tokenRepo;
 
 	@Override
 	protected void doFilterInternal(
@@ -58,12 +56,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 		if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) { //Check người dùng tồn tại, và người dùng đã được cấp quyền chưa
 			UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
 			
-            //check xem token còn sử dụng được ko
-            var isTokenValid = tokenRepo.findByToken(jwt)
-                    .map(t -> !t.isExpired() && !t.isRevoked()) //map sang boolean
-                    .orElse(false);
             
-            if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
+            if (jwtService.isTokenValid(jwt, userDetails)) {
             	
             	//Tạo quyền
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

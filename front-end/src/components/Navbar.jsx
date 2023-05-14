@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system';
+import PropTypes from 'prop-types';
 
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -37,8 +38,12 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import AppBar from '@mui/material/AppBar';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
+import Slide from '@mui/material/Slide';
 
-import { useNavigate, Link, createSearchParams } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import useLogout from "../hooks/useLogout";
 import { useSelector } from "react-redux";
 import useAuth from "../hooks/useAuth";
@@ -48,7 +53,7 @@ const Container = styled.div`
     border-bottom: 0.5px solid;
     border-color: lightgray;
     align-items: center;
-    margin-bottom: 50px;
+    margin-bottom: 150px;
 `
 
 const Wrapper = styled.div`
@@ -164,24 +169,49 @@ const Right = styled.div`
     }
 `   
 
-const SearchContainer = styled.div`
-    border: 0.5px solid lightgray;
-    align-items: center;
-    padding: 5px;
-    display: flex;
-    justify-content: space-between;
-    margin-left: 50px;
-`
-
-const Input = styled.input`
-    border: none;
-    background: transparent;
-    color: black;
-    resize: none;
-    outline: none;
-    display: flex;
-    flex: 1;
-`
+const SearchInput = styled(TextField)({
+    '& .MuiInputBase-root': {
+      borderRadius: 0,
+      marginLeft: '50px'
+    },
+    '& label.Mui-focused': {
+      color: '#A0AAB4'
+    },
+    '& .MuiInput-underline:after': {
+      borderBottomColor: '#B2BAC2',
+    },
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 0,
+      '& fieldset': {
+        borderRadius: 0,
+        borderColor: '#E0E3E7',
+      },
+      '&:hover fieldset': {
+        borderRadius: 0,
+        borderColor: '#B2BAC2',
+      },
+      '&.Mui-focused fieldset': {
+        borderRadius: 0,
+        borderColor: '#6F7E8C',
+      },
+    },
+    '& input:valid + fieldset': {
+      borderColor: 'lightgray',
+      borderRadius: 0,
+      borderWidth: 1,
+    },
+    '& input:invalid + fieldset': {
+      borderColor: '#e66161',
+      borderRadius: 0,
+      borderWidth: 1,
+    },
+    '& input:valid:focus + fieldset': {
+      borderColor: '#63e399',
+      borderLeftWidth: 4,
+      borderRadius: 0,
+      padding: '4px !important', 
+    },
+});
 
 const Logo = styled.h2`
     position: relative;
@@ -194,15 +224,13 @@ const Logo = styled.h2`
     align-items: center;
     display: flex;
     flex-wrap: wrap;
-    margin: 10px 0px 10px 15px;
+    margin: 5px 0px 5px 15px;
 `
 
 const ImageLogo = styled.img`
-    width: 25px;
-    height: 25px;
-    margin-right: 15px;
-    margin-top: 0;
-    margin-bottom: 0;
+    width: 40px;
+    height: 40px;
+    margin: 0 10px 0 0;
     padding: 0;
 `
 
@@ -314,7 +342,35 @@ const CartButton = styled.button`
     }
 `
 
-const Navbar = () => {
+function HideOnScroll(props) {
+    const { children, window } = props;
+    const [ display, setDisplay ] = useState(['block'])
+
+    const trigger = useScrollTrigger({
+      target: window ? window() : undefined,
+    });
+
+    useEffect(() => {
+        if (!trigger){
+            setDisplay('block');
+        }
+    }, [trigger])
+
+    return (
+      <Slide className={"top-header"} style={{display: display}} 
+        appear={false} direction="down" in={!trigger} 
+        addEndListener={() => {if (trigger) setDisplay('none')}}>
+        {children}
+      </Slide>
+    );
+  }
+  
+  HideOnScroll.propTypes = {
+    children: PropTypes.element.isRequired,
+    window: PropTypes.func,
+};
+
+const Navbar = (props) => {
     const products = useSelector(state => state.cart.products); //Lấy products trong giỏ từ redux
     const [openDrawer, setOpen] = useState(false);
     const [searchField, setSearchField] = useState('');
@@ -436,7 +492,7 @@ const Navbar = () => {
     >
         <Link to={`/`} style={{paddingLeft: '20px'}}>
             <Logo>
-                <ImageLogo src="/vite.svg" className="logo" alt="Vite logo" />RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORES</p>
+                <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORES</p>
             </Logo>
         </Link>
         <List>
@@ -594,118 +650,126 @@ const Navbar = () => {
 
   return (
     <Container>
-        <TopHeader>
-            <Grid container>
-                <Grid item xs={12} md={6}>
-                    <ContactContainer>
-                        <Contact><PhoneIcon sx={{fontSize: 18, marginRight: 1}}/>+12345678890</Contact>
-                        <Contact><MailIcon sx={{fontSize: 18, marginRight: 1}}/>daihocnonglam@hcmuaf.edu.vn</Contact>
-                    </ContactContainer>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                    <SocialContainer>
-                        <Social color="3B5999"><FacebookIcon sx={{fontSize: 18}}/></Social>
-                        <Social color="FF0000"><YouTubeIcon sx={{fontSize: 18}}/></Social>
-                        <Social color="E4405F"><InstagramIcon sx={{fontSize: 18}}/></Social>
-                        <Social color="55ACEE"><TwitterIcon sx={{fontSize: 18}}/></Social>
-                    </SocialContainer>
-                </Grid>
-            </Grid>
-        </TopHeader>
-        <Wrapper>
-            <Grid container>
-                <Grid item xs={12} md={7}>
-                    <Left>
-                        <div style={{display: 'flex', alignItems: 'center'}}>
-                            <Button onClick={toggleDrawer()}><MenuIcon/></Button>
-                            <Drawer
-                                anchor='left'
-                                open={openDrawer}
-                                onClose={toggleDrawer()}
-                                >
-                                {list()}
-                            </Drawer>
-                            <Link to={`/`}>
-                            <Logo>
-                                <ImageLogo src="/vite.svg" className="logo" alt="Vite logo" />RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORE</p>
-                            </Logo>
-                            </Link>
-                        </div>
-                        <form onSubmit={handleSubmitSearch}>
-                            <SearchContainer>
-                                <Input placeholder='Tìm kiếm... '
-                                onChange={(e) => setSearchField(e.target.value)}
-                                value={searchField}
-                                />
-                                <SearchIcon style={{color:"gray"}}/>
-                            </SearchContainer>
-                        </form>
-                    </Left>
-                </Grid>
-                <Grid item xs={12} md={5}>
-                    <Right>
-                        <NavItem>
-                            <Stack spacing={1} direction="row" sx={{ color: 'action.active' }}>
-                                <StyledIconButton disableRipple disableFocusRipple aria-label="notification">
-                                    <StyledBadge badgeContent={4} anchorOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'left',
-                                    }}>
-                                        <NotificationsActiveIcon/>
-                                    </StyledBadge>
-                                    <p style={{fontSize: '13px', marginLeft: '5px'}}>Thông báo</p>
-                                </StyledIconButton>
-                                <Link to={`/cart`}>
-                                    <StyledIconButton disableRipple disableFocusRipple 
-                                    aria-label="cart"
-                                    aria-owns={openCart ? "mouse-over-popover" : undefined}
-                                    aria-haspopup="true"
-                                    onMouseEnter={handlePopoverOpen}
-                                    onMouseLeave={handlePopoverClose}>
-                                        <StyledBadge badgeContent={products.length} anchorOrigin={{
-                                            vertical: 'top',
-                                            horizontal: 'left',
-                                        }}>
-                                            <ShoppingCartIcon/>
-                                        </StyledBadge>
-                                        <p style={{fontSize: '13px', marginLeft: '5px'}}>Giỏ hàng</p>
-                                        <>
-                                        {miniCart}
-                                        </>
-                                    </StyledIconButton>
-                                </Link>
-                                {auth.userName ? (
-                                <Tooltip title="Tài khoản">
-                                    <StyledIconButton
-                                        disableRipple disableFocusRipple
-                                        onClick={handleClick}
-                                        size="small"
-                                        sx={{ ml: 2 }}
-                                        aria-controls={open ? 'account-menu' : undefined}
-                                        aria-haspopup="true"
-                                        aria-expanded={open ? 'true' : undefined}
-                                    >
-                                        <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
-                                        <p style={{fontSize: '13px', marginLeft: '5px'}}>{auth.userName}</p>
-                                    </StyledIconButton>
-                                </Tooltip>
-                                ) : (
-                                <Link to={`/login`}>
-                                    <StyledIconButton disableRipple disableFocusRipple aria-label="login">
-                                        <LockIcon/>
-                                        <p style={{fontSize: '13px', marginLeft: '5px'}}>Đăng nhập</p>
-                                    </StyledIconButton>
-                                </Link>
-                                )}
-                            </Stack>
-                            <>
-                            {profile}
-                            </>
-                        </NavItem>
-                    </Right>
-                </Grid>
-            </Grid>
-        </Wrapper>
+        <AppBar sx={{backgroundColor: 'white'}} position="fixed">
+            <Stack>
+                <HideOnScroll {...props}>
+                    <TopHeader>
+                        <Grid container>
+                            <Grid item xs={12} md={6}>
+                                <ContactContainer>
+                                    <Contact><PhoneIcon sx={{fontSize: 18, marginRight: 1}}/>+12345678890</Contact>
+                                    <Contact><MailIcon sx={{fontSize: 18, marginRight: 1}}/>daihocnonglam@hcmuaf.edu.vn</Contact>
+                                </ContactContainer>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <SocialContainer>
+                                    <Social color="3B5999"><FacebookIcon sx={{fontSize: 18}}/></Social>
+                                    <Social color="FF0000"><YouTubeIcon sx={{fontSize: 18}}/></Social>
+                                    <Social color="E4405F"><InstagramIcon sx={{fontSize: 18}}/></Social>
+                                    <Social color="55ACEE"><TwitterIcon sx={{fontSize: 18}}/></Social>
+                                </SocialContainer>
+                            </Grid>
+                        </Grid>
+                    </TopHeader>
+                </HideOnScroll>
+                <Wrapper>
+                    <Grid container>
+                        <Grid item xs={12} md={7}>
+                            <Left>
+                                <div style={{display: 'flex', alignItems: 'center'}}>
+                                    <Button onClick={toggleDrawer()}><MenuIcon/></Button>
+                                    <Drawer
+                                        anchor='left'
+                                        open={openDrawer}
+                                        onClose={toggleDrawer()}
+                                        >
+                                        {list()}
+                                    </Drawer>
+                                    <Link to={`/`}>
+                                    <Logo>
+                                        <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORE</p>
+                                    </Logo>
+                                    </Link>
+                                </div>
+                                <form onSubmit={handleSubmitSearch}>
+                                    <SearchInput placeholder='Tìm kiếm... '
+                                    onChange={(e) => setSearchField(e.target.value)}
+                                    value={searchField}
+                                    id="search"
+                                    size="small"
+                                    InputProps={{
+                                        endAdornment: <SearchIcon style={{color:"gray"}}/>
+                                    }}
+                                    />
+                                </form>
+                            </Left>
+                        </Grid>
+                        <Grid item xs={12} md={5}>
+                            <Right>
+                                <NavItem>
+                                    <Stack spacing={1} direction="row" sx={{ color: 'action.active' }}>
+                                        <StyledIconButton disableRipple disableFocusRipple aria-label="notification">
+                                            <StyledBadge badgeContent={4} anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'left',
+                                            }}>
+                                                <NotificationsActiveIcon/>
+                                            </StyledBadge>
+                                            <p style={{fontSize: '13px', marginLeft: '5px'}}>Thông báo</p>
+                                        </StyledIconButton>
+                                        <Link to={`/cart`}>
+                                            <StyledIconButton disableRipple disableFocusRipple 
+                                            aria-label="cart"
+                                            aria-owns={openCart ? "mouse-over-popover" : undefined}
+                                            aria-haspopup="true"
+                                            onMouseEnter={handlePopoverOpen}
+                                            onMouseLeave={handlePopoverClose}>
+                                                <StyledBadge badgeContent={products.length} anchorOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'left',
+                                                }}>
+                                                    <ShoppingCartIcon/>
+                                                </StyledBadge>
+                                                <p style={{fontSize: '13px', marginLeft: '5px'}}>Giỏ hàng</p>
+                                                <>
+                                                {miniCart}
+                                                </>
+                                            </StyledIconButton>
+                                        </Link>
+                                        {auth.userName ? (
+                                        <Tooltip title="Tài khoản">
+                                            <StyledIconButton
+                                                disableRipple disableFocusRipple
+                                                onClick={handleClick}
+                                                size="small"
+                                                sx={{ ml: 2 }}
+                                                aria-controls={open ? 'account-menu' : undefined}
+                                                aria-haspopup="true"
+                                                aria-expanded={open ? 'true' : undefined}
+                                            >
+                                                <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+                                                <p style={{fontSize: '13px', marginLeft: '5px'}}>{auth.userName}</p>
+                                            </StyledIconButton>
+                                        </Tooltip>
+                                        ) : (
+                                        <Link to={`/login`}>
+                                            <StyledIconButton disableRipple disableFocusRipple aria-label="login">
+                                                <LockIcon/>
+                                                <p style={{fontSize: '13px', marginLeft: '5px'}}>Đăng nhập</p>
+                                            </StyledIconButton>
+                                        </Link>
+                                        )}
+                                    </Stack>
+                                    <>
+                                    {profile}
+                                    </>
+                                </NavItem>
+                            </Right>
+                        </Grid>
+                    </Grid>
+                </Wrapper>
+            </Stack>
+        </AppBar>
     </Container>
   )
 }

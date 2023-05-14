@@ -26,7 +26,7 @@ const useRefreshToken = () => {
 
             return {
                 ...prev,
-                userName,
+                userName: userName,
                 roles: roles,
                 accessToken: accessToken
             }

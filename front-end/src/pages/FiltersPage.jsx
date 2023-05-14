@@ -102,12 +102,14 @@ const pageSize = 8;
 const BOOKS_URL = 'api/books/filters';
 
 const FiltersPage = () => {
-    const[searchParams, setSearchParams] = useSearchParams();
+    const[searchParams] = useSearchParams();
     const[booksList, setBooksList] = useState([]);
     const[filters, setFilters] = useState({
-        cateId: searchParams.get("cateId") ? searchParams.get("cateId") : "",
         value: [1000, 10000000],
-        keyword: searchParams.get("keyword") ? searchParams.get("keyword") : ""
+        keyword: searchParams.get("keyword") ? searchParams.get("keyword") : "",
+        type: searchParams.get("type") ? searchParams.get("type") : "",
+        pubId: searchParams.get("pubId") ? searchParams.get("pubId") : "",
+        cateId: searchParams.get("cateId") ? searchParams.get("cateId") : ""
     })
     const[pagination, setPagination] = useState({
         currPage: 0,
@@ -120,18 +122,24 @@ const FiltersPage = () => {
         + "&pSize=" + pagination.pageSize 
         + "&sortBy=" + pagination.sortBy
         + "&cateId=" + filters.cateId
+        + "&pubId=" + filters.pubId
+        + "&type=" + filters.type
         + "&keyword=" + filters.keyword
         + "&fromRage=" + filters.value[0]
         + "&toRange=" + filters.value[1]);
 
     //Load
     useEffect(() => {
-        loadBooks(); 
-    }, [loading == false])
+        if (!loading){
+            loadBooks(); 
+        }
+    }, [loading])
 
     useEffect(() => {
         setFilters({...filters, 
             keyword: searchParams.get("keyword") ? searchParams.get("keyword") : "",
+            type: searchParams.get("type") ? searchParams.get("type") : "",
+            pubId: searchParams.get("pubId") ? searchParams.get("pubId") : "",
             cateId: searchParams.get("cateId") ? searchParams.get("cateId") : ""})
     }, [searchParams])
 

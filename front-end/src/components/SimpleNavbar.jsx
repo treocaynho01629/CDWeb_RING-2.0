@@ -63,11 +63,9 @@ const Logo = styled.h2`
 `
 
 const ImageLogo = styled.img`
-    width: 25px;
-    height: 25px;
-    margin-right: 15px;
-    margin-top: 0;
-    margin-bottom: 0;
+    width: 40px;
+    height: 40px;
+    margin: 0 10px 0 0;
     padding: 0;
 `
 
@@ -88,7 +86,7 @@ const SimpleNavbar = () => {
                         <div style={{display: 'flex', alignItems: 'center'}}>
                             <Link to={`/`}>
                             <Logo>
-                                <ImageLogo src="/vite.svg" className="logo" alt="Vite logo" />RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORES</p>
+                                <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORES</p>
                             </Logo>
                             </Link>
                         </div>

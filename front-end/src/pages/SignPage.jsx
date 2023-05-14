@@ -2,9 +2,16 @@ import { useRef, useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import axios from "../api/axios";
 import styled from 'styled-components'
+import { styled as muiStyled } from '@mui/material/styles';
 
 import SimpleNavbar from "../components/SimpleNavbar";
-import { Stack } from "@mui/material";
+import Stack from "@mui/material/Stack";
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
@@ -58,27 +65,49 @@ const Title = styled.h1`
     color: inherit;
 `
 
-const InputContainer = styled.div`
-    border: 0.5px solid;
-    border-color: ${props=>props.color};;
-    align-items: center;
-    padding: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 300px;
-    height: 25px;
-`
-
-const Input = styled.input`
-    border: none;
-    background: transparent;
-    color: black;
-    resize: none;
-    outline: none;
-    display: flex;
-    flex: 1;
-`
+const CustomInput = muiStyled(TextField)(({ theme }) => ({
+    '& .MuiInputBase-root': {
+        borderRadius: 0,
+        width: '300px',
+    },
+    '& label.Mui-focused': {
+        color: '#b4a0a8'
+    },
+    '& .MuiInput-underline:after': {
+        borderBottomColor: '#B2BAC2',
+    },
+    '& .MuiOutlinedInput-root': {
+    borderRadius: 0,
+        '& fieldset': {
+            borderRadius: 0,
+            borderColor: '#E0E3E7',
+        },
+        '&:hover fieldset': {
+            borderRadius: 0,
+            borderColor: '#B2BAC2',
+        },
+        '&.Mui-focused fieldset': {
+            borderRadius: 0,
+            borderColor: '#6F7E8C',
+        },
+    },
+    '& input:valid + fieldset': {
+        borderColor: 'lightgray',
+        borderRadius: 0,
+        borderWidth: 1,
+    },
+    '& input:invalid + fieldset': {
+        borderColor: '#e66161',
+        borderRadius: 0,
+        borderWidth: 1,
+    },
+    '& input:valid:focus + fieldset': {
+        borderColor: '#63e399',
+        borderLeftWidth: 4,
+        borderRadius: 0,
+        padding: '4px !important', 
+    },
+}));
 
 const Button = styled.button`
     background-color: #63e399;
@@ -143,10 +172,29 @@ function SignPage() {
     const [password, setPassword] = useState('');
     const [errMsgLogin, setErrMsgLogin] = useState('');
     const [cookies, setCookie] = useCookies(['refreshToken']);
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
 
     const togglePersist = () => {
         setPersist(prev => !prev);
     }
+
+    const endAdornment=
+    <InputAdornment position="end">
+        <IconButton
+            aria-label="toggle password visibility"
+            onClick={handleClickShowPassword}
+            onMouseDown={handleMouseDownPassword}
+            edge="end"
+        >
+            {showPassword ? <VisibilityOff /> : <Visibility />}
+        </IconButton>
+    </InputAdornment>
 
     useEffect(() => {
         localStorage.setItem("persist", persist);
@@ -218,6 +266,7 @@ function SignPage() {
     const [matchPwd, setMatchPwd] = useState('');
     const [validMatch, setValidMatch] = useState(false);
     const [matchFocus, setMatchFocus] = useState(false);
+    const [showRegPassword, setShowRegPassword] = useState(false);
 
     //Email vlidation
     const [email, setEmail] = useState('');
@@ -227,6 +276,24 @@ function SignPage() {
     //Error and success message
     const [errMsg, setErrMsg] = useState('');
     const [success, setSuccess] = useState(false);
+
+    const handleClickShowRegPassword = () => setShowRegPassword((show) => !show);
+
+    const handleMouseDownRegPassword = (event) => {
+        event.preventDefault();
+    };
+
+    const endAdornmentReg=
+    <InputAdornment position="end">
+        <IconButton
+            aria-label="toggle password visibility"
+            onClick={handleClickShowRegPassword}
+            onMouseDown={handleMouseDownRegPassword}
+            edge="end"
+        >
+            {showRegPassword ? <VisibilityOff /> : <Visibility />}
+        </IconButton>
+    </InputAdornment>
 
     //Focus username
     useEffect(() => {
@@ -301,145 +368,142 @@ function SignPage() {
     }
 
   return (
-    <>
-    {success ? (
-        <section>
-            <h1>Success!</h1>
-            <p>
-                <a href="#">Sign In</a>
-            </p>
-        </section>
-    ) : (
-        <Container>
-            <SimpleNavbar/>
-            <Wrapper>
-                <Left>
-                    <form onSubmit={handleSubmitLogin}>
-                        <Title>Đăng nhập</Title>
-                        <Stack spacing={1} direction="column">
-                            <p ref={errRef} className={errMsgLogin ? "errmsg" : "offscreen"} aria-live="assertive">{errMsgLogin}</p>
-                            <InputContainer color="lightgray">
-                                <Input placeholder="Tên đăng nhập"
-                                type="text"
-                                id="UserName"
-                                ref={userRef}
-                                autoComplete="on"
-                                onChange={(e) => setUserName(e.target.value)}
-                                value={userName}
-                                />
-                            </InputContainer>
-                            <InputContainer color="lightgray">
-                                <Input placeholder='Mật khẩu' 
-                                type="password"
-                                id="Pass"
-                                onChange={(e) => setPassword(e.target.value)}
-                                value={password}
-                                />
-                            </InputContainer>
+    <Container>
+        <SimpleNavbar/>
+        <Wrapper>
+            <Left>
+                <form onSubmit={handleSubmitLogin}>
+                    <Title>Đăng nhập</Title>
+                    <Stack spacing={1} direction="column">
+                        <Instruction ref={errRef}
+                        display={errMsgLogin ? "block" : "none"}
+                        aria-live="assertive">
+                            {errMsgLogin}
+                        </Instruction>
+                        <CustomInput label="Tên đăng nhập"
+                            type="text"
+                            id="UserName"
+                            ref={userRef}
+                            autoComplete="on"
+                            onChange={(e) => setUserName(e.target.value)}
+                            value={userName}
+                            size="small"
+                            margin="dense"
+                        />
+                        <CustomInput label='Mật khẩu' 
+                            type={showPassword ? 'text' : 'password'}
+                            id="Pass"
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={password}
+                            size="small"
+                            margin="dense"
+                            InputProps={{
+                                endAdornment: endAdornment
+                            }}
+                        />
+                        <div className="persistCheck" style={{display: 'flex', alignItems: 'center'}}>
+                            <input
+                                type="checkbox"
+                                id="persist"
+                                onChange={togglePersist}
+                                checked={persist}
+                                style={{color: 'red'}}
+                            />
+                            <label htmlFor="persist" style={{fontSize: '14px'}}>Lưu đăng nhập</label>
+                        </div>
+                        <br/>
+                        <Button>Đăng nhập</Button>
+                    </Stack>
+                </form>
+            </Left>
+            <div style={{display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            margin: '0 80px'}}>
+                <OrBox> HOẶC</OrBox>
+            </div>
+            <Right>
+                <form onSubmit={handleSubmit}>
+                    <Title>Đăng ký tài khoản mới</Title>
+                    <Stack spacing={1} direction="column">
+                        <Instruction ref={errRef}
+                        display={errMsg ? "block" : "none"}
+                        aria-live="assertive">
+                        {errMsg}
+                        </Instruction>
+                        <CustomInput label="Tên đăng nhập"
+                            type="text"
+                            id="regUser"
+                            ref={userRef}
+                            onChange={(e) => setUser(e.target.value)}
+                            value={user}
+                            aria-invalid={validName ? "false" : "true"}
+                            aria-describedby="uidnote"
+                            onFocus={() => setUserFocus(true)}
+                            onBlur={() => setUserFocus(false)}
+                            error = {userFocus && user && !validName}
+                            helperText= {userFocus && user && !validName ? "4 đến 24 kí tự." : ""}
+                            size="small"
+                            margin="dense"
+                        />
+                        <CustomInput label='Địa chỉ email' 
+                            type="email"
+                            id="regEmail"
+                            ref={userRef}
+                            autoComplete="off"
+                            onChange={(e) => setEmail(e.target.value)}
+                            value={email}
+                            aria-invalid={validEmail ? "false" : "true"}
+                            aria-describedby="uidnote"
+                            onFocus={() => setEmailFocus(true)}
+                            onBlur={() => setEmailFocus(false)}
+                            error = {emailFocus && email && !validEmail}
+                            helperText= {emailFocus && email && !validEmail ? "Sai định dạng email." : ""}
+                            size="small"
+                            margin="dense"
+                        />
+                        <CustomInput label='Mật khẩu' 
+                            type={showRegPassword ? 'text' : 'password'}
+                            id="regPass"
+                            onChange={(e) => setPwd(e.target.value)}
+                            value={pwd}
+                            aria-invalid={validPwd ? "false" : "true"}
+                            aria-describedby="pwdnote"
+                            onFocus={() => setPwdFocus(true)}
+                            onBlur={() => setPwdFocus(false)}
+                            error = {pwd && !validPwd}
+                            helperText= {pwdFocus && pwd && !validPwd ? "8 đến 24 kí tự. Phải bao gồm chữ in hoa và ký tự đặc biệt." : ""}
+                            size="small"
+                            margin="dense"
+                            InputProps={{
+                                endAdornment: endAdornmentReg
+                            }}
+                        />
+                        <CustomInput label='Nhập lại mật khẩu' 
+                            type={showRegPassword ? 'text' : 'password'}
+                            id="regConfirmPass"
+                            onChange={(e) => setMatchPwd(e.target.value)}
+                            value={matchPwd}
+                            aria-invalid={validMatch ? "false" : "true"}
+                            aria-describedby="confirmnote"
+                            onFocus={() => setMatchFocus(true)}
+                            onBlur={() => setMatchFocus(false)}
+                            error = {matchPwd && !validMatch}
+                            helperText= {matchPwd && !validMatch ? "Không trùng mật khẩu." : ""}
+                            size="small"
+                            margin="dense"
+                            InputProps={{
+                                endAdornment: endAdornmentReg
+                            }}
+                        />
 
-                            <div className="persistCheck" style={{display: 'flex', alignItems: 'center'}}>
-                                <input
-                                    type="checkbox"
-                                    id="persist"
-                                    onChange={togglePersist}
-                                    checked={persist}
-                                    style={{color: 'red'}}
-                                />
-                                <label htmlFor="persist" style={{fontSize: '14px'}}>Lưu đăng nhập</label>
-                            </div>
-                            <br/>
-                            <Button>Đăng nhập</Button>
-                        </Stack>
-                    </form>
-                </Left>
-                <div style={{display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                margin: '0 80px'}}>
-                    <OrBox> HOẶC</OrBox>
-                </div>
-                <Right>
-                    <form onSubmit={handleSubmit}>
-                        <Title>Đăng ký tài khoản mới</Title>
-                        <Stack spacing={1} direction="column">
-                            <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
-                            <Instruction display={userFocus && user && !validName ? "block" : "none"}>
-                                4 đến 24 kí tự.
-                            </Instruction>
-                        
-                            <Instruction display={emailFocus && email && !validEmail ? "block" : "none"}>
-                                Sai định dạng email.
-                            </Instruction>
-
-                            <Instruction display={pwdFocus && !validPwd ? "block" : "none"}>
-                                8 đến 24 kí tự. Phải bao gồm chữ in hoa và ký tự đặc biệt.
-                            </Instruction>
-
-                            <Instruction display={matchFocus && !validMatch ? "block" : "none"}>
-                                Không trùng mật khẩu.
-                            </Instruction>
-                            <InputContainer color={user && !validName ? "red" : "lightgray"}>
-                                <Input placeholder="Tên đăng nhập"
-                                type="text"
-                                id="regUser"
-                                ref={userRef}
-                                autoComplete="off"
-                                onChange={(e) => setUser(e.target.value)}
-                                value={user}
-                                required
-                                aria-invalid={validName ? "false" : "true"}
-                                aria-describedby="uidnote"
-                                onFocus={() => setUserFocus(true)}
-                                onBlur={() => setUserFocus(false)}/>
-                            </InputContainer>
-                            <InputContainer color={email && !validEmail ? "red" : "lightgray"}>
-                                <Input placeholder='Địa chỉ email' 
-                                type="email"
-                                id="regEmail"
-                                ref={userRef}
-                                autoComplete="off"
-                                onChange={(e) => setEmail(e.target.value)}
-                                value={email}
-                                required
-                                aria-invalid={validEmail ? "false" : "true"}
-                                aria-describedby="uidnote"
-                                onFocus={() => setEmailFocus(true)}
-                                onBlur={() => setEmailFocus(false)}/>
-                            </InputContainer>
-                            <InputContainer color={pwd && !validPwd ? "red" : "lightgray"}>
-                                <Input placeholder='Mật khẩu' 
-                                type="password"
-                                id="regPass"
-                                onChange={(e) => setPwd(e.target.value)}
-                                value={pwd}
-                                required
-                                aria-invalid={validPwd ? "false" : "true"}
-                                aria-describedby="pwdnote"
-                                onFocus={() => setPwdFocus(true)}
-                                onBlur={() => setPwdFocus(false)}/>
-                            </InputContainer>
-                            <InputContainer color={matchPwd && !validMatch ? "red" : "lightgray"}>
-                                <Input placeholder='Nhập lại mật khẩu' 
-                                type="password"
-                                id="regConfirmPass"
-                                onChange={(e) => setMatchPwd(e.target.value)}
-                                value={matchPwd}
-                                required
-                                aria-invalid={validMatch ? "false" : "true"}
-                                aria-describedby="confirmnote"
-                                onFocus={() => setMatchFocus(true)}
-                                onBlur={() => setMatchFocus(false)}/>
-                            </InputContainer>
-
-                            <br/>
-                            <Button disabled={!validName || !validPwd || !validMatch || !validEmail ? true : false}>Đăng ký</Button>
-                        </Stack>
-                    </form>
-                </Right>
-            </Wrapper>
-        </Container>
-    )}
-    </>
+                        <br/>
+                        <Button disabled={!validName || !validPwd || !validMatch || !validEmail ? true : false}>Đăng ký</Button>
+                    </Stack>
+                </form>
+            </Right>
+        </Wrapper>
+    </Container>
   )
 }
 

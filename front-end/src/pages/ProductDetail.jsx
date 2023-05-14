@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react'
 
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system';
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 
 import RemoveIcon from '@mui/icons-material/Remove'
 import AddIcon from '@mui/icons-material/Add'
@@ -13,20 +11,15 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SellIcon from '@mui/icons-material/Sell';
 
-import Box from '@mui/material/Box';
-import Tab from '@mui/material/Tab';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
 import Grid from '@mui/material/Grid';
 import Rating from '@mui/material/Rating'
-import TextareaAutosize from '@mui/material/TextareaAutosize';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 
 import ProductImages from '../components/ProductImages';
 import ProductsSlider from '../components/ProductsSlider';
-import AppPagination from '../components/AppPagination';
-import Review from '../components/Review';
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+import ProductDetailContainer from '../components/ProductDetailContainer'
 
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -52,10 +45,6 @@ const Wrapper = styled.div`
     @media (min-width: 1200px) {
         width: 1170px;
     }
-`
-
-const ProductDetailContainer = styled.div`
-    margin: 50px 0px;
 `
 
 const CouponContainer = styled.div`
@@ -258,108 +247,16 @@ const BuyButton = styled.button`
     }
 `
 
-const FullInfoTab = styled.div``
-
-const RatingTab = styled.div``
-
-const RatingSelect = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-`
-
-const RateSelect = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
-`
-
-const RateButton = styled.button`
-    border-radius: 0;
-    padding: 10px;
-    margin-top: -15px;
-    border: none;
-    outline: none;
-    background-color: #63e399;
-    color: white;
-    font-size: 14px;
-    justify-content: center;
-    font-weight: bold;
-    transition: all 0.5s ease;
-
-    &:hover {
-        background-color: lightgray;
-        color: gray;
-    }
-`
-
-const RelatedTab = styled.div``
-
-const StyledTabList = muiStyled((props) => (
-    <TabList
-      {...props}
-      TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
-    />
-  ))({
-    '& .MuiTabs-indicator': {
-      display: 'flex',
-      justifyContent: 'center',
-      backgroundColor: 'red',
-    },
-    '& .MuiTabs-indicatorSpan': {
-      width: '100%',
-      height: 100,
-      backgroundColor: '#63e399',
-    },
-  });
-  
-  const StyledTab = muiStyled((props) => <Tab disableRipple {...props} />)(
-    ({ theme }) => ({
-      fontWeight: 400,
-      color: 'rgba(255, 255, 255, 0.7)',
-      '&.Mui-selected': {
-        fontWeight: 'bold',
-        backgroundColor: '#63e399',
-        color: 'white',
-        outline: 'none',
-        border: 'none',
-      },
-      '&.Mui-focusVisible': {
-        backgroundColor: 'transparent',
-        outline: 'none',
-        border: 'none',
-      },
-      '&.Mui-focused': {
-        outline: 'none',
-        border: 'none',
-      },
-    }),
-);
+const BOOK_URL = `/api/books/`;
+const BOOKS_RANDOM_URL = 'api/books/random?amount=10';
 
 const ProductDetail = () => {
-
     const {id} = useParams();
-    const BOOK_URL = `/api/books/${id}`;
-    const REVIEW_URL = `/api/reviews/${id}`;
-    const BOOKS_RELATED_URL = 'api/books/filters?pSize=10';
-    const BOOKS_RANDOM_URL = 'api/books/random?amount=10';
-
     const [book, setBook] = useState([]);
-    const [reviewList, setReviewList] = useState([]);
-    const [pagination, setPagination] = useState({
-        currPage: 0,
-        pageSize: 5,
-        totalPages: 0
-    })
-    const [value, setValue] = useState('1');
     const [amountIndex, setAmountIndex] = useState(1);
     const { enqueueSnackbar } = useSnackbar();
 
-    const { loading, data, error } = useFetch(BOOK_URL);
-    const { loading: loadingReview, data: reviews } = useFetch(REVIEW_URL + "?pSize=" + pagination.pageSize 
-                                                                        + "&pageNo=" + pagination.currPage);
-    const { loading: loadingRelated, data: booksRelated } = useFetch(BOOKS_RELATED_URL + "&cateId=" + book?.cateId);
+    const { loading, data, error } = useFetch(BOOK_URL + id);
     const { loading: loadingRandom, data: booksRandom } = useFetch(BOOKS_RANDOM_URL);
     
     const dispatch = useDispatch();
@@ -373,36 +270,17 @@ const ProductDetail = () => {
 
     //Load
     useEffect(()=>{
-        if (error?.response?.status === 404) navigate('/missing');
+        if (!loading){
+            if (error?.response?.status === 404) navigate('/missing');
 
-        loadBook();
-        loadReview(); 
-        setPagination({ ...pagination, currPage: 0});
-        window.scrollTo(0, 0);
-    }, [loading == false]);
-
-    useEffect(() => {
-        loadReview(); 
-    }, [pagination.currPage, pagination.pageSize, loadingReview == false])
+            loadBook();
+            window.scrollTo(0, 0);
+        }
+    }, [loading]);
 
     const loadBook = async ()=>{
         setBook(data);
     }
-
-    const loadReview = async ()=>{
-        setPagination({ ...pagination, totalPages: reviews?.totalPages});
-        setReviewList(reviews?.content);
-    }
-
-    //Change page
-    const handlePageChange = (page) => {
-        setPagination({...pagination, currPage: page - 1});
-    };
-
-    //Change amount
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
 
     const changeAmount = (n) => {
         setAmountIndex(prev => prev + n);
@@ -424,60 +302,10 @@ const ProductDetail = () => {
         }))
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        try {
-            const response = await axiosPrivate.post(REVIEW_URL,
-                JSON.stringify({
-                    cart: products,
-                    firstName: firstName,
-                    lastName: lastName,
-                    phone: phone,
-                    address: address,
-                    message: message
-                } ),
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
-                }
-            );
-            console.log(JSON.stringify(response))
-            dispatch(resetCart());
-            navigate('/cart');
-        } catch (err) {
-            console.log(err);
-            if (!err?.response) {
-            } else if (err.response?.status === 404) {
-            } else {
-            }
-        }
-    }
-
-    //Review
-    let review;
-    if (loadingReview){
-        review = <p>loading</p>
-    } else if (book?.rateAmount != 0){
-        review = 
-        <Box>
-            {reviewList?.map((review, index) => (
-                <Grid key={index}>
-                    <Review review={review}/>
-                </Grid>
-            ))}
-            <AppPagination pagination={pagination}
-            onPageChange={handlePageChange}/>
-        </Box>
-    } else {
-        review = <Box sx={{marginBottom: 5}}>Chưa có ai bình luận, hãy trở thành người đầu tiên!</Box>
-    }
-
     let product;
-    let fullInfo;
+    
     if (loading){
         product = <p>loading</p>
-        fullInfo = <p>loading</p>
     } else {
         product =
         <Grid container spacing={2}>
@@ -511,7 +339,7 @@ const ProductDetail = () => {
                                     <strong style={{paddingLeft: 10}}>({book?.rateAmount}) Đánh giá</strong>
                                 </TotalRatingContainer>
                                 <PriceContainer>
-                                    <Price>{book?.price.toLocaleString()} đ</Price>
+                                    <Price>{book?.price?.toLocaleString()} đ</Price>
                                     <OldPrice>{Math.round(book?.price * 1.1).toLocaleString()} đ</OldPrice>
                                 </PriceContainer>
                                 <DetailTitle>Chi tiết:</DetailTitle>
@@ -523,7 +351,9 @@ const ProductDetail = () => {
                                 </Detail>
                                 <Detail>
                                     Hình thức bìa: &nbsp;
-                                    {book?.type}
+                                    <Link to={`/filters?type=${book?.type}`}>
+                                        {book?.type}
+                                    </Link>
                                 </Detail>
                                 <br/>
                                 <DetailTitle>Mô tả sản phẩm:</DetailTitle>
@@ -570,26 +400,6 @@ const ProductDetail = () => {
                 </CouponContainer>
             </Grid>
         </Grid>
-
-        fullInfo =
-        <FullInfoTab>
-            <h3>Thông tin chi tiết: </h3>
-            <p><b>Mã hàng:</b> {book?.id}</p>
-            <p><b>Tác giả:</b> {book?.author}</p>
-            <p><b>NXB:</b> {book?.publisher?.pubName}</p>
-            <p><b>Trọng lượng (gr):</b> {book?.weight} gr</p>
-            <p><b>Kích thước:</b> {book?.size} cm</p>
-            <p><b>Số trang:</b> {book?.pages}</p>
-            <p><b>Hình thức:</b> {book?.type}</p>
-            <TextareaAutosize
-                value={book?.description}
-                cols={100}
-                rows={20}
-                readOnly
-                disabled
-                style={{ marginTop: '50px', padding: '0', backgroundColor: 'white', resize: 'none', border: 'none'}}
-            />
-        </FullInfoTab>
     }
 
     return (
@@ -613,62 +423,9 @@ const ProductDetail = () => {
                     <strong style={{textDecoration: 'underline'}}>{book?.title}</strong>
                 </Breadcrumbs>
             </div>
-
             {product}
-
-            <ProductDetailContainer>
-                <Box sx={{ width: '100%', typography: 'body1'}}>
-                    <TabContext value={value}>
-                        <Box sx={{color: 'rgb(30, 255, 0)', backgroundColor: 'rgb(39, 39, 39)'}}>
-                        <StyledTabList onChange={handleChange} aria-label="tab">
-                            <StyledTab label="THÔNG TIN CHI TIẾT" value="1" />
-                            <StyledTab label="ĐÁNH GIÁ" value="2" />
-                            <StyledTab label="SẢN PHẨM LIÊN QUAN" value="3" />
-                        </StyledTabList>
-                        </Box>
-                        <TabPanel value="1">
-                            {fullInfo}
-                        </TabPanel>
-                        <TabPanel value="2">
-                            <RatingTab>
-                                {review}
-                                <Box>
-                                    <Box>
-                                        <strong>Để lại đánh giá của bạn</strong>
-                                    </Box>
-                                    <TextareaAutosize
-                                        aria-label="comment"
-                                        minRows={7}
-                                        placeholder="Đánh giá của bạn ..."
-                                        style={{ width: '100%', margin: '30px 0px', backgroundColor: 'white', outline: 'none',
-                                        borderRadius: '0', resize: 'none', color: 'black', fontSize: '16px'}}
-                                    />
-                                    <RatingSelect>
-                                        <RateSelect>
-                                            <strong>Đánh giá: </strong>
-                                            <StyledRating
-                                                sx={{marginLeft: '5px'}} 
-                                                name="product-rating"
-                                                defaultValue={5}
-                                                getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
-                                                icon={<StarIcon fontSize="10px"/>}
-                                                emptyIcon={<StarBorderIcon fontSize="10"/>}
-                                            /> 
-                                        </RateSelect>
-                                        <RateButton>Gửi đánh giá</RateButton>
-                                    </RatingSelect>
-                                </Box>
-                            </RatingTab>
-                        </TabPanel>
-                        <TabPanel value="3">
-                            <RelatedTab>
-                                <ProductsSlider booksList={booksRelated?.content} loading={loadingRelated}/>
-                            </RelatedTab>
-                        </TabPanel>
-                    </TabContext>
-                </Box>
-                <ProductsSlider booksList={booksRandom} loading={loadingRandom}/>
-            </ProductDetailContainer>
+            <ProductDetailContainer loading={loading} book={book}/>
+            {/* <ProductsSlider booksList={booksRandom} loading={loadingRandom}/> */}
         </Wrapper>
         <Footer/>
     </Container>
