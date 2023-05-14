@@ -31,7 +31,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
-import useFetch from '../hooks/useFetch'
+import usePrivateFetch from '../hooks/usePrivateFetch'
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 
 import AddProductDialog from './AddProductDialog';
@@ -64,10 +64,7 @@ const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
   },
 }));
 
-const BOOKS_URL = 'api/books/filters';
-const CATEGORIES_URL = 'api/categories';
-const PUBLISHERS_URL = 'api/publishers';
-const BOOK_URL = 'api/books';
+const ACCOUNTS_URL = 'api/accounts';
 
 const headCells = [
   {
@@ -78,25 +75,25 @@ const headCells = [
     label: 'ID',
   },
   {
-    id: 'title',
+    id: 'username',
     align: 'left',
-    width: '500px',
+    width: '200px',
     disablePadding: false,
-    label: 'Tiêu đề',
+    label: 'Tên đăng nhập',
   },
   {
-    id: 'image',
+    id: 'emal',
     align: 'left',
-    width: '100px',
+    width: '250px',
     disablePadding: false,
-    label: 'Ảnh',
+    label: 'Email',
   },
   {
-    id: 'price',
+    id: 'roles',
     align: 'right',
-    width: '110px',
+    width: '150px',
     disablePadding: false,
-    label: 'Giá (đ)',
+    label: 'Quyền',
   },
   {
     id: 'action',
@@ -167,7 +164,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { loadingCate, dataCate, loadingPub, dataPub, numSelected, selectedAll, refetch } = props;
+  const { numSelected, selectedAll, refetch } = props;
   const [openNew, setOpenNew] = useState(false);
  
   const handleClickOpenNew = () => {
@@ -231,15 +228,8 @@ function EnhancedTableToolbar(props) {
             </Typography>
           </IconButton>
         </Tooltip>
-        <AddProductDialog 
-        open={openNew} 
-        setOpen={setOpenNew}
-        loadingCate={loadingCate}
-        dataCate={dataCate}
-        loadingPub={loadingPub}
-        dataPub={dataPub}
-        refetch={refetch}/>
-        </>
+        <p>Add dialog</p>
+      </>
       )}
     </Toolbar>
   );
@@ -250,8 +240,7 @@ EnhancedTableToolbar.propTypes = {
   selectedAll: PropTypes.bool.isRequired,
 };
 
-export default function TableBook() {
-  const { auth } = useAuth();
+export default function TableAccount() {
   const [id, setId] = useState([]);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('id');
@@ -259,17 +248,11 @@ export default function TableBook() {
   const [selectedAll, setSelectedAll] = useState(false);
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(true);
-  const [seller, setSeller] = useState(!(auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
   const [openEdit, setOpenEdit] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { loading, data: rows , refetch} = useFetch(BOOKS_URL 
+  const { loading, data: rows , refetch} = usePrivateFetch(ACCOUNTS_URL
     + "?pageNo=" + page
-    + "&pSize=" + rowsPerPage
-    + "&seller=" + (seller === false ? "" : auth.userName)
-    + "&sortDir=" + order
-    + "&sortBy=" + orderBy);
-  const { loading: loadingCate, data: dataCate } = useFetch(CATEGORIES_URL);
-  const { loading: loadingPub, data: dataPub } = useFetch(PUBLISHERS_URL);
+    + "&pSize=" + rowsPerPage);
 
   const axiosPrivate = useAxiosPrivate();
 
@@ -372,10 +355,6 @@ export default function TableBook() {
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: '2px' }}>
         <EnhancedTableToolbar 
-        loadingCate={loadingCate}
-        dataCate={dataCate}
-        loadingPub={loadingPub}
-        dataPub={dataPub}
         numSelected={selected.length} 
         selectedAll={selectedAll} 
         refetch={refetch}/>
@@ -426,9 +405,9 @@ export default function TableBook() {
                     <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
                       {row.id}
                     </TableCell>
-                    <TableCell align="left"><ItemTitle>{row.title}</ItemTitle></TableCell>
-                    <TableCell align="left"><img src={row.image} style={{width: '45px', height: '45px'}}/></TableCell>
-                    <TableCell align="right">{row.price.toLocaleString()} đ</TableCell>
+                    <TableCell align="left"><ItemTitle>{row.username}</ItemTitle></TableCell>
+                    <TableCell align="left"><ItemTitle>{row.email}</ItemTitle></TableCell>
+                    <TableCell align="right">{row.id} test</TableCell>
                     <TableCell align="right"> 
                       <IconButton sx={{"&:hover": {transform: 'scale(1.05)', color: '#63e399'}}}
                       onClick={(e) => handleClickOpenEdit(row.id)}>
@@ -458,15 +437,7 @@ export default function TableBook() {
                 </TableRow>
               )}
             </TableBody>
-            <EditProductDialog 
-            id={id}
-            open={openEdit} 
-            setOpen={setOpenEdit}
-            loadingCate={loadingCate}
-            dataCate={dataCate}
-            loadingPub={loadingPub}
-            dataPub={dataPub}
-            refetch={refetch}/>
+            <p>Add Edit Dialog</p>
           </Table>
         </TableContainer>
         <TablePagination
@@ -496,19 +467,6 @@ export default function TableBook() {
         checked={dense} onChange={handleChangeDense} />}
         label="Thu gọn"
       />
-      {auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))
-        ? <FormControlLabel
-          control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
-            color: '#63e399',
-          },
-          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-            backgroundColor: '#63e399',
-          },}} 
-          checked={seller} onChange={handleChangeSeller} />}
-          label="Theo người bán"
-        />
-        : <></>
-      }
     </Box>
   );
 }

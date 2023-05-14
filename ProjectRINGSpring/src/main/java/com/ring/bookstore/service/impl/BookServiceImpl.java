@@ -1,6 +1,7 @@
 package com.ring.bookstore.service.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ring.bookstore.dtos.BookDTO;
 import com.ring.bookstore.dtos.BookDetailDTO;
 import com.ring.bookstore.dtos.IBookDisplay;
-import com.ring.bookstore.dtos.ImageDTO;
 import com.ring.bookstore.dtos.mappers.BookDetailMapper;
 import com.ring.bookstore.dtos.mappers.BookDisplayMapper;
 import com.ring.bookstore.dtos.mappers.BookMapper;
@@ -33,7 +32,6 @@ import com.ring.bookstore.model.Book;
 import com.ring.bookstore.model.BookDetail;
 import com.ring.bookstore.model.Category;
 import com.ring.bookstore.model.Image;
-import com.ring.bookstore.model.OrderDetail;
 import com.ring.bookstore.model.Publisher;
 import com.ring.bookstore.repository.BookDetailRepository;
 import com.ring.bookstore.repository.BookRepository;
@@ -44,7 +42,6 @@ import com.ring.bookstore.repository.PublisherRepository;
 import com.ring.bookstore.repository.ReviewRepository;
 import com.ring.bookstore.request.BookRequest;
 import com.ring.bookstore.service.BookService;
-import com.ring.bookstore.service.ImageService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -84,22 +81,31 @@ public class BookServiceImpl implements BookService {
 	}
     
     public Page<BookDTO> getBooksByFilter(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-    		String keyword, Integer cateId, Integer pubId, String type, Double fromRange, Double toRange) {
+    		String keyword, Integer cateId, List<Integer> pubId, String seller, String type, Double fromRange, Double toRange) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending()
                 											: Sort.by(sortBy).descending());
         
         //To String
         String cateIdString = "";
-        String pubIdString = "";
+        String[] pubListString = {""};
         
         if (cateId != 0) cateIdString = String.valueOf(cateId);  
-        if (pubId != 0) pubIdString = String.valueOf(pubId);
-        String[] test = {""};
+        if (pubId.size() != 0) {
+        	List<Integer> pubList = pubRepo.findAllIds();
+            pubList.removeAll(pubId);
+        	pubListString = Arrays.toString(pubList.toArray()).split("[\\[\\]]")[1].split(", "); 
+        }
+        
+        for (int i = 0; i < pubListString.length; i++) {
+        	
+        	System.out.println(pubListString[i]);
+        }
         
         //Get
         Page<IBookDisplay> booksList = bookRepo.findBooksWithFilter(keyword
 										        		, cateIdString
-										        		, test
+										        		, pubListString
+										        		, seller
 										        		, type
 										        		, fromRange
 										        		, toRange
@@ -107,9 +113,16 @@ public class BookServiceImpl implements BookService {
         List<BookDTO> bookDtos = booksList.stream().map(bookDisplayMapper::apply).collect(Collectors.toList());
         return new PageImpl<BookDTO>(bookDtos, pageable, booksList.getTotalElements());
     }
+    
+    //Lấy sách theo id
+  	public Book getBookById(Integer id) {
+  		Book book= bookRepo.findById(id).orElseThrow(() -> 
+  			new ResourceNotFoundException("Product does not exists!"));
+  		return book;
+  	}
 
-	//Lấy sách theo id
-	public BookDetailDTO getBookById(Integer id) {
+	//Lấy sách hiển thị theo id
+	public BookDetailDTO getBookDetailById(Integer id) {
 		Book book= bookRepo.findById(id).orElseThrow(() -> 
 			new ResourceNotFoundException("Product does not exists!"));
 		BookDetailDTO bookDetailDTO = bookDetailMapper.apply(book);
@@ -168,14 +181,18 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public Book updateBook(BookRequest request, MultipartFile file, Integer id, Account seller) throws IOException {
 		//Kiểm tra ảnh
-		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-	    var image = Image.builder()
-	    		.name(fileName)
-	    		.type(file.getContentType())
-	    		.image(file.getBytes())
-				.build();
-	    		
-	    Image savedImage = imageRepo.save(image);
+		Image savedImage = null;
+		
+		if (file != null) { //Tạo ảnh mới nếu có file
+			String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+		    var image = Image.builder()
+		    		.name(fileName)
+		    		.type(file.getContentType())
+		    		.image(file.getBytes())
+					.build();
+		    		
+		    savedImage = imageRepo.save(image);
+		}
 		
 	    //Kiểm tra thông tin
 		Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found"));
@@ -196,13 +213,14 @@ public class BookServiceImpl implements BookService {
 		
 		book.setTitle(request.getTitle());
 		book.setDescription(request.getDescription());
-		book.setImages(savedImage);
 		book.setPrice(request.getPrice());
 		book.setPublisher(pub);
 		book.setCate(cate);
 		book.setAuthor(request.getAuthor());
 		book.setAmount(request.getAmount());
 		book.setType(request.getType());
+		if (file != null) book.setImages(savedImage); //Nếu có ảnh mới >> set
+		
 		Book savedBook = bookRepo.save(book);
 		
         return savedBook;

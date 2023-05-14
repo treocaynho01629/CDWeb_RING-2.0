@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import styled from 'styled-components'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
@@ -90,7 +91,7 @@ const AddToCart = styled.p`
 
 const ProductSimple = ({book}) => {
 
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
     const dispatch = useDispatch();
 
     const handleAddToCart = (book) => {

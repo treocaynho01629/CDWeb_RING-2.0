@@ -12,6 +12,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import PersonIcon from '@mui/icons-material/Person';
 import PhoneIcon from '@mui/icons-material/Phone';
 import HomeIcon from '@mui/icons-material/Home';
+import CloseIcon from '@mui/icons-material/Close';
 
 import { styled as muiStyled } from '@mui/material/styles';
 import Stack from "@mui/material/Stack";
@@ -23,12 +24,15 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import InputBase from '@mui/material/InputBase';
-
-import { Grid, Modal, TextareaAutosize } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import TextField from '@mui/material/TextField';
+import { Grid, TextareaAutosize } from '@mui/material';
 
 import { useDispatch, useSelector } from "react-redux";
 import { resetCart } from '../redux/cartReducer';
@@ -36,6 +40,62 @@ import { Link, useNavigate } from "react-router-dom";
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 
 const Container = styled.div``
+
+const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
+    '& .MuiDialog-paper': {
+      borderRadius: 0,
+      padding: '20px 15px',
+    },
+    '& .MuiDialogContent-root': {
+      padding: theme.spacing(2),
+    },
+    '& .MuiDialogActions-root': {
+      padding: theme.spacing(1),
+    },
+  }));
+  
+const CustomInput = muiStyled(TextField)(({ theme }) => ({
+    '& .MuiInputBase-root': {
+        borderRadius: 0,
+    },
+    '& label.Mui-focused': {
+        color: '#b4a0a8'
+    },
+    '& .MuiInput-underline:after': {
+        borderBottomColor: '#B2BAC2',
+    },
+    '& .MuiOutlinedInput-root': {
+    borderRadius: 0,
+        '& fieldset': {
+            borderRadius: 0,
+            borderColor: '#E0E3E7',
+        },
+        '&:hover fieldset': {
+            borderRadius: 0,
+            borderColor: '#B2BAC2',
+        },
+        '&.Mui-focused fieldset': {
+            borderRadius: 0,
+            borderColor: '#6F7E8C',
+        },
+    },
+    '& input:valid + fieldset': {
+        borderColor: 'lightgray',
+        borderRadius: 0,
+        borderWidth: 1,
+    },
+    '& input:invalid + fieldset': {
+        borderColor: '#e66161',
+        borderRadius: 0,
+        borderWidth: 1,
+    },
+    '& input:valid:focus + fieldset': {
+        borderColor: '#63e399',
+        borderLeftWidth: 4,
+        borderRadius: 0,
+        padding: '4px !important', 
+    },
+}));
 
 const Wrapper = styled.div`
     padding-right: 15px;
@@ -141,7 +201,7 @@ const ItemImage = styled.img`
 `
 
 const CustomButton = styled.div`
-    padding: 10px 25px;
+    padding: 10px 15px;
     font-size: 16px;
     font-weight: 400;
     background-color: #63e399;
@@ -161,7 +221,7 @@ const CustomButton = styled.div`
 `
 
 const ClearButton = styled.div`
-    padding: 10px 25px;
+    padding: 10px 15px;
     font-size: 16px;
     font-weight: 400;
     background-color: #e66161;
@@ -232,26 +292,6 @@ const Amount = styled.p`
     flex-wrap: wrap;
     align-items: center;
     text-align: center;
-`
-
-const Input = styled.input`
-    border: none;
-    background: transparent;
-    color: black;
-    resize: none;
-    outline: none;
-    display: flex;
-`
-
-const InputContainer = styled.div`
-    border: 0.5px solid;
-    border-color: ${props=>props.color};;
-    background-color: #f5f5f5;
-    padding: 10px;
-    align-items: center;
-    justify-content: space-between;
-    display: flex;
-    align-items: center;
 `
 
 const Payout = styled.div`
@@ -479,48 +519,49 @@ const Checkout = () => {
                         <Grid item xs sx={{justifyContent: 'flex-end'}}> 
                             <EditButton onClick={handleOpen}>Thay đổi</EditButton>
                         </Grid>
-                        <Modal
-                        open={open}
-                        onClose={handleClose}
-                        >
-                            <Box sx={style}>
+                        <CustomDialog open={open} onClose={handleClose}>
+                            <DialogTitle sx={{display: 'flex', alignItems: 'center'}}><LocationOnIcon/>&nbsp;Địa chỉ người nhận</DialogTitle>
+                            <DialogContent>
                                 <Stack spacing={1} direction="column">
-                                    <SemiTitle><LocationOnIcon/>&nbsp;Địa chỉ người nhận</SemiTitle>
-                                    <p className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
+                                    <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
                                     
-                                    <Instruction display={firstName && lastName && phone && address ? "none" : "block"}>
-                                        Vui lòng nhập đầy đủ thông tin!
-                                    </Instruction>
-                                    <Instruction display={!validPhone && phone ? "block" : "none"}>
-                                        Sai định dạng số điện thoại!
-                                    </Instruction>
-
-                                    <InputContainer color={!firstName ? "red" : "lightgray"}>
-                                        <Input placeholder='Nhập Họ đệm *'
-                                        type="text"
-                                        autoComplete="on"
-                                        onChange={(e) => setFirstName(e.target.value)}
-                                        value={firstName}
-                                        />
-                                        <PersonIcon style={{color:"gray"}}/>
-                                    </InputContainer>
-                                    <InputContainer color={!lastName ? "red" : "lightgray"}>
-                                        <Input placeholder='Nhập Tên *'
-                                        type="text"
-                                        autoComplete="on"
-                                        onChange={(e) => setLastName(e.target.value)}
-                                        value={lastName}
-                                        />
-                                    </InputContainer>
+                                    <CustomInput label='Nhập Họ đệm'
+                                    type="text"
+                                    id="firstName"
+                                    required
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                    value={firstName}
+                                    error = {!firstName}
+                                    size="small"
+                                    sx={{width: '500px'}}
+                                    InputProps={{
+                                        endAdornment: <PersonIcon style={{color:"gray"}}/>
+                                    }}
+                                    />
+                                    <CustomInput label='Nhập Tên'
+                                    type="text"
+                                    id="lastName"
+                                    required
+                                    onChange={(e) => setLastName(e.target.value)}
+                                    value={lastName}
+                                    error = {!lastName}
+                                    size="small"
+                                    />
                                     
-                                    <InputContainer color={!phone || (phone && !validPhone) ? "red" : "lightgray"}>
-                                        <Input placeholder='Nhập số điện thoại (+84) *'
-                                        autoComplete="on"
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        value={phone}
-                                        />
-                                        <PhoneIcon style={{color:"gray"}}/>
-                                    </InputContainer>
+                                    <CustomInput placeholder='Nhập số điện thoại (+84)'
+                                    autoComplete="on"
+                                    id="phone"
+                                    required
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    value={phone}
+                                    error={!phone || (phone && !validPhone)}
+                                    helperText={(phone && !validPhone) ? "Sai định dạng số điện thoại!" : ""}
+                                    size="small"
+                                    InputProps={{
+                                        endAdornment: <PhoneIcon style={{color:"gray"}}/>
+                                    }}
+                                    />
+                                    
                                     <Select
                                     value={city}
                                     onChange={(e) => setCity(e.target.value)}
@@ -554,26 +595,25 @@ const Checkout = () => {
                                         <MenuItem value={'Xã Tân Hạnh'}>Xã Tân Hạnh</MenuItem>
                                         <MenuItem value={'Xã Long Hưng'}>Xã Long Hưng</MenuItem>
                                     </Select>
-                                    <InputContainer color={!address ? "red" : "lightgray"}>
-                                        <Input placeholder='Nhập địa chỉ nhận hàng *'
-                                        type="text"
-                                        autoComplete="on"
-                                        onChange={(e) => setAddress(e.target.value)}
-                                        value={address}
-                                        />
-                                        <HomeIcon style={{color:"gray"}}/>
-                                    </InputContainer>
-                                    <Grid container columnSpacing={1} rowSpacing={3} align="right">
-                                        <Grid item xs={2}>
-                                            <CustomButton onClick={handleClose}>Áp dụng</CustomButton>
-                                        </Grid>
-                                        <Grid item xs={2}>
-                                            <ClearButton onClick={clearInput}>Xoá</ClearButton>
-                                        </Grid>
-                                    </Grid>
+                                    <CustomInput placeholder='Nhập địa chỉ nhận hàng'
+                                    type="text"
+                                    autoComplete="on"
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    value={address}
+                                    error={!address}
+                                    size="small"
+                                    InputProps={{
+                                        endAdornment: <HomeIcon style={{color:"gray"}}/>
+                                    }}
+                                    />
+                                    
                                 </Stack>
-                            </Box>
-                        </Modal>
+                            </DialogContent>
+                            <DialogActions>
+                                <CustomButton onClick={handleClose}><CheckIcon sx={{marginRight: '10px'}}/>Áp dụng</CustomButton>
+                                <ClearButton onClick={clearInput}><CloseIcon sx={{marginRight: '10px'}}/>Xoá</ClearButton>
+                            </DialogActions>
+                        </CustomDialog>
                     </Grid>
                 </SmallContainer>
                 <SemiTitle><ShoppingCartIcon/>&nbsp;Kiểm tra lại sản phẩm</SemiTitle>
@@ -633,10 +673,8 @@ const Checkout = () => {
                     <Grid container spacing={1}>
                         <Grid item xs={10} sx={{display: 'flex', justifyContent: 'space-between'}}>
                             <Grid item xs={10}>
-                                <InputContainer color={"lightgray"}>
-                                    <Input placeholder='Nhập mã giảm giá ...'/>
-                                    <SellIcon style={{color:"gray"}}/>
-                                </InputContainer>
+                                <CustomInput placeholder='Nhập mã giảm giá ...' size="small"/>
+                                <SellIcon style={{color:"gray"}}/>
                             </Grid>
                             <Grid item xs>
                                 <CustomButton>Áp dụng</CustomButton>

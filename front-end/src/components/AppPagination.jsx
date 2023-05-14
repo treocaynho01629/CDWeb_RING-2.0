@@ -48,13 +48,11 @@ const AppPagination = (props) => {
 
     return (
     <Stack spacing={2} sx={{my: 5}}>
-    <Pagination count={count} shape="rounded" 
+    <Pagination count={count ? count : 0} shape="rounded" 
     page={page}
     onChange={handlePageChange} 
     renderItem={(item) => (
         <StyledPageItem
-        //   component={Link}
-        //   to={`/inbox${item.page === 1 ? '' : `?page=${item.page}`}`}
           {...item}
         />
     )}/>

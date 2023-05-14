@@ -2,6 +2,9 @@ package com.ring.bookstore.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,8 +28,9 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	//Lấy tất cả acc
-	public List<Account> getAllAccounts() {
-		return accRepo.findAll();
+	public Page<Account> getAllAccounts(Integer pageNo, Integer pageSize) {
+		Pageable pageable = PageRequest.of(pageNo, pageSize);
+		return accRepo.findAll(pageable);
 	}
 
 	//Lấy acc theo id

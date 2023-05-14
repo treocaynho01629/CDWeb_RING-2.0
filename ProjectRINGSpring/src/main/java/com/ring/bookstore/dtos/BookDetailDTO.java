@@ -19,6 +19,7 @@ public record BookDetailDTO(Integer id,
 		LocalDate date,
 		String language,
 		Double weight,
+		Integer amount,
 		Integer rateTotal, 
 		Integer rateAmount) {
 

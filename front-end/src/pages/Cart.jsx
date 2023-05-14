@@ -12,7 +12,6 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PaymentsIcon from '@mui/icons-material/Payments';
 
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Typography from '@mui/material/Typography';
 import { Checkbox, Grid, IconButton } from '@mui/material';
 
 import { styled as muiStyled } from '@mui/material/styles';

@@ -21,12 +21,13 @@ public interface BookRepository extends JpaRepository<Book, Integer>{
 	left join Image i on i.id = b.images.id
 	where concat (b.title, b.author) like %:keyword%
 	and cast(b.cate.id as string) like %:cateId%
+	and b.user.userName like %:seller%
 	and cast(b.publisher.id as string) not in :pubId
 	and b.type like %:type%
 	and b.price between :fromRange and :toRange
 	group by b.id, b.title, b.description, i.name, b.price 
 	""")
-	public Page<IBookDisplay> findBooksWithFilter(String keyword, String cateId, String[] pubId, String type, Double fromRange, Double toRange, Pageable pageable);
+	public Page<IBookDisplay> findBooksWithFilter(String keyword, String cateId, String[] pubId, String seller,String type, Double fromRange, Double toRange, Pageable pageable);
 	
 	@Query("select b from Book b order by newid() limit :amount")
 	public List<Book> findRandomBooks(int amount);

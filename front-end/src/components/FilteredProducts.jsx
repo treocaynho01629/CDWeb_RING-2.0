@@ -1,6 +1,6 @@
-import { Grid } from "@mui/material"
 import styled from "styled-components"
 import Product from "./Product"
+import Grid from "@mui/material/Grid"
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { styled as muiStyled } from '@mui/system';
 
@@ -21,12 +21,14 @@ const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
 
 const FilteredProducts = ({loading, booksList}) => {
 
-  if (loading){
-    return <CustomLinearProgress/>
-  }
-
   return (
     <Container>
+      <div style={{height: '20px'}}>
+        {loading && (
+          <CustomLinearProgress/>
+        )}
+      </div>
+
       <Grid container spacing={1}>
         {booksList?.map(book=>(
             <Grid key={book.id} item xs={12} sm={6} md={4} lg={3}>

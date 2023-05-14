@@ -45,6 +45,7 @@ public class BookDetailMapper implements Function<Book, BookDetailDTO> {
         		detail.getBDate(),
         		detail.getBLanguage(),
         		detail.getBWeight(),
+        		book.getAmount(),
         		reviewRepo.findTotalRatingByBookId(book.getId()),
         		book.getBookReviews().size());
     }

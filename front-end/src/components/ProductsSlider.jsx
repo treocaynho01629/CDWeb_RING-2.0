@@ -27,14 +27,14 @@ const ProductsSlider = ({loading, booksList}) => {
 
   if (loading){
     return (
-      <Container>
-        <p></p>
-        <OwlCarousel className='owl-theme' lazyLoad dots={false} margin={10} items={5}>
-        {Array.from(new Array(5))?.map((index) => (
-          <Skeleton key={index} variant="rectangular" animation="wave" width={213} height={380}/>
-        ))}
-        </OwlCarousel>
-      </Container>
+      // <Container>
+      //   <OwlCarousel className='owl-theme' lazyLoad dots={false} margin={10} items={5}>
+      //   {Array.from(new Array(5))?.map((index) => (
+      //     <Skeleton key={index} variant="rectangular" animation="wave" width={213} height={380}/>
+      //   ))}
+      //   </OwlCarousel>
+      // </Container>
+      <p>loading</p>
     )
   }
 
@@ -42,7 +42,7 @@ const ProductsSlider = ({loading, booksList}) => {
     <Container>
       <OwlCarousel className='owl-theme' loop lazyLoad dots={false} margin={10} responsive={responsive}>
       {booksList?.map((book, index) => (
-        <div class='item' key={index} style={{display: 'flex'}}>
+        <div className='item' key={index} style={{display: 'flex'}}>
           <ProductSimple book={book}/>
         </div>
       ))}
