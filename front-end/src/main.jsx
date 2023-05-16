@@ -9,9 +9,9 @@ import { persistor, store } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { CookiesProvider } from "react-cookie";
 import { SnackbarProvider, MaterialDesignContent } from 'notistack';
-import styled from '@mui/system/styled';
+import { styled as muiStyled } from '@mui/material/styles';
 
-const StyledMaterialDesignContent = styled(MaterialDesignContent)(() => ({
+const StyledMaterialDesignContent = muiStyled(MaterialDesignContent)(() => ({
   '&.notistack-MuiContent-success': {
     borderRadius: '0',
     backgroundColor: '#63e399',

@@ -1,10 +1,18 @@
 package com.ring.bookstore.model;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -31,7 +39,7 @@ public class Image {
             strategy = GenerationType.SEQUENCE,
             generator = "primary_sequence"
     )
-	private Long id;
+	private Integer id;
 
 	@Column(name = "name")
 	private String name;
@@ -39,6 +47,13 @@ public class Image {
 	@Column(name = "type")
 	private String type;
 
-	@Column(name = "image", unique = false, nullable = false, length = 100000)
+	@Lob
+	@Column(name = "image", unique = false, nullable = false, columnDefinition = "MEDIUMBLOB")
 	private byte[] image;
+	
+	@OneToMany(cascade = CascadeType.ALL, 
+			mappedBy = "images", 
+			fetch = FetchType.LAZY)
+	@JsonIgnore
+    private List<Book> books;
 }

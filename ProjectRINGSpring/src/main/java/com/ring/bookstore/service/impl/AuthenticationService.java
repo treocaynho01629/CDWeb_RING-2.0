@@ -61,7 +61,7 @@ public class AuthenticationService {
 	            .build();
 	
 	    //Save user and token
-	    var savedUser = accountRepo.save(acc);
+	    accountRepo.save(acc);
 	    var jwtToken = jwtService.generateToken(acc); //Token
 	    var refreshToken = jwtService.generateRefreshToken(acc);
 	

@@ -2,8 +2,8 @@ import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-import useRefreshToken from '../hooks/useRefreshToken';
-import useAuth from '../hooks/useAuth';
+import useRefreshToken from '../../hooks/useRefreshToken';
+import useAuth from '../../hooks/useAuth';
 
 const PersistLogin = () => {
     const [isLoading, setIsLoading] = useState(true);

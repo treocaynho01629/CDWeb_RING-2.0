@@ -121,7 +121,7 @@ const ProductDetailContainer = (props) => {
               </TabPanel>
               <TabPanel value="3">
                   <RelatedTab>
-                      {/* <ProductsSlider booksList={booksRelated?.content} loading={loadingRelated}/> */}
+                      <ProductsSlider booksList={booksRelated?.content} loading={loadingRelated}/>
                   </RelatedTab>
               </TabPanel>
           </TabContext>

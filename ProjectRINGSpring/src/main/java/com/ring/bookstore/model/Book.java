@@ -15,7 +15,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
-import java.util.Set;
+import java.util.List;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -29,14 +29,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table(indexes = @Index(columnList = "title"))
 @EqualsAndHashCode
+@Table(indexes = @Index(columnList = "title"))
 public class Book {
 
     @Id
@@ -54,10 +53,10 @@ public class Book {
     private Integer id;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id")
+    @JoinColumn(name = "image_id", nullable = true)
     @JsonIgnore 
     private Image images;
-
+    
     @Column
     private Double price;
 
@@ -104,7 +103,7 @@ public class Book {
     		fetch = FetchType.LAZY)
     @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore 
-    private Set<Review> bookReviews;
+    private List<Review> bookReviews;
 
     @OneToMany(cascade = CascadeType.ALL, 
     		orphanRemoval = true, 
@@ -112,7 +111,7 @@ public class Book {
     		fetch = FetchType.LAZY)
     @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
-    private Set<OrderDetail> bookOrderDetails;
+    private List<OrderDetail> orderDetails;
     
     public void addReview(Review review) {
     	bookReviews.add(review);
@@ -125,12 +124,12 @@ public class Book {
     }
     
     public void addOrderDetail(OrderDetail detail) {
-    	bookOrderDetails.add(detail);
+    	orderDetails.add(detail);
     	detail.setBook(this);
     }
  
     public void removeOrderDetail(OrderDetail detail) {
-    	bookOrderDetails.remove(detail);
+    	orderDetails.remove(detail);
     	detail.setBook(null);
     }
 }

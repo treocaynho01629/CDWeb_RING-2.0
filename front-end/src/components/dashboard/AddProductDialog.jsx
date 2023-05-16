@@ -23,8 +23,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
 import CustomDropZone from './CustomDropZone';
-import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 
+//#region styled
 const CustomButton = styled.div`
     padding: 10px 15px;
     font-size: 16px;
@@ -63,6 +64,13 @@ const ClearButton = styled.div`
         background: lightgray;
         color: #424242;
     }
+`
+
+const Instruction = styled.p`
+    font-size: 14px;
+    font-style: italic;
+    color: red;
+    display: ${props=>props.display};;
 `
 
 const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
@@ -203,51 +211,56 @@ const bookTypes = [
 ];
 
 const BOOK_URL = 'api/books';
+//#endregion
 
 const AddProductDialog = (props) => {
+    //#region construct
     const { open, setOpen, loadingCate, dataCate, loadingPub, dataPub, refetch } = props;
     const [date, setDate] = useState(dayjs('2001-01-01'));
     const [files, setFiles] = useState([]);
-    const [title, setTitle] = useState([''])
-    const [price, setPrice] = useState([''])
-    const [amount, setAmount] = useState([''])
-    const [description, setDescription] = useState([''])
-    const [author, setAuthor] = useState([''])
-    const [pubId, setPubId] = useState([1])
-    const [cateId, setCateId] = useState([1])
-    const [weight, setWeight] = useState([''])
-    const [size, setSize] = useState([''])
-    const [pages, setPages] = useState([''])
+    const [title, setTitle] = useState('')
+    const [price, setPrice] = useState('')
+    const [amount, setAmount] = useState('')
+    const [description, setDescription] = useState('')
+    const [author, setAuthor] = useState('')
+    const [pubId, setPubId] = useState(1)
+    const [cateId, setCateId] = useState(1)
+    const [weight, setWeight] = useState('')
+    const [size, setSize] = useState('')
+    const [pages, setPages] = useState('')
     const [language, setLanguage] = useState(bookLanguages[0].value);
     const [type, setType] = useState(bookTypes[0].value);
+    const [err, setErr] = useState([]);
+    const [errMsg, setErrMsg] = useState('');
     const axiosPrivate = useAxiosPrivate();
     const { enqueueSnackbar } = useSnackbar();
 
     const handleCloseNew = () => {
         setOpen(false);
+        setErr([]);
+        setErrMsg('');
     };
 
     const handleAddBook = async (event) => {
         event.preventDefault();
-        enqueueSnackbar('Đã thêm sản phẩm!', { variant: 'success' });
-
         const formData = new FormData();
 
         const json = JSON.stringify({
-            price: price.toString(),
-            amount: amount.toString(),
+            price,
+            amount,
             title,
             description,
             type,
             author,
-            pubId: pubId.toString(),
-            cateId: cateId.toString(),
-            weight: weight.toString(),
+            pubId,
+            cateId,
+            weight,
             size,
-            pages: pages.toString(),
+            pages,
             date: date.format('YYYY-MM-DD'),
             language
         });
+
         const blob = new Blob([json], {
             type: 'application/json'
         });
@@ -265,31 +278,42 @@ const AddProductDialog = (props) => {
             );
 
             refetch();
+            enqueueSnackbar('Đã thêm sản phẩm!', { variant: 'success' });
             setDate(dayjs('2001-01-01'));
             setFiles([]);
-            setTitle(['']);
-            setPrice(['']);
-            setAmount(['']);
-            setDescription(['']);
-            setAuthor(['']);
-            setWeight(['']);
-            setSize(['']);
-            setPages(['']);
-            setPubId([1]);
-            setCateId([1]);
+            setTitle('');
+            setPrice('');
+            setAmount('');
+            setDescription('');
+            setAuthor('');
+            setWeight('');
+            setSize('');
+            setPages('');
+            setPubId(1);
+            setCateId(1);
             setType(bookTypes[0].value);
             setLanguage(bookLanguages[0].value);
-            setOpen(false);
+            setErrMsg('');
+            setErr([]);
         } catch (err) {
             console.log(err);
+            setErr(err);
             if (!err?.response) {
+                setErrMsg('Server không phản hồi');
             } else if (err.response?.status === 409) {
+                setErrMsg(err.response?.data?.errors?.errorMessage);
+            } else if (err.response?.status === 403) {
+                setErrMsg('Chưa có ảnh kèm theo!');
             } else if (err.response?.status === 400) {
+                setErrMsg('Sai định dạng thông tin!');  
             } else {
+                setErrMsg('Thêm sản phẩm thất bại!')
             }
-            errRef.current.focus();
+
+            enqueueSnackbar('Thêm sản phẩm thất bại!', { variant: 'error' });
         }
     };
+    //#endregion
 
     if (loadingCate || loadingPub){
         return <></>
@@ -299,8 +323,10 @@ const AddProductDialog = (props) => {
         <CustomDialog open={open} onClose={handleCloseNew} maxWidth={'md'}>
         <DialogTitle sx={{display: 'flex', alignItems: 'center'}}><AutoStoriesIcon/>&nbsp;Thêm sản phẩm</DialogTitle>
         <DialogContent>
-            <Grid container spacing={1}>
-            <Grid item xs={12} sm={6}>
+          <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
+          <Grid container columnSpacing={1}>
+            <Grid container item columnSpacing={1}>
+              <Grid item xs={12} sm={6}>
                 <CustomInput
                 required
                 margin="dense"
@@ -310,40 +336,11 @@ const AddProductDialog = (props) => {
                 variant="outlined"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                error={err?.response?.data?.errors?.title}
+                helperText={err?.response?.data?.errors?.title}
                 />
-                <CustomInput
-                required
-                margin="dense"
-                id="author"
-                label="Tác giả"
-                fullWidth
-                variant="outlined"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                />
-                <CustomInput
-                required
-                margin="dense"
-                id="price"
-                label="Giá"
-                fullWidth
-                variant="outlined"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                />
-                <CustomInput
-                required
-                margin="dense"
-                id="amount"
-                label="Số lượng"
-                type="number"
-                fullWidth
-                variant="outlined"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                />
-            </Grid>
-            <Grid item xs={12} sm={6}>
+              </Grid>
+              <Grid item xs={12} sm={6}>
                 <CustomInput
                 required
                 margin="dense"
@@ -354,7 +351,27 @@ const AddProductDialog = (props) => {
                 variant="outlined"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
+                error={err?.response?.data?.errors?.weight}
+                helperText= {err?.response?.data?.errors?.weight}
                 />
+              </Grid>
+            </Grid>
+            <Grid container item columnSpacing={1}>
+              <Grid item xs={12} sm={6}>
+                <CustomInput
+                required
+                margin="dense"
+                id="author"
+                label="Tác giả"
+                fullWidth
+                variant="outlined"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                error={err?.response?.data?.errors?.author}
+                helperText= {err?.response?.data?.errors?.author}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
                 <CustomInput
                 required
                 margin="dense"
@@ -364,7 +381,28 @@ const AddProductDialog = (props) => {
                 variant="outlined"
                 value={size}
                 onChange={(e) => setSize(e.target.value)}
+                error={err?.response?.data?.errors?.size}
+                helperText= {err?.response?.data?.errors?.size}
                 />
+              </Grid>
+            </Grid>
+            <Grid container item columnSpacing={1}>
+              <Grid item xs={12} sm={6}>
+                <CustomInput
+                required
+                margin="dense"
+                id="price"
+                label="Giá"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                error={err?.response?.data?.errors?.price}
+                helperText={err?.response?.data?.errors?.price}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
                 <CustomInput
                 required
                 margin="dense"
@@ -375,17 +413,41 @@ const AddProductDialog = (props) => {
                 variant="outlined"
                 value={pages}
                 onChange={(e) => setPages(e.target.value)}
+                error={err?.response?.data?.errors?.pages}
+                helperText= {err?.response?.data?.errors?.pages}
                 />
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <FormControl margin="dense" fullWidth>
-                    <CustomDatePicker
-                    label="Ngày xuất bản"
-                    value={date}
-                    className="DatePicker"
-                    onChange={(newValue) => setDate(newValue)}
-                    />
-                </FormControl>
-                </LocalizationProvider>
+              </Grid>
+            </Grid>
+            <Grid container item columnSpacing={1}>
+              <Grid item xs={12} sm={6}>
+                  <CustomInput
+                  required
+                  margin="dense"
+                  id="amount"
+                  label="Số lượng"
+                  type="number"
+                  fullWidth
+                  variant="outlined"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  error={err?.response?.data?.errors?.amount}
+                  helperText= {err?.response?.data?.errors?.amount}
+                  />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <FormControl margin="dense" fullWidth>
+                      <CustomDatePicker
+                      label="Ngày xuất bản"
+                      value={date}
+                      className="DatePicker"
+                      onChange={(newValue) => setDate(newValue)}
+                      error={err?.response?.data?.errors?.date}
+                      helperText= {err?.response?.data?.errors?.date}
+                      />
+                  </FormControl>
+                  </LocalizationProvider>
+              </Grid>
             </Grid>
             <Grid item xs={12}>
                 <CustomDropZone files={files} setFiles={setFiles}/>
@@ -402,6 +464,8 @@ const AddProductDialog = (props) => {
                 variant="outlined"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                error={err?.response?.data?.errors?.description}
+                helperText= {err?.response?.data?.errors?.description}
                 />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -472,8 +536,7 @@ const AddProductDialog = (props) => {
                 ))}
                 </CustomInput>
             </Grid>
-            </Grid>
-            
+          </Grid>
         </DialogContent>
         <DialogActions>
             <CustomButton onClick={handleAddBook}><CheckIcon sx={{marginRight: '10px'}}/>Thêm</CustomButton>

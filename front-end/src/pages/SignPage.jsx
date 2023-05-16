@@ -17,7 +17,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import jwt from 'jwt-decode';
 
-//Style
+//#region styled
 const Container = styled.div`
 `
 
@@ -148,6 +148,7 @@ const OrBox = styled.h3`
     width: 60px;
     height: 60px;
 `
+//#endregion
 
 //Validate input
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;

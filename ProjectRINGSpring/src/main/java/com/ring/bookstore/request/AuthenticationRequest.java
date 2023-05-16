@@ -14,6 +14,7 @@ public class AuthenticationRequest {
 
 	@NotNull(message = "Tên đăng nhập không được để trống!")	
 	private String userName;
+	
 	@NotNull(message = "Mật khẩu không được để trống!")
 	private String pass;
 }

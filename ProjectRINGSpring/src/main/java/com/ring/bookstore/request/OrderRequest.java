@@ -17,15 +17,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderRequest {
 	
-	@NotNull(message = "Cart can not be empty")
+	@NotNull(message = "Giỏ hàng không được trống!")
 	private List<CartItem> cart;
-	@NotBlank(message = "First name is required")
+	
+	@NotBlank(message = "Họ đệm không được bỏ trống!")
 	private String firstName;
-	@NotBlank(message = "Last name is required")
+	
+	@NotBlank(message = "Tên không được bỏ trống!")
 	private String lastName;
-	@NotBlank(message = "Phone number is required")
+	
+	@NotBlank(message = "Số điện thoại không được bỏ trống!")
 	private String phone;
-	@NotBlank(message = "Address is required")
+	
+	@NotBlank(message = "Địa chỉ không được bỏ trống!")
 	private String address;
 	private String message;
 }

@@ -144,7 +144,7 @@ const FiltersPage = () => {
     }, [searchParams])
 
     const loadBooks = async()=>{
-        setPagination({ ...pagination, totalPages: data?.totalPages - 1});
+        setPagination({ ...pagination, totalPages: data?.totalPages});
         setBooksList(data?.content);
     };
 

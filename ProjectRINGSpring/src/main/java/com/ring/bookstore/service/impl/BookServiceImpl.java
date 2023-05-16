@@ -54,8 +54,6 @@ public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepo;
 	private final BookDetailRepository detailRepo;
 	private final CategoryRepository cateRepo;
-	private final OrderDetailRepository orderDetailRepo;
-	private final ReviewRepository reviewRepo;
 	private final ImageRepository imageRepo;
 	
 	@Autowired
@@ -80,6 +78,7 @@ public class BookServiceImpl implements BookService {
         return bookDtos;
 	}
     
+	//Lấy sách theo bộ lọc
     public Page<BookDTO> getBooksByFilter(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
     		String keyword, Integer cateId, List<Integer> pubId, String seller, String type, Double fromRange, Double toRange) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending()
@@ -134,17 +133,19 @@ public class BookServiceImpl implements BookService {
 	public Book addBook(BookRequest request, MultipartFile file, Account seller) throws IOException {
 		//Kiểm tra ảnh
 		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-	    var image = Image.builder()
-	    		.name(fileName)
-	    		.type(file.getContentType())
-	    		.image(file.getBytes())
-				.build();
+		Image image = imageRepo.findByName(fileName).orElse(
+			Image.builder()
+    		.name(fileName)
+    		.type(file.getContentType())
+    		.image(file.getBytes())
+			.build()
+		);
 	    		
-	    Image savedImage = imageRepo.save(image);
-		
 	    //Kiểm tra thông tin
 		Category cate = cateRepo.findById(request.getCateId()).orElseThrow(()-> new ResourceNotFoundException("Category not found"));
 		Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(()-> new ResourceNotFoundException("Publisher not found"));
+		
+		Image savedImage = imageRepo.save(image); //Save ảnh
 		
 		//Thêm sách vào DTB
         var book = Book.builder()
@@ -181,17 +182,18 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public Book updateBook(BookRequest request, MultipartFile file, Integer id, Account seller) throws IOException {
 		//Kiểm tra ảnh
-		Image savedImage = null;
+		Image newImage = null;
 		
-		if (file != null) { //Tạo ảnh mới nếu có file
+		if (file != null) { //Tạo ảnh mới nếu có file ảnh mới
 			String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-		    var image = Image.builder()
-		    		.name(fileName)
-		    		.type(file.getContentType())
-		    		.image(file.getBytes())
-					.build();
-		    		
-		    savedImage = imageRepo.save(image);
+			Image image = imageRepo.findByName(fileName).orElse(
+				Image.builder()
+	    		.name(fileName)
+	    		.type(file.getContentType())
+	    		.image(file.getBytes())
+				.build()
+			);
+			newImage = image;
 		}
 		
 	    //Kiểm tra thông tin
@@ -219,10 +221,12 @@ public class BookServiceImpl implements BookService {
 		book.setAuthor(request.getAuthor());
 		book.setAmount(request.getAmount());
 		book.setType(request.getType());
-		if (file != null) book.setImages(savedImage); //Nếu có ảnh mới >> set
+		if (file != null) {
+			Image savedImage = imageRepo.save(newImage);
+			book.setImages(savedImage); //Nếu có ảnh mới >> set
+		}
 		
 		Book savedBook = bookRepo.save(book);
-		
         return savedBook;
 	}
 
@@ -233,8 +237,6 @@ public class BookServiceImpl implements BookService {
 		//Check seller
 		if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
 
-		orderDetailRepo.deleteByBook_Id(id);
-		reviewRepo.deleteByBook_Id(id);
 		bookRepo.deleteById(id);
 		return book;
 	}
@@ -243,8 +245,8 @@ public class BookServiceImpl implements BookService {
         boolean result = false;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         //Có role ADMIN hoặc là người bán cuốn Sách
-        if ((auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())))
-                || book.getUser().getId() == seller.getId()) {
+        if (book.getUser().getId().equals(seller.getId()) 
+        		|| (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())))) {
             result = true;
         }
         return result;

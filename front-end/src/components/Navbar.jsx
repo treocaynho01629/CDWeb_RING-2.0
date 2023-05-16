@@ -12,12 +12,14 @@ import YouTubeIcon from '@mui/icons-material/YouTube';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import MenuIcon from '@mui/icons-material/Menu';
+import LockIcon from '@mui/icons-material/Lock';
+import Logout from '@mui/icons-material/Logout';
+import SpeedIcon from '@mui/icons-material/Speed';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 
 import Stack from '@mui/material/Stack';
 import Badge from '@mui/material/Badge';
 import IconButton from '@mui/material/IconButton';
-import LockIcon from '@mui/icons-material/Lock';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import Avatar from '@mui/material/Avatar';
 import DeliveryDiningIcon from '@mui/icons-material/DeliveryDining';
 import Menu from '@mui/material/Menu';
@@ -25,8 +27,6 @@ import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
-import HelpIcon from '@mui/icons-material/Help';
-import Logout from '@mui/icons-material/Logout';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
@@ -48,6 +48,7 @@ import useLogout from "../hooks/useLogout";
 import { useSelector } from "react-redux";
 import useAuth from "../hooks/useAuth";
 
+//#region styled
 const Container = styled.div`
     background-color: white;
     border-bottom: 0.5px solid;
@@ -341,6 +342,7 @@ const CartButton = styled.button`
         color: black;
     }
 `
+//#endregion
 
 function HideOnScroll(props) {
     const { children, window } = props;
@@ -371,6 +373,7 @@ function HideOnScroll(props) {
 };
 
 const Navbar = (props) => {
+    //#region construct
     const products = useSelector(state => state.cart.products); //Lấy products trong giỏ từ redux
     const [openDrawer, setOpen] = useState(false);
     const [searchField, setSearchField] = useState('');
@@ -382,6 +385,8 @@ const Navbar = (props) => {
     const [anchorElCart, setAnchorElCart] = useState(null);
     const open = Boolean(anchorEl);
     const openCart = Boolean(anchorElCart);
+
+    const [role, setRole] = useState(auth?.roles?.length);
     
     const handlePopoverOpen = (event) => {
         setAnchorElCart(event.currentTarget);
@@ -397,11 +402,11 @@ const Navbar = (props) => {
     }
 
     const handleClick = (event) => {
-      setAnchorEl(event.currentTarget);
+        setAnchorEl(event.currentTarget);
     };
 
     const handleClose = () => {
-      setAnchorEl(null);
+        setAnchorEl(null);
     };
 
     const toggleDrawer = () => (event) => {
@@ -441,14 +446,16 @@ const Navbar = (props) => {
             </List>
             <Divider/>
             <List>
-                <ListItem disablePadding>
+                {role >= 2 && (
+                <ListItem disablePadding onClick={() => navigate('/' + (role == 3 ? 'admin' : 'management'))}>
                 <ListItemButton>
                     <ListItemIcon>
-                        <HelpIcon/>
+                        <SpeedIcon/>
                     </ListItemIcon>
-                    <ListItemText primary="Trợ giúp"  />
+                    <ListItemText primary="Dashboard"  />
                 </ListItemButton>
                 </ListItem>
+                )}
 
                 <ListItem disablePadding>
                 <ListItemButton onClick={signOut}>
@@ -463,25 +470,14 @@ const Navbar = (props) => {
     } else {
         sublist = 
         <List>
-            <ListItem disablePadding>
+            <ListItem disablePadding onClick={() => navigate('/login')}>
                 <ListItemButton>
                     <ListItemIcon>
-                        <HelpIcon/>
+                        <LockIcon/>
                     </ListItemIcon>
-                    <ListItemText primary="Trợ giúp"  />
+                    <ListItemText primary="Đăng nhập"  />
                 </ListItemButton>
             </ListItem>
-
-            <Link to={`/login`}>
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <LockIcon/>
-                        </ListItemIcon>
-                        <ListItemText primary="Đăng nhập"  />
-                    </ListItemButton>
-                </ListItem>
-            </Link>
         </List>
     }
     
@@ -492,7 +488,7 @@ const Navbar = (props) => {
     >
         <Link to={`/`} style={{paddingLeft: '20px'}}>
             <Logo>
-                <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORES</p>
+                <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORE</p>
             </Logo>
         </Link>
         <List>
@@ -501,19 +497,17 @@ const Navbar = (props) => {
                     <ListItemIcon>
                         <NotificationsActiveIcon/>
                     </ListItemIcon>
-                    <ListItemText primary="Thông báo (4)" />
+                    <ListItemText primary="Thông báo" />
                 </ListItemButton>
             </ListItem>
 
             <ListItem disablePadding>
-                <Link to={`/cart`}>
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <ShoppingCartIcon/>
-                        </ListItemIcon>
-                        <ListItemText>Giỏ hàng ({products.length})</ListItemText>
-                    </ListItemButton>
-                </Link>
+                <ListItemButton onClick={() => navigate('/cart')}>
+                    <ListItemIcon>
+                        <ShoppingCartIcon/>
+                    </ListItemIcon>
+                    <ListItemText>Giỏ hàng ({products.length})</ListItemText>
+                </ListItemButton>
             </ListItem>
         </List>
         <Divider />
@@ -566,13 +560,15 @@ const Navbar = (props) => {
             </ListItemIcon>
             Đơn giao
         </MenuItem>
-        <Divider />
-        <MenuItem>
+        <Divider/>
+        {role >= 2 && (
+        <MenuItem onClick={() => navigate('/' + (role == 3 ? 'admin' : 'management'))}>
             <ListItemIcon>
-                <HelpIcon fontSize="small" />
+                <SpeedIcon fontSize="small" />
             </ListItemIcon>
-            Trợ giúp
+            Dashboard
         </MenuItem>
+        )}
         <MenuItem onClick={signOut}>
             <ListItemIcon>
                 <Logout fontSize="small" />
@@ -647,6 +643,7 @@ const Navbar = (props) => {
         }
         </MiniCartContainer>
     </Popover>
+    //#endregion
 
   return (
     <Container>
@@ -709,7 +706,7 @@ const Navbar = (props) => {
                                 <NavItem>
                                     <Stack spacing={1} direction="row" sx={{ color: 'action.active' }}>
                                         <StyledIconButton disableRipple disableFocusRipple aria-label="notification">
-                                            <StyledBadge badgeContent={4} anchorOrigin={{
+                                            <StyledBadge badgeContent={0} anchorOrigin={{
                                                 vertical: 'top',
                                                 horizontal: 'left',
                                             }}>

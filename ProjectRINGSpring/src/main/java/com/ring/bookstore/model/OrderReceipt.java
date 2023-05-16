@@ -8,13 +8,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Nationalized;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,10 +27,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @EqualsAndHashCode
 public class OrderReceipt {
 
@@ -72,15 +73,25 @@ public class OrderReceipt {
     private Double total;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({
-    	@JoinColumn(name = "user_id", referencedColumnName = "id"),	
-    	@JoinColumn(name = "user_name", referencedColumnName = "userName")
-	})
+    @JoinColumn(name = "user_id")
     @JsonIgnore
     private Account user;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
+    @OneToMany(cascade = CascadeType.ALL, 
+    		orphanRemoval = true,  
+    		mappedBy = "order", 
+    		fetch = FetchType.LAZY)
+    @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
-    private Set<OrderDetail> orderOrderDetails;
+    private List<OrderDetail> orderOrderDetails;
 
+    public void addOrderDetail(OrderDetail detail) {
+    	orderOrderDetails.add(detail);
+    	detail.setOrder(this);
+    }
+ 
+    public void removeOrderDetail(OrderDetail detail) {
+    	orderOrderDetails.remove(detail);
+    	detail.setOrder(null);
+    }
 }

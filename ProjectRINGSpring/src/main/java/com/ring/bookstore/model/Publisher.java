@@ -1,5 +1,6 @@
 package com.ring.bookstore.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,7 +41,7 @@ public class Publisher {
     @Nationalized 
     private String pubName;
 
-    @OneToMany(mappedBy = "publisher")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "publisher")
     @JsonIgnore
     private Set<Book> publisherBooks;
 

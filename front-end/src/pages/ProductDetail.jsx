@@ -425,7 +425,8 @@ const ProductDetail = () => {
             </div>
             {product}
             <ProductDetailContainer loading={loading} book={book}/>
-            {/* <ProductsSlider booksList={booksRandom} loading={loadingRandom}/> */}
+            <ProductsSlider booksList={booksRandom} loading={loadingRandom}/>
+            <br/><br/>
         </Wrapper>
         <Footer/>
     </Container>

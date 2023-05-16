@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
+@Validated
 public class BookController {
 	
 	private final BookService bookService;
@@ -81,8 +83,8 @@ public class BookController {
 	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> addBook(@Valid @RequestPart("request") BookRequest request,
-    									@RequestPart("image") MultipartFile file,
-    		 							@CurrentAccount Account currUser) {
+									@RequestPart("image") MultipartFile file,
+		 							@CurrentAccount Account currUser) {
 		try {
 			Book addedBook = bookService.addBook(request, file, currUser);
 			return new ResponseEntity< >(addedBook, HttpStatus.CREATED);

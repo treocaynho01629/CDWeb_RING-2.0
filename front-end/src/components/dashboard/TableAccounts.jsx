@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import styled from 'styled-components'
 import PropTypes from 'prop-types';
@@ -24,19 +24,20 @@ import Switch from '@mui/material/Switch';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import { visuallyHidden } from '@mui/utils';
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
-import usePrivateFetch from '../hooks/usePrivateFetch'
-import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import usePrivateFetch from '../../hooks/usePrivateFetch'
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 
 import AddProductDialog from './AddProductDialog';
 import EditProductDialog from './EditProductDialog';
 
+//#region preStyled
 const ItemTitle = styled.p`
     font-size: 12px;
     text-overflow: ellipsis;
@@ -72,34 +73,39 @@ const headCells = [
     align: 'center',
     width: '70px',
     disablePadding: false,
+    sortable: true,
     label: 'ID',
   },
   {
-    id: 'username',
+    id: 'userName',
     align: 'left',
     width: '200px',
     disablePadding: false,
+    sortable: true,
     label: 'Tên đăng nhập',
   },
   {
-    id: 'emal',
+    id: 'email',
     align: 'left',
     width: '250px',
     disablePadding: false,
+    sortable: true,
     label: 'Email',
   },
   {
-    id: 'roles',
+    id: 'authorities',
     align: 'right',
     width: '150px',
     disablePadding: false,
+    sortable: false,
     label: 'Quyền',
   },
   {
     id: 'action',
     align: 'right',
-    width: '150px',
+    width: '250px',
     disablePadding: false,
+    sortable: false,
     label: 'Hành động',
   },
 ];
@@ -113,7 +119,7 @@ function EnhancedTableHead(props) {
 
   return (
     <TableHead>
-      <TableRow>
+      <TableRow sx={{height: '58px'}}>
         <TableCell padding="checkbox">
           <Checkbox
             sx={{
@@ -140,18 +146,24 @@ function EnhancedTableHead(props) {
             style={{ width: headCell.width }}
             sortDirection={orderBy === headCell.id ? order : false}
           >
-            <TableSortLabel
+            {headCell.sortable ? (
+              <TableSortLabel
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
+              >
+                {headCell.label}
+                {orderBy === headCell.id ? (
+                  <Box component="span" sx={visuallyHidden}>
+                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                  </Box>
+                ) : null}
+              </TableSortLabel>
+            ) : (
+              <TableSortLabel hideSortIcon>
+                {headCell.label}
+              </TableSortLabel>
+            )}
           </TableCell>
         ))}
       </TableRow>
@@ -189,7 +201,7 @@ function EnhancedTableToolbar(props) {
           component="div"
         >
         <AutoStoriesIcon sx={{marginRight: '10px'}}/>
-        {selectedAll ? "Chọn tất cả" : `Chọn ${numSelected} sản phẩm`}
+        {selectedAll ? "Chọn tất cả" : `Chọn ${numSelected} thành viên`}
         </Typography>
       ) : (
         <Typography
@@ -199,19 +211,19 @@ function EnhancedTableToolbar(props) {
           component="div"
         >
           <AutoStoriesIcon sx={{color: 'white', marginRight: '10px'}}/>
-          Danh sách sản phẩm
+          Danh sách thành viên
         </Typography>
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Xoá sản phẩm đã chọn">
+        <Tooltip title="Xoá thành viên đã chọn">
           <IconButton>
             <DeleteIcon sx={{color: 'white', "&:hover": {transform: 'scale(1.05)', color: '#e66161'}}} />
           </IconButton>
         </Tooltip>
       ) : (
       <>
-        <Tooltip title="Thêm sản phẩm mới">
+        <Tooltip title="Thêm thành viên mới">
           <IconButton sx={{borderRadius: '5px',
           "&:hover": {
             backgroundColor: '#50be7e',
@@ -223,12 +235,12 @@ function EnhancedTableToolbar(props) {
             id="tableTitle"
             component="div"
             >
-              Thêm sản phẩm
+              Thêm thành viên
             <AddIcon sx={{color: 'white', marginLeft: '10px'}}/>
             </Typography>
           </IconButton>
         </Tooltip>
-        <p>Add dialog</p>
+        //<>Add dialog</>
       </>
       )}
     </Toolbar>
@@ -239,8 +251,12 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
   selectedAll: PropTypes.bool.isRequired,
 };
+//#endregion
 
-export default function TableAccount() {
+export default function TableAccounts(props) {
+  //#region construct
+  const { setAccCount } = props;
+  const { auth } = useAuth();
   const [id, setId] = useState([]);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('id');
@@ -249,12 +265,21 @@ export default function TableAccount() {
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(true);
   const [openEdit, setOpenEdit] = useState(false);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { loading, data: rows , refetch} = usePrivateFetch(ACCOUNTS_URL
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [filter, setFilter] = useState(false);
+  const { loading, data: rows , refetch} = usePrivateFetch(ACCOUNTS_URL + (filter ? "/employees" : "") 
     + "?pageNo=" + page
-    + "&pSize=" + rowsPerPage);
+    + "&pSize=" + rowsPerPage
+    + "&sortDir=" + order
+    + "&sortBy=" + orderBy);
 
   const axiosPrivate = useAxiosPrivate();
+
+  useEffect(()=>{
+    if (!loading){
+      setAccCount(rows?.totalElements);
+    }
+  }, [loading]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -307,8 +332,8 @@ export default function TableAccount() {
     setDense(event.target.checked);
   };
 
-  const handleChangeSeller= (event) => {
-    setSeller(event.target.checked);
+  const handleChangeFilter = (event) => {
+    setFilter(event.target.checked);
     setPage(0);
   };
 
@@ -319,7 +344,7 @@ export default function TableAccount() {
 
   const handleDelete = async (id) => {
     try {
-        const response = await axiosPrivate.delete(BOOK_URL + "/" + id,
+        const response = await axiosPrivate.delete(ACCOUNTS_URL + "/" + id,
             {
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
@@ -343,6 +368,7 @@ export default function TableAccount() {
         } else if (err.response?.status === 400) {
         } else {
         }
+        enqueueSnackbar('Xoá thành viên thất bại!', { variant: 'error' });
     }
   };
 
@@ -350,6 +376,7 @@ export default function TableAccount() {
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements) : 0;
+  //#endregion
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -358,7 +385,7 @@ export default function TableAccount() {
         numSelected={selected.length} 
         selectedAll={selectedAll} 
         refetch={refetch}/>
-        <TableContainer sx={{ maxHeight: 440 }}>
+        <TableContainer sx={{ maxHeight: 500 }}>
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
@@ -407,7 +434,7 @@ export default function TableAccount() {
                     </TableCell>
                     <TableCell align="left"><ItemTitle>{row.username}</ItemTitle></TableCell>
                     <TableCell align="left"><ItemTitle>{row.email}</ItemTitle></TableCell>
-                    <TableCell align="right">{row.id} test</TableCell>
+                    <TableCell align="right">{row.authorities.length == 3 ? 'ADMIN' : row.authorities.length == 2 ? 'SELLER' : 'MEMBER'}</TableCell>
                     <TableCell align="right"> 
                       <IconButton sx={{"&:hover": {transform: 'scale(1.05)', color: '#63e399'}}}
                       onClick={(e) => handleClickOpenEdit(row.id)}>
@@ -437,7 +464,6 @@ export default function TableAccount() {
                 </TableRow>
               )}
             </TableBody>
-            <p>Add Edit Dialog</p>
           </Table>
         </TableContainer>
         <TablePagination
@@ -467,6 +493,19 @@ export default function TableAccount() {
         checked={dense} onChange={handleChangeDense} />}
         label="Thu gọn"
       />
+      {auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))
+        ? <FormControlLabel
+          control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
+            color: '#63e399',
+          },
+          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+            backgroundColor: '#63e399',
+          },}} 
+          checked={filter} onChange={handleChangeFilter} />}
+          label="Lọc nhân viên"
+        />
+        : null
+      }
     </Box>
   );
 }
