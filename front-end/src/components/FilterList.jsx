@@ -15,6 +15,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import axios from '../api/axios'
 import { Grid } from "@mui/material";
 
+//#region styled
 const Container = styled.div`
 `
 
@@ -111,6 +112,7 @@ function valuetext(value) {
   }
   return `${scaledValue} đ`;
 }
+//#endriegion
 
 const CATEGORIES_URL = 'api/categories';
 
@@ -302,7 +304,7 @@ const FilterList = (props) => {
               <ListItemButton sx={{pl: 0, py: 0, justifyContent: 'space-between'}}>
                 <FilterText onClick={() => handleCateChange(cate.id)}>{cate.categoryName}</FilterText>
                 { cate.cateSubs.length == 0
-                  ? <p></p>
+                  ? <></>
                   : < >
                   {open[cate.id] ? <ExpandLess onClick={() => handleClick(cate.id)}/> 
                       : <ExpandMore onClick={() => handleClick(cate.id)}/>}

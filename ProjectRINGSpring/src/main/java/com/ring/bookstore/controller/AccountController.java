@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ring.bookstore.model.Account;
+import com.ring.bookstore.request.AccountRequest;
 import com.ring.bookstore.service.AccountService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @CrossOrigin("http://localhost:5173")
@@ -32,9 +35,21 @@ public class AccountController {
 	//Lấy tất cả acc
 	@GetMapping
 	@PreAuthorize("hasAnyRole('ADMIN')")
-	public Page<Account> getAllAccounts(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
-										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo){
-		return accountService.getAllAccounts(pageNo, pageSize);
+	public Page<Account> getAllAccounts(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
+										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir){
+		return accountService.getAllAccounts(pageNo, pageSize, sortBy, sortDir);
+	}
+	
+	//Lấy tất cả nhân viên
+	@GetMapping("/employees")
+	@PreAuthorize("hasAnyRole('ADMIN')")
+	public Page<Account> getAllSellers(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
+										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir){
+		return accountService.getAllEmployees(pageNo, pageSize, sortBy, sortDir);
 	}
 	
 	//Lấy acc theo {id}
@@ -48,15 +63,15 @@ public class AccountController {
 	@PostMapping("{id}")
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	public ResponseEntity<Account> updateAccount(@PathVariable("id") Integer accountId,
-			@RequestBody Account account){
-		return new ResponseEntity<Account>(accountService.updateAccount(account, accountId), HttpStatus.OK);
+			@Valid @RequestBody AccountRequest requestt){
+		return new ResponseEntity<Account>(accountService.updateAccount(requestt, accountId), HttpStatus.OK);
 	}
 	
 	//Tạo acc mới
 	@PostMapping()
 	@PreAuthorize("hasAnyRole('ADMIN')")
-	public ResponseEntity<Account> saveAccount(@RequestBody Account account){
-		return new ResponseEntity<Account>(accountService.saveAccount(account), HttpStatus.CREATED);
+	public ResponseEntity<Account> saveAccount(@Valid @RequestBody AccountRequest request){
+		return new ResponseEntity<Account>(accountService.saveAccount(request), HttpStatus.CREATED);
 	}
 	
 	//Xoá acc {id}

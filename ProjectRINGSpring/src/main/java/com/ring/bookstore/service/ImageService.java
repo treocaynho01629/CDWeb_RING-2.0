@@ -7,12 +7,14 @@ import com.ring.bookstore.dtos.ImageDTO;
 import com.ring.bookstore.model.Image;
 
 import java.io.IOException;
-import java.util.stream.Stream;
+import java.util.List;
 
 @Service
 public interface ImageService {
 	
-    ImageDTO uploadImage(MultipartFile file) throws IOException;
+	ImageDTO uploadImage(MultipartFile file) throws IOException;
     Image getImage(String name);
-    Stream<Image> getAllImages();
+    ImageDTO deleteImage(Integer id);
+    boolean existsImage(String name);
+    List<ImageDTO> getAllImages();
 }

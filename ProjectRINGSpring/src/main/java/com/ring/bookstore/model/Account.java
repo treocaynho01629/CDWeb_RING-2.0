@@ -3,7 +3,6 @@ package com.ring.bookstore.model;
 import jakarta.persistence.*;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,7 +25,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Table(name="account")
 public class Account implements UserDetails {
 
     /**
@@ -58,24 +56,24 @@ public class Account implements UserDetails {
     @Column(length = 1000)
     private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(	name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonIgnore
-    private Set<Role> roles = new HashSet<>();
+    private Set<Role> roles;
     
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Book> sellBooks;
     
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
-    private Set<Review> userReviews;
+    private List<Review> userReviews;
     
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
-    private Set<OrderReceipt> userOrderReceipts;
+    private List<OrderReceipt> userOrderReceipts;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -117,4 +115,23 @@ public class Account implements UserDetails {
 	public boolean isEnabled() {
 		return true;
 	}
+	
+	public void removeAllOrders() {
+		userOrderReceipts.forEach(order -> order.setUser(null));
+        this.userOrderReceipts.clear();
+    }
+	
+	public void removeAllReviews() {
+        userReviews.forEach(review -> review.setUser(null));
+        this.userReviews.clear();
+    }
+	
+	public void removeAllBooks() {
+		sellBooks.forEach(book -> book.setUser(null));
+        this.sellBooks.clear();
+    }
+	
+	public void removeAllRoles() {
+        this.roles.clear();
+    }
 }

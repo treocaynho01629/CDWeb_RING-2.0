@@ -9,9 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.ring.bookstore.dtos.ReviewDTO;
 import com.ring.bookstore.dtos.mappers.ReviewMapper;
@@ -19,10 +19,6 @@ import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.Book;
-import com.ring.bookstore.model.BookDetail;
-import com.ring.bookstore.model.Category;
-import com.ring.bookstore.model.Image;
-import com.ring.bookstore.model.Publisher;
 import com.ring.bookstore.model.Review;
 import com.ring.bookstore.repository.BookRepository;
 import com.ring.bookstore.repository.OrderReceiptRepository;
@@ -43,20 +39,6 @@ public class ReviewServiceImpl implements ReviewService {
 	@Autowired
 	private ReviewMapper reviewMapper;
 	
-	public Page<ReviewDTO> getAllReviews(Integer pageNo, Integer pageSize) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize);
-		Page<Review> reviewsList = reviewRepo.findAll(pageable);
-		List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList());
-        return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements());
-	}
-
-	public Page<ReviewDTO> getReviewsByBookId(Integer id, Integer pageNo, Integer pageSize) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize);
-		Page<Review> reviewsList = reviewRepo.findAllByBook_Id(id, pageable);
-        List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList());
-        return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements());
-	}
-
 	//review sản phẩm
 	public Review review(Integer id, ReviewRequest request, Account user) {
 		
@@ -75,5 +57,43 @@ public class ReviewServiceImpl implements ReviewService {
         Review addedReview = reviewRepo.save(review);
 
         return addedReview;
+	}
+	
+	public Page<ReviewDTO> getAllReviews(Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending());
+		Page<Review> reviewsList = reviewRepo.findAll(pageable);
+		List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList());
+        return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements());
+	}
+
+	public Page<ReviewDTO> getReviewsByBookId(Integer id, Integer pageNo, Integer pageSize) {
+		Pageable pageable = PageRequest.of(pageNo, pageSize);
+		Page<Review> reviewsList = reviewRepo.findAllByBook_Id(id, pageable);
+        List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList());
+        return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements());
+	}
+	
+	public Page<ReviewDTO> getReviewsByUser(Integer userId, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending());
+		Page<Review> reviewsList = reviewRepo.findAllByUser_Id(userId, pageable);
+	    List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList());
+	    return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements());
+	}
+
+	public Page<ReviewDTO> getReviewsByUser(Account user, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending());
+		Page<Review> reviewsList = reviewRepo.findAllByUser_Id(user.getId(), pageable);
+	    List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList());
+	    return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements());
+	}
+	
+	public Review deleteReview(Integer id) {
+		Review review = reviewRepo.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Review does not exists!"));
+		reviewRepo.deleteById(id);
+		return review;
 	}
 }

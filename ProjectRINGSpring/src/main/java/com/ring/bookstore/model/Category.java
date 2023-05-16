@@ -1,5 +1,6 @@
 package com.ring.bookstore.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,10 +31,10 @@ public class Category {
     @Nationalized 
     private String categoryName;
 
-    @OneToMany(mappedBy = "cate", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cate", fetch = FetchType.LAZY)
     private Set<Sub> cateSubs;
 
-    @OneToMany(mappedBy = "cate")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cate")
     @JsonIgnore
     private Set<Book> cateBooks;
 

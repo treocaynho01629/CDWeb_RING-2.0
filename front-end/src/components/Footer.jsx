@@ -166,7 +166,7 @@ const Footer = () => {
             <Grid container>
                 <Grid item xs={12} md={3}>
                     <Left>
-                        <Logo>RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORES</p></Logo>
+                        <Logo>RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORE</p></Logo>
                         <Description>Khu phố 6, Phường Linh Trung, TP. Thủ Đức - TP. Hồ Chí Minh</Description>
                         <Social>
                             <SocialIcon color="3B5999">

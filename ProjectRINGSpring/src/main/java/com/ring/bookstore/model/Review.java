@@ -7,7 +7,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import java.time.LocalDateTime;
@@ -63,10 +62,7 @@ public class Review {
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({
-    	@JoinColumn(name = "user_id", referencedColumnName = "id"),	
-    	@JoinColumn(name = "user_name", referencedColumnName = "userName")
-	})
+    @JoinColumn(name = "user_id")
     @JsonIgnore
     private Account user;
 

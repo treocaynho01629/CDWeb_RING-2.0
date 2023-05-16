@@ -24,7 +24,8 @@ const usePrivateFetch = (url) => {
         isMounted && setData(res.data);
       } catch (err) {
         setError(true);
-        navigate('/login', { state: { from: location }, replace: true });
+        console.log(err);
+        // navigate('/login', { state: { from: location }, replace: true });
       }
       setLoading(false);
     };
@@ -49,7 +50,8 @@ const usePrivateFetch = (url) => {
         isMounted && setData(res.data);
       } catch (err) {
         setError(true);
-        navigate('/login', { state: { from: location }, replace: true });
+        console.log(err);
+        // navigate('/login', { state: { from: location }, replace: true });
       }
       setLoading(false);
     };

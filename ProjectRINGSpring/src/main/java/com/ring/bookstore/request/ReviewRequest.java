@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReviewRequest {
 	
-	@NotBlank(message = "Content is required")
+	@NotBlank(message = "Nội dung đánh giá không bỏ trống!")
 	private String content;
 
-	@NotNull(message = "Rating is required")
+	@NotNull(message = "Đánh giá không bỏ trống!")
 	private Integer rating;
 }

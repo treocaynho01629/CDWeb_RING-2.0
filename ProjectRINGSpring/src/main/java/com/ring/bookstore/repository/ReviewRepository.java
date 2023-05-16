@@ -13,6 +13,8 @@ public interface ReviewRepository extends JpaRepository<Review, Integer>{
 	
 	Page<Review> findAllByBook_Id(Integer id, Pageable pageable);
 	
+	Page<Review> findAllByUser_Id(Integer id, Pageable pageable);
+	
 	@Query("""
     select coalesce(sum(r.rating), 0) from Review r where r.book.id = :id
     """)

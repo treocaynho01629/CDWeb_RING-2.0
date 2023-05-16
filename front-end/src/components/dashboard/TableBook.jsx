@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import styled from 'styled-components'
 import PropTypes from 'prop-types';
@@ -24,24 +24,26 @@ import Switch from '@mui/material/Switch';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import { visuallyHidden } from '@mui/utils';
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
+import { useSnackbar } from 'notistack';
 
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
-import useFetch from '../hooks/useFetch'
-import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import useFetch from '../../hooks/useFetch'
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 
 import AddProductDialog from './AddProductDialog';
 import EditProductDialog from './EditProductDialog';
 
+//#region preStyled
 const ItemTitle = styled.p`
-    font-size: 12px;
-    text-overflow: ellipsis;
-	overflow: hidden;
-	white-space: nowrap;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 	
 	@supports (-webkit-line-clamp: 1) {
       overflow: hidden;
@@ -75,6 +77,7 @@ const headCells = [
     align: 'center',
     width: '70px',
     disablePadding: false,
+    sortable: true,
     label: 'ID',
   },
   {
@@ -82,6 +85,7 @@ const headCells = [
     align: 'left',
     width: '500px',
     disablePadding: false,
+    sortable: true,
     label: 'Tiêu đề',
   },
   {
@@ -89,20 +93,23 @@ const headCells = [
     align: 'left',
     width: '100px',
     disablePadding: false,
+    sortable: false,
     label: 'Ảnh',
   },
   {
     id: 'price',
     align: 'right',
-    width: '110px',
+    width: '120px',
     disablePadding: false,
-    label: 'Giá (đ)',
+    sortable: true,
+    label: 'Giá(đ)',
   },
   {
     id: 'action',
     align: 'right',
     width: '150px',
     disablePadding: false,
+    sortable: false,
     label: 'Hành động',
   },
 ];
@@ -116,7 +123,7 @@ function EnhancedTableHead(props) {
 
   return (
     <TableHead>
-      <TableRow>
+      <TableRow sx={{height: '58px'}}>
         <TableCell padding="checkbox">
           <Checkbox
             sx={{
@@ -143,18 +150,24 @@ function EnhancedTableHead(props) {
             style={{ width: headCell.width }}
             sortDirection={orderBy === headCell.id ? order : false}
           >
-            <TableSortLabel
+            {headCell.sortable ? (
+              <TableSortLabel
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
+              >
+                {headCell.label}
+                {orderBy === headCell.id ? (
+                  <Box component="span" sx={visuallyHidden}>
+                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                  </Box>
+                ) : null}
+              </TableSortLabel>
+            ) : (
+              <TableSortLabel hideSortIcon>
+                {headCell.label}
+              </TableSortLabel>
+            )}
           </TableCell>
         ))}
       </TableRow>
@@ -250,7 +263,11 @@ EnhancedTableToolbar.propTypes = {
   selectedAll: PropTypes.bool.isRequired,
 };
 
-export default function TableBook() {
+//#endregion
+
+export default function TableBook(props) {
+  //#region construct
+  const { setBookCount } = props;
   const { auth } = useAuth();
   const [id, setId] = useState([]);
   const [order, setOrder] = useState('asc');
@@ -261,7 +278,7 @@ export default function TableBook() {
   const [dense, setDense] = useState(true);
   const [seller, setSeller] = useState(!(auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
   const [openEdit, setOpenEdit] = useState(false);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const { loading, data: rows , refetch} = useFetch(BOOKS_URL 
     + "?pageNo=" + page
     + "&pSize=" + rowsPerPage
@@ -271,7 +288,14 @@ export default function TableBook() {
   const { loading: loadingCate, data: dataCate } = useFetch(CATEGORIES_URL);
   const { loading: loadingPub, data: dataPub } = useFetch(PUBLISHERS_URL);
 
+  const { enqueueSnackbar } = useSnackbar();
   const axiosPrivate = useAxiosPrivate();
+
+  useEffect(()=>{
+    if (!loading && setBookCount){
+      setBookCount(rows?.totalElements);
+    }
+  }, [loading]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -353,6 +377,7 @@ export default function TableBook() {
         }
 
         refetch();
+        enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
     } catch (err) {
         console.log(err);
         if (!err?.response) {
@@ -360,6 +385,7 @@ export default function TableBook() {
         } else if (err.response?.status === 400) {
         } else {
         }
+        enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
     }
   };
 
@@ -368,8 +394,10 @@ export default function TableBook() {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements) : 0;
 
+  //#endregion
+
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%'}}>
       <Paper sx={{ width: '100%', mb: '2px' }}>
         <EnhancedTableToolbar 
         loadingCate={loadingCate}
@@ -379,7 +407,7 @@ export default function TableBook() {
         numSelected={selected.length} 
         selectedAll={selectedAll} 
         refetch={refetch}/>
-        <TableContainer sx={{ maxHeight: 440 }}>
+        <TableContainer sx={{ maxHeight: 500 }}>
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
@@ -507,7 +535,7 @@ export default function TableBook() {
           checked={seller} onChange={handleChangeSeller} />}
           label="Theo người bán"
         />
-        : <></>
+        : null
       }
     </Box>
   );

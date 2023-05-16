@@ -22,9 +22,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 
 import CustomDropZone from './CustomDropZone';
-import useFetch from '../hooks/useFetch'
-import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import useFetch from '../../hooks/useFetch'
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 
+//#region styled
 const CustomButton = styled.div`
     padding: 10px 15px;
     font-size: 16px;
@@ -209,25 +210,29 @@ const bookTypes = [
     },
 ];
 
+//#endregion
+
 const BOOK_URL = 'api/books';
 
 const EditProductDialog = (props) => {
+    //#region construct
     const { id, open, setOpen, loadingCate, dataCate, loadingPub, dataPub, refetch } = props;
     const [date, setDate] = useState(dayjs('2001-01-01'));
     const [files, setFiles] = useState([]);
     const [image, setImage] = useState([]);
-    const [title, setTitle] = useState([''])
-    const [price, setPrice] = useState([''])
-    const [amount, setAmount] = useState([''])
+    const [title, setTitle] = useState('')
+    const [price, setPrice] = useState('')
+    const [amount, setAmount] = useState('')
     const [description, setDescription] = useState([''])
-    const [author, setAuthor] = useState([''])
-    const [pubId, setPubId] = useState([1])
-    const [cateId, setCateId] = useState([1])
-    const [weight, setWeight] = useState([''])
-    const [size, setSize] = useState([''])
-    const [pages, setPages] = useState([''])
+    const [author, setAuthor] = useState('')
+    const [pubId, setPubId] = useState(1)
+    const [cateId, setCateId] = useState(1)
+    const [weight, setWeight] = useState('')
+    const [size, setSize] = useState('')
+    const [pages, setPages] = useState('')
     const [language, setLanguage] = useState(bookLanguages[0].value);
     const [type, setType] = useState(bookTypes[0].value);
+    const [err, setErr] = useState([]);
     const [errMsg, setErrMsg] = useState('');
     const axiosPrivate = useAxiosPrivate();
     const { enqueueSnackbar } = useSnackbar();
@@ -293,21 +298,28 @@ const EditProductDialog = (props) => {
           );
 
           refetch();
-          enqueueSnackbar('Đã chỉnh sửa sản phẩm!', { variant: 'warning' });
-          setErrMsg(['']);
+          enqueueSnackbar('Đã chỉnh sửa sản phẩm!', { variant: 'success' });
+          setErrMsg('');
+          setErr([]);
           setFiles([]);
           setOpen(false);
       } catch (err) {
           console.log(err);
+          setErr(err);
           if (!err?.response) {
-            setErrMsg('No Server Response');
+              setErrMsg('Server không phản hồi');
+          } else if (err.response?.status === 409) {
+              setErrMsg(err.response?.data?.errors?.errorMessage);
           } else if (err.response?.status === 400) {
-            setErrMsg('Sai định dạng thông tin!');  
+              setErrMsg('Sai định dạng thông tin!');  
           } else {
-            setErrMsg(err.response?.data?.errors?.errorMessage);
+              setErrMsg('Sửa sản phẩm thất bại!')
           }
+
+          enqueueSnackbar('Sửa sản phẩm thất bại!', { variant: 'error' });
       }
     };
+    //#endregion
 
     if (loadingCate || loadingPub || loading || !id){
     return <></>
@@ -317,10 +329,11 @@ const EditProductDialog = (props) => {
     <CustomDialog open={open} onClose={handleCloseNew} maxWidth={'md'}>
     <DialogTitle sx={{display: 'flex', alignItems: 'center'}}><EditIcon/>&nbsp;Chỉnh sửa sản phẩm</DialogTitle>
     <DialogContent>
-    <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
-    <Grid container spacing={1}>
-        <Grid item xs={12} sm={6}>
-        <CustomInput
+      <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
+      <Grid container columnSpacing={1}>
+        <Grid container item columnSpacing={1}>
+          <Grid item xs={12} sm={6}>
+            <CustomInput
             required
             margin="dense"
             id="title"
@@ -329,41 +342,12 @@ const EditProductDialog = (props) => {
             variant="outlined"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-        />
-        <CustomInput
-            required
-            margin="dense"
-            id="author"
-            label="Tác giả"
-            fullWidth
-            variant="outlined"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-        />
-        <CustomInput
-            required
-            margin="dense"
-            id="price"
-            label="Giá"
-            fullWidth
-            variant="outlined"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-        />
-        <CustomInput
-            required
-            margin="dense"
-            id="amount"
-            label="Số lượng"
-            type="number"
-            fullWidth
-            variant="outlined"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-        />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-        <CustomInput
+            error={err?.response?.data?.errors?.title}
+            helperText={err?.response?.data?.errors?.title}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <CustomInput
             required
             margin="dense"
             id="weight"
@@ -373,8 +357,28 @@ const EditProductDialog = (props) => {
             variant="outlined"
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
-        />
-        <CustomInput
+            error={err?.response?.data?.errors?.weight}
+            helperText= {err?.response?.data?.errors?.weight}
+            />
+          </Grid>
+        </Grid>
+        <Grid container item columnSpacing={1}>
+          <Grid item xs={12} sm={6}>
+            <CustomInput
+            required
+            margin="dense"
+            id="author"
+            label="Tác giả"
+            fullWidth
+            variant="outlined"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            error={err?.response?.data?.errors?.author}
+            helperText= {err?.response?.data?.errors?.author}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <CustomInput
             required
             margin="dense"
             id="size"
@@ -383,8 +387,29 @@ const EditProductDialog = (props) => {
             variant="outlined"
             value={size}
             onChange={(e) => setSize(e.target.value)}
-        />
-        <CustomInput
+            error={err?.response?.data?.errors?.size}
+            helperText= {err?.response?.data?.errors?.size}
+            />
+          </Grid>
+        </Grid>
+        <Grid container item columnSpacing={1}>
+          <Grid item xs={12} sm={6}>
+            <CustomInput
+            required
+            margin="dense"
+            id="price"
+            label="Giá"
+            type="number"
+            fullWidth
+            variant="outlined"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            error={err?.response?.data?.errors?.price}
+            helperText={err?.response?.data?.errors?.price}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <CustomInput
             required
             margin="dense"
             id="pages"
@@ -394,23 +419,51 @@ const EditProductDialog = (props) => {
             variant="outlined"
             value={pages}
             onChange={(e) => setPages(e.target.value)}
-        />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <FormControl margin="dense" fullWidth>
-            <CustomDatePicker
-                label="Ngày xuất bản"
-                value={date}
-                className="DatePicker"
-                onChange={(newValue) => setDate(newValue)}
+            error={err?.response?.data?.errors?.pages}
+            helperText= {err?.response?.data?.errors?.pages}
             />
-            </FormControl>
-        </LocalizationProvider>
+          </Grid>
+        </Grid>
+        <Grid container item columnSpacing={1}>
+          <Grid item xs={12} sm={6}>
+              <CustomInput
+              required
+              margin="dense"
+              id="amount"
+              label="Số lượng"
+              type="number"
+              fullWidth
+              variant="outlined"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              error={err?.response?.data?.errors?.amount}
+              helperText= {err?.response?.data?.errors?.amount}
+              />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <FormControl margin="dense" fullWidth>
+                  <CustomDatePicker
+                  label="Ngày xuất bản"
+                  value={date}
+                  className="DatePicker"
+                  onChange={(newValue) => setDate(newValue)}
+                  slotProps={{
+                    textField: {
+                      error: err?.response?.data?.errors?.date,
+                      helperText: err?.response?.data?.errors?.date,
+                    },
+                  }}
+                  />
+              </FormControl>
+              </LocalizationProvider>
+          </Grid>
         </Grid>
         <Grid item xs={12}>
-        <CustomDropZone image={image} files={files} setFiles={setFiles}/>
+            <CustomDropZone image={image} files={files} setFiles={setFiles}/>
         </Grid>
         <Grid item xs={12}>
-        <CustomInput
+            <CustomInput
             required
             margin="dense"
             id="description"
@@ -421,10 +474,12 @@ const EditProductDialog = (props) => {
             variant="outlined"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-        />
+            error={err?.response?.data?.errors?.description}
+            helperText= {err?.response?.data?.errors?.description}
+            />
         </Grid>
         <Grid item xs={12} sm={6}>
-        <CustomInput
+            <CustomInput
             label="Ngôn ngữ"
             select
             required 
@@ -433,14 +488,14 @@ const EditProductDialog = (props) => {
             id="language"
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-        >
+            >
             {bookLanguages.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
+                <MenuItem key={option.value} value={option.value}>
                 {option.label}
-            </MenuItem>
+                </MenuItem>
             ))}
-        </CustomInput>
-        <CustomInput
+            </CustomInput>
+            <CustomInput
             label="Hình thức bìa"
             select
             required 
@@ -449,16 +504,16 @@ const EditProductDialog = (props) => {
             id="type"
             value={type}
             onChange={(e) => setType(e.target.value)}
-        >
+            >
             {bookTypes.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
+                <MenuItem key={option.value} value={option.value}>
                 {option.label}
-            </MenuItem>
+                </MenuItem>
             ))}
-        </CustomInput>
+            </CustomInput>
         </Grid>
         <Grid item xs={12} sm={6}>
-        <CustomInput
+            <CustomInput
             label="Thể loại"
             select
             required 
@@ -467,14 +522,14 @@ const EditProductDialog = (props) => {
             id="category"
             value={cateId}
             onChange={(e) => setCateId(e.target.value)}
-        >
+            >
             {dataCate?.map((option) => (
-            <MenuItem key={option.id} value={option.id}>
+                <MenuItem key={option.id} value={option.id}>
                 {option.categoryName}
-            </MenuItem>
+                </MenuItem>
             ))}
-        </CustomInput>
-        <CustomInput
+            </CustomInput>
+            <CustomInput
             label="Nhà xuất bản"
             select
             required 
@@ -483,16 +538,15 @@ const EditProductDialog = (props) => {
             id="publisher"
             value={pubId}
             onChange={(e) => setPubId(e.target.value)}
-        >
+            >
             {dataPub?.map((option) => (
-            <MenuItem key={option.id} value={option.id}>
+                <MenuItem key={option.id} value={option.id}>
                 {option.pubName}
-            </MenuItem>
+                </MenuItem>
             ))}
-        </CustomInput>
+            </CustomInput>
         </Grid>
-    </Grid>
-
+      </Grid>
     </DialogContent>
     <DialogActions>
       <CustomButton onClick={handleEditBook}><EditIcon sx={{marginRight: '10px'}}/>Chỉnh sửa</CustomButton>
