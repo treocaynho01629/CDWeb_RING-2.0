@@ -3,10 +3,10 @@ import { useState } from "react";
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 
-import TableBook from '../../components/dashboard/TableBook'
 import DashboardNavbar from "../../components/dashboard/DashboardNavbar";
-import TableAccounts from "../../components/dashboard/TableAccounts";
 import DashboardDrawer from "../../components/dashboard/DashboardDrawer";
+import TableBook from '../../components/dashboard/TableBook'
+import TableAccounts from "../../components/dashboard/TableAccounts";
 import TableReviews from "../../components/dashboard/TableReviews";
 import TableReceipts from "../../components/dashboard/TableReceipts";
 
@@ -92,10 +92,10 @@ const Admin = () => {
         </Grid>
         <Grid container spacing={3}>
           <Grid item sm={12} lg={6}>
-            <TableReviews setReviewCount={setReviewCount}/>
+            <TableReceipts setReceiptCount={setReceiptCount}/>
           </Grid>
           <Grid item sm={12} lg={6}>
-            <TableReceipts setReceiptCount={setReceiptCount}/>
+            <TableReviews setReviewCount={setReviewCount}/>
           </Grid>
         </Grid>
       </Box>

@@ -18,6 +18,7 @@ import { Link } from "react-router-dom"
 import { addToCart } from '../redux/cartReducer';
 import { useDispatch } from 'react-redux';
 
+//#region styled
 const MoreInfo = styled.div`
     opacity: 0;
     width: 100%;
@@ -182,6 +183,7 @@ const StyledRating = muiStyled(Rating)({
         color: '#00ff6a',
     },
 });
+//#endregion
 
 const Product = ({book}) => {
 

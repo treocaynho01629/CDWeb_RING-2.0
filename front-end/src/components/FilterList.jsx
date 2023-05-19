@@ -5,12 +5,19 @@ import { styled as muiStyled } from '@mui/system';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 import Divider from '@mui/material/Divider';
+import Checkbox from '@mui/material/Checkbox';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import Collapse from '@mui/material/Collapse';
+
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import PriceChangeIcon from '@mui/icons-material/PriceChange';
+import CategoryIcon from '@mui/icons-material/Category';
+import ClassIcon from '@mui/icons-material/Class';
 
 import axios from '../api/axios'
 import { Grid } from "@mui/material";
@@ -47,6 +54,8 @@ const FilterText = styled.h3`
     text-transform: uppercase;
     margin: 5px 0px;
     color: inherit;
+    display: flex;
+    align-items: center;
 
     &:hover {
         color: #63e399;
@@ -110,22 +119,53 @@ function valuetext(value) {
   if (scaledValue >= 10000000) {
     scaledValue = 10000000;
   }
-  return `${scaledValue} đ`;
+  return `${scaledValue.toLocaleString()} đ`;
 }
-//#endriegion
+//#endregion
 
 const CATEGORIES_URL = 'api/categories';
+const PUBLISHERS_URL = 'api/publishers';
+const marks = [
+  {
+    value: 0,
+    label: '0 đ',
+  },
+  {
+    value: 3.75,
+    label: '',
+  },
+  {
+    value: 7.5,
+    label: '200,000 đ',
+  },
+  {
+    value: 11.25,
+    label: '',
+  },
+  {
+    value: 15,
+    label: '10tr',
+  },
+];
 
 const FilterList = (props) => {
-  const {filters, onCateChange, onRangeChange} = props;
+  //#region construct
+  const {filters, onCateChange, onRangeChange, onChangePub} = props;
   const [open, setOpen] = useState(false);
+  const [cateId, setCateId] = useState(filters?.cateId);
   const [catesList, setCatesList] = useState([])
-  const [value, setValue] = useState([0, 15]);
-  const [valueInput, setValueInput] = useState([calculateValue(value[0]), calculateValue(value[1])]);
+  const [pubList, setPubList] = useState([]);
+  const [selectedPub, setSelectedPub] = useState(filters?.pubId);
+  const [valueInput, setValueInput] = useState(filters?.value);
+  const [value, setValue] = useState([reverseCalculateValue(valueInput[0]), reverseCalculateValue(valueInput[1])]);
 
   //Scale
   function calculateValue(value) {
     return ( 2 ** value) * 1000;
+  }
+
+  function reverseCalculateValue(value){
+    return Math.log(value / 1000) / Math.log(2);
   }
 
   // Change stuff
@@ -151,7 +191,7 @@ const FilterList = (props) => {
     let newValue = [...valueInput]
     newValue[0] = event.target.value === '' ? '' : Number(event.target.value);
     let rangeValue = [...value]
-    rangeValue[0] = Math.log(newValue[0] / 1000) / Math.log(2);
+    rangeValue[0] = reverseCalculateValue(newValue[0]);
     setValueInput(newValue);
     setValue(rangeValue);
     onRangeChange(newValue);
@@ -161,10 +201,33 @@ const FilterList = (props) => {
     let newValue = [...valueInput]
     newValue[1] = event.target.value === '' ? '' : Number(event.target.value);
     let rangeValue = [...value]
-    rangeValue[1] = Math.log(newValue[1] / 1000) / Math.log(2);
+    rangeValue[1] = reverseCalculateValue(newValue[1]);
     setValueInput(newValue);
     setValue(rangeValue);
     onRangeChange(newValue);
+  };
+
+  const handleChangePub = (event) => {
+    if (onChangePub){
+      const selectedIndex = selectedPub.indexOf(event.target.value);
+      let newSelected = [];
+
+      if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selectedPub, event.target.value);
+      } else if (selectedIndex === 0) {
+        newSelected = newSelected.concat(selectedPub.slice(1));
+      } else if (selectedIndex === selectedPub.length - 1) {
+        newSelected = newSelected.concat(selectedPub.slice(0, -1));
+      } else if (selectedIndex > 0) {
+        newSelected = newSelected.concat(
+          selectedPub.slice(0, selectedIndex),
+          selectedPub.slice(selectedIndex + 1),
+        );
+      }
+
+      setSelectedPub(newSelected);
+      onChangePub(newSelected);
+    }
   };
 
   const handleBlur = () => {
@@ -190,9 +253,15 @@ const FilterList = (props) => {
     }
   };
 
+  useEffect(()=>{
+    setSelectedPub(filters?.pubId);
+    setCateId(filters?.cateId);
+  }, [filters]);
+
   //Load
   useEffect(()=>{
     loadCategories();
+    loadPublishers();
     handleBlur();
   }, []);
 
@@ -201,28 +270,13 @@ const FilterList = (props) => {
       setCatesList(result.data);
   };
 
-  const marks = [
-    {
-      value: 0,
-      label: '0đ',
-    },
-    {
-      value: 3.75,
-      label: '',
-    },
-    {
-      value: 7.5,
-      label: '200.000đ',
-    },
-    {
-      value: 11.25,
-      label: '',
-    },
-    {
-      value: 15,
-      label: '10tr',
-    },
-  ];
+  const loadPublishers = async()=>{
+    const result = await axios.get(PUBLISHERS_URL);
+    setPubList(result.data);
+  };
+
+  const isSelected = (id) => selectedPub.indexOf(id) !== -1;
+  //#endregion
 
   return (
     <Container>
@@ -230,7 +284,7 @@ const FilterList = (props) => {
 
       <Filter>
         <TitleContainer>
-          <FilterText>Khoảng giá</FilterText>
+          <FilterText><PriceChangeIcon/>&nbsp;Khoảng giá</FilterText>
         </TitleContainer>
         
         <Box sx={{ width: 220}}>
@@ -290,10 +344,12 @@ const FilterList = (props) => {
           </PriceInputContainer>
         </InputContainer>
       </Filter>
-
       <Divider/>
-
       <Filter>
+        <TitleContainer>
+          <FilterText><CategoryIcon/>&nbsp;Danh mục</FilterText>
+        </TitleContainer>
+
         <List
           sx={{ width: '100%', maxWidth: 250, py: 0}}
           component="nav"
@@ -301,11 +357,18 @@ const FilterList = (props) => {
         >
           {catesList.map((cate, index) => (
             <Grid key={index}>
-              <ListItemButton sx={{pl: 0, py: 0, justifyContent: 'space-between'}}>
+              <ListItemButton 
+              sx={{pl: 0, py: 0, 
+                justifyContent: 'space-between',
+                '&.Mui-selected': {
+                  color: '#63e399'
+                },
+              }}
+              selected={cateId == cate?.id}>
                 <FilterText onClick={() => handleCateChange(cate.id)}>{cate.categoryName}</FilterText>
                 { cate.cateSubs.length == 0
-                  ? <></>
-                  : < >
+                  ? null
+                  : <>
                   {open[cate.id] ? <ExpandLess onClick={() => handleClick(cate.id)}/> 
                       : <ExpandMore onClick={() => handleClick(cate.id)}/>}
                     </>
@@ -326,6 +389,35 @@ const FilterList = (props) => {
             </Grid>
           ))}
         </List>
+      </Filter>
+      <Divider/>
+      <Filter>
+        <TitleContainer>
+          <FilterText><ClassIcon/>&nbsp;Nhà xuất bản</FilterText>
+        </TitleContainer>
+
+        <FormGroup sx={{padding: 0}}>
+        {pubList.map((pub, index) => {
+          const isItemSelected = isSelected(`${pub.id}`);
+
+          return (
+            <FormControlLabel
+              control={
+                <Checkbox value={pub.id} 
+                checked={isItemSelected} 
+                onChange={handleChangePub} 
+                disableRipple
+                name={pub.pubName}
+                sx={{paddingLeft: 0, 
+                  '&.Mui-checked': {
+                  color: '#63e399',
+                }}} />
+              }
+              label={pub.pubName}
+            />
+          )
+        })}
+        </FormGroup>
       </Filter>
     </Container>
   )

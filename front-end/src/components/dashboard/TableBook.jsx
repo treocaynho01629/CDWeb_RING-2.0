@@ -26,6 +26,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { visuallyHidden } from '@mui/utils';
 import useAuth from "../../hooks/useAuth";
 import { useSnackbar } from 'notistack';
+import { Link } from "react-router-dom";
 
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import EditIcon from '@mui/icons-material/Edit';
@@ -452,9 +453,13 @@ export default function TableBook(props) {
                       />
                     </TableCell>
                     <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
-                      {row.id}
+                      <Link to={`/detail/${row.id}`}>{row.id}</Link>
                     </TableCell>
-                    <TableCell align="left"><ItemTitle>{row.title}</ItemTitle></TableCell>
+                    <TableCell align="left">
+                      <Link to={`/detail/${row.id}`}>
+                        <ItemTitle>{row.title}</ItemTitle>
+                      </Link>
+                    </TableCell>
                     <TableCell align="left"><img src={row.image} style={{width: '45px', height: '45px'}}/></TableCell>
                     <TableCell align="right">{row.price.toLocaleString()} đ</TableCell>
                     <TableCell align="right"> 

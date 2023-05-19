@@ -12,6 +12,7 @@ import { useDispatch } from "react-redux"
 import useFetch from '../hooks/useFetch'
 import { useSnackbar } from 'notistack';
 
+//#region styled
 const ImgContainer = styled.div`
     height: 450px;
     text-align: center;
@@ -88,6 +89,7 @@ const Button = styled.button`
     outline: none;
     border: 0;
 `
+//#endregion
 
 const RANDOMBOOKS_URL = 'api/books/random';
 
@@ -133,7 +135,7 @@ function Item({book})
 
 const Slider = () => {
     const [booskList, setBooksList] = useState([])
-    const { loading, error, data } = useFetch(RANDOMBOOKS_URL);
+    const { loading, data } = useFetch(RANDOMBOOKS_URL);
 
     //Load
     useEffect(()=>{

@@ -16,6 +16,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import Logout from '@mui/icons-material/Logout';
 import SpeedIcon from '@mui/icons-material/Speed';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 
 import Stack from '@mui/material/Stack';
 import Badge from '@mui/material/Badge';
@@ -418,6 +419,7 @@ const Navbar = (props) => {
 
     const handleSubmitSearch = async (e) => {
         e.preventDefault();
+        setSearchField('');
         navigate(`/filters?keyword=${searchField}`);
     }
 
@@ -617,7 +619,10 @@ const Navbar = (props) => {
         <MiniCartContainer>
         <div style={{margin: '20px 0px'}}><b>Sản phẩm trong giỏ hàng</b></div>
         {products.length == 0 ?
-            <p>Trống</p>
+        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', height: '250px'}}>
+            <RemoveShoppingCartIcon sx={{fontSize: '50px'}}/>
+            <b>GIỎ HÀNG TRỐNG</b>
+        </div>
         :
             <>
             {products.slice(0, 5).map((product, index) => (

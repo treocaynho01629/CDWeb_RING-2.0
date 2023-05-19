@@ -14,7 +14,7 @@ public interface ReviewService {
 	Page<ReviewDTO> getAllReviews(Integer pageNo, Integer pageSize, String sortBy, String sortDir);
 	Page<ReviewDTO> getReviewsByUser(Integer userId, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
 	Page<ReviewDTO> getReviewsByUser(Account user, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
-	Page<ReviewDTO> getReviewsByBookId(Integer id, Integer pageNo, Integer pageSize);
+	Page<ReviewDTO> getReviewsByBookId(Integer id, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
 	Review review(Integer id, ReviewRequest request, Account user);
 	Review deleteReview(Integer id);
 }

@@ -241,7 +241,7 @@ function SignPage() {
             navigate(from, { replace: true });
         } catch (err) {
             if (!err?.response) {
-                setErrMsgLogin('No Server Response');
+                setErrMsgLogin('Server không phản hồi');
             } else if (err.response?.status === 404) {
                 setErrMsgLogin('Sai tên tài khoản hoặc mật khẩu!');
             } else if (err.response?.status === 400) {
@@ -356,7 +356,7 @@ function SignPage() {
 
             console.log(err);
             if (!err?.response) {
-                setErrMsg('No Server Response');
+                setErrMsg('Server không phản hồi');
             } else if (err.response?.status === 409) {
                 setErrMsg(err.response?.data?.errors?.errorMessage);
             } else if (err.response?.status === 400) {

@@ -25,7 +25,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 
 import { visuallyHidden } from '@mui/utils';
 
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import TryIcon from '@mui/icons-material/Try';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import usePrivateFetch from '../../hooks/usePrivateFetch'
@@ -245,7 +245,7 @@ function EnhancedTableToolbar(props) {
           variant="h6"
           component="div"
         >
-        <AutoStoriesIcon sx={{marginRight: '10px'}}/>
+        <TryIcon sx={{marginRight: '10px'}}/>
         {selectedAll ? "Chọn tất cả" : `Chọn ${numSelected} đánh giá`}
         </Typography>
       ) : (
@@ -255,7 +255,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          <AutoStoriesIcon sx={{color: 'white', marginRight: '10px'}}/>
+          <TryIcon sx={{color: 'white', marginRight: '10px'}}/>
           Danh sách đánh giá
         </Typography>
       )}
@@ -279,7 +279,7 @@ EnhancedTableToolbar.propTypes = {
 
 export default function TableReviews(props) {
   //#region construct
-  const { setReviewCount } = props;
+  const { setReviewCount, id } = props;
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('id');
   const [selected, setSelected] = useState([]);
@@ -287,7 +287,7 @@ export default function TableReviews(props) {
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(true);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { loading, data: rows , refetch} = usePrivateFetch(REVIEWS_URL
+  const { loading, data: rows , refetch} = usePrivateFetch(REVIEWS_URL + (id ? `/${id}` : '')
     + "?pageNo=" + page
     + "&pSize=" + rowsPerPage
     + "&sortDir=" + order

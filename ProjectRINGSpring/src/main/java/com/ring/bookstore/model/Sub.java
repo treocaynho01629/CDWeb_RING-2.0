@@ -4,7 +4,6 @@ import org.hibernate.annotations.Nationalized;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -45,5 +44,4 @@ public class Sub {
     @JoinColumn(name = "cate_id")
     @JsonIgnore
     private Category cate;
-
 }

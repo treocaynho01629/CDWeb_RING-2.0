@@ -7,7 +7,6 @@ import CategoryIcon from '@mui/icons-material/Category';
 import Skeleton from '@mui/material/Skeleton';
 
 import { Link } from "react-router-dom"
-import useFetch from "../hooks/useFetch";
 
 const ItemContainer = styled.div`
     display: flex;
@@ -82,8 +81,6 @@ const Arrow = styled.div`
     }
 `
 
-const CATEGORIES_URL = 'api/categories';
-
 const CateItem = ({cate}) => {
     return (
         <Link to={`/filters?cateId=${cate.id}`} style={{color: 'inherit'}}>
@@ -95,11 +92,10 @@ const CateItem = ({cate}) => {
     )
 }
 
-const Categories = () => {
-
+const Categories = (props) => {
     const slideRef = useRef();
     const [catesList, setCatesList] = useState([])
-    const { loading, data } = useFetch(CATEGORIES_URL);
+    const { loading, data } = props;
 
     //Load
     useEffect(()=>{

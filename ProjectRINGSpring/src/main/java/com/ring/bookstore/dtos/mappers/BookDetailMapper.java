@@ -37,6 +37,7 @@ public class BookDetailMapper implements Function<Book, BookDetailDTO> {
         		book.getDescription(),
         		book.getType(),
         		book.getAuthor(),
+        		book.getUser().getUsername(),
         		book.getPublisher(),
         		cate.getId(),
         		cate.getCategoryName(),

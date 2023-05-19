@@ -43,8 +43,10 @@ public class ReviewController {
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getReviewsByBookId(@PathVariable("id") Integer bookId,
 												@RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
-												@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo){
-		return new ResponseEntity< >(reviewService.getReviewsByBookId(bookId, pageNo, pageSize), HttpStatus.OK);
+												@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+												@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+	    										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir){
+		return new ResponseEntity< >(reviewService.getReviewsByBookId(bookId, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
 	//Lấy Review theo người dùng
