@@ -13,9 +13,12 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 
+import { useNavigate } from "react-router-dom";
 import useFetch from '../hooks/useFetch'
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import useAuth from "../hooks/useAuth";
 
+//#region styled
 const RatingTab = styled.div``
 
 const RatingSelect = styled.div`
@@ -33,13 +36,13 @@ const RateSelect = styled.div`
 
 const RateButton = styled.button`
     border-radius: 0;
-    padding: 10px;
+    padding: 10px 20px;
     margin-top: -15px;
     border: none;
     outline: none;
     background-color: #63e399;
     color: white;
-    font-size: 14px;
+    font-size: 16px;
     justify-content: center;
     font-weight: bold;
     transition: all 0.5s ease;
@@ -60,20 +63,24 @@ const StyledRating = muiStyled(Rating)({
         color: '#00ff6a',
     },
 });
+//#endregion
 
 const REVIEW_URL = `/api/reviews/`
 
 const ReviewTab = (props) => {
+    //#region construct
     const {id, rateAmount} = props;
     const [content, setContent] = useState('');
     const [rating, setRating] = useState(5);
     const [reviewList, setReviewList] = useState([]);
     const [pagination, setPagination] = useState({
         currPage: 0,
-        pageSize: 5,
+        pageSize: 8,
         totalPages: 0
     })
     const axiosPrivate = useAxiosPrivate();
+    const { auth } = useAuth();
+    const navigate = useNavigate();
 
     const { loading: loadingReview, data: reviews, refetch } = useFetch(REVIEW_URL + id
         + "?pSize=" + pagination.pageSize 
@@ -99,6 +106,11 @@ const ReviewTab = (props) => {
         setContent(event.target.value);
     };
 
+    const handleChangeSize = (newValue) => {
+        handlePageChange(1);
+        setPagination({...pagination, pageSize: newValue});
+    };
+
     const handleSubmitReview = async (e) => {
         e.preventDefault();
 
@@ -117,6 +129,7 @@ const ReviewTab = (props) => {
             refetch();
             setContent('');
             setRating(5);
+            handlePageChange(1);
         } catch (err) {
             console.log(err);
             if (!err?.response) {
@@ -139,47 +152,57 @@ const ReviewTab = (props) => {
                 </Grid>
             ))}
             <AppPagination pagination={pagination}
-            onPageChange={handlePageChange}/>
+            onPageChange={handlePageChange}
+            onSizeChange={handleChangeSize}/>
         </Box>
     } else {
         review = <Box sx={{marginBottom: 5}}>Chưa có ai bình luận, hãy trở thành người đầu tiên!</Box>
     }
+    //#endregion
 
   return (
     <RatingTab>
         {review}
         <Box>
+            {auth.userName ?
             <Box>
-                <strong>Để lại đánh giá của bạn</strong>
+                <Box><strong style={{fontSize: '16px'}}>Để lại đánh giá của bạn</strong></Box>
+                <form onSubmit={handleSubmitReview}>
+                    <TextareaAutosize
+                        aria-label="comment"
+                        minRows={7}
+                        value={content}
+                        onChange={handleChangeContent}
+                        placeholder="Đánh giá của bạn ..."
+                        style={{ width: '100%', margin: '30px 0px', backgroundColor: 'white', outline: 'none',
+                        borderRadius: '0', resize: 'none', color: 'black', fontSize: '16px'}}
+                    />
+                    <RatingSelect>
+                        <RateSelect>
+                            <strong>Đánh giá: </strong>
+                            <StyledRating
+                                sx={{marginLeft: '5px'}} 
+                                name="product-rating"
+                                value={rating}
+                                onChange={(event, newValue) => {
+                                    setRating(newValue);
+                                }}
+                                getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
+                                icon={<StarIcon fontSize="10px"/>}
+                                emptyIcon={<StarBorderIcon fontSize="10"/>}
+                            /> 
+                        </RateSelect>
+                        <RateButton>Gửi đánh giá</RateButton>
+                    </RatingSelect>
+                </form>
             </Box>
-            <form onSubmit={handleSubmitReview}>
-            <TextareaAutosize
-                aria-label="comment"
-                minRows={7}
-                value={content}
-                onChange={handleChangeContent}
-                placeholder="Đánh giá của bạn ..."
-                style={{ width: '100%', margin: '30px 0px', backgroundColor: 'white', outline: 'none',
-                borderRadius: '0', resize: 'none', color: 'black', fontSize: '16px'}}
-            />
-            <RatingSelect>
-                <RateSelect>
-                    <strong>Đánh giá: </strong>
-                    <StyledRating
-                        sx={{marginLeft: '5px'}} 
-                        name="product-rating"
-                        value={rating}
-                        onChange={(event, newValue) => {
-                            setRating(newValue);
-                        }}
-                        getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
-                        icon={<StarIcon fontSize="10px"/>}
-                        emptyIcon={<StarBorderIcon fontSize="10"/>}
-                    /> 
-                </RateSelect>
-                <RateButton>Gửi đánh giá</RateButton>
-            </RatingSelect>
-            </form>
+            : 
+            <Box>
+                <Box><strong style={{fontSize: '16px'}}>Bạn chưa đăng nhập, hãy Đăng nhập để để lại đánh giá của bạn</strong></Box>
+                <br/>
+                <RateButton onClick={() => navigate('/login')}>Đăng nhập ngay</RateButton>
+            </Box>
+            }
         </Box>
     </RatingTab>
   )

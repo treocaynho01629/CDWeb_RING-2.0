@@ -15,17 +15,16 @@ import com.ring.bookstore.model.Book;
 public interface BookRepository extends JpaRepository<Book, Integer>{
 	
 	@Query("""
-	select b.id as id, b.title as title, b.description as description, i.name as image, b.price as price, 
-	count(r.id) as rateAmount, isnull(sum(r.rating), 0) as rateTotal 
+	select b.id as id, b.title as title, b.description as description, b.images.name as image, b.price as price, 
+	count(r.id) as rateAmount, isnull(sum(r.rating), 0) as rateTotal, size(b.orderDetails) as orderTime
 	from Book b left join Review r on b.id = r.book.id
-	left join Image i on i.id = b.images.id
 	where concat (b.title, b.author) like %:keyword%
 	and cast(b.cate.id as string) like %:cateId%
 	and b.user.userName like %:seller%
 	and cast(b.publisher.id as string) not in :pubId
 	and b.type like %:type%
 	and b.price between :fromRange and :toRange
-	group by b.id, b.title, b.description, i.name, b.price 
+	group by b.id, b.title, b.description, b.images.name, b.price
 	""")
 	public Page<IBookDisplay> findBooksWithFilter(String keyword, String cateId, String[] pubId, String seller,String type, Double fromRange, Double toRange, Pageable pageable);
 	

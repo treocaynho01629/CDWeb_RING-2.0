@@ -3,9 +3,12 @@ import { useState } from "react";
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 
-import TableBook from '../../components/dashboard/TableBook'
 import DashboardNavbar from "../../components/dashboard/DashboardNavbar";
 import DashboardDrawer from "../../components/dashboard/DashboardDrawer";
+import TableBook from '../../components/dashboard/TableBook'
+import TableAccounts from "../../components/dashboard/TableAccounts";
+import TableReviews from "../../components/dashboard/TableReviews";
+import TableReceipts from "../../components/dashboard/TableReceipts";
 
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import GroupIcon from '@mui/icons-material/Group';
@@ -42,6 +45,8 @@ const Management = () => {
   const [open, setOpen] = useState(false);
   const [accCount, setAccCount] = useState(0);
   const [bookCount, setBookCount] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
+  const [receiptCount, setReceiptCount] = useState(0);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -51,15 +56,39 @@ const Management = () => {
 
       <Box component="main" sx={{ flexGrow: 1, p: 3 , marginTop: '80px'}}>
         <Grid container spacing={3} sx={{marginBottom: '20px'}}>
-          <Grid item sm={6} md={3}>
+          <Grid item xs={12} md={4}>
             <CountContainer elevation={3} >
               <AutoStoriesIcon sx={countIconStyle}/>
               <CountInfo><h2 style={{margin: 0}}>{bookCount}</h2><span>Cuốn sách</span></CountInfo>
             </CountContainer>
           </Grid>
+          <Grid item sm={6} md={4}>
+            <CountContainer elevation={3} >
+              <ReceiptIcon sx={countIconStyle}/>
+              <CountInfo><h2 style={{margin: 0}}>{receiptCount}</h2><span>Đơn đặt hàng</span></CountInfo>
+            </CountContainer>
+          </Grid>
+          <Grid item sm={6} md={4}>
+            <CountContainer elevation={3} >
+              <TryIcon sx={countIconStyle}/>
+              <CountInfo><h2 style={{margin: 0}}>{reviewCount}</h2><span>Đánh giá</span></CountInfo>
+            </CountContainer>
+          </Grid>
         </Grid>
 
-        <TableBook setBookCount={setBookCount}/>
+        <Grid container spacing={3}>
+          <Grid item sm={12}>
+            <TableBook setBookCount={setBookCount}/>
+          </Grid>
+        </Grid>
+        <Grid container spacing={3}>
+          <Grid item sm={12} lg={6}>
+            <TableReceipts setReceiptCount={setReceiptCount}/>
+          </Grid>
+          <Grid item sm={12} lg={6}>
+            <TableReviews setReviewCount={setReviewCount}/>
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   )

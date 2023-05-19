@@ -37,9 +37,7 @@ import com.ring.bookstore.repository.BookDetailRepository;
 import com.ring.bookstore.repository.BookRepository;
 import com.ring.bookstore.repository.CategoryRepository;
 import com.ring.bookstore.repository.ImageRepository;
-import com.ring.bookstore.repository.OrderDetailRepository;
 import com.ring.bookstore.repository.PublisherRepository;
-import com.ring.bookstore.repository.ReviewRepository;
 import com.ring.bookstore.request.BookRequest;
 import com.ring.bookstore.service.BookService;
 
@@ -93,11 +91,6 @@ public class BookServiceImpl implements BookService {
         	List<Integer> pubList = pubRepo.findAllIds();
             pubList.removeAll(pubId);
         	pubListString = Arrays.toString(pubList.toArray()).split("[\\[\\]]")[1].split(", "); 
-        }
-        
-        for (int i = 0; i < pubListString.length; i++) {
-        	
-        	System.out.println(pubListString[i]);
         }
         
         //Get

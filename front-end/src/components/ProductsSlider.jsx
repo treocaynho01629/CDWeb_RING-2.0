@@ -1,16 +1,32 @@
 import styled from "styled-components"
+import { styled as muiStyled } from '@mui/material/styles';
 
 import OwlCarousel from 'react-owl-carousel';
 import 'owl.carousel/dist/assets/owl.carousel.css';
 import 'owl.carousel/dist/assets/owl.theme.default.css';
 
-import Skeleton from '@mui/material/Skeleton';
+import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
+//#region styled
 import ProductSimple from "./ProductSimple"
 
 const Container = styled.div`
     position: relative;
+    height: 384px;
+    margin-bottom: 10px;
 `
+
+const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
+  borderRadius: 0,
+  [`&.${linearProgressClasses.colorPrimary}`]: {
+      backgroundColor: 'white',
+  },
+  [`& .${linearProgressClasses.bar}`]: {
+      borderRadius: 0,
+      backgroundColor: '#63e399',
+  },
+}));
+//#endregion
 
 const ProductsSlider = ({loading, booksList}) => {
 
@@ -27,14 +43,9 @@ const ProductsSlider = ({loading, booksList}) => {
 
   if (loading){
     return (
-      // <Container>
-      //   <OwlCarousel className='owl-theme' lazyLoad dots={false} margin={10} items={5}>
-      //   {Array.from(new Array(5))?.map((index) => (
-      //     <Skeleton key={index} variant="rectangular" animation="wave" width={213} height={380}/>
-      //   ))}
-      //   </OwlCarousel>
-      // </Container>
-      <p>loading</p>
+      <Container>
+        <CustomLinearProgress/>
+      </Container>
     )
   }
 
@@ -48,7 +59,6 @@ const ProductsSlider = ({loading, booksList}) => {
       ))}
       </OwlCarousel>
     </Container>
-    
   )
 }
 

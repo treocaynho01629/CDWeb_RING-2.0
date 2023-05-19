@@ -12,9 +12,9 @@ import TabPanel from '@mui/lab/TabPanel';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 
 import ProductsSlider from '../components/ProductsSlider';
-
 import useFetch from '../hooks/useFetch'
 
+//#region styled
 const FullInfoTab = styled.div``
 
 const RelatedTab = styled.div``
@@ -37,7 +37,7 @@ const StyledTabList = muiStyled((props) => (
     },
   });
   
-  const StyledTab = muiStyled((props) => <Tab disableRipple {...props} />)(
+const StyledTab = muiStyled((props) => <Tab disableRipple {...props} />)(
     ({ theme }) => ({
       fontWeight: 400,
       color: 'rgba(255, 255, 255, 0.7)',
@@ -63,6 +63,7 @@ const StyledTabList = muiStyled((props) => (
 const DetailContainer = styled.div`
     margin: 50px 0px;
 `
+//#endregion
 
 const BOOKS_RELATED_URL = 'api/books/filters?pSize=10&cateId=';
 

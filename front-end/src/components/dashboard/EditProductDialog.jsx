@@ -234,16 +234,18 @@ const EditProductDialog = (props) => {
     const [type, setType] = useState(bookTypes[0].value);
     const [err, setErr] = useState([]);
     const [errMsg, setErrMsg] = useState('');
+    const [isOpen, setIsOpen] = useState(false);
     const axiosPrivate = useAxiosPrivate();
     const { enqueueSnackbar } = useSnackbar();
-    const { loading, data } = useFetch(BOOK_URL + "/" + id);
+    const { loading, data } = useFetch(id.length !== 0 ? BOOK_URL + "/" + id : '');
 
     const handleCloseNew = () => {
       setOpen(false);
     };
 
     useEffect(() => {
-      if (id && open && !loading){
+      if (id.length !== 0 && open && data && !loading){
+        console.log(id);
         setDate(dayjs(data?.date));
         setFiles([]);
         setImage(data?.image);

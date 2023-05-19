@@ -16,7 +16,6 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -26,7 +25,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 
 import { visuallyHidden } from '@mui/utils';
 
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -102,11 +101,11 @@ const RECEIPTS_URL = 'api/orders';
 const headCells = [
   {
     id: 'user.userName',
-    align: 'center',
+    align: 'left',
     width: '200px',
     disablePadding: false,
     sortable: true,
-    label: 'Thành viên',
+    label: 'Khách hàng',
   },
   {
     id: 'email',
@@ -134,7 +133,7 @@ const headCells = [
   },
   {
     id: 'total',
-    align: 'left',
+    align: 'right',
     width: '250px',
     disablePadding: false,
     sortable: true,
@@ -209,34 +208,15 @@ function EnhancedTableToolbar(props) {
         }),
       }}
     >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: '1 1 100%' , fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center'}}
-          variant="h6"
-          component="div"
-        >
-        <AutoStoriesIcon sx={{marginRight: '10px'}}/>
-        {selectedAll ? "Chọn tất cả" : `Chọn ${numSelected} đánh giá`}
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: '1 1 100%' , fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center'}}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          <AutoStoriesIcon sx={{color: 'white', marginRight: '10px'}}/>
-          Danh sách đánh giá
-        </Typography>
-      )}
-
-      {numSelected > 0 ? (
-        <Tooltip title="Xoá đánh giá đã chọn">
-          <IconButton>
-            <DeleteIcon sx={{color: 'white', "&:hover": {transform: 'scale(1.05)', color: '#e66161'}}} />
-          </IconButton>
-        </Tooltip>
-      ) : (<></>)}
+      <Typography
+        sx={{ flex: '1 1 100%' , fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center'}}
+        variant="h6"
+        id="tableTitle"
+        component="div"
+      >
+        <ReceiptIcon sx={{color: 'white', marginRight: '10px'}}/>
+        Danh sách đơn hàng
+      </Typography>
     </Toolbar>
   );
 }
@@ -266,7 +246,7 @@ function Row(props) {
         <TableCell align="left"><ItemTitle>{row.email}</ItemTitle></TableCell>
         <TableCell align="left"><ItemAddress>{row.address}</ItemAddress></TableCell>
         <TableCell align="left"><ItemDate>{row.date}</ItemDate></TableCell>
-        <TableCell align="right">{Math.round(row.total).toLocaleString()}đ</TableCell>
+        <TableCell align="right">{Math.round(row.total).toLocaleString()} đ</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -290,10 +270,10 @@ function Row(props) {
                       <TableCell component="th" scope="row">
                         {detail.bookId}
                       </TableCell>
-                      <TableCell>{detail.price.toLocaleString()}đ</TableCell>
+                      <TableCell>{detail.price.toLocaleString()} đ</TableCell>
                       <TableCell align="right">{detail.amount}</TableCell>
                       <TableCell align="right">
-                        {Math.round(detail.amount * detail.price).toLocaleString()}đ
+                        {Math.round(detail.amount * detail.price).toLocaleString()} đ
                       </TableCell>
                     </TableRow>
                   ))}

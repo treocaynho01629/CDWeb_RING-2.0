@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system';
@@ -10,10 +10,14 @@ import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SellIcon from '@mui/icons-material/Sell';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import CheckIcon from '@mui/icons-material/Check';
 
 import Grid from '@mui/material/Grid';
 import Rating from '@mui/material/Rating'
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Avatar from '@mui/material/Avatar';
+import Skeleton from '@mui/material/Skeleton';
 
 import ProductImages from '../components/ProductImages';
 import ProductsSlider from '../components/ProductsSlider';
@@ -27,6 +31,7 @@ import { addToCart } from '../redux/cartReducer';
 import useFetch from '../hooks/useFetch'
 import { useSnackbar } from 'notistack';
 
+//#region styled
 const Container = styled.div`
 `
 
@@ -47,25 +52,28 @@ const Wrapper = styled.div`
     }
 `
 
-const CouponContainer = styled.div`
+const StuffContainer = styled.div`
     border: 0.5px solid lightgray;
     padding: 20px 10px;
+    margin-bottom: 20px;
 `
 
-const CouponTitle = styled.h5`
-    margin: 0;
+const SellerContainer = styled.div`
+    display: flex; 
+    justify-content: space-evenly;
+    align-items: center;
+    margin: 20px 0px;
 `
 
 const CouponTab = styled.div`
     background-color: lightgray;   
     margin-top: 10px; 
-    padding: 5px;
+    padding: 10px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     text-align: center;
     justify-content: center;
-    color: black;
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
@@ -246,6 +254,7 @@ const BuyButton = styled.button`
         color: gray;
     }
 `
+//#endregion
 
 const BOOK_URL = `/api/books/`;
 const BOOKS_RANDOM_URL = 'api/books/random?amount=10';
@@ -255,6 +264,7 @@ const ProductDetail = () => {
     const [book, setBook] = useState([]);
     const [amountIndex, setAmountIndex] = useState(1);
     const { enqueueSnackbar } = useSnackbar();
+    const ref = useRef(null);
 
     const { loading, data, error } = useFetch(BOOK_URL + id);
     const { loading: loadingRandom, data: booksRandom } = useFetch(BOOKS_RANDOM_URL);
@@ -302,10 +312,30 @@ const ProductDetail = () => {
         }))
     };
 
+    const handleViewMore = () => {
+        ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
     let product;
     
     if (loading){
-        product = <p>loading</p>
+        product = 
+        <Grid container spacing={2}>
+            <Grid item sm={12} md={10}>
+                <Grid container spacing={2} justifyContent="flex-start" alignItems="stretch">
+                    <Grid item sm={12} md={6}>
+                        <Skeleton variant="rectangular" animation="wave" width={478} height={645}/>
+                    </Grid>
+                    <Grid item sm={12} md={6}>
+                        <Skeleton variant="rectangular" animation="wave" width={478} height={704}/>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Grid item sm={12} md={2}>
+                <Skeleton variant="rectangular" animation="wave" width={181} height={170}/>
+                <Skeleton variant="rectangular" animation="wave" width={181} height={230}/>
+            </Grid>
+        </Grid>
     } else {
         product =
         <Grid container spacing={2}>
@@ -317,9 +347,7 @@ const ProductDetail = () => {
                     <Grid item sm={12} md={6}>
                         <InfoContainer>
                             <div>
-                                <Title>
-                                    {book?.title}
-                                </Title>
+                                <Title>{book?.title}</Title>
                                 <Detail>
                                     Nhà xuất bản: &nbsp;
                                     <Link to={`/filters?pubId=${book?.publisher?.id}`}>
@@ -360,6 +388,9 @@ const ProductDetail = () => {
                                 <Description>
                                     {book?.description}
                                 </Description>
+                                <Detail>
+                                    <Link onClick={handleViewMore}>Xem thêm...</Link>
+                                </Detail>
                             </div>
                             <FilterContainer>
                                 <Divider sx={{my: 2}}/>
@@ -388,16 +419,28 @@ const ProductDetail = () => {
                 </Grid>
             </Grid>
             <Grid item sm={12} md={2}>
-                <CouponContainer>
-                    <CouponTitle>KHUYẾN MÃI</CouponTitle>
-                    <CouponTab><SellIcon/>&nbsp;MÃ: ABCDFE39</CouponTab>
-                    <CouponTab><SellIcon/>&nbsp;MÃ: ABCDFE39</CouponTab>
-                    <CouponTab><SellIcon/>&nbsp;MÃ: ABCDFE39</CouponTab>
-                    <CouponTab><SellIcon/>&nbsp;MÃ: ABCDFE39</CouponTab>
-                    <CouponTab><SellIcon/>&nbsp;MÃ: ABCDFE39</CouponTab>
-                    <CouponTab><SellIcon/>&nbsp;MÃ: ABCDFE39</CouponTab>
-                    <CouponTab><SellIcon/>&nbsp;MÃ: ABCDFE39</CouponTab>
-                </CouponContainer>
+                <StuffContainer>
+                    <h5 style={{margin: 0, display: 'flex', alignItems: 'center'}}><StorefrontIcon/>&nbsp;NHÀ PHÂN PHỐI</h5>
+                    <SellerContainer>
+                        <Avatar>H</Avatar>
+                        <Link to={`/filters?sellerName=${book?.sellerName}`}>
+                            {book?.sellerName}
+                        </Link>
+                    </SellerContainer>
+                    <h4 style={{margin: 0, 
+                        display: 'flex', 
+                        justifyContent: 'center',
+                        alignItems: 'center', 
+                        color: '#63e399'}}>
+                        ĐỐI TÁC RING!&nbsp;<CheckIcon/>
+                    </h4>
+                </StuffContainer>
+                <StuffContainer>
+                    <h5 style={{margin: 0, display: 'flex', alignItems: 'center'}}><SellIcon/>&nbsp;KHUYẾN MÃI</h5>
+                    <CouponTab><SellIcon/>&nbsp; MÃ: ABCDFE39</CouponTab>
+                    <CouponTab><SellIcon/>&nbsp; MÃ: DFCR4546</CouponTab>
+                    <CouponTab><SellIcon/>&nbsp; MÃ: TRBB1234</CouponTab>
+                </StuffContainer>
             </Grid>
         </Grid>
     }
@@ -424,7 +467,9 @@ const ProductDetail = () => {
                 </Breadcrumbs>
             </div>
             {product}
-            <ProductDetailContainer loading={loading} book={book}/>
+            <div ref={ref} >
+                <ProductDetailContainer loading={loading} book={book}/>
+            </div>
             <ProductsSlider booksList={booksRandom} loading={loadingRandom}/>
             <br/><br/>
         </Wrapper>

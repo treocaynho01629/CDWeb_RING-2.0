@@ -24,10 +24,13 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import PropTypes from 'prop-types';
 
+import useAuth from "../hooks/useAuth";
+import { useSnackbar } from 'notistack';
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { removeItem, increaseQuantity, decreaseQuantity, changeQuantity } from '../redux/cartReducer';
 
+//#region styled
 const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: '#63e399',
@@ -271,6 +274,32 @@ const PayButton = styled.button`
         background-color: lightgray;
         color: black;
     }
+
+    &:disabled {
+        background-color: gray;
+        color: darkslategray;
+    }
+`
+
+const BackButton = styled.button`
+    background-color: #63e399;
+    padding: 15px 20px;
+    margin-top: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    font-weight: 500;
+    border-radius: 0;
+    border: none;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    transition: all 0.5s ease;
+
+    &:hover {
+        background-color: lightgray;
+        color: black;
+    }
 `
 
 const hoverIcon = {
@@ -279,12 +308,16 @@ const hoverIcon = {
         color: '#e66161',
     },
 };
+//#endregion
 
 const Cart = () => {
+    //#region construct
     const products = useSelector(state => state.cart.products); //Lấy products trong giỏ từ redux
     const dispatch = useDispatch();
     const [selected, setSelected] = useState([]);
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
+    const { auth } = useAuth();
 
     //Tính tổng tiền
     const totalPrice = () =>{
@@ -325,6 +358,7 @@ const Cart = () => {
 
     const handleDelete = (id) => {
         if (isSelected(id)) handleSelect(id);
+        enqueueSnackbar('Đã xoá sản phẩm khỏi giỏ hàng!', { variant: 'error' });
         dispatch(removeItem(id));
     }
 
@@ -344,6 +378,7 @@ const Cart = () => {
             dispatch(removeItem(id))
         })
         setSelected([]);
+        enqueueSnackbar('Đã xoá sản phẩm khỏi giỏ hàng!', { variant: 'error' });
     }
 
     const isSelected = (id) => selected.indexOf(id) !== -1;
@@ -387,6 +422,7 @@ const Cart = () => {
     onSelectAllClick: PropTypes.func.isRequired,
     rowCount: PropTypes.number.isRequired,
     };
+    //#endregion
 
   return (
     <Container>
@@ -401,6 +437,19 @@ const Cart = () => {
                 </Breadcrumbs>
             </div>
             
+            {products.length == 0 ?
+            <div style={{display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            height: '550px'}}>
+                <img style={{height: '250px'}} src="/empty.svg"/>
+                <h2>Giỏ hàng của bạn đang trống</h2>
+                <BackButton onClick={() => navigate('/')}>
+                    Tiếp tục mua sắm
+                </BackButton>
+            </div>
+            :
             <Grid container spacing={3} sx={{mb: 10}}>
                 <Grid item xs={12} lg={8}>
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 0px'}}>
@@ -510,10 +559,14 @@ const Cart = () => {
                             <PayoutText>Tổng:</PayoutText>
                             <PayoutPrice>{Math.round(totalPrice() * 1.1 + 10000).toLocaleString()}&nbsp;đ</PayoutPrice>
                         </PayoutRow>
-                        <PayButton disabled={products.length == 0} onClick={() => navigate('/checkout')}><PaymentsIcon style={{fontSize: 18}}/>&nbsp;THANH TOÁN</PayButton>
+                        <PayButton disabled={products.length == 0} 
+                            onClick={() => navigate('/checkout')}>
+                            <PaymentsIcon style={{fontSize: 18}}/>&nbsp;{auth.userName ? 'THANH TOÁN' : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
+                        </PayButton>
                     </Payout>
                 </Grid>
             </Grid>
+            }
         </Wrapper>
         <Footer/>
     </Container>

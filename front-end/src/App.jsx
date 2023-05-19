@@ -10,6 +10,8 @@ import Missing from './pages/error/Missing';
 import Admin from './pages/dashboard/Admin';
 import Management from './pages/dashboard/Management';
 import ManageBooks from './pages/dashboard/ManageBooks';
+import ManageAccounts from './pages/dashboard/ManageAccounts';
+import DetailProduct from './pages/dashboard/DetailProduct';
 
 import Layout from './components/authorize/Layout';
 import RequireAuth from './components/authorize/RequireAuth';
@@ -19,7 +21,6 @@ import {
   Routes,
   Route
 } from 'react-router-dom';
-import ManageAccounts from './pages/dashboard/ManageAccounts';
 
 function App() {
   return (
@@ -45,12 +46,15 @@ function App() {
           <Route element={<RequireAuth allowedRoles={['ROLE_SELLER']} />}>
             <Route path="/management" element={<Management/>}/>
             <Route path="/manage-books" element={<ManageBooks/>}/>
+            <Route path="/detail/:id" element={<DetailProduct/>}/>
           </Route>
 
           //ADMIN
           <Route element={<RequireAuth allowedRoles={['ROLE_ADMIN']} />}>
             <Route path="/admin" element={<Admin/>}/>
             <Route path="/manage-accounts" element={<ManageAccounts/>}/>
+            {/* <Route path="/manage-receipts" element={<ManageAccounts/>}/> */}
+            {/* <Route path="/manage-reviews" element={<ManageAccounts/>}/> */}
           </Route>
         </Route>
 

@@ -67,8 +67,9 @@ public class ReviewServiceImpl implements ReviewService {
         return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements());
 	}
 
-	public Page<ReviewDTO> getReviewsByBookId(Integer id, Integer pageNo, Integer pageSize) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize);
+	public Page<ReviewDTO> getReviewsByBookId(Integer id, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending());
 		Page<Review> reviewsList = reviewRepo.findAllByBook_Id(id, pageable);
         List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList());
         return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements());

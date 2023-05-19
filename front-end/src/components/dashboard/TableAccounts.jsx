@@ -26,7 +26,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { visuallyHidden } from '@mui/utils';
 import useAuth from "../../hooks/useAuth";
 
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import GroupIcon from '@mui/icons-material/Group';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -200,7 +200,7 @@ function EnhancedTableToolbar(props) {
           variant="h6"
           component="div"
         >
-        <AutoStoriesIcon sx={{marginRight: '10px'}}/>
+        <GroupIcon sx={{marginRight: '10px'}}/>
         {selectedAll ? "Chọn tất cả" : `Chọn ${numSelected} thành viên`}
         </Typography>
       ) : (
@@ -210,7 +210,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          <AutoStoriesIcon sx={{color: 'white', marginRight: '10px'}}/>
+          <GroupIcon sx={{color: 'white', marginRight: '10px'}}/>
           Danh sách thành viên
         </Typography>
       )}
