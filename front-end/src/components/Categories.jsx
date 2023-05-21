@@ -1,9 +1,7 @@
 import { useRef, useState, useEffect } from "react"
 import styled from "styled-components"
 
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
-import CategoryIcon from '@mui/icons-material/Category';
+import { KeyboardArrowRight, KeyboardArrowLeft, Category as CategoryIcon} from '@mui/icons-material';
 import Skeleton from '@mui/material/Skeleton';
 
 import { Link } from "react-router-dom"

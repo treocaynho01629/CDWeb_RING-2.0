@@ -3,22 +3,10 @@ import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useTheme } from '@mui/material/styles';
 
+import { Toolbar, IconButton, Stack, Badge, Tooltip, Avatar, Menu, MenuItem, Divider, ListItemIcon} from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import Logout from '@mui/icons-material/Logout';
-import HomeIcon from '@mui/icons-material/Home';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 
-import Stack from '@mui/material/Stack';
-import Badge from '@mui/material/Badge';
-import Tooltip from '@mui/material/Tooltip';
-import Avatar from '@mui/material/Avatar';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Divider from '@mui/material/Divider';
-import ListItemIcon from '@mui/material/ListItemIcon';
+import { Menu as MenuIcon, Logout, Home as HomeIcon, NotificationsActive as NotificationsActiveIcon} from '@mui/icons-material';
 
 import { useNavigate, Link } from "react-router-dom";
 import useLogout from "../../hooks/useLogout";

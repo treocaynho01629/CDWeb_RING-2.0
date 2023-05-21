@@ -4,15 +4,12 @@ import Navbar from '../components/Navbar'
 import Products from '../components/Products'
 import Slider from '../components/Slider'
 import Footer from '../components/Footer'
+import ProductsSlider from '../components/ProductsSlider'
 
 import styled from 'styled-components'
-import { Grid } from '@mui/material'
-import Divider from '@mui/material/Divider';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { Grid, Divider, ToggleButton, ToggleButtonGroup } from '@mui/material'
 
 import { styled as muiStyled } from '@mui/system';
-import ProductsSlider from '../components/ProductsSlider'
 import { useNavigate } from 'react-router-dom';
 
 import useFetch from '../hooks/useFetch'
@@ -162,7 +159,7 @@ const Home = () => {
       navigate('/filters');
     } else if (!loadingMore && more){
       setBooksList(current => [...current, ...more?.content]);
-      setCount(booksList.length / 5 + 1);
+      setCount(prev => prev + 1);
     }
   }
 

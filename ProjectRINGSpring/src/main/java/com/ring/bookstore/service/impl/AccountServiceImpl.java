@@ -3,6 +3,7 @@ package com.ring.bookstore.service.impl;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -11,16 +12,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ring.bookstore.dtos.ProfileDTO;
+import com.ring.bookstore.dtos.mappers.ProfileMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.Account;
+import com.ring.bookstore.model.AccountProfile;
 import com.ring.bookstore.model.Role;
+import com.ring.bookstore.repository.AccountProfileRepository;
 import com.ring.bookstore.repository.AccountRepository;
-import com.ring.bookstore.repository.BookRepository;
-import com.ring.bookstore.repository.OrderReceiptRepository;
-import com.ring.bookstore.repository.ReviewRepository;
 import com.ring.bookstore.request.AccountRequest;
+import com.ring.bookstore.request.ChangePassRequest;
+import com.ring.bookstore.request.ProfileRequest;
 import com.ring.bookstore.service.AccountService;
 import com.ring.bookstore.service.RoleService;
 
@@ -31,11 +35,12 @@ import lombok.RequiredArgsConstructor;
 public class AccountServiceImpl implements AccountService {
 	
 	private final AccountRepository accountRepo;
+	private final AccountProfileRepository profileRepo;
 	private final PasswordEncoder passwordEncoder;
 	private final RoleService roleService;
-	private final OrderReceiptRepository orderRepo;
-	private final ReviewRepository reviewRepo;
-	private final BookRepository bookRepo;
+	
+	@Autowired
+	private ProfileMapper profileMapper;
 	
 	//Lấy tất cả acc
 	public Page<Account> getAllAccounts(Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
@@ -89,16 +94,14 @@ public class AccountServiceImpl implements AccountService {
 
 	//Chỉnh sửa acc
 	public Account updateAccount(AccountRequest request, Integer id) {
-		
-		//Kiểm tra người dùng vs username và email đã tồn tại chưa
-		if (!accountRepo.findByUserName(request.getUserName()).isEmpty()){
-			throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Người dùng với tên đăng nhập này đã tồn tại!");
-		}
-		
 		//Kiểm tra người dùng có tồn tại?
 	    Account currUser = accountRepo.findById(id)
 	            .orElseThrow(()-> new ResourceNotFoundException("User does not exist!"));
 	    
+	    //Kiểm tra người dùng vs username và email đã tồn tại chưa
+  		if (!request.getUserName().equals(currUser.getUsername()) && !accountRepo.findByUserName(request.getUserName()).isEmpty()){
+  			throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Người dùng với tên đăng nhập này đã tồn tại!");
+  		}
 		
 	    //Set Role và Employee
 		Set<Role> roles = new HashSet<>();
@@ -106,7 +109,8 @@ public class AccountServiceImpl implements AccountService {
 		
 		if (request.getRoles() >= 2) {
 		    roles.add(roleService.findByRoleName(RoleName.ROLE_SELLER).orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "Role not found")));
-		} else if (request.getRoles() >= 3) {
+		} 
+		if (request.getRoles() >= 3) {
 		    roles.add(roleService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "Role not found")));
 		}
 		
@@ -134,6 +138,42 @@ public class AccountServiceImpl implements AccountService {
 		
 		//delete
 		accountRepo.delete(savedAccount);
+	}
+	
+	public ProfileDTO getProfile(Account user) {
+		return profileMapper.apply(user);
+	}
+
+	@Override
+	public AccountProfile updateProfile(ProfileRequest request, Account user) {
+		AccountProfile profile = user.getProfile();
+		
+		if (profile == null) {
+			profile = new AccountProfile();
+			profile.setUser(user);
+		}
+		
+		profile.setName(request.getName());
+		profile.setPhone(request.getPhone());
+		profile.setAddress(request.getAddress());
+		profile.setDob(request.getDob());
+		profile.setGender(request.getGender());
+		
+		 //Save user
+		AccountProfile updatedProfile = profileRepo.save(profile);
+		return updatedProfile;
+	}
+
+	@Override
+	public Account changePassword(ChangePassRequest request, Account user) {
+		//Kiểm tra mật khẩu hiện tại có đúng ko
+        if (!passwordEncoder.matches(request.getPass(), user.getPass())) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Mật khẩu hiện tại không đúng!");
+        if (!request.getNewPass().equals(request.getNewPassRe())) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Mật khẩu không trùng khớp!");
+        
+        // Đổi mật khẩu
+        user.setPass(passwordEncoder.encode(request.getNewPass()));
+        Account savedAccount = accountRepo.save(user);
+        return savedAccount;
 	}
 
 }

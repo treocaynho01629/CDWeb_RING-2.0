@@ -7,34 +7,53 @@ function useFetch(url) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get(url)
-      .then((response) => {
-        setData(response.data);
-      })
-      .catch((err) => {
-        setError(err);
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(url, {
+          signal: controller.signal
+        });
+        isMounted && setData(res.data);
+      } catch (err) {
+        setError(true);
         console.log(err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      }
+      setLoading(false);
+    };
+    fetchData();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    }
   }, [url]);
 
   const refetch = () => {
-    setLoading(true);
-    axios
-      .get(url)
-      .then((response) => {
-        setData(response.data);
-      })
-      .catch((err) => {
-        setError(err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(url, {
+          signal: controller.signal
+        });
+        isMounted && setData(res.data);
+      } catch (err) {
+        setError(true);
+        console.log(err);
+      }
+      setLoading(false);
+    };
+    fetchData();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    }
   };
 
   return { data, loading, error, refetch };
