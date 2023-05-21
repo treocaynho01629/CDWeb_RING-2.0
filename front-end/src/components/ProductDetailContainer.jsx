@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { lazy, Suspense } from 'react'
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system';
 
-import ReviewTab from '../components/ReviewTab'
+const ReviewTab = lazy(() => import('../components/ReviewTab')) ;
 
-import Box from '@mui/material/Box';
-import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import TextareaAutosize from '@mui/material/TextareaAutosize';
+import { Box, Tab, TextareaAutosize} from '@mui/material';
+import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import ProductsSlider from '../components/ProductsSlider';
 import useFetch from '../hooks/useFetch'
@@ -37,7 +36,7 @@ const StyledTabList = muiStyled((props) => (
     },
   });
   
-const StyledTab = muiStyled((props) => <Tab disableRipple {...props} />)(
+const StyledTab = muiStyled((props) => <Tab {...props} />)(
     ({ theme }) => ({
       fontWeight: 400,
       color: 'rgba(255, 255, 255, 0.7)',
@@ -53,7 +52,7 @@ const StyledTab = muiStyled((props) => <Tab disableRipple {...props} />)(
         outline: 'none',
         border: 'none',
       },
-      '&.Mui-focused': {
+      '&:focus': {
         outline: 'none',
         border: 'none',
       },
@@ -63,24 +62,36 @@ const StyledTab = muiStyled((props) => <Tab disableRipple {...props} />)(
 const DetailContainer = styled.div`
     margin: 50px 0px;
 `
+
+const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
+  borderRadius: 0,
+  [`&.${linearProgressClasses.colorPrimary}`]: {
+      backgroundColor: 'white',
+  },
+  [`& .${linearProgressClasses.bar}`]: {
+      borderRadius: 0,
+      backgroundColor: '#63e399',
+  },
+}));
 //#endregion
 
 const BOOKS_RELATED_URL = 'api/books/filters?pSize=10&cateId=';
 
 const ProductDetailContainer = (props) => {
-  const {loading, book} = props;
-  const [value, setValue] = useState('1');
+  const {loading, book, tab, onTabChange} = props;
   const { loading: loadingRelated, data: booksRelated } = useFetch(BOOKS_RELATED_URL + (book ? book?.cateId : ""));
 
   //Change Tab
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    if (onTabChange){
+      onTabChange(newValue);
+    }
   };
 
   let fullInfo;
 
   if (loading){
-    fullInfo = <p>loading</p>
+    fullInfo = <CustomLinearProgress/>
   } else {
     fullInfo =
         <FullInfoTab>
@@ -106,7 +117,7 @@ const ProductDetailContainer = (props) => {
   return (
     <DetailContainer>
       <Box sx={{ width: '100%', typography: 'body1'}}>
-          <TabContext value={value}>
+          <TabContext value={tab}>
               <Box sx={{color: 'rgb(30, 255, 0)', backgroundColor: 'rgb(39, 39, 39)'}}>
               <StyledTabList onChange={handleChange} aria-label="tab">
                   <StyledTab label="THÔNG TIN CHI TIẾT" value="1" />
@@ -118,7 +129,9 @@ const ProductDetailContainer = (props) => {
                   {fullInfo}
               </TabPanel>
               <TabPanel value="2">
+                <Suspense fallback={<CustomLinearProgress/>}>
                   <ReviewTab id={book?.id} rateAmount={book?.rateAmount}/>
+                </Suspense>
               </TabPanel>
               <TabPanel value="3">
                   <RelatedTab>

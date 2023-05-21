@@ -1,47 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
+import { styled as muiStyled, useTheme } from '@mui/material/styles';
+
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
 
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import SellIcon from '@mui/icons-material/Sell';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import PaymentsIcon from '@mui/icons-material/Payments';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
-import CheckIcon from '@mui/icons-material/Check';
-import PersonIcon from '@mui/icons-material/Person';
-import PhoneIcon from '@mui/icons-material/Phone';
-import HomeIcon from '@mui/icons-material/Home';
-import CloseIcon from '@mui/icons-material/Close';
+import { ShoppingCart as ShoppingCartIcon, Sell as SellIcon, LocationOn as LocationOnIcon, Payments as PaymentsIcon,
+CreditCard as CreditCardIcon, Check as CheckIcon, Person as PersonIcon, Phone as PhoneIcon, Home as HomeIcon,
+Close as CloseIcon, QrCode as QrCodeIcon, LocalAtm as LocalAtmIcon, SystemSecurityUpdateGood as SystemSecurityUpdateGoodIcon } from '@mui/icons-material';
 
-import { styled as muiStyled } from '@mui/material/styles';
-import Stack from "@mui/material/Stack";
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
+import { Grid, TextareaAutosize, Stack, Table, TableBody, TableContainer, TableHead, TableRow, Paper,
+Breadcrumbs, MenuItem, Select, InputBase, Dialog, DialogActions, DialogContent, DialogTitle, TextField,
+Stepper, Step, StepLabel, StepContent, Radio, RadioGroup, FormControlLabel } from '@mui/material';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import InputBase from '@mui/material/InputBase';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
-import { Grid, TextareaAutosize } from '@mui/material';
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
-import StepContent from '@mui/material/StepContent';
 
 import { useDispatch, useSelector } from "react-redux";
 import { resetCart } from '../redux/cartReducer';
 import { Link, useNavigate } from "react-router-dom";
+import { LazyLoadImage } from 'react-lazy-load-image-component'
+import { useSnackbar } from 'notistack';
+import usePrivateFetch from '../hooks/usePrivateFetch'
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 //#region styled
 const Container = styled.div``
@@ -49,6 +29,7 @@ const Container = styled.div``
 const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
     '& .MuiDialog-paper': {
       borderRadius: 0,
+      minWidth: '550px',
       padding: '20px 15px',
     },
     '& .MuiDialogContent-root': {
@@ -57,7 +38,7 @@ const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
     '& .MuiDialogActions-root': {
       padding: theme.spacing(1),
     },
-  }));
+}));
   
 const CustomInput = muiStyled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
@@ -148,7 +129,7 @@ const SmallContainer = styled.div`
     padding: 20px;
 `
 
-const EditButton = styled.div`
+const TextButton = styled.div`
     font-size: 16px;
     font-weight: 400;
     display: flex;
@@ -161,7 +142,6 @@ const EditButton = styled.div`
     transition: all 0.5s ease;
 
     &:hover {
-        transform: scale(1.05);
         color: #63e399;
     }
 `
@@ -197,12 +177,6 @@ const ItemContainer = styled.div`
 
 const ItemSummary = styled.div`
     margin-left: 10px;
-`
-
-const ItemImage = styled.img`
-    width: 90px;
-    height: 90px;
-    border: 0.5px solid lightgray;
 `
 
 const CustomButton = styled.div`
@@ -242,23 +216,6 @@ const ClearButton = styled.div`
     &:hover {
         background: lightgray;
         color: #424242;
-    }
-`
-
-const SelectCoupon = styled.div`
-    font-size: 16px;
-    font-weight: 400;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
-    color: #424242;
-    cursor: pointer;
-    transition: all 0.5s ease;
-
-    &:hover {
-        transform: scale(1.05);
-        color: #63e399;
     }
 `
 
@@ -365,18 +322,6 @@ const Instruction = styled.p`
     display: ${props=>props.display};;
 `
 
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 700,
-    bgcolor: 'background.paper',
-    border: '0.5px solid lightgray',
-    borderRadius: 0,
-    p: 4,
-};
-
 const BootstrapInput = muiStyled(InputBase)(({ theme }) => ({
   'label + &': {
     marginTop: theme.spacing(3),
@@ -408,6 +353,7 @@ const stepStyle = {
 
 const PHONE_REGEX = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/;
 const CHECKOUT_URL = '/api/orders';
+const PROFILE_URL = '/api/accounts/profile';
 
 const Checkout = () => {
     //#region construct
@@ -421,13 +367,20 @@ const Checkout = () => {
     const [address, setAddress] = useState('');
     const [message, setMessage] = useState('');
     const [errMsg, setErrMsg] = useState('');
+    const [err, setErr] = useState([]);
     const [activeStep, setActiveStep] = useState(0);
+    const [value, setValue] = useState("1");
+    const { loading, data } = usePrivateFetch(PROFILE_URL);
+    const fullAddress = `${city}` + `${state ? `/ ${state}` : ''}` + `${address ? `/ ${address}` : ''}`
 
     const products = useSelector(state => state.cart.products); //Lấy products trong giỏ từ redux
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const axiosPrivate = useAxiosPrivate();
     const errRef = useRef();
+    const { enqueueSnackbar } = useSnackbar();
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
     //Tính tổng tiền
     const totalPrice = () =>{
@@ -438,7 +391,7 @@ const Checkout = () => {
 
     //Error message reset when reinput stuff
     useEffect(() => {
-        if (!firstName || !lastName || !phone || !address) {
+        if ((!firstName || !lastName || !phone || !address) && !loading) {
             setErrMsg("Vui lòng nhập địa chỉ giao hàng!");
             errRef.current.focus();
             setActiveStep(0);
@@ -450,9 +403,27 @@ const Checkout = () => {
     }, [firstName, lastName, phone, address])
 
     useEffect(() => {
+        if (!loading){
+            setAddress(data?.address);
+            setPhone(data?.phone);
+            var fullName = data?.name.split(' ');
+            setLastName(fullName[fullName.length - 1]);
+            if (fullName.length > 2) setFirstName(fullName.slice(0, -1).join(' '));
+        }
+    }, [loading])
+
+    useEffect(() => {
         const result = PHONE_REGEX.test(phone);
         setValidPhone(result);
     }, [phone])
+
+    const handleNext = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    };
+
+    const handleChange = (event) => {
+        setValue(event.target.value);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -476,7 +447,7 @@ const Checkout = () => {
                     firstName: firstName,
                     lastName: lastName,
                     phone: phone,
-                    address: city + "/" + state + "/" + address,
+                    address: fullAddress,
                     message: message
                 } ),
                 {
@@ -484,11 +455,12 @@ const Checkout = () => {
                     withCredentials: true
                 }
             );
-            console.log(JSON.stringify(response))
             dispatch(resetCart());
+            enqueueSnackbar('Đặt hàng thành công!', { variant: 'success' });
             navigate('/cart');
         } catch (err) {
             console.log(err);
+            setErr(err);
             if (!err?.response) {
                 setErrMsg('No Server Response');
             } else if (err.response?.status === 409) {
@@ -532,238 +504,288 @@ const Checkout = () => {
             </div>
             <CheckoutContainer>
                 <Title><PersonIcon/>&nbsp;XÁC NHẬN ĐẶT HÀNG</Title>
-                <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                    <div style={{maxWidth: '50px', marginRight: '10px'}}>
-                        <Stepper activeStep={activeStep} 
-                        orientation="vertical" 
-                        sx={stepStyle}>
-                             <Step key={1}>
-                                <StepLabel></StepLabel>
-                                <StepContent sx={{height: activeStep == 0 ? '120px' : '70px'}}>
-                                </StepContent>
-                            </Step>
-                            <Step key={2}>
-                                <StepLabel></StepLabel>
-                                <StepContent sx={{height: `${products.length * 129 + 260}px`}}>
-                                </StepContent>
-                            </Step>
-                            <Step key={3}>
-                                <StepLabel></StepLabel>
-                            </Step>
-                        </Stepper>
-                    </div>
-                    <div style={{width: '100%'}}>
-                        <SemiTitle><LocationOnIcon/>&nbsp;Địa chỉ người nhận</SemiTitle>
-                        <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
-                        <SmallContainer color={firstName && lastName && phone && address && validPhone ? 'lightgray' : 'red' }>
-                            <Grid container spacing={1}>
-                                <Grid item xs={3}>
-                                    <strong>{firstName + " " + lastName} {phone ? `(+84) ${phone}` : ''}</strong>
-                                </Grid>
-                                <Grid item xs={8}>{city} {state ? `/ ${state}` : ''} {address ? `/ ${address}` : ''}</Grid>
-                                <Grid item xs sx={{justifyContent: 'flex-end'}}> 
-                                    <EditButton onClick={handleOpen}>Thay đổi</EditButton>
-                                </Grid>
-                                <CustomDialog open={open} onClose={handleClose}>
-                                    <DialogTitle sx={{display: 'flex', alignItems: 'center'}}><LocationOnIcon/>&nbsp;Địa chỉ người nhận</DialogTitle>
-                                    <DialogContent>
-                                        <Stack spacing={1} direction="column">
-                                            <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
-                                            
-                                            <CustomInput label='Nhập Họ đệm'
-                                            type="text"
-                                            id="firstName"
-                                            required
-                                            onChange={(e) => setFirstName(e.target.value)}
-                                            value={firstName}
-                                            error = {!firstName}
-                                            size="small"
-                                            sx={{width: '500px'}}
-                                            InputProps={{
-                                                endAdornment: <PersonIcon style={{color:"gray"}}/>
-                                            }}
-                                            />
-                                            <CustomInput label='Nhập Tên'
-                                            type="text"
-                                            id="lastName"
-                                            required
-                                            onChange={(e) => setLastName(e.target.value)}
-                                            value={lastName}
-                                            error = {!lastName}
-                                            size="small"
-                                            />
-                                            
-                                            <CustomInput placeholder='Nhập số điện thoại (+84)'
-                                            autoComplete="on"
-                                            id="phone"
-                                            required
-                                            onChange={(e) => setPhone(e.target.value)}
-                                            value={phone}
-                                            error={!phone || (phone && !validPhone)}
-                                            helperText={(phone && !validPhone) ? "Sai định dạng số điện thoại!" : ""}
-                                            size="small"
-                                            InputProps={{
-                                                endAdornment: <PhoneIcon style={{color:"gray"}}/>
-                                            }}
-                                            />
-                                            
-                                            <Select
-                                            value={city}
-                                            onChange={(e) => setCity(e.target.value)}
-                                            displayEmpty
-                                            inputProps={{ 'aria-label': 'Without label' }}
-                                            input={<BootstrapInput />}
-                                            >
-                                                <MenuItem disabled value="">
-                                                    <em>--Tỉnh/Thành phố--</em>
-                                                </MenuItem>
-                                                <MenuItem value={'TP. Hồ Chí Minh'}>TP. Hồ Chí Minh</MenuItem>
-                                                <MenuItem value={'Hải Phòng'}>Hải Phòng</MenuItem>
-                                                <MenuItem value={'Hà Nội'}>Hà Nội</MenuItem>
-                                                <MenuItem value={'Lâm Đồng'}>Lâm Đồng</MenuItem>
-                                                <MenuItem value={'Bà Rịa - Vũng Tàu'}>Bà Rịa - Vũng Tàu</MenuItem>
-                                            </Select>
-                                            <Select
-                                            value={state}
-                                            onChange={(e) => setState(e.target.value)}
-                                            displayEmpty
-                                            inputProps={{ 'aria-label': 'Without label' }}
-                                            input={<BootstrapInput />}
-                                            >
-                                                <MenuItem disabled value="">
-                                                    <em>--Phường/Xã--</em>
-                                                </MenuItem>
-                                                <MenuItem value={'Phường An Bình'}>	Phường An Bình</MenuItem>
-                                                <MenuItem value={'Phường Bình Đa'}>	Phường Bình Đa</MenuItem>
-                                                <MenuItem value={'Xã Xuân Trường'}>Xã Xuân Trường</MenuItem>
-                                                <MenuItem value={'Xã Phước Tân'}>Xã Phước Tân</MenuItem>
-                                                <MenuItem value={'Xã Tân Hạnh'}>Xã Tân Hạnh</MenuItem>
-                                                <MenuItem value={'Xã Long Hưng'}>Xã Long Hưng</MenuItem>
-                                            </Select>
-                                            <CustomInput placeholder='Nhập địa chỉ nhận hàng'
-                                            type="text"
-                                            autoComplete="on"
-                                            onChange={(e) => setAddress(e.target.value)}
-                                            value={address}
-                                            error={!address}
-                                            size="small"
-                                            InputProps={{
-                                                endAdornment: <HomeIcon style={{color:"gray"}}/>
-                                            }}
-                                            />
-                                            
-                                        </Stack>
-                                    </DialogContent>
-                                    <DialogActions>
-                                        <CustomButton onClick={handleClose}><CheckIcon sx={{marginRight: '10px'}}/>Áp dụng</CustomButton>
-                                        <ClearButton onClick={clearInput}><CloseIcon sx={{marginRight: '10px'}}/>Xoá</ClearButton>
-                                    </DialogActions>
-                                </CustomDialog>
-                            </Grid>
-                        </SmallContainer>
-                        <SemiTitle><ShoppingCartIcon/>&nbsp;Kiểm tra lại sản phẩm</SemiTitle>
-                        <TableContainer component={Paper} sx={{borderRadius: '0%'}} >
-                            <Table sx={{minWidth: 500, borderRadius: '0%'}} aria-label="cart-table">
-                                <TableHead>
-                                    <TableRow sx={{padding: 0}}>
-                                        <StyledTableCell sx={{marginLeft: '20px'}}>SẢN PHẨM (100)</StyledTableCell>
-                                        <StyledTableCell>Đơn giá</StyledTableCell>
-                                        <StyledTableCell>Số lượng</StyledTableCell>
-                                        <StyledTableCell>Thành tiền</StyledTableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                {products.map((product, index) => {
-                                    return (
-                                        <StyledTableRow hover
-                                            key={product.id}
-                                        >
-                                            <StyledTableCell>
-                                                <Link to={`/product/${product.id}`} style={{display: 'flex'}}>
-                                                    <ItemContainer>
-                                                        <ItemImage src={product.image}/>
-                                                        <ItemSummary>
-                                                            <ItemTitle>{product.title}</ItemTitle>
-                                                        </ItemSummary>
-                                                    </ItemContainer>
-                                                </Link>
-                                            </StyledTableCell>
-                                            <StyledTableCell align="right">
-                                                <Price>{product.price.toLocaleString()}đ</Price>
-                                            </StyledTableCell>
-                                            <StyledTableCell align="right">
-                                                <Amount>{product.quantity}</Amount>
-                                            </StyledTableCell>
-                                            <StyledTableCell align="right"><Price>{(product.price * product.quantity).toLocaleString()}đ</Price></StyledTableCell>
-                                        </StyledTableRow>
-                                    )
-                                })}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <div style={{marginTop: '20px', marginLeft: '10px'}}>
-                            <strong style={{fontSize: '16px'}}>Ghi chú khi giao hàng: </strong>
-                        </div>
-                        <TextareaAutosize
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            aria-label="note"
-                            minRows={7}
-                            placeholder="Nhập ghi chú cho đơn hàng ..."
-                            style={{ width: '100%', margin: '10px 0px', backgroundColor: 'white', outline: 'none',
-                            borderRadius: '0', resize: 'none', color: 'black', fontSize: '16px'}}
-                        />
-                        <SemiTitle><SellIcon/>&nbsp;Khuyến mãi</SemiTitle>
-                        <SmallContainer>
-                            <Grid container spacing={1}>
-                                <Grid item xs={10} sx={{display: 'flex', justifyContent: 'space-between'}}>
-                                    <Grid item xs={10}>
-                                        <CustomInput placeholder='Nhập mã giảm giá ...' size="small"/>
-                                        <SellIcon style={{color:"gray"}}/>
+                <Stepper activeStep={activeStep} 
+                orientation="vertical" 
+                sx={stepStyle}>
+                    <Step key={0} expanded>
+                        <StepLabel>
+                            <SemiTitle><LocationOnIcon/>&nbsp;Địa chỉ người nhận</SemiTitle>
+                        </StepLabel>
+                        <StepContent>
+                            <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
+                            <SmallContainer color={firstName && lastName && phone && address && validPhone ? 'lightgray' : 'red' }>
+                                <Grid container spacing={1}>
+                                    <Grid item xs={3}>
+                                        <strong>{firstName + " " + lastName} {phone ? `(+84) ${phone}` : ''}</strong>
                                     </Grid>
-                                    <Grid item xs>
-                                        <CustomButton>Áp dụng</CustomButton>
+                                    <Grid item xs={8}>{city} {state ? `/ ${state}` : ''} {address ? `/ ${address}` : ''}</Grid>
+                                    <Grid item xs sx={{justifyContent: 'flex-end'}}> 
+                                        <TextButton onClick={handleOpen}>Thay đổi</TextButton>
+                                    </Grid>
+                                    <CustomDialog open={open} 
+                                    scroll="body"
+                                    onClose={handleClose}
+                                    fullScreen={fullScreen}>
+                                        <DialogTitle sx={{display: 'flex', alignItems: 'center'}}><LocationOnIcon/>&nbsp;Địa chỉ người nhận</DialogTitle>
+                                        <DialogContent>
+                                            <Stack spacing={1} direction="column">
+                                                <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
+                                                <CustomInput label='Nhập Họ đệm'
+                                                type="text"
+                                                id="firstName"
+                                                required
+                                                onChange={(e) => setFirstName(e.target.value)}
+                                                value={firstName}
+                                                error = {!firstName || err?.response?.data?.errors?.firstName}
+                                                helperText= {err?.response?.data?.errors?.firstName}
+                                                size="small"
+                                                sx={{width: '100%'}}
+                                                InputProps={{
+                                                    endAdornment: <PersonIcon style={{color:"gray"}}/>
+                                                }}
+                                                />
+                                                <CustomInput label='Nhập Tên'
+                                                type="text"
+                                                id="lastName"
+                                                required
+                                                fullWidth
+                                                onChange={(e) => setLastName(e.target.value)}
+                                                value={lastName}
+                                                error = {!lastName || err?.response?.data?.errors?.lastName}
+                                                helperText= {err?.response?.data?.errors?.lastName}
+                                                size="small"
+                                                />
+                                                
+                                                <CustomInput placeholder='Nhập số điện thoại (+84)'
+                                                id="phone"
+                                                required
+                                                onChange={(e) => setPhone(e.target.value)}
+                                                value={phone}
+                                                error={!phone || (phone && !validPhone) || err?.response?.data?.errors?.phone}
+                                                helperText={(phone && !validPhone) ? "Sai định dạng số điện thoại!" : err?.response?.data?.errors?.phone}
+                                                size="small"
+                                                InputProps={{
+                                                    endAdornment: <PhoneIcon style={{color:"gray"}}/>
+                                                }}
+                                                />
+                                                
+                                                <Select
+                                                value={city}
+                                                onChange={(e) => setCity(e.target.value)}
+                                                displayEmpty
+                                                inputProps={{ 'aria-label': 'Without label' }}
+                                                input={<BootstrapInput />}
+                                                >
+                                                    <MenuItem disabled value="">
+                                                        <em>--Tỉnh/Thành phố--</em>
+                                                    </MenuItem>
+                                                    <MenuItem value={'TP. Hồ Chí Minh'}>TP. Hồ Chí Minh</MenuItem>
+                                                    <MenuItem value={'Hải Phòng'}>Hải Phòng</MenuItem>
+                                                    <MenuItem value={'Hà Nội'}>Hà Nội</MenuItem>
+                                                    <MenuItem value={'Lâm Đồng'}>Lâm Đồng</MenuItem>
+                                                    <MenuItem value={'Bà Rịa - Vũng Tàu'}>Bà Rịa - Vũng Tàu</MenuItem>
+                                                </Select>
+                                                <Select
+                                                value={state}
+                                                onChange={(e) => setState(e.target.value)}
+                                                displayEmpty
+                                                inputProps={{ 'aria-label': 'Without label' }}
+                                                input={<BootstrapInput />}
+                                                >
+                                                    <MenuItem disabled value="">
+                                                        <em>--Phường/Xã--</em>
+                                                    </MenuItem>
+                                                    <MenuItem value={'Phường An Bình'}>	Phường An Bình</MenuItem>
+                                                    <MenuItem value={'Phường Bình Đa'}>	Phường Bình Đa</MenuItem>
+                                                    <MenuItem value={'Xã Xuân Trường'}>Xã Xuân Trường</MenuItem>
+                                                    <MenuItem value={'Xã Phước Tân'}>Xã Phước Tân</MenuItem>
+                                                    <MenuItem value={'Xã Tân Hạnh'}>Xã Tân Hạnh</MenuItem>
+                                                    <MenuItem value={'Xã Long Hưng'}>Xã Long Hưng</MenuItem>
+                                                </Select>
+                                                <CustomInput placeholder='Nhập địa chỉ nhận hàng'
+                                                type="text"
+                                                autoComplete="on"
+                                                onChange={(e) => setAddress(e.target.value)}
+                                                value={address}
+                                                error={!address || err?.response?.data?.errors?.address}
+                                                helperText= {err?.response?.data?.errors?.address}
+                                                size="small"
+                                                InputProps={{
+                                                    endAdornment: <HomeIcon style={{color:"gray"}}/>
+                                                }}
+                                                />
+                                                
+                                            </Stack>
+                                        </DialogContent>
+                                        <DialogActions>
+                                            <CustomButton onClick={handleClose}><CheckIcon sx={{marginRight: '10px'}}/>Áp dụng</CustomButton>
+                                            <ClearButton onClick={clearInput}><CloseIcon sx={{marginRight: '10px'}}/>Xoá</ClearButton>
+                                        </DialogActions>
+                                    </CustomDialog>
+                                </Grid>
+                            </SmallContainer>
+                        </StepContent>
+                    </Step>
+                    <Step key={1} expanded>
+                        <StepLabel>
+                            <SemiTitle><ShoppingCartIcon/>&nbsp;Kiểm tra lại sản phẩm</SemiTitle>
+                        </StepLabel>
+                        <StepContent>
+                            <TableContainer component={Paper} sx={{borderRadius: '0%'}} >
+                                <Table sx={{minWidth: 500, borderRadius: '0%'}} aria-label="cart-table">
+                                    <TableHead>
+                                        <TableRow sx={{padding: 0}}>
+                                            <StyledTableCell sx={{marginLeft: '20px'}}>SẢN PHẨM (100)</StyledTableCell>
+                                            <StyledTableCell>Đơn giá</StyledTableCell>
+                                            <StyledTableCell>Số lượng</StyledTableCell>
+                                            <StyledTableCell>Thành tiền</StyledTableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                    {products.map((product, index) => {
+                                        return (
+                                            <StyledTableRow hover
+                                                key={product.id}
+                                            >
+                                                <StyledTableCell>
+                                                    <Link to={`/product/${product.id}`} style={{display: 'flex'}}>
+                                                        <ItemContainer>
+                                                            <LazyLoadImage src={product.image}
+                                                                height={90}
+                                                                width={90} 
+                                                                style={{
+                                                                    border: '0.5px solid lightgray'
+                                                                }}
+                                                            /> 
+                                                            <ItemSummary>
+                                                                <ItemTitle>{product.title}</ItemTitle>
+                                                            </ItemSummary>
+                                                        </ItemContainer>
+                                                    </Link>
+                                                </StyledTableCell>
+                                                <StyledTableCell align="right">
+                                                    <Price>{product.price.toLocaleString()}đ</Price>
+                                                </StyledTableCell>
+                                                <StyledTableCell align="right">
+                                                    <Amount>{product.quantity}</Amount>
+                                                </StyledTableCell>
+                                                <StyledTableCell align="right"><Price>{(product.price * product.quantity).toLocaleString()}đ</Price></StyledTableCell>
+                                            </StyledTableRow>
+                                        )
+                                    })}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                            <div style={{marginTop: '20px', marginLeft: '10px'}}>
+                                <strong style={{fontSize: '16px'}}>Ghi chú khi giao hàng: </strong>
+                            </div>
+                            <TextareaAutosize
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                aria-label="note"
+                                minRows={7}
+                                placeholder="Nhập ghi chú cho đơn hàng ..."
+                                style={{ width: '100%', margin: '10px 0px', backgroundColor: 'white', outline: 'none',
+                                borderRadius: '0', resize: 'none', color: 'black', fontSize: '16px'}}
+                            />
+                            {activeStep === 1 ?
+                            <div style={{width: '10%'}}>
+                                <CustomButton onClick={handleNext}>Tiếp tục</CustomButton>
+                            </div>
+                            : null
+                            }
+                    
+                        </StepContent>
+                    </Step>
+                    <Step key={2}>
+                        <StepLabel>
+                            <SemiTitle><CreditCardIcon/>&nbsp;Thanh toán</SemiTitle>
+                        </StepLabel>
+                        <StepContent>
+                            <SemiTitle><CreditCardIcon/>&nbsp;Hình thức thanh toán</SemiTitle>
+                            <SmallContainer>
+                                <RadioGroup spacing={1} row value={value} onChange={handleChange}>
+                                    <FormControlLabel value="1" control={<Radio  sx={{
+                                        '&.Mui-checked': {
+                                        color: '#63e399',
+                                    }}}/>} 
+                                    label={<div style={{display: 'flex', alignItems: 'center'}}>
+                                            <LocalAtmIcon sx={{fontSize: 30}}/>Tiền mặt
+                                        </div>} />
+                                    <FormControlLabel value="2" control={<Radio  sx={{
+                                        '&.Mui-checked': {
+                                        color: '#63e399',
+                                    }}}/>} 
+                                    label={<div style={{display: 'flex', alignItems: 'center'}}>
+                                            <CreditCardIcon sx={{fontSize: 30}}/>Thẻ ATM
+                                        </div>} />
+                                    <FormControlLabel value="3" control={<Radio  sx={{
+                                        '&.Mui-checked': {
+                                        color: '#63e399',
+                                    }}}/>} 
+                                    label={<div style={{display: 'flex', alignItems: 'center'}}>
+                                            <SystemSecurityUpdateGoodIcon sx={{fontSize: 30}}/>Internet Banking
+                                        </div>} />
+                                    <FormControlLabel value="4" control={<Radio  sx={{
+                                        '&.Mui-checked': {
+                                        color: '#63e399',
+                                    }}}/>} 
+                                    label={<div style={{display: 'flex', alignItems: 'center'}}>
+                                            <QrCodeIcon sx={{fontSize: 30}}/>QR Code
+                                        </div>} />
+                                </RadioGroup>
+                            </SmallContainer>
+                            <SemiTitle><SellIcon/>&nbsp;Khuyến mãi</SemiTitle>
+                            <SmallContainer>
+                                <Grid container spacing={1}>
+                                    <Grid item xs={6} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                        <Grid item xs={10}>
+                                            <CustomInput placeholder='Nhập mã giảm giá ...'
+                                                size="small"
+                                                fullWidth
+                                                InputProps={{
+                                                    endAdornment: <SellIcon style={{color:"gray"}}/>
+                                                }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs><CustomButton>Áp dụng</CustomButton></Grid>
+                                    </Grid>
+                                    <Grid item xs sx={{alignItems: 'center', display: 'flex', justifyContent: 'flex-end'}}>
+                                        <TextButton>Chọn mã</TextButton>
                                     </Grid>
                                 </Grid>
-                                <Grid item xs sx={{alignItems: 'center', display: 'flex', justifyContent: 'flex-end'}}>
-                                    <SelectCoupon>Chọn mã</SelectCoupon>
+                            </SmallContainer>
+                            <Title><CheckIcon/>&nbsp;XÁC THỰC ĐẶT HÀNG</Title>
+                            <Grid container>
+                                <Grid item lg={6} xs={12} sx={{display: 'flex'}}>
+                                    <Payout>
+                                        <PayoutTitle>THANH TOÁN</PayoutTitle>
+                                        <PayoutRow>
+                                            <PayoutText>Thành tiền:</PayoutText>
+                                            <PayoutText>{totalPrice().toLocaleString()} đ</PayoutText>
+                                        </PayoutRow>
+                                        <PayoutRow>
+                                            <PayoutText>VAT:</PayoutText>
+                                            <PayoutText>10%</PayoutText>
+                                        </PayoutRow>
+                                        <PayoutRow>
+                                            <PayoutText>Phí ship:</PayoutText>
+                                            <PayoutText>10,000 đ</PayoutText>
+                                        </PayoutRow>
+                                        <PayoutRow>
+                                            <PayoutText>Tổng:</PayoutText>
+                                            <PayoutPrice>{Math.round(totalPrice() * 1.1 + 10000).toLocaleString()}&nbsp;đ</PayoutPrice>
+                                        </PayoutRow>
+                                        <PayButton onClick={handleSubmit}
+                                        disabled={!validPhone || !firstName || !lastName || !address || !phone ? true : false}>
+                                            <PaymentsIcon style={{fontSize: 18}}/>&nbsp;ĐẶT HÀNG
+                                        </PayButton>
+                                    </Payout>
                                 </Grid>
                             </Grid>
-                        </SmallContainer>
-                        <SemiTitle><CreditCardIcon/>&nbsp;Hình thức thanh toán</SemiTitle>
-                        <SmallContainer>
-                            dsadas
-                        </SmallContainer>
-                        <Title><CheckIcon/>&nbsp;XÁC THỰC ĐẶT HÀNG</Title>
-                        <Grid container>
-                            <Grid item lg={6} xs={12} sx={{display: 'flex'}}>
-                                <Payout>
-                                    <PayoutTitle>THANH TOÁN</PayoutTitle>
-                                    <PayoutRow>
-                                        <PayoutText>Thành tiền:</PayoutText>
-                                        <PayoutText>{totalPrice().toLocaleString()} đ</PayoutText>
-                                    </PayoutRow>
-                                    <PayoutRow>
-                                        <PayoutText>VAT:</PayoutText>
-                                        <PayoutText>10%</PayoutText>
-                                    </PayoutRow>
-                                    <PayoutRow>
-                                        <PayoutText>Phí ship:</PayoutText>
-                                        <PayoutText>10,000 đ</PayoutText>
-                                    </PayoutRow>
-                                    <PayoutRow>
-                                        <PayoutText>Tổng:</PayoutText>
-                                        <PayoutPrice>{Math.round(totalPrice() * 1.1 + 10000).toLocaleString()}&nbsp;đ</PayoutPrice>
-                                    </PayoutRow>
-                                    <PayButton onClick={handleSubmit}
-                                    disabled={!validPhone || !firstName || !lastName || !address || !phone ? true : false}>
-                                        <PaymentsIcon style={{fontSize: 18}}/>&nbsp;ĐẶT HÀNG
-                                    </PayButton>
-                                </Payout>
-                            </Grid>
-                        </Grid>
-                    </div>
-                </div>
+                        </StepContent>
+                    </Step>
+                </Stepper>
             </CheckoutContainer>
         </Wrapper>
         <Footer/>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import useAxiosPrivate from "./useAxiosPrivate";
-import { useNavigate, useLocation } from "react-router-dom";
 
 const usePrivateFetch = (url) => {
   const [data, setData] = useState(null);
@@ -8,8 +7,6 @@ const usePrivateFetch = (url) => {
   const [error, setError] = useState(false);
 
   const axiosPrivate = useAxiosPrivate();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     let isMounted = true;
@@ -25,7 +22,6 @@ const usePrivateFetch = (url) => {
       } catch (err) {
         setError(true);
         console.log(err);
-        // navigate('/login', { state: { from: location }, replace: true });
       }
       setLoading(false);
     };
@@ -51,7 +47,6 @@ const usePrivateFetch = (url) => {
       } catch (err) {
         setError(true);
         console.log(err);
-        // navigate('/login', { state: { from: location }, replace: true });
       }
       setLoading(false);
     };

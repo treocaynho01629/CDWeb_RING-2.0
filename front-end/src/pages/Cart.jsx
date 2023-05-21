@@ -1,34 +1,22 @@
 import { useState } from "react";
 
 import styled from 'styled-components'
+import { styled as muiStyled } from '@mui/material/styles';
+
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
 
-import RemoveIcon from '@mui/icons-material/Remove'
-import AddIcon from '@mui/icons-material/Add'
-import DeleteIcon from '@mui/icons-material/Delete'
-import SellIcon from '@mui/icons-material/Sell';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import PaymentsIcon from '@mui/icons-material/Payments';
-
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import { Checkbox, Grid, IconButton } from '@mui/material';
-
-import { styled as muiStyled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
+import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, Sell as SellIcon, ShoppingCart as ShoppingCartIcon, Payments as PaymentsIcon } from '@mui/icons-material';
+import { Checkbox, Grid, IconButton, Breadcrumbs, Table, TableBody, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import PropTypes from 'prop-types';
 
-import useAuth from "../hooks/useAuth";
 import { useSnackbar } from 'notistack';
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { removeItem, increaseQuantity, decreaseQuantity, changeQuantity } from '../redux/cartReducer';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import useAuth from "../hooks/useAuth";
 
 //#region styled
 const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
@@ -148,12 +136,6 @@ const ItemContainer = styled.div`
 
 const ItemSummary = styled.div`
     margin-left: 10px;
-`
-
-const ItemImage = styled.img`
-    width: 90px;
-    height: 90px;
-    border: 0.5px solid lightgray;
 `
 
 const ItemTitle = styled.p`
@@ -279,6 +261,11 @@ const PayButton = styled.button`
         background-color: gray;
         color: darkslategray;
     }
+
+    &:focus {
+        outline: none;
+        border: none;
+    }
 `
 
 const BackButton = styled.button`
@@ -300,12 +287,21 @@ const BackButton = styled.button`
         background-color: lightgray;
         color: black;
     }
+
+    &:focus {
+        outline: none;
+        border: none;
+    }
 `
 
 const hoverIcon = {
     "&:hover": {
         transform: 'scale(1.05)',
         color: '#e66161',
+    },
+    "&:focus": {
+        outline: 'none',
+        border: 'none',
     },
 };
 //#endregion
@@ -443,7 +439,9 @@ const Cart = () => {
             justifyContent: 'center', 
             alignItems: 'center',
             height: '550px'}}>
-                <img style={{height: '250px'}} src="/empty.svg"/>
+                <LazyLoadImage src="/empty.svg"
+                    height={250}
+                /> 
                 <h2>Giỏ hàng của bạn đang trống</h2>
                 <BackButton onClick={() => navigate('/')}>
                     Tiếp tục mua sắm
@@ -479,6 +477,8 @@ const Cart = () => {
                                         <StyledTableCell component="th" scope="product" onClick={() => handleSelect(product.id)}>
                                             <div style={{display: 'flex'}}>
                                                 <Checkbox
+                                                disableRipple
+                                                disableFocusRipple
                                                 color="primary"
                                                 checked={isItemSelected}
                                                 inputProps={{
@@ -491,10 +491,16 @@ const Cart = () => {
                                                 />
                                                 <Link to={`/product/${product.id}`}>
                                                     <ItemContainer>
-                                                            <ItemImage src={product.image}/>
-                                                            <ItemSummary>
-                                                                <ItemTitle>{product.title}</ItemTitle>
-                                                            </ItemSummary>
+                                                        <LazyLoadImage src={product.image}
+                                                            height={90}
+                                                            width={90} 
+                                                            style={{
+                                                                border: '0.5px solid lightgray'
+                                                            }}
+                                                        /> 
+                                                        <ItemSummary>
+                                                            <ItemTitle>{product.title}</ItemTitle>
+                                                        </ItemSummary>
                                                     </ItemContainer>
                                                 </Link>
                                             </div>

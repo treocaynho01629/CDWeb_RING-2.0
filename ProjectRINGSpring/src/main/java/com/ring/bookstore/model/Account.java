@@ -55,6 +55,11 @@ public class Account implements UserDetails {
 
     @Column(length = 1000)
     private String email;
+    
+    @OneToOne(cascade = CascadeType.ALL, 
+    		orphanRemoval = true, 
+    		mappedBy = "user")
+    private AccountProfile profile;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(	name = "user_roles",

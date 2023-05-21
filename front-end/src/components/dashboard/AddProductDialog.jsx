@@ -3,24 +3,14 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Grid from "@mui/material/Grid"
-import MenuItem from "@mui/material/MenuItem"
-import FormControl from '@mui/material/FormControl';
+import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, FormControl} from '@mui/material';
+import { Check as CheckIcon, Close as CloseIcon, AutoStories as AutoStoriesIcon} from '@mui/icons-material';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
 import { useSnackbar } from 'notistack';
-
-import CheckIcon from '@mui/icons-material/Check';
-import CloseIcon from '@mui/icons-material/Close';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import dayjs from 'dayjs';
 
 import CustomDropZone from './CustomDropZone';
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';

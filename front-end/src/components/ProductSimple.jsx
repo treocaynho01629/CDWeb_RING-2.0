@@ -1,22 +1,11 @@
-import { useEffect } from 'react';
 import styled from 'styled-components'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
-import { useSnackbar } from 'notistack';
-
 import { Link } from "react-router-dom"
-import { addToCart } from '../redux/cartReducer';
 import { useDispatch } from 'react-redux';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
-const Image = styled.img`
-    height: 250px;
-    width: 190px;
-    z-index: -1;
-    transition: all 0.5s ease;
-    margin: 10px 0;
-    object-fit: contain;
-`
-
+//#region styled
 const Container = styled.div`
     min-width: 210px;
     max-width: 210px;
@@ -88,13 +77,15 @@ const AddToCart = styled.p`
         background-color: #63e399;
     }
 `
+//#endregion
 
 const ProductSimple = ({book}) => {
-
-    const { enqueueSnackbar } = useSnackbar();
     const dispatch = useDispatch();
 
-    const handleAddToCart = (book) => {
+    const handleAddToCart = async (book) => {
+        const { addToCart } = await import('../redux/cartReducer');
+        const { enqueueSnackbar } = await import('notistack');
+
         enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });
         dispatch(addToCart({
             id: book.id,
@@ -108,7 +99,15 @@ const ProductSimple = ({book}) => {
   return (
       <Container>
         <Link to={`/product/${book.id}`} style={{color: 'inherit'}}>
-            <Image src={book.image}/>
+            <LazyLoadImage src={book.image}
+                height={250}
+                width={190} 
+                style={{
+                    zIndex: -1,
+                    marginBottom: '10px 0',
+                    objectFit: 'contain',
+                }}
+            />
             <Info>
                 <Price>{book.price.toLocaleString()}&nbsp;đ</Price>
                 <Title>{book.title}</Title>

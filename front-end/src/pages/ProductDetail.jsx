@@ -3,21 +3,9 @@ import React, { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system';
 
-import RemoveIcon from '@mui/icons-material/Remove'
-import AddIcon from '@mui/icons-material/Add'
-import Divider from '@mui/material/Divider'
-import StarIcon from '@mui/icons-material/Star';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import SellIcon from '@mui/icons-material/Sell';
-import StorefrontIcon from '@mui/icons-material/Storefront';
-import CheckIcon from '@mui/icons-material/Check';
-
-import Grid from '@mui/material/Grid';
-import Rating from '@mui/material/Rating'
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Avatar from '@mui/material/Avatar';
-import Skeleton from '@mui/material/Skeleton';
+import { Remove as RemoveIcon, Add as AddIcon, Star as StarIcon, StarBorder as StarBorderIcon,
+ShoppingCart as ShoppingCartIcon, Sell as SellIcon, Storefront as StorefrontIcon, Check as CheckIcon} from '@mui/icons-material';
+import { Divider, Grid, Rating, Breadcrumbs, Avatar, Skeleton } from '@mui/material';
 
 import ProductImages from '../components/ProductImages';
 import ProductsSlider from '../components/ProductsSlider';
@@ -27,9 +15,7 @@ import ProductDetailContainer from '../components/ProductDetailContainer'
 
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { addToCart } from '../redux/cartReducer';
-import useFetch from '../hooks/useFetch'
-import { useSnackbar } from 'notistack';
+import useFetch from '../hooks/useFetch';
 
 //#region styled
 const Container = styled.div`
@@ -60,7 +46,6 @@ const StuffContainer = styled.div`
 
 const SellerContainer = styled.div`
     display: flex; 
-    justify-content: space-evenly;
     align-items: center;
     margin: 20px 0px;
 `
@@ -252,6 +237,11 @@ const BuyButton = styled.button`
     &:hover {
         background-color: lightgray;
         color: gray;
+    };
+
+    &:focus {
+        border: none;
+        outline: none;
     }
 `
 //#endregion
@@ -261,16 +251,14 @@ const BOOKS_RANDOM_URL = 'api/books/random?amount=10';
 
 const ProductDetail = () => {
     const {id} = useParams();
-    const [book, setBook] = useState([]);
     const [amountIndex, setAmountIndex] = useState(1);
-    const { enqueueSnackbar } = useSnackbar();
+    const [tab, setTab] = useState("1");
     const ref = useRef(null);
-
-    const { loading, data, error } = useFetch(BOOK_URL + id);
-    const { loading: loadingRandom, data: booksRandom } = useFetch(BOOKS_RANDOM_URL);
-    
-    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const { loading, data: book, error } = useFetch(BOOK_URL + id);
+    const { loading: loadingRandom, data: booksRandom } = useFetch(BOOKS_RANDOM_URL);
 
     const avgRate = () =>{
         let rate = 0;
@@ -280,28 +268,25 @@ const ProductDetail = () => {
 
     //Load
     useEffect(()=>{
-        if (!loading){
-            if (error?.response?.status === 404) navigate('/missing');
-
-            loadBook();
+        if (!loading) {
             window.scrollTo(0, 0);
+            handleTabChange("1");
         }
     }, [loading]);
 
-    const loadBook = async ()=>{
-        setBook(data);
-    }
+    useEffect(()=>{
+        if (error && error?.response?.status === 404) navigate('/missing');
+    }, [error]);
 
     const changeAmount = (n) => {
-        setAmountIndex(prev => prev + n);
-
-        if ((amountIndex + n) < 1){
-            setAmountIndex(1)
-        }
+        setAmountIndex(prev => (prev + n < 1 ? 1 : prev + n));
     }
 
     //Add to cart
-    const handleAddToCart = (book) => {
+    const handleAddToCart = async (book) => {
+        const { addToCart } = await import('../redux/cartReducer');
+        const { enqueueSnackbar } = await import('notistack');
+
         enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });
         dispatch(addToCart({
             id: book.id,
@@ -312,7 +297,12 @@ const ProductDetail = () => {
         }))
     };
 
+    const handleTabChange = (tab) => {
+        setTab(tab);
+    }
+
     const handleViewMore = () => {
+        handleTabChange("1");
         ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
@@ -423,13 +413,12 @@ const ProductDetail = () => {
                     <h5 style={{margin: 0, display: 'flex', alignItems: 'center'}}><StorefrontIcon/>&nbsp;NHÀ PHÂN PHỐI</h5>
                     <SellerContainer>
                         <Avatar>H</Avatar>
-                        <Link to={`/filters?sellerName=${book?.sellerName}`}>
-                            {book?.sellerName}
+                        <Link to={`/filters?seller=${book?.sellerName}`}>
+                            &nbsp;{book?.sellerName}
                         </Link>
                     </SellerContainer>
-                    <h4 style={{margin: 0, 
+                    <h4 style={{margin: '0 5px', 
                         display: 'flex', 
-                        justifyContent: 'center',
                         alignItems: 'center', 
                         color: '#63e399'}}>
                         ĐỐI TÁC RING!&nbsp;<CheckIcon/>
@@ -468,7 +457,10 @@ const ProductDetail = () => {
             </div>
             {product}
             <div ref={ref} >
-                <ProductDetailContainer loading={loading} book={book}/>
+                <ProductDetailContainer loading={loading} 
+                book={book}
+                tab={tab}
+                onTabChange={handleTabChange}/>
             </div>
             <ProductsSlider booksList={booksRandom} loading={loadingRandom}/>
             <br/><br/>

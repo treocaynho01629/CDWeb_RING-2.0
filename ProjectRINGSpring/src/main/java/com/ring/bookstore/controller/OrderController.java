@@ -60,7 +60,7 @@ public class OrderController {
     }
 	
 	@GetMapping("/user")
-	@PreAuthorize("hasAnyRole('ADMIN')")
+	@PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getOrdersByUser(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
     										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
         									@CurrentAccount Account currUser){
