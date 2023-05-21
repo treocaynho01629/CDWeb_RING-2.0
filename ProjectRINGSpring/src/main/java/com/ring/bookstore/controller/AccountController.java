@@ -9,13 +9,19 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ring.bookstore.config.CurrentAccount;
+import com.ring.bookstore.dtos.ProfileDTO;
 import com.ring.bookstore.model.Account;
+import com.ring.bookstore.model.AccountProfile;
 import com.ring.bookstore.request.AccountRequest;
+import com.ring.bookstore.request.ChangePassRequest;
+import com.ring.bookstore.request.ProfileRequest;
 import com.ring.bookstore.service.AccountService;
 
 import jakarta.validation.Valid;
@@ -34,7 +40,7 @@ public class AccountController {
 	
 	//Lấy tất cả acc
 	@GetMapping
-	@PreAuthorize("hasAnyRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public Page<Account> getAllAccounts(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
 										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
 										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
@@ -44,7 +50,7 @@ public class AccountController {
 	
 	//Lấy tất cả nhân viên
 	@GetMapping("/employees")
-	@PreAuthorize("hasAnyRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public Page<Account> getAllSellers(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
 										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
 										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
@@ -54,33 +60,59 @@ public class AccountController {
 	
 	//Lấy acc theo {id}
 	@GetMapping("{id}")
-	@PreAuthorize("hasAnyRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Account> getAccountById(@PathVariable("id") Integer accountId){
 		return new ResponseEntity<Account>(accountService.getAccountById(accountId), HttpStatus.OK);
 	}
 	
 	//Chỉnh sửa acc {id}
-	@PostMapping("{id}")
-	@PreAuthorize("hasAnyRole('ADMIN')")
+	@PutMapping("{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Account> updateAccount(@PathVariable("id") Integer accountId,
 			@Valid @RequestBody AccountRequest requestt){
 		return new ResponseEntity<Account>(accountService.updateAccount(requestt, accountId), HttpStatus.OK);
 	}
 	
 	//Tạo acc mới
-	@PostMapping()
-	@PreAuthorize("hasAnyRole('ADMIN')")
+	@PostMapping
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Account> saveAccount(@Valid @RequestBody AccountRequest request){
 		return new ResponseEntity<Account>(accountService.saveAccount(request), HttpStatus.CREATED);
 	}
 	
 	//Xoá acc {id}
 	@DeleteMapping("{id}")
-	@PreAuthorize("hasAnyRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<String> deleteAccount(@PathVariable("id") Integer accountId){
 		
 		//Xoá khỏi DB
 		accountService.deleteAccount(accountId);
 		return new ResponseEntity<String>("Account deleted successfully!", HttpStatus.OK);
+	}
+	
+	//Lấy profile
+	@GetMapping("/profile")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<ProfileDTO> getProfile(@CurrentAccount Account currUser){
+		ProfileDTO profile = accountService.getProfile(currUser);
+		return new ResponseEntity< >(profile, HttpStatus.OK);
+	}
+	
+	//Update hồ sơ
+	@PutMapping("/profile")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<AccountProfile> updateProfile(@Valid @RequestBody ProfileRequest request, @CurrentAccount Account currUser){
+		AccountProfile profile = accountService.updateProfile(request, currUser);
+		return new ResponseEntity< >(profile, HttpStatus.OK);
+	}
+	
+	//Đổi mật khẩu
+	@PutMapping("/change-password")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePassRequest request, @CurrentAccount Account currUser){
+		Account account = accountService.changePassword(request, currUser);
+		String result = "Đổi mật khẩu thất bại";
+		if (account != null) result = "Thay đổi mật khẩu thành công!";
+		return new ResponseEntity< >(result, HttpStatus.OK);
 	}
 }

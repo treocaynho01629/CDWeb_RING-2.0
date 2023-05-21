@@ -3,50 +3,20 @@ import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system';
 import PropTypes from 'prop-types';
 
-import SearchIcon from '@mui/icons-material/Search';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import MailIcon from '@mui/icons-material/Mail';
-import PhoneIcon from '@mui/icons-material/Phone';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import YouTubeIcon from '@mui/icons-material/YouTube';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import MenuIcon from '@mui/icons-material/Menu';
-import LockIcon from '@mui/icons-material/Lock';
-import Logout from '@mui/icons-material/Logout';
-import SpeedIcon from '@mui/icons-material/Speed';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
-
-import Stack from '@mui/material/Stack';
-import Badge from '@mui/material/Badge';
-import IconButton from '@mui/material/IconButton';
-import Avatar from '@mui/material/Avatar';
-import DeliveryDiningIcon from '@mui/icons-material/DeliveryDining';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Divider from '@mui/material/Divider';
-import Tooltip from '@mui/material/Tooltip';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import Popover from '@mui/material/Popover';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import AppBar from '@mui/material/AppBar';
-import useScrollTrigger from '@mui/material/useScrollTrigger';
-import Slide from '@mui/material/Slide';
+import { Search as SearchIcon, ShoppingCart as ShoppingCartIcon, 
+    Mail as MailIcon, Phone as PhoneIcon, 
+    Facebook as FacebookIcon, YouTube as YouTubeIcon,
+    Instagram as InstagramIcon, DeliveryDining as DeliveryDiningIcon, 
+    Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, 
+    Logout, Speed as SpeedIcon, NotificationsActive as NotificationsActiveIcon, 
+    RemoveShoppingCart as RemoveShoppingCartIcon} from '@mui/icons-material';
+import { Stack, Badge, IconButton, Avatar, Menu, MenuItem, ListItemIcon, Divider
+, Tooltip, Card, CardContent, CardMedia, Box, Drawer, Popover, List, ListItem, ListItemButton
+, ListItemText, Grid, TextField, AppBar, useScrollTrigger, Slide} from '@mui/material';
 
 import { useNavigate, Link } from "react-router-dom";
-import useLogout from "../hooks/useLogout";
 import { useSelector } from "react-redux";
+import useLogout from "../hooks/useLogout";
 import useAuth from "../hooks/useAuth";
 
 //#region styled
@@ -174,13 +144,14 @@ const Right = styled.div`
 const SearchInput = styled(TextField)({
     '& .MuiInputBase-root': {
       borderRadius: 0,
-      marginLeft: '50px'
+      marginLeft: '50px',
     },
     '& label.Mui-focused': {
       color: '#A0AAB4'
     },
     '& .MuiInput-underline:after': {
       borderBottomColor: '#B2BAC2',
+      background: 'transparent'
     },
     '& .MuiOutlinedInput-root': {
       borderRadius: 0,
@@ -366,9 +337,9 @@ function HideOnScroll(props) {
         {children}
       </Slide>
     );
-  }
+}
   
-  HideOnScroll.propTypes = {
+HideOnScroll.propTypes = {
     children: PropTypes.element.isRequired,
     window: PropTypes.func,
 };
@@ -387,7 +358,7 @@ const Navbar = (props) => {
     const open = Boolean(anchorEl);
     const openCart = Boolean(anchorElCart);
 
-    const [role, setRole] = useState(auth?.roles?.length);
+    const [role] = useState(auth?.roles?.length);
     
     const handlePopoverOpen = (event) => {
         setAnchorElCart(event.currentTarget);
@@ -399,7 +370,9 @@ const Navbar = (props) => {
 
     const signOut = async () => {
         await logout();
+        const { enqueueSnackbar } = await import('notistack');
         navigate('/');
+        enqueueSnackbar('Đã đăng xuất!', { variant: 'error' });
     }
 
     const handleClick = (event) => {
@@ -417,10 +390,10 @@ const Navbar = (props) => {
         setOpen(!openDrawer)
     };
 
-    const handleSubmitSearch = async (e) => {
+    const handleSubmitSearch = (e) => {
         e.preventDefault();
-        setSearchField('');
         navigate(`/filters?keyword=${searchField}`);
+        setSearchField('');
     }
 
     let sublist;
@@ -429,7 +402,7 @@ const Navbar = (props) => {
         <Grid>
             <List>
                 <ListItem disablePadding>
-                <ListItemButton>
+                <ListItemButton onClick={() => navigate('/profile/detail')}>
                     <ListItemIcon>
                         <Avatar /> 
                     </ListItemIcon>
@@ -438,7 +411,7 @@ const Navbar = (props) => {
                 </ListItem>
 
                 <ListItem disablePadding>
-                <ListItemButton>
+                <ListItemButton onClick={() => navigate('/profile/receipts')}>
                     <ListItemIcon>
                         <DeliveryDiningIcon/>
                     </ListItemIcon>
@@ -553,10 +526,10 @@ const Navbar = (props) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
     >
-        <MenuItem>
+        <MenuItem onClick={() => navigate('/profile/detail')}>
             <Avatar /> Thông tin tài khoản
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={() => navigate('/profile/receipts')}>
             <ListItemIcon>
                 <DeliveryDiningIcon fontSize="small"/> 
             </ListItemIcon>
@@ -628,6 +601,7 @@ const Navbar = (props) => {
             {products.slice(0, 5).map((product, index) => (
             <Card key={index} mt={0} sx={{ display: 'flex', alignItems: 'center' }}>
                 <CardMedia
+                    loading="lazy"
                     component="img"
                     sx={{ width: 50, height: 50 }}
                     image={product.image}
@@ -710,7 +684,7 @@ const Navbar = (props) => {
                             <Right>
                                 <NavItem>
                                     <Stack spacing={1} direction="row" sx={{ color: 'action.active' }}>
-                                        <StyledIconButton disableRipple disableFocusRipple aria-label="notification">
+                                        <StyledIconButton aria-label="notification">
                                             <StyledBadge badgeContent={0} anchorOrigin={{
                                                 vertical: 'top',
                                                 horizontal: 'left',
@@ -720,7 +694,7 @@ const Navbar = (props) => {
                                             <p style={{fontSize: '13px', marginLeft: '5px'}}>Thông báo</p>
                                         </StyledIconButton>
                                         <Link to={`/cart`}>
-                                            <StyledIconButton disableRipple disableFocusRipple 
+                                            <StyledIconButton 
                                             aria-label="cart"
                                             aria-owns={openCart ? "mouse-over-popover" : undefined}
                                             aria-haspopup="true"
@@ -741,7 +715,6 @@ const Navbar = (props) => {
                                         {auth.userName ? (
                                         <Tooltip title="Tài khoản">
                                             <StyledIconButton
-                                                disableRipple disableFocusRipple
                                                 onClick={handleClick}
                                                 size="small"
                                                 sx={{ ml: 2 }}
@@ -755,7 +728,7 @@ const Navbar = (props) => {
                                         </Tooltip>
                                         ) : (
                                         <Link to={`/login`}>
-                                            <StyledIconButton disableRipple disableFocusRipple aria-label="login">
+                                            <StyledIconButton aria-label="login">
                                                 <LockIcon/>
                                                 <p style={{fontSize: '13px', marginLeft: '5px'}}>Đăng nhập</p>
                                             </StyledIconButton>

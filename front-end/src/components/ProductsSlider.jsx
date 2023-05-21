@@ -51,7 +51,7 @@ const ProductsSlider = ({loading, booksList}) => {
 
   return (
     <Container>
-      <OwlCarousel className='owl-theme' loop lazyLoad dots={false} margin={10} responsive={responsive}>
+      <OwlCarousel className='owl-theme' autoPlay rewind lazyLoad dots={false} margin={10} responsive={responsive}>
       {booksList?.map((book, index) => (
         <div className='item' key={index} style={{display: 'flex'}}>
           <ProductSimple book={book}/>

@@ -29,6 +29,7 @@ import com.ring.bookstore.repository.BookRepository;
 import com.ring.bookstore.repository.OrderDetailRepository;
 import com.ring.bookstore.repository.OrderReceiptRepository;
 import com.ring.bookstore.request.OrderRequest;
+import com.ring.bookstore.service.EmailService;
 import com.ring.bookstore.service.OrderService;
 
 import jakarta.transaction.Transactional;
@@ -41,6 +42,7 @@ public class OrderServiceImpl implements OrderService {
 	private final OrderReceiptRepository orderRepo;
 	private final OrderDetailRepository detailRepo;
 	private final BookRepository bookRepo;
+	private final EmailService emailService;
 	
 	@Autowired
 	private OrderMapper orderMapper;
@@ -87,6 +89,16 @@ public class OrderServiceImpl implements OrderService {
 		}
 		
 		savedOrder.setTotal(total * 1.1 + 10000l);
+		
+		//Gửi mail
+        String subject = "Welcome to HRMS Production! ";
+        String content = "<h1 style=\"color:white\"><p style=\"color:#057063\">HRMS</p>&nbsp;Chào mừng</h1>\n"
+                + "<br><h3 style=\"color:white\">Tài khoản HRMS Production của đã được tạo thành công!</h3>\n \n"
+                + "<br><br><p>Tên tài khoản: <b></b></p>\n"
+                + "<p>Nhân viên: <b></b></p>";
+
+        emailService.sendHtmlMessage(user.getEmail(), subject, content);
+		
 		return orderRepo.save(savedOrder);
 	}
 

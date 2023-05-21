@@ -12,7 +12,7 @@
 	<artifactId>bookstore</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ProjectRINGSpring</name>
-	<description>ECommerce Bookstore Project for CDWeb</description>
+	<description>ECommerce Bookstore Project mon Chuyen De Web: Ha Duc Trong - MSSV: 19130248, Nguyen Cong Binh - MSSV: 19130018</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -41,6 +41,7 @@
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -57,7 +58,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -77,6 +77,15 @@
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.11.5</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
 		</dependency>
 	</dependencies>
 

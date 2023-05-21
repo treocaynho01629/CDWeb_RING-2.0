@@ -21,4 +21,6 @@ public interface ReviewRepository extends JpaRepository<Review, Integer>{
 	int findTotalRatingByBookId(Integer id);
 	
 	void deleteByBook_Id(Integer id);
+	
+	boolean existsByBook_IdAndUser_Id(Integer bookId, Integer userId);
 }

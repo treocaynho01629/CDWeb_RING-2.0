@@ -3,32 +3,14 @@ import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useTheme } from '@mui/material/styles';
 
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import CategoryIcon from '@mui/icons-material/Category';
-import ClassIcon from '@mui/icons-material/Class';
-import GroupIcon from '@mui/icons-material/Group';
-import PersonIcon from '@mui/icons-material/Person';
-import TryIcon from '@mui/icons-material/Try';
-import EqualizerIcon from '@mui/icons-material/Equalizer';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
-import SpeedIcon from '@mui/icons-material/Speed';
-
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, ExpandLess, ExpandMore
+, Category as CategoryIcon, Group as GroupIcon, Person as PersonIcon
+, Try as TryIcon, Equalizer as EqualizerIcon, TrendingUp as TrendingUpIcon, Receipt as ReceiptIcon
+, AutoStories as AutoStoriesIcon, Speed as SpeedIcon } from '@mui/icons-material';
+import { Divider, ListItem, ListItemButton, ListItemIcon, ListItemText, List, IconButton, Collapse } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import IconButton from '@mui/material/IconButton';
-import Collapse from '@mui/material/Collapse';
 
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 
 //#region preStyled

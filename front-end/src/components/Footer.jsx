@@ -1,19 +1,16 @@
 import styled from "styled-components"
-import FacebookIcon from '@mui/icons-material/Facebook';
-import YouTubeIcon from '@mui/icons-material/YouTube';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import QrCodeIcon from '@mui/icons-material/QrCode';
-import LocalAtmIcon from '@mui/icons-material/LocalAtm';
-import ScheduleIcon from '@mui/icons-material/Schedule';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
+
+import { Facebook as FacebookIcon, YouTube as YouTubeIcon, Instagram as InstagramIcon, Twitter as TwitterIcon, 
+    QrCode as QrCodeIcon, LocalAtm as LocalAtmIcon, SystemSecurityUpdateGood as SystemSecurityUpdateGoodIcon, CreditCard as CreditCardIcon} from '@mui/icons-material';
 
 import Grid from '@mui/material/Grid';
 
+//#region styled
 const Container = styled.div`
     display: flex;
     flex-direction: column;
     background-color: #ebebeb;
+    margin-top: 100px;
 `
 
 const Wrapper = styled.div`
@@ -158,6 +155,7 @@ const Group = styled.p`
         display: flex;
     }
 `
+//#endregion
 
 const Footer = () => {
   return (
@@ -222,8 +220,8 @@ const Footer = () => {
                                         <Payment><LocalAtmIcon sx={{fontSize: 30}}/><p style={{fontSize: 14, margin: 0}}>Tiền mặt</p></Payment>
                                     </ListItem>
                                     <ListItem style={{display: 'flex'}}>
-                                        <Payment><ScheduleIcon sx={{fontSize: 30}}/><p style={{fontSize: 14, margin: 0}}>QR Code</p></Payment>
-                                        <Payment><CreditCardIcon sx={{fontSize: 30}}/><p style={{fontSize: 14, margin: 0}}>Tiền mặt</p></Payment>
+                                        <Payment><SystemSecurityUpdateGoodIcon sx={{fontSize: 30}}/><p style={{fontSize: 14, margin: 0}}>Internet Banking</p></Payment>
+                                        <Payment><CreditCardIcon sx={{fontSize: 30}}/><p style={{fontSize: 14, margin: 0}}>Thẻ ATM</p></Payment>
                                     </ListItem>
                                 </List>
                             </Grid>

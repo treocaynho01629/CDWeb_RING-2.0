@@ -44,7 +44,8 @@ public class ReviewServiceImpl implements ReviewService {
 		
 		//Kiểm tra sách
 		Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found"));
-		if (!orderRepo.existsByUserBuyBook(id, user.getUsername())) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "User have not bought the product!");
+		if (!orderRepo.existsByUserBuyBook(id, user.getUsername())) throw new HttpResponseException(HttpStatus.NO_CONTENT, "Hãy mua sản phẩm để có thể đánh giá!");
+		if (reviewRepo.existsByBook_IdAndUser_Id(id, user.getId())) throw new HttpResponseException(HttpStatus.ALREADY_REPORTED, "Bạn đã đánh giá sản phẩm rồi!");
 		
 		//Thêm review cho sách
         var review = Review.builder()

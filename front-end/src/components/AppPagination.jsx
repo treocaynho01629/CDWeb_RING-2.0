@@ -3,11 +3,7 @@ import { useEffect, useState } from 'react'
 import styled from "styled-components"
 import { styled as muiStyled } from '@mui/system';
 
-import Pagination from '@mui/material/Pagination';
-import PaginationItem from '@mui/material/PaginationItem';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import MenuItem from "@mui/material/MenuItem"
+import { Pagination, PaginationItem, Stack, TextField, MenuItem } from '@mui/material';
 
 //#region styled
 const Container = styled.div`
