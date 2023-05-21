@@ -1,22 +1,14 @@
 import { useState } from 'react'
 
 import styled from 'styled-components'
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
-
-import StarIcon from '@mui/icons-material/Star';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-
-import { Divider } from '@mui/material'
 import { styled as muiStyled } from '@mui/system'
 
-import Rating from '@mui/material/Rating'
-import { useSnackbar } from 'notistack';
+import { KeyboardArrowRight, KeyboardArrowLeft, Star as StarIcon, StarBorder as StarBorderIcon, ShoppingCart as ShoppingCartIcon} from '@mui/icons-material';
+import { Divider, Rating } from '@mui/material'
 
 import { Link } from "react-router-dom"
-import { addToCart } from '../redux/cartReducer';
 import { useDispatch } from 'react-redux';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 //#region styled
 const MoreInfo = styled.div`
@@ -33,24 +25,15 @@ const MoreInfo = styled.div`
     cursor: pointer;
 `
 
-const Image = styled.img`
-    height: 300px;
-    width: 210px;
-    z-index: -1;
-    transition: all 0.5s ease;
-    margin-bottom: 5px;
-    object-fit: contain;
-    
-`
-
 const ImageSlider = styled.div`
     overflow: hidden;
     position: relative;
     z-index: -1;
-    padding: 10px 20px 20px 20px;
+    padding: 5px 5px 0px 5px;
 `
 
 const Container = styled.div`
+    min-width: 210px;
     max-width: 290px;
     height: 100%;
     display: flex;
@@ -63,10 +46,6 @@ const Container = styled.div`
     &:hover ${MoreInfo}{
         opacity: 1;
     };
-
-    &:hover ${Image}{
-        transform: scale(1.05);
-    }
 `
 
 const Info = styled.div`
@@ -184,12 +163,9 @@ const StyledRating = muiStyled(Rating)({
     },
 });
 //#endregion
+const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY(-1)'];
 
 const Product = ({book}) => {
-
-    const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY(-1)'];
-    const { enqueueSnackbar } = useSnackbar();
-
     const [slideIndex, setSlideIndex] = useState(1);
     const dispatch = useDispatch();
 
@@ -210,7 +186,10 @@ const Product = ({book}) => {
         }
     }
 
-    const handleAddToCart = (book) => {
+    const handleAddToCart = async (book) => {
+        const { addToCart } = await import('../redux/cartReducer');
+        const { enqueueSnackbar } = await import('notistack');
+
         enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });
         dispatch(addToCart({
             id: book.id,
@@ -225,8 +204,19 @@ const Product = ({book}) => {
       <Container>
         <ImageSlider>
             {multiImages.map((style, index) => (
-            <Image key={index} src={book.image} 
-            style={{display: (index + 1) === slideIndex ? "block" : "none", transform: style}}/>
+            <LazyLoadImage key={index}
+                src={book.image}
+                height={300} 
+                width={210}
+                style={{
+                    zIndex: -1,
+                    transition: 'all 0.5s ease',
+                    marginBottom: '5px',
+                    objectFit: 'contain',
+                    display: (index + 1) === slideIndex ? "block" : "none", 
+                    transform: style,
+                }}
+            />
             ))}
         </ImageSlider>
         <Info>

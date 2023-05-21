@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import styled from "styled-components"
+
 import Navbar from "../components/Navbar"
 import Footer from "../components/Footer"
 import AppPagination from '../components/AppPagination'
@@ -11,9 +12,11 @@ import SortList from "../components/SortList"
 import Divider from '@mui/material/Divider';
 import Grid from "@mui/material/Grid"
 
+import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+
 import { styled as muiStyled } from '@mui/system';
 import useFetch from '../hooks/useFetch'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 //#region styled
 const Container = styled.div`
@@ -34,6 +37,32 @@ const Wrapper = styled.div`
     @media (min-width: 1200px) {
         width: 1170px;
     }
+`
+
+const Button = styled.button`
+  background-color: #63e399;
+  padding: 10px 20px;;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 0;
+  border: none;
+  transition: all 0.5s ease;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+      background-color: lightgray;
+      color: black;
+  };
+
+  &:focus {
+      outline: none;
+      border: none;
+      border: 0;
+  };
+
+  outline: none;
+  border: 0;
 `
 
 const Title = muiStyled(Divider)({
@@ -57,6 +86,7 @@ const FiltersPage = () => {
         value: searchParams.get("value") ? searchParams.get("value").split(',') : [1000, 10000000],
         keyword: searchParams.get("keyword") ? searchParams.get("keyword") : "",
         type: searchParams.get("type") ? searchParams.get("type") : "",
+        seller: searchParams.get("seller") ? searchParams.get("seller") : "",
         pubId: searchParams.get("pubId") ? searchParams.get("pubId").split(',') : [],
         cateId: searchParams.get("cateId") ? searchParams.get("cateId") : "",
     })
@@ -76,26 +106,23 @@ const FiltersPage = () => {
         + "&pubId=" + filters.pubId
         + "&type=" + filters.type
         + "&keyword=" + filters.keyword
-        + "&fromRage=" + filters.value[0]
+        + "&seller=" + filters.seller
+        + "&fromRange=" + filters.value[0]
         + "&toRange=" + filters.value[1]);
+    const navigate = useNavigate();
 
     //Load
     useEffect(() => {
         if (!loading && data){
-            loadBooks(); 
+            setPagination({ ...pagination, totalPages: data?.totalPages});
+            setBooksList(data?.content);
         }
-        console.log(filters?.value);
     }, [loading])
-
-    const loadBooks = ()=>{
-        setPagination({ ...pagination, totalPages: data?.totalPages});
-        setBooksList(data?.content);
-    };
 
     //Change
     const handleCateChange = (id) => {
         handlePageChange(1);
-        if (filters?.cateId == id){
+        if (filters?.cateId == id || id == ""){
             setFilters({...filters, cateId: ''});
             searchParams.delete("cateId");
             setSearchParams(searchParams);
@@ -162,9 +189,14 @@ const FiltersPage = () => {
 
     const handleChangeSearch = (newValue) => {
         handlePageChange(1);
+        if (newValue == ""){
+            searchParams.delete("keyword");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("keyword", newValue);
+            setSearchParams(searchParams);
+        }
         setFilters({...filters, keyword: newValue});
-        searchParams.set("keyword", newValue);
-        setSearchParams(searchParams);
     };
 
     const handleChangePub = (newValue) => {
@@ -178,6 +210,49 @@ const FiltersPage = () => {
         }
         setFilters({...filters, pubId: newValue});
     };
+
+    const handleChangeType = (newValue) => {
+        handlePageChange(1);
+        if (newValue == ""){
+            searchParams.delete("type");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("type", newValue);
+            setSearchParams(searchParams);
+        }
+        setFilters({...filters, type: newValue});
+    };
+
+    const handleChangeSeller = (newValue) => {
+        handlePageChange(1);
+        if (newValue == ""){
+            searchParams.delete("seller");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("seller", newValue);
+            setSearchParams(searchParams);
+        }
+        setFilters({...filters, seller: newValue});
+    };
+
+    const resetFilter = () => {
+        setFilters({
+            value: [1000, 10000000],
+            keyword: "",
+            type: "",
+            seller: "",
+            pubId: [],
+            cateId: "",
+        })
+        setPagination({
+            currPage: 0,
+            pageSize: 16,
+            totalPages: 0,
+            sortBy: "id",
+            sortDir: "desc",
+        })
+        navigate('/filters')
+    }
     //#endregion
 
     return (
@@ -189,8 +264,12 @@ const FiltersPage = () => {
                     <FilterList  filters={filters}
                     onCateChange={handleCateChange}
                     onRangeChange={handleRangeChange}
-                    onChangePub={handleChangePub}/>
-                    Quang cao them sau
+                    onChangePub={handleChangePub}
+                    onChangeType={handleChangeType}
+                    onChangeSeller={handleChangeSeller}/>
+                    <div style={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
+                        <Button onClick={resetFilter}><FilterAltOffIcon/>Huỷ bộ lọc</Button>
+                    </div>
                 </Grid>
                 <Grid item xs={12} md={9}>
                     <Title>DANH MỤC SẢN PHẨM</Title>

@@ -1,15 +1,6 @@
 package com.ring.bookstore.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
-
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 import org.hibernate.annotations.Nationalized;
@@ -18,20 +9,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 
 @Entity
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-public class BookDetail {
-
-    @Id
+@EqualsAndHashCode
+public class AccountProfile {
+	@Id
     @Column(nullable = false, updatable = false)
     @SequenceGenerator(
             name = "primary_sequence",
@@ -45,26 +34,26 @@ public class BookDetail {
     )
     @JsonIgnore
     private Integer id;
+	
+	@Column(length = 250)
+	@Nationalized 
+    private String name;
+
+	@Column(length = 15)
+    private String phone;
+
+    @Column(length = 10)
+    private String gender;
 
     @Column
-    private Double bWeight;
+    private LocalDate dob;
 
-    @Column(length = 50)
-    private String size;
-
-    @Column
-    private Integer pages;
-
-    @Column
-    private LocalDate bDate;
-
-    @Column(length = 100)
+    @Column(length = 500)
     @Nationalized 
-    private String bLanguage;
+    private String address;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
-    private Book book;
-
+    private Account user;
 }

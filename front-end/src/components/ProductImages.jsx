@@ -4,6 +4,9 @@ import styled from 'styled-components'
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+
+//#region styled
 const ImgContainer = styled.div`
     align-items: center;
     justify-content: center;
@@ -40,12 +43,6 @@ const ImageNumber = styled.p`
     left: 0;
 `
 
-const Image = styled.img`
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-    padding: 15px;
-`
 const SmallImageSlider = styled.div`
     display: flex;
     overflow-x: scroll;
@@ -77,13 +74,6 @@ const SmallImageSlide = styled.div`
     }
 `
 
-const SmallImage = styled.img`
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    display: inline-block;
-`
-
 const ImageButton = styled.div`
     width: 35px;
     height: 80px;
@@ -104,9 +94,9 @@ const ImageButton = styled.div`
         color: white;
     }
 `
+//#endregion
 
 const ProductImages = ({images}) => {
-
     const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY(-1)'];
 
     const [width, setWidth] = useState(0);
@@ -167,7 +157,15 @@ const ProductImages = ({images}) => {
             <ImageSlide key={index}
             style={{display: (index + 1) === slideIndex ? "block" : "none"}}>
                 <ImageNumber>{index + 1} / {multiImages.length}</ImageNumber>
-                <Image src={images} style={{transform: style}}/>        
+                <LazyLoadImage src={images}
+                height={500}
+                width={'100%'} 
+                style={{
+                    padding: '15px 20px',
+                    objectFit: 'cover',
+                    transform: style
+                }}
+                />        
             </ImageSlide>
             ))}
             <ImageButton direction="left" onClick={()=>changeSlide(-1)}>
@@ -184,7 +182,14 @@ const ProductImages = ({images}) => {
                 <SmallImageSlide key={index} 
                 className={`${index + 1 === slideIndex && 'active'}`}
                 onClick={()=>setSlideIndex(index + 1)}>
-                        <SmallImage src={images} style={{transform: style}}/>
+                    <LazyLoadImage src={images}
+                        height={80}
+                        width={80} 
+                        style={{
+                            objectFit: 'cover',
+                            display: 'inline-block'
+                        }}
+                    />
                 </SmallImageSlide>
                 ))}
             </SmallImageSlider>

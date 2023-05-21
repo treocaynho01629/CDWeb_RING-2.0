@@ -2,15 +2,13 @@ import { useState, useEffect } from "react"
 
 import styled from "styled-components"
 import Carousel from 'react-material-ui-carousel'
-import Paper from '@mui/material/Paper'
-import Grid from '@mui/material/Grid'
-import Skeleton from '@mui/material/Skeleton';
+
+import { Paper, Grid, Skeleton } from '@mui/material';
 
 import { Link } from "react-router-dom"
-import { addToCart } from '../redux/cartReducer';
 import { useDispatch } from "react-redux"
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import useFetch from '../hooks/useFetch'
-import { useSnackbar } from 'notistack';
 
 //#region styled
 const ImgContainer = styled.div`
@@ -18,11 +16,6 @@ const ImgContainer = styled.div`
     text-align: center;
     justify-content: center;
     align-items: center;
-`
-
-const Image = styled.img`
-    height: 400px;
-    object-fit: contain;
 `
 
 const InfoContainer = styled.div`
@@ -93,12 +86,13 @@ const Button = styled.button`
 
 const RANDOMBOOKS_URL = 'api/books/random';
 
-function Item({book})
-{
+function Item({book}){
     const dispatch = useDispatch();
-    const { enqueueSnackbar } = useSnackbar();
 
-    const handleAddToCart = (book) => {
+    const handleAddToCart = async (book) => {
+        const { addToCart } = await import('../redux/cartReducer');
+        const { enqueueSnackbar } = await import('notistack');
+
         enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });
         dispatch(addToCart({
             id: book.id,
@@ -115,7 +109,13 @@ function Item({book})
                 <Grid item xs={12} sm={12} md={5}>
                     <Link to={`/product/${book.id}`}>
                         <ImgContainer>
-                            <Image src={book.image}/>
+                            <LazyLoadImage src={book.image}
+                            height={400}
+                            width={400} 
+                            style={{
+                                objectFit: 'container',
+                            }}
+                            /> 
                         </ImgContainer>
                     </Link>
                 </Grid>

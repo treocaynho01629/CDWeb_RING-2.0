@@ -2,29 +2,54 @@ import { useState, useEffect } from "react"
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system';
 
-import Box from '@mui/material/Box';
-import Slider from '@mui/material/Slider';
-import Divider from '@mui/material/Divider';
-import Checkbox from '@mui/material/Checkbox';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import Collapse from '@mui/material/Collapse';
-
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import PriceChangeIcon from '@mui/icons-material/PriceChange';
-import CategoryIcon from '@mui/icons-material/Category';
-import ClassIcon from '@mui/icons-material/Class';
+import { Grid, Box, Slider, Divider, Checkbox, FormGroup, FormControlLabel, TextField, MenuItem, List, ListItemButton, Collapse} from '@mui/material';
+import { ExpandLess, ExpandMore, PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon} from '@mui/icons-material';
 
 import axios from '../api/axios'
-import { Grid } from "@mui/material";
 
 //#region styled
-const Container = styled.div`
-`
+const CustomInput = muiStyled(TextField)({
+  '& .MuiInputBase-root': {
+    borderRadius: 0,
+  },
+  '& label.Mui-focused': {
+    color: '#A0AAB4'
+  },
+  '& .MuiInput-underline:after': {
+    borderBottomColor: '#B2BAC2',
+  },
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 0,
+    '& fieldset': {
+      borderRadius: 0,
+      borderColor: '#E0E3E7',
+    },
+    '&:hover fieldset': {
+      borderRadius: 0,
+      borderColor: '#B2BAC2',
+    },
+    '&.Mui-focused fieldset': {
+      borderRadius: 0,
+      borderColor: '#6F7E8C',
+    },
+  },
+  '& input:valid + fieldset': {
+    borderColor: 'lightgray',
+    borderRadius: 0,
+    borderWidth: 1,
+  },
+  '& input:invalid + fieldset': {
+    borderColor: '#e66161',
+    borderRadius: 0,
+    borderWidth: 1,
+  },
+  '& input:valid:focus + fieldset': {
+    borderColor: '#63e399',
+    borderLeftWidth: 4,
+    borderRadius: 0,
+    padding: '4px !important', 
+  },
+});
 
 const TitleContainer = styled.div`
     width: 100%;
@@ -147,17 +172,65 @@ const marks = [
     label: '10tr',
   },
 ];
+const bookTypes = [
+  {
+      value: 'Bìa mềm',
+      label: 'Bìa mềm',
+  },
+  {
+      value: 'Bìa rời',
+      label: 'Bìa rời',
+  },
+  {
+      value: 'Bìa cứng',
+      label: 'Bìa cứng',
+  },
+  {
+      value: 'Bìa gỗ',
+      label: 'Bìa gỗ',
+  },
+];
 
 const FilterList = (props) => {
   //#region construct
-  const {filters, onCateChange, onRangeChange, onChangePub} = props;
+  const {filters, onCateChange, onRangeChange, onChangePub, onChangeType, onChangeSeller} = props;
   const [open, setOpen] = useState(false);
   const [cateId, setCateId] = useState(filters?.cateId);
-  const [catesList, setCatesList] = useState([])
-  const [pubList, setPubList] = useState([]);
   const [selectedPub, setSelectedPub] = useState(filters?.pubId);
   const [valueInput, setValueInput] = useState(filters?.value);
+  const [type, setType] = useState(filters?.type);
+  const [seller, setSeller] = useState(filters?.seller);
+  const [catesList, setCatesList] = useState([])
+  const [pubList, setPubList] = useState([]);
   const [value, setValue] = useState([reverseCalculateValue(valueInput[0]), reverseCalculateValue(valueInput[1])]);
+
+  useEffect(()=>{
+    setCateId(filters?.cateId);
+  }, [filters?.cateId]);
+
+  useEffect(()=>{
+    setSelectedPub(filters?.pubId);
+  }, [filters?.pubId]);
+
+  useEffect(()=>{
+    setType(filters?.type);
+  }, [filters?.type]);
+
+  useEffect(()=>{
+    setSeller(filters?.seller);
+  }, [filters?.seller]);
+
+  useEffect(()=>{
+    setValueInput(filters?.value);
+    setValue([reverseCalculateValue(filters?.value[0]), reverseCalculateValue(filters?.value[1])]);
+  }, [filters?.value]);
+
+  //Load
+  useEffect(()=>{
+    loadCategories();
+    loadPublishers();
+    handleBlur();
+  }, []);
 
   //Scale
   function calculateValue(value) {
@@ -253,18 +326,6 @@ const FilterList = (props) => {
     }
   };
 
-  useEffect(()=>{
-    setSelectedPub(filters?.pubId);
-    setCateId(filters?.cateId);
-  }, [filters]);
-
-  //Load
-  useEffect(()=>{
-    loadCategories();
-    loadPublishers();
-    handleBlur();
-  }, []);
-
   const loadCategories = async()=>{
       const result = await axios.get(CATEGORIES_URL);
       setCatesList(result.data);
@@ -275,11 +336,24 @@ const FilterList = (props) => {
     setPubList(result.data);
   };
 
+  const handleChangeType = (event) => {
+    if (onChangeType){
+      onChangeType(event.target.value)
+    }
+  }
+
+  const handleChangeSeller = (event) => {
+    event.preventDefault();
+    if (onChangeSeller){
+      onChangeSeller(seller);
+    }
+  };
+
   const isSelected = (id) => selectedPub.indexOf(id) !== -1;
   //#endregion
 
   return (
-    <Container>
+    <div>
       <Title>BỘ LỌC</Title>
 
       <Filter>
@@ -355,8 +429,8 @@ const FilterList = (props) => {
           component="nav"
           aria-labelledby="nested-list"
         >
-          {catesList.map((cate, index) => (
-            <Grid key={index}>
+          {catesList.map((cate) => (
+            <Grid key={cate.id}>
               <ListItemButton 
               sx={{pl: 0, py: 0, 
                 justifyContent: 'space-between',
@@ -375,8 +449,8 @@ const FilterList = (props) => {
                 }
                 
               </ListItemButton>
-              {cate.cateSubs.map((sub, index2) => (
-                <Grid key={index2}>
+              {cate.cateSubs.map((sub, index) => (
+                <Grid key={index}>
                   <Collapse in={open[cate.id]} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     <ListItemButton sx={{ pl: 2 , py: 0, color: 'gray'}}>
@@ -401,7 +475,7 @@ const FilterList = (props) => {
           const isItemSelected = isSelected(`${pub.id}`);
 
           return (
-            <FormControlLabel
+            <FormControlLabel key={index}
               control={
                 <Checkbox value={pub.id} 
                 checked={isItemSelected} 
@@ -419,7 +493,41 @@ const FilterList = (props) => {
         })}
         </FormGroup>
       </Filter>
-    </Container>
+      <Divider/>
+      <Filter>
+        <TitleContainer>
+          <FilterText><TuneIcon/>&nbsp;KHÁC</FilterText>
+        </TitleContainer>
+        <CustomInput
+        label="Hình thức bìa"
+        select
+        margin="dense" 
+        fullWidth
+        id="type"
+        value={type}
+        onChange={handleChangeType}
+        >
+          <MenuItem key="all" value="">Tất cả</MenuItem>
+        {bookTypes.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+          {option.label}
+          </MenuItem>
+        ))}
+        </CustomInput>
+        <CustomInput
+          margin="dense"
+          id="seller"
+          label="Tên người bán"
+          fullWidth
+          variant="outlined"
+          value={seller}
+          onBlur={handleChangeSeller}
+          onChange={(e) => setSeller(e.target.value)}
+          />
+      </Filter>
+      <Divider/>
+      
+    </div>
   )
 }
 
