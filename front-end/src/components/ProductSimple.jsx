@@ -69,7 +69,7 @@ const AddToCart = styled.p`
     transition: all 0.5s ease;
     z-index: 15;
     margin-bottom: 10px;
-    padding: 5px 15px;
+    padding: 10px 15px;
     cursor: pointer;
 
     &:hover {
@@ -113,7 +113,9 @@ const ProductSimple = ({book}) => {
                 <Title>{book.title}</Title>
             </Info>
         </Link>
-        <AddToCart onClick={() => handleAddToCart(book)}><ShoppingCartIcon style={{fontSize: 14}}/>&nbsp;THÊM VÀO GIỎ</AddToCart>
+        <AddToCart onClick={() => handleAddToCart(book)}>
+            <ShoppingCartIcon style={{fontSize: 14}}/>&nbsp;THÊM VÀO GIỎ
+        </AddToCart>
     </Container>
   )
 }

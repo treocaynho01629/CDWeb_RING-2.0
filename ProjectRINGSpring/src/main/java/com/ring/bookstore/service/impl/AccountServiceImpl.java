@@ -1,6 +1,7 @@
 package com.ring.bookstore.service.impl;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ring.bookstore.dtos.AccountDetailDTO;
 import com.ring.bookstore.dtos.ProfileDTO;
+import com.ring.bookstore.dtos.mappers.AccountDetailMapper;
 import com.ring.bookstore.dtos.mappers.ProfileMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
@@ -25,6 +28,7 @@ import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.request.AccountRequest;
 import com.ring.bookstore.request.ChangePassRequest;
 import com.ring.bookstore.request.ProfileRequest;
+import com.ring.bookstore.response.IChartResponse;
 import com.ring.bookstore.service.AccountService;
 import com.ring.bookstore.service.RoleService;
 
@@ -41,6 +45,8 @@ public class AccountServiceImpl implements AccountService {
 	
 	@Autowired
 	private ProfileMapper profileMapper;
+	@Autowired
+	private AccountDetailMapper detailMapper;
 	
 	//Lấy tất cả acc
 	public Page<Account> getAllAccounts(Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
@@ -57,9 +63,10 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	//Lấy acc theo id
-	public Account getAccountById(Integer id) {
-		return accountRepo.findById(id).orElseThrow(() -> 
+	public AccountDetailDTO getAccountById(Integer id) {
+		Account account = accountRepo.findById(id).orElseThrow(() -> 
 					new ResourceNotFoundException("User does not exists!")); //exception nếu ko tồn tại
+		return detailMapper.apply(account);
 	}
 	
 	//Tạo acc
@@ -80,15 +87,27 @@ public class AccountServiceImpl implements AccountService {
 		    roles.add(roleService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "Role not found")));
 	    }
 		
+	    //Save user
 		var acc = Account.builder()
 		            .userName(request.getUserName())
 		            .pass(passwordEncoder.encode(request.getPass()))
 		            .email(request.getEmail())
 		            .roles(roles)
 		            .build();
-		
-		 //Save user
+		 
 	    Account savedAccount = accountRepo.save(acc);
+		
+		//Save profile
+		var profile = AccountProfile.builder()
+				.name(request.getName())
+				.phone(request.getPhone())
+				.address(request.getAddress())
+				.dob(request.getDob())
+				.gender(request.getGender())
+				.user(savedAccount)
+				.build();
+		
+		profileRepo.save(profile);
 		return savedAccount;
 	}
 
@@ -114,13 +133,30 @@ public class AccountServiceImpl implements AccountService {
 		    roles.add(roleService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "Role not found")));
 		}
 		
+		//Save user
 		currUser.setUserName(request.getUserName());
-		currUser.setPass(passwordEncoder.encode(request.getPass()));
 		currUser.setEmail(request.getEmail());
 		currUser.setRoles(roles);
+		if (!request.isKeepOldPass())currUser.setPass(passwordEncoder.encode(request.getPass())); //Đổi pass với điều kiện
 		
-		 //Save user
 	    Account updatedAccount = accountRepo.save(currUser);
+		
+	    //Save profile
+		AccountProfile profile = updatedAccount.getProfile();
+		
+		if (profile == null) {
+			profile = new AccountProfile();
+			profile.setUser(updatedAccount);
+		}
+		
+		profile.setName(request.getName());
+		profile.setPhone(request.getPhone());
+		profile.setAddress(request.getAddress());
+		profile.setDob(request.getDob());
+		profile.setGender(request.getGender());
+		
+		profileRepo.save(profile);
+		
 		return updatedAccount;
 	}
 
@@ -159,7 +195,6 @@ public class AccountServiceImpl implements AccountService {
 		profile.setDob(request.getDob());
 		profile.setGender(request.getGender());
 		
-		 //Save user
 		AccountProfile updatedProfile = profileRepo.save(profile);
 		return updatedProfile;
 	}
@@ -176,4 +211,12 @@ public class AccountServiceImpl implements AccountService {
         return savedAccount;
 	}
 
+	@Override
+	public List<IChartResponse> getTopAccount() {
+		return accountRepo.getTopUser();
+	}
+
+	public List<IChartResponse> getTopSeller() {
+		return accountRepo.getTopSeller();
+	}
 }

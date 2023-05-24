@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 
 import styled from 'styled-components'
 import PropTypes from 'prop-types';
@@ -18,8 +18,8 @@ import useAuth from "../../hooks/useAuth";
 import useFetch from '../../hooks/useFetch'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 
-import AddProductDialog from './AddProductDialog';
-import EditProductDialog from './EditProductDialog';
+const AddProductDialog = lazy(() => import('./AddProductDialog'));
+const EditProductDialog = lazy(() => import('./EditProductDialog'));
 
 //#region preStyled
 const ItemTitle = styled.p`
@@ -211,22 +211,19 @@ function EnhancedTableToolbar(props) {
       ) : (
       <>
         <Tooltip title="Thêm sản phẩm mới">
-          <IconButton sx={{borderRadius: '5px',
-          "&:hover": {
-            backgroundColor: '#50be7e',
+          <IconButton sx={{
+          "&:focus": {
+            outline: 'none',
           }}}
           onClick={handleClickOpenNew}>
-            <Typography
-            sx={{ flex: '1 1 100%' , fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center'}}
-            variant="h6"
-            id="tableTitle"
-            component="div"
-            >
-              Thêm sản phẩm
-            <AddIcon sx={{color: 'white', marginLeft: '10px'}}/>
-            </Typography>
+          <AddIcon sx={{color: 'white'}}/>
           </IconButton>
         </Tooltip>
+        </>
+      )}
+
+      <Suspense fallback={<></>}>
+      { openNew ?
         <AddProductDialog 
         open={openNew} 
         setOpen={setOpenNew}
@@ -235,8 +232,9 @@ function EnhancedTableToolbar(props) {
         loadingPub={loadingPub}
         dataPub={dataPub}
         refetch={refetch}/>
-        </>
-      )}
+        : null
+      }
+      </Suspense>
     </Toolbar>
   );
 }
@@ -248,9 +246,9 @@ EnhancedTableToolbar.propTypes = {
 
 //#endregion
 
-export default function TableBook(props) {
+export default function TableBooks(props) {
   //#region construct
-  const { setBookCount } = props;
+  const { setBookCount, sellerName ,mini } = props;
   const { auth } = useAuth();
   const [id, setId] = useState([]);
   const [order, setOrder] = useState('asc');
@@ -261,11 +259,11 @@ export default function TableBook(props) {
   const [dense, setDense] = useState(true);
   const [seller, setSeller] = useState(!(auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
   const [openEdit, setOpenEdit] = useState(false);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(mini ? 5 : 10);
   const { loading, data: rows , refetch} = useFetch(BOOKS_URL 
     + "?pageNo=" + page
     + "&pSize=" + rowsPerPage
-    + "&seller=" + (seller === false ? "" : auth.userName)
+    + "&seller=" + (seller === false ? "" : auth.userName) + (sellerName ? sellerName : '') 
     + "&sortDir=" + order
     + "&sortBy=" + orderBy);
   const { loading: loadingCate, data: dataCate } = useFetch(CATEGORIES_URL);
@@ -373,9 +371,7 @@ export default function TableBook(props) {
   };
 
   const isSelected = (name) => (selected.indexOf(name) !== -1 || selectedAll);
-
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements) : 0;
+  const emptyRows = Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements);
 
   //#endregion
 
@@ -390,9 +386,9 @@ export default function TableBook(props) {
         numSelected={selected.length} 
         selectedAll={selectedAll} 
         refetch={refetch}/>
-        <TableContainer sx={{ maxHeight: 500 }}>
+        <TableContainer sx={{ maxHeight: mini ? 330 : 500 }}>
           <Table
-            sx={{ minWidth: 750 }}
+            sx={{ minWidth: mini ? 500 : 750 }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
@@ -479,15 +475,19 @@ export default function TableBook(props) {
                 </TableRow>
               )}
             </TableBody>
-            <EditProductDialog 
-            id={id}
-            open={openEdit} 
-            setOpen={setOpenEdit}
-            loadingCate={loadingCate}
-            dataCate={dataCate}
-            loadingPub={loadingPub}
-            dataPub={dataPub}
-            refetch={refetch}/>
+            <Suspense fallback={<></>}>
+            {openEdit ?
+              <EditProductDialog 
+              id={id}
+              open={openEdit} 
+              setOpen={setOpenEdit}
+              loadingCate={loadingCate}
+              dataCate={dataCate}
+              loadingPub={loadingPub}
+              dataPub={dataPub}
+              refetch={refetch}/>
+            : null}
+            </Suspense>
           </Table>
         </TableContainer>
         <TablePagination
@@ -504,32 +504,44 @@ export default function TableBook(props) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <div style={{height: '10px'}}>
+      <Box sx={{height: '10px'}}>
         {loading && (<CustomLinearProgress/>)}  
-      </div>
-      <FormControlLabel
-        control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
-          color: '#63e399',
-        },
-        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-          backgroundColor: '#63e399',
-        },}} 
-        checked={dense} onChange={handleChangeDense} />}
-        label="Thu gọn"
-      />
-      {auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))
-        ? <FormControlLabel
-          control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
-            color: '#63e399',
-          },
-          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-            backgroundColor: '#63e399',
-          },}} 
-          checked={seller} onChange={handleChangeSeller} />}
-          label="Theo người bán"
-        />
+      </Box>
+      <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+        <Box>
+          <FormControlLabel
+            control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
+              color: '#63e399',
+            },
+            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+              backgroundColor: '#63e399',
+            },}} 
+            checked={dense} onChange={handleChangeDense} />}
+            label="Thu gọn"
+          />
+          {auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName)) && !sellerName
+            ? <FormControlLabel
+              control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
+                color: '#63e399',
+              },
+              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                backgroundColor: '#63e399',
+              },}} 
+              checked={seller} onChange={handleChangeSeller} />}
+              label="Theo người bán"
+            />
+            : null
+          }
+        </Box>
+        {mini ?
+        <Link to={'/manage-books'} style={{display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10}}>Xem tất cả</Link>
         : null
-      }
+        }
+      </Box>
     </Box>
   );
 }
+
+TableBooks.defaultProps = {
+  mini: false,
+};

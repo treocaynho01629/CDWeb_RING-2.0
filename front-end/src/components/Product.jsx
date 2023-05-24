@@ -6,7 +6,7 @@ import { styled as muiStyled } from '@mui/system'
 import { KeyboardArrowRight, KeyboardArrowLeft, Star as StarIcon, StarBorder as StarBorderIcon, ShoppingCart as ShoppingCartIcon} from '@mui/icons-material';
 import { Divider, Rating } from '@mui/material'
 
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
@@ -17,23 +17,22 @@ const MoreInfo = styled.div`
     height: 100%;
     position: absolute;
     top: -10%;
+    cursor: pointer;
     z-index: 3;
     display: flex;
     justify-content: end;
     align-items: center;
     transition: all 0.5s ease;
-    cursor: pointer;
 `
 
 const ImageSlider = styled.div`
     overflow: hidden;
     position: relative;
-    z-index: -1;
     padding: 5px 5px 0px 5px;
 `
 
 const Container = styled.div`
-    min-width: 210px;
+    min-width: 220px;
     max-width: 290px;
     height: 100%;
     display: flex;
@@ -53,7 +52,7 @@ const Info = styled.div`
     flex-direction: column;
     padding: 0px 10px;
     margin-top: -20px;
-    width: 90%;
+    width: 95%;
     z-index: 4;
 `
 
@@ -118,6 +117,8 @@ const Arrow = styled.div`
     margin: 5px;
     opacity: 0.75;
     transition: all 0.5s ease;
+    cursor: pointer;
+    z-index: 5;
 
     &:hover{
         background-color: #63e399;
@@ -168,14 +169,16 @@ const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY
 const Product = ({book}) => {
     const [slideIndex, setSlideIndex] = useState(1);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const avgRate = (book) =>{
+    const avgRate = () =>{
         let rate = 0;
         rate = Math.round((book?.rateTotal / book?.rateAmount)*2)/2
         return rate;
     }
 
-    const changeSlide = (n) => {
+    const changeSlide = (event, n) => {
+        event.stopPropagation();
         setSlideIndex(prev => prev + n);
 
         if ((slideIndex + n) > multiImages.length){
@@ -204,6 +207,7 @@ const Product = ({book}) => {
       <Container>
         <ImageSlider>
             {multiImages.map((style, index) => (
+            <>
             <LazyLoadImage key={index}
                 src={book.image}
                 height={300} 
@@ -217,6 +221,7 @@ const Product = ({book}) => {
                     transform: style,
                 }}
             />
+            </>
             ))}
         </ImageSlider>
         <Info>
@@ -243,11 +248,11 @@ const Product = ({book}) => {
                 />
             </Extra>
         </Info>
-        <MoreInfo>
-            <Arrow direction="left" onClick={()=>changeSlide(-1)}>
+        <MoreInfo onClick={() => navigate(`/product/${book.id}`)}>
+            <Arrow direction="left" onClick={(e)=>changeSlide(e, -1)}>
                 <KeyboardArrowLeft style={{fontSize: 30}}/>
             </Arrow>
-            <Arrow direction="right" onClick={()=>changeSlide(1)}>
+            <Arrow direction="right" onClick={(e)=>changeSlide(e, 1)}>
                 <KeyboardArrowRight style={{fontSize: 30}}/>
             </Arrow>
         </MoreInfo>

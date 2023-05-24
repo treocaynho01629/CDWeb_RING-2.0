@@ -113,7 +113,7 @@ function Item({book}){
                             height={400}
                             width={400} 
                             style={{
-                                objectFit: 'container',
+                                objectFit: 'contain',
                             }}
                             /> 
                         </ImgContainer>

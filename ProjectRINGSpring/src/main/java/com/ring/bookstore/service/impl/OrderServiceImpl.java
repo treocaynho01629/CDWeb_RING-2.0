@@ -29,6 +29,7 @@ import com.ring.bookstore.repository.BookRepository;
 import com.ring.bookstore.repository.OrderDetailRepository;
 import com.ring.bookstore.repository.OrderReceiptRepository;
 import com.ring.bookstore.request.OrderRequest;
+import com.ring.bookstore.response.IChartResponse;
 import com.ring.bookstore.service.EmailService;
 import com.ring.bookstore.service.OrderService;
 
@@ -53,6 +54,7 @@ public class OrderServiceImpl implements OrderService {
 		
 		//Xử lý data từ request
 		String fullName = request.getFirstName() + " " + request.getLastName();
+		String cartContent = "";
 		double total = 0.0; //Tổng tiền
 		
 		//Check giỏ hàng
@@ -76,11 +78,18 @@ public class OrderServiceImpl implements OrderService {
 			//Kiểm tra sản phẩm có tồn tại trong database
 			Book book = bookRepo.findById(i.getId())
 			            .orElseThrow(()-> new ResourceNotFoundException("Product does not exists!"));
-			total += (i.getQuantity() * book.getPrice());
+			double totalPrice = (i.getQuantity() * book.getPrice());
+			total += totalPrice;
+			
+			cartContent += 
+			"<p>Tên sản phẩm: <b>" + book.getTitle() + "</b></p>\n"
+    		+ "<p>Số lượng: <b>" + i.getQuantity() + "</b></p>\n"
+    		+ "<p>Thành tiền: <b>" + totalPrice + "đ </b></p>\n"
+    		+ "<br><br>\n";
 			
 			var orderDetail = OrderDetail.builder()
 					.amount(i.getQuantity())
-					.price(i.getPrice())
+					.price(book.getPrice())
 					.book(book)
 					.order(savedOrder)
 					.build();
@@ -91,12 +100,16 @@ public class OrderServiceImpl implements OrderService {
 		savedOrder.setTotal(total * 1.1 + 10000l);
 		
 		//Gửi mail
-        String subject = "Welcome to HRMS Production! ";
-        String content = "<h1 style=\"color:white\"><p style=\"color:#057063\">HRMS</p>&nbsp;Chào mừng</h1>\n"
-                + "<br><h3 style=\"color:white\">Tài khoản HRMS Production của đã được tạo thành công!</h3>\n \n"
-                + "<br><br><p>Tên tài khoản: <b></b></p>\n"
-                + "<p>Nhân viên: <b></b></p>";
-
+        String subject = "RING! - BOOKSTORE: Đặt hàng thành công! ";
+        String content = "<h1 style=\"color:black\"><p style=\"color:#63e399\">RING!</p>&nbsp;- BOOKSTORE</h1>\n"
+                + "<h2>Đơn hàng của bạn đã được xác nhận!</h2>\n"
+                + "<h3>Chi tiết đơn hàng:</h3>\n"
+                + "<p>Tên người nhận: <b>" + fullName + "</b></p>\n"
+                + "<p>SĐT người nhận: <b>" + request.getPhone()+ "</b></p>\n"
+                + "<p>Địa chỉ: <b>" + request.getAddress()  + "</b></p>\n"
+                + "<br><p>Lời nhắn cho shipper: <b>" + request.getMessage() + "</b></p>\n"
+                + "<br><br><h3>Chi tiết sản phẩm:</h3>\n"
+                + cartContent;
         emailService.sendHtmlMessage(user.getEmail(), subject, content);
 		
 		return orderRepo.save(savedOrder);
@@ -146,5 +159,17 @@ public class OrderServiceImpl implements OrderService {
 		new ResourceNotFoundException("Order does not exists!"));
 		OrderDTO orderDTO = orderMapper.apply(order);
 		return orderDTO;
+	}
+
+	@Override
+	public List<IChartResponse> getMonthlySale(Account user) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+        //Có role ADMIN hoặc là người bán sách
+        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString()))) {
+        	return orderRepo.getMonthlySale();
+        } else {
+        	return orderRepo.getMonthlySaleBySeller(user.getId());
+        }
 	}
 }

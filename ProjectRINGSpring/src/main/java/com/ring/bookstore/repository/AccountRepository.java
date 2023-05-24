@@ -1,5 +1,6 @@
 package com.ring.bookstore.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.ring.bookstore.model.Account;
+import com.ring.bookstore.response.IChartResponse;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer>{
@@ -19,4 +21,27 @@ public interface AccountRepository extends JpaRepository<Account, Integer>{
 	select a from Account a where size(a.roles) > 1
 	""")
 	Page<Account> findEmployees(Pageable pageable);
+	
+	@Query(value ="""
+	select t.user_name as name, coalesce(t.rv, 0) as data, coalesce(t2.od, 0) as otherData
+	from
+	(select top(7) a.user_name, r.user_id, count(r.id) as rv
+	from review r join account a on a.id = r.user_id
+	group by a.user_name, r.user_id order by rv desc) t
+	left join
+	(select top(7) o2.user_id, sum(o.amount) as od
+	from order_receipt o2 join order_detail o on o2.id = o.order_id
+	group by o2.user_id order by od desc) t2 on t.user_id = t2.user_id
+	order by otherData desc
+	""", nativeQuery = true)
+	List<IChartResponse> getTopUser();
+	
+	@Query("""
+	select a.userName as name, count(b.id) as data, isnull(sum(o.amount), 0) as otherData 
+	from Account a join Book b on a.id = b.user.id 
+	left join OrderDetail o on b.id = o.book.id
+	group by a.userName
+	order by data desc
+	""")
+	List<IChartResponse> getTopSeller();
 }

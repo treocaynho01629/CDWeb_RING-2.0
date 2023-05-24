@@ -7,8 +7,9 @@ import { styled as muiStyled } from '@mui/material/styles';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel
 , Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch, Collapse} from '@mui/material';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
-import { visuallyHidden } from '@mui/utils';
 import { Receipt as ReceiptIcon, KeyboardArrowDown as KeyboardArrowDownIcon, KeyboardArrowUp as KeyboardArrowUpIcon} from '@mui/icons-material';
+import { visuallyHidden } from '@mui/utils';
+import { Link } from "react-router-dom";
 
 import usePrivateFetch from '../../hooks/usePrivateFetch'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
@@ -122,7 +123,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, selectedAll } =
+  const { order, orderBy, numSelected, rowCount, onRequestSort, selectedAll } =
     props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -170,12 +171,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, selectedAll, refetch } = props;
-  const [openNew, setOpenNew] = useState(false);
- 
-  const handleClickOpenNew = () => {
-    setOpenNew(true);
-  };
+  const { numSelected } = props;
 
   return (
     <Toolbar
@@ -209,6 +205,10 @@ EnhancedTableToolbar.propTypes = {
 function Row(props) {
   const { row } = props;
   const [open, setOpen] = useState(false);
+
+  useEffect(() =>{
+    setOpen(false);
+  }, [row])
 
   return (
     <React.Fragment>
@@ -270,24 +270,22 @@ function Row(props) {
 
 export default function TableReceipts(props) {
   //#region construct
-  const { setReceiptCount } = props;
+  const { setReceiptCount, mini, id } = props;
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('id');
   const [selected, setSelected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(true);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { loading, data: rows , refetch} = usePrivateFetch(RECEIPTS_URL
+  const [rowsPerPage, setRowsPerPage] = useState(mini ? 5 : 10);
+  const { loading, data: rows , refetch} = usePrivateFetch(RECEIPTS_URL + (id ? `/book/${id}` : "")
     + "?pageNo=" + page
     + "&pSize=" + rowsPerPage
     + "&sortDir=" + order
     + "&sortBy=" + orderBy);
 
-  const axiosPrivate = useAxiosPrivate();
-
   useEffect(()=>{
-    if (!loading){
+    if (!loading && setReceiptCount){
       setReceiptCount(rows?.totalElements);
     }
   }, [loading]);
@@ -296,38 +294,6 @@ export default function TableReceipts(props) {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = rows?.content?.map((n) => n.id);
-      setSelected(newSelected);
-      setSelectedAll(true);
-      return;
-    }
-    setSelected([]);
-    setSelectedAll(false);
-  };
-
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
-    }
-
-    setSelectedAll(false);
-    setSelected(newSelected);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -343,37 +309,7 @@ export default function TableReceipts(props) {
     setDense(event.target.checked);
   };
 
-  const handleDelete = async (id) => {
-    try {
-        const response = await axiosPrivate.delete(REVIEWS_URL + "/" + id,
-            {
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
-            }
-        );
-
-        //Bỏ selected
-        const selectedIndex = selected.indexOf(id);
-        let newSelected = [];
-
-        if (selectedIndex === 0) {
-          newSelected = newSelected.concat(selected.slice(1));
-          setSelected(newSelected);
-        }
-
-        refetch();
-    } catch (err) {
-        console.log(err);
-        if (!err?.response) {
-        } else if (err.response?.status === 409) {
-        } else if (err.response?.status === 400) {
-        } else {
-        }
-    }
-  };
-
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements) : 0;
+  const emptyRows = Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements);
   //#endregion
 
   return (
@@ -383,9 +319,9 @@ export default function TableReceipts(props) {
         numSelected={selected.length} 
         selectedAll={selectedAll} 
         refetch={refetch}/>
-        <TableContainer sx={{ maxHeight: 500 }}>
+        <TableContainer sx={{ maxHeight: mini ? 330 : 500 }}>
           <Table
-            sx={{ minWidth: 750 }}
+            sx={{ minWidth: mini ? 500 : 750 }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
@@ -393,7 +329,6 @@ export default function TableReceipts(props) {
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows?.totalElements}
               selectedAll={selectedAll}
@@ -434,19 +369,29 @@ export default function TableReceipts(props) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <div style={{height: '10px'}}>
+      <Box sx={{height: '10px'}}>
         {loading && (<CustomLinearProgress/>)}  
-      </div>
-      <FormControlLabel
-        control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
-          color: '#63e399',
-        },
-        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-          backgroundColor: '#63e399',
-        },}} 
-        checked={dense} onChange={handleChangeDense} />}
-        label="Thu gọn"
-      />
+      </Box>
+      <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+        <FormControlLabel
+          control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
+            color: '#63e399',
+          },
+          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+            backgroundColor: '#63e399',
+          },}} 
+          checked={dense} onChange={handleChangeDense} />}
+          label="Thu gọn"
+        />
+        {mini ?
+        <Link to={'/manage-receipts'} style={{display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10}}>Xem tất cả</Link>
+        : null
+        }
+      </Box>
     </Box>
   );
 }
+
+TableReceipts.defaultProps = {
+  mini: false,
+};

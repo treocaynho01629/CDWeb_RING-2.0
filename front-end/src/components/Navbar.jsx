@@ -9,10 +9,10 @@ import { Search as SearchIcon, ShoppingCart as ShoppingCartIcon,
     Instagram as InstagramIcon, DeliveryDining as DeliveryDiningIcon, 
     Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, 
     Logout, Speed as SpeedIcon, NotificationsActive as NotificationsActiveIcon, 
-    RemoveShoppingCart as RemoveShoppingCartIcon} from '@mui/icons-material';
+    RemoveShoppingCart as RemoveShoppingCartIcon, Storefront} from '@mui/icons-material';
 import { Stack, Badge, IconButton, Avatar, Menu, MenuItem, ListItemIcon, Divider
 , Tooltip, Card, CardContent, CardMedia, Box, Drawer, Popover, List, ListItem, ListItemButton
-, ListItemText, Grid, TextField, AppBar, useScrollTrigger, Slide} from '@mui/material';
+, ListItemText, Grid, TextField, AppBar, useScrollTrigger, Slide, Collapse} from '@mui/material';
 
 import { useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -52,7 +52,6 @@ const Wrapper = styled.div`
 `
 
 const TopHeader = styled.div`
-    height: 50%;
     padding: 0 30px;
     background-color: #ebebeb;
     color: #424242;
@@ -147,7 +146,7 @@ const SearchInput = styled(TextField)({
       marginLeft: '50px',
     },
     '& label.Mui-focused': {
-      color: '#A0AAB4'
+      color: '#A0AAB4',
     },
     '& .MuiInput-underline:after': {
       borderBottomColor: '#B2BAC2',
@@ -165,25 +164,9 @@ const SearchInput = styled(TextField)({
       },
       '&.Mui-focused fieldset': {
         borderRadius: 0,
-        borderColor: '#6F7E8C',
+        borderColor: '#63e399',
       },
-    },
-    '& input:valid + fieldset': {
-      borderColor: 'lightgray',
-      borderRadius: 0,
-      borderWidth: 1,
-    },
-    '& input:invalid + fieldset': {
-      borderColor: '#e66161',
-      borderRadius: 0,
-      borderWidth: 1,
-    },
-    '& input:valid:focus + fieldset': {
-      borderColor: '#63e399',
-      borderLeftWidth: 4,
-      borderRadius: 0,
-      padding: '4px !important', 
-    },
+    }
 });
 
 const Logo = styled.h2`
@@ -318,24 +301,16 @@ const CartButton = styled.button`
 
 function HideOnScroll(props) {
     const { children, window } = props;
-    const [ display, setDisplay ] = useState(['block'])
 
     const trigger = useScrollTrigger({
       target: window ? window() : undefined,
     });
 
-    useEffect(() => {
-        if (!trigger){
-            setDisplay('block');
-        }
-    }, [trigger])
-
     return (
-      <Slide className={"top-header"} style={{display: display}} 
-        appear={false} direction="down" in={!trigger} 
-        addEndListener={() => {if (trigger) setDisplay('none')}}>
+      <Collapse className={"top-header"} 
+      in={!trigger}>
         {children}
-      </Slide>
+      </Collapse>
     );
 }
   
@@ -348,6 +323,7 @@ const Navbar = (props) => {
     //#region construct
     const products = useSelector(state => state.cart.products); //Lấy products trong giỏ từ redux
     const [openDrawer, setOpen] = useState(false);
+    const [hover, setHover] = useState(false);
     const [searchField, setSearchField] = useState('');
     const { auth } = useAuth();
     const navigate = useNavigate();
@@ -422,7 +398,7 @@ const Navbar = (props) => {
             <Divider/>
             <List>
                 {role >= 2 && (
-                <ListItem disablePadding onClick={() => navigate('/' + (role == 3 ? 'admin' : 'management'))}>
+                <ListItem disablePadding onClick={() => navigate('/dashboard')}>
                 <ListItemButton>
                     <ListItemIcon>
                         <SpeedIcon/>
@@ -537,7 +513,7 @@ const Navbar = (props) => {
         </MenuItem>
         <Divider/>
         {role >= 2 && (
-        <MenuItem onClick={() => navigate('/' + (role == 3 ? 'admin' : 'management'))}>
+        <MenuItem onClick={() => navigate('/dashboard')}>
             <ListItemIcon>
                 <SpeedIcon fontSize="small" />
             </ListItemIcon>
@@ -585,7 +561,6 @@ const Navbar = (props) => {
                 zIndex: 0,
                 },
             },
-            // onMouseEnter: handlePopoverOpen,
             onMouseLeave: handlePopoverClose
         }}
         >
@@ -652,7 +627,7 @@ const Navbar = (props) => {
                     <Grid container>
                         <Grid item xs={12} md={7}>
                             <Left>
-                                <div style={{display: 'flex', alignItems: 'center'}}>
+                                <Box sx={{display: 'flex', alignItems: 'center'}}>
                                     <Button onClick={toggleDrawer()}><MenuIcon/></Button>
                                     <Drawer
                                         anchor='left'
@@ -666,18 +641,37 @@ const Navbar = (props) => {
                                         <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORE</p>
                                     </Logo>
                                     </Link>
-                                </div>
-                                <form onSubmit={handleSubmitSearch}>
-                                    <SearchInput placeholder='Tìm kiếm... '
-                                    onChange={(e) => setSearchField(e.target.value)}
-                                    value={searchField}
-                                    id="search"
-                                    size="small"
-                                    InputProps={{
-                                        endAdornment: <SearchIcon style={{color:"gray"}}/>
-                                    }}
-                                    />
-                                </form>
+                                </Box>
+                                <Box sx={{display: 'flex'}}>
+                                    <Tooltip title="Duyệt cửa hàng">
+                                        <StyledIconButton aria-label="explore" 
+                                        onClick={() => navigate('/filters')}
+                                        sx={{marginLeft: 2, marginRight: 0, zIndex: 10}}>
+                                            <Storefront sx={{fontSize: '26px'}}/>
+                                        </StyledIconButton>
+                                    </Tooltip>
+                                    <div style={{display: 'flex', alignItems: 'center', marginLeft: -40}}>
+                                        <Collapse orientation="horizontal" 
+                                        timeout={700}
+                                        in={searchField || hover} 
+                                        collapsedSize={102}>
+                                            <form onSubmit={handleSubmitSearch}>
+                                                <SearchInput placeholder='Tìm kiếm... '
+                                                onMouseEnter={(e) => setHover(true)}
+                                                onMouseLeave={(e) => setHover(false)}
+                                                onChange={(e) => setSearchField(e.target.value)}
+                                                value={searchField}
+                                                id="search"
+                                                size="small"
+                                                width={50}
+                                                InputProps={{
+                                                    endAdornment: <SearchIcon style={{color:"gray"}}/>
+                                                }}
+                                                />
+                                            </form>
+                                        </Collapse>
+                                    </div>
+                                </Box>
                             </Left>
                         </Grid>
                         <Grid item xs={12} md={5}>

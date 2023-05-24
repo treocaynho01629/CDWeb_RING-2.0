@@ -1,5 +1,7 @@
 package com.ring.bookstore.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import com.ring.bookstore.dtos.OrderDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.OrderReceipt;
 import com.ring.bookstore.request.OrderRequest;
+import com.ring.bookstore.response.IChartResponse;
 import com.ring.bookstore.service.OrderService;
 
 import jakarta.validation.Valid;
@@ -79,4 +82,10 @@ public class OrderController {
         return new ResponseEntity< >(orders, HttpStatus.OK);
     }
 
+	@GetMapping("/sale")
+	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> getMonthlySale(@CurrentAccount Account currUser){
+        List<IChartResponse> chart =  orderService.getMonthlySale(currUser);
+        return new ResponseEntity< >(chart, HttpStatus.OK);
+    }
 }

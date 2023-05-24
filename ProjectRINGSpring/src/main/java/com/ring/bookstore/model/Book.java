@@ -52,7 +52,7 @@ public class Book {
     )
     private Integer id;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id", nullable = true)
     @JsonIgnore 
     private Image images;
