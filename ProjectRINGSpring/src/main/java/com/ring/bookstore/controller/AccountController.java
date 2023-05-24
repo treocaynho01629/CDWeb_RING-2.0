@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ring.bookstore.config.CurrentAccount;
+import com.ring.bookstore.dtos.AccountDetailDTO;
 import com.ring.bookstore.dtos.ProfileDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.AccountProfile;
@@ -41,28 +42,30 @@ public class AccountController {
 	//Lấy tất cả acc
 	@GetMapping
 	@PreAuthorize("hasRole('ADMIN')")
-	public Page<Account> getAllAccounts(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
+	public ResponseEntity<?> getAllAccounts(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
 										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
 										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
 										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir){
-		return accountService.getAllAccounts(pageNo, pageSize, sortBy, sortDir);
+		Page<Account> accounts = accountService.getAllAccounts(pageNo, pageSize, sortBy, sortDir);
+		return new ResponseEntity< >(accounts, HttpStatus.OK);
 	}
 	
 	//Lấy tất cả nhân viên
 	@GetMapping("/employees")
 	@PreAuthorize("hasRole('ADMIN')")
-	public Page<Account> getAllSellers(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
+	public ResponseEntity<?>  getAllSellers(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
 										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
 										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
 										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir){
-		return accountService.getAllEmployees(pageNo, pageSize, sortBy, sortDir);
+		Page<Account> accounts = accountService.getAllEmployees(pageNo, pageSize, sortBy, sortDir);
+		return new ResponseEntity< >(accounts, HttpStatus.OK);
 	}
 	
 	//Lấy acc theo {id}
 	@GetMapping("{id}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<Account> getAccountById(@PathVariable("id") Integer accountId){
-		return new ResponseEntity<Account>(accountService.getAccountById(accountId), HttpStatus.OK);
+	public ResponseEntity<AccountDetailDTO> getAccountById(@PathVariable("id") Integer accountId){
+		return new ResponseEntity<AccountDetailDTO>(accountService.getAccountById(accountId), HttpStatus.OK);
 	}
 	
 	//Chỉnh sửa acc {id}
@@ -114,5 +117,19 @@ public class AccountController {
 		String result = "Đổi mật khẩu thất bại";
 		if (account != null) result = "Thay đổi mật khẩu thành công!";
 		return new ResponseEntity< >(result, HttpStatus.OK);
+	}
+	
+	//Lấy dữ liệu cho biểu đồ (Người dùng)
+	@GetMapping("/top-accounts")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> getTopAccounts(){
+		return new ResponseEntity< >(accountService.getTopAccount(), HttpStatus.OK);
+	}
+	
+	//Lấy dữ liệu cho biểu đồ (Người bán)
+	@GetMapping("/top-sellers")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> getTopSellers(){
+		return new ResponseEntity< >(accountService.getTopSeller(), HttpStatus.OK);
 	}
 }

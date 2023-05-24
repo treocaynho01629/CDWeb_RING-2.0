@@ -3,13 +3,14 @@ import { useState } from "react";
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 
-import ChartAccounts from '../../components/dashboard/ChartAccounts'
-import TableAccounts from "../../components/dashboard/TableAccounts";
+import ChartSales from '../../components/dashboard/ChartSales'
+import TableReceipts from "../../components/dashboard/TableReceipts";
 
-import GroupIcon from '@mui/icons-material/Group';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 
 import { Grid, Paper } from '@mui/material';
 import { useNavigate } from "react-router-dom"
+
 
 //#region preStyled
 const CountContainer = muiStyled(Paper)(({ theme }) => ({
@@ -32,26 +33,26 @@ const countIconStyle = {
 }
 //#endregion
 
-const ManageAccounts = () => {
-  const [accCount, setAccCount] = useState(0);
+const ManageReceipts = () => {
+  const [receiptCount, setReceiptCount] = useState(0);
   const navigate = useNavigate();
 
   return (
     <>
-      <h2>Quản lý người dùng</h2>
-      <h3 style={{color: 'darkgray', cursor: 'pointer'}} onClick={() => navigate('/dashboard')}>Dashboard / Quản lý người dùng</h3>
+      <h2>Quản lý doanh thu</h2>
+      <h3 style={{color: 'darkgray', cursor: 'pointer'}} onClick={() => navigate('/dashboard')}>Dashboard / Quản lý doanh thu</h3>
       <Grid container spacing={3} sx={{marginBottom: '20px'}}>
         <Grid item sm={6} md={3}>
           <CountContainer elevation={3} >
-            <GroupIcon sx={countIconStyle}/>
-            <CountInfo><h2 style={{margin: 0}}>{accCount}</h2><span>Thành viên</span></CountInfo>
+            <ReceiptIcon sx={countIconStyle}/>
+            <CountInfo><h2 style={{margin: 0}}>{receiptCount}</h2><span>Đơn hàng</span></CountInfo>
           </CountContainer>
         </Grid>
       </Grid>
-      <ChartAccounts/>
-      <TableAccounts setAccCount={setAccCount}/>
+      <ChartSales/>
+      <TableReceipts setReceiptCount={setReceiptCount}/>
     </>
   )
 }
 
-export default ManageAccounts
+export default ManageReceipts

@@ -23,6 +23,7 @@ import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.request.AuthenticationRequest;
 import com.ring.bookstore.request.RegisterRequest;
 import com.ring.bookstore.response.AuthenticationResponse;
+import com.ring.bookstore.service.EmailService;
 import com.ring.bookstore.service.RoleService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,9 +39,10 @@ public class AuthenticationService {
 
   private final AccountRepository accountRepo;
   private final PasswordEncoder passwordEncoder;
-  private final JwtService jwtService;
-  private final RoleService roleService;
   private final AuthenticationManager authenticationManager;
+  private final RoleService roleService;
+  private final JwtService jwtService;
+  private final EmailService emailService;
 
   public AuthenticationResponse register(RegisterRequest request) { //Đăng ký
 
@@ -132,6 +134,10 @@ public class AuthenticationService {
         	  new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
           }
 		}
+  }
+  
+  public void forgotPass() {
+	  
   }
 }
 

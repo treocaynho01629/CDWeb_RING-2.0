@@ -21,7 +21,7 @@ const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
     '& .MuiDialog-paper': {
       borderRadius: 0,
       width: '350px',
-      padding: '20px 15px',
+      padding: '15px 10px 15px 20px',
     },
     '& .MuiDialogContent-root': {
       padding: theme.spacing(2),
@@ -354,9 +354,9 @@ const LoginTab = () => {
             <CustomDialog open={open} 
             scroll="body"
             onClose={handleClose}>
-                <DialogTitle sx={{display: 'flex', alignItems: 'center'}}>Gửi mật khẩu về email</DialogTitle>
-                <DialogContent>
-                    <CustomInput label='Nhập email tài khoản' 
+                <DialogTitle sx={{display: 'flex', alignItems: 'center'}}>Nhập email khôi phục mật khẩu</DialogTitle>
+                <DialogContent sx={{display: 'flex', justifyContent: 'flex-end'}}>
+                    <CustomInput placeholder='Nhập email tài khoản' 
                         id="email"
                         onChange={(e) => setEmail(e.target.value)}
                         value={email}
@@ -366,9 +366,8 @@ const LoginTab = () => {
                         size="small"
                     />
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}><CheckIcon sx={{marginRight: '10px'}}/>Xác nhận</Button>
-                    <Button style={{backgroundColor: '#e66161'}} onClick={handleClose}><CloseIcon sx={{marginRight: '10px'}}/>Huỷ</Button>
+                <DialogActions sx={{width: '90%'}}>
+                    <Button onClick={handleClose}><CheckIcon sx={{marginRight: '5px'}}/>Gửi</Button>
                 </DialogActions>
             </CustomDialog>
         </Left>

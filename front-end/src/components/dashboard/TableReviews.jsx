@@ -7,8 +7,9 @@ import { styled as muiStyled } from '@mui/material/styles';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel
 , Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch} from '@mui/material';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
-import { visuallyHidden } from '@mui/utils';
 import { Try as TryIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { visuallyHidden } from '@mui/utils';
+import { Link } from "react-router-dom";
 
 import usePrivateFetch from '../../hooks/usePrivateFetch'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
@@ -75,8 +76,6 @@ const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
       backgroundColor: '#63e399',
   },
 }));
-
-const REVIEWS_URL = 'api/reviews';
 
 const headCells = [
   {
@@ -259,17 +258,20 @@ EnhancedTableToolbar.propTypes = {
 };
 //#endregion
 
+const REVIEWS_URL = 'api/reviews';
+
 export default function TableReviews(props) {
   //#region construct
-  const { setReviewCount, id } = props;
+  const { setReviewCount, id, userId, mini } = props;
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('id');
   const [selected, setSelected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(true);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { loading, data: rows , refetch} = usePrivateFetch(REVIEWS_URL + (id ? `/${id}` : '')
+  const [rowsPerPage, setRowsPerPage] = useState(mini ? 5 : 10);
+  const { loading, data: rows , refetch} = usePrivateFetch(REVIEWS_URL + (id ? `/${id}` : '') 
+    + (userId ? `/user/${userId}` : '') 
     + "?pageNo=" + page
     + "&pSize=" + rowsPerPage
     + "&sortDir=" + order
@@ -278,7 +280,7 @@ export default function TableReviews(props) {
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(()=>{
-    if (!loading){
+    if (!loading && setReviewCount){
       setReviewCount(rows?.totalElements);
     }
   }, [loading]);
@@ -365,8 +367,7 @@ export default function TableReviews(props) {
 
   const isSelected = (name) => (selected.indexOf(name) !== -1 || selectedAll);
 
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements) : 0;
+  const emptyRows = Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements);
   //#endregion
 
   return (
@@ -376,9 +377,9 @@ export default function TableReviews(props) {
         numSelected={selected.length} 
         selectedAll={selectedAll} 
         refetch={refetch}/>
-        <TableContainer sx={{ maxHeight: 500 }}>
+        <TableContainer sx={{ maxHeight: mini ? 330 : 500 }}>
           <Table
-            sx={{ minWidth: 750 }}
+            sx={{ minWidth: mini ? 500 : 750 }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
@@ -469,19 +470,29 @@ export default function TableReviews(props) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <div style={{height: '10px'}}>
+      <Box sx={{height: '10px'}}>
         {loading && (<CustomLinearProgress/>)}  
-      </div>
-      <FormControlLabel
-        control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
-          color: '#63e399',
-        },
-        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-          backgroundColor: '#63e399',
-        },}} 
-        checked={dense} onChange={handleChangeDense} />}
-        label="Thu gọn"
-      />
+      </Box>
+      <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+        <FormControlLabel
+          control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
+            color: '#63e399',
+          },
+          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+            backgroundColor: '#63e399',
+          },}} 
+          checked={dense} onChange={handleChangeDense} />}
+          label="Thu gọn"
+        />
+        {mini ?
+        <Link to={'/manage-reviews'} style={{display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10}}>Xem tất cả</Link>
+        : null
+        }
+      </Box>
     </Box>
   );
 }
+
+TableReviews.defaultProps = {
+  mini: false,
+};

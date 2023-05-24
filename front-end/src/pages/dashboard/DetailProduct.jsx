@@ -1,29 +1,16 @@
-import React, { useState } from 'react';
-import { useTheme } from '@mui/material/styles';
+import React, { useState, lazy, Suspense } from 'react';
 import styled from 'styled-components'
 
-import DashboardNavbar from "../../components/dashboard/DashboardNavbar";
-import DashboardDrawer from "../../components/dashboard/DashboardDrawer";
 import TableReviews from "../../components/dashboard/TableReviews";
 import TableReceipts from "../../components/dashboard/TableReceipts";
 
-import CssBaseline from '@mui/material/CssBaseline';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Divider  from '@mui/material/Divider';
-
-import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import SkipNextIcon from '@mui/icons-material/SkipNext';
+import { TextareaAutosize, Box, Card, CardContent, CardMedia, IconButton, Typography, Grid, Divider } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 
 import useFetch from '../../hooks/useFetch'
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+
+const EditProductDialog = lazy(() => import('../../components/dashboard/EditProductDialog'));
 
 //#region styled
 const CustomButton = styled.button`
@@ -52,12 +39,12 @@ const CustomButton = styled.button`
 `
 
 const Title = styled.h2`
-    font-size: 35px;
+    font-size: 29px;
     line-height: normal;
     text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: break-word;
-    max-width: 400px;
+    width: 95%;
 	
 	@supports (-webkit-line-clamp: 2) {
       overflow: hidden;
@@ -71,94 +58,152 @@ const Title = styled.h2`
 //#endregion
 
 const BOOK_URL = `/api/books/`;
+const CATEGORIES_URL = 'api/categories';
+const PUBLISHERS_URL = 'api/publishers';
 
 const DetailProduct = () => {
     const {id} = useParams();
-    const theme = useTheme();
-    const [open, setOpen] = useState(false);
-    const [reviewCount, setReviewCount] = useState(0);
-    const [receiptCount, setReceiptCount] = useState(0);
+    const [openEdit, setOpenEdit] = useState(false);
+    const { loading, data, refetch } = useFetch(BOOK_URL + id);
+    const { loading: loadingCate, data: dataCate } = useFetch(CATEGORIES_URL);
+    const { loading: loadingPub, data: dataPub } = useFetch(PUBLISHERS_URL);
+    const navigate = useNavigate();
 
-    const { loading, data } = useFetch(BOOK_URL + id);
+    const handleClickOpenEdit = () => {
+        setOpenEdit(true);
+    };
 
     return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <DashboardNavbar open={open} setOpen={setOpen}/>
-      <DashboardDrawer open={open} setOpen={setOpen}/>
-
-      <Box component="main" sx={{ flexGrow: 1, p: 3 , marginTop: '80px'}}>
-        <Card sx={{ display: 'flex', justifyContent: 'between', marginBottom: 3}}>
+    <>
+    <Card elevation={3} sx={{ display: 'flex', marginBottom: 3}}>
+        <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
             <CardMedia
             component="img"
-            sx={{ width: 500, borderRadius: 5, margin: 3 }}
+            sx={{ width: 400, height: 400, objectFit: 'contain', borderRadius: 5, margin: 3, padding: 1}}
             image={data?.image}
             />
             <Divider sx={{marginLeft: 2, marginRight: 2}} orientation="vertical" variant="middle" flexItem/>
-            <Box sx={{ flex: '1 0 auto', display: 'flex', justifyContent: 'space-between'}}>
-            <CardContent sx={{ flex: '1 0 auto', padding: '50px'}}>
-                <Title>
-                {data?.title}
-                </Title>
-                <Typography my={2} component="div" variant="h5">
+        </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+            <CardContent sx={{padding: '50px'}}>
+                <Title>{data?.title}</Title>
+                <Typography my={2} component="div" variant="h6" sx={{fontWeight: 'bold'}}>
                 Giá: {data?.price.toLocaleString()} đ
                 </Typography>
                 <Grid container spacing={3}>
                     <Grid item xs={4}>
-                        <Typography my={1} variant="h6" color="text.primary" component="div">
+                        <Typography my={1} sx={{fontWeight: 'bold'}} variant="subtitle1" color="text.primary" component="div">
                         Thể loại:
                         </Typography>
-                        <Typography my={1} variant="h6" color="text.primary" component="div">
+                        <Typography my={1} sx={{fontWeight: 'bold'}} variant="subtitle1" color="text.primary" component="div">
                         Nhà xuất bản:
                         </Typography>
-                        <Typography my={1} variant="h6" color="text.primary" component="div">
+                        <Typography my={1} sx={{fontWeight: 'bold'}} variant="subtitle1" color="text.primary" component="div">
                         Tác giả: 
                         </Typography>
-                        <Typography my={1} variant="h6" color="text.primary" component="div">
-                        Bìa: 
+                        <Typography my={1} sx={{fontWeight: 'bold'}} variant="subtitle1" color="text.primary" component="div">
+                        Hình thức: 
                         </Typography>
-                        <Typography my={1} variant="h6" color="text.primary" component="div">
+                        <Typography my={1} sx={{fontWeight: 'bold'}} variant="subtitle1" color="text.primary" component="div">
                         Người bán:
                         </Typography>
                     </Grid>
                     <Grid item xs={8}>
-                        <Typography my={1} variant="h6" color="text.secondary" component="div">
+                        <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
                         {data?.cateName}
                         </Typography>
-                        <Typography my={1} variant="h6" color="text.secondary" component="div">
+                        <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
                         {data?.publisher?.pubName}
                         </Typography>
-                        <Typography my={1} variant="h6" color="text.secondary" component="div">
+                        <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
                         {data?.author}
                         </Typography>
-                        <Typography my={1} variant="h6" color="text.secondary" component="div">
+                        <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
                         {data?.type}
                         </Typography>
-                        <Typography my={1} variant="h6" color="text.secondary" component="div">
-                        <Link to={'/'}>{data?.sellerName}</Link>
+                        <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
+                        <a>{data?.sellerName}</a>
                         </Typography>
                     </Grid>
                 </Grid>
-                <CustomButton style={{marginTop: '10px'}}>Xem trang sản phẩm</CustomButton>
+                <CustomButton style={{marginTop: '10px'}} onClick={() => navigate(`/product/${id}`)}>Xem trang sản phẩm</CustomButton>
             </CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', pr: 2, pt: 2 }}>
-                <IconButton aria-label="play/pause">
-                    <PlayArrowIcon sx={{ height: 38, width: 38 }} />
+            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+            <Divider orientation="vertical" variant="middle"/>
+                <IconButton sx={{width: '100%', borderRadius: 0, "&:hover": {color: '#63e399'}}} onClick={handleClickOpenEdit}>
+                    <EditIcon sx={{ height: 42, width: 42 }} />
                 </IconButton>
             </Box>
-            </Box>
-        </Card>
-
+        </Box>
+    </Card>
+    <Suspense fallback={<></>}>
+    {openEdit ?
+        <EditProductDialog 
+        id={id}
+        open={openEdit} 
+        setOpen={setOpenEdit}
+        loadingCate={loadingCate}
+        dataCate={dataCate}
+        loadingPub={loadingPub}
+        dataPub={dataPub}
+        refetch={refetch}/>
+    : null}
+    </Suspense>
+    <Card elevation={3} sx={{padding: '10px 30px', mb: 3}}> 
         <Grid container spacing={3}>
-          <Grid item sm={12} lg={6}>
-            <TableReceipts setReceiptCount={setReceiptCount}/>
-          </Grid>
-          <Grid item sm={12} lg={6}>
-            <TableReviews setReviewCount={setReviewCount} id={id}/>
-          </Grid>
+            <Grid item xs={12} lg={6}>
+                <Typography my={2} variant="h5" component="div" sx={{fontWeight: 'bold'}}>Thông tin chi tiết: </Typography>
+                <Grid container spacing={3}>
+                    <Grid item xs={3}>
+                        <Typography my={1} variant="subtitle1" color="text.primary" component="div" sx={{fontWeight: 'bold'}}>
+                        Mã hàng:
+                        </Typography>
+                        <Typography my={1} variant="subtitle1" color="text.primary" component="div" sx={{fontWeight: 'bold'}}>
+                        Trọng lượng (gr):
+                        </Typography>
+                        <Typography my={1} variant="subtitle1" color="text.primary" component="div" sx={{fontWeight: 'bold'}}>
+                        Kích thước:
+                        </Typography>
+                        <Typography my={1} variant="subtitle1" color="text.primary" component="div" sx={{fontWeight: 'bold'}}>
+                        Số trang:
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={9}>
+                        <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
+                        {data?.id ? data?.id : 'N/A'}
+                        </Typography>
+                        <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
+                        {data?.weight ? data?.weight : 'N/A'}
+                        </Typography>
+                        <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
+                        {data?.size ? data?.size : 'N/A'}
+                        </Typography>
+                        <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
+                        {data?.page ? data?.page : 'N/A'}
+                        </Typography>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Grid item xs={12} lg={6}>
+                <Typography my={2} variant="h5" component="div" sx={{fontWeight: 'bold'}}>Mô tả</Typography>
+                <TextareaAutosize
+                value={data?.description}
+                readOnly
+                disabled
+                style={{backgroundColor: 'white', resize: 'none', width: '95%', border: 'none'}}
+                />
+            </Grid>
         </Grid>
-      </Box>
-    </Box>
+    </Card>
+    <Grid container spacing={3}>
+        <Grid item sm={12} lg={6}>
+        <TableReceipts mini={true} id={id}/>
+        </Grid>
+        <Grid item sm={12} lg={6}>
+        <TableReviews mini={true} id={id}/>
+        </Grid>
+    </Grid>
+    </>
       
     );
 }

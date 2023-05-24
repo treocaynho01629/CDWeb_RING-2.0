@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import styled from "styled-components"
 
-import Navbar from "../components/Navbar"
-import Footer from "../components/Footer"
 import AppPagination from '../components/AppPagination'
 import FilterList from "../components/FilterList"
 import FilteredProducts from "../components/FilteredProducts"
@@ -19,9 +17,6 @@ import useFetch from '../hooks/useFetch'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 //#region styled
-const Container = styled.div`
-`
-
 const Wrapper = styled.div`
     padding-right: 15px;
     padding-left: 15px;
@@ -132,7 +127,7 @@ const FiltersPage = () => {
             setSearchParams(searchParams);
         }
     }
-
+    
     const handleRangeChange = (newValue) => {
         handlePageChange(1);
         if (newValue.toString() == [1000, 10000000].toString()){
@@ -162,7 +157,7 @@ const FiltersPage = () => {
             searchParams.set("sortBy", newValue);
             setSearchParams(searchParams);
         }
-    };
+    }
 
     const handleChangeDir = (newValue) => {
         if (newValue == 'desc'){
@@ -173,7 +168,7 @@ const FiltersPage = () => {
             setSearchParams(searchParams);
         }
         setPagination({...pagination, sortDir: newValue});
-    };
+    }
 
     const handleChangeSize = (newValue) => {
         handlePageChange(1);
@@ -185,7 +180,7 @@ const FiltersPage = () => {
             setSearchParams(searchParams);
         }
         setPagination({...pagination, pageSize: newValue});
-    };
+    }
 
     const handleChangeSearch = (newValue) => {
         handlePageChange(1);
@@ -197,7 +192,7 @@ const FiltersPage = () => {
             setSearchParams(searchParams);
         }
         setFilters({...filters, keyword: newValue});
-    };
+    }
 
     const handleChangePub = (newValue) => {
         handlePageChange(1);
@@ -209,7 +204,7 @@ const FiltersPage = () => {
             setSearchParams(searchParams);
         }
         setFilters({...filters, pubId: newValue});
-    };
+    }
 
     const handleChangeType = (newValue) => {
         handlePageChange(1);
@@ -221,7 +216,7 @@ const FiltersPage = () => {
             setSearchParams(searchParams);
         }
         setFilters({...filters, type: newValue});
-    };
+    }
 
     const handleChangeSeller = (newValue) => {
         handlePageChange(1);
@@ -233,7 +228,7 @@ const FiltersPage = () => {
             setSearchParams(searchParams);
         }
         setFilters({...filters, seller: newValue});
-    };
+    }
 
     const resetFilter = () => {
         setFilters({
@@ -256,38 +251,34 @@ const FiltersPage = () => {
     //#endregion
 
     return (
-    <Container>
-        <Navbar/>
-        <Wrapper>
-            <Grid container spacing={5}>
-                <Grid item xs={12} md={3}>
-                    <FilterList  filters={filters}
-                    onCateChange={handleCateChange}
-                    onRangeChange={handleRangeChange}
-                    onChangePub={handleChangePub}
-                    onChangeType={handleChangeType}
-                    onChangeSeller={handleChangeSeller}/>
-                    <div style={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
-                        <Button onClick={resetFilter}><FilterAltOffIcon/>Huỷ bộ lọc</Button>
-                    </div>
-                </Grid>
-                <Grid item xs={12} md={9}>
-                    <Title>DANH MỤC SẢN PHẨM</Title>
-                    <SortList filters={filters}
-                    pagination={pagination}
-                    onChangeOrder={handleChangeOrder}
-                    onChangeDir={handleChangeDir}
-                    onChangeSearch={handleChangeSearch}/>
-                    <FilteredProducts loading={loading} 
-                    booksList={booksList}/>
-                    <AppPagination pagination={pagination}
-                    onPageChange={handlePageChange}
-                    onSizeChange={handleChangeSize}/>
-                </Grid>
+    <Wrapper>
+        <Grid container spacing={5}>
+            <Grid item xs={12} md={3}>
+                <FilterList  filters={filters}
+                onCateChange={handleCateChange}
+                onRangeChange={handleRangeChange}
+                onChangePub={handleChangePub}
+                onChangeType={handleChangeType}
+                onChangeSeller={handleChangeSeller}/>
+                <div style={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
+                    <Button onClick={resetFilter}><FilterAltOffIcon/>Huỷ bộ lọc</Button>
+                </div>
             </Grid>
-        </Wrapper>
-        <Footer/>
-    </Container>
+            <Grid item xs={12} md={9}>
+                <Title>DANH MỤC SẢN PHẨM</Title>
+                <SortList filters={filters}
+                pagination={pagination}
+                onChangeOrder={handleChangeOrder}
+                onChangeDir={handleChangeDir}
+                onChangeSearch={handleChangeSearch}/>
+                <FilteredProducts loading={loading} 
+                booksList={booksList}/>
+                <AppPagination pagination={pagination}
+                onPageChange={handlePageChange}
+                onSizeChange={handleChangeSize}/>
+            </Grid>
+        </Grid>
+    </Wrapper>
   )
 }
 
