@@ -9,8 +9,6 @@ import { Divider, Grid, Rating, Breadcrumbs, Avatar, Skeleton } from '@mui/mater
 
 import ProductImages from '../components/ProductImages';
 import ProductsSlider from '../components/ProductsSlider';
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 import ProductDetailContainer from '../components/ProductDetailContainer'
 
 import { Link, useParams, useNavigate } from 'react-router-dom';
@@ -79,7 +77,7 @@ const InfoContainer = styled.div`
     border: 0.5px solid lightgray;
 `
 
-const Title = styled.h2`
+const BookTitle = styled.h2`
     font-size: 22px;
     line-height: normal;
     margin-top: 30px;
@@ -97,6 +95,16 @@ const Title = styled.h2`
       -webkit-box-orient: vertical;
     }
 `
+
+const Title = muiStyled(Divider)({
+    fontSize: 18,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    color: '#63e399',
+    textAlign: 'center',
+    justifyContent: 'center',
+    margin: '20px 0px',
+});
 
 const Detail = styled.h3`
     font-size: 15px;
@@ -337,7 +345,7 @@ const ProductDetail = () => {
                     <Grid item sm={12} md={6}>
                         <InfoContainer>
                             <div>
-                                <Title>{book?.title}</Title>
+                                <BookTitle>{book?.title}</BookTitle>
                                 <Detail>
                                     Nhà xuất bản: &nbsp;
                                     <Link to={`/filters?pubId=${book?.publisher?.id}`}>
@@ -435,38 +443,35 @@ const ProductDetail = () => {
     }
 
     return (
-    <Container>
-        <Navbar/>
-        <Wrapper>
-            <div role="presentation" style={{margin: '20px 10px'}}>
-                <Breadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
-                    <Link to={`/`} style={{backgroundColor: '#63e399', padding: '5px 15px', color: 'white'}}>
-                    Trang chủ
-                    </Link>
-                    <Link to={`/filters`}>
-                    Danh mục sản phẩm
-                    </Link>
-                    <Link to={`/filters?cateId=${book?.cateId}`}>
-                    {book?.cateName}
-                    </Link>
-                    <Link to={`/filters?pubId=${book?.publisher?.id}`}>
-                    {book?.publisher?.pubName}
-                    </Link>
-                    <strong style={{textDecoration: 'underline'}}>{book?.title}</strong>
-                </Breadcrumbs>
-            </div>
-            {product}
-            <div ref={ref} >
-                <ProductDetailContainer loading={loading} 
-                book={book}
-                tab={tab}
-                onTabChange={handleTabChange}/>
-            </div>
-            <ProductsSlider booksList={booksRandom} loading={loadingRandom}/>
-            <br/><br/>
-        </Wrapper>
-        <Footer/>
-    </Container>
+    <Wrapper>
+        <div role="presentation" style={{margin: '20px 10px'}}>
+            <Breadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
+                <Link to={`/`} style={{backgroundColor: '#63e399', padding: '5px 15px', color: 'white'}}>
+                Trang chủ
+                </Link>
+                <Link to={`/filters`}>
+                Danh mục sản phẩm
+                </Link>
+                <Link to={`/filters?cateId=${book?.cateId}`}>
+                {book?.cateName}
+                </Link>
+                <Link to={`/filters?pubId=${book?.publisher?.id}`}>
+                {book?.publisher?.pubName}
+                </Link>
+                <strong style={{textDecoration: 'underline'}}>{book?.title}</strong>
+            </Breadcrumbs>
+        </div>
+        {product}
+        <div ref={ref} >
+            <ProductDetailContainer loading={loading} 
+            book={book}
+            tab={tab}
+            onTabChange={handleTabChange}/>
+        </div>
+        <Title>CÓ THỂ BẠN SẼ THÍCH</Title>
+        <ProductsSlider booksList={booksRandom} loading={loadingRandom}/>
+        <br/><br/>
+    </Wrapper>
   )
 }
 

@@ -43,6 +43,7 @@ public class AccountProfile {
     private String phone;
 
     @Column(length = 10)
+    @Nationalized 
     private String gender;
 
     @Column

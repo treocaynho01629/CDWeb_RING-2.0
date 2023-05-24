@@ -8,9 +8,12 @@ import Layout from './components/authorize/Layout';
 import RequireAuth from './components/authorize/RequireAuth';
 import PersistLogin from './components/authorize/PersistsLogin';
 
-import Home from './pages/Home';
-import FiltersPage from './pages/FiltersPage';
-import ProductDetail from './pages/ProductDetail';
+const PageLayout = lazy(() => import('./components/PageLayout'));
+const DashboardLayout = lazy(() => import('./components/dashboard/DashboardLayout'));
+
+const Home = lazy(() => import('./pages/Home'));
+const FiltersPage = lazy(() => import('./pages/FiltersPage'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 
 const Cart = lazy(() => import('./pages/Cart')) ;
 const SignPage = lazy(() => import('./pages/SignPage')) ;
@@ -20,22 +23,21 @@ const Missing = lazy(() => import('./pages/error/Missing')) ;
 const Checkout = lazy(() => import('./pages/Checkout')) ;
 const Profile = lazy(() => import('./pages/Profile')) ;
 
-import ManageBooks from './pages/dashboard/ManageBooks';
-import ManageAccounts from './pages/dashboard/ManageAccounts';
-import DetailProduct from './pages/dashboard/DetailProduct';
+const ManageBooks = lazy(() => import('./pages/dashboard/ManageBooks')) ;
+const ManageAccounts = lazy(() => import('./pages/dashboard/ManageAccounts')) ;
+const ManageReceipts = lazy(() => import('./pages/dashboard/ManageReceipts')) ;
+const ManageReviews = lazy(() => import('./pages/dashboard/ManageReviews')) ;
+const DetailProduct = lazy(() => import('./pages/dashboard/DetailProduct.jsx')) ;
+const DetailAccount = lazy(() => import('./pages/dashboard/DetailAccount.jsx')) ;
 
-const Admin = lazy(() => import('./pages/dashboard/Admin')) ;
-const Management = lazy(() => import('./pages/dashboard/Management')) ;
+const Dashboard = lazy(() => import('./pages/dashboard/Dashboard')) ;
 
-import {
-  Routes,
-  Route
-} from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
   borderRadius: 0,
   [`&.${linearProgressClasses.colorPrimary}`]: {
-      backgroundColor: 'white',
+      backgroundColor: 'gray',
   },
   [`& .${linearProgressClasses.bar}`]: {
       borderRadius: 0,
@@ -56,31 +58,35 @@ function App() {
           <Route path="*" element={<Missing />} />
 
           <Route element={<PersistLogin />}>
-            //ANONYMOUS
-            <Route path="/" element={<Home/>}/>
-            <Route path="/filters" element={<FiltersPage/>}/>
-            <Route path="/product/:id" element={<ProductDetail/>}/>
-            <Route path="/cart" element={<Cart/>}/>
+            <Route element={<PageLayout />}>
+              //ANONYMOUS
+              <Route path="/" element={<Home/>}/>
+              <Route path="/filters" element={<FiltersPage/>}/>
+              <Route path="/product/:id" element={<ProductDetail/>}/>
+              <Route path="/cart" element={<Cart/>}/>
 
-            //USER
-            <Route element={<RequireAuth allowedRoles={['ROLE_USER']} />}>
-              <Route path="/checkout" element={<Checkout/>}/>
-              <Route path="/profile/:tab" element={<Profile/>}/>
+              //USER
+              <Route element={<RequireAuth allowedRoles={['ROLE_USER']} />}>
+                <Route path="/checkout" element={<Checkout/>}/>
+                <Route path="/profile/:tab" element={<Profile/>}/>
+              </Route>
             </Route>
 
-            //SELLER
-            <Route element={<RequireAuth allowedRoles={['ROLE_SELLER']} />}>
-              <Route path="/management" element={<Management/>}/>
-              <Route path="/manage-books" element={<ManageBooks/>}/>
-              <Route path="/detail/:id" element={<DetailProduct/>}/>
-            </Route>
+            <Route element={<DashboardLayout />}>
+              //SELLER
+              <Route element={<RequireAuth allowedRoles={['ROLE_SELLER']} />}>
+                <Route path="/dashboard" element={<Dashboard/>}/>
+                <Route path="/manage-books" element={<ManageBooks/>}/>
+                <Route path="/manage-receipts" element={<ManageReceipts/>}/>
+                <Route path="/detail/:id" element={<DetailProduct/>}/>
+              </Route>
 
-            //ADMIN
-            <Route element={<RequireAuth allowedRoles={['ROLE_ADMIN']} />}>
-              <Route path="/admin" element={<Admin/>}/>
-              <Route path="/manage-accounts" element={<ManageAccounts/>}/>
-              {/* <Route path="/manage-receipts" element={<ManageAccounts/>}/> */}
-              {/* <Route path="/manage-reviews" element={<ManageAccounts/>}/> */}
+              //ADMIN
+              <Route element={<RequireAuth allowedRoles={['ROLE_ADMIN']} />}>
+                <Route path="/manage-accounts" element={<ManageAccounts/>}/>
+                <Route path="/manage-reviews" element={<ManageReviews/>}/>
+                <Route path="/user/:id" element={<DetailAccount/>}/>
+              </Route>
             </Route>
           </Route>
         </Route>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, memo, useMemo } from "react"
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system';
 
@@ -6,6 +6,7 @@ import { Grid, Box, Slider, Divider, Checkbox, FormGroup, FormControlLabel, Text
 import { ExpandLess, ExpandMore, PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon} from '@mui/icons-material';
 
 import axios from '../api/axios'
+import useFetch from "../hooks/useFetch";
 
 //#region styled
 const CustomInput = muiStyled(TextField)({
@@ -191,26 +192,92 @@ const bookTypes = [
   },
 ];
 
+const PublisherFilter = ({onChangePub, filters}) => {
+  const [selectedPub, setSelectedPub] = useState(filters?.pubId);
+  const { data } = useFetch(PUBLISHERS_URL);
+
+  console.log('test');
+
+  useEffect(()=>{
+    setSelectedPub(filters?.pubId);
+  }, [filters?.pubId]);
+
+  const handleChangePub = (e) => {
+    if (onChangePub){
+      const selectedIndex = selectedPub.indexOf(e.target.value);
+      let newSelected = [];
+
+      if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selectedPub, e.target.value);
+      } else if (selectedIndex === 0) {
+        newSelected = newSelected.concat(selectedPub.slice(1));
+      } else if (selectedIndex === selectedPub.length - 1) {
+        newSelected = newSelected.concat(selectedPub.slice(0, -1));
+      } else if (selectedIndex > 0) {
+        newSelected = newSelected.concat(
+          selectedPub.slice(0, selectedIndex),
+          selectedPub.slice(selectedIndex + 1),
+        );
+      }
+
+      setSelectedPub(newSelected);
+      onChangePub(newSelected);
+    }
+  }
+
+  const isSelected = (id) => selectedPub.indexOf(id) !== -1;
+
+  return (
+    <Filter>
+        <TitleContainer>
+          <FilterText><ClassIcon/>&nbsp;Nhà xuất bản</FilterText>
+        </TitleContainer>
+
+        <FormGroup sx={{padding: 0}}>
+        {data?.map((pub, index) => {
+          const isItemSelected = isSelected(`${pub?.id}`);
+
+          return (
+            <FormControlLabel key={index}
+              control={
+                <Checkbox value={pub?.id} 
+                checked={isItemSelected} 
+                onChange={handleChangePub} 
+                disableRipple
+                name={pub?.pubName}
+                sx={{paddingLeft: 0, 
+                  '&.Mui-checked': {
+                  color: '#63e399',
+                }}} />
+              }
+              label={pub?.pubName}
+            />
+          )
+        })}
+        </FormGroup>
+    </Filter>
+  )
+}
+
+const TestFilter = memo(
+  PublisherFilter, 
+  (prevProps, nextProps) => (prevProps.filters.pubId) !== (nextProps.filters.pubId), 
+);
+
 const FilterList = (props) => {
   //#region construct
   const {filters, onCateChange, onRangeChange, onChangePub, onChangeType, onChangeSeller} = props;
   const [open, setOpen] = useState(false);
   const [cateId, setCateId] = useState(filters?.cateId);
-  const [selectedPub, setSelectedPub] = useState(filters?.pubId);
   const [valueInput, setValueInput] = useState(filters?.value);
   const [type, setType] = useState(filters?.type);
   const [seller, setSeller] = useState(filters?.seller);
   const [catesList, setCatesList] = useState([])
-  const [pubList, setPubList] = useState([]);
   const [value, setValue] = useState([reverseCalculateValue(valueInput[0]), reverseCalculateValue(valueInput[1])]);
 
   useEffect(()=>{
     setCateId(filters?.cateId);
   }, [filters?.cateId]);
-
-  useEffect(()=>{
-    setSelectedPub(filters?.pubId);
-  }, [filters?.pubId]);
 
   useEffect(()=>{
     setType(filters?.type);
@@ -228,7 +295,6 @@ const FilterList = (props) => {
   //Load
   useEffect(()=>{
     loadCategories();
-    loadPublishers();
     handleBlur();
   }, []);
 
@@ -280,27 +346,8 @@ const FilterList = (props) => {
     onRangeChange(newValue);
   };
 
-  const handleChangePub = (event) => {
-    if (onChangePub){
-      const selectedIndex = selectedPub.indexOf(event.target.value);
-      let newSelected = [];
-
-      if (selectedIndex === -1) {
-        newSelected = newSelected.concat(selectedPub, event.target.value);
-      } else if (selectedIndex === 0) {
-        newSelected = newSelected.concat(selectedPub.slice(1));
-      } else if (selectedIndex === selectedPub.length - 1) {
-        newSelected = newSelected.concat(selectedPub.slice(0, -1));
-      } else if (selectedIndex > 0) {
-        newSelected = newSelected.concat(
-          selectedPub.slice(0, selectedIndex),
-          selectedPub.slice(selectedIndex + 1),
-        );
-      }
-
-      setSelectedPub(newSelected);
-      onChangePub(newSelected);
-    }
+  const handleChangePub = (newSelected) => {
+    if (onChangePub) onChangePub(newSelected);
   };
 
   const handleBlur = () => {
@@ -331,11 +378,6 @@ const FilterList = (props) => {
       setCatesList(result.data);
   };
 
-  const loadPublishers = async()=>{
-    const result = await axios.get(PUBLISHERS_URL);
-    setPubList(result.data);
-  };
-
   const handleChangeType = (event) => {
     if (onChangeType){
       onChangeType(event.target.value)
@@ -349,7 +391,7 @@ const FilterList = (props) => {
     }
   };
 
-  const isSelected = (id) => selectedPub.indexOf(id) !== -1;
+  
   //#endregion
 
   return (
@@ -465,34 +507,7 @@ const FilterList = (props) => {
         </List>
       </Filter>
       <Divider/>
-      <Filter>
-        <TitleContainer>
-          <FilterText><ClassIcon/>&nbsp;Nhà xuất bản</FilterText>
-        </TitleContainer>
-
-        <FormGroup sx={{padding: 0}}>
-        {pubList.map((pub, index) => {
-          const isItemSelected = isSelected(`${pub.id}`);
-
-          return (
-            <FormControlLabel key={index}
-              control={
-                <Checkbox value={pub.id} 
-                checked={isItemSelected} 
-                onChange={handleChangePub} 
-                disableRipple
-                name={pub.pubName}
-                sx={{paddingLeft: 0, 
-                  '&.Mui-checked': {
-                  color: '#63e399',
-                }}} />
-              }
-              label={pub.pubName}
-            />
-          )
-        })}
-        </FormGroup>
-      </Filter>
+      <TestFilter onChangePub={handleChangePub} filters={filters}/>
       <Divider/>
       <Filter>
         <TitleContainer>
@@ -526,9 +541,8 @@ const FilterList = (props) => {
           />
       </Filter>
       <Divider/>
-      
     </div>
   )
 }
 
-export default FilterList
+export default FilterList;
