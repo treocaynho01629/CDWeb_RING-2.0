@@ -100,7 +100,9 @@ export default function DashboardNavbar(props) {
 
     const signOut = async () => {
       await logout();
+      const { enqueueSnackbar } = await import('notistack');
       navigate('/');
+      enqueueSnackbar('Đã đăng xuất!', { variant: 'error' });
     }
   
     const handleClick = (event) => {
@@ -132,7 +134,7 @@ export default function DashboardNavbar(props) {
         >
         <MenuIcon sx={{color: 'gray'}}/>
         </IconButton>
-        <Link to={auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName)) ? '/admin' : '/management'} style={{marginLeft: '20px'}}>
+        <Link to={'/dashboard'} style={{marginLeft: '20px'}}>
             <Logo>
                 RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- DASHBOARD</p>
             </Logo>

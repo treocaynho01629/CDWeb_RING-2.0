@@ -162,7 +162,7 @@ const ProductImages = ({images}) => {
                 width={'100%'} 
                 style={{
                     padding: '15px 20px',
-                    objectFit: 'cover',
+                    objectFit: 'contain',
                     transform: style
                 }}
                 />        
@@ -186,7 +186,7 @@ const ProductImages = ({images}) => {
                         height={80}
                         width={80} 
                         style={{
-                            objectFit: 'cover',
+                            objectFit: 'contain',
                             display: 'inline-block'
                         }}
                     />

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 
 import styled from 'styled-components'
 import PropTypes from 'prop-types';
@@ -10,13 +10,14 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { Group as GroupIcon, Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 
 import { visuallyHidden } from '@mui/utils';
+import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 
 import usePrivateFetch from '../../hooks/usePrivateFetch'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 
-import AddProductDialog from './AddProductDialog';
-import EditProductDialog from './EditProductDialog';
+const AddAccountDialog = lazy(() => import('./AddAccountDialog'));
+const EditAccountDialog = lazy(() => import('./EditAccountDialog'));
 
 //#region preStyled
 const ItemTitle = styled.p`
@@ -45,8 +46,6 @@ const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
       backgroundColor: '#63e399',
   },
 }));
-
-const ACCOUNTS_URL = 'api/accounts';
 
 const headCells = [
   {
@@ -205,25 +204,26 @@ function EnhancedTableToolbar(props) {
       ) : (
       <>
         <Tooltip title="Thêm thành viên mới">
-          <IconButton sx={{borderRadius: '5px',
-          "&:hover": {
-            backgroundColor: '#50be7e',
-          }}}
+          <IconButton sx={{
+            "&:focus": {
+              outline: 'none',
+            }}}
           onClick={handleClickOpenNew}>
-            <Typography
-            sx={{ flex: '1 1 100%' , fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center'}}
-            variant="h6"
-            id="tableTitle"
-            component="div"
-            >
-              Thêm thành viên
-            <AddIcon sx={{color: 'white', marginLeft: '10px'}}/>
-            </Typography>
+          <AddIcon sx={{color: 'white'}}/>
           </IconButton>
         </Tooltip>
-        //<>Add dialog</>
       </>
       )}
+
+      <Suspense fallback={<></>}>
+        { openNew ?
+          <AddAccountDialog 
+          open={openNew} 
+          setOpen={setOpenNew}
+          refetch={refetch}/>
+          : null
+        }
+      </Suspense>
     </Toolbar>
   );
 }
@@ -234,9 +234,11 @@ EnhancedTableToolbar.propTypes = {
 };
 //#endregion
 
+const ACCOUNTS_URL = 'api/accounts';
+
 export default function TableAccounts(props) {
   //#region construct
-  const { setAccCount } = props;
+  const { setAccCount, mini } = props;
   const { auth } = useAuth();
   const [id, setId] = useState([]);
   const [order, setOrder] = useState('asc');
@@ -246,8 +248,9 @@ export default function TableAccounts(props) {
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(true);
   const [openEdit, setOpenEdit] = useState(false);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(mini ? 5 : 10);
   const [filter, setFilter] = useState(false);
+  const [seller, setSeller] = useState(!(auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
   const { loading, data: rows , refetch} = usePrivateFetch(ACCOUNTS_URL + (filter ? "/employees" : "") 
     + "?pageNo=" + page
     + "&pSize=" + rowsPerPage
@@ -257,7 +260,7 @@ export default function TableAccounts(props) {
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(()=>{
-    if (!loading){
+    if (!loading && setAccCount){
       setAccCount(rows?.totalElements);
     }
   }, [loading]);
@@ -354,9 +357,7 @@ export default function TableAccounts(props) {
   };
 
   const isSelected = (name) => (selected.indexOf(name) !== -1 || selectedAll);
-
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements) : 0;
+  const emptyRows = Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements);
   //#endregion
 
   return (
@@ -366,9 +367,9 @@ export default function TableAccounts(props) {
         numSelected={selected.length} 
         selectedAll={selectedAll} 
         refetch={refetch}/>
-        <TableContainer sx={{ maxHeight: 500 }}>
+        <TableContainer sx={{ maxHeight: mini ? 330 : 500 }}>
           <Table
-            sx={{ minWidth: 750 }}
+            sx={{ minWidth: mini? 500 : 750 }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
@@ -411,10 +412,14 @@ export default function TableAccounts(props) {
                       />
                     </TableCell>
                     <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
-                      {row.id}
+                    <Link to={seller ? '' : `/user/${row.id}`}>{row.id}</Link>
                     </TableCell>
-                    <TableCell align="left"><ItemTitle>{row.username}</ItemTitle></TableCell>
-                    <TableCell align="left"><ItemTitle>{row.email}</ItemTitle></TableCell>
+                    <TableCell align="left">
+                    <Link to={seller ? '' : `/user/${row.id}`}><ItemTitle>{row.username}</ItemTitle></Link>
+                    </TableCell>
+                    <TableCell align="left">
+                    <Link to={seller ? '' : `/user/${row.id}`}><ItemTitle>{row.email}</ItemTitle></Link>
+                    </TableCell>
                     <TableCell align="right">{row.authorities.length == 3 ? 'ADMIN' : row.authorities.length == 2 ? 'SELLER' : 'MEMBER'}</TableCell>
                     <TableCell align="right"> 
                       <IconButton sx={{"&:hover": {transform: 'scale(1.05)', color: '#63e399'}}}
@@ -445,6 +450,16 @@ export default function TableAccounts(props) {
                 </TableRow>
               )}
             </TableBody>
+            <Suspense fallback={<></>}>
+              { openEdit ?
+                <EditAccountDialog 
+                id={id}
+                open={openEdit} 
+                setOpen={setOpenEdit}
+                refetch={refetch}/>
+                : null
+              }
+            </Suspense>
           </Table>
         </TableContainer>
         <TablePagination
@@ -461,32 +476,44 @@ export default function TableAccounts(props) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <div style={{height: '10px'}}>
+      <Box sx={{height: '10px'}}>
         {loading && (<CustomLinearProgress/>)}  
-      </div>
-      <FormControlLabel
-        control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
-          color: '#63e399',
-        },
-        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-          backgroundColor: '#63e399',
-        },}} 
-        checked={dense} onChange={handleChangeDense} />}
-        label="Thu gọn"
-      />
-      {auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))
-        ? <FormControlLabel
-          control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
-            color: '#63e399',
-          },
-          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-            backgroundColor: '#63e399',
-          },}} 
-          checked={filter} onChange={handleChangeFilter} />}
-          label="Lọc nhân viên"
-        />
+      </Box>
+      <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+        <Box>
+          <FormControlLabel
+            control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
+              color: '#63e399',
+            },
+            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+              backgroundColor: '#63e399',
+            },}} 
+            checked={dense} onChange={handleChangeDense} />}
+            label="Thu gọn"
+          />
+          {auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))
+            ? <FormControlLabel
+              control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
+                color: '#63e399',
+              },
+              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                backgroundColor: '#63e399',
+              },}} 
+              checked={filter} onChange={handleChangeFilter} />}
+              label="Lọc nhân viên"
+            />
+            : null
+          }
+        </Box>
+        {mini ?
+        <Link to={'/manage-accounts'} style={{display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10}}>Xem tất cả</Link>
         : null
-      }
+        }
+      </Box>
     </Box>
   );
 }
+
+TableAccounts.defaultProps = {
+  mini: false,
+};

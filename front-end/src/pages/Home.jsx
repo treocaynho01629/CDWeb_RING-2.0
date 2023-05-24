@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import Categories from '../components/Categories'
-import Navbar from '../components/Navbar'
 import Products from '../components/Products'
 import Slider from '../components/Slider'
-import Footer from '../components/Footer'
 import ProductsSlider from '../components/ProductsSlider'
 
 import styled from 'styled-components'
@@ -15,9 +13,6 @@ import { useNavigate } from 'react-router-dom';
 import useFetch from '../hooks/useFetch'
 
 //#region styled
-const Container = styled.div`
-`
-
 const ToggleGroupContainer = styled.div`
   background-color: rgb(39, 39, 39);
   margin-bottom: 10px;
@@ -179,63 +174,59 @@ const Home = () => {
   }, [loadingCate]);
 
   return (
-    <Container>
-      <Navbar/>
-        <Wrapper>
-          <Slider/>
-          <Categories loading={loadingCate} data={cates}/>
-          <Grid sx={{my: 3}} container spacing={5}>
-            <Grid item xs={12} md={12}>
-              <Title>SẢN PHẨM MỚI NHẤT</Title>
-              <Products booksList={booksList}/>
-              <ButtonContainer>
-                <Button onClick={handleShowMore}>Xem thêm</Button>
-              </ButtonContainer>
-              
-              <Title>SẢN PHẨM XẾP THEO</Title>
-              <ToggleGroupContainer>
-                <StyledToggleButtonGroup
-                    value={orderBy}
-                    exclusive
-                    onChange={handleChangeOrder}
-                >
-                  {orderGroup.map((order, index) => (
-                    <StyledToggleButton key={index} value={order.value}>{order.label}</StyledToggleButton>
-                  ))}
-                </StyledToggleButtonGroup>
-              </ToggleGroupContainer>
-              <ProductsSlider  booksList={booksOrder?.content} loading={loadingOrder}/>
-              <ButtonContainer>
-                <Button onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</Button>
-              </ButtonContainer>
+    <Wrapper>
+      <Slider/>
+      <Categories loading={loadingCate} data={cates}/>
+      <Grid sx={{my: 3}} container spacing={5}>
+        <Grid item xs={12} md={12}>
+          <Title>SẢN PHẨM MỚI NHẤT</Title>
+          <Products booksList={booksList}/>
+          <ButtonContainer>
+            <Button onClick={handleShowMore}>Xem thêm</Button>
+          </ButtonContainer>
+          
+          <Title>SẢN PHẨM XẾP THEO</Title>
+          <ToggleGroupContainer>
+            <StyledToggleButtonGroup
+                value={orderBy}
+                exclusive
+                onChange={handleChangeOrder}
+            >
+              {orderGroup.map((order, index) => (
+                <StyledToggleButton key={index} value={order.value}>{order.label}</StyledToggleButton>
+              ))}
+            </StyledToggleButtonGroup>
+          </ToggleGroupContainer>
+          <ProductsSlider  booksList={booksOrder?.content} loading={loadingOrder}/>
+          <ButtonContainer>
+            <Button onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</Button>
+          </ButtonContainer>
 
-              <Title>SẢN PHẨM DANH MỤC</Title>
-              <ToggleGroupContainer>
-                <StyledToggleButtonGroup
-                    value={currCate}
-                    exclusive
-                    onChange={handleChangeCate}
-                >
-                  {randomCates?.map((cate) => (
-                    <StyledToggleButton key={cate?.id} value={cate?.id}>{cate?.categoryName}</StyledToggleButton>
-                  ))}
-                </StyledToggleButtonGroup>
-              </ToggleGroupContainer>
-              <ProductsSlider  booksList={booksCate?.content} loading={loadingByCate}/>
-              <ButtonContainer>
-                <Button onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</Button>
-              </ButtonContainer>
-              
-              <Title>CÓ THỂ BẠN SẼ THÍCH</Title>
-              <ProductsSlider  booksList={booksRandom} loading={loadingRandom}/>
-              <ButtonContainer>
-                <Button onClick={refetch}>Làm mới</Button>
-              </ButtonContainer>
-            </Grid>
-          </Grid>
-        </Wrapper>
-        <Footer/>
-    </Container>
+          <Title>SẢN PHẨM DANH MỤC</Title>
+          <ToggleGroupContainer>
+            <StyledToggleButtonGroup
+                value={currCate}
+                exclusive
+                onChange={handleChangeCate}
+            >
+              {randomCates?.map((cate) => (
+                <StyledToggleButton key={cate?.id} value={cate?.id}>{cate?.categoryName}</StyledToggleButton>
+              ))}
+            </StyledToggleButtonGroup>
+          </ToggleGroupContainer>
+          <ProductsSlider  booksList={booksCate?.content} loading={loadingByCate}/>
+          <ButtonContainer>
+            <Button onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</Button>
+          </ButtonContainer>
+          
+          <Title>CÓ THỂ BẠN SẼ THÍCH</Title>
+          <ProductsSlider  booksList={booksRandom} loading={loadingRandom}/>
+          <ButtonContainer>
+            <Button onClick={refetch}>Làm mới</Button>
+          </ButtonContainer>
+        </Grid>
+      </Grid>
+    </Wrapper>
   )
 }
 

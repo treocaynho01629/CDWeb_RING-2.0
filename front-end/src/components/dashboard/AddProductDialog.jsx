@@ -9,7 +9,6 @@ import { Check as CheckIcon, Close as CloseIcon, AutoStories as AutoStoriesIcon}
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { useSnackbar } from 'notistack';
 import dayjs from 'dayjs';
 
 import CustomDropZone from './CustomDropZone';
@@ -223,7 +222,6 @@ const AddProductDialog = (props) => {
     const [err, setErr] = useState([]);
     const [errMsg, setErrMsg] = useState('');
     const axiosPrivate = useAxiosPrivate();
-    const { enqueueSnackbar } = useSnackbar();
 
     const handleCloseNew = () => {
         setOpen(false);
@@ -268,6 +266,7 @@ const AddProductDialog = (props) => {
             );
 
             refetch();
+            const { enqueueSnackbar } = await import('notistack');
             enqueueSnackbar('Đã thêm sản phẩm!', { variant: 'success' });
             setDate(dayjs('2001-01-01'));
             setFiles([]);

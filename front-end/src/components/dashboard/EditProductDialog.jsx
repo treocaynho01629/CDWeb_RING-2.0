@@ -8,7 +8,6 @@ import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Men
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { useSnackbar } from 'notistack';
 import dayjs from 'dayjs';
 
 import EditIcon from '@mui/icons-material/Edit';
@@ -227,14 +226,8 @@ const EditProductDialog = (props) => {
     const [type, setType] = useState(bookTypes[0].value);
     const [err, setErr] = useState([]);
     const [errMsg, setErrMsg] = useState('');
-    const [isOpen, setIsOpen] = useState(false);
     const axiosPrivate = useAxiosPrivate();
-    const { enqueueSnackbar } = useSnackbar();
     const { loading, data } = useFetch(id.length !== 0 ? BOOK_URL + "/" + id : '');
-
-    const handleCloseNew = () => {
-      setOpen(false);
-    };
 
     useEffect(() => {
       if (id.length !== 0 && open && data && !loading){
@@ -256,6 +249,10 @@ const EditProductDialog = (props) => {
         setLanguage(data?.language);
       }
     }, [loading])
+
+    const handleCloseNew = () => {
+      setOpen(false);
+    };
 
     const handleEditBook = async (event) => {
       event.preventDefault();
@@ -293,6 +290,7 @@ const EditProductDialog = (props) => {
           );
 
           refetch();
+          const { enqueueSnackbar } = await import('notistack');
           enqueueSnackbar('Đã chỉnh sửa sản phẩm!', { variant: 'success' });
           setErrMsg('');
           setErr([]);

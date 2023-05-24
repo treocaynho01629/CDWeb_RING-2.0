@@ -3,9 +3,6 @@ import { useState } from "react";
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 
-import Footer from '../components/Footer'
-import Navbar from '../components/Navbar'
-
 import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, Sell as SellIcon, ShoppingCart as ShoppingCartIcon, Payments as PaymentsIcon } from '@mui/icons-material';
 import { Checkbox, Grid, IconButton, Breadcrumbs, Table, TableBody, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -42,8 +39,6 @@ const StyledTableRow = muiStyled(TableRow)(({ theme }) => ({
     border: 0,
   },
 }));
-
-const Container = styled.div``
 
 const Wrapper = styled.div`
     padding-right: 15px;
@@ -421,161 +416,158 @@ const Cart = () => {
     //#endregion
 
   return (
-    <Container>
-        <Navbar/>
-        <Wrapper>
-            <div role="presentation" style={{margin: '20px 10px'}}>
-                <Breadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
-                    <Link to={`/`} style={{backgroundColor: '#63e399', padding: '5px 15px', color: 'white'}}>
-                    Trang chủ
-                    </Link>
-                    <strong style={{textDecoration: 'underline'}}>Giỏ hàng</strong>
-                </Breadcrumbs>
-            </div>
-            
-            {products.length == 0 ?
-            <div style={{display: 'flex', 
-            flexDirection: 'column', 
-            justifyContent: 'center', 
-            alignItems: 'center',
-            height: '550px'}}>
-                <LazyLoadImage src="/empty.svg"
-                    height={250}
-                /> 
-                <h2>Giỏ hàng của bạn đang trống</h2>
-                <BackButton onClick={() => navigate('/')}>
-                    Tiếp tục mua sắm
-                </BackButton>
-            </div>
-            :
-            <Grid container spacing={3} sx={{mb: 10}}>
-                <Grid item xs={12} lg={8}>
-                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 0px'}}>
-                        <Title><ShoppingCartIcon/>&nbsp;GIỎ HÀNG ({products.length})</Title>
-                        <DeleteAllButton style={{display: selected.length > 0 ? "flex" : "none"}} onClick={handleDeleteMultiple}>Xoá mục đã chọn&nbsp;<DeleteIcon/></DeleteAllButton>
-                    </div>
-                    <TableContainer component={Paper} sx={{borderRadius: '0%'}} >
-                        <Table sx={{ minWidth: 500, borderRadius: '0%'}} aria-label="cart-table">
-                            <EnhancedTableHead
-                                numSelected={selected.length}
-                                onSelectAllClick={handleSelectAllClick}
-                                rowCount={products.length}
-                            />
-                            <TableBody>
-                            {products.map((product, index) => {
-                                const isItemSelected = isSelected(product.id);
-                                const labelId = `enhanced-table-checkbox-${index}`;
+    <Wrapper>
+        <div role="presentation" style={{margin: '20px 10px'}}>
+            <Breadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
+                <Link to={`/`} style={{backgroundColor: '#63e399', padding: '5px 15px', color: 'white'}}>
+                Trang chủ
+                </Link>
+                <strong style={{textDecoration: 'underline'}}>Giỏ hàng</strong>
+            </Breadcrumbs>
+        </div>
+        
+        {products.length == 0 ?
+        <div style={{display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        height: '550px'}}>
+            <LazyLoadImage src="/empty.svg"
+                height={250}
+            /> 
+            <h2>Giỏ hàng của bạn đang trống</h2>
+            <BackButton onClick={() => navigate('/')}>
+                Tiếp tục mua sắm
+            </BackButton>
+        </div>
+        :
+        <Grid container spacing={3} sx={{mb: 10}}>
+            <Grid item xs={12} lg={8}>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 0px'}}>
+                    <Title><ShoppingCartIcon/>&nbsp;GIỎ HÀNG ({products.length})</Title>
+                    <DeleteAllButton style={{display: selected.length > 0 ? "flex" : "none"}} onClick={handleDeleteMultiple}>Xoá mục đã chọn&nbsp;<DeleteIcon/></DeleteAllButton>
+                </div>
+                <TableContainer component={Paper} sx={{borderRadius: '0%'}} >
+                    <Table sx={{ minWidth: 500, borderRadius: '0%'}} aria-label="cart-table">
+                        <EnhancedTableHead
+                            numSelected={selected.length}
+                            onSelectAllClick={handleSelectAllClick}
+                            rowCount={products.length}
+                        />
+                        <TableBody>
+                        {products.map((product, index) => {
+                            const isItemSelected = isSelected(product.id);
+                            const labelId = `enhanced-table-checkbox-${index}`;
 
-                                return (
-                                    <StyledTableRow hover
-                                        role="checkbox"
-                                        aria-checked={isItemSelected}
-                                        tabIndex={-1}
-                                        key={product.id}
-                                        selected={isItemSelected}
-                                    >
-                                        <StyledTableCell component="th" scope="product" onClick={() => handleSelect(product.id)}>
-                                            <div style={{display: 'flex'}}>
-                                                <Checkbox
-                                                disableRipple
-                                                disableFocusRipple
-                                                color="primary"
-                                                checked={isItemSelected}
-                                                inputProps={{
-                                                    'aria-labelledby': labelId,
-                                                }}
-                                                sx={{marginRight: 2,
-                                                    '&.Mui-checked': {
-                                                    color: 'gray',
-                                                }}}
-                                                />
-                                                <Link to={`/product/${product.id}`}>
-                                                    <ItemContainer>
-                                                        <LazyLoadImage src={product.image}
-                                                            height={90}
-                                                            width={90} 
-                                                            style={{
-                                                                border: '0.5px solid lightgray'
-                                                            }}
-                                                        /> 
-                                                        <ItemSummary>
-                                                            <ItemTitle>{product.title}</ItemTitle>
-                                                        </ItemSummary>
-                                                    </ItemContainer>
-                                                </Link>
-                                            </div>
-                                        </StyledTableCell>
-                                        <StyledTableCell align="right">
-                                            <Price>{product.price.toLocaleString()}đ</Price>
-                                            <Discount>{Math.round(product.price * 1.1).toLocaleString()}đ</Discount>
-                                        </StyledTableCell>
-                                        <StyledTableCell align="center">
-                                            <div style={{display: 'flex', justifyContent: 'center'}}>
-                                                <AmountButton direction="remove" onClick={() => handleDecrease(product.quantity, product.id)}>
-                                                    <RemoveIcon style={{fontSize: 12}}/>
-                                                </AmountButton>
-                                                <InputContainer>
-                                                    <AmountInput type="number" onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)} value={product.quantity}/>    
-                                                </InputContainer>
-                                                <AmountButton direction="add" onClick={() => dispatch(increaseQuantity(product.id))}>
-                                                    <AddIcon style={{fontSize: 12}}/>
-                                                </AmountButton>
-                                            </div>
-                                            <IconButton sx={hoverIcon} onClick={() => handleDelete(product.id)}>
-                                                <DeleteIcon/>
-                                            </IconButton>
-                                        </StyledTableCell>
-                                        <StyledTableCell align="right"><Price>{(product.price * product.quantity).toLocaleString()}đ</Price></StyledTableCell>
-                                    </StyledTableRow>
-                                )
-                            })}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Grid>
-                <Grid item xs={12} lg={4}> 
-                    <div style={{display: 'flex', justifyContent: 'end', alignItems: 'center', padding: '20px 0px'}}>
-                        <Title>ĐƠN DỰ TÍNH&nbsp;</Title><SellIcon/>
-                    </div>
-                    <Payout>
-                        <PayoutTitle>KHUYẾN MÃI</PayoutTitle>
-                        <CouponRow>
-                            <PayoutText>Nhập mã:</PayoutText>
-                            <CouponContainer>
-                                <Input/>
-                                <SellIcon style={{color:"gray"}}/>
-                            </CouponContainer>
-                        </CouponRow>
-                    </Payout>
-                    <Payout>
-                        <PayoutTitle>THANH TOÁN</PayoutTitle>
-                        <PayoutRow>
-                            <PayoutText>Thành tiền:</PayoutText>
-                            <PayoutText>{totalPrice().toLocaleString()} đ</PayoutText>
-                        </PayoutRow>
-                        <PayoutRow>
-                            <PayoutText>VAT:</PayoutText>
-                            <PayoutText>10%</PayoutText>
-                        </PayoutRow>
-                        <PayoutRow>
-                            <PayoutText>Phí ship:</PayoutText>
-                            <PayoutText>10,000 đ</PayoutText>
-                        </PayoutRow>
-                        <PayoutRow>
-                            <PayoutText>Tổng:</PayoutText>
-                            <PayoutPrice>{Math.round(totalPrice() * 1.1 + 10000).toLocaleString()}&nbsp;đ</PayoutPrice>
-                        </PayoutRow>
-                        <PayButton disabled={products.length == 0} 
-                            onClick={() => navigate('/checkout')}>
-                            <PaymentsIcon style={{fontSize: 18}}/>&nbsp;{auth.userName ? 'THANH TOÁN' : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
-                        </PayButton>
-                    </Payout>
-                </Grid>
+                            return (
+                                <StyledTableRow hover
+                                    role="checkbox"
+                                    aria-checked={isItemSelected}
+                                    tabIndex={-1}
+                                    key={product.id}
+                                    selected={isItemSelected}
+                                >
+                                    <StyledTableCell component="th" scope="product" onClick={() => handleSelect(product.id)}>
+                                        <div style={{display: 'flex'}}>
+                                            <Checkbox
+                                            disableRipple
+                                            disableFocusRipple
+                                            color="primary"
+                                            checked={isItemSelected}
+                                            inputProps={{
+                                                'aria-labelledby': labelId,
+                                            }}
+                                            sx={{marginRight: 2,
+                                                '&.Mui-checked': {
+                                                color: 'gray',
+                                            }}}
+                                            />
+                                            <Link to={`/product/${product.id}`}>
+                                                <ItemContainer>
+                                                    <LazyLoadImage src={product.image}
+                                                        height={90}
+                                                        width={90} 
+                                                        style={{
+                                                            border: '0.5px solid lightgray'
+                                                        }}
+                                                    /> 
+                                                    <ItemSummary>
+                                                        <ItemTitle>{product.title}</ItemTitle>
+                                                    </ItemSummary>
+                                                </ItemContainer>
+                                            </Link>
+                                        </div>
+                                    </StyledTableCell>
+                                    <StyledTableCell align="right">
+                                        <Price>{product.price.toLocaleString()}đ</Price>
+                                        <Discount>{Math.round(product.price * 1.1).toLocaleString()}đ</Discount>
+                                    </StyledTableCell>
+                                    <StyledTableCell align="center">
+                                        <div style={{display: 'flex', justifyContent: 'center'}}>
+                                            <AmountButton direction="remove" onClick={() => handleDecrease(product.quantity, product.id)}>
+                                                <RemoveIcon style={{fontSize: 12}}/>
+                                            </AmountButton>
+                                            <InputContainer>
+                                                <AmountInput type="number" onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)} value={product.quantity}/>    
+                                            </InputContainer>
+                                            <AmountButton direction="add" onClick={() => dispatch(increaseQuantity(product.id))}>
+                                                <AddIcon style={{fontSize: 12}}/>
+                                            </AmountButton>
+                                        </div>
+                                        <IconButton sx={hoverIcon} onClick={() => handleDelete(product.id)}>
+                                            <DeleteIcon/>
+                                        </IconButton>
+                                    </StyledTableCell>
+                                    <StyledTableCell align="right"><Price>{(product.price * product.quantity).toLocaleString()}đ</Price></StyledTableCell>
+                                </StyledTableRow>
+                            )
+                        })}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </Grid>
-            }
-        </Wrapper>
-        <Footer/>
-    </Container>
+            <Grid item xs={12} lg={4}> 
+                <div style={{display: 'flex', justifyContent: 'end', alignItems: 'center', padding: '20px 0px'}}>
+                    <Title>ĐƠN DỰ TÍNH&nbsp;</Title><SellIcon/>
+                </div>
+                <Payout>
+                    <PayoutTitle>KHUYẾN MÃI</PayoutTitle>
+                    <CouponRow>
+                        <PayoutText>Nhập mã:</PayoutText>
+                        <CouponContainer>
+                            <Input/>
+                            <SellIcon style={{color:"gray"}}/>
+                        </CouponContainer>
+                    </CouponRow>
+                </Payout>
+                <Payout>
+                    <PayoutTitle>THANH TOÁN</PayoutTitle>
+                    <PayoutRow>
+                        <PayoutText>Thành tiền:</PayoutText>
+                        <PayoutText>{totalPrice().toLocaleString()} đ</PayoutText>
+                    </PayoutRow>
+                    <PayoutRow>
+                        <PayoutText>VAT:</PayoutText>
+                        <PayoutText>10%</PayoutText>
+                    </PayoutRow>
+                    <PayoutRow>
+                        <PayoutText>Phí ship:</PayoutText>
+                        <PayoutText>10,000 đ</PayoutText>
+                    </PayoutRow>
+                    <PayoutRow>
+                        <PayoutText>Tổng:</PayoutText>
+                        <PayoutPrice>{Math.round(totalPrice() * 1.1 + 10000).toLocaleString()}&nbsp;đ</PayoutPrice>
+                    </PayoutRow>
+                    <PayButton disabled={products.length == 0} 
+                        onClick={() => navigate('/checkout')}>
+                        <PaymentsIcon style={{fontSize: 18}}/>&nbsp;{auth.userName ? 'THANH TOÁN' : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
+                    </PayButton>
+                </Payout>
+            </Grid>
+        </Grid>
+        }
+        <br/><br/>
+    </Wrapper>
   )
 }
 

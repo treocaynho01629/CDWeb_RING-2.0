@@ -74,10 +74,11 @@ const Drawer = muiStyled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'ope
 
 const DashboardDrawer = (props) => {
     const {open, setOpen} = props;
-    const [openList, setOpenList] = useState(false);
+    const [openList, setOpenList] = useState(true);
     const theme = useTheme();
-    const { auth } = useAuth();
     const navigate = useNavigate();
+    const { auth } = useAuth();
+    const [admin, setAdmin] = useState((auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
 
     const handleClick = (id) => {
       setOpenList((prevState) => ({ ...prevState, [id]: !prevState[id] }));
@@ -99,7 +100,7 @@ const DashboardDrawer = (props) => {
         <Divider />
         <List>
           <ListItem key={0} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton onClick={() => navigate(auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName)) ? '/admin' : '/management')}
+            <ListItemButton onClick={() => navigate('/dashboard')}
               sx={{
                 minHeight: 48,
                 justifyContent: open ? 'initial' : 'center',
@@ -151,14 +152,19 @@ const DashboardDrawer = (props) => {
                 </ListItemIcon>
                 <ListItemText primary="Sách" />
               </ListItemButton>
+              {admin ?
               <ListItemButton sx={{ pl: 4 }}>
                 <ListItemIcon>
                   <CategoryIcon />
                 </ListItemIcon>
                 <ListItemText primary="Danh mục | NXB" />
               </ListItemButton>
+              : null}
             </List>
           </Collapse>
+
+          {admin ?
+          <>
           <ListItem key={2} disablePadding sx={{ display: 'block' }}>
             <ListItemButton onClick={() => handleClick(2)}
               sx={{
@@ -189,7 +195,7 @@ const DashboardDrawer = (props) => {
                 </ListItemIcon>
                 <ListItemText primary="Người dùng" />
               </ListItemButton>
-              <ListItemButton sx={{ pl: 4 }}>
+              <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/manage-reviews')}>
                 <ListItemIcon>
                   <TryIcon />
                 </ListItemIcon>
@@ -197,6 +203,8 @@ const DashboardDrawer = (props) => {
               </ListItemButton>
             </List>
           </Collapse>
+          </>
+          : null}
 
           <ListItem key={3} disablePadding sx={{ display: 'block' }}>
             <ListItemButton onClick={() => handleClick(3)}
@@ -222,17 +230,11 @@ const DashboardDrawer = (props) => {
           </ListItem>
           <Collapse in={openList[3]} timeout="auto" unmountOnExit sx={{ display: open ? 'block' : 'none' }}>
             <List component="div" disablePadding>
-              <ListItemButton sx={{ pl: 4 }}>
+              <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/manage-receipts')}>
                 <ListItemIcon>
                   <TrendingUpIcon />
                 </ListItemIcon>
                 <ListItemText primary="Doanh thu" />
-              </ListItemButton>
-              <ListItemButton sx={{ pl: 4 }}>
-                <ListItemIcon>
-                  <ReceiptIcon />
-                </ListItemIcon>
-                <ListItemText primary="Đơn hàng" />
               </ListItemButton>
             </List>
           </Collapse>

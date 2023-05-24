@@ -19,14 +19,14 @@ const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
 const FilteredProducts = ({loading, booksList}) => {
 
   return (
-    <div style={{pading: '20px 0px'}}>
+    <div style={{padding: 0}}>
       <div style={{height: '20px'}}>
         {loading && (
           <CustomLinearProgress/>
         )}
       </div>
 
-      <Grid container spacing={1}>
+      <Grid container rowSpacing={2} columnSpacing={6}>
         {booksList?.map(book=>(
             <Grid key={book.id} item xs={12} sm={6} md={4} lg={3}>
               <Product book={book}/>
