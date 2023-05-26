@@ -22,7 +22,7 @@ const persistedReducer = persistReducer(persistConfig, cartReducer);
 
 export const store = configureStore({
   reducer: {
-    cart: persistedReducer,
+    cart: persistedReducer, //Reducer chứa Giỏ hàng
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

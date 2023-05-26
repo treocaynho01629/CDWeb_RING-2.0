@@ -19,6 +19,7 @@ const useLogout = () => {
             console.error(err);
         }
 
+        //Xoá auth, xoá cookie
         setAuth({});
         removeCookie('refreshToken', { path: '/'});
         localStorage.removeItem("auth");

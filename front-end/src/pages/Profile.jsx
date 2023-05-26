@@ -584,7 +584,10 @@ const Profile = () => {
         setOpen(prevState => !prevState);
     };
 
-    const handleOpenDialog = () => setOpenDialog(true);
+    const handleOpenDialog = () => {
+        setOpenDialog(true)
+        navigate('/profile/detail');
+    };
     const handleCloseDialog = () => setOpenDialog(false);
 
     const handleClickShowPassword = () => setShow((show) => !show);
