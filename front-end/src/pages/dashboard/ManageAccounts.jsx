@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
@@ -35,6 +35,11 @@ const countIconStyle = {
 const ManageAccounts = () => {
   const [accCount, setAccCount] = useState(0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+      window.scrollTo(0, 0);
+      document.title = `RING! - Người dùng`;
+  }, [])
 
   return (
     <>

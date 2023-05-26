@@ -140,7 +140,7 @@ const Categories = (props) => {
             {(loading ? Array.from(new Array(15)) : catesList)?.map((cate, index) => (
                 <div key={index}>
                     {cate ? (
-                        <Link to={`/filters?cateId=${cate.id}`} style={{color: 'inherit'}}>
+                        <Link to={`/filters?cateId=${cate.id}`} style={{color: '#424242'}}>
                             <ItemContainer>
                                 {index % 2 == 0 ? 
                                 <CategoryIcon/>

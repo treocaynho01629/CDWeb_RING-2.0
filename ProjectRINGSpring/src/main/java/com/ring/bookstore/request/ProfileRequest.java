@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProfileRequest {
+public class ProfileRequest { //Để cập nhật Hồ sơ Người dùng
 
 	@Size(max = 250, message = "Tên không quá 500 kí tự")
 	private String name;

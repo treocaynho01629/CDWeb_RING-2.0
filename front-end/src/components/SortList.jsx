@@ -3,8 +3,8 @@ import React, { useEffect, useState, useRef } from 'react'
 import styled from "styled-components"
 import { styled as muiStyled } from '@mui/system';
 
-import { TextField, MenuItem, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import { TextField, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip, IconButton } from '@mui/material';
+import { Search as SearchIcon, SearchOff} from '@mui/icons-material';
 
 //#region styled
 const Container = styled.div`
@@ -144,6 +144,7 @@ const SortList = (props) => {
     const { filters, pagination, onChangeOrder, onChangeDir, onChangeSearch } = props;
     const [ sortBy, setSortBy] = useState(pagination.sortBy);
     const [ sortDir, setSortDir] = useState(pagination.sortDir);
+    const [ toggleSearch, setToggleSearch ] = useState(filters?.keyword ? true : false);
     const searchRef = useRef(null);
 
     const handleChangeOrder = (event, newValue) => {
@@ -165,6 +166,12 @@ const SortList = (props) => {
         }
     };
 
+    const handleToggleSearch = () => setToggleSearch((toggleSearch) => !toggleSearch);
+
+    const handleMouseDown = (event) => {
+        event.preventDefault();
+    };
+
     useEffect(() => {
         setSortBy(pagination?.sortBy);
         setSortDir(pagination?.sortDir);
@@ -184,6 +191,16 @@ const SortList = (props) => {
                     <StyledToggleButton key={index} value={order.value}>{order.label}</StyledToggleButton>
                     ))}
                 </StyledToggleButtonGroup>
+                <Tooltip title="Tìm kiếm">
+                    <IconButton aria-label="search" 
+                    onClick={handleToggleSearch}
+                    onMouseDown={handleMouseDown}
+                    sx={{marginRight: 0, zIndex: 10}}>
+                        {toggleSearch ? 
+                        <SearchIcon sx={{fontSize: '26px', color: '#63e399'}}/>
+                         : <SearchOff sx={{fontSize: '26px'}}/>}
+                    </IconButton>
+                </Tooltip>
             </Sort>
             <CustomInput
             select
@@ -194,7 +211,7 @@ const SortList = (props) => {
                 <MenuItem value={'asc'}>Thấp đến cao</MenuItem>
             </CustomInput>
         </SortContainer>
-        {filters?.keyword ?
+        {toggleSearch ?
         <form onSubmit={handleSubmitSearch}>
             <SearchInput placeholder='Từ khoá... '
                 id="search"

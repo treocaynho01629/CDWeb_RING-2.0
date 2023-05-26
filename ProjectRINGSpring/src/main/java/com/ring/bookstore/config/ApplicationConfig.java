@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
-public class ApplicationConfig {
+public class ApplicationConfig { //Cấu hình phần mềm
 	
 	private final AccountRepository accountRepo;
 	

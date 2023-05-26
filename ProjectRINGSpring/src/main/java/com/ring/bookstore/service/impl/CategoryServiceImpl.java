@@ -17,16 +17,14 @@ public class CategoryServiceImpl implements CategoryService {
 	
 	private final CategoryRepository cateRepo;
 
-	//Lấy tất cả Mục
+	//Lấy tất cả Danh mục
 	public List<Category> getAllCategories() {
 		return cateRepo.findAll();
 	}
 
-	//Lấy Mục theo Id
+	//Lấy Danh mục theo Id
 	public Category getCategoryById(Integer id) {
 		return cateRepo.findById(id).orElseThrow(() -> 
 		new ResourceNotFoundException("Category does not exists!")); //exception nếu ko tồn tại
 	}
-	
-
 }

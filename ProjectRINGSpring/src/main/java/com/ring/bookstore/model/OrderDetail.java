@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class OrderDetail {
+public class OrderDetail { //Chi tiết Đơn hàng
 
     @Id
     @Column(nullable = false, updatable = false)

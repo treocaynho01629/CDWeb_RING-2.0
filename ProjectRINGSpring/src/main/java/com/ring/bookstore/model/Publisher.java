@@ -21,7 +21,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Publisher {
+public class Publisher { //Nhà xuất bản
 
     @Id
     @Column(nullable = false, updatable = false)

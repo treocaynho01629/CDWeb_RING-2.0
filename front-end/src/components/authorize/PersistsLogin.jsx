@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
-import Backdrop from '@mui/material/Backdrop';
-import CircularProgress from '@mui/material/CircularProgress';
+import { Backdrop, CircularProgress } from '@mui/material';
 import useRefreshToken from '../../hooks/useRefreshToken';
 import useAuth from '../../hooks/useAuth';
 

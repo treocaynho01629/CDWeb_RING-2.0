@@ -156,12 +156,18 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, selectedAll, refetch } = props;
+  const { numSelected, selectedAll, refetch, handleDeleteMultiples } = props;
   const [openNew, setOpenNew] = useState(false);
  
   const handleClickOpenNew = () => {
     setOpenNew(true);
   };
+
+  const handleDelete = () => {
+    if (handleDeleteMultiples) {
+      handleDeleteMultiples();
+    }
+  }
 
   return (
     <Toolbar
@@ -197,7 +203,7 @@ function EnhancedTableToolbar(props) {
 
       {numSelected > 0 ? (
         <Tooltip title="Xoá thành viên đã chọn">
-          <IconButton>
+          <IconButton onClick={handleDelete}>
             <DeleteIcon sx={{color: 'white', "&:hover": {transform: 'scale(1.05)', color: '#e66161'}}} />
           </IconButton>
         </Tooltip>
@@ -327,6 +333,8 @@ export default function TableAccounts(props) {
   };
 
   const handleDelete = async (id) => {
+    const { enqueueSnackbar } = await import('notistack');
+
     try {
         const response = await axiosPrivate.delete(ACCOUNTS_URL + "/" + id,
             {
@@ -345,6 +353,34 @@ export default function TableAccounts(props) {
         }
 
         refetch();
+        enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
+    } catch (err) {
+        console.log(err);
+        if (!err?.response) {
+        } else if (err.response?.status === 409) {
+        } else if (err.response?.status === 400) {
+        } else {
+        }
+        enqueueSnackbar('Xoá thành viên thất bại!', { variant: 'error' });
+    }
+  };
+
+  const handleDeleteMultiples = async () => {
+    const { enqueueSnackbar } = await import('notistack');
+
+    try {
+        let DELETE_URL = ( selectedAll ? ACCOUNTS_URL + "/delete-all" : ACCOUNTS_URL + "/delete-multiples?ids=" + selected)
+        const response = await axiosPrivate.delete(DELETE_URL,
+            {
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true
+            }
+        );
+
+        refetch();
+        setSelected([]);
+        setSelectedAll(false);
+        enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
     } catch (err) {
         console.log(err);
         if (!err?.response) {
@@ -366,6 +402,7 @@ export default function TableAccounts(props) {
         <EnhancedTableToolbar 
         numSelected={selected.length} 
         selectedAll={selectedAll} 
+        handleDeleteMultiples={handleDeleteMultiples}
         refetch={refetch}/>
         <TableContainer sx={{ maxHeight: mini ? 330 : 500 }}>
           <Table

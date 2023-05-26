@@ -1,5 +1,7 @@
 package com.ring.bookstore.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -17,4 +19,6 @@ public interface ReviewService {
 	Page<ReviewDTO> getReviewsByBookId(Integer id, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
 	Review review(Integer id, ReviewRequest request, Account user);
 	Review deleteReview(Integer id);
+	void deleteReviews(List<Integer> ids);
+	void deleteAllReviews();
 }

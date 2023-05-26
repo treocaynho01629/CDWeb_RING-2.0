@@ -25,47 +25,49 @@ public class ImageServiceImpl implements ImageService {
 	@Autowired
 	private ImageMapper imageMapper;
 
-	//Tải ảnh
+	//Tải Ảnh lên Server
 	public ImageDTO uploadImage(MultipartFile file) throws IOException {
 
 		//Kiểm tra file
 		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 		
-		//Kiểm tra ảnh tồn tại?
-		Image image = imageRepo.findByName(fileName).orElse(
+		Image image = imageRepo.findByName(fileName).orElse( //Lấy ảnh nếu đã tồn tại || Tạo ảnh mới khi chưa có
 				Image.builder()
 				.name(fileName)
 				.type(file.getContentType())
 				.image(file.getBytes())
 				.build());
-		imageRepo.save(image);
-		ImageDTO dto = imageMapper.apply(image);
+		imageRepo.save(image); //Lưu vào CSDL
+		ImageDTO dto = imageMapper.apply(image); //Trả ảnh đã Map về DTO
 		return dto;
 	}
 
-	//Trả ảnh
+	//Lấy ảnh theo {Tên}
 	public Image getImage(String name) {
 		Image image = imageRepo.findByName(name)
-				.orElseThrow(() -> new ResourceNotFoundException("Image does not exists!"));
+				.orElseThrow(() -> new ResourceNotFoundException("Image does not exists!")); //Báo lỗi khi ko có
 		return image;
 	}
 
+	//Lấy tất cả Ảnh
 	public List<ImageDTO> getAllImages() {
         List<Image> imagesList = imageRepo.findAll();
-        List<ImageDTO> imageDtos = imagesList.stream().map(imageMapper::apply).collect(Collectors.toList());
+        List<ImageDTO> imageDtos = imagesList.stream().map(imageMapper::apply).collect(Collectors.toList()); //Map sang DTO và trả về
 		return imageDtos;
 	}
 
+	//Xoá ảnh theo {id}
 	@Override
 	public ImageDTO deleteImage(Integer id) {
 		Image image = imageRepo.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Image does not exists!"));
+				.orElseThrow(() -> new ResourceNotFoundException("Image does not exists!")); //Báo lỗi khi ko có
 		imageRepo.deleteById(id);
 		
-		ImageDTO dto = imageMapper.apply(image);
+		ImageDTO dto = imageMapper.apply(image); //Map DTO và trả về
 		return dto;
 	}
 
+	//Kiểm tra ảnh với {Tên} đã tồn tại?
 	public boolean existsImage(String name) {
 		return imageRepo.existsByName(name);
 	}

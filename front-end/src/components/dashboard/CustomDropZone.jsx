@@ -1,10 +1,11 @@
-import React, {useEffect} from 'react';
+import { useEffect } from 'react';
 import styled from 'styled-components'
 
 import Grid from "@mui/material/Grid"
 
 import {useDropzone} from 'react-dropzone';
 
+//#region styled
 const DropZoneContainer = styled.div`
     display: flex;
     justify-content: center;
@@ -18,35 +19,43 @@ const DropZoneContainer = styled.div`
 const ThumbContainer = styled.div`
     display: flex;
     height: 350px;
-    flex-direction: row;
+    width: 100%;
     flex-wrap: wrap;
+    justify-content: center;
+    background-color: #d6e2db;
 `
 
 const Thumb = styled.div`
-    display: inline-flex;
+    display: flex;
     border: 1px solid #eaeaea;
     height: 350px;
-    margin-right: 8px;
+    width: 100%;
     padding: 4px;
     box-sizing: border-box;
+    justify-content: center;
 `
 
 const ThumbInner = styled.div`
     display: flex;
     min-width: 0;
     overflow: hidden;
+    justify-content: center;
 `
 
 const ThumbImage = styled.img`
     display: block;
-    width: auto;
     height: 100%;
+    width: 100%;
+    object-fit: cover;
 `
+//#endregion
 
 const CustomDropZone = (props) => {
     const { image, files, setFiles } = props;
-    const {getRootProps, getInputProps} = useDropzone({
-        maxFiles:1,
+    const {getRootProps, getInputProps, fileRejections} = useDropzone({
+        maxFiles: 1,
+        maxSize: 2000000,
+        multiple: false,
         accept: {
         'image/*': []
         },
@@ -56,7 +65,13 @@ const CustomDropZone = (props) => {
         })));
         }
     });
-  
+
+    const fileRejectionItems = fileRejections.map(({ file, errors }) => (
+      <b style={{display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'red'}}>
+        File: {file.path} - {file.size} bytes Quá lớn
+      </b>
+    ));
+
   let thumbs
 
   if (files?.length != 0) {
@@ -92,7 +107,11 @@ const CustomDropZone = (props) => {
             <Grid item xs={12} sm={6}>
                 <DropZoneContainer {...getRootProps({className: 'dropzone'})}>
                     <input {...getInputProps()} />
-                    <p>Thả hoặc click vào để tải ảnh</p>
+                    <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                      <p>Thả hoặc click vào để tải ảnh</p>
+                      <b>(Tối đa 2MB)</b>
+                      {fileRejectionItems}
+                    </div>
                 </DropZoneContainer>
             </Grid>
             <Grid item xs={12} sm={6} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>

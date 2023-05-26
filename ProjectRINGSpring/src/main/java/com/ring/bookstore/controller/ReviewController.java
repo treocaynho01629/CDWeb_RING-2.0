@@ -1,5 +1,7 @@
 package com.ring.bookstore.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,11 +27,11 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
-public class ReviewController {
+public class ReviewController { //Controller Đánh giá
 	
 	private final ReviewService reviewService;
 	
-	//Lấy tất cả Review
+	//Lấy tất cả Đánh giá
 	@GetMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllReviews(@RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
@@ -39,7 +41,7 @@ public class ReviewController {
 		return new ResponseEntity< >(reviewService.getAllReviews(pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
-	//Lấy Review theo sách
+	//Lấy Đánh giá theo {id} Sách
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getReviewsByBookId(@PathVariable("id") Integer bookId,
 												@RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
@@ -49,7 +51,7 @@ public class ReviewController {
 		return new ResponseEntity< >(reviewService.getReviewsByBookId(bookId, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
-	//Lấy Review theo người dùng
+	//Lấy Đánh giá theo {id} Người dùng
 	@GetMapping("/user/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getReviewsByUser(@PathVariable("id") Integer userId,
@@ -60,7 +62,7 @@ public class ReviewController {
 		return new ResponseEntity< >(reviewService.getReviewsByUser(userId, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
-	//Lấy Review theo người dùng (cá nhân)
+	//Lấy Đánh giá theo Người dùng hiện tại
 	@GetMapping("/user")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<?> getReviewsByUser(@RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
@@ -71,7 +73,7 @@ public class ReviewController {
 		return new ResponseEntity< >(reviewService.getReviewsByUser(currUser, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
-	//Review sách
+	//Đánh giá sách
 	@PostMapping("/{id}")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<?> reviewBook(@PathVariable("id") Integer bookId,
@@ -80,10 +82,26 @@ public class ReviewController {
 		return new ResponseEntity< >(reviewService.review(bookId, request, currUser), HttpStatus.OK);
 	}
 	
-	//Xoá review
+	//Xoá Đánh giá
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> deleteReview(@PathVariable("id") Integer bookId){
 		return new ResponseEntity< >(reviewService.deleteReview(bookId), HttpStatus.OK);
 	}
+	
+	//Xoá nhiều Đánh giá theo list id
+    @DeleteMapping("/delete-multiples")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteReviews(@RequestParam("ids") List<Integer> ids) {
+    	reviewService.deleteReviews(ids);
+        return new ResponseEntity<>("Gỡ đánh giá thành công", HttpStatus.OK);
+    }
+    
+    //Xoá tất cả Đánh giá
+    @DeleteMapping("/delete-all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteAllReviews() {
+    	reviewService.deleteAllReviews();
+        return new ResponseEntity<>("Gỡ đánh giá thành công", HttpStatus.OK);
+    }
 }

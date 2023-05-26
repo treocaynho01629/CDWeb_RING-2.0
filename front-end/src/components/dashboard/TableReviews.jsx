@@ -202,11 +202,12 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, selectedAll, refetch } = props;
-  const [openNew, setOpenNew] = useState(false);
+  const { numSelected, selectedAll, handleDeleteMultiples } = props;
  
-  const handleClickOpenNew = () => {
-    setOpenNew(true);
+  const handleDelete = () => {
+    if (handleDeleteMultiples) {
+      handleDeleteMultiples();
+    }
   };
 
   return (
@@ -243,7 +244,7 @@ function EnhancedTableToolbar(props) {
 
       {numSelected > 0 ? (
         <Tooltip title="Xoá đánh giá đã chọn">
-          <IconButton>
+          <IconButton onClick={handleDelete}>
             <DeleteIcon sx={{color: 'white', "&:hover": {transform: 'scale(1.05)', color: '#e66161'}}} />
           </IconButton>
         </Tooltip>
@@ -337,6 +338,8 @@ export default function TableReviews(props) {
   };
 
   const handleDelete = async (id) => {
+    const { enqueueSnackbar } = await import('notistack');
+
     try {
         const response = await axiosPrivate.delete(REVIEWS_URL + "/" + id,
             {
@@ -362,6 +365,34 @@ export default function TableReviews(props) {
         } else if (err.response?.status === 400) {
         } else {
         }
+        enqueueSnackbar('Xoá đánh giá thất bại!', { variant: 'error' });
+    }
+  };
+
+  const handleDeleteMultiples = async () => {
+    const { enqueueSnackbar } = await import('notistack');
+
+    try {
+        let DELETE_URL = ( selectedAll ? REVIEWS_URL + "/delete-all" : REVIEWS_URL + "/delete-multiples?ids=" + selected)
+        const response = await axiosPrivate.delete(DELETE_URL,
+            {
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true
+            }
+        );
+
+        refetch();
+        setSelected([]);
+        setSelectedAll(false);
+        enqueueSnackbar('Đã xoá đánh giá!', { variant: 'success' });
+    } catch (err) {
+        console.log(err);
+        if (!err?.response) {
+        } else if (err.response?.status === 409) {
+        } else if (err.response?.status === 400) {
+        } else {
+        }
+        enqueueSnackbar('Xoá đánh giá thất bại!', { variant: 'error' });
     }
   };
 
@@ -376,7 +407,7 @@ export default function TableReviews(props) {
         <EnhancedTableToolbar 
         numSelected={selected.length} 
         selectedAll={selectedAll} 
-        refetch={refetch}/>
+        handleDeleteMultiples={handleDeleteMultiples}/>
         <TableContainer sx={{ maxHeight: mini ? 330 : 500 }}>
           <Table
             sx={{ minWidth: mini ? 500 : 750 }}
