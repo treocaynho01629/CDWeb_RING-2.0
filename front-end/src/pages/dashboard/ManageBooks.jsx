@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
@@ -75,6 +75,11 @@ const ManageBooks = () => {
   const { loading: loadingFav, data: fav } = useFetch(BOOKS_URL + "?pSize=5&sortBy=rateAmount&sortDir=desc&seller=" + (seller === false ? "" : auth.userName));
   const navigate = useNavigate();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.title = `RING! - Sản phẩm`;
+  }, [])
+
   return (
     <>
       <h2>Quản lý sách</h2>
@@ -95,8 +100,8 @@ const ManageBooks = () => {
           <Paper elevation={3} sx={{padding: '5px 15px'}}>
             <h3 style={{display: 'flex', alignItems: 'center'}}><LocalFireDepartment/>Top 5 sách bán chạy</h3>
             <Stack>
-              { best?.content?.map((book) => (
-                <Paper elevation={1} 
+              { best?.content?.map((book, index) => (
+                <Paper elevation={1} key={index}
                 onClick={() => navigate(`/detail/${book.id}`)}
                 sx={{width: '100%', display: 'flex', my: '5px', padding: 1, cursor: 'pointer'}}>
                   <LazyLoadImage src={book.image} style={imageStyle}/>

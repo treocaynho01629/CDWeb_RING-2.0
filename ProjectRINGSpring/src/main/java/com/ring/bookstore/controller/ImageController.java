@@ -26,18 +26,18 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
-public class ImageController {
+public class ImageController { //Controller Ảnh
 	
 	private final ImageService imageService;
 	
-	//Lấy tất cả ảnh
+	//Lấy tất cả Ảnh
 	@GetMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllImages() {
 		return new ResponseEntity<>(imageService.getAllImages(), HttpStatus.OK);
 	}
 
-	//Tải ảnh lên Server
+	//Tải Ảnh lên Server
 	@PostMapping("/upload")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
 	public ResponseEntity<?> uploadFile(@RequestParam("image") MultipartFile file) throws IOException {
@@ -51,15 +51,14 @@ public class ImageController {
 		}
 	}
 	
-	//Lấy ảnh
+	//Lấy Ảnh theo {name}
 	@GetMapping("/{name}")
 	public ResponseEntity<byte[]> getImage(@PathVariable String name) {
 		Image image = imageService.getImage(name);
-
-		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(image.getImage());
+		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(image.getImage()); //Trả file Ảnh
 	}
 	
-	//Xoá ảnh
+	//Xoá Ảnh theo {id}
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getImage(@PathVariable Integer id) {

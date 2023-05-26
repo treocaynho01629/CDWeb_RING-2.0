@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
-public class CategoryController {
+public class CategoryController { //Controller Danh mục
 	
 	private final CategoryService cateService;
 	

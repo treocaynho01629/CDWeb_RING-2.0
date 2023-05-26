@@ -26,14 +26,23 @@ public interface BookRepository extends JpaRepository<Book, Integer>{
 	and b.price between :fromRange and :toRange
 	group by b.id, b.title, b.description, b.images.name, b.price
 	""")
-	public Page<IBookDisplay> findBooksWithFilter(String keyword, String cateId, String[] pubId, String seller,String type, Double fromRange, Double toRange, Pageable pageable);
+	public Page<IBookDisplay> findBooksWithFilter(String keyword, //Lấy Sách theo bộ lọc (từ khoá, danh mục, ...)
+			String cateId, 
+			String[] pubId, 
+			String seller, 
+			String type, 
+			Double fromRange, 
+			Double toRange, 
+			Pageable pageable);
 	
 	@Query("select b from Book b order by newid() limit :amount")
-	public List<Book> findRandomBooks(int amount);
+	public List<Book> findRandomBooks(int amount); //Lấy Sách ngẫu nhiên
+	
+	public void deleteByUser_Id(Integer id);
 	
 	@Query("""
 	select b from Book b
 	""")
-	List<IBookDisplay> testStuff();
+	List<IBookDisplay> testStuff(); //Test
 
 }

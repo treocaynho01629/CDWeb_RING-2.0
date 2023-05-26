@@ -23,4 +23,6 @@ public interface BookService {
 	Book addBook(BookRequest request, MultipartFile file, Account seller) throws IOException;
 	Book updateBook(BookRequest request, MultipartFile file, Integer id, Account seller) throws IOException;
 	Book deleteBook(Integer id, Account seller);
+	void deleteBooks(List<Integer> ids, Account seller);
+	void deleteAllBooks(Account seller);
 }

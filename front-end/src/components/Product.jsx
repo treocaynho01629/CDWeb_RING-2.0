@@ -29,6 +29,7 @@ const ImageSlider = styled.div`
     overflow: hidden;
     position: relative;
     padding: 5px 5px 0px 5px;
+    transition: all 0.25s ease;
 `
 
 const Container = styled.div`
@@ -41,10 +42,19 @@ const Container = styled.div`
     justify-content: space-between;
     position: relative;
     border: 0.5px solid lightgray;
+    transition: all 0.5s ease;
 
     &:hover ${MoreInfo}{
         opacity: 1;
     };
+
+    &:hover ${ImageSlider}{
+        padding: 0;
+    };
+
+    &:hover {
+        border-color: gray;
+    }
 `
 
 const Info = styled.div`
@@ -52,7 +62,7 @@ const Info = styled.div`
     flex-direction: column;
     padding: 0px 10px;
     margin-top: -20px;
-    width: 95%;
+    width: 92%;
     z-index: 4;
 `
 
@@ -208,7 +218,7 @@ const Product = ({book}) => {
         <ImageSlider>
             {multiImages.map((style, index) => (
             <>
-            <LazyLoadImage key={index}
+            <LazyLoadImage key={index + ":" + book.id}
                 src={book.image}
                 height={300} 
                 width={210}

@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Image {
+public class Image { //Ảnh
 	@Id
     @Column(nullable = false, updatable = false)
     @SequenceGenerator(

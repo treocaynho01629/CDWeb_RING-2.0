@@ -30,20 +30,21 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
-public class OrderController {
+public class OrderController { //Controller Đơn hàng
 	
 	private final OrderService orderService;
 	
+	//Đặt hàng
 	@PostMapping
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<OrderReceipt> checkout( //Tạo tài khoản
-          @RequestBody @Valid OrderRequest request,
-          @CurrentAccount Account currUser
+	public ResponseEntity<OrderReceipt> checkout(@RequestBody @Valid OrderRequest request,
+												@CurrentAccount Account currUser
     ) {
 		  OrderReceipt orderReceipt = orderService.checkout(request, currUser);
           return new ResponseEntity< >(orderReceipt, HttpStatus.CREATED);
     }
 	
+	//Lấy tất cả Đơn hàng
 	@GetMapping
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> getAllOrders(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
@@ -55,6 +56,7 @@ public class OrderController {
         return new ResponseEntity< >(orders, HttpStatus.OK);
     }
 	
+	//Lấy Đơn hàng theo {id}
 	@GetMapping("{id}")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> getOrderById(@PathVariable("id") Integer id){
@@ -62,6 +64,7 @@ public class OrderController {
         return new ResponseEntity< >(order, HttpStatus.OK);
     }
 	
+	//Lấy Đơn hàng theo Người dùng hiện tại
 	@GetMapping("/user")
 	@PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getOrdersByUser(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
@@ -71,6 +74,7 @@ public class OrderController {
         return new ResponseEntity< >(orders, HttpStatus.OK);
     }
 	
+	//Lấy Đơn hàng theo {id} Sách
 	@GetMapping("/book/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> getOrdersByBookId(@PathVariable("id") Integer id,
@@ -82,6 +86,7 @@ public class OrderController {
         return new ResponseEntity< >(orders, HttpStatus.OK);
     }
 
+	//Lấy dữ liệu Doanh thu cho biểu đồ
 	@GetMapping("/sale")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> getMonthlySale(@CurrentAccount Account currUser){
