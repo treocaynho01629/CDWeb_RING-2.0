@@ -15,7 +15,11 @@ import com.ring.bookstore.response.IChartResponse;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer>{
 	
-	Optional<Account> findByUserName(String userName);
+	Optional<Account> findByUserName(String userName); //Tìm Người dùng theo Tên đăng nhập
+	
+	List<Account> findByEmail(String email); //Tìm Người dùng theo Email
+	
+	Optional<Account> findByResetPassToken(String resetPassToken); //Tìm Người dùng theo Reset Token
 	
 	@Query("""
 	select a from Account a where size(a.roles) > 1
@@ -34,7 +38,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer>{
 	group by o2.user_id order by od desc) t2 on t.user_id = t2.user_id
 	order by otherData desc
 	""", nativeQuery = true)
-	List<IChartResponse> getTopUser();
+	List<IChartResponse> getTopUser(); //Tìm Top 7 Người dùng (Đặt hàng nhiều và Đánh giá nhiều)
 	
 	@Query("""
 	select a.userName as name, count(b.id) as data, isnull(sum(o.amount), 0) as otherData 
@@ -43,5 +47,5 @@ public interface AccountRepository extends JpaRepository<Account, Integer>{
 	group by a.userName
 	order by data desc
 	""")
-	List<IChartResponse> getTopSeller();
+	List<IChartResponse> getTopSeller(); //Tìm Top Nhân viên (Bán nhiều và Doanh thu nhiều)
 }

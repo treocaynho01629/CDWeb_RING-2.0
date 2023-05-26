@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode
-public class OrderReceipt {
+public class OrderReceipt { //Đơn hàng
 
     @Id
     @Column(nullable = false, updatable = false)

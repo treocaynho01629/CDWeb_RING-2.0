@@ -10,7 +10,6 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { AutoStories as AutoStoriesIcon, Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon} from '@mui/icons-material';
 
 import { visuallyHidden } from '@mui/utils';
-import { useSnackbar } from 'notistack';
 import { Link } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import useAuth from "../../hooks/useAuth";
@@ -163,12 +162,18 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { loadingCate, dataCate, loadingPub, dataPub, numSelected, selectedAll, refetch } = props;
+  const { loadingCate, dataCate, loadingPub, dataPub, numSelected, selectedAll, refetch, handleDeleteMultiples } = props;
   const [openNew, setOpenNew] = useState(false);
  
   const handleClickOpenNew = () => {
     setOpenNew(true);
   };
+
+  const handleDelete = () => {
+    if (handleDeleteMultiples) {
+      handleDeleteMultiples();
+    }
+  }
 
   return (
     <Toolbar
@@ -204,7 +209,7 @@ function EnhancedTableToolbar(props) {
 
       {numSelected > 0 ? (
         <Tooltip title="Xoá sản phẩm đã chọn">
-          <IconButton>
+          <IconButton onClick={handleDelete}>
             <DeleteIcon sx={{color: 'white', "&:hover": {transform: 'scale(1.05)', color: '#e66161'}}} />
           </IconButton>
         </Tooltip>
@@ -268,8 +273,6 @@ export default function TableBooks(props) {
     + "&sortBy=" + orderBy);
   const { loading: loadingCate, data: dataCate } = useFetch(CATEGORIES_URL);
   const { loading: loadingPub, data: dataPub } = useFetch(PUBLISHERS_URL);
-
-  const { enqueueSnackbar } = useSnackbar();
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(()=>{
@@ -340,6 +343,8 @@ export default function TableBooks(props) {
   };
 
   const handleDelete = async (id) => {
+    const { enqueueSnackbar } = await import('notistack');
+
     try {
         const response = await axiosPrivate.delete(BOOK_URL + "/" + id,
             {
@@ -370,6 +375,33 @@ export default function TableBooks(props) {
     }
   };
 
+  const handleDeleteMultiples = async () => {
+    const { enqueueSnackbar } = await import('notistack');
+
+    try {
+        let DELETE_URL = ( selectedAll ? BOOK_URL + "/delete-all" : BOOK_URL + "/delete-multiples?ids=" + selected)
+        const response = await axiosPrivate.delete(DELETE_URL,
+            {
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true
+            }
+        );
+
+        refetch();
+        setSelected([]);
+        setSelectedAll(false);
+        enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+    } catch (err) {
+        console.log(err);
+        if (!err?.response) {
+        } else if (err.response?.status === 409) {
+        } else if (err.response?.status === 400) {
+        } else {
+        }
+        enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+    }
+  };
+
   const isSelected = (name) => (selected.indexOf(name) !== -1 || selectedAll);
   const emptyRows = Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements);
 
@@ -385,6 +417,7 @@ export default function TableBooks(props) {
         dataPub={dataPub}
         numSelected={selected.length} 
         selectedAll={selectedAll} 
+        handleDeleteMultiples={handleDeleteMultiples}
         refetch={refetch}/>
         <TableContainer sx={{ maxHeight: mini ? 330 : 500 }}>
           <Table

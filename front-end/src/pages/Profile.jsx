@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react'
+import { useState, useEffect, lazy, Suspense} from 'react'
 
 import styled from "styled-components"
 import { styled as muiStyled } from '@mui/material/styles';
@@ -24,6 +24,8 @@ import { useDispatch } from "react-redux"
 import dayjs from 'dayjs';
 import usePrivateFetch from '../hooks/usePrivateFetch'
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
+
+const Pending = lazy(() => import('../components/authorize/Pending'));
 
 //#region styled
 const Wrapper = styled.div`
@@ -375,11 +377,11 @@ const ReceiptsTable = () => {
                             receipt?.orderDetails?.map((detail, index) => {
                                 return (
                                     <>
-                                    <TableRow key={detail.id + "a"} sx={{backgroundColor: '#f7f7f7'}}>
+                                    <TableRow key={detail.id + "a" + index} sx={{backgroundColor: '#f7f7f7'}}>
                                         <TableCell colSpan={1}><ItemTitle>Giao tới: {receipt.address}</ItemTitle></TableCell>
                                         <TableCell align="right"><StatusTag><CheckIcon/>ĐÃ GIAO</StatusTag></TableCell>
                                     </TableRow>
-                                    <TableRow key={detail.id + "b"}>
+                                    <TableRow key={detail.id + "b" + index}>
                                         <TableCell>
                                             <div style={{display: 'flex'}}>
                                                 <Link to={`/product/${detail.bookId}`} style={{color: 'inherit'}}>
@@ -388,7 +390,8 @@ const ReceiptsTable = () => {
                                                             height={90}
                                                             width={90} 
                                                             style={{
-                                                                border: '0.5px solid lightgray'
+                                                                border: '0.5px solid lightgray',
+                                                                objectFit: 'contain'
                                                             }}
                                                         /> 
                                                         <div style={{marginLeft: '20px', marginTop: '10px'}}>
@@ -404,7 +407,7 @@ const ReceiptsTable = () => {
                                             <Discount>{Math.round(detail.price * 1.1).toLocaleString()} đ</Discount>
                                         </TableCell>
                                     </TableRow>
-                                    <TableRow key={detail.id + "c"}>
+                                    <TableRow key={detail.id + "c" + index}>
                                         <TableCell colSpan={1} sx={{cursor: 'pointer'}} onClick={() => navigate(`/product/${detail.bookId}`)}>Đánh giá sản phẩm?</TableCell>
                                         <TableCell align="right">
                                             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '10px'}}>
@@ -475,7 +478,7 @@ const ReviewTable = () => {
         :
         <Box>
             {reviews?.content?.map((review, index) => (
-                <Grid key={index}>
+                <Grid key={review.id + ":" + index}>
                     <Review review={review}/>
                 </Grid>
             ))}
@@ -515,6 +518,7 @@ const Review = ({review}) => {
 
 const Profile = () => {
     //#region construct
+    const [pending, setPending] = useState(false);
     const {tab} = useParams();
     const [open, setOpen] = useState(false);
     const [err, setErr] = useState([]);
@@ -540,6 +544,15 @@ const Profile = () => {
     const navigate = useNavigate();
     const axiosPrivate = useAxiosPrivate();
     const { loading, data, refetch } = usePrivateFetch(PROFILE_URL);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        document.title = `RING! - Hồ sơ`;
+    }, [])
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [tab])
 
     useEffect(() => {
         const result = PWD_REGEX.test(newPass);
@@ -643,6 +656,9 @@ const Profile = () => {
            return;
        }
 
+       setPending(true);
+       setOpenDialog(false);
+
         try {
             const response = await axiosPrivate.put(CHANGE_PASS_URL,
                 JSON.stringify({
@@ -666,6 +682,8 @@ const Profile = () => {
             const { enqueueSnackbar } = await import('notistack');
             enqueueSnackbar('Đổi mật khẩu thành công!', { variant: 'success' });
             refetch();
+            setPending(false);
+            setOpenDialog(true);
         } catch (err) {
             console.log(err);
             setErrr(err);
@@ -677,6 +695,8 @@ const Profile = () => {
             } else {
                 setOtherErrMsg("Đổi mật khẩu thất bại!");
             }
+            setPending(false);
+            setOpenDialog(true);
         }
     }
 
@@ -695,12 +715,18 @@ const Profile = () => {
 
   return (
     <Wrapper>
+        {pending ?
+        <Suspense fallBack={<></>}>
+            <Pending/>
+        </Suspense>
+        : null
+        }
         <Grid container spacing={5}>
             <Grid item xs={12} md={3} sx={{display: 'flex', justifyContent: 'center'}}>
                 <ListContainer>
                     <MiniProfile>
                         <div style={{display: 'flex', alignItems: 'center'}}>
-                            <Avatar sx={{ width: 50, height: 50, marginRight: 2}}/><h3>test</h3>
+                            <Avatar sx={{ width: 50, height: 50, marginRight: 2}}/><h3>{data?.userName}</h3>
                         </div>
                         <ChangeText onClick={() => navigate('/profile/detail')}><EditIcon/>Sửa hồ sơ</ChangeText>
                     </MiniProfile>
@@ -851,7 +877,6 @@ const Profile = () => {
                                 <Instruction display={otherErrMsg ? "block" : "none"} aria-live="assertive">{otherErrMsg}</Instruction>
                                 <CustomInput label='Nhập mật khẩu hiện tại' 
                                     type={show ? 'text' : 'password'}
-                                    id="pass"
                                     onChange={(e) => setPass(e.target.value)}
                                     value={pass}
                                     error = {errr?.response?.data?.errors?.password}
@@ -863,7 +888,6 @@ const Profile = () => {
                                 />
                                 <CustomInput label='Nhập mật khẩu mới' 
                                     type={show ? 'text' : 'password'}
-                                    id="newPass"
                                     onChange={(e) => setNewPass(e.target.value)}
                                     value={newPass}
                                     aria-invalid={validNewPass ? "false" : "true"}
@@ -877,7 +901,6 @@ const Profile = () => {
                                 />
                                 <CustomInput label='Nhập lại mật khẩu mới' 
                                     type={show ? 'text' : 'password'}
-                                    id="newPassRe"
                                     onChange={(e) => setNewPassRe(e.target.value)}
                                     value={newPassRe}
                                     aria-invalid={validNewPassRe ? "false" : "true"}
@@ -909,7 +932,6 @@ const Profile = () => {
                     </ContentContainer>
                     </TabPanel>
                 </TabContext>
-                
             </Grid>
         </Grid>
     </Wrapper>

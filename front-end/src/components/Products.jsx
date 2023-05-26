@@ -8,7 +8,7 @@ const Products = ({booksList}) => {
       <Grid container spacing={1}>
         {booksList.map((book)=>(
             <Grid key={book.id} item xs={12} sm={4} md={3} lg={2.4}>
-              <Product book={book}/>
+              <Product key={book.id} book={book}/>
             </Grid>
         ))}
       </Grid>

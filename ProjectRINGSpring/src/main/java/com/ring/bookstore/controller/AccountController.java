@@ -1,5 +1,7 @@
 package com.ring.bookstore.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +32,7 @@ import jakarta.validation.Valid;
 @RestController
 @CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/accounts")
-public class AccountController {
+public class AccountController { //Controller Người dùng
 	
 	private AccountService accountService;
 	
@@ -39,7 +41,7 @@ public class AccountController {
 		this.accountService = accountService;
 	}
 	
-	//Lấy tất cả acc
+	//Lấy tất cả Người dùng
 	@GetMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllAccounts(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
@@ -50,7 +52,7 @@ public class AccountController {
 		return new ResponseEntity< >(accounts, HttpStatus.OK);
 	}
 	
-	//Lấy tất cả nhân viên
+	//Lấy tất cả Nhân viên
 	@GetMapping("/employees")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?>  getAllSellers(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
@@ -61,14 +63,14 @@ public class AccountController {
 		return new ResponseEntity< >(accounts, HttpStatus.OK);
 	}
 	
-	//Lấy acc theo {id}
+	//Lấy Người dùng theo {id}
 	@GetMapping("{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<AccountDetailDTO> getAccountById(@PathVariable("id") Integer accountId){
 		return new ResponseEntity<AccountDetailDTO>(accountService.getAccountById(accountId), HttpStatus.OK);
 	}
 	
-	//Chỉnh sửa acc {id}
+	//Chỉnh sửa Người dùng theo {id}
 	@PutMapping("{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Account> updateAccount(@PathVariable("id") Integer accountId,
@@ -76,14 +78,14 @@ public class AccountController {
 		return new ResponseEntity<Account>(accountService.updateAccount(requestt, accountId), HttpStatus.OK);
 	}
 	
-	//Tạo acc mới
+	//Tạo Người dùng mới
 	@PostMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Account> saveAccount(@Valid @RequestBody AccountRequest request){
 		return new ResponseEntity<Account>(accountService.saveAccount(request), HttpStatus.CREATED);
 	}
 	
-	//Xoá acc {id}
+	//Xoá Người dùng với {id}
 	@DeleteMapping("{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<String> deleteAccount(@PathVariable("id") Integer accountId){
@@ -93,7 +95,23 @@ public class AccountController {
 		return new ResponseEntity<String>("Account deleted successfully!", HttpStatus.OK);
 	}
 	
-	//Lấy profile
+	//Xoá nhiều Người dùng theo list id
+    @DeleteMapping("/delete-multiples")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteAccounts(@RequestParam("ids") List<Integer> ids) {
+    	accountService.deleteAccounts(ids);
+        return new ResponseEntity<>("Gỡ người dùng thành công", HttpStatus.OK);
+    }
+    
+    //Xoá tất cả Người dùng
+    @DeleteMapping("/delete-all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteAllAccounts() {
+    	accountService.deleteAllAccounts();
+        return new ResponseEntity<>("Gỡ người dùng thành công", HttpStatus.OK);
+    }
+	
+	//Lấy Hồ sơ Người dùng (AccountProfile)
 	@GetMapping("/profile")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<ProfileDTO> getProfile(@CurrentAccount Account currUser){
@@ -101,7 +119,7 @@ public class AccountController {
 		return new ResponseEntity< >(profile, HttpStatus.OK);
 	}
 	
-	//Update hồ sơ
+	//Update Hồ sơ người dùng
 	@PutMapping("/profile")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<AccountProfile> updateProfile(@Valid @RequestBody ProfileRequest request, @CurrentAccount Account currUser){
@@ -109,7 +127,7 @@ public class AccountController {
 		return new ResponseEntity< >(profile, HttpStatus.OK);
 	}
 	
-	//Đổi mật khẩu
+	//Đổi mật khẩu Người dùng
 	@PutMapping("/change-password")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePassRequest request, @CurrentAccount Account currUser){

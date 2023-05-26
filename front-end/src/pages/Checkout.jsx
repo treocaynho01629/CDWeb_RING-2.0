@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, lazy, Suspense } from 'react'
 import styled from 'styled-components'
 import { styled as muiStyled, useTheme } from '@mui/material/styles';
 
@@ -19,6 +19,8 @@ import { useSnackbar } from 'notistack';
 import usePrivateFetch from '../hooks/usePrivateFetch'
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import useMediaQuery from '@mui/material/useMediaQuery';
+
+const Pending = lazy(() => import('../components/authorize/Pending'));
 
 //#region styled
 const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
@@ -352,6 +354,7 @@ const PROFILE_URL = '/api/accounts/profile';
 
 const Checkout = () => {
     //#region construct
+    const [pending, setPending] = useState(false);
     const [open, setOpen] = useState(false);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -407,6 +410,8 @@ const Checkout = () => {
             var fullName = data?.name.split(' ');
             setLastName(fullName[fullName.length - 1]);
             if (fullName.length > 2) setFirstName(fullName.slice(0, -1).join(' '));
+            document.title = `RING! - Thanh toán`;
+            window.scrollTo(0, 0);
         }
     }, [loading])
 
@@ -437,6 +442,7 @@ const Checkout = () => {
             errRef.current.focus();
             return;
         }
+        setPending(true);
 
         try {
             const response = await axiosPrivate.post(CHECKOUT_URL,
@@ -456,6 +462,7 @@ const Checkout = () => {
             dispatch(resetCart());
             enqueueSnackbar('Đặt hàng thành công!', { variant: 'success' });
             navigate('/cart');
+            setPending(false);
         } catch (err) {
             console.log(err);
             setErr(err);
@@ -487,6 +494,12 @@ const Checkout = () => {
 
   return (
     <Wrapper>
+        {pending ?
+        <Suspense fallBack={<></>}>
+            <Pending/>
+        </Suspense>
+        : null
+        }
         <div role="presentation" style={{margin: '20px 10px'}}>
             <Breadcrumbs separator="›" aria-label="breadcrumb">
                 <Link to={`/`} style={{backgroundColor: '#63e399', padding: '5px 15px', color: 'white'}}>
@@ -650,7 +663,8 @@ const Checkout = () => {
                                                             height={90}
                                                             width={90} 
                                                             style={{
-                                                                border: '0.5px solid lightgray'
+                                                                border: '0.5px solid lightgray',
+                                                                objectFit: 'contain'
                                                             }}
                                                         /> 
                                                         <ItemSummary>

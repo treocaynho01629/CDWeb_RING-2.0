@@ -20,7 +20,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Sub {
+public class Sub { //Danh mục phụ
 
     @Id
     @Column(nullable = false, updatable = false)

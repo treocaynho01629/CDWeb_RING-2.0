@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system';
 import PropTypes from 'prop-types';
@@ -12,7 +12,7 @@ import { Search as SearchIcon, ShoppingCart as ShoppingCartIcon,
     RemoveShoppingCart as RemoveShoppingCartIcon, Storefront} from '@mui/icons-material';
 import { Stack, Badge, IconButton, Avatar, Menu, MenuItem, ListItemIcon, Divider
 , Tooltip, Card, CardContent, CardMedia, Box, Drawer, Popover, List, ListItem, ListItemButton
-, ListItemText, Grid, TextField, AppBar, useScrollTrigger, Slide, Collapse} from '@mui/material';
+, ListItemText, Grid, TextField, AppBar, useScrollTrigger, Collapse} from '@mui/material';
 
 import { useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -29,10 +29,6 @@ const Container = styled.div`
 `
 
 const Wrapper = styled.div`
-    padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
     display: flex;
     flex-direction: column;
 
@@ -42,6 +38,8 @@ const Wrapper = styled.div`
 
     @media (min-width: 768px) {
         width: 750px;
+        margin-left: auto;
+        margin-right: auto;
     }
     @media (min-width: 992px) {
         width: 970px;
@@ -55,11 +53,15 @@ const TopHeader = styled.div`
     padding: 0 30px;
     background-color: #ebebeb;
     color: #424242;
-    display: flex;
+    display: none;
     justify-content: space-between;
     align-items: center;
     font-size: 15px;
     font-weight: bold;
+
+    @media (min-width: 900px) {
+        display: flex
+    }
 `
 
 const ContactContainer = styled.div`
@@ -270,11 +272,18 @@ const Button = styled.button`
     color: black;
     outline: none;
     border: none;
-    transition: all 0.5s ease;
+    transition: all 0.25s ease;
+    border-radius: 10%;
 
     &:hover {
         background-color: #63e399;
+        opacity: 0.7;
         color: white;
+    }
+
+    &:focus {
+        outline: none;
+        border: none;
     }
 
     @media (min-width: 900px) {
@@ -574,7 +583,7 @@ const Navbar = (props) => {
         :
             <>
             {products.slice(0, 5).map((product, index) => (
-            <Card key={index} mt={0} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Card key={index + ":" + product.id} mt={0} sx={{ display: 'flex', alignItems: 'center' }}>
                 <CardMedia
                     loading="lazy"
                     component="img"
@@ -608,8 +617,8 @@ const Navbar = (props) => {
                         <Grid container>
                             <Grid item xs={12} md={6}>
                                 <ContactContainer>
-                                    <Contact><PhoneIcon sx={{fontSize: 18, marginRight: 1}}/>+12345678890</Contact>
-                                    <Contact><MailIcon sx={{fontSize: 18, marginRight: 1}}/>daihocnonglam@hcmuaf.edu.vn</Contact>
+                                    <Contact><PhoneIcon sx={{fontSize: 18, marginRight: 1}}/>+8419130018</Contact>
+                                    <Contact><MailIcon sx={{fontSize: 18, marginRight: 1}}/>19130248@hcmuaf.edu.vn</Contact>
                                 </ContactContainer>
                             </Grid>
                             <Grid item xs={12} md={6}>
@@ -628,7 +637,7 @@ const Navbar = (props) => {
                         <Grid item xs={12} md={7}>
                             <Left>
                                 <Box sx={{display: 'flex', alignItems: 'center'}}>
-                                    <Button onClick={toggleDrawer()}><MenuIcon/></Button>
+                                    <Button onClick={toggleDrawer()}><MenuIcon sx={{fontSize: 26}}/></Button>
                                     <Drawer
                                         anchor='left'
                                         open={openDrawer}

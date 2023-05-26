@@ -37,12 +37,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
 @Validated
-public class BookController {
+public class BookController { //Controller Sách
 	
 	private final BookService bookService;
 	private final AccountRepository accRepo;
 	
-	//Lấy sách theo trang
+	//Lấy tất cả Sách
 	@GetMapping()
     public ResponseEntity<?> getAllBooks(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
 										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo){
@@ -50,14 +50,14 @@ public class BookController {
         return new ResponseEntity< >(books, HttpStatus.OK);
     }
 	
-	//Lấy sách random
+	//Lấy Sách ngẫu nhiên
 	@GetMapping("/random")
     public ResponseEntity<?> getRandomBooks(@RequestParam(value = "amount", defaultValue = "5") Integer amount){
         List<BookDTO> books =  bookService.getRandomBooks(amount);
         return new ResponseEntity< >(books, HttpStatus.OK);
     }
 	
-	//Filters
+	//Lấy Sách theo bộ lọc
 	@GetMapping("/filters")
     public ResponseEntity<?> getBooksByFilter(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
     										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
@@ -74,12 +74,13 @@ public class BookController {
         return new ResponseEntity< >(books, HttpStatus.OK);
     }
 	
-	//Lấy sách hiển thị theo {id}
+	//Lấy Sách chi tiết theo {id}
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getBookDetailById(@PathVariable("id") Integer bookId) {
 		return new ResponseEntity< >(bookService.getBookDetailById(bookId), HttpStatus.OK);
 	}
 	
+	//Thêm sách mới
 	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> addBook(@Valid @RequestPart("request") BookRequest request,
@@ -88,12 +89,13 @@ public class BookController {
 		try {
 			Book addedBook = bookService.addBook(request, file, currUser);
 			return new ResponseEntity< >(addedBook, HttpStatus.CREATED);
-		} catch (IOException e) {
+		} catch (IOException e) { //File ảnh lỗi >> Báo lỗi
 			String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
 		}
     }
 	
+	//Cập nhật Sách
     @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> updateBook(@Valid @RequestPart("request") BookRequest request, 
@@ -104,22 +106,41 @@ public class BookController {
     	try {
     		Book savedBook = bookService.updateBook(request, file, id, currUser);
 			return new ResponseEntity< >(savedBook, HttpStatus.CREATED);
-		} catch (IOException e) {
+		} catch (IOException e) { //File ảnh lỗi >> Báo lỗi
 			String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
 		}
     }
     
+    //Xoá Sách theo {id}
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<Book> removeBook(@PathVariable("id") int id,
+    public ResponseEntity<Book> deleteBook(@PathVariable("id") int id,
 										@CurrentAccount Account currUser) {
         Book deletedBook = bookService.deleteBook(id, currUser);
         return new ResponseEntity<>(deletedBook, HttpStatus.OK);
     }
+    
+    //Xoá nhiều Sách theo list id
+    @DeleteMapping("/delete-multiples")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> deleteBooks(@RequestParam("ids") List<Integer> ids,
+										@CurrentAccount Account currUser) {
+        bookService.deleteBooks(ids, currUser);
+        return new ResponseEntity<>("Gỡ sách thành công", HttpStatus.OK);
+    }
+    
+    //Xoá tất cả Sách
+    @DeleteMapping("/delete-all")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> deleteAllBooks(@CurrentAccount Account currUser) {
+        bookService.deleteAllBooks(currUser);
+        return new ResponseEntity<>("Gỡ sách thành công", HttpStatus.OK);
+    }
 	
 	//Test
 	@GetMapping("/test/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getTest(@PathVariable("id") long bookId){
         Account test =  accRepo.findByUserName("chuotcon1").orElse(null);
         return new ResponseEntity< >(test, HttpStatus.OK);

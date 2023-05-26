@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 @RequiredArgsConstructor
-public class LogoutService implements LogoutHandler {
+public class LogoutService implements LogoutHandler { //Đăng xuất khỏi Security Context Holder của Spring
 
     @Override
     public void logout(
@@ -21,11 +21,11 @@ public class LogoutService implements LogoutHandler {
             HttpServletResponse response,
             Authentication authentication
     ) {
-        //Lấy token hiện tại từ header
+        //Lấy JWT từ header request
         final String authHeader = request.getHeader("Authorization");
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) return;
 
-        SecurityContext context = SecurityContextHolder.getContext();
+        SecurityContext context = SecurityContextHolder.getContext(); //Xoá context
         context.setAuthentication(null);
 
         SecurityContextHolder.clearContext();

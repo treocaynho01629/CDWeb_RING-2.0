@@ -2,6 +2,7 @@ package com.ring.bookstore.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +26,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Account implements UserDetails {
+public class Account implements UserDetails { //Người dùng
 
     /**
 	 * 
@@ -53,8 +54,16 @@ public class Account implements UserDetails {
     @JsonIgnore
     private String pass;
 
-    @Column(length = 1000)
+    @Column(nullable = false, length = 1000)
     private String email;
+    
+    @Column(unique = true)
+    @JsonIgnore
+    private String resetPassToken;
+    
+    @Column(nullable = true)
+    @JsonIgnore
+	private LocalDateTime tokenCreationDate;
     
     @OneToOne(cascade = CascadeType.ALL, 
     		orphanRemoval = true, 
