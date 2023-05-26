@@ -19,28 +19,28 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Inte
 	from OrderReceipt or join OrderDetail od on or.id = od.order.id
 	where or.user.userName = :userName and od.book.id = :id
 	""")
-	boolean existsByUserBuyBook(Integer id, String userName);
+	boolean existsByUserBuyBook(Integer id, String userName); //Kiểm tra người dùng đã mua Sách chưa (Có Đơn >> Mua r)
 	
-	Page<OrderReceipt> findAllByUser_Id(Integer id, Pageable pageable);
+	Page<OrderReceipt> findAllByUser_Id(Integer id, Pageable pageable); //Lấy Đơn hàng theo {Id Người dùng}
 	
 	@Query("""
 	select o from OrderReceipt o join OrderDetail od on o.id = od.order.id 
 	where od.book.user.id = :id
 	""")
-	Page<OrderReceipt> findAllBySeller(Integer id, Pageable pageable);
+	Page<OrderReceipt> findAllBySeller(Integer id, Pageable pageable); //Lấy Đơn hành theo {Id Nhân viên}
 	
 	@Query("""
 	select o from OrderReceipt o join OrderDetail od on o.id = od.order.id 
 	where od.book.id = :id
 	""")
-	Page<OrderReceipt> findAllByBookId(Integer id, Pageable pageable);
+	Page<OrderReceipt> findAllByBookId(Integer id, Pageable pageable); //Lấy Đơn hàng theo {Id Sách}
 	
 	@Query("""
 	select month(o.oDate) as name, isnull(sum(o2.amount) , 0) as data, isnull(sum(distinct o.total) , 0) as otherData 
 	from OrderReceipt o left join OrderDetail o2 on o.id = o2.order.id
 	group by month(o.oDate)
 	""")
-	List<IChartResponse> getMonthlySale();
+	List<IChartResponse> getMonthlySale(); //Lấy dữ liệu doanh thu theo tháng
 	
 	@Query("""
 	select month(o.oDate) as name, isnull(sum(o2.amount) , 0) as data, isnull(sum(distinct o.total) , 0) as otherData 
@@ -48,5 +48,5 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Inte
 	where b.user.id = :id
 	group by month(o.oDate)
 	""")
-	List<IChartResponse> getMonthlySaleBySeller(Integer id);
+	List<IChartResponse> getMonthlySaleBySeller(Integer id); //Lấy dữ liệu doanh thu theo tháng theo {Id Nhân viên}
 }

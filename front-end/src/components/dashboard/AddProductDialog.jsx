@@ -295,6 +295,8 @@ const AddProductDialog = (props) => {
                 setErrMsg('Chưa có ảnh kèm theo!');
             } else if (err.response?.status === 400) {
                 setErrMsg('Sai định dạng thông tin!');  
+            } else if (err.response?.status === 417) {
+              setErrMsg('File ảnh quá lớn (Tối đa 5MB)!');  
             } else {
                 setErrMsg('Thêm sản phẩm thất bại!')
             }

@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChangePassRequest { //Để đổi mật khẩu
+public class ResetPassRequest { //Để khôi phục mật khẩu
 
-	@NotNull(message = "Mật khẩu hiện tại không được để trống!")
-	private String pass;
+	@NotNull(message = "Token không được để trống!")
+	private String token;
 	
 	@NotNull(message = "Mật khẩu mới không được để trống!")
 	@Size(min = 8, max = 24, message = "Mật khẩu dài 8-24 kí tự")

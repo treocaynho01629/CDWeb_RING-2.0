@@ -8,5 +8,4 @@ import com.ring.bookstore.model.BookDetail;
 @Repository
 public interface BookDetailRepository extends JpaRepository<BookDetail, Integer>{
 
-
 }

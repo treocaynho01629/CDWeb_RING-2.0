@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from 'react';
+import { useState, lazy, Suspense, useEffect } from 'react';
 import styled from 'styled-components'
 
 import TableReviews from "../../components/dashboard/TableReviews";
@@ -14,7 +14,7 @@ const EditProductDialog = lazy(() => import('../../components/dashboard/EditProd
 
 //#region styled
 const CustomButton = styled.button`
-    width: 70%;
+    width: 250px;
     border-radius: 0;
     padding: 15px;
     margin-top: -15px;
@@ -73,6 +73,13 @@ const DetailProduct = () => {
         setOpenEdit(true);
     };
 
+    useEffect(() => {
+        if (!loading){
+            window.scrollTo(0, 0);
+            document.title = `RING! - ${data?.title}`;
+        }
+    }, [loading])
+
     return (
     <>
     <Card elevation={3} sx={{ display: 'flex', marginBottom: 3}}>
@@ -90,8 +97,8 @@ const DetailProduct = () => {
                 <Typography my={2} component="div" variant="h6" sx={{fontWeight: 'bold'}}>
                 Giá: {data?.price.toLocaleString()} đ
                 </Typography>
-                <Grid container spacing={3}>
-                    <Grid item xs={4}>
+                <Grid container spacing={3} sx={{maxWidth: '600px'}}>
+                    <Grid item xs={5}>
                         <Typography my={1} sx={{fontWeight: 'bold'}} variant="subtitle1" color="text.primary" component="div">
                         Thể loại:
                         </Typography>
@@ -108,7 +115,7 @@ const DetailProduct = () => {
                         Người bán:
                         </Typography>
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid item xs={7}>
                         <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
                         {data?.cateName}
                         </Typography>
@@ -154,7 +161,7 @@ const DetailProduct = () => {
             <Grid item xs={12} lg={6}>
                 <Typography my={2} variant="h5" component="div" sx={{fontWeight: 'bold'}}>Thông tin chi tiết: </Typography>
                 <Grid container spacing={3}>
-                    <Grid item xs={3}>
+                    <Grid item xs={4}>
                         <Typography my={1} variant="subtitle1" color="text.primary" component="div" sx={{fontWeight: 'bold'}}>
                         Mã hàng:
                         </Typography>
@@ -168,7 +175,7 @@ const DetailProduct = () => {
                         Số trang:
                         </Typography>
                     </Grid>
-                    <Grid item xs={9}>
+                    <Grid item xs={8}>
                         <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
                         {data?.id ? data?.id : 'N/A'}
                         </Typography>

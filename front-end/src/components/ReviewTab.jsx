@@ -9,7 +9,6 @@ import { Avatar, Rating, Box, Grid, TextareaAutosize} from '@mui/material';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import { useNavigate } from "react-router-dom";
-import { useSnackbar } from 'notistack';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import useFetch from '../hooks/useFetch'
 import useAuth from "../hooks/useAuth";
@@ -127,7 +126,6 @@ const ReviewTab = (props) => {
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
     const { auth } = useAuth();
-    const { enqueueSnackbar } = useSnackbar();
 
     const { loading: loadingReview, data: reviews, refetch } = useFetch(REVIEW_URL + id
         + "?pSize=" + pagination.pageSize 
@@ -156,6 +154,7 @@ const ReviewTab = (props) => {
 
     const handleSubmitReview = async (e) => {
         e.preventDefault(); 
+        const { enqueueSnackbar } = await import('notistack');
 
         try {
             const response = await axiosPrivate.post(REVIEW_URL + id,
@@ -188,6 +187,7 @@ const ReviewTab = (props) => {
             } else {
                 setErrMsg("Đánh giá thất bại!");
             }
+            enqueueSnackbar('Đánh giá thất bại!', { variant: 'error' });
         }
     }
 

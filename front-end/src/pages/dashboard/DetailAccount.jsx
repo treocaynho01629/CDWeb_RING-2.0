@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from 'react';
+import { useState, lazy, Suspense, useEffect } from 'react';
 import styled from 'styled-components'
 
 import { Avatar, Box, Card, CardContent, IconButton, Typography, Grid, Divider } from '@mui/material';
@@ -32,6 +32,13 @@ const DetailAccount = () => {
     const handleClickOpenEdit = () => {
         setOpenEdit(true);
     };
+
+    useEffect(() => {
+        if (!loading){
+            window.scrollTo(0, 0);
+            document.title = `RING! - ${data?.userName}`;
+        }
+    }, [loading])
 
     return (
     <>

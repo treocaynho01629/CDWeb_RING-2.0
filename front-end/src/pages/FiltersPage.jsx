@@ -113,6 +113,11 @@ const FiltersPage = () => {
             setBooksList(data?.content);
         }
     }, [loading])
+    
+    useEffect(() => {
+        document.title = 'RING! - Cửa hàng';
+        window.scrollTo(0, 0);
+    }, [])
 
     //Change
     const handleCateChange = (id) => {

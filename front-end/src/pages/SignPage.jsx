@@ -1,8 +1,6 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
-
-import SimpleNavbar from "../components/SimpleNavbar";
 
 import { Stack, TextField, IconButton, InputAdornment, FormControlLabel, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions} from '@mui/material';
 import { Check as CheckIcon, Close as CloseIcon, Visibility, VisibilityOff } from '@mui/icons-material';
@@ -12,6 +10,9 @@ import { useCookies } from 'react-cookie';
 import useAuth from "../hooks/useAuth";
 import axios from "../api/axios";
 import jwt from 'jwt-decode';
+
+import SimpleNavbar from "../components/SimpleNavbar";
+const Pending = lazy(() => import('../components/authorize/Pending'));
 
 //#region styled
 const Container = styled.div`
@@ -141,6 +142,11 @@ const Button = styled.button`
         background-color: gray;
         color: darkslategray;
     }
+
+    &:focus {
+        outline: none;
+        border: none;
+    }
 `
 
 const Instruction = styled.p`
@@ -169,8 +175,9 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%:]).{8,24}$/;
 const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 const REGISTER_URL = '/api/v1/auth/register';
 const LOGIN_URL = '/api/v1/auth/authenticate';
+const FORGOT_URL = '/api/v1/auth/forgot-password?email=';
 
-const LoginTab = () => {
+const LoginTab = ({setPending}) => {
     const { setAuth, persist, setPersist } = useAuth(); //Authorize context
 
     //Router
@@ -185,10 +192,12 @@ const LoginTab = () => {
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
+    const [validEmail, setValidEmail] = useState(false);
+    const [err, setErr] = useState([]);
     const [errMsgLogin, setErrMsgLogin] = useState('');
+    const [errMsgReset, setErrMsgReset] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [open, setOpen] = useState(false);
-    const [validEmail, setValidEmail] = useState(false);
     const [cookies, setCookie] = useCookies(['refreshToken']);
 
     useEffect(() => {
@@ -216,7 +225,12 @@ const LoginTab = () => {
     }
 
     const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setOpen(false);
+        setEmail('');
+        setErr([]);
+        setErrMsgReset('');
+    }
 
     const endAdornment=
     <InputAdornment position="end">
@@ -232,6 +246,7 @@ const LoginTab = () => {
 
     const handleSubmitLogin = async (e) => {
         e.preventDefault();
+        const { enqueueSnackbar } = await import('notistack');
 
         try {
             const response = await axios.post(LOGIN_URL,
@@ -259,7 +274,6 @@ const LoginTab = () => {
                 setCookie('refreshToken', refreshToken, {path: '/', expires});
             }
 
-            const { enqueueSnackbar } = await import('notistack');
             enqueueSnackbar('Đăng nhập thành công', { variant: 'success' });
             //Về trang vừa rồi
             navigate(from, { replace: true });
@@ -275,27 +289,39 @@ const LoginTab = () => {
                 setErrMsgLogin('Đăng nhập thất bại');
             }
             errRef.current.focus();
+            enqueueSnackbar('Đăng nhập thất bại', { variant: 'error' });
         }
     }
 
     const handleForgotPassword = async (e) => {
         e.preventDefault();
 
+        setPending(true);
+        setOpen(false);
         try {
             const response = await axios.post(FORGOT_URL + email);
 
+            setEmail('');
+            setErr([]);
+            setErrMsgReset('');
             const { enqueueSnackbar } = await import('notistack');
-            enqueueSnackbar('Đã gửi mật khẩu về email!', { variant: 'success' });
+            enqueueSnackbar('Đã gửi yêu cầu về email!', { variant: 'success' });
+            setPending(false);
+            setOpen(true);
         } catch (err) {
+            console.log(err);
+            setErr(err);
             if (!err?.response) {
-                setErrMsgLogin('Server không phản hồi');
+                setErrMsgReset('Server không phản hồi');
             } else if (err.response?.status === 404) {
-                setErrMsgLogin('Sai tên tài khoản hoặc mật khẩu!');
+                setErrMsgReset('Tài khoản với email không tồn tại!');
             } else if (err.response?.status === 400) {
-                setErrMsgLogin('Sai định dạng thông tin!');
+                setErrMsgReset('Sai định dạng thông tin!');
             } else {
-                setErrMsgLogin('Khôi phục mật khẩu thất bại');
+                setErrMsgReset('Gửi yêu cầu thất bại');
             }
+            setPending(false);
+            setOpen(true);
         }
     }
 
@@ -321,7 +347,6 @@ const LoginTab = () => {
                     />
                     <CustomInput label='Mật khẩu' 
                         type={showPassword ? 'text' : 'password'}
-                        id="Pass"
                         onChange={(e) => setPassword(e.target.value)}
                         value={password}
                         size="small"
@@ -355,26 +380,27 @@ const LoginTab = () => {
             scroll="body"
             onClose={handleClose}>
                 <DialogTitle sx={{display: 'flex', alignItems: 'center'}}>Nhập email khôi phục mật khẩu</DialogTitle>
-                <DialogContent sx={{display: 'flex', justifyContent: 'flex-end'}}>
+                <DialogContent sx={{display: 'flex', justifyContent: 'flex-end', flexDirection: 'column'}}>
+                    <Instruction display={errMsgReset ? "block" : "none"} aria-live="assertive">{errMsgReset}</Instruction>
                     <CustomInput placeholder='Nhập email tài khoản' 
                         id="email"
                         onChange={(e) => setEmail(e.target.value)}
                         value={email}
                         fullWidth
-                        error = {email && !validEmail}
-                        helperText= {email && !validEmail ? "Email không hợp lệ!" : ""}
+                        error = {(email && !validEmail) || err?.response?.data?.errors?.email}
+                        helperText= {email && !validEmail ? "Email không hợp lệ!" : err?.response?.data?.errors?.email}
                         size="small"
                     />
                 </DialogContent>
                 <DialogActions sx={{width: '90%'}}>
-                    <Button onClick={handleClose}><CheckIcon sx={{marginRight: '5px'}}/>Gửi</Button>
+                    <Button onClick={handleForgotPassword}><CheckIcon sx={{marginRight: '5px'}}/>Gửi</Button>
                 </DialogActions>
             </CustomDialog>
         </Left>
     )
 }
 
-const RegisterTab = () => {
+const RegisterTab = ({setPending}) => {
     const userRef = useRef();
     const errRef = useRef();
 
@@ -400,6 +426,7 @@ const RegisterTab = () => {
 
     //Error and success message
     const [errMsg, setErrMsg] = useState('');
+    const [err, setErr] = useState([]);
 
     const handleClickShowRegPassword = () => setShowRegPassword((show) => !show);
 
@@ -460,6 +487,8 @@ const RegisterTab = () => {
             setErrMsg("Sai định dạng thông tin!");
             return;
         }
+        const { enqueueSnackbar } = await import('notistack');
+        setPending(true);
 
         try {
             const response = await axios.post(REGISTER_URL,
@@ -470,16 +499,18 @@ const RegisterTab = () => {
                 }
             );
             
-            const { enqueueSnackbar } = await import('notistack');
-            
             setUser('');
             setPwd('');
             setMatchPwd('');
             setEmail('');
+            setErr([]);
+            setErrMsg('');
             enqueueSnackbar('Đăng ký thành công!', { variant: 'success' });
+            setPending(false);
         } catch (err) {
 
             console.log(err);
+            setErr(err);
             if (!err?.response) {
                 setErrMsg('Server không phản hồi');
             } else if (err.response?.status === 409) {
@@ -490,6 +521,8 @@ const RegisterTab = () => {
                 setErrMsg('Đăng ký thất bại!')
             }
             errRef.current.focus();
+            enqueueSnackbar('Đăng ký thất bại!', { variant: 'error' });
+            setPending(false);
         }
     }
 
@@ -513,8 +546,8 @@ const RegisterTab = () => {
                         aria-describedby="uidnote"
                         onFocus={() => setUserFocus(true)}
                         onBlur={() => setUserFocus(false)}
-                        error = {userFocus && user && !validName}
-                        helperText= {userFocus && user && !validName ? "4 đến 24 kí tự." : ""}
+                        error = {(userFocus && user && !validName) || err?.response?.data?.errors?.userName}
+                        helperText= {userFocus && user && !validName ? "4 đến 24 kí tự." : err?.response?.data?.errors?.userName}
                         size="small"
                         margin="dense"
                     />
@@ -529,22 +562,22 @@ const RegisterTab = () => {
                         aria-describedby="uidnote"
                         onFocus={() => setEmailFocus(true)}
                         onBlur={() => setEmailFocus(false)}
-                        error = {emailFocus && email && !validEmail}
-                        helperText= {emailFocus && email && !validEmail ? "Sai định dạng email." : ""}
+                        error = {(emailFocus && email && !validEmail) || err?.response?.data?.errors?.email}
+                        helperText= {emailFocus && email && !validEmail ? "Sai định dạng email." : err?.response?.data?.errors?.email}
                         size="small"
                         margin="dense"
                     />
                     <CustomInput label='Mật khẩu' 
                         type={showRegPassword ? 'text' : 'password'}
-                        id="regPass"
                         onChange={(e) => setPwd(e.target.value)}
                         value={pwd}
                         aria-invalid={validPwd ? "false" : "true"}
                         aria-describedby="pwdnote"
                         onFocus={() => setPwdFocus(true)}
                         onBlur={() => setPwdFocus(false)}
-                        error = {pwd && !validPwd}
-                        helperText= {pwdFocus && pwd && !validPwd ? "8 đến 24 kí tự. Phải bao gồm chữ in hoa và ký tự đặc biệt." : ""}
+                        error = {(pwd && !validPwd) || err?.response?.data?.errors?.pass}
+                        helperText= {pwdFocus && pwd && !validPwd ? "8 đến 24 kí tự. Phải bao gồm chữ in hoa và ký tự đặc biệt." 
+                        : err?.response?.data?.errors?.pass}
                         size="small"
                         margin="dense"
                         InputProps={{
@@ -553,13 +586,13 @@ const RegisterTab = () => {
                     />
                     <CustomInput label='Nhập lại mật khẩu' 
                         type={showRegPassword ? 'text' : 'password'}
-                        id="regConfirmPass"
                         onChange={(e) => setMatchPwd(e.target.value)}
                         value={matchPwd}
                         aria-invalid={validMatch ? "false" : "true"}
                         aria-describedby="confirmnote"
-                        error = {matchPwd && !validMatch}
-                        helperText= {matchPwd && !validMatch ? "Không trùng mật khẩu." : ""}
+                        error = {(matchPwd && !validMatch) || err?.response?.data?.errors?.pass}
+                        helperText= {matchPwd && !validMatch ? "Không trùng mật khẩu." 
+                        : err?.response?.data?.errors?.pass}
                         size="small"
                         margin="dense"
                         InputProps={{
@@ -576,19 +609,31 @@ const RegisterTab = () => {
 }
 
 function SignPage() {
+    const [pending, setPending] = useState(false);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        document.title = `RING! - Chào mừng`;
+    }, [])
     
   return (
     <Container>
         <SimpleNavbar/>
+        {pending ?
+        <Suspense fallBack={<></>}>
+            <Pending/>
+        </Suspense>
+        : null
+        }
         <Wrapper>
-            <LoginTab/>
-            <div style={{display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            margin: '0 80px'}}>
-                <OrBox> HOẶC</OrBox>
-            </div>
-            <RegisterTab/>
+            <LoginTab setPending={setPending}/>
+                <div style={{display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                margin: '0 80px'}}>
+                    <OrBox> HOẶC</OrBox>
+                </div>
+            <RegisterTab setPending={setPending}/>
         </Wrapper>
     </Container>
   )

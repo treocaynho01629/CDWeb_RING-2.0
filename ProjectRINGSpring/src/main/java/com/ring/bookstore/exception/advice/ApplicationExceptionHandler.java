@@ -28,30 +28,30 @@ public class ApplicationExceptionHandler{
         return new ExceptionMessage(400, "Invalid argument", errorMap);
     }
 
-    @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(RuntimeException.class)
     public ExceptionMessage processRuntimeException(RuntimeException e) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("errorMessage", e.getMessage());
         return new ExceptionMessage(500, "An internal server error occurred.", errorMap);
     }
 
-    @ExceptionHandler(HttpResponseException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(HttpResponseException.class)
     public ExceptionMessage processSocialException(HttpResponseException e) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("errorMessage", e.getMessage());
         return new ExceptionMessage(e.getStatus().value(), e.getStatus().getReasonPhrase(), errorMap);
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ResourceNotFoundException.class)
     public ExceptionMessage processResourceNotFoundException(ResourceNotFoundException e) {
         return e.getExceptionMessage();
     }
     
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
     @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ExceptionMessage handleMaxSizeException(MaxUploadSizeExceededException e) {
     	Map<String, String> errorMap = new HashMap<>();
         errorMap.put("errorMessage", e.getMessage());

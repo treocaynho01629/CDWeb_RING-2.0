@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
@@ -310,6 +310,11 @@ const Cart = () => {
     const { enqueueSnackbar } = useSnackbar();
     const { auth } = useAuth();
 
+    useEffect(() => { 
+        document.title = `RING! - Giỏ hàng`;
+        window.scrollTo(0, 0); 
+    }, [])
+
     //Tính tổng tiền
     const totalPrice = () =>{
         let total = 0;
@@ -488,7 +493,8 @@ const Cart = () => {
                                                         height={90}
                                                         width={90} 
                                                         style={{
-                                                            border: '0.5px solid lightgray'
+                                                            border: '0.5px solid lightgray',
+                                                            objectFit: 'contain'
                                                         }}
                                                     /> 
                                                     <ItemSummary>

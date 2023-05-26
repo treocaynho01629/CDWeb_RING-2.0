@@ -279,6 +279,7 @@ const ProductDetail = () => {
         if (!loading) {
             window.scrollTo(0, 0);
             handleTabChange("1");
+            document.title = `RING! - ${book.title}`;
         }
     }, [loading]);
 

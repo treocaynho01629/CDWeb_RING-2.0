@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
@@ -42,6 +42,11 @@ const Dashboard = () => {
   const [receiptCount, setReceiptCount] = useState(0);
   const { auth } = useAuth();
   const [admin, setAdmin] = useState((auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.title = `RING! - Dashboard`;
+  }, [])
 
   return (
     <>

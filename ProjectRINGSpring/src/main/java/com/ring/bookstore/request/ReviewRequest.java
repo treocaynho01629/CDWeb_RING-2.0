@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewRequest {
+public class ReviewRequest { //Để đánh giá
 	
 	@NotBlank(message = "Nội dung đánh giá không bỏ trống!")
 	private String content;

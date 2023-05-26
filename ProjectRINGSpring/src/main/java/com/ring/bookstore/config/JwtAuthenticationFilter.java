@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter{
+public class JwtAuthenticationFilter extends OncePerRequestFilter{ //Bộ xác thực sử dụng JWT
 	
 	private final JwtService jwtService;
 	private final UserDetailsService userDetailsService;
@@ -33,11 +33,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 			@NonNull FilterChain filterChain)
 			throws ServletException, IOException {
 		
+		//Lấy mã authentication từ HttpRequest
 		final String authHeader = request.getHeader("Authorization");
 		final String jwt;
 		final String userName;
 		
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) { //Trống || không hợp lệ >> huỷ Request
 			filterChain.doFilter(request, response);
 			return;
 		}
@@ -45,9 +46,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 		jwt = authHeader.substring(7); //Sau "Bearer "
 		
 		try {
-			userName = jwtService.extractUsername(jwt);
+			userName = jwtService.extractUsername(jwt); //Lấy tên người dùng từ JWT
 		} catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); //Không có >> báo lỗi xác thực
             response.getWriter().write(e.getMessage());
             response.getWriter().flush();
             return;
@@ -56,10 +57,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 		if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) { //Check người dùng tồn tại, và người dùng đã được cấp quyền chưa
 			UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
 			
-            
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+            if (jwtService.isTokenValid(jwt, userDetails)) { //Nếu JWT hợp lệ
             	
-            	//Tạo quyền
+            	//Tạo quyền truy cập
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
@@ -70,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
                 
-                //Gán quyền vào context holder
+                //Gán quyền vào Security Context Holder của Spring
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
 		}

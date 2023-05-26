@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookRequest {
+public class BookRequest { //Để tạo và cập nhật Sách
 	
 	@NotNull(message = "Giá không được bỏ trống!")
 	@Min(value = 1000, message = "Giá từ 1000đ")

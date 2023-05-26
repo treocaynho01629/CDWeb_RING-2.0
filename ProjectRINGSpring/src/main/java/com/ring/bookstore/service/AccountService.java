@@ -21,6 +21,8 @@ public interface AccountService {
 	Account saveAccount(AccountRequest request);
 	Account updateAccount(AccountRequest request, Integer id);
 	void deleteAccount(Integer id);
+	void deleteAccounts(List<Integer> ids);
+	void deleteAllAccounts();
 	ProfileDTO getProfile(Account user);
 	AccountProfile updateProfile(ProfileRequest request, Account user);
 	Account changePassword(ChangePassRequest request, Account user);
