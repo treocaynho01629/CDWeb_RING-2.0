@@ -553,7 +553,7 @@ const RegisterTab = ({setPending}) => {
                     />
                     <CustomInput label='Địa chỉ email' 
                         type="email"
-                        id="regEmail"
+                        id="email"
                         ref={userRef}
                         autoComplete="off"
                         onChange={(e) => setEmail(e.target.value)}
