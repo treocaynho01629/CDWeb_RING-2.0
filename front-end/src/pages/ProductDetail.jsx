@@ -291,7 +291,7 @@ const ProductDetail = () => {
         setAmountIndex(prev => (prev + n < 1 ? 1 : prev + n));
     }
 
-    //Add to cart
+    //Add to cart (Thêm sản phẩm vào giỏ)
     const handleAddToCart = async (book) => {
         const { addToCart } = await import('../redux/cartReducer');
         const { enqueueSnackbar } = await import('notistack');

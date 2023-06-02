@@ -96,7 +96,7 @@ public class AuthenticationService { // Dịch vụ Xác thực
 
 		Set<Role> roles = user.getRoles();
 
-		// Kiểm tra JWT có hợp lệ
+		// Kiểm tra có hợp lệ
 		try {
 			Authentication authentication = authenticationManager
 					.authenticate(new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPass()));
@@ -147,13 +147,16 @@ public class AuthenticationService { // Dịch vụ Xác thực
 	//Quên mật khẩu
 	public void forgotPassword(String email) {
 
+		//Lấy danh sách các tài khoản có email trên
 		List<Account> accounts = accountRepo.findByEmail(email);
+		//Nếu trống >> báo lỗi ko có
 		if (accounts.size() == 0) throw new ResourceNotFoundException("User with this email does not exist!");
-		String resetContent = "";
+		String resetContent = ""; //Nội dung gửi email
 
+		//Lặp qua các tài khoản
 		for (Account a : accounts) {
-			String token = updateResetToken(a);
-			String url = "http://localhost:5173/reset-password?token=" + token;
+			String token = updateResetToken(a); //Tạo token reset mới
+			String url = "http://localhost:5173/reset-password?token=" + token; //Tạo url đính kèm vs nội dung mail
 			
 			//Thêm token vào nội dung email
 			resetContent += 

@@ -6,7 +6,7 @@ An E-Commerce Web App using Spring Boot, ViteJS.
 - Right click on `Database` folder
 - Choose `Restore Database`
 - Click on `Device` tick
-- Find the Initialize database file `RINGSpringBoot.bak` and click `Restore`
+- Find the Initialize database files `RINGSpringBoot_1.bak` and `RINGSpringBoot_2.bak` then click `Restore`
 
 #### Change application properties
 - Change your Database path in the `application.properties` file
