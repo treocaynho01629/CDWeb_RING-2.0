@@ -94,7 +94,7 @@ public class JwtService {
 	private Claims extractAllClaims(String token) {
 		return Jwts
 				.parserBuilder()
-				.setSigningKey(getSignInKey())
+				.setSigningKey(getSignInKey()) //Kiểm tra token sử dụng signinkey
 				.build()
 				.parseClaimsJws(token)
 				.getBody();
