@@ -617,8 +617,8 @@ const Navbar = (props) => {
                         <Grid container>
                             <Grid item xs={12} md={6}>
                                 <ContactContainer>
-                                    <Contact><PhoneIcon sx={{fontSize: 18, marginRight: 1}}/>+8419130018</Contact>
-                                    <Contact><MailIcon sx={{fontSize: 18, marginRight: 1}}/>19130248@hcmuaf.edu.vn</Contact>
+                                    <Contact><PhoneIcon sx={{fontSize: 18, marginRight: 1}}/>+8419130248</Contact>
+                                    <Contact><MailIcon sx={{fontSize: 18, marginRight: 1}}/>haductrong01629@gmail.com</Contact>
                                 </ContactContainer>
                             </Grid>
                             <Grid item xs={12} md={6}>
