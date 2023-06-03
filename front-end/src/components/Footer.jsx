@@ -232,7 +232,7 @@ const Footer = () => {
         </Wrapper>
         <BotFooter>
             <BotText>Giấy chứng nhận Đăng ý kính doanh do NLU - TP.HCM cấp ngày 01/01/2022.</BotText>
-            <Group>Nhóm 19130248 - 19130018</Group>
+            <Group>DoraZ</Group>
         </BotFooter>
     </Container>
   )
