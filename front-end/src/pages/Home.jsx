@@ -173,7 +173,7 @@ const Home = () => {
   useEffect(()=>{
     if (!loadingCate){
       let randoms = (cates?.sort(() => 0.5 - Math.random()).slice(0, 4));
-      setCurrCate(randoms[0]?.id);
+      setCurrCate(randoms ? randoms[0]?.id : null);
       setRandomCates(randoms);
     }
   }, [loadingCate]);
