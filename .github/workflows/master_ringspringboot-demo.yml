@@ -49,5 +49,5 @@ jobs:
         with:
           app-name: 'RINGSpringBoot-demo'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C9229FECE42E4A4A833C52F8F115D572 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AD7CF8EFD0C8434BBA2611A3F74CBF26 }}
           package: '*.jar'
