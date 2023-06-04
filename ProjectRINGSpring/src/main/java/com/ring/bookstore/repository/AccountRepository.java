@@ -15,6 +15,8 @@ import com.ring.bookstore.response.IChartResponse;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer>{
 	
+	boolean existsByUserName(String userName); //Kiểm tra Người dùng theo Tên đăng nhập
+	
 	Optional<Account> findByUserName(String userName); //Tìm Người dùng theo Tên đăng nhập
 	
 	List<Account> findByEmail(String email); //Tìm Người dùng theo Email

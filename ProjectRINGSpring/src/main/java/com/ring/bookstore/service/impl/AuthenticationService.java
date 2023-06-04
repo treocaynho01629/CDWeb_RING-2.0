@@ -53,8 +53,8 @@ public class AuthenticationService { // Dịch vụ Xác thực
 	// Đăng ký
 	public AuthenticationResponse register(RegisterRequest request) {
 
-		// Kiểm tra Người dùng vs Username và Email đã tồn tại chưa
-		if (!accountRepo.findByUserName(request.getUserName()).isEmpty()) {
+		// Kiểm tra Người dùng vs Username đã tồn tại
+		if (accountRepo.existsByUserName(request.getUserName())) {
 			throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Người dùng với tên đăng nhập này đã tồn tại!");
 		}
 
