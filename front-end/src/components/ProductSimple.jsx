@@ -7,7 +7,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 //#region styled
 const Container = styled.div`
-    min-width: 210px;
+    min-width: 170px;
     max-width: 210px;
     display: flex;
     flex-direction: column;

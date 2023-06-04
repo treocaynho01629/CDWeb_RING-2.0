@@ -48,8 +48,7 @@ const Wrapper = styled.div`
 const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
     '& .MuiDialog-paper': {
       borderRadius: 0,
-      minWidth: '450px',
-      padding: '20px 15px',
+      width: '90%',
     },
     '& .MuiDialogContent-root': {
       padding: theme.spacing(2),
@@ -108,7 +107,6 @@ const ItemText = styled.h3`
 `
 
 const MiniProfile = styled.div`
-    max-width: 300px;
 `
 
 const listStyle = {
@@ -499,8 +497,10 @@ const Review = ({review}) => {
       <div>
         <Profiler>
           <Box sx={{display: 'flex', alignItems: 'center'}}>
+            <Box display={{xs: 'none', md: 'flex'}}>
               <RatingInfo><Avatar sx={{width: '20px', height: '20px', marginRight: '5px'}}>A</Avatar>{review.userName}</RatingInfo>
               <RatingInfo><AccessTimeIcon sx={{fontSize: 18, marginRight: '5px', color: '#63e399'}}/>{date.getHours() + ":" + date.getMinutes()}</RatingInfo>
+            </Box>
               <RatingInfo><CalendarMonthIcon sx={{fontSize: 18, marginRight: '5px', color: '#63e399'}}/>{date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear()}</RatingInfo>
           </Box>
           <Box sx={{display: 'flex', alignItems: 'center'}}>
@@ -724,14 +724,18 @@ const Profile = () => {
         </Suspense>
         : null
         }
-        <Grid container spacing={5}>
-            <Grid item xs={12} md={3} sx={{display: 'flex', justifyContent: 'center'}}>
+        <Grid container spacing={2}>
+            <Grid item xs={12} md={3.5} lg={3} sx={{display: 'flex', justifyContent: 'center'}}>
                 <ListContainer>
                     <MiniProfile>
-                        <div style={{display: 'flex', alignItems: 'center'}}>
-                            <Avatar sx={{ width: 50, height: 50, marginRight: 2}}/><h3>{data?.userName}</h3>
-                        </div>
-                        <ChangeText onClick={() => navigate('/profile/detail')}><EditIcon/>Sửa hồ sơ</ChangeText>
+                        <Grid container spacing={1}>
+                            <Grid item xs={6} md={12} sx={{display: 'flex', alignItems: 'center'}}>
+                                <Avatar sx={{ width: 50, height: 50, marginRight: 2}}/><h3>{data?.userName}</h3>
+                            </Grid>
+                            <Grid item xs={6} md={12} sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                <ChangeText onClick={() => navigate('/profile/detail')}><EditIcon/>Sửa hồ sơ</ChangeText>
+                            </Grid>
+                        </Grid>
                     </MiniProfile>
                     <Divider sx={{margin: '20px 0px'}}/>
                     <List
@@ -765,7 +769,7 @@ const Profile = () => {
                     </List>
                 </ListContainer>
             </Grid>
-            <Grid item xs={12} md={9}>
+            <Grid item xs={12} md={8.5} lg={9}>
                 <TabContext value={tab}>
                     <TabPanel value="detail">
                     <ContentContainer>
@@ -773,109 +777,111 @@ const Profile = () => {
                         {loading ? 
                         <CustomLinearProgress/>
                         :    
-                        <Grid container spacing={3} sx={{paddingBottom: '100px'}}>
-                            <Grid item xs={4} lg={3}>
-                                <Stack spacing={0}>
-                                    <InfoStack><InfoText>Tên đăng nhập: </InfoText></InfoStack>
-                                    <InfoStack><InfoText>Email: </InfoText></InfoStack>
-                                    <InfoStack><InfoText>Tên: </InfoText></InfoStack>
-                                    <InfoStack><InfoText>Số điện thoại: </InfoText></InfoStack>
-                                    <InfoStack><InfoText>Ngày sinh: </InfoText></InfoStack>
-                                    <InfoStack><InfoText>Địa chỉ: </InfoText></InfoStack>
-                                    <InfoStack><InfoText>Giới tính: </InfoText></InfoStack>
-                                    <InfoStack><Button onClick={handleChangeInfo}>Lưu thông tin</Button></InfoStack>
-                                </Stack>
-                            </Grid>
-                            <Grid item xs={8} lg={6}>
-                                <Stack spacing={0}>
-                                    <InfoStack><InfoText>{data?.userName} </InfoText></InfoStack>
-                                    <InfoStack><InfoText>{data?.email} </InfoText></InfoStack>
-                                    <InfoStack>
-                                        <CustomInput
-                                        type="text"
-                                        id="name"
-                                        onChange={(e) => setName(e.target.value)}
-                                        value={name}
-                                        error = {err?.response?.data?.errors?.firstName}
-                                        helperText= {err?.response?.data?.errors?.firstName}
-                                        size="small"
-                                        sx={{width: '80%'}}
-                                        />
-                                    </InfoStack>
-                                    <InfoStack>
-                                        <CustomInput
-                                        id="phone"
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        value={phone}
-                                        error={(phone && !validPhone) || err?.response?.data?.errors?.phone}
-                                        helperText={(phone && !validPhone) ? "Sai định dạng số điện thoại!" : err?.response?.data?.errors?.phone}
-                                        size="small"
-                                        sx={{width: '80%'}}
-                                        />
-                                    </InfoStack>
-                                    <InfoStack>
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <FormControl margin="dense" fullWidth>
-                                            <CustomDatePicker
-                                            value={dob}
-                                            className="DatePicker"
-                                            onChange={(newValue) => setDob(newValue)}
+                        <Box sx={{paddingBottom: '100px'}}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={4} lg={3}>
+                                    <Stack spacing={0}>
+                                        <InfoStack><InfoText>Tên đăng nhập: </InfoText></InfoStack>
+                                        <InfoStack><InfoText>Email: </InfoText></InfoStack>
+                                        <InfoStack><InfoText>Tên: </InfoText></InfoStack>
+                                        <InfoStack><InfoText>Số điện thoại: </InfoText></InfoStack>
+                                        <InfoStack><InfoText>Ngày sinh: </InfoText></InfoStack>
+                                        <InfoStack><InfoText>Địa chỉ: </InfoText></InfoStack>
+                                        <InfoStack><InfoText>Giới tính: </InfoText></InfoStack>
+                                    </Stack>
+                                </Grid>
+                                <Grid item xs={8} lg={6}>
+                                    <Stack spacing={0}>
+                                        <InfoStack><InfoText>{data?.userName} </InfoText></InfoStack>
+                                        <InfoStack><InfoText>{data?.email} </InfoText></InfoStack>
+                                        <InfoStack>
+                                            <CustomInput
+                                            type="text"
+                                            id="name"
+                                            onChange={(e) => setName(e.target.value)}
+                                            value={name}
+                                            error = {err?.response?.data?.errors?.firstName}
+                                            helperText= {err?.response?.data?.errors?.firstName}
                                             size="small"
-                                            slotProps={{
-                                                textField: {
-                                                size: "small",
-                                                error: err?.response?.data?.errors?.dob,
-                                                helperText: err?.response?.data?.errors?.dob,
-                                                },
-                                            }}
+                                            sx={{width: '80%'}}
                                             />
-                                        </FormControl>
-                                        </LocalizationProvider>
-                                    </InfoStack>
-                                    <InfoStack>
-                                        <CustomInput
-                                        type="text"
-                                        id="address"
-                                        onChange={(e) => setAddress(e.target.value)}
-                                        value={address}
-                                        error = {err?.response?.data?.errors?.address}
-                                        helperText= {err?.response?.data?.errors?.address}
-                                        size="small"
-                                        sx={{width: '80%'}}
-                                        />
-                                    </InfoStack>
-                                    <InfoStack>
-                                        <RadioGroup spacing={1} row value={gender} onChange={(e) => setGender(e.target.value)}>
-                                            <FormControlLabel value="Nam" control={<Radio  sx={{
-                                                '&.Mui-checked': {
-                                                color: '#63e399',
-                                            }}}/>} 
-                                            label="Nam"/>
-                                            <FormControlLabel value="Nữ" control={<Radio  sx={{
-                                                '&.Mui-checked': {
-                                                color: '#63e399',
-                                            }}}/>} 
-                                            label="Nữ"/>
-                                            <FormControlLabel value="" control={<Radio  sx={{
-                                                '&.Mui-checked': {
-                                                color: '#63e399',
-                                            }}}/>} 
-                                            label="Không"/>
-                                        </RadioGroup>
-                                    </InfoStack>
-                                </Stack>
+                                        </InfoStack>
+                                        <InfoStack>
+                                            <CustomInput
+                                            id="phone"
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            value={phone}
+                                            error={(phone && !validPhone) || err?.response?.data?.errors?.phone}
+                                            helperText={(phone && !validPhone) ? "Sai định dạng số điện thoại!" : err?.response?.data?.errors?.phone}
+                                            size="small"
+                                            sx={{width: '80%'}}
+                                            />
+                                        </InfoStack>
+                                        <InfoStack>
+                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <FormControl margin="dense" fullWidth>
+                                                <CustomDatePicker
+                                                value={dob}
+                                                className="DatePicker"
+                                                onChange={(newValue) => setDob(newValue)}
+                                                size="small"
+                                                slotProps={{
+                                                    textField: {
+                                                    size: "small",
+                                                    error: err?.response?.data?.errors?.dob,
+                                                    helperText: err?.response?.data?.errors?.dob,
+                                                    },
+                                                }}
+                                                />
+                                            </FormControl>
+                                            </LocalizationProvider>
+                                        </InfoStack>
+                                        <InfoStack>
+                                            <CustomInput
+                                            type="text"
+                                            id="address"
+                                            onChange={(e) => setAddress(e.target.value)}
+                                            value={address}
+                                            error = {err?.response?.data?.errors?.address}
+                                            helperText= {err?.response?.data?.errors?.address}
+                                            size="small"
+                                            sx={{width: '80%'}}
+                                            />
+                                        </InfoStack>
+                                        <InfoStack>
+                                            <RadioGroup spacing={1} row value={gender} onChange={(e) => setGender(e.target.value)}>
+                                                <FormControlLabel value="Nam" control={<Radio  sx={{
+                                                    '&.Mui-checked': {
+                                                    color: '#63e399',
+                                                }}}/>} 
+                                                label="Nam"/>
+                                                <FormControlLabel value="Nữ" control={<Radio  sx={{
+                                                    '&.Mui-checked': {
+                                                    color: '#63e399',
+                                                }}}/>} 
+                                                label="Nữ"/>
+                                                <FormControlLabel value="" control={<Radio  sx={{
+                                                    '&.Mui-checked': {
+                                                    color: '#63e399',
+                                                }}}/>} 
+                                                label="Không"/>
+                                            </RadioGroup>
+                                        </InfoStack>
+                                    </Stack>
+                                </Grid>
+                                <Grid item xs={12} lg={3} display={{xs: 'none', lg: 'flex'}} sx={{justifyContent: 'center'}}>
+                                    <Avatar sx={{height: 150, width: 150}}/>
+                                </Grid>
                             </Grid>
-                            <Grid item xs={12} lg={3} sx={{display: 'flex', justifyContent: 'center'}}>
-                                <Avatar sx={{height: 150, width: 150}}/>
-                            </Grid>
-                        </Grid>
+                            <InfoStack><Button onClick={handleChangeInfo}>Lưu thông tin</Button></InfoStack>
+                        </Box>
                         }
                     </ContentContainer>
                     <CustomDialog open={openDialog} 
                     scroll="body"
                     onClose={handleCloseDialog}>
-                        <DialogTitle sx={{display: 'flex', alignItems: 'center'}}>Thay đổi mật khẩu</DialogTitle>
-                        <DialogContent sx={{marginTop: 0}}>
+                        <DialogTitle sx={{display: 'flex', alignItems: 'center', marginTop: '10px'}}>Thay đổi mật khẩu</DialogTitle>
+                        <DialogContent sx={{marginTop: 0, marginX: '10px'}}>
                             <Stack spacing={2} direction="column">
                                 <Instruction display={otherErrMsg ? "block" : "none"} aria-live="assertive">{otherErrMsg}</Instruction>
                                 <CustomInput label='Nhập mật khẩu hiện tại' 
@@ -916,7 +922,7 @@ const Profile = () => {
                                 />
                             </Stack>
                         </DialogContent>
-                        <DialogActions>
+                        <DialogActions sx={{marginBottom: '20px'}}>
                             <Button onClick={handleChangePassword}><CheckIcon sx={{marginRight: '10px'}}/>Xác nhận</Button>
                             <Button style={{backgroundColor: '#e66161'}} onClick={handleCloseDialog}><CloseIcon sx={{marginRight: '10px'}}/>Huỷ</Button>
                         </DialogActions>

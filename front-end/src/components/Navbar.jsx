@@ -181,8 +181,19 @@ const Logo = styled.h2`
     cursor: pointer;
     align-items: center;
     display: flex;
-    flex-wrap: wrap;
     margin: 5px 0px 5px 15px;
+    width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: all 1.75s ease;
+
+    &.active {
+        width: 110px;
+    }
+
+    @media (min-width: 600px) {
+        width: 251px;
+    }
 `
 
 const ImageLogo = styled.img`
@@ -333,6 +344,7 @@ const Navbar = (props) => {
     const products = useSelector(state => state.cart.products); //Lấy products trong giỏ từ redux
     const [openDrawer, setOpen] = useState(false);
     const [hover, setHover] = useState(false);
+    const [focus, setFocus] = useState(false);
     const [searchField, setSearchField] = useState('');
     const { auth } = useAuth();
     const navigate = useNavigate();
@@ -646,7 +658,7 @@ const Navbar = (props) => {
                                         {list()}
                                     </Drawer>
                                     <Link to={`/`}>
-                                    <Logo>
+                                    <Logo className={searchField || hover || focus ? 'active' : 'deactive'}>
                                         <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORE</p>
                                     </Logo>
                                     </Link>
@@ -662,12 +674,14 @@ const Navbar = (props) => {
                                     <div style={{display: 'flex', alignItems: 'center', marginLeft: -40}}>
                                         <Collapse orientation="horizontal" 
                                         timeout={700}
-                                        in={searchField || hover} 
+                                        in={searchField || hover || focus} 
                                         collapsedSize={102}>
                                             <form onSubmit={handleSubmitSearch}>
                                                 <SearchInput placeholder='Tìm kiếm... '
                                                 onMouseEnter={(e) => setHover(true)}
                                                 onMouseLeave={(e) => setHover(false)}
+                                                onFocus={() => setFocus(true)}
+                                                onBlur={() => setFocus(false)}
                                                 onChange={(e) => setSearchField(e.target.value)}
                                                 value={searchField}
                                                 id="search"

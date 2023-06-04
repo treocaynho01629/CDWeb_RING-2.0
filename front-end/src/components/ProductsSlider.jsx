@@ -31,7 +31,13 @@ const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
 const ProductsSlider = ({loading, booksList}) => {
 
   let responsive = 
-  {768:{
+  {0:{
+    items:2
+  },
+  600:{
+    items:3
+  },
+  768:{
       items:3
   },
   992:{
