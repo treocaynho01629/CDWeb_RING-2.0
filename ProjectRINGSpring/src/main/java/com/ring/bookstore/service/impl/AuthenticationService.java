@@ -2,6 +2,7 @@ package com.ring.bookstore.service.impl;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,6 +50,9 @@ public class AuthenticationService { // Dịch vụ Xác thực
 	private final EmailService emailService;
 	private final JwtService jwtService;
 	private static final long EXPIRE_TOKEN_AFTER_MINUTES = 30;
+	
+	@Value("${ring.fronturl}")
+	private String frontUrl;
 	
 	// Đăng ký
 	public AuthenticationResponse register(RegisterRequest request) {
@@ -157,7 +161,7 @@ public class AuthenticationService { // Dịch vụ Xác thực
 		//Lặp qua các tài khoản
 		for (Account a : accounts) {
 			String token = updateResetToken(a); //Tạo token reset mới
-			String url = "http://localhost:5173/reset-password?token=" + token; //Tạo url đính kèm vs nội dung mail
+			String url = frontUrl + "/reset-password?token=" + token; //Tạo url đính kèm vs nội dung mail
 			
 			//Thêm token vào nội dung email
 			resetContent += 

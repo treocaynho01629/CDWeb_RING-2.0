@@ -21,8 +21,12 @@ const Container = styled.div`
 const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
     '& .MuiDialog-paper': {
       borderRadius: 0,
-      width: '350px',
-      padding: '15px 10px 15px 20px',
+      width: '100%',
+      padding: 0,
+      ["@media (min-width:450px)"]: { 
+        width: '350px', 
+        padding: '15px 10px 15px 20px', 
+    }
     },
     '& .MuiDialogContent-root': {
       padding: theme.spacing(2),
@@ -44,10 +48,10 @@ const Wrapper = styled.div`
 
     @media (min-width: 768px) {
         width: 750px;
-        flex-direction: row;
     }
     @media (min-width: 992px) {
         width: 970px;
+        flex-direction: row;
     }
     @media (min-width: 1200px) {
         width: 1170px;
@@ -80,6 +84,49 @@ const CustomInput = muiStyled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
         borderRadius: 0,
         width: '300px',
+    },
+    '& label.Mui-focused': {
+        color: '#b4a0a8'
+    },
+    '& .MuiInput-underline:after': {
+        borderBottomColor: '#B2BAC2',
+    },
+    '& .MuiOutlinedInput-root': {
+    borderRadius: 0,
+        '& fieldset': {
+            borderRadius: 0,
+            borderColor: '#E0E3E7',
+        },
+        '&:hover fieldset': {
+            borderRadius: 0,
+            borderColor: '#B2BAC2',
+        },
+        '&.Mui-focused fieldset': {
+            borderRadius: 0,
+            borderColor: '#6F7E8C',
+        },
+    },
+    '& input:valid + fieldset': {
+        borderColor: 'lightgray',
+        borderRadius: 0,
+        borderWidth: 1,
+    },
+    '& input:invalid + fieldset': {
+        borderColor: '#e66161',
+        borderRadius: 0,
+        borderWidth: 1,
+    },
+    '& input:valid:focus + fieldset': {
+        borderColor: '#63e399',
+        borderLeftWidth: 4,
+        borderRadius: 0,
+        padding: '4px !important', 
+    },
+}));
+
+const CustomEmailInput = muiStyled(TextField)(({ theme }) => ({
+    '& .MuiInputBase-root': {
+        borderRadius: 0,
     },
     '& label.Mui-focused': {
         color: '#b4a0a8'
@@ -382,7 +429,7 @@ const LoginTab = ({setPending}) => {
                 <DialogTitle sx={{display: 'flex', alignItems: 'center'}}>Nhập email khôi phục mật khẩu</DialogTitle>
                 <DialogContent sx={{display: 'flex', justifyContent: 'flex-end', flexDirection: 'column'}}>
                     <Instruction display={errMsgReset ? "block" : "none"} aria-live="assertive">{errMsgReset}</Instruction>
-                    <CustomInput placeholder='Nhập email tài khoản' 
+                    <CustomEmailInput placeholder='Nhập email tài khoản' 
                         id="email"
                         onChange={(e) => setEmail(e.target.value)}
                         value={email}
@@ -628,9 +675,10 @@ function SignPage() {
         <Wrapper>
             <LoginTab setPending={setPending}/>
                 <div style={{display: 'flex', 
+                width: '20%',
+                margin: '20px 0px',
                 alignItems: 'center', 
-                justifyContent: 'center',
-                margin: '0 80px'}}>
+                justifyContent: 'center'}}>
                     <OrBox> HOẶC</OrBox>
                 </div>
             <RegisterTab setPending={setPending}/>

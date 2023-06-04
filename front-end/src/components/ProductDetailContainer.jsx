@@ -109,7 +109,7 @@ const ProductDetailContainer = (props) => {
                 rows={20}
                 readOnly
                 disabled
-                style={{ marginTop: '50px', padding: '0', backgroundColor: 'white', resize: 'none', border: 'none'}}
+                style={{ width: '95%', marginTop: '50px', padding: '0', backgroundColor: 'white', resize: 'none', border: 'none'}}
             />
         </FullInfoTab>
   }
