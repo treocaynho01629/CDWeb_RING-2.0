@@ -161,6 +161,7 @@ const Home = () => {
   useEffect(()=>{
     window.scrollTo(0, 0);
     document.title = `RING! - Bookstore`;
+    console.log(import.meta.env.VITE_PORT_SOCKET_SPRING);
   }, []);
 
   //Load

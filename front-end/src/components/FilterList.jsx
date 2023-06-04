@@ -196,8 +196,6 @@ const PublisherFilter = ({onChangePub, filters}) => {
   const [selectedPub, setSelectedPub] = useState(filters?.pubId);
   const { data } = useFetch(PUBLISHERS_URL);
 
-  console.log('test');
-
   useEffect(()=>{
     setSelectedPub(filters?.pubId);
   }, [filters?.pubId]);
