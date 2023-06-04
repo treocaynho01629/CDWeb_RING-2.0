@@ -5,7 +5,7 @@ import { styled as muiStyled } from '@mui/system';
 
 import { Remove as RemoveIcon, Add as AddIcon, Star as StarIcon, StarBorder as StarBorderIcon,
 ShoppingCart as ShoppingCartIcon, Sell as SellIcon, Storefront as StorefrontIcon, Check as CheckIcon} from '@mui/icons-material';
-import { Divider, Grid, Rating, Breadcrumbs, Avatar, Skeleton } from '@mui/material';
+import { Box, Divider, Grid, Rating, Breadcrumbs, Avatar, Skeleton } from '@mui/material';
 
 import ProductImages from '../components/ProductImages';
 import ProductsSlider from '../components/ProductsSlider';
@@ -45,7 +45,22 @@ const StuffContainer = styled.div`
 const SellerContainer = styled.div`
     display: flex; 
     align-items: center;
-    margin: 20px 0px;
+    margin: 10px 0px;
+
+    a {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        
+        @supports (-webkit-line-clamp: 1) {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: initial;
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+        }
+    }
 `
 
 const CouponTab = styled.div`
@@ -320,30 +335,29 @@ const ProductDetail = () => {
     if (loading){
         product = 
         <Grid container spacing={2}>
-            <Grid item sm={12} md={10}>
+            <Grid item xs={12} lg={10}>
                 <Grid container spacing={2} justifyContent="flex-start" alignItems="stretch">
-                    <Grid item sm={12} md={6}>
-                        <Skeleton variant="rectangular" animation="wave" width={478} height={645}/>
+                    <Grid item xs={12} md={6}>
+                        <Skeleton variant="rectangular" animation="wave" width={'100%'} height={645}/>
                     </Grid>
-                    <Grid item sm={12} md={6}>
-                        <Skeleton variant="rectangular" animation="wave" width={478} height={704}/>
+                    <Grid item xs={12} md={6}>
+                        <Skeleton variant="rectangular" animation="wave" width={'100%'} height={704}/>
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid item sm={12} md={2}>
-                <Skeleton variant="rectangular" animation="wave" width={181} height={170}/>
-                <Skeleton variant="rectangular" animation="wave" width={181} height={230}/>
+            <Grid item xs={12} lg={2}>
+                <Skeleton variant="rectangular" animation="wave" width={'100%'} height={170}/>
             </Grid>
         </Grid>
     } else {
         product =
         <Grid container spacing={2}>
-            <Grid item sm={12} md={10}>
+            <Grid item xs={12} lg={10}>
                 <Grid container spacing={2} justifyContent="flex-start" alignItems="stretch">
-                    <Grid item sm={12} md={6}>
+                    <Grid item xs={12} md={6}>
                         <ProductImages images={book?.image}/>
                     </Grid>
-                    <Grid item sm={12} md={6}>
+                    <Grid item xs={12} md={6}>
                         <InfoContainer>
                             <div>
                                 <BookTitle>{book?.title}</BookTitle>
@@ -417,28 +431,39 @@ const ProductDetail = () => {
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid item sm={12} md={2}>
-                <StuffContainer>
-                    <h5 style={{margin: 0, display: 'flex', alignItems: 'center'}}><StorefrontIcon/>&nbsp;NHÀ PHÂN PHỐI</h5>
-                    <SellerContainer>
-                        <Avatar>H</Avatar>
-                        <Link to={`/filters?seller=${book?.sellerName}`}>
-                            &nbsp;{book?.sellerName}
-                        </Link>
-                    </SellerContainer>
-                    <h4 style={{margin: '0 5px', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        color: '#63e399'}}>
-                        ĐỐI TÁC RING!&nbsp;<CheckIcon/>
-                    </h4>
-                </StuffContainer>
-                <StuffContainer>
-                    <h5 style={{margin: 0, display: 'flex', alignItems: 'center'}}><SellIcon/>&nbsp;KHUYẾN MÃI</h5>
-                    <CouponTab><SellIcon/>&nbsp; MÃ: ABCDFE39</CouponTab>
-                    <CouponTab><SellIcon/>&nbsp; MÃ: DFCR4546</CouponTab>
-                    <CouponTab><SellIcon/>&nbsp; MÃ: TRBB1234</CouponTab>
-                </StuffContainer>
+            <Grid item xs={12} lg={2}>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} md={3}>
+                        <StuffContainer>
+                            <Box display={{xs: 'flex', md: 'block'}}>
+                                <h5 style={{margin: '0 20px 0px 0', display: 'flex', alignItems: 'center', textDecoration: 'underline'}}><StorefrontIcon/>&nbsp;NHÀ PHÂN PHỐI: </h5>
+                                <SellerContainer>
+                                    <Avatar>H</Avatar>
+                                    <Link to={`/filters?seller=${book?.sellerName}`}>
+                                        &nbsp;{book?.sellerName}
+                                    </Link>
+                                    &nbsp;&nbsp;&nbsp;
+                                </SellerContainer>
+                                <Box display={{xs: 'none', sm: 'flex'}} sx={{alignItems: 'center'}}>
+                                    <h4 style={{margin: '0 5px', 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        color: '#63e399'}}>
+                                        ĐỐI TÁC RING!&nbsp;<CheckIcon/>
+                                    </h4>
+                                </Box>
+                            </Box>
+                        </StuffContainer>
+                    </Grid>
+                    <Grid item xs={12} md={9}>
+                        <StuffContainer>
+                            <h5 style={{margin: 0, display: 'flex', alignItems: 'center'}}><SellIcon/>&nbsp;KHUYẾN MÃI</h5>
+                            <CouponTab><SellIcon/>&nbsp; MÃ: ABCDFE39</CouponTab>
+                            <CouponTab><SellIcon/>&nbsp; MÃ: DFCR4546</CouponTab>
+                            <CouponTab><SellIcon/>&nbsp; MÃ: TRBB1234</CouponTab>
+                        </StuffContainer>
+                    </Grid>
+                </Grid>
             </Grid>
         </Grid>
     }

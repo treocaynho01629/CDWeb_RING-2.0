@@ -11,6 +11,7 @@ const Container = styled.div`
     flex-direction: column;
     background-color: #ebebeb;
     margin-top: 100px;
+    width: 100%;
 `
 
 const Wrapper = styled.div`
@@ -137,6 +138,18 @@ const BotText = styled.p`
     text-align: center;
     justify-content: center;
     color: #424242;
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	
+	@supports (-webkit-line-clamp: 1) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: initial;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
 `
 
 const Group = styled.p`

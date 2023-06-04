@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import styled from "styled-components"
 
@@ -7,8 +7,7 @@ import FilterList from "../components/FilterList"
 import FilteredProducts from "../components/FilteredProducts"
 import SortList from "../components/SortList"
 
-import Divider from '@mui/material/Divider';
-import Grid from "@mui/material/Grid"
+import { Divider, Grid, Dialog, DialogContent, Box } from '@mui/material';
 
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 
@@ -22,7 +21,11 @@ const Wrapper = styled.div`
     padding-left: 15px;
     margin-right: auto;
     margin-left: auto;
+    display: flex;
 
+    @media (min-width: 600px) {
+        width: 600px;
+    }
     @media (min-width: 768px) {
         width: 750px;
     }
@@ -35,30 +38,44 @@ const Wrapper = styled.div`
 `
 
 const Button = styled.button`
-  background-color: #63e399;
-  padding: 10px 20px;;
-  font-size: 16px;
-  font-weight: 500;
-  border-radius: 0;
-  border: none;
-  transition: all 0.5s ease;
-  display: flex;
-  align-items: center;
+    background-color: #63e399;
+    padding: 10px 20px;
+    margin: 0 5px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 0;
+    border: none;
+    transition: all 0.5s ease;
+    display: flex;
+    align-items: center;
 
-  &:hover {
-      background-color: lightgray;
-      color: black;
-  };
+    &:hover {
+        background-color: lightgray;
+        color: black;
+    };
 
-  &:focus {
-      outline: none;
-      border: none;
-      border: 0;
-  };
+    &:focus {
+        outline: none;
+        border: none;
+        border: 0;
+    };
 
-  outline: none;
-  border: 0;
+    outline: none;
+    border: 0;
 `
+
+const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
+    '& .MuiDialog-paper': {
+      borderRadius: 0,
+      padding: '20px 15px',
+    },
+    '& .MuiDialogContent-root': {
+      padding: theme.spacing(2),
+    },
+    '& .MuiDialogActions-root': {
+      padding: theme.spacing(1),
+    },
+}));
 
 const Title = muiStyled(Divider)({
     fontSize: 18,
@@ -104,6 +121,7 @@ const FiltersPage = () => {
         + "&seller=" + filters.seller
         + "&fromRange=" + filters.value[0]
         + "&toRange=" + filters.value[1]);
+    const [open, setOpen] = useState(false);
     const navigate = useNavigate();
 
     //Load
@@ -253,29 +271,46 @@ const FiltersPage = () => {
         })
         navigate('/filters')
     }
+
+    const handleClose = () => {
+        setOpen(false);
+    };
     //#endregion
+
+    let filterList = <>
+        <FilterList  filters={filters}
+            onCateChange={handleCateChange}
+            onRangeChange={handleRangeChange}
+            onChangePub={handleChangePub}
+            onChangeType={handleChangeType}
+            onChangeSeller={handleChangeSeller}/>
+        <div style={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
+            <Button onClick={resetFilter}><FilterAltOffIcon/>Xoá bộ lọc</Button>
+            <Box display={{sx: 'block', md: 'none'}}>
+                <Button onClick={handleClose}>Áp dụng</Button>
+            </Box>
+        </div>
+    </>
 
     return (
     <Wrapper>
-        <Grid container spacing={5}>
-            <Grid item xs={12} md={3}>
-                <FilterList  filters={filters}
-                onCateChange={handleCateChange}
-                onRangeChange={handleRangeChange}
-                onChangePub={handleChangePub}
-                onChangeType={handleChangeType}
-                onChangeSeller={handleChangeSeller}/>
-                <div style={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
-                    <Button onClick={resetFilter}><FilterAltOffIcon/>Huỷ bộ lọc</Button>
-                </div>
+        <CustomDialog open={open} onClose={handleClose} maxWidth={'md'}>
+            <DialogContent>
+                {filterList}
+            </DialogContent>
+        </CustomDialog>
+        <Grid container spacing={5} sx={{display: 'flex', justifyContent: 'center'}}>
+            <Grid item xs={12} md={3.5} lg={3} display={{ xs: "none", md: "block" }}>
+                {filterList}
             </Grid>
-            <Grid item xs={12} md={9}>
+            <Grid item xs={12} md={8.5} lg={9}>
                 <Title>DANH MỤC SẢN PHẨM</Title>
                 <SortList filters={filters}
                 pagination={pagination}
                 onChangeOrder={handleChangeOrder}
                 onChangeDir={handleChangeDir}
-                onChangeSearch={handleChangeSearch}/>
+                onChangeSearch={handleChangeSearch}
+                setOpen={setOpen}/>
                 <FilteredProducts loading={loading} 
                 booksList={booksList}/>
                 <AppPagination pagination={pagination}

@@ -130,3 +130,11 @@ input:-webkit-autofill:active{
 input:-webkit-autofill{
   -webkit-text-fill-color: black !important;
 }
+
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-select: none;
+}

@@ -25,6 +25,8 @@ const ImageSlider = styled.div`
     padding: 5px;
     overflow: hidden;
     position: relative;
+    display: 'flex';
+    justify-content: 'center';
 `
 
 const ImageSlide = styled.div`
@@ -46,10 +48,12 @@ const ImageNumber = styled.p`
 const SmallImageSlider = styled.div`
     display: flex;
     overflow-x: scroll;
+    width: 95%;
     margin: 0px 10px;
     padding: 10px;
     user-select: none;
     scroll-behavior: smooth;
+    white-space: nowrap;
 
     &::-webkit-scrollbar {
         display: none;
@@ -158,8 +162,7 @@ const ProductImages = ({images}) => {
             style={{display: (index + 1) === slideIndex ? "block" : "none"}}>
                 <ImageNumber>{index + 1} / {multiImages.length}</ImageNumber>
                 <LazyLoadImage src={images}
-                height={500}
-                width={'100%'} 
+                width={'95%'} 
                 style={{
                     padding: '15px 20px',
                     objectFit: 'contain',
@@ -187,7 +190,8 @@ const ProductImages = ({images}) => {
                         width={80} 
                         style={{
                             objectFit: 'contain',
-                            display: 'inline-block'
+                            display: 'inline-block',
+                            transform: style
                         }}
                     />
                 </SmallImageSlide>

@@ -1,4 +1,4 @@
-import { useState, useEffect, memo, useMemo } from "react"
+import { useState, useEffect } from "react"
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system';
 
@@ -257,11 +257,6 @@ const PublisherFilter = ({onChangePub, filters}) => {
   )
 }
 
-const TestFilter = memo(
-  PublisherFilter, 
-  (prevProps, nextProps) => (prevProps.filters.pubId) !== (nextProps.filters.pubId), 
-);
-
 const FilterList = (props) => {
   //#region construct
   const {filters, onCateChange, onRangeChange, onChangePub, onChangeType, onChangeSeller} = props;
@@ -395,150 +390,160 @@ const FilterList = (props) => {
   return (
     <div>
       <Title>BỘ LỌC</Title>
+      <Grid container spacing={0}>
+        <Grid item xs={12}>
+          <Filter>
+            <TitleContainer>
+              <FilterText><PriceChangeIcon/>&nbsp;Khoảng giá</FilterText>
+            </TitleContainer>
+            
+            <Box sx={{ width: 220}}>
+              <PriceSlider
+                getAriaLabel={() => 'Bộ lọc giá'}
+                value={value} 
+                min={0}
+                max={15}
+                scale={calculateValue}
+                marks={marks}
+                valueLabelDisplay="auto"
+                getAriaValueText={valuetext}
+                valueLabelFormat={valuetext}
+                onChange={handleChangeRange}
+                onChangeCommitted={handleChangeRangeCommited}
+                onBlur={handleBlur}
+                size="lg"
+              />
+            </Box>
+            <InputContainer>
+              <PriceInputContainer>
+                <PriceInput 
+                type="number"
+                min="1000"
+                max="10000000"
+                step="5000"
+                onChange={handleInputChange} 
+                onBlur={handleBlur} 
+                value={valueInput[0]}
+                inputProps={{
+                  step: 1000,
+                  min: 1000,
+                  max: 10000000,
+                  type: 'number',
+                  'aria-labelledby': 'input-slider',
+                }}
+                />
+              </PriceInputContainer>
+              &nbsp;đến&nbsp;
+              <PriceInputContainer>
+                <PriceInput 
+                type="number"
+                min="1000"
+                max="10000000"
+                step="5000"
+                onChange={handleInputChange2} 
+                onBlur={handleBlur} 
+                value={valueInput[1]}
+                inputProps={{
+                  step: 1000,
+                  min: 1000,
+                  max: 10000000,
+                  type: 'number',
+                  'aria-labelledby': 'input-slider',
+                }}
+                />
+              </PriceInputContainer>
+            </InputContainer>
+          </Filter>
+          <Divider/>
+        </Grid>
+        <Grid item xs={12} sm={6} md={12}>
+          <Filter>
+            <TitleContainer>
+              <FilterText><CategoryIcon/>&nbsp;Danh mục</FilterText>
+            </TitleContainer>
 
-      <Filter>
-        <TitleContainer>
-          <FilterText><PriceChangeIcon/>&nbsp;Khoảng giá</FilterText>
-        </TitleContainer>
-        
-        <Box sx={{ width: 220}}>
-          <PriceSlider
-            getAriaLabel={() => 'Bộ lọc giá'}
-            value={value} 
-            min={0}
-            max={15}
-            scale={calculateValue}
-            marks={marks}
-            valueLabelDisplay="auto"
-            getAriaValueText={valuetext}
-            valueLabelFormat={valuetext}
-            onChange={handleChangeRange}
-            onChangeCommitted={handleChangeRangeCommited}
-            onBlur={handleBlur}
-            size="lg"
-          />
-        </Box>
-        <InputContainer>
-          <PriceInputContainer>
-            <PriceInput 
-            type="number"
-            min="1000"
-            max="10000000"
-            step="5000"
-            onChange={handleInputChange} 
-            onBlur={handleBlur} 
-            value={valueInput[0]}
-            inputProps={{
-              step: 1000,
-              min: 1000,
-              max: 10000000,
-              type: 'number',
-              'aria-labelledby': 'input-slider',
-            }}
-            />
-          </PriceInputContainer>
-          &nbsp;đến&nbsp;
-          <PriceInputContainer>
-            <PriceInput 
-            type="number"
-            min="1000"
-            max="10000000"
-            step="5000"
-            onChange={handleInputChange2} 
-            onBlur={handleBlur} 
-            value={valueInput[1]}
-            inputProps={{
-              step: 1000,
-              min: 1000,
-              max: 10000000,
-              type: 'number',
-              'aria-labelledby': 'input-slider',
-            }}
-            />
-          </PriceInputContainer>
-        </InputContainer>
-      </Filter>
-      <Divider/>
-      <Filter>
-        <TitleContainer>
-          <FilterText><CategoryIcon/>&nbsp;Danh mục</FilterText>
-        </TitleContainer>
-
-        <List
-          sx={{ width: '100%', maxWidth: 250, py: 0}}
-          component="nav"
-          aria-labelledby="nested-list"
-        >
-          {catesList.map((cate) => (
-            <Grid key={cate.id}>
-              <ListItemButton 
-              sx={{pl: 0, py: 0, 
-                justifyContent: 'space-between',
-                '&.Mui-selected': {
-                  color: '#63e399'
-                },
-              }}
-              selected={cateId == cate?.id}>
-                <FilterText onClick={() => handleCateChange(cate.id)}>{cate.categoryName}</FilterText>
-                { cate.cateSubs.length == 0
-                  ? null
-                  : <>
-                  {open[cate.id] ? <ExpandLess onClick={() => handleClick(cate.id)}/> 
-                      : <ExpandMore onClick={() => handleClick(cate.id)}/>}
-                    </>
-                }
-                
-              </ListItemButton>
-              {cate.cateSubs.map((sub, index) => (
-                <Grid key={index}>
-                  <Collapse in={open[cate.id]} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 2 , py: 0, color: 'gray'}}>
-                      <FilterText>{sub.subName}</FilterText>
-                    </ListItemButton>
-                  </List>
-                </Collapse>
+            <List
+              sx={{ width: '100%', maxWidth: 250, py: 0}}
+              component="nav"
+              aria-labelledby="nested-list"
+            >
+              {catesList.map((cate) => (
+                <Grid key={cate.id}>
+                  <ListItemButton 
+                  sx={{pl: 0, py: 0, 
+                    justifyContent: 'space-between',
+                    '&.Mui-selected': {
+                      color: '#63e399'
+                    },
+                  }}
+                  selected={cateId == cate?.id}>
+                    <FilterText onClick={() => handleCateChange(cate.id)}>{cate.categoryName}</FilterText>
+                    { cate.cateSubs.length == 0
+                      ? null
+                      : <>
+                      {open[cate.id] ? <ExpandLess onClick={() => handleClick(cate.id)}/> 
+                          : <ExpandMore onClick={() => handleClick(cate.id)}/>}
+                        </>
+                    }
+                    
+                  </ListItemButton>
+                  {cate.cateSubs.map((sub, index) => (
+                    <Grid key={index}>
+                      <Collapse in={open[cate.id]} timeout="auto" unmountOnExit>
+                      <List component="div" disablePadding>
+                        <ListItemButton sx={{ pl: 2 , py: 0, color: 'gray'}}>
+                          <FilterText>{sub.subName}</FilterText>
+                        </ListItemButton>
+                      </List>
+                    </Collapse>
+                    </Grid>
+                  ))}
                 </Grid>
               ))}
-            </Grid>
-          ))}
-        </List>
-      </Filter>
-      <Divider/>
-      <TestFilter onChangePub={handleChangePub} filters={filters}/>
-      <Divider/>
-      <Filter>
-        <TitleContainer>
-          <FilterText><TuneIcon/>&nbsp;KHÁC</FilterText>
-        </TitleContainer>
-        <CustomInput
-        label="Hình thức bìa"
-        select
-        margin="dense" 
-        fullWidth
-        id="type"
-        value={type}
-        onChange={handleChangeType}
-        >
-          <MenuItem key="all" value="">Tất cả</MenuItem>
-        {bookTypes.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-          {option.label}
-          </MenuItem>
-        ))}
-        </CustomInput>
-        <CustomInput
-          margin="dense"
-          id="seller"
-          label="Tên người bán"
-          fullWidth
-          variant="outlined"
-          value={seller}
-          onBlur={handleChangeSeller}
-          onChange={(e) => setSeller(e.target.value)}
-          />
-      </Filter>
-      <Divider/>
+            </List>
+          </Filter>
+          <Divider/>
+        </Grid>
+        <Grid item xs={12} sm={6} md={12}>
+          <PublisherFilter onChangePub={handleChangePub} filters={filters}/>
+          <Divider/>
+        </Grid>
+        <Grid item xs={12}>
+          <Filter>
+            <TitleContainer>
+              <FilterText><TuneIcon/>&nbsp;KHÁC</FilterText>
+            </TitleContainer>
+            <CustomInput
+            label="Hình thức bìa"
+            select
+            margin="dense" 
+            fullWidth
+            id="type"
+            value={type}
+            onChange={handleChangeType}
+            >
+              <MenuItem key="all" value="">Tất cả</MenuItem>
+            {bookTypes.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+              {option.label}
+              </MenuItem>
+            ))}
+            </CustomInput>
+            <CustomInput
+              margin="dense"
+              id="seller"
+              label="Tên người bán"
+              fullWidth
+              variant="outlined"
+              value={seller}
+              onBlur={handleChangeSeller}
+              onChange={(e) => setSeller(e.target.value)}
+              />
+          </Filter>
+          <Divider/>
+        </Grid>
+      </Grid>
+
     </div>
   )
 }

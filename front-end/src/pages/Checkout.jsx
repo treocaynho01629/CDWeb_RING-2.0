@@ -26,8 +26,7 @@ const Pending = lazy(() => import('../components/authorize/Pending'));
 const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
     '& .MuiDialog-paper': {
       borderRadius: 0,
-      minWidth: '550px',
-      padding: '20px 15px',
+      width: '100%',
     },
     '& .MuiDialogContent-root': {
       padding: theme.spacing(2),
@@ -536,7 +535,7 @@ const Checkout = () => {
                                 onClose={handleClose}
                                 fullScreen={fullScreen}>
                                     <DialogTitle sx={{display: 'flex', alignItems: 'center'}}><LocationOnIcon/>&nbsp;Địa chỉ người nhận</DialogTitle>
-                                    <DialogContent>
+                                    <DialogContent sx={{marginX: '10px'}}>
                                         <Stack spacing={1} direction="column">
                                             <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
                                             <CustomInput label='Nhập Họ đệm'
@@ -626,7 +625,7 @@ const Checkout = () => {
                                             
                                         </Stack>
                                     </DialogContent>
-                                    <DialogActions>
+                                    <DialogActions sx={{marginBottom: '10px'}}>
                                         <CustomButton onClick={handleClose}><CheckIcon sx={{marginRight: '10px'}}/>Áp dụng</CustomButton>
                                         <ClearButton onClick={clearInput}><CloseIcon sx={{marginRight: '10px'}}/>Xoá</ClearButton>
                                     </DialogActions>
@@ -699,7 +698,7 @@ const Checkout = () => {
                             borderRadius: '0', resize: 'none', color: 'black', fontSize: '16px'}}
                         />
                         {activeStep === 1 ?
-                        <div style={{width: '10%'}}>
+                        <div style={{width: '30%'}}>
                             <CustomButton onClick={handleNext}>Tiếp tục</CustomButton>
                         </div>
                         : null
@@ -748,8 +747,8 @@ const Checkout = () => {
                         <SemiTitle><SellIcon/>&nbsp;Khuyến mãi</SemiTitle>
                         <SmallContainer>
                             <Grid container spacing={1}>
-                                <Grid item xs={6} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <Grid item xs={9}>
+                                <Grid item xs={8} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <Grid item xs={7}>
                                         <CustomInput placeholder='Nhập mã giảm giá ...'
                                             size="small"
                                             fullWidth

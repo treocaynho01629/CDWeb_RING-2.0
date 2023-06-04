@@ -16,7 +16,6 @@ const MoreInfo = styled.div`
     width: 100%;
     height: 100%;
     position: absolute;
-    top: -10%;
     cursor: pointer;
     z-index: 3;
     display: flex;
@@ -28,12 +27,16 @@ const MoreInfo = styled.div`
 const ImageSlider = styled.div`
     overflow: hidden;
     position: relative;
-    padding: 5px 5px 0px 5px;
+    display: flex;
+    justify-content: center;
+    padding: 2px 2px 0px 2px;
+    margin: 2px 2px 0px 2px;
     transition: all 0.25s ease;
+    z-Index: -1;
 `
 
 const Container = styled.div`
-    min-width: 220px;
+    min-width: 172px;
     max-width: 290px;
     height: 100%;
     display: flex;
@@ -42,6 +45,7 @@ const Container = styled.div`
     justify-content: space-between;
     position: relative;
     border: 0.5px solid lightgray;
+    overflow: hidden;
     transition: all 0.5s ease;
 
     &:hover ${MoreInfo}{
@@ -54,6 +58,10 @@ const Container = styled.div`
 
     &:hover {
         border-color: gray;
+    }
+
+    @media (min-width: 1000px) {
+        min-width: 220px;
     }
 `
 
@@ -141,7 +149,7 @@ const Extra= styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    text-align: cecnter;
+    text-align: center;
     margin: 0;
 `
 
@@ -161,6 +169,10 @@ const AddToCart = styled.p`
 
     &:hover {
         color: #63e399;
+    }
+
+    &:after {
+        content: "  THÊM VÀO GIỎ";
     }
 `
 
@@ -220,12 +232,12 @@ const Product = ({book}) => {
             <>
             <LazyLoadImage key={index + ":" + book.id}
                 src={book.image}
-                height={300} 
-                width={210}
+                height={220}
+                width={'85%'}
                 style={{
                     zIndex: -1,
                     transition: 'all 0.5s ease',
-                    marginBottom: '5px',
+                    margin: '5px 0px 10px 0px',
                     objectFit: 'contain',
                     display: (index + 1) === slideIndex ? "block" : "none", 
                     transform: style,
@@ -246,7 +258,7 @@ const Product = ({book}) => {
             </Link>
             <Divider/>
             <Extra>
-                <AddToCart onClick={() => handleAddToCart(book)}><ShoppingCartIcon style={{fontSize: 14}}/>&nbsp;THÊM VÀO GIỎ</AddToCart>
+                <AddToCart onClick={() => handleAddToCart(book)}><ShoppingCartIcon style={{fontSize: 14}}/>&nbsp;</AddToCart>
                 <StyledRating
                     name="product-rating"
                     value={avgRate(book)}
