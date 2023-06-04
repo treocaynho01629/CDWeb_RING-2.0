@@ -1,6 +1,12 @@
 # CDWeb_RING-2.0
 An E-Commerce Web App using Spring Boot, ViteJS.
 
+#### Feature:
+- CRUD Books, Users, Reviews.
+- JWT Authentication: Sign in, Sign up, Recover pass
+- Search, Filters books, Sell books
+- Cart function, Orders, Reviews books
+
 ## Local setup
 #### Database setup (MSSQL)
 - Right click on `Database` folder
@@ -8,27 +14,28 @@ An E-Commerce Web App using Spring Boot, ViteJS.
 - Click on `Device` tick
 - Find the Initialize database files `RINGSpringBoot_1.bak` and `RINGSpringBoot_2.bak` then click `Restore`
 
-#### Change application properties
-- Change your Database path in the `application.properties` file
-```properties
-spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
-spring.datasource.url=jdbc:sqlserver://localhost\\SQLEXPRESS:1433;databaseName=RINGSpringBoot;encrypt=true;trustServerCertificate=true;
-spring.datasource.username=<your database username>
-spring.datasource.password=<your database password>
+#### Setup environment variable
+- Front-End .env
+```.env
+VITE_PORT_SOCKET_SPRING=<Your spring application url path>
 ```
-- Change your Email also
-```properties
-spring.mail.host=smtp.gmail.com
-spring.mail.port=587
-spring.mail.username=<your email address>
-spring.mail.password=<your email application password>
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
-spring.mail.properties.mail.smtp.starttls.required=true
+- Back-End .env
+```.env
+spring_profiles_active=prod
+PORT_SOCKET_SPRING=<Your front-end url path>
+PROD_DB_HOST=<Your SQL server database path>
+PROD_DB_PORT=<Your SQL server database port>
+PROD_DB_NAME=RINGSpringBoot
+PROD_DB_USERNAME=<Your SQL server username>
+PROD_DB_PASSWORD=<Your SQL server password>
+USERNAME_EMAIL=<Your email address>
+PASSWORD_EMAIL=<Your email app password>
+JWT_SECRET_KEY=<Your secret key>
 ```
+[About email app password](https://support.google.com/mail/answer/185833?hl=en)
 
 #### Commands
-- Use `npm install` to install and then `npm run dev` to start the front-end
+- Use `npm install` to install and then `npm run dev` to start the front-end | `npm run build` and `npm run preview` to build prod
 - Use `mvn clean install` to install and then `mvn spring-boot:run` to start the back-end
 
 #### Screenshot
