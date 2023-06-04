@@ -56,36 +56,37 @@ public class AuthenticationService { // Dịch vụ Xác thực
 		// Kiểm tra Người dùng vs Username đã tồn tại
 		if (accountRepo.existsByUserName(request.getUserName())) {
 			throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Người dùng với tên đăng nhập này đã tồn tại!");
+		} else {
+			
+			// Set Quyền >> USER
+			Set<Role> roles = new HashSet<>();
+			roles.add(roleService.findByRoleName(RoleName.ROLE_USER)
+					.orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "No roles has been set")));
+			
+			// Tạo Người dùng mới + set thông tin
+			var acc = Account.builder().userName(request.getUserName()).pass(passwordEncoder.encode(request.getPass()))
+					.email(request.getEmail()).roles(roles).build();
+			
+			accountRepo.save(acc); // Lưu Người dùng vào CSDL
+			var jwtToken = jwtService.generateToken(acc); // Tạo JWT mới của Người dùng
+			var refreshToken = jwtService.generateRefreshToken(acc); // Tạo refresh token
+			
+			//Tạo và gửi Email
+			String subject = "RING! - BOOKSTORE: Đăng ký thành công! "; 
+			String content = "<h1><b style=\"color: #63e399;\">RING!</b> - BOOKSTORE</h1>\n"
+					+ "<h2 style=\"background-color: #63e399; padding: 10px; color: white;\" >\r\n"
+					+ "Tài khoản của bạn đã được đăng ký thành công!\r\n"
+					+ "</h2>\n"
+					+ "<h3>Tài khoản RING!:</h3>\n"
+					+ "<p><b>- Tên đăng nhập: </b>" + request.getUserName() + " đã đăng ký thành công</p>\n"
+					+ "<p>- Chúc bạn có trả nghiệm vui vẻ khi mua sách tại RING! - BOOKSTORE</p>\n"
+					+ "<br><p>Liên hệ hỗ trợ khi cần thiết: <b>ringbookstore@ring.email</b></p>\n"
+					+ "<br><br><h3>Cảm ơn đã tham gia!</h3>\n";
+			emailService.sendHtmlMessage(request.getEmail(), subject, content); //Gửi
+			
+			// Tạo và trả về thông tin xác thực Người dùng
+			return AuthenticationResponse.builder().token(jwtToken).refreshToken(refreshToken).roles(roles).build();
 		}
-
-		// Set Quyền >> USER
-		Set<Role> roles = new HashSet<>();
-		roles.add(roleService.findByRoleName(RoleName.ROLE_USER)
-				.orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "No roles has been set")));
-
-		// Tạo Người dùng mới + set thông tin
-		var acc = Account.builder().userName(request.getUserName()).pass(passwordEncoder.encode(request.getPass()))
-				.email(request.getEmail()).roles(roles).build();
-
-		accountRepo.save(acc); // Lưu Người dùng vào CSDL
-		var jwtToken = jwtService.generateToken(acc); // Tạo JWT mới của Người dùng
-		var refreshToken = jwtService.generateRefreshToken(acc); // Tạo refresh token
-		
-		//Tạo và gửi Email
-        String subject = "RING! - BOOKSTORE: Đăng ký thành công! "; 
-        String content = "<h1><b style=\"color: #63e399;\">RING!</b> - BOOKSTORE</h1>\n"
-                + "<h2 style=\"background-color: #63e399; padding: 10px; color: white;\" >\r\n"
-                + "Tài khoản của bạn đã được đăng ký thành công!\r\n"
-                + "</h2>\n"
-                + "<h3>Tài khoản RING!:</h3>\n"
-                + "<p><b>- Tên đăng nhập: </b>" + request.getUserName() + " đã đăng ký thành công</p>\n"
-                + "<p>- Chúc bạn có trả nghiệm vui vẻ khi mua sách tại RING! - BOOKSTORE</p>\n"
-                + "<br><p>Liên hệ hỗ trợ khi cần thiết: <b>ringbookstore@ring.email</b></p>\n"
-                + "<br><br><h3>Cảm ơn đã tham gia!</h3>\n";
-        emailService.sendHtmlMessage(request.getEmail(), subject, content); //Gửi
-
-		// Tạo và trả về thông tin xác thực Người dùng
-		return AuthenticationResponse.builder().token(jwtToken).refreshToken(refreshToken).roles(roles).build();
 	}
 
 	// Xác thực đăng nhập
