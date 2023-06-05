@@ -181,7 +181,7 @@ const Logo = styled.h2`
     align-items: center;
     display: flex;
     margin: 5px 0px 5px 0px;
-    width: 40px;
+    width: 110px;
     white-space: nowrap;
     overflow: hidden;
     transition: all 1s ease;
@@ -192,11 +192,14 @@ const Logo = styled.h2`
         @media (min-width: 450px) {
             width: 110px;
         }
-    }
 
-    @media (min-width: 450px) {
-        width: 110px;
-        margin: 5px 0px 5px 0px;
+        @media (min-width: 600px) {
+            width: 251px;
+        }
+
+        @media (min-width: 900px) {
+            width: 110px;
+        }
     }
 
     @media (min-width: 600px) {
@@ -413,7 +416,7 @@ const Navbar = (props) => {
         setAnchorEl(null);
     };
 
-    const toggleDrawer = (open) => () => {
+    const toggleDrawer = (open) => (e) => {
         setOpen(open)
     };
 
@@ -442,7 +445,7 @@ const Navbar = (props) => {
                 <ListItem disablePadding>
                 <ListItemButton onClick={() => {
                     navigate('/profile/detail')
-                    toggleDrawer(false)
+                    setOpen(false)
                     }}>
                     <ListItemIcon>
                         <Avatar /> 
@@ -454,7 +457,7 @@ const Navbar = (props) => {
                 <ListItem disablePadding>
                 <ListItemButton onClick={() => {
                     navigate('/profile/receipts')
-                    toggleDrawer(false)
+                    setOpen(false)
                     }}>
                     <ListItemIcon>
                         <DeliveryDiningIcon/>
@@ -519,7 +522,7 @@ const Navbar = (props) => {
         <List sx={{marginLeft: '15px'}}>
             <ListItem disablePadding onClick={() => {
                 navigate('/filters')
-                toggleDrawer(false)
+                setOpen(false)
                 }}>
                 <ListItemButton>
                     <ListItemIcon>
@@ -540,9 +543,9 @@ const Navbar = (props) => {
                 </ListItemButton>
             </ListItem>
 
-            <ListItem disablePadding onClick={() => {
+            <ListItem disablePadding onClick={(e) => {
                     navigate('/cart')
-                    toggleDrawer(false)
+                    setOpen(false)
                     }}>
                 <ListItemButton >
                     <ListItemIcon>
