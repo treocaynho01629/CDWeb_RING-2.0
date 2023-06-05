@@ -326,7 +326,8 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%:]).{8,24}$/;
 const ReceiptsTable = () => {
     const [count, setCount] = useState(0);
     const [receipts, setReceipts] = useState([]);
-    const { loading: loadingReceipts, data: dataReceipts } = usePrivateFetch(RECEIPTS_URL + "&pageNo=" + count);
+    const { loading: loadingReceipts, data: dataReceipts } = usePrivateFetch(RECEIPTS_URL + "&pageNo=" + 0);
+    const { loading: loadingMore, data: more } = usePrivateFetch(RECEIPTS_URL + "&pageNo=" + count);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -351,8 +352,11 @@ const ReceiptsTable = () => {
         }
     }, [loadingReceipts]);
 
-    const handleShowMoreReceipts = () => {
-        setCount(prev => prev + 1);
+    const handleShowMoreReceipts = async () => {
+        if (!loadingMore && more){
+            setReceipts(current => [...current, ...more?.content]);
+          setCount(prev => prev + 1);
+        }
     }
 
     if (loadingReceipts){
@@ -426,7 +430,7 @@ const ReceiptsTable = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <div style={{display: dataReceipts?.last ? 'none' : 'flex', 
+            <div style={{display: more?.last ? 'none' : 'flex', 
             justifyContent: 'center', 
             margin: '20px 0px'}}>
                 <Button onClick={handleShowMoreReceipts}>Xem thêm</Button>

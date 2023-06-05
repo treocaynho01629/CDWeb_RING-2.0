@@ -7,7 +7,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 //#region styled
 const Container = styled.div`
-    min-width: 170px;
+    min-width: 145px;
     max-width: 210px;
     display: flex;
     flex-direction: column;
@@ -16,6 +16,7 @@ const Container = styled.div`
     text-align: center;
     position: relative;
     border: 0.5px solid lightgray;
+    overflow: hidden;
 `
 
 const Info = styled.div`
@@ -103,7 +104,7 @@ const ProductSimple = ({book}) => {
                 height={250}
                 width={190} 
                 style={{
-                    zIndex: -1,
+                    zIndex: -3,
                     marginBottom: '10px 0',
                     objectFit: 'contain',
                 }}

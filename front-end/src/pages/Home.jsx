@@ -16,6 +16,13 @@ import useFetch from '../hooks/useFetch'
 const ToggleGroupContainer = styled.div`
   background-color: rgb(39, 39, 39);
   margin-bottom: 10px;
+  overflow-x: scroll;
+  scroll-behavior: smooth;
+  white-space: nowrap;
+
+  &::-webkit-scrollbar {
+      display: none;
+  }
 `
 
 const ButtonContainer = styled.div`
@@ -81,13 +88,16 @@ const StyledToggleButtonGroup = muiStyled(ToggleButtonGroup)(({ theme }) => ({
     color: 'rgba(255, 255, 255, 0.7)',
     fontWeight: 400,
     border: 0,
-    borderRadius: 0
+    borderRadius: 0,
   },
 }));
 
 const StyledToggleButton = muiStyled(ToggleButton)(({ theme }) => ({
     paddingLeft: '20px',
     paddingRight: '20px',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
     '&:hover': {
       backgroundColor: '#63e399',
     },
