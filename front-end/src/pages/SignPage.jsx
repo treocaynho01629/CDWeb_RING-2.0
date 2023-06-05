@@ -286,6 +286,10 @@ const LoginTab = ({setPending}) => {
             onClick={handleClickShowPassword}
             onMouseDown={handleMouseDownPassword}
             edge="end"
+            sx={{
+            "&:focus": {
+                outline: 'none',
+            }}}
         >
             {showPassword ? <VisibilityOff /> : <Visibility />}
         </IconButton>
@@ -488,6 +492,10 @@ const RegisterTab = ({setPending}) => {
             onClick={handleClickShowRegPassword}
             onMouseDown={handleMouseDownRegPassword}
             edge="end"
+            sx={{
+            "&:focus": {
+                outline: 'none',
+            }}}
         >
             {showRegPassword ? <VisibilityOff /> : <Visibility />}
         </IconButton>

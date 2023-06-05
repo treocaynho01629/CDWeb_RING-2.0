@@ -129,7 +129,7 @@ const FilterButton = styled.button`
     border-radius: 0;
     background-color: white;
     border: 0.5px solid lightgray;
-    color: black;
+    color: darkslategrey;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -8,8 +8,7 @@ import FilteredProducts from "../components/FilteredProducts"
 import SortList from "../components/SortList"
 
 import { Divider, Grid, Dialog, DialogContent, Box } from '@mui/material';
-
-import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+import { Check, FilterAltOff as FilterAltOffIcon } from '@mui/icons-material'
 
 import { styled as muiStyled } from '@mui/system';
 import useFetch from '../hooks/useFetch'
@@ -287,7 +286,7 @@ const FiltersPage = () => {
         <div style={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
             <Button onClick={resetFilter}><FilterAltOffIcon/>Xoá bộ lọc</Button>
             <Box display={{sx: 'block', md: 'none'}}>
-                <Button onClick={handleClose}>Áp dụng</Button>
+                <Button onClick={handleClose}><Check/>Áp dụng</Button>
             </Box>
         </div>
     </>

@@ -9,9 +9,9 @@ import { Search as SearchIcon, ShoppingCart as ShoppingCartIcon,
     Instagram as InstagramIcon, DeliveryDining as DeliveryDiningIcon, 
     Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, 
     Logout, Speed as SpeedIcon, NotificationsActive as NotificationsActiveIcon, 
-    RemoveShoppingCart as RemoveShoppingCartIcon, Storefront} from '@mui/icons-material';
+    RemoveShoppingCart as RemoveShoppingCartIcon, Storefront, KeyboardArrowLeft, Keyboard} from '@mui/icons-material';
 import { Stack, Badge, IconButton, Avatar, Menu, MenuItem, ListItemIcon, Divider
-, Tooltip, Card, CardContent, CardMedia, Box, Drawer, Popover, List, ListItem, ListItemButton
+, Tooltip, Card, CardContent, CardMedia, Box, Drawer, SwipeableDrawer, Popover, List, ListItem, ListItemButton
 , ListItemText, Grid, TextField, AppBar, useScrollTrigger, Collapse} from '@mui/material';
 
 import { useNavigate, Link } from "react-router-dom";
@@ -31,8 +31,7 @@ const Container = styled.div`
 const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
-
-    padding: 5px 30px;
+    padding: 5px 20px;
     justify-content: space-between;
     align-items: center;
 
@@ -181,18 +180,49 @@ const Logo = styled.h2`
     cursor: pointer;
     align-items: center;
     display: flex;
-    margin: 5px 0px 5px 15px;
-    width: 110px;
+    margin: 5px 0px 5px 0px;
+    width: 40px;
     white-space: nowrap;
     overflow: hidden;
-    transition: all 1.75s ease;
+    transition: all 1s ease;
 
     &.active {
+        width: 0px;
+
+        @media (min-width: 450px) {
+            width: 110px;
+        }
+    }
+
+    @media (min-width: 450px) {
         width: 110px;
+        margin: 5px 0px 5px 0px;
     }
 
     @media (min-width: 600px) {
         width: 251px;
+        margin: 5px 0px 5px 15px;
+    }
+`
+
+const DrawerLogo = styled.h2`
+    position: relative;
+    font-family: abel;
+    font-size: 27px;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: #63e399;
+    cursor: pointer;
+    align-items: center;
+    display: flex;
+    width: 251px;
+    margin: 5px 5px 5px -5px;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: all 1.25s ease;
+
+    @media (min-width: 450px) {
+        margin: 5px 0px 5px 15px;
     }
 `
 
@@ -276,20 +306,17 @@ const Button = styled.button`
     justify-content: center;
     border-radius: 0;
     padding: 0;
-    margin-right: 10px;
     width: 40px;
     height: 40px;
     background-color: transparent;
-    color: black;
+    color: gray;
     outline: none;
     border: none;
     transition: all 0.25s ease;
-    border-radius: 10%;
 
     &:hover {
-        background-color: #63e399;
-        opacity: 0.7;
-        color: white;
+        transform: scaleY(1.1);
+        color: black,
     }
 
     &:focus {
@@ -315,6 +342,11 @@ const CartButton = styled.button`
     &:hover {
         background-color: lightgray;
         color: black;
+    }
+
+    &:focus {
+        outline: none;
+        border: none;
     }
 `
 //#endregion
@@ -344,6 +376,7 @@ const Navbar = (props) => {
     const products = useSelector(state => state.cart.products); //Lấy products trong giỏ từ redux
     const [openDrawer, setOpen] = useState(false);
     const [hover, setHover] = useState(false);
+    const [delayHandler, setDelayHandler] = useState(null)
     const [focus, setFocus] = useState(false);
     const [searchField, setSearchField] = useState('');
     const { auth } = useAuth();
@@ -380,11 +413,8 @@ const Navbar = (props) => {
         setAnchorEl(null);
     };
 
-    const toggleDrawer = () => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-        return;
-    }
-        setOpen(!openDrawer)
+    const toggleDrawer = (open) => () => {
+        setOpen(open)
     };
 
     const handleSubmitSearch = (e) => {
@@ -393,13 +423,27 @@ const Navbar = (props) => {
         setSearchField('');
     }
 
+    const handleMouseEnter = event => {
+        setDelayHandler(setTimeout(() => {
+            setHover(true)
+        }, 250))
+    }
+
+    const handlOnMouseLeave = () => {
+        setHover(false);
+        clearTimeout(delayHandler);
+    }
+
     let sublist;
     if (auth.userName){
         sublist = 
         <Grid>
-            <List>
+            <List sx={{marginLeft: '15px'}}>
                 <ListItem disablePadding>
-                <ListItemButton onClick={() => navigate('/profile/detail')}>
+                <ListItemButton onClick={() => {
+                    navigate('/profile/detail')
+                    toggleDrawer(false)
+                    }}>
                     <ListItemIcon>
                         <Avatar /> 
                     </ListItemIcon>
@@ -408,7 +452,10 @@ const Navbar = (props) => {
                 </ListItem>
 
                 <ListItem disablePadding>
-                <ListItemButton onClick={() => navigate('/profile/receipts')}>
+                <ListItemButton onClick={() => {
+                    navigate('/profile/receipts')
+                    toggleDrawer(false)
+                    }}>
                     <ListItemIcon>
                         <DeliveryDiningIcon/>
                     </ListItemIcon>
@@ -417,7 +464,7 @@ const Navbar = (props) => {
                 </ListItem>
             </List>
             <Divider/>
-            <List>
+            <List sx={{marginLeft: '15px'}}>
                 {role >= 2 && (
                 <ListItem disablePadding onClick={() => navigate('/dashboard')}>
                 <ListItemButton>
@@ -441,7 +488,7 @@ const Navbar = (props) => {
         </Grid>
     } else {
         sublist = 
-        <List>
+        <List sx={{marginLeft: '15px'}}>
             <ListItem disablePadding onClick={() => navigate('/login')}>
                 <ListItemButton>
                     <ListItemIcon>
@@ -453,18 +500,38 @@ const Navbar = (props) => {
         </List>
     }
     
-    const list = (anchor) => (
+    const list = (
     <Box
-        sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 300 }}
+        sx={{ width: 'auto',
+            ["@media (min-width:450px)"]: { width: 400 }
+        }}
         role="presentation"
     >
-        <Link to={`/`} style={{paddingLeft: '20px'}}>
-            <Logo>
+        <Box sx={{marginY: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+            <Link to={`/`} onClick={toggleDrawer(false)} style={{paddingLeft: '20px'}}>
+            <DrawerLogo>
                 <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORE</p>
-            </Logo>
-        </Link>
-        <List>
-            <ListItem disablePadding>
+            </DrawerLogo>
+            </Link>
+            <Button style={{marginRight: '15px'}} onClick={toggleDrawer(false)}><KeyboardArrowLeft sx={{fontSize: 26}}/></Button>
+        </Box>
+        <Divider />
+        <List sx={{marginLeft: '15px'}}>
+            <ListItem disablePadding onClick={() => {
+                navigate('/filters')
+                setOpen(!openDrawer)
+                }}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <Storefront/>
+                    </ListItemIcon>
+                    <ListItemText primary="Cửa hàng" />
+                </ListItemButton>
+            </ListItem>
+        </List>
+        <Divider/>
+        <List sx={{marginLeft: '15px'}}>
+            <ListItem disablePadding onClick={toggleDrawer(false)}>
                 <ListItemButton>
                     <ListItemIcon>
                         <NotificationsActiveIcon/>
@@ -473,12 +540,15 @@ const Navbar = (props) => {
                 </ListItemButton>
             </ListItem>
 
-            <ListItem disablePadding>
-                <ListItemButton onClick={() => navigate('/cart')}>
+            <ListItem disablePadding onClick={() => {
+                    navigate('/cart')
+                    setOpen(!openDrawer)
+                    }}>
+                <ListItemButton >
                     <ListItemIcon>
                         <ShoppingCartIcon/>
                     </ListItemIcon>
-                    <ListItemText>Giỏ hàng ({products.length})</ListItemText>
+                    <ListItemText>Giỏ hàng ({products.length} sản phẩm)</ListItemText>
                 </ListItemButton>
             </ListItem>
         </List>
@@ -523,10 +593,16 @@ const Navbar = (props) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
     >
-        <MenuItem onClick={() => navigate('/profile/detail')}>
+        <MenuItem onClick={() => {
+            navigate('/profile/detail')
+            setOpen(!openDrawer)
+            }}>
             <Avatar /> Thông tin tài khoản
         </MenuItem>
-        <MenuItem onClick={() => navigate('/profile/receipts')}>
+        <MenuItem onClick={() => {
+            navigate('/profile/receipts')
+            setOpen(!openDrawer)
+            }}>
             <ListItemIcon>
                 <DeliveryDiningIcon fontSize="small"/> 
             </ListItemIcon>
@@ -534,7 +610,10 @@ const Navbar = (props) => {
         </MenuItem>
         <Divider/>
         {role >= 2 && (
-        <MenuItem onClick={() => navigate('/dashboard')}>
+        <MenuItem onClick={() => {
+            navigate('/dashboard')
+            setOpen(!openDrawer)
+            }}>
             <ListItemIcon>
                 <SpeedIcon fontSize="small" />
             </ListItemIcon>
@@ -646,17 +725,22 @@ const Navbar = (props) => {
                 </HideOnScroll>
                 <Wrapper>
                     <Grid container>
-                        <Grid item xs={12} md={7}>
+                        <Grid item xs={12} md={7} sx={{display: 'flex', alignItems: 'center'}}>
                             <Left>
                                 <Box sx={{display: 'flex', alignItems: 'center'}}>
-                                    <Button onClick={toggleDrawer()}><MenuIcon sx={{fontSize: 26}}/></Button>
-                                    <Drawer
+                                    <Button onClick={toggleDrawer(true)}><MenuIcon sx={{fontSize: 26}}/></Button>
+                                    <SwipeableDrawer
                                         anchor='left'
                                         open={openDrawer}
-                                        onClose={toggleDrawer()}
+                                        onOpen={toggleDrawer(true)}
+                                        onClose={toggleDrawer(false)}
+                                        disableSwipeToOpen={false}
+                                        ModalProps={{
+                                          keepMounted: true,
+                                        }}
                                         >
-                                        {list()}
-                                    </Drawer>
+                                        {list}
+                                    </SwipeableDrawer>
                                     <Link to={`/`}>
                                     <Logo className={searchField || hover || focus ? 'active' : 'deactive'}>
                                         <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORE</p>
@@ -667,19 +751,23 @@ const Navbar = (props) => {
                                     <Tooltip title="Duyệt cửa hàng">
                                         <StyledIconButton aria-label="explore" 
                                         onClick={() => navigate('/filters')}
-                                        sx={{marginLeft: 2, marginRight: 0, zIndex: 10}}>
+                                        sx={{marginLeft: 2, 
+                                        marginRight: 0, 
+                                        zIndex: 10,
+                                        }}>
                                             <Storefront sx={{fontSize: '26px'}}/>
                                         </StyledIconButton>
                                     </Tooltip>
                                     <div style={{display: 'flex', alignItems: 'center', marginLeft: -40}}>
                                         <Collapse orientation="horizontal" 
-                                        timeout={700}
+                                        timeout={500}
+                                        easing={'ease'}
                                         in={searchField || hover || focus} 
                                         collapsedSize={102}>
                                             <form onSubmit={handleSubmitSearch}>
                                                 <SearchInput placeholder='Tìm kiếm... '
-                                                onMouseEnter={(e) => setHover(true)}
-                                                onMouseLeave={(e) => setHover(false)}
+                                                onMouseEnter={handleMouseEnter}
+                                                onMouseLeave={handlOnMouseLeave}
                                                 onFocus={() => setFocus(true)}
                                                 onBlur={() => setFocus(false)}
                                                 onChange={(e) => setSearchField(e.target.value)}
