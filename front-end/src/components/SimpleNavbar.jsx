@@ -94,7 +94,10 @@ const SimpleNavbar = () => {
                 </Grid>
                 <Grid item xs={12} md={5}>
                     <Right>
-                        <StyledIconButton aria-label="help">
+                        <StyledIconButton aria-label="help" sx={{
+                            "&:focus": {
+                                outline: 'none',
+                            }}}>
                                 <HelpIcon/>
                             <p style={{fontSize: '13px', marginLeft: '5px'}}>Trợ giúp</p>
                         </StyledIconButton>
