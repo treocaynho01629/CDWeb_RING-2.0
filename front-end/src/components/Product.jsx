@@ -178,6 +178,8 @@ const AddToCart = styled.p`
 
 const StyledRating = muiStyled(Rating)({
     fontSize: 14,
+    display: 'flex',
+    alignItems: 'center',
     '& .MuiRating-iconFilled': {
         color: '#63e399',
     },
@@ -196,7 +198,7 @@ const Product = ({book}) => {
     const avgRate = () =>{
         let rate = 0;
         rate = Math.round((book?.rateTotal / book?.rateAmount)*2)/2
-        rate = rate ? rate : 0;
+        rate = rate ? rate : '~';
         return rate;
     }
 
@@ -261,11 +263,11 @@ const Product = ({book}) => {
             <Extra>
                 <AddToCart onClick={() => handleAddToCart(book)}><ShoppingCartIcon style={{fontSize: 14}}/>&nbsp;</AddToCart>
                 <Box display={{xs: 'none', lg: 'block'}} sx={{cursor: 'pointer'}}>
-                    <Tooltip title={`Trên tổng ${book.rateAmount} đánh giá`}>
+                    <Tooltip title={avgRate() === '~' ? 'Chưa có đánh giá nào' : `Trên tổng ${book.rateAmount} đánh giá`}>
                         <Box>
                             <StyledRating
                                 name="product-rating"
-                                value={avgRate(book)}
+                                value={avgRate()}
                                 getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
                                 precision={0.5}
                                 icon={<StarIcon style={{fontSize: 16}}/>}
@@ -276,9 +278,9 @@ const Product = ({book}) => {
                     </Tooltip>
                 </Box>
                 <Box display={{xs: 'block', lg: 'none'}} sx={{cursor: 'pointer'}}>
-                    <Tooltip title={`Trên tổng ${book.rateAmount} đánh giá`}>
+                    <Tooltip title={avgRate() === '~' ? 'Chưa có đánh giá nào' : `Trên tổng ${book.rateAmount} đánh giá`}>
                         <Box sx={{display: 'flex', alignItems: 'center'}}> 
-                            <b style={{fontSize: '14px', marginRight: '5px'}}>{avgRate(book)}</b>
+                            <b style={{fontSize: '12px', marginRight: '5px'}}>{avgRate()}</b>
                             <StarIcon style={{fontSize: 16,
                                 color: '#63e399',
                                 '&hover': {
