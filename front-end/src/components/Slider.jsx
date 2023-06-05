@@ -13,6 +13,7 @@ import useFetch from '../hooks/useFetch'
 //#region styled
 const ImgContainer = styled.div`
     height: 450px;
+    display: flex;
     text-align: center;
     justify-content: center;
     align-items: center;
@@ -25,7 +26,9 @@ const InfoContainer = styled.div`
 `
 
 const Title = styled.h2`
+    min-height: 74px;
     font-size: 30px;
+    margin: 0;
     line-height: normal;
     text-overflow: ellipsis;
 	overflow: hidden;
@@ -39,9 +42,15 @@ const Title = styled.h2`
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
     }
+
+    @media (min-width: 900px) {
+        margin: 25px 0px;
+        min-width: auto;
+    }
 `
 
 const Description = styled.p`
+    min-height: 72px;
     margin: 30px 0px;
     font-size: 18px;
     text-overflow: ellipsis;
@@ -55,6 +64,10 @@ const Description = styled.p`
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
+    }
+
+    @media (min-width: 900px) {
+        min-width: auto;
     }
 `
 
@@ -104,9 +117,9 @@ function Item({book}){
     };
 
     return (
-        <Paper>
+        <Paper sx={{maxHeight: '800px'}}>
             <Grid container sx={{alignItems: 'center'}}>
-                <Grid item xs={12} sm={12} md={5}>
+                <Grid item xs={12} md={5}>
                     <Link to={`/product/${book.id}`}>
                         <ImgContainer>
                             <LazyLoadImage src={book.image}
@@ -119,7 +132,7 @@ function Item({book}){
                         </ImgContainer>
                     </Link>
                 </Grid>
-                <Grid item xs={12} sm={12} md={7}>
+                <Grid item xs={12} md={7}>
                     <InfoContainer>
                         <Link to={`/product/${book.id}`} style={{color: 'inherit'}}>
                             <Title>{book.title}</Title>
@@ -147,7 +160,7 @@ const Slider = () => {
     };
 
     let skeleton = 
-    <Paper>
+    <Paper sx={{maxHeight: '800px'}}>
         <Grid container sx={{alignItems: 'center'}}>
             <Grid item xs={12} sm={12} md={5}>
                 <ImgContainer>
@@ -157,6 +170,9 @@ const Slider = () => {
             <Grid item xs={12} sm={12} md={7}>
                 <InfoContainer>
                     <Skeleton variant="text" sx={{ fontSize: '30px' }}/>
+                    <Skeleton variant="text" sx={{ fontSize: '30px' }}/>
+                    <Skeleton variant="text" sx={{ fontSize: '18px' }}/>
+                    <Skeleton variant="text" sx={{ fontSize: '18px' }}/>
                     <Skeleton variant="text" sx={{ fontSize: '18px' }}/>
                     <Skeleton variant="rectangular" width={109} height={39} />
                 </InfoContainer>
@@ -166,7 +182,7 @@ const Slider = () => {
     
 
   return (
-    <Carousel animation="slide" duration="700"
+    <Carousel animation="slide" duration="700" interval={15000}
     sx={{
         marginBottom: '20px'
     }}
