@@ -81,6 +81,7 @@ const Brand = styled.h5`
 `
 
 const Title = styled.h5`
+    line-height: 2;
     font-size: 14px;
     margin: 0;
     text-overflow: ellipsis;
