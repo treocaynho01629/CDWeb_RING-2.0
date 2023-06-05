@@ -294,7 +294,7 @@ const ProductDetail = () => {
         if (!loading) {
             window.scrollTo(0, 0);
             handleTabChange("1");
-            document.title = `RING! - ${book.title}`;
+            document.title = `RING! - ${book?.title}`;
         }
     }, [loading]);
 
@@ -433,10 +433,15 @@ const ProductDetail = () => {
             </Grid>
             <Grid item xs={12} lg={2}>
                 <Grid container spacing={2}>
-                    <Grid item xs={12} md={3}>
+                    <Grid item xs={12} md={3} lg={12}>
                         <StuffContainer>
                             <Box display={{xs: 'flex', md: 'block'}}>
-                                <h5 style={{margin: '0 20px 0px 0', display: 'flex', alignItems: 'center', textDecoration: 'underline'}}><StorefrontIcon/>&nbsp;NHÀ PHÂN PHỐI: </h5>
+                                <h5 style={{margin: '0 20px 0px 0', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                textDecoration: 'underline'}}>
+                                    <StorefrontIcon/>&nbsp;NHÀ PHÂN PHỐI: 
+                                </h5>
                                 <SellerContainer>
                                     <Avatar>H</Avatar>
                                     <Link to={`/filters?seller=${book?.sellerName}`}>
@@ -455,7 +460,7 @@ const ProductDetail = () => {
                             </Box>
                         </StuffContainer>
                     </Grid>
-                    <Grid item xs={12} md={9}>
+                    <Grid item xs={12} md={9} lg={12}>
                         <StuffContainer>
                             <h5 style={{margin: 0, display: 'flex', alignItems: 'center'}}><SellIcon/>&nbsp;KHUYẾN MÃI</h5>
                             <CouponTab><SellIcon/>&nbsp; MÃ: ABCDFE39</CouponTab>
