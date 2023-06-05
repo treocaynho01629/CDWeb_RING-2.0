@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system'
 
 import { KeyboardArrowRight, KeyboardArrowLeft, Star as StarIcon, StarBorder as StarBorderIcon, ShoppingCart as ShoppingCartIcon} from '@mui/icons-material';
-import { Divider, Rating } from '@mui/material'
+import { Divider, Rating, Box, Tooltip } from '@mui/material'
 
 import { Link, useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux';
@@ -196,6 +196,7 @@ const Product = ({book}) => {
     const avgRate = () =>{
         let rate = 0;
         rate = Math.round((book?.rateTotal / book?.rateAmount)*2)/2
+        rate = rate ? rate : 0;
         return rate;
     }
 
@@ -259,15 +260,34 @@ const Product = ({book}) => {
             <Divider/>
             <Extra>
                 <AddToCart onClick={() => handleAddToCart(book)}><ShoppingCartIcon style={{fontSize: 14}}/>&nbsp;</AddToCart>
-                <StyledRating
-                    name="product-rating"
-                    value={avgRate(book)}
-                    getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
-                    precision={0.5}
-                    icon={<StarIcon style={{fontSize: 16}}/>}
-                    emptyIcon={<StarBorderIcon style={{fontSize: 16}}/>}
-                    readOnly
-                />
+                <Box display={{xs: 'none', lg: 'block'}} sx={{cursor: 'pointer'}}>
+                    <Tooltip title={`Trên tổng ${book.rateAmount} đánh giá`}>
+                        <Box>
+                            <StyledRating
+                                name="product-rating"
+                                value={avgRate(book)}
+                                getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
+                                precision={0.5}
+                                icon={<StarIcon style={{fontSize: 16}}/>}
+                                emptyIcon={<StarBorderIcon style={{fontSize: 16}}/>}
+                                readOnly
+                            />
+                        </Box>
+                    </Tooltip>
+                </Box>
+                <Box display={{xs: 'block', lg: 'none'}} sx={{cursor: 'pointer'}}>
+                    <Tooltip title={`Trên tổng ${book.rateAmount} đánh giá`}>
+                        <Box sx={{display: 'flex', alignItems: 'center'}}> 
+                            <b style={{fontSize: '14px', marginRight: '5px'}}>{avgRate(book)}</b>
+                            <StarIcon style={{fontSize: 16,
+                                color: '#63e399',
+                                '&hover': {
+                                    color: '#00ff6a',
+                                }}}
+                            />
+                        </Box>
+                    </Tooltip>
+                </Box>
             </Extra>
         </Info>
         <MoreInfo onClick={() => navigate(`/product/${book.id}`)}>
