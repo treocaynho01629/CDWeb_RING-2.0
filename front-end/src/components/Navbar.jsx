@@ -11,7 +11,7 @@ import { Search as SearchIcon, ShoppingCart as ShoppingCartIcon,
     Logout, Speed as SpeedIcon, NotificationsActive as NotificationsActiveIcon, 
     RemoveShoppingCart as RemoveShoppingCartIcon, Storefront, KeyboardArrowLeft, Keyboard} from '@mui/icons-material';
 import { Stack, Badge, IconButton, Avatar, Menu, MenuItem, ListItemIcon, Divider
-, Tooltip, Card, CardContent, CardMedia, Box, Drawer, SwipeableDrawer, Popover, List, ListItem, ListItemButton
+, Tooltip, Card, CardContent, CardMedia, Box, SwipeableDrawer, Popover, List, ListItem, ListItemButton
 , ListItemText, Grid, TextField, AppBar, useScrollTrigger, Collapse} from '@mui/material';
 
 import { useNavigate, Link } from "react-router-dom";
@@ -519,7 +519,7 @@ const Navbar = (props) => {
         <List sx={{marginLeft: '15px'}}>
             <ListItem disablePadding onClick={() => {
                 navigate('/filters')
-                setOpen(!openDrawer)
+                toggleDrawer(false)
                 }}>
                 <ListItemButton>
                     <ListItemIcon>
@@ -542,7 +542,7 @@ const Navbar = (props) => {
 
             <ListItem disablePadding onClick={() => {
                     navigate('/cart')
-                    setOpen(!openDrawer)
+                    toggleDrawer(false)
                     }}>
                 <ListItemButton >
                     <ListItemIcon>
@@ -595,13 +595,11 @@ const Navbar = (props) => {
     >
         <MenuItem onClick={() => {
             navigate('/profile/detail')
-            setOpen(!openDrawer)
             }}>
             <Avatar /> Thông tin tài khoản
         </MenuItem>
         <MenuItem onClick={() => {
             navigate('/profile/receipts')
-            setOpen(!openDrawer)
             }}>
             <ListItemIcon>
                 <DeliveryDiningIcon fontSize="small"/> 
@@ -612,7 +610,6 @@ const Navbar = (props) => {
         {role >= 2 && (
         <MenuItem onClick={() => {
             navigate('/dashboard')
-            setOpen(!openDrawer)
             }}>
             <ListItemIcon>
                 <SpeedIcon fontSize="small" />
