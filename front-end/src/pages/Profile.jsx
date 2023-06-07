@@ -324,7 +324,7 @@ const CHANGE_PASS_URL = "/api/accounts/change-password";
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%:]).{8,24}$/;
 
 const ReceiptsTable = () => {
-    const [count, setCount] = useState(0);
+    const [count, setCount] = useState(1);
     const [receipts, setReceipts] = useState([]);
     const { loading: loadingReceipts, data: dataReceipts } = usePrivateFetch(RECEIPTS_URL + "&pageNo=" + 0);
     const { loading: loadingMore, data: more } = usePrivateFetch(RECEIPTS_URL + "&pageNo=" + count);
