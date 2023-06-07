@@ -16,7 +16,7 @@ public interface BookRepository extends JpaRepository<Book, Integer>{
 	
 	@Query("""
 	select b.id as id, b.title as title, b.description as description, b.images.name as image, b.price as price, 
-	count(r.id) as rateAmount, isnull(sum(r.rating), 0) as rateTotal, size(b.orderDetails) as orderTime
+	count(r.id) as rateAmount, coalesce(sum(r.rating), 0) as rateTotal, size(b.orderDetails) as orderTime
 	from Book b left join Review r on b.id = r.book.id
 	where concat (b.title, b.author) like %:keyword%
 	and cast(b.cate.id as string) like %:cateId%
