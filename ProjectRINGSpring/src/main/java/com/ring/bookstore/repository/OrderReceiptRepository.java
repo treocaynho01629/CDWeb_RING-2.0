@@ -36,14 +36,14 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Inte
 	Page<OrderReceipt> findAllByBookId(Integer id, Pageable pageable); //Lấy Đơn hàng theo {Id Sách}
 	
 	@Query("""
-	select month(o.oDate) as name, isnull(sum(o2.amount) , 0) as data, isnull(sum(distinct o.total) , 0) as otherData 
+	select month(o.oDate) as name, coalesce(sum(o2.amount) , 0) as data, coalesce(sum(distinct o.total) , 0) as otherData 
 	from OrderReceipt o left join OrderDetail o2 on o.id = o2.order.id
 	group by month(o.oDate)
 	""")
 	List<IChartResponse> getMonthlySale(); //Lấy dữ liệu doanh thu theo tháng
 	
 	@Query("""
-	select month(o.oDate) as name, isnull(sum(o2.amount) , 0) as data, isnull(sum(distinct o.total) , 0) as otherData 
+	select month(o.oDate) as name, coalesce(sum(o2.amount) , 0) as data, coalesce(sum(distinct o.total) , 0) as otherData 
 	from OrderReceipt o left join OrderDetail o2 on o.id = o2.order.id join Book b on b.id = o2.book.id
 	where b.user.id = :id
 	group by month(o.oDate)
