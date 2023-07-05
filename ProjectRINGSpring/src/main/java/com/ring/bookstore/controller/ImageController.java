@@ -55,7 +55,7 @@ public class ImageController { //Controller Ảnh
 	@GetMapping("/{name}")
 	public ResponseEntity<byte[]> getImage(@PathVariable String name) {
 		Image image = imageService.getImage(name);
-		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(image.getImage()); //Trả file Ảnh
+		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf(image.getType())).body(image.getImage()); //Trả file Ảnh
 	}
 	
 	//Xoá Ảnh theo {id}
