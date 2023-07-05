@@ -38,6 +38,6 @@ public class OrderMapper implements Function<OrderReceipt, OrderDTO> {
         		order.getTotal(),
         		userName,
         		detailsDTO
-        		);
+		);
     }
 }

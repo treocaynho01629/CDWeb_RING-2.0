@@ -19,17 +19,12 @@ public class BookMapper implements Function<Book, BookDTO> {
     @Override
     public BookDTO apply(Book book) {
 
-		String fileDownloadUri = "N/A";
-
-		try {
-			fileDownloadUri = ServletUriComponentsBuilder
+		String fileDownloadUri = ServletUriComponentsBuilder
 					.fromCurrentContextPath()
 					.path("/api/images/")
 					.path(book.getImages().getName())
 					.toUriString();
-		} catch (Exception e){
-		}
-    	
+
         return new BookDTO(book.getId()
         		,book.getTitle()
         		,book.getDescription()

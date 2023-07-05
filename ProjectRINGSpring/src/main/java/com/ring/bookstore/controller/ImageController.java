@@ -1,7 +1,13 @@
 package com.ring.bookstore.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
+import com.ring.bookstore.utils.ImageUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +46,7 @@ public class ImageController { //Controller Ảnh
 	//Tải Ảnh lên Server
 	@PostMapping("/upload")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-	public ResponseEntity<?> uploadFile(@RequestParam("image") MultipartFile file) throws IOException {
+	public ResponseEntity<?> uploadFile(@RequestParam("image") MultipartFile file) {
 		
 		try {
 			ImageDTO image = imageService.uploadImage(file);
@@ -51,17 +57,32 @@ public class ImageController { //Controller Ảnh
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
 		}
 	}
+
+	//Tải nhiều ảnh
+	@PostMapping("/upload_multiples")
+	public ResponseEntity<?> uploadFiles( @RequestParam("images") MultipartFile[] files) {
+		List<String> messages = new ArrayList<>();
+
+		Arrays.asList(files).stream().forEach(file -> {
+			try {
+				imageService.uploadImage(file);
+				messages.add(file.getOriginalFilename() + " [Successful]");
+			} catch (Exception e) {
+				messages.add(file.getOriginalFilename() + " <Failed> - " + e.getMessage());
+			}
+		});
+
+		return new ResponseEntity<>(messages, HttpStatus.OK);
+	}
 	
 	//Lấy Ảnh theo {name}
 	@GetMapping("/{name}")
 	public ResponseEntity<byte[]> getImage(@PathVariable String name) {
-		byte[] imageData = imageService.getImage(name);
+		Image image = imageService.getImage(name);
+		byte[] imageData = ImageUtils.decompressImage(image.getImage());
 		return ResponseEntity.status(HttpStatus.OK)
-				.contentType(MediaType.valueOf("image/png"))
-				.body(imageData);
-
-//		Image image = imageService.getImage(name);
-//		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(image.getImage()); //Trả file Ảnh
+				.contentType(MediaType.valueOf(image.getType()))
+				.body(imageData); //Trả file Ảnh
 	}
 	
 	//Xoá Ảnh theo {id}

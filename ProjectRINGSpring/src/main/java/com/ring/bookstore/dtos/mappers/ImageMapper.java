@@ -15,16 +15,11 @@ public class ImageMapper implements Function<Image, ImageDTO> {
     @Override
     public ImageDTO apply(Image image) {
 
-		String fileDownloadUri = "N/A";
-
-		try {
-			fileDownloadUri = ServletUriComponentsBuilder
+		String fileDownloadUri = ServletUriComponentsBuilder
 					.fromCurrentContextPath()
 					.path("/api/images/")
 					.path(image.getName())
 					.toUriString();
-		} catch (Exception e){
-		}
 
         return new ImageDTO(image.getName()
         		,fileDownloadUri

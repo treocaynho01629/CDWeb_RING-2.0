@@ -47,13 +47,10 @@ public class ImageServiceImpl implements ImageService {
 	}
 
 	//Lấy ảnh theo {name}
-	public byte[] getImage(String name) {
+	public Image getImage(String name) {
 		Image image = imageRepo.findByName(name)
 				.orElseThrow(() -> new ResourceNotFoundException("Image does not exists!")); //Báo lỗi khi ko có
-//		return image;
-
-		byte[] imageData = ImageUtils.decompressImage(image.getImage());
-		return imageData;
+		return image;
 	}
 
 	//Lấy tất cả Ảnh

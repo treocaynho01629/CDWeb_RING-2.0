@@ -21,16 +21,11 @@ public class BookDetailMapper implements Function<Book, BookDetailDTO> {
     @Override
     public BookDetailDTO apply(Book book) {
 
-		String fileDownloadUri = "N/A";
-
-		try {
-			fileDownloadUri = ServletUriComponentsBuilder
+		String fileDownloadUri = ServletUriComponentsBuilder
 					  .fromCurrentContextPath()
 					  .path("/api/images/")
 					  .path(book.getImages().getName())
 					  .toUriString();
-		} catch (Exception e){
-		}
 
     	Category cate = book.getCate();
     	BookDetail detail = book.getBookDetail();
