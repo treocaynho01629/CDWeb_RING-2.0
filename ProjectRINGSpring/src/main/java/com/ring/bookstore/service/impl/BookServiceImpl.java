@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ring.bookstore.utils.ImageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -132,7 +133,7 @@ public class BookServiceImpl implements BookService {
 			Image.builder()
     		.name(fileName)
     		.type(file.getContentType())
-    		.image(file.getBytes())
+    		.image(ImageUtils.compressImage(file.getBytes()))
 			.build()
 		);
 	    		
@@ -184,7 +185,7 @@ public class BookServiceImpl implements BookService {
 				Image.builder()
 	    		.name(fileName)
 	    		.type(file.getContentType())
-	    		.image(file.getBytes())
+	    		.image(ImageUtils.compressImage(file.getBytes()))
 				.build()
 			);
 			newImage = image;

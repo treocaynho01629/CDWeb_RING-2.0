@@ -13,7 +13,7 @@ import java.util.List;
 public interface ImageService {
 	
 	ImageDTO uploadImage(MultipartFile file) throws IOException;
-    byte[] getImage(String name);
+    Image getImage(String name);
     ImageDTO deleteImage(Integer id);
     boolean existsImage(String name);
     List<ImageDTO> getAllImages();

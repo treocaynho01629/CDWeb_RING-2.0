@@ -19,6 +19,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "image")
@@ -48,7 +50,8 @@ public class Image { //Ảnh
 	private String type;
 
 	@Lob
-	@Column(name = "image", length = 1000)
+	@Column(name = "image")
+	@JdbcTypeCode(SqlTypes.BINARY)
 	private byte[] image;
 	
 	@OneToMany(cascade = CascadeType.ALL, 

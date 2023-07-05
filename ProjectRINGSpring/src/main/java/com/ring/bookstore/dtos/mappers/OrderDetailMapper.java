@@ -16,17 +16,12 @@ public class OrderDetailMapper implements Function<OrderDetail, OrderDetailDTO> 
     	
     	Book book = detail.getBook();
 
-		String fileDownloadUri = "N/A";
-
-		try {
-			fileDownloadUri = ServletUriComponentsBuilder
+		String fileDownloadUri = ServletUriComponentsBuilder
 					.fromCurrentContextPath()
 					.path("/api/images/")
 					.path(book.getImages().getName())
 					.toUriString();
-		} catch (Exception e){
-		}
-    	
+
         return new OrderDetailDTO(detail.getAmount(),
         		detail.getPrice(),
         		detail.getBook().getId(),
