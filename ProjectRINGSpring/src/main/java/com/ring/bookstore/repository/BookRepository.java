@@ -35,7 +35,7 @@ public interface BookRepository extends JpaRepository<Book, Integer>{
 			Double toRange, 
 			Pageable pageable);
 	
-	@Query("select b from Book b order by rand() limit :amount")
+	@Query("select b from Book b order by random() limit :amount")
 	public List<Book> findRandomBooks(int amount); //Lấy Sách ngẫu nhiên
 	
 	public void deleteByUser_Id(Integer id);

@@ -12,7 +12,7 @@
 	<artifactId>bookstore</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ProjectRINGSpring</name>
-	<description>ECommerce Bookstore Project mon Chuyen De Web: Ha Duc Trong - MSSV: 19130248, Nguyen Cong Binh - MSSV: 19130018</description>
+	<description>ECommerce Bookstore Project</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -46,6 +46,11 @@
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>

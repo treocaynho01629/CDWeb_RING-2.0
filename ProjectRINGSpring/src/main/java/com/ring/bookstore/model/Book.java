@@ -54,7 +54,6 @@ public class Book { //Sách
     
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id", nullable = true)
-    @JsonIgnore 
     private Image images;
     
     @Column
