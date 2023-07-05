@@ -48,7 +48,7 @@ public class Image { //Ảnh
 	private String type;
 
 	@Lob
-	@Column(name = "image", unique = false, nullable = false, columnDefinition = "MEDIUMBLOB")
+	@Column(name = "image", length = 1000)
 	private byte[] image;
 	
 	@OneToMany(cascade = CascadeType.ALL, 

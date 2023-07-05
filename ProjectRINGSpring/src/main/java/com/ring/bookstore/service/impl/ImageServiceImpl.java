@@ -1,5 +1,7 @@
 package com.ring.bookstore.service.impl;
 
+import com.ring.bookstore.utils.ImageUtils;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -35,18 +37,23 @@ public class ImageServiceImpl implements ImageService {
 				Image.builder()
 				.name(fileName)
 				.type(file.getContentType())
-				.image(file.getBytes())
+				.image(null)
 				.build());
+
+		image.setImage(ImageUtils.compressImage(file.getBytes())); //Set ảnh mới
 		imageRepo.save(image); //Lưu vào CSDL
 		ImageDTO dto = imageMapper.apply(image); //Trả ảnh đã Map về DTO
 		return dto;
 	}
 
-	//Lấy ảnh theo {Tên}
-	public Image getImage(String name) {
+	//Lấy ảnh theo {name}
+	public byte[] getImage(String name) {
 		Image image = imageRepo.findByName(name)
 				.orElseThrow(() -> new ResourceNotFoundException("Image does not exists!")); //Báo lỗi khi ko có
-		return image;
+//		return image;
+
+		byte[] imageData = ImageUtils.decompressImage(image.getImage());
+		return imageData;
 	}
 
 	//Lấy tất cả Ảnh
@@ -58,6 +65,7 @@ public class ImageServiceImpl implements ImageService {
 
 	//Xoá ảnh theo {id}
 	@Override
+	@Transactional
 	public ImageDTO deleteImage(Integer id) {
 		Image image = imageRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Image does not exists!")); //Báo lỗi khi ko có
@@ -67,7 +75,7 @@ public class ImageServiceImpl implements ImageService {
 		return dto;
 	}
 
-	//Kiểm tra ảnh với {Tên} đã tồn tại?
+	//Kiểm tra ảnh với {name} đã tồn tại?
 	public boolean existsImage(String name) {
 		return imageRepo.existsByName(name);
 	}

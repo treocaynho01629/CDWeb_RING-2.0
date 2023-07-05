@@ -46,6 +46,7 @@ public class ImageController { //Controller Ảnh
 			ImageDTO image = imageService.uploadImage(file);
 			return new ResponseEntity<>(image, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
 		}
@@ -54,8 +55,13 @@ public class ImageController { //Controller Ảnh
 	//Lấy Ảnh theo {name}
 	@GetMapping("/{name}")
 	public ResponseEntity<byte[]> getImage(@PathVariable String name) {
-		Image image = imageService.getImage(name);
-		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(image.getImage()); //Trả file Ảnh
+		byte[] imageData = imageService.getImage(name);
+		return ResponseEntity.status(HttpStatus.OK)
+				.contentType(MediaType.valueOf("image/png"))
+				.body(imageData);
+
+//		Image image = imageService.getImage(name);
+//		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(image.getImage()); //Trả file Ảnh
 	}
 	
 	//Xoá Ảnh theo {id}
