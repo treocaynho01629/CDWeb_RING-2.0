@@ -53,7 +53,7 @@ const Container = styled.div`
     };
 
     &:hover ${ImageSlider}{
-        padding: 0;
+        transform: scale(1.025);
     };
 
     &:hover {
