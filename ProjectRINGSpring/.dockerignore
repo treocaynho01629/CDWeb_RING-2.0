@@ -1,0 +1,11 @@
+.idea
+.test
+.settings
+uploads
+bin
+
+.classpath
+.factorypath
+.gitignore
+.project
+HELP.md
