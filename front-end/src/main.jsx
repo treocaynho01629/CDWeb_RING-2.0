@@ -8,8 +8,10 @@ import { Provider } from 'react-redux';
 import { persistor, store } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { CookiesProvider } from "react-cookie";
-import { SnackbarProvider, MaterialDesignContent } from 'notistack';
+import { SnackbarProvider, MaterialDesignContent, closeSnackbar } from 'notistack';
 import { styled as muiStyled } from '@mui/material/styles';
+import { Close } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 
 const StyledMaterialDesignContent = muiStyled(MaterialDesignContent)(() => ({
   '&.notistack-MuiContent-success': {
@@ -29,11 +31,19 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <PersistGate loading={"loading"} persistor={persistor}>
           <AuthProvider>
             <SnackbarProvider
-            autoHideDuration={1500}
-            Components={{
-              success: StyledMaterialDesignContent,
-              error: StyledMaterialDesignContent,
-            }}>
+              autoHideDuration={1500}
+              action={(snackbarId) => (
+                <IconButton
+                  aria-label="dismiss snack"
+                  onClick={() => closeSnackbar(snackbarId)}
+                >
+                  <Close />
+                </IconButton>
+              )}
+              Components={{
+                success: StyledMaterialDesignContent,
+                error: StyledMaterialDesignContent,
+              }}>
               <Routes>
                 <Route path="/*" element={<App />} />
               </Routes>
