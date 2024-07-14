@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class OrderServiceImpl implements OrderService { //Dịch vụ Đơn hàng
+public class OrderServiceImpl implements OrderService {
 	 
 	private final OrderReceiptRepository orderRepo;
 	private final OrderDetailRepository detailRepo;
@@ -48,19 +48,19 @@ public class OrderServiceImpl implements OrderService { //Dịch vụ Đơn hàn
 	@Autowired
 	private OrderMapper orderMapper;
 	
-	//Đặt hàng
+	//Commit order
 	@Transactional
 	public OrderReceipt checkout(OrderRequest request, Account user) {
 		
-		//Xử lý dữ liệu từ request
-		String fullName = request.getFirstName() + " " + request.getLastName(); //Hợp Họ và Tên
-		String cartContent = ""; //Nội dung Email của giỏ hàng
-		double total = 0.0; //Tổng tiền
+		//Info validation
+		String fullName = request.getFirstName() + " " + request.getLastName(); //Fullname
+		String cartContent = ""; //For email
+		double total = 0.0; //Total price
 		
-		//Kiểm tra giỏ hàng từ Request, Trống >> báo lỗi
+		//Get cart from request
 		if (request.getCart() != null && request.getCart().size() == 0) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Empty cart!"); 
 		
-		//Tạo Đơn hàng mới và set dữ liệu
+		//Create new receipt
 		var orderReceipt = OrderReceipt.builder()
 				.fullName(fullName)
 				.email(user.getEmail())
@@ -71,18 +71,18 @@ public class OrderServiceImpl implements OrderService { //Dịch vụ Đơn hàn
 				.user(user)
 				.build();
 		
-		OrderReceipt savedOrder = orderRepo.save(orderReceipt); //Lưu Đơn hàng vào CSDL
+		OrderReceipt savedOrder = orderRepo.save(orderReceipt); //Save receipt to database
 		
-		//Tạo Chi tiết đơn hàng cho từng Sản phẩm trong Giỏ hàng
+		//Create order details
 		for (CartItem i : request.getCart()) {
-			//Kiểm tra Sản phẩm (Sách) có tồn tại trong CSDL không >> Báo lỗi
+			//Book validation
 			Book book = bookRepo.findById(i.getId()) 
 			            .orElseThrow(()-> new ResourceNotFoundException("Product does not exists!"));
 			
-			double totalPrice = (i.getQuantity() * book.getPrice()); //Tính giá tiền sản phẩm (Giá X Số lượng)
-			total += totalPrice; //Thêm vào tổng giá trị Giỏ hàng
+			double totalPrice = (i.getQuantity() * book.getPrice()); //Price
+			total += totalPrice; //Add to total price
 			
-			//Thêm sản phẩm vào nội dung Email
+			//Add to email content
 			cartContent += 
 			  "<div style=\"display: flex; padding: 5px 15px; border: 0.5px solid lightgray;\">\r\n"
 			+ "	   <div style=\"margin-left: 15px;\">\r\n"
@@ -92,7 +92,7 @@ public class OrderServiceImpl implements OrderService { //Dịch vụ Đơn hàn
 			+ "    </div>\r\n"
 			+ "</div><br><br>";
 			
-			//Tạo Chi tiết đơn hàng và set dữ liệu
+			//Create details
 			var orderDetail = OrderDetail.builder()
 					.amount(i.getQuantity())
 					.price(book.getPrice())
@@ -100,12 +100,12 @@ public class OrderServiceImpl implements OrderService { //Dịch vụ Đơn hàn
 					.order(savedOrder)
 					.build();
 			
-			detailRepo.save(orderDetail); //Lưu Chi tiết đơn hàng vào CSDL
+			detailRepo.save(orderDetail); //Save details to database
 		}
 		
-		savedOrder.setTotal(total * 1.1 + 10000); //Lưu tổng giá trị đơn hàng vào Đơn hàng
+		savedOrder.setTotal(total * 1.1 + 10000); //+ fixed taxed total
 		
-		//Tạo và gửi Email
+		//Create and send email
         String subject = "RING! - BOOKSTORE: Đặt hàng thành công! "; 
         String content = "<h1><b style=\"color: #63e399;\">RING!</b> - BOOKSTORE</h1>\n"
                 + "<h2 style=\"background-color: #63e399; padding: 10px; color: white;\" >\r\n"
@@ -119,67 +119,67 @@ public class OrderServiceImpl implements OrderService { //Dịch vụ Đơn hàn
                 + "<br><br><h3>Chi tiết sản phẩm:</h3>\n"
                 + cartContent
                 + "<br><br><h3>Tổng đơn giá: <b style=\"color: red\">" + total * 1.1 + 10000 + "đ</b></h3>";
-        emailService.sendHtmlMessage(user.getEmail(), subject, content); //Gửi
+        emailService.sendHtmlMessage(user.getEmail(), subject, content); //Send
 		
-		return orderRepo.save(savedOrder); //Lưu Đơn hàng vào CSDL và trả về
+		return orderRepo.save(savedOrder); //Save to database
 	}
 
-	//Lấy tất cả Đơn hàng
+	//Get all orders
 	@Override
 	public Page<OrderDTO> getAllOrders(Account user, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Tạo phân trang
+		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 					: Sort.by(sortBy).descending());
 		
 		Page<OrderReceipt> ordersList = null;
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString()))) {
-        	ordersList = orderRepo.findAll(pageable); //Có Quyền ADMIN >> Lấy tất cả từ CSDL
+        	ordersList = orderRepo.findAll(pageable); //Get all if ADMIN
         } else {
-        	ordersList = orderRepo.findAllBySeller(user.getId(), pageable); //Có quyền SELLER >> Chỉ lấy Đơn hàng từ sách họ bán
+        	ordersList = orderRepo.findAllBySeller(user.getId(), pageable); //If SELLER, only get their
         }
 		
-        List<OrderDTO> ordersDTO = ordersList.stream().map(orderMapper::apply).collect(Collectors.toList()); //Map sang DTO
-        return new PageImpl<OrderDTO>(ordersDTO, pageable, ordersList.getTotalElements()); //Trả về sau khi phân trang và Map
+        List<OrderDTO> ordersDTO = ordersList.stream().map(orderMapper::apply).collect(Collectors.toList()); //Map to DTO
+        return new PageImpl<OrderDTO>(ordersDTO, pageable, ordersList.getTotalElements()); //Return paginated orders
 	}
 
-	//Lấy Đơn hàng theo {Id Sách}
+	//Get order with book's {id}
 	@Override
 	public Page<OrderDTO> getOrdersByBookId(Integer id, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Tạo phân trang
+		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
 	
-		Page<OrderReceipt> ordersList = orderRepo.findAllByBookId(id, pageable); //Lấy Đơn hàng từ CSDL
-	    List<OrderDTO> ordersDTO = ordersList.stream().map(orderMapper::apply).collect(Collectors.toList()); //Map và phân trang
-	    return new PageImpl<OrderDTO>(ordersDTO, pageable, ordersList.getTotalElements()); //Trả về
+		Page<OrderReceipt> ordersList = orderRepo.findAllByBookId(id, pageable); //Fetch from database
+	    List<OrderDTO> ordersDTO = ordersList.stream().map(orderMapper::apply).collect(Collectors.toList()); //Map to DTO and pagination
+	    return new PageImpl<OrderDTO>(ordersDTO, pageable, ordersList.getTotalElements());
 	}
 
-	//Lấy Đơn hàng theo Người dùng hiện tại
+	//Get current user's orders
 	@Override
 	public Page<OrderDTO> getOrdersByUser(Account user, Integer pageNo, Integer pageSize) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize); //Phân trang
-		Page<OrderReceipt> ordersList = orderRepo.findAllByUser_Id(user.getId(), pageable); //Lấy Đơn hàng từ CSDL
-	    List<OrderDTO> ordersDTO = ordersList.stream().map(orderMapper::apply).collect(Collectors.toList()); //Map và phân trang
-	    return new PageImpl<OrderDTO>(ordersDTO, pageable, ordersList.getTotalElements()); //Trả về
+		Pageable pageable = PageRequest.of(pageNo, pageSize); //Pagination
+		Page<OrderReceipt> ordersList = orderRepo.findAllByUser_Id(user.getId(), pageable); //Fetch from database
+	    List<OrderDTO> ordersDTO = ordersList.stream().map(orderMapper::apply).collect(Collectors.toList()); //Map to DTO and pagination
+	    return new PageImpl<OrderDTO>(ordersDTO, pageable, ordersList.getTotalElements());
 	}
 
-	//Lấy đơn hàng theo {id}
+	//Get order by {id}
 	@Override
 	public OrderDTO getOrderById(Integer id) {
-		OrderReceipt order = orderRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order does not exists!")); //Báo lỗi nếu ko có
-		OrderDTO orderDTO = orderMapper.apply(order); //Map sang DTO
-		return orderDTO; //Trả về
+		OrderReceipt order = orderRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order does not exists!"));
+		OrderDTO orderDTO = orderMapper.apply(order); //Map to DTO
+		return orderDTO;
 	}
 
-	//Lấy dữ liệu doanh thu theo tháng
+	//Get monthly sales
 	@Override
 	public List<IChartResponse> getMonthlySale(Account user) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString()))) {
-        	return orderRepo.getMonthlySale(); //Có quyền ADMIN >> Lấy dữ liệu tất cả Đơn hàng từ CSDL
+        	return orderRepo.getMonthlySale(); //Get all if ADMIN
         } else {
-        	return orderRepo.getMonthlySaleBySeller(user.getId()); //Có quyền SELLER >> Chỉ lấy dữ liệu Đơn hàng từ sách họ bán
+        	return orderRepo.getMonthlySaleBySeller(user.getId()); //If seller only get their
         }
 	}
 }

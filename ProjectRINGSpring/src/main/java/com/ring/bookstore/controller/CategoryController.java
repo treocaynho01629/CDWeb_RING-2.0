@@ -18,11 +18,11 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
-public class CategoryController { //Controller Danh mục
+public class CategoryController {
 	
 	private final CategoryService cateService;
 	
-	//Lấy tất Danh mục
+	//Get all categories
 	@GetMapping()
 	public ResponseEntity<?> getAllCategories(){
 		List<Category> categories =  cateService.getAllCategories();

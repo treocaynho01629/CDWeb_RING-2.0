@@ -10,6 +10,6 @@ import com.ring.bookstore.model.OrderDetail;
 @Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Integer>{
 	
-	void deleteByBook_Id(Integer id); //Xoá Chi tiết đơn hàng theo {Id sách}
-	List<OrderDetail> findByOrder_Id(Integer id); //Tìm Chi tiết đơn hàng theo {Id đơn hàng}
+	void deleteByBook_Id(Integer id); //Delete OrderDetail by book's {id}
+	List<OrderDetail> findByOrder_Id(Integer id); //Find OrderDetail by order's {id}
 }

@@ -1,46 +1,53 @@
-import React, { useEffect, useState, useRef } from 'react'
-
 import styled from "styled-components"
+import { useEffect, useState, useRef } from 'react'
 import { styled as muiStyled } from '@mui/system';
-
-import { Box, Grid, TextField, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip, IconButton } from '@mui/material';
-import { Search as SearchIcon, SearchOff, FilterAlt} from '@mui/icons-material';
+import { Grid, TextField, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip, IconButton } from '@mui/material';
+import { Search as SearchIcon, SearchOff, FilterAlt } from '@mui/icons-material';
+import { orderGroup } from "../ultils/filters";
+import CustomInput from "./custom/CustomInput";
+import CustomButton from "./custom/CustomButton";
 
 //#region styled
 const Container = styled.div`
+    margin-bottom: 5px;
 `
 
 const SearchInput = styled(TextField)({
+    maxWidth: '500px',
+    '& .MuiFormControl-root': {
+        backgroundColor: 'red',
+        display: 'flex',
+        justifyContent: 'center'
+    },
     '& .MuiInputBase-root': {
-      borderRadius: 0,
-      margin: '10px 0px',
-      maxWidth: '500px',
+        borderRadius: 0,
+        margin: '10px 0px',
     },
     '& label.Mui-focused': {
-      color: '#A0AAB4'
+        color: '#A0AAB4'
     },
     '& .MuiInput-underline:after': {
-      borderBottomColor: '#B2BAC2',
+        borderBottomColor: '#B2BAC2',
     },
     '& .MuiOutlinedInput-root': {
-      borderRadius: 0,
-      '& fieldset': {
         borderRadius: 0,
-        borderColor: '#E0E3E7',
-      },
-      '&:hover fieldset': {
-        borderRadius: 0,
-        borderColor: '#B2BAC2',
-      },
-      '&.Mui-focused fieldset': {
-        borderRadius: 0,
-        borderColor: '#6F7E8C',
-      },
+        '& fieldset': {
+            borderRadius: 0,
+            borderColor: '#E0E3E7',
+        },
+        '&:hover fieldset': {
+            borderRadius: 0,
+            borderColor: '#B2BAC2',
+        },
+        '&.Mui-focused fieldset': {
+            borderRadius: 0,
+            borderColor: '#6F7E8C',
+        },
     },
     '& input:valid + fieldset': {
-      borderColor: 'lightgray',
-      borderRadius: 0,
-      borderWidth: 1,
+        borderColor: 'lightgray',
+        borderRadius: 0,
+        borderWidth: 1,
     },
 });
 
@@ -58,28 +65,40 @@ const Sort = styled.div`
 `
 
 const StyledToggleButtonGroup = muiStyled(ToggleButtonGroup)(({ theme }) => ({
+    width: '100%',
+
+    '@media screen and (min-width: 768px)': {
+        width: 'auto',
+        marginLeft: '10px',
+    },
+
     '& .MuiToggleButtonGroup-grouped': {
-      backgroundColor: 'rgb(39, 39, 39)',
-      color: 'rgba(255, 255, 255, 0.7)',
-      fontWeight: 400,
-      border: 0,
-      borderRadius: 0,
-      marginLeft: '10px',
+        backgroundColor: '#272727',
+        color: '#ffffffb2',
+        fontWeight: 400,
+        border: 0,
+        borderRadius: 0,
     },
 }));
-  
+
 const StyledToggleButton = muiStyled(ToggleButton)(({ theme }) => ({
-    
-    padding: '7px 15px',
-    marginRight: '10px',
+    padding: '10px 15px',
+    marginRight: 0,
     textTransform: 'none',
     fontSize: '14px',
+    minWidth: '25%',
+    transition: 'all .3s ease',
+
+    '@media screen and (min-width: 768px)': {
+        marginRight: '5px',
+    },
+
     '&:hover': {
-        backgroundColor: '#63e399',
+        backgroundColor: theme.palette.secondary.main,
     },
     '&.Mui-selected': {
         fontWeight: 'bold',
-        backgroundColor: '#63e399',
+        backgroundColor: theme.palette.secondary.main,
         color: 'white',
     },
     '&:focus': {
@@ -88,184 +107,139 @@ const StyledToggleButton = muiStyled(ToggleButton)(({ theme }) => ({
     },
 }));
 
-const CustomInput = styled(TextField)({
-    '& .MuiInputBase-root': {
-        borderRadius: 0,
-        padding: 0,
-        height: '42px',
-    },
-    '& label.Mui-focused': {
-        color: '#A0AAB4'
-    },
-    '& .MuiInput-underline:after': {
-        borderBottomColor: '#B2BAC2',
-    },
-    '& .MuiOutlinedInput-root': {
-        borderRadius: 0,
-        '& fieldset': {
-        borderRadius: 0,
-        borderColor: '#E0E3E7',
-        },
-        '&:hover fieldset': {
-        borderRadius: 0,
-        borderColor: '#B2BAC2',
-        },
-        '&.Mui-focused fieldset': {
-        borderRadius: 0,
-        borderColor: '#6F7E8C',
-        },
-    },
-    '& input:valid + fieldset': {
-        borderColor: 'lightgray',
-        borderRadius: 0,
-        borderWidth: 1,
-    },
-});
+const FilterTitle = styled.h4`
+    display: none;
 
-const FilterButton = styled.button`
-    height: 42px;
-    padding: 0 5px;
-    margin-left: 8px;
-    border-radius: 0;
-    background-color: white;
-    border: 0.5px solid lightgray;
-    color: darkslategrey;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    &:hover {
-        background-color: lightgray;
-        border-color: #63e399;
-    }
-
-    &:focus {
-        outline: none;
+    @media (min-width: 768px) {
+        display: block;
     }
 `
 //#endregion
 
-const orderGroup = [
-    {
-        value: 'id',
-        label: 'Mới nhất',
-    },
-    {
-        value: 'orderTime',
-        label: 'Bán chạy',
-    },
-    {
-        value: 'rateAmount',
-        label: 'Yêu thích',
-    },
-    {
-        value: 'price',
-        label: 'Giá bán',
-    },
-];
-
 const SortList = (props) => {
-    const { filters, pagination, onChangeOrder, onChangeDir, onChangeSearch, setOpen } = props;
-    const [ sortBy, setSortBy] = useState(pagination.sortBy);
-    const [ sortDir, setSortDir] = useState(pagination.sortDir);
-    const [ toggleSearch, setToggleSearch ] = useState(filters?.keyword ? true : false);
+    const { filters, pagination, onChangeOrder, onChangeDir, onChangeSearch, onSizeChange, setOpen } = props;
     const searchRef = useRef(null);
 
-    const handleChangeOrder = (event, newValue) => {
-        if (newValue != null && onChangeOrder){
-            onChangeOrder(newValue);
-        }
-    };
+    //Initial value
+    const [sortBy, setSortBy] = useState(pagination?.sortBy);
+    const [sortDir, setSortDir] = useState(pagination?.sortDir);
+    const [toggleSearch, setToggleSearch] = useState(filters?.keyword ? true : false);
 
-    const handleChangeDir = (event) => {
-        if (onChangeDir){
-            onChangeDir(event.target.value)
-        }
-    };
-
-    const handleSubmitSearch = (event) => {
-        event.preventDefault();
-        if (onChangeSearch){
-            onChangeSearch(searchRef.current.value);
-        }
-    };
-
-    const handleToggleSearch = () => setToggleSearch((toggleSearch) => !toggleSearch);
-
-    const handleMouseDown = (event) => {
-        event.preventDefault();
-    };
-
-    const handleSetOpen = (event) => {
-        if (setOpen) setOpen(true); 
-    }
-
+    //Update sort
     useEffect(() => {
         setSortBy(pagination?.sortBy);
         setSortDir(pagination?.sortDir);
     }, [pagination])
 
-  return (
-    <Container>
-        <SortContainer>
-            <Sort>
-                <Grid container spacing={0} sx={{width: '100%'}}>
-                    <Grid item xs={12} sm={8} sx={{display: 'flex', alignItems: 'center'}}>
-                        <h4>Sắp xếp theo</h4>
-                        <StyledToggleButtonGroup
-                            value={sortBy}
-                            exclusive
-                            onChange={handleChangeOrder}
-                        >
-                            {orderGroup.map((order, index) => (
-                                <StyledToggleButton key={index} value={order.value}>{order.label}</StyledToggleButton>
-                            ))}
-                        </StyledToggleButtonGroup>
+    //Change order by
+    const handleChangeOrder = (event, newValue) => {
+        if (newValue != null && onChangeOrder) onChangeOrder(newValue);
+    };
+
+    //Change sort direction
+    const handleChangeDir = (event) => {
+        if (onChangeDir) onChangeDir(event.target.value)
+    };
+
+    //Change search value
+    const handleSubmitSearch = (event) => {
+        event.preventDefault();
+        if (onChangeSearch) onChangeSearch(searchRef.current.value);
+    };
+
+    //Change amount display
+    const handleChangeSize = (event) => { if (onSizeChange) onSizeChange(event.target.value) }
+
+    //Toggle open search input / filter dialog
+    const handleToggleSearch = () => setToggleSearch((toggleSearch) => !toggleSearch);
+    const handleSetOpen = (event) => { if (setOpen) setOpen(true) }
+
+    return (
+        <Container>
+            <SortContainer>
+                <Sort>
+                    <Grid container spacing={0} sx={{ width: '100%' }}>
+                        <Grid item xs={12} md={8} sx={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '5px' }}>
+                            <FilterTitle>Xếp theo</FilterTitle>
+                            <StyledToggleButtonGroup
+                                value={sortBy}
+                                exclusive
+                                onChange={handleChangeOrder}
+                                size="large"
+                            >
+                                {orderGroup.map((order, index) => (
+                                    <StyledToggleButton
+                                        key={`${order?.label}-${index}`}
+                                        value={order?.value}
+                                    >
+                                        {order?.label}
+                                    </StyledToggleButton>
+                                ))}
+                            </StyledToggleButtonGroup>
+                        </Grid>
+                        <Grid item xs={12} md={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-end' } }}>
+                            <Tooltip title="Tìm kiếm">
+                                <IconButton aria-label="search"
+                                    onClick={handleToggleSearch}
+                                    onMouseDown={(e) => e.preventDefault}
+                                    sx={{ marginRight: 0, zIndex: 10 }}>
+                                    {toggleSearch ?
+                                        <SearchIcon sx={{ fontSize: '26px', color: '#63e399' }} />
+                                        : <SearchOff sx={{ fontSize: '26px' }} />}
+                                </IconButton>
+                            </Tooltip>
+                            <CustomInput
+                                size="small"
+                                select
+                                value={sortDir}
+                                onChange={handleChangeDir}
+                            >
+                                <MenuItem value={'desc'}>Cao đến thấp</MenuItem>
+                                <MenuItem value={'asc'}>Thấp đến cao</MenuItem>
+                            </CustomInput>
+                            <CustomInput
+                                size="small"
+                                select
+                                value={pagination?.pageSize}
+                                onChange={handleChangeSize}
+                                sx={{ marginLeft: '5px', display: { xs: 'block', sm: 'none' } }}
+                            >
+                                <MenuItem value={8}>Hiển thị 8</MenuItem>
+                                <MenuItem value={16}>Hiển thị 16</MenuItem>
+                                <MenuItem value={24}>Hiển thị 24</MenuItem>
+                                <MenuItem value={48}>Hiển thị 48</MenuItem>
+                            </CustomInput>
+                            <CustomButton
+                                size="small"
+                                variant="outlined"
+                                sx={{ height: '40px', marginLeft: '5px', display: { xs: 'flex', md: 'none' } }}
+                                onClick={handleSetOpen}
+                            >
+                                <FilterAlt />Lọc
+                            </CustomButton>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={4} sx={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
-                        <Tooltip title="Tìm kiếm">
-                            <IconButton aria-label="search" 
-                            onClick={handleToggleSearch}
-                            onMouseDown={handleMouseDown}
-                            sx={{marginRight: 0, zIndex: 10}}>
-                                {toggleSearch ? 
-                                <SearchIcon sx={{fontSize: '26px', color: '#63e399'}}/>
-                                : <SearchOff sx={{fontSize: '26px'}}/>}
-                            </IconButton>
-                        </Tooltip>
-                        <CustomInput
-                        select
-                        value={sortDir}
-                        onChange={handleChangeDir}
-                        >
-                            <MenuItem value={'desc'}>Cao đến thấp</MenuItem>
-                            <MenuItem value={'asc'}>Thấp đến cao</MenuItem>
-                        </CustomInput>
-                        <Box display={{ xs: 'block', md: 'none' }}>
-                            <FilterButton onClick={handleSetOpen}><FilterAlt/>Lọc</FilterButton>
-                        </Box>
-                    </Grid>
-                </Grid>
-            </Sort>
-        </SortContainer>
-        {toggleSearch ?
-        <form onSubmit={handleSubmitSearch}>
-            <SearchInput placeholder='Từ khoá... '
-                id="search"
-                size="small"
-                fullWidth
-                defaultValue={filters.keyword}
-                inputRef={searchRef}
-                onBlur={handleSubmitSearch}
-                InputProps={{
-                    endAdornment: <SearchIcon style={{color:"gray"}}/>
-                }}
-            />
-        </form> 
-        : null
-        }
-    </Container>
-  )
+                </Sort>
+            </SortContainer>
+            {
+                toggleSearch
+                &&
+                <form onSubmit={handleSubmitSearch} style={{ display: 'flex', justifyContent: 'center' }}>
+                    <SearchInput placeholder='Từ khoá... '
+                        id="search"
+                        size="small"
+                        fullWidth
+                        defaultValue={filters.keyword}
+                        inputRef={searchRef}
+                        onBlur={handleSubmitSearch}
+                        InputProps={{
+                            endAdornment: <SearchIcon style={{ color: "gray" }} />
+                        }}
+                    />
+                </form>
+            }
+        </Container>
+    )
 }
 
 export default SortList

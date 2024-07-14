@@ -13,23 +13,23 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class RoleServiceImpl implements RoleService { //Dịch vụ Quyền
+public class RoleServiceImpl implements RoleService {
 	
     private final RoleRepository roleRepo;
     
-    //Tìm Quyền với {Tên quyền}
+    //Find by role {name}
     @Override
     public Optional<Role> findByRoleName(RoleName roleName) {
         return roleRepo.findByRoleName(roleName);
     }
 
-    //Tạo quyền mới
+    //Create new role
     @Override
     public void save(Role role) {
         roleRepo.save(role);
     }
 
-    //Đếm quyền
+    //Count roles
     @Override
     public long count() {
         return roleRepo.count();

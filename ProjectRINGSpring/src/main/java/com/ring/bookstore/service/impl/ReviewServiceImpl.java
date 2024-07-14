@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class ReviewServiceImpl implements ReviewService { //Dịch vụ Đánh giá
+public class ReviewServiceImpl implements ReviewService {
 	
 	private final ReviewRepository reviewRepo;
 	private final BookRepository bookRepo;
@@ -40,17 +40,17 @@ public class ReviewServiceImpl implements ReviewService { //Dịch vụ Đánh g
 	@Autowired
 	private ReviewMapper reviewMapper;
 	
-	//Đánh giá Sản phẩm
+	//Review
 	public Review review(Integer id, ReviewRequest request, Account user) {
 		
-		//Kiểm tra Sách ko tồn tại >> báo lỗi
+		//Book validation
 		Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found")); 
-		//Kiểm tra người dùng đã mua sách chưa >> báo lỗi
+		//Check if user had bought it yet
 		if (!orderRepo.existsByUserBuyBook(id, user.getUsername())) throw new HttpResponseException(HttpStatus.NO_CONTENT, "Hãy mua sản phẩm để có thể đánh giá!");
-		//Kiểm tra người dùng đã đánh giá Sách này chưa >> báo lỗi
+		//Check if user had reviewed it yet
 		if (reviewRepo.existsByBook_IdAndUser_Id(id, user.getId())) throw new HttpResponseException(HttpStatus.ALREADY_REPORTED, "Bạn đã đánh giá sản phẩm rồi!");
 		
-		//Tạo Đánh giá và set thông tin
+		//Create review
         var review = Review.builder()
                 .book(book)
                 .rating(request.getRating())
@@ -59,66 +59,66 @@ public class ReviewServiceImpl implements ReviewService { //Dịch vụ Đánh g
                 .user(user)
                 .build();
         
-        Review addedReview = reviewRepo.save(review); //Lưu Đánh giá vào CSDL
-        return addedReview; //Trả về
+        Review addedReview = reviewRepo.save(review); //Save to database
+        return addedReview; //Return added review
 	}
 	
-	//Lấy tất cả Đánh giá
+	//Get all reviews
 	public Page<ReviewDTO> getAllReviews(Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Tạo phân trang
+		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
-		Page<Review> reviewsList = reviewRepo.findAll(pageable); //Lấy Đánh giá
-		List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList()); //Map sang DTO
-        return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements()); //Trả Đánh giá đã phân trang và Map
+		Page<Review> reviewsList = reviewRepo.findAll(pageable); //Fetch from database
+		List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList()); //Map to DTO
+        return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements()); //Return paginated reviews
 	}
 
-	//Lấy Đánh giá theo {Id Sách}
+	//Get reviews from book's {id}
 	public Page<ReviewDTO> getReviewsByBookId(Integer id, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Tạo phân trang
+		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
-		Page<Review> reviewsList = reviewRepo.findAllByBook_Id(id, pageable); //Lấy Đánh giá
-        List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList()); //Map sang DTO
-        return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements()); //Trả Đánh giá đã phân trang và Map
+		Page<Review> reviewsList = reviewRepo.findAllByBook_Id(id, pageable); //Fetch from database
+        List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList()); //Map to DTO
+        return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements()); //Return paginated reviews
 	}
 	
-	//Lấy Đánh giá theo {Id Người dùng}
+	//Get reviews by user's {id}
 	public Page<ReviewDTO> getReviewsByUser(Integer userId, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Tạo phân trang
+		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
-		Page<Review> reviewsList = reviewRepo.findAllByUser_Id(userId, pageable); //Lấy Đánh giá
-	    List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList()); //Map sang DTO
-	    return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements()); //Trả Đánh giá đã phân trang và Map
+		Page<Review> reviewsList = reviewRepo.findAllByUser_Id(userId, pageable); //Fetch from database
+	    List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList()); //Map to DTO
+	    return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements()); //Return paginated reviews
 	}
 
-	//Lấy Đánh giá theo Người dùng hiện tại
+	//Get current user's reviews
 	public Page<ReviewDTO> getReviewsByUser(Account user, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Tạo phân trang
+		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
-		Page<Review> reviewsList = reviewRepo.findAllByUser_Id(user.getId(), pageable); //Lấy Đánh giá
-	    List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList()); //Map sang DTO
-	    return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements()); //Trả Đánh giá đã phân trang và Map
+		Page<Review> reviewsList = reviewRepo.findAllByUser_Id(user.getId(), pageable); //Fetch from database
+	    List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList()); //Map to DTO
+	    return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements()); //Return paginated reviews
 	}
 	
-	//Xoá Đánh giá theo {id} (ADMIN)
+	//Delete review by {id} (ADMIN)
 	public Review deleteReview(Integer id) {
 		Review review = reviewRepo.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Review does not exists!")); //Nếu không tồn tại >> Bão lỗi
-		reviewRepo.deleteById(id); //Xoá khỏi CSDL
+				.orElseThrow(() -> new ResourceNotFoundException("Review does not exists!"));
+		reviewRepo.deleteById(id); //Delete from database
 		return review;
 	}
 	
-	//Xoá nhiều Đánh giá (ADMIN)
+	//Delete multiples reviews (ADMIN)
 	@Transactional
 	public void deleteReviews(List<Integer> ids) {
-		//Duyệt từng Đánh giá
+		//Loop through and delete
 		for (Integer id : ids) {
 			reviewRepo.findById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("Review does not exists!")); //Nếu không tồn tại >> Bão lỗi
-			reviewRepo.deleteById(id); //Xoá khỏi CSDL
+					.orElseThrow(() -> new ResourceNotFoundException("Review does not exists!"));
+			reviewRepo.deleteById(id); //Delete from database
 		}
 	}
 	
-	//Xoá tất cả Đánh giá (ADMIN)
+	//Delete all reviews ADMIN)
 	@Transactional
 	public void deleteAllReviews() {
 		reviewRepo.deleteAll();

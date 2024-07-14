@@ -18,7 +18,7 @@ public interface BookRepository extends JpaRepository<Book, Integer>{
 	select b.id as id, b.title as title, b.description as description, b.images.name as image, b.price as price, 
 	count(r.id) as rateAmount, coalesce(sum(r.rating), 0) as rateTotal, size(b.orderDetails) as orderTime
 	from Book b left join Review r on b.id = r.book.id
-	where concat (b.title, b.author) like %:keyword%
+	where concat (b.title, b.author) ilike %:keyword%
 	and cast(b.cate.id as string) like %:cateId%
 	and b.user.userName like %:seller%
 	and cast(b.publisher.id as string) not in :pubId
@@ -26,7 +26,7 @@ public interface BookRepository extends JpaRepository<Book, Integer>{
 	and b.price between :fromRange and :toRange
 	group by b.id, b.title, b.description, b.images.name, b.price
 	""")
-	public Page<IBookDisplay> findBooksWithFilter(String keyword, //Lấy Sách theo bộ lọc (từ khoá, danh mục, ...)
+	public Page<IBookDisplay> findBooksWithFilter(String keyword, //Get books by filtering
 			String cateId, 
 			String[] pubId, 
 			String seller, 
@@ -36,7 +36,7 @@ public interface BookRepository extends JpaRepository<Book, Integer>{
 			Pageable pageable);
 	
 	@Query("select b from Book b order by random() limit :amount")
-	public List<Book> findRandomBooks(int amount); //Lấy Sách ngẫu nhiên
+	public List<Book> findRandomBooks(int amount); //Get random books
 	
 	public void deleteByUser_Id(Integer id);
 	

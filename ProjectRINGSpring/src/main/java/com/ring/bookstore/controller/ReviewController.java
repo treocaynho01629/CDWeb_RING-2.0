@@ -27,11 +27,11 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
-public class ReviewController { //Controller Đánh giá
+public class ReviewController {
 	
 	private final ReviewService reviewService;
 	
-	//Lấy tất cả Đánh giá
+	//Get all reviews
 	@GetMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllReviews(@RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
@@ -41,7 +41,7 @@ public class ReviewController { //Controller Đánh giá
 		return new ResponseEntity< >(reviewService.getAllReviews(pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
-	//Lấy Đánh giá theo {id} Sách
+	//Get reviews for book's {id}
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getReviewsByBookId(@PathVariable("id") Integer bookId,
 												@RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
@@ -51,7 +51,7 @@ public class ReviewController { //Controller Đánh giá
 		return new ResponseEntity< >(reviewService.getReviewsByBookId(bookId, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
-	//Lấy Đánh giá theo {id} Người dùng
+	//Get reviews from user's {id}
 	@GetMapping("/user/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getReviewsByUser(@PathVariable("id") Integer userId,
@@ -62,7 +62,7 @@ public class ReviewController { //Controller Đánh giá
 		return new ResponseEntity< >(reviewService.getReviewsByUser(userId, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
-	//Lấy Đánh giá theo Người dùng hiện tại
+	//Get current user's reviews
 	@GetMapping("/user")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<?> getReviewsByUser(@RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
@@ -73,7 +73,7 @@ public class ReviewController { //Controller Đánh giá
 		return new ResponseEntity< >(reviewService.getReviewsByUser(currUser, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 	
-	//Đánh giá sách
+	//Review
 	@PostMapping("/{id}")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<?> reviewBook(@PathVariable("id") Integer bookId,
@@ -82,14 +82,14 @@ public class ReviewController { //Controller Đánh giá
 		return new ResponseEntity< >(reviewService.review(bookId, request, currUser), HttpStatus.OK);
 	}
 	
-	//Xoá Đánh giá
+	//Delete review
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> deleteReview(@PathVariable("id") Integer bookId){
 		return new ResponseEntity< >(reviewService.deleteReview(bookId), HttpStatus.OK);
 	}
 	
-	//Xoá nhiều Đánh giá theo list id
+	//Delete multiples reviews in a lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteReviews(@RequestParam("ids") List<Integer> ids) {
@@ -97,7 +97,7 @@ public class ReviewController { //Controller Đánh giá
         return new ResponseEntity<>("Gỡ đánh giá thành công", HttpStatus.OK);
     }
     
-    //Xoá tất cả Đánh giá
+    //Delete all reviews
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteAllReviews() {

@@ -32,18 +32,18 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
-public class ImageController { //Controller Ảnh
+public class ImageController {
 	
 	private final ImageService imageService;
 	
-	//Lấy tất cả Ảnh
+	//Gett all images
 	@GetMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllImages() {
 		return new ResponseEntity<>(imageService.getAllImages(), HttpStatus.OK);
 	}
 
-	//Tải Ảnh lên Server
+	//Upload image
 	@PostMapping("/upload")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
 	public ResponseEntity<?> uploadFile(@RequestParam("image") MultipartFile file) {
@@ -58,7 +58,7 @@ public class ImageController { //Controller Ảnh
 		}
 	}
 
-	//Tải nhiều ảnh
+	//Upload multiples images
 	@PostMapping("/upload_multiples")
 	public ResponseEntity<?> uploadFiles( @RequestParam("images") MultipartFile[] files) {
 		List<String> messages = new ArrayList<>();
@@ -75,17 +75,17 @@ public class ImageController { //Controller Ảnh
 		return new ResponseEntity<>(messages, HttpStatus.OK);
 	}
 	
-	//Lấy Ảnh theo {name}
+	//Get image by  {name}
 	@GetMapping("/{name}")
 	public ResponseEntity<byte[]> getImage(@PathVariable String name) {
 		Image image = imageService.getImage(name);
 		byte[] imageData = ImageUtils.decompressImage(image.getImage());
 		return ResponseEntity.status(HttpStatus.OK)
 				.contentType(MediaType.valueOf(image.getType()))
-				.body(imageData); //Trả file Ảnh
+				.body(imageData); //Return image
 	}
 	
-	//Xoá Ảnh theo {id}
+	//Delete image by {id}
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getImage(@PathVariable Integer id) {

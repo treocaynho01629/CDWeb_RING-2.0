@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class AccountProfile { //Hồ sơ Người dùng
+public class AccountProfile {
 	@Id
     @Column(nullable = false, updatable = false)
     @SequenceGenerator(

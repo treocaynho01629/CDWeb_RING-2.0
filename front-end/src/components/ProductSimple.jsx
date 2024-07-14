@@ -1,9 +1,10 @@
 import styled from 'styled-components'
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-
 import { Link } from "react-router-dom"
 import { useDispatch } from 'react-redux';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { Skeleton } from '@mui/material';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import CustomButton from './custom/CustomButton';
 
 //#region styled
 const Container = styled.div`
@@ -56,31 +57,9 @@ const Price = styled.span`
     align-items: center;
     text-align: center;
 `
-
-const AddToCart = styled.p`
-    font-size: 11px;
-    font-weight: bold;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    color: inherit;
-    background-color: #f3f3f3;
-    transition: all 0.5s ease;
-    z-index: 15;
-    margin-bottom: 10px;
-    padding: 10px 15px;
-    cursor: pointer;
-
-    &:hover {
-        color: white;
-        background-color: #63e399;
-    }
-`
 //#endregion
 
-const ProductSimple = ({book}) => {
+const ProductSimple = ({ book }) => {
     const dispatch = useDispatch();
 
     const handleAddToCart = async (book) => {
@@ -97,28 +76,52 @@ const ProductSimple = ({book}) => {
         }))
     };
 
-  return (
-      <Container>
-        <Link to={`/product/${book.id}`} style={{color: 'inherit'}}>
-            <LazyLoadImage src={book.image}
-                height={250}
-                width={190} 
-                style={{
-                    zIndex: -3,
-                    marginBottom: '10px 0',
-                    objectFit: 'contain',
-                }}
-            />
-            <Info>
-                <Price>{book.price.toLocaleString()}&nbsp;đ</Price>
-                <Title>{book.title}</Title>
-            </Info>
-        </Link>
-        <AddToCart onClick={() => handleAddToCart(book)}>
-            <ShoppingCartIcon style={{fontSize: 14}}/>&nbsp;THÊM VÀO GIỎ
-        </AddToCart>
-    </Container>
-  )
+    if (book) {
+        return (
+            <Container>
+                <Link to={`/product/${book?.id}`} style={{ color: 'inherit' }}>
+                    <LazyLoadImage src={book?.image}
+                        height={250}
+                        width={190}
+                        style={{
+                            zIndex: -3,
+                            marginBottom: '10px 0',
+                            objectFit: 'contain',
+                        }}
+                    />
+                    <Info>
+                        <Price>{book.price.toLocaleString()}&nbsp;đ</Price>
+                        <Title>{book.title}</Title>
+                    </Info>
+                </Link>
+                <CustomButton
+                    size="small"
+                    variant="outlined"
+                    onClick={() => handleAddToCart(book)}
+                    sx={{ marginTop: '10px', marginBottom: '15px', padding: '6px 10px' }}
+                >
+                    <ShoppingCartIcon style={{ fontSize: 14 }} />&nbsp;THÊM VÀO GIỎ
+                </CustomButton>
+            </Container>
+        )
+    } else {
+        return (
+            <Container>
+                <Skeleton variant="rectangular" width={190} height={240} sx={{ margin: '5px 5px 20px 5px' }} />
+                <Info>
+                    <Skeleton variant="text" sx={{ fontSize: '21px' }} width="60%" />
+                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width="100%" />
+                </Info>
+                <CustomButton
+                    size="small"
+                    variant="outlined"
+                    sx={{ marginTop: '10px', marginBottom: '15px', padding: '6px 10px' }}
+                >
+                    <ShoppingCartIcon style={{ fontSize: 14 }} />&nbsp;THÊM VÀO GIỎ
+                </CustomButton>
+            </Container>
+        )
+    }
 }
 
 export default ProductSimple

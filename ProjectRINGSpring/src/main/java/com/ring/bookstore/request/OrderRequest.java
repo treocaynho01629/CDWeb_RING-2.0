@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderRequest { //Để đặt hàng
+public class OrderRequest { //Request body when order
 	
 	@NotNull(message = "Giỏ hàng không được trống!")
 	private List<CartItem> cart;

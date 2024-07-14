@@ -18,11 +18,11 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/publishers")
 @RequiredArgsConstructor
-public class PublisherController { //Controller Nhà xuất bản
+public class PublisherController {
 	
 	private final PublisherService pubService;
 	
-	//Lấy tất Nhà xuất bản
+	//Get all publishers
 	@GetMapping()
 	public ResponseEntity<?> getAllCategories(){
 		List<Publisher> publishers =  pubService.getAllPublishers();

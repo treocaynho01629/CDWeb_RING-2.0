@@ -12,6 +12,6 @@ import com.ring.bookstore.model.Image;
 public interface ImageRepository extends JpaRepository<Image, Integer>{
 	@Transactional
 	
-	Optional<Image> findByName(String name); //Lấy Ảnh theo {Tên}
-	boolean existsByName(String name); //Kiểm tra Ảnh với {Tên} đã tồn tại ?
+	Optional<Image> findByName(String name); //Get image by {name}
+	boolean existsByName(String name); //Check exist image with {name}
 }

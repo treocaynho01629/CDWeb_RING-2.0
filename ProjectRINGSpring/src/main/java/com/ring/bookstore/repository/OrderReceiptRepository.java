@@ -19,28 +19,28 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Inte
 	from OrderReceipt or join OrderDetail od on or.id = od.order.id
 	where or.user.userName = :userName and od.book.id = :id
 	""")
-	boolean existsByUserBuyBook(Integer id, String userName); //Kiểm tra người dùng đã mua Sách chưa (Có Đơn >> Mua r)
+	boolean existsByUserBuyBook(Integer id, String userName); //Check if user have bought this book before
 	
-	Page<OrderReceipt> findAllByUser_Id(Integer id, Pageable pageable); //Lấy Đơn hàng theo {Id Người dùng}
+	Page<OrderReceipt> findAllByUser_Id(Integer id, Pageable pageable); //Get orders from user's {id}
 	
 	@Query("""
 	select o from OrderReceipt o join OrderDetail od on o.id = od.order.id 
 	where od.book.user.id = :id
 	""")
-	Page<OrderReceipt> findAllBySeller(Integer id, Pageable pageable); //Lấy Đơn hành theo {Id Nhân viên}
+	Page<OrderReceipt> findAllBySeller(Integer id, Pageable pageable); //Get orders by seller's {id}
 	
 	@Query("""
 	select o from OrderReceipt o join OrderDetail od on o.id = od.order.id 
 	where od.book.id = :id
 	""")
-	Page<OrderReceipt> findAllByBookId(Integer id, Pageable pageable); //Lấy Đơn hàng theo {Id Sách}
+	Page<OrderReceipt> findAllByBookId(Integer id, Pageable pageable); //Get orders with book's {id}
 	
 	@Query("""
 	select month(o.oDate) as name, coalesce(sum(o2.amount) , 0) as data, coalesce(sum(distinct o.total) , 0) as otherData 
 	from OrderReceipt o left join OrderDetail o2 on o.id = o2.order.id
 	group by month(o.oDate)
 	""")
-	List<IChartResponse> getMonthlySale(); //Lấy dữ liệu doanh thu theo tháng
+	List<IChartResponse> getMonthlySale(); //Get monthly sale
 	
 	@Query("""
 	select month(o.oDate) as name, coalesce(sum(o2.amount) , 0) as data, coalesce(sum(distinct o.total) , 0) as otherData 
@@ -48,5 +48,5 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Inte
 	where b.user.id = :id
 	group by month(o.oDate)
 	""")
-	List<IChartResponse> getMonthlySaleBySeller(Integer id); //Lấy dữ liệu doanh thu theo tháng theo {Id Nhân viên}
+	List<IChartResponse> getMonthlySaleBySeller(Integer id); //Get monthly sale by seller's {id}
 }

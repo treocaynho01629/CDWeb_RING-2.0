@@ -19,21 +19,21 @@ public class EmailServiceImpl implements EmailService {
 	
     private final JavaMailSender emailSender;
     
-    @Value("${spring.mail.username}") //Lấy mail gửi từ file Properties
+    @Value("${spring.mail.username}") //Get username from application.properties
     private String sender;
 
-    //Gửi mail thường
+    //Normal email
     public String sendSimpleMessage(String to, String subject, String text) {
     	
         try {
-        	//Tạo mail
+        	//Create
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(sender);
             message.setTo(to);
             message.setSubject(subject);
             message.setText(text);
 
-            emailSender.send(message); //Gửi
+            emailSender.send(message); //Send
             return "Gửi email thành công";
         } catch (MailException e) {
             e.printStackTrace();
@@ -41,11 +41,11 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    //Gửi mail Html
+    //Mail with HTML
     public String sendHtmlMessage(String to, String subject, String htmlBody) {
     	
         try {
-        	//Tạo mail
+        	//Create
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
@@ -54,7 +54,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject(subject);
             helper.setText(htmlBody, true);
             
-            emailSender.send(message); //Gửi
+            emailSender.send(message); //Send
             return "Gửi email thành công";
         } catch (MessagingException e) {
         	e.printStackTrace();

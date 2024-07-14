@@ -1,6 +1,6 @@
 package com.ring.bookstore.dtos;
 
-//Chi tiết hoá đơn
+//Order details
 public record OrderDetailDTO(Integer amount, Double price, Integer bookId, String image, String bookTitle) {
 
 }

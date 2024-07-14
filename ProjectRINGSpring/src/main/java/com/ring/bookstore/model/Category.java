@@ -20,7 +20,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Category { //Danh mục
+public class Category {
 
     @Id
     @Column(nullable = false, updatable = false)

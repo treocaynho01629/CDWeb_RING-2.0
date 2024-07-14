@@ -36,7 +36,7 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode
 @Table(indexes = @Index(columnList = "title"))
-public class Book { //Sách
+public class Book {
 
     @Id
     @Column(nullable = false, updatable = false)

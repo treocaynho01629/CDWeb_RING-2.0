@@ -20,7 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class Role { //Quyền
+public class Role {
 
     @Id
     @Column(nullable = false, updatable = false)

@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Zoom,
-  Fab,
-} from "@mui/material";
+import { Box, Zoom, Fab } from "@mui/material";
 import { keyframes } from '@mui/system';
 import { KeyboardArrowUp } from "@mui/icons-material";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
@@ -24,8 +20,8 @@ const myEffect = keyframes`
 `
 
 const styledFab = {
-    borderRadius: 0, 
-    color: 'white', 
+    borderRadius: 0,
+    color: 'white',
     backgroundColor: '#63e399',
     animation: `${myEffect} 7s infinite`,
     animationDelay: '5s',
@@ -43,36 +39,40 @@ const styledFab = {
 
 const ScrollToTop = () => {
     const trigger = useScrollTrigger({
-      threshold: 100,
+        threshold: 100,
     });
- 
+
     const scrollToTop = React.useCallback(() => {
         window.scrollTo({ top: 0, behavior: "smooth" })
     }, []);
- 
-   return (
-    <Zoom in={trigger}>
-        <Box
-        role="presentation"
-        sx={{
-            position: "fixed",
-            bottom: 32,
-            right: 32,
-            zIndex: 99,
-        }}
-        unmountOnExit
-        >
-        <Fab
-            onClick={scrollToTop}
-            size="medium"
-            aria-label="scroll back to top"
-            sx={styledFab}
-        >
-            <KeyboardArrowUp sx={{fontSize: 30}}/>
-        </Fab>
-        </Box>
-    </Zoom>
-   )
- }
+
+    return (
+        <Zoom in={trigger}>
+            <Box
+                role="presentation"
+                sx={{
+                    position: "fixed",
+                    bottom: 55,
+                    right: 15,
+                    zIndex: 99,
+
+                    '@media screen and (min-width: 768px)': {
+                        bottom: 32,
+                        right: 32,
+                    },
+                }}
+            >
+                <Fab
+                    onClick={scrollToTop}
+                    size="medium"
+                    aria-label="scroll back to top"
+                    sx={styledFab}
+                >
+                    <KeyboardArrowUp sx={{ fontSize: 30 }} />
+                </Fab>
+            </Box>
+        </Zoom>
+    )
+}
 
 export default ScrollToTop

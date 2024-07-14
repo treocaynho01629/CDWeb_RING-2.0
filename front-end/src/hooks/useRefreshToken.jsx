@@ -1,7 +1,7 @@
 import axios from '../api/axios';
 import useAuth from './useAuth';
 import { useCookies } from 'react-cookie';
-import jwt from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 const REFRESH_URL = '/api/v1/auth/refresh-token';
 
@@ -19,7 +19,7 @@ const useRefreshToken = () => {
         setAuth(prev => {
             const accessToken = response.data.token;
             const roles = response.data.roles;
-            const tokenData = jwt(accessToken);
+            const tokenData = jwtDecode(accessToken);
             const userName = tokenData.sub;
 
             // console.log(accessToken);

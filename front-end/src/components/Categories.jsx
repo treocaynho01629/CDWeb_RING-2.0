@@ -137,7 +137,7 @@ const Categories = (props) => {
     <Container>
         <CateContainer>
         <Wrapper draggable={true} ref={slideRef}>
-            {(loading ? Array.from(new Array(15)) : catesList)?.map((cate, index) => (
+            {(loading || !catesList?.length ? Array.from(new Array(15)) : catesList)?.map((cate, index) => (
                 <div key={index}>
                     {cate ? (
                         <Link to={`/filters?cateId=${cate.id}`} style={{color: '#424242'}}>

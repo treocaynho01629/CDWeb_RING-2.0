@@ -32,55 +32,89 @@ const DetailAccount = Loadable(lazy(() => import('./pages/dashboard/DetailAccoun
 const Dashboard = Loadable(lazy(() => import('./pages/dashboard/Dashboard')));
 
 import { Routes, Route } from 'react-router-dom';
+import { createTheme, ThemeProvider } from '@mui/material';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#424242",
+      contrastText: "#ffffffb3",
+    },
+    secondary: {
+      main: "#63e399",
+      contrastText: "#ffffff",
+    },
+    error: {
+      main: "#e66161"
+    }
+  },
+  shape: {
+    borderRadius: 0,
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          display: 'flex',
+          alignItems: 'center',
+          textTransform: 'none',
+        },
+      },
+    }
+  },
+});
 
 function App() {
   return (
-    <Suspense fallback={<Loader/>}>
-    <Routes>
-        <Route path="/" element={<Layout />}>
+    <ThemeProvider theme={theme}>
+      <Suspense fallback={<Loader />}>
+        <Routes>
+          <Route path="/" element={<Layout />}>
           //PUBLIC
-          <Route path="/login" element={<SignPage/>}/>
-          <Route path="/reset-password" element={<ResetPage/>}/>
-          <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="/login" element={<SignPage />} />
+            <Route path="/signup" element={<SignPage />} />
+            <Route path="/reset-password" element={<ResetPage />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
 
           //MISSING
-          <Route path="*" element={<Missing />} />
+            <Route path="*" element={<Missing />} />
 
-          <Route element={<PersistLogin />}>
-            <Route element={<PageLayout />}>
+            <Route element={<PersistLogin />}>
+              <Route element={<PageLayout />}>
               //ANONYMOUS
-              <Route path="/" element={<Home/>}/>
-              <Route path="/filters" element={<FiltersPage/>}/>
-              <Route path="/product/:id" element={<ProductDetail/>}/>
-              <Route path="/cart" element={<Cart/>}/>
+                <Route path="/" element={<Home />} />
+                <Route path="/filters" element={<FiltersPage />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/cart" element={<Cart />} />
 
               //USER
-              <Route element={<RequireAuth allowedRoles={['ROLE_USER']} />}>
-                <Route path="/checkout" element={<Checkout/>}/>
-                <Route path="/profile/:tab" element={<Profile/>}/>
+                <Route element={<RequireAuth allowedRoles={['ROLE_USER']} />}>
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/profile/:tab" element={<Profile />} />
+                </Route>
               </Route>
-            </Route>
 
-            <Route element={<DashboardLayout />}>
+              <Route element={<DashboardLayout />}>
               //SELLER
-              <Route element={<RequireAuth allowedRoles={['ROLE_SELLER']} />}>
-                <Route path="/dashboard" element={<Dashboard/>}/>
-                <Route path="/manage-books" element={<ManageBooks/>}/>
-                <Route path="/manage-receipts" element={<ManageReceipts/>}/>
-                <Route path="/detail/:id" element={<DetailProduct/>}/>
-              </Route>
+                <Route element={<RequireAuth allowedRoles={['ROLE_SELLER']} />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/manage-books" element={<ManageBooks />} />
+                  <Route path="/manage-receipts" element={<ManageReceipts />} />
+                  <Route path="/detail/:id" element={<DetailProduct />} />
+                </Route>
 
               //ADMIN
-              <Route element={<RequireAuth allowedRoles={['ROLE_ADMIN']} />}>
-                <Route path="/manage-accounts" element={<ManageAccounts/>}/>
-                <Route path="/manage-reviews" element={<ManageReviews/>}/>
-                <Route path="/user/:id" element={<DetailAccount/>}/>
+                <Route element={<RequireAuth allowedRoles={['ROLE_ADMIN']} />}>
+                  <Route path="/manage-accounts" element={<ManageAccounts />} />
+                  <Route path="/manage-reviews" element={<ManageReviews />} />
+                  <Route path="/user/:id" element={<DetailAccount />} />
+                </Route>
               </Route>
             </Route>
           </Route>
-        </Route>
-    </Routes>
-    </Suspense>
+        </Routes>
+      </Suspense>
+    </ThemeProvider>
   )
 }
 

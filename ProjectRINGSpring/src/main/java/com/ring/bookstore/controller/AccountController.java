@@ -32,7 +32,7 @@ import jakarta.validation.Valid;
 @RestController
 @CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/accounts")
-public class AccountController { //Controller Người dùng
+public class AccountController {
 	
 	private AccountService accountService;
 	
@@ -41,7 +41,7 @@ public class AccountController { //Controller Người dùng
 		this.accountService = accountService;
 	}
 	
-	//Lấy tất cả Người dùng
+	//Get all accounts
 	@GetMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllAccounts(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
@@ -52,7 +52,7 @@ public class AccountController { //Controller Người dùng
 		return new ResponseEntity< >(accounts, HttpStatus.OK);
 	}
 	
-	//Lấy tất cả Nhân viên
+	//Get all sellers
 	@GetMapping("/employees")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?>  getAllSellers(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
@@ -63,14 +63,14 @@ public class AccountController { //Controller Người dùng
 		return new ResponseEntity< >(accounts, HttpStatus.OK);
 	}
 	
-	//Lấy Người dùng theo {id}
+	//Get account by {id}
 	@GetMapping("{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<AccountDetailDTO> getAccountById(@PathVariable("id") Integer accountId){
 		return new ResponseEntity<AccountDetailDTO>(accountService.getAccountById(accountId), HttpStatus.OK);
 	}
 	
-	//Chỉnh sửa Người dùng theo {id}
+	//Edit account by {id}
 	@PutMapping("{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Account> updateAccount(@PathVariable("id") Integer accountId,
@@ -78,14 +78,14 @@ public class AccountController { //Controller Người dùng
 		return new ResponseEntity<Account>(accountService.updateAccount(requestt, accountId), HttpStatus.OK);
 	}
 	
-	//Tạo Người dùng mới
+	//Create new account through Admin dashboard
 	@PostMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Account> saveAccount(@Valid @RequestBody AccountRequest request){
 		return new ResponseEntity<Account>(accountService.saveAccount(request), HttpStatus.CREATED);
 	}
 	
-	//Xoá Người dùng với {id}
+	//Delete account by {id}
 	@DeleteMapping("{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<String> deleteAccount(@PathVariable("id") Integer accountId){
@@ -95,7 +95,7 @@ public class AccountController { //Controller Người dùng
 		return new ResponseEntity<String>("Account deleted successfully!", HttpStatus.OK);
 	}
 	
-	//Xoá nhiều Người dùng theo list id
+	//Delete multiple accounts from a lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteAccounts(@RequestParam("ids") List<Integer> ids) {
@@ -103,7 +103,7 @@ public class AccountController { //Controller Người dùng
         return new ResponseEntity<>("Gỡ người dùng thành công", HttpStatus.OK);
     }
     
-    //Xoá tất cả Người dùng
+    //Delete all accounts
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteAllAccounts() {
@@ -111,7 +111,7 @@ public class AccountController { //Controller Người dùng
         return new ResponseEntity<>("Gỡ người dùng thành công", HttpStatus.OK);
     }
 	
-	//Lấy Hồ sơ Người dùng (AccountProfile)
+	//Get account's profile (AccountProfile)
 	@GetMapping("/profile")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<ProfileDTO> getProfile(@CurrentAccount Account currUser){
@@ -119,7 +119,7 @@ public class AccountController { //Controller Người dùng
 		return new ResponseEntity< >(profile, HttpStatus.OK);
 	}
 	
-	//Update Hồ sơ người dùng
+	//Update account's profile
 	@PutMapping("/profile")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<AccountProfile> updateProfile(@Valid @RequestBody ProfileRequest request, @CurrentAccount Account currUser){
@@ -127,7 +127,7 @@ public class AccountController { //Controller Người dùng
 		return new ResponseEntity< >(profile, HttpStatus.OK);
 	}
 	
-	//Đổi mật khẩu Người dùng
+	//Change account's password
 	@PutMapping("/change-password")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePassRequest request, @CurrentAccount Account currUser){
@@ -137,14 +137,14 @@ public class AccountController { //Controller Người dùng
 		return new ResponseEntity< >(result, HttpStatus.OK);
 	}
 	
-	//Lấy dữ liệu cho biểu đồ (Người dùng)
+	//Get accounts chart (User)
 	@GetMapping("/top-accounts")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getTopAccounts(){
 		return new ResponseEntity< >(accountService.getTopAccount(), HttpStatus.OK);
 	}
 	
-	//Lấy dữ liệu cho biểu đồ (Người bán)
+	//Get sellers chart
 	@GetMapping("/top-sellers")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getTopSellers(){

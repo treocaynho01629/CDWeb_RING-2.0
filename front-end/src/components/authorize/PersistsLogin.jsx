@@ -1,13 +1,15 @@
+import { lazy, Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Backdrop, CircularProgress } from '@mui/material';
 import useRefreshToken from '../../hooks/useRefreshToken';
 import useAuth from '../../hooks/useAuth';
 
+const PendingIndicator = lazy(() => import('../../components/authorize/PendingIndicator'));
+
 const PersistLogin = () => {
-    const [isLoading, setIsLoading] = useState(true);
     const refresh = useRefreshToken();
     const { auth, persist } = useAuth();
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         let isMounted = true;
@@ -29,33 +31,15 @@ const PersistLogin = () => {
         return () => isMounted = false;
     }, [])
 
-    useEffect(() => {
-        if (isLoading) {
-            console.log('Đang xác thực đăng nhập');
-        } else {
-            console.log('Xác thực hoàn tất!');
-        }
-    }, [isLoading])
-
     return (
         <>
-            {!persist
-                ? <Outlet />
-                : isLoading
-                    ?
-                    <Backdrop sx={{ color: 'white'}} open={true}>
-                        <CircularProgress
-                        sx={{
-                          color: '#63e399',
-                          marginRight: '10px',
-                        }}
-                        size={40}
-                        thickness={5}
-                        />
-                        <b>Đang xác thực đăng nhập ...</b>
-                    </Backdrop>
-                    : <Outlet />
+            {(persist && isLoading)
+                    &&
+                    <Suspense fallBack={<></>}>
+                        <PendingIndicator open={isLoading} message="Đang xác thực đăng nhập ..."/>
+                    </Suspense>
             }
+            <Outlet />
         </>
     )
 }

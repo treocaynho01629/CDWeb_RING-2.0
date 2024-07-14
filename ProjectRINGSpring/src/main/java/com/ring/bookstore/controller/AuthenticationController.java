@@ -32,38 +32,38 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-public class AuthenticationController { // Controller Xác thực đăng nhập
+public class AuthenticationController {
 
 	@Autowired
 	private final AuthenticationService authService;
 
-	//Đăng ký tài khoản
+	//Register
 	@PostMapping("/register")
 	public ResponseEntity<AuthenticationResponse> register(@RequestBody @Valid RegisterRequest request) {
 		return ResponseEntity.ok(authService.register(request));
 	}
 
-	//Xác thực đăng nhập
+	//Authenticate sign in
 	@PostMapping("/authenticate")
 	public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request) {
 		return ResponseEntity.ok(authService.authenticate(request));
 	}
 
-	//Làm mới JWT cho Người dùng
+	//Refresh JWT token
 	@GetMapping("/refresh-token")
 	public void refreshToken(HttpServletRequest request, HttpServletResponse response)
 			throws StreamWriteException, DatabindException, IOException {
 		authService.refreshToken(request, response);
 	}
 	
-	//Quên mật khẩu
+	//Send forgot password email
 	@PostMapping("/forgot-password")
 	public ResponseEntity<?> forgotPassword(@RequestParam(value="email") String email){
 		authService.forgotPassword(email);
 		return new ResponseEntity< >("Đã gửi email khôi phục mật khẩu", HttpStatus.OK);
 	}
 	
-	//Khôi phục mật khẩu
+	//Reset password
 	@PutMapping("/reset-password")
 	public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPassRequest request){
 		Account account = authService.resetPassword(request);

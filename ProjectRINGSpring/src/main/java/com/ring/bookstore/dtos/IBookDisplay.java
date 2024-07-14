@@ -1,6 +1,6 @@
 package com.ring.bookstore.dtos;
 
-//Sách hiển thị
+//Display book info
 public interface IBookDisplay {
 	Integer getId();
 	String getTitle();

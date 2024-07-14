@@ -30,7 +30,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class Review { //Đánh giá
+public class Review {
 
     @Id
     @Column(nullable = false, updatable = false)

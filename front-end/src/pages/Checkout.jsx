@@ -20,7 +20,7 @@ import usePrivateFetch from '../hooks/usePrivateFetch'
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-const Pending = lazy(() => import('../components/authorize/Pending'));
+const PendingIndicator = lazy(() => import('../components/authorize/PendingIndicator'));
 
 //#region styled
 const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
@@ -80,20 +80,6 @@ const CustomInput = muiStyled(TextField)(({ theme }) => ({
 }));
 
 const Wrapper = styled.div`
-    padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
-
-    @media (min-width: 768px) {
-        width: 750px;
-    }
-    @media (min-width: 992px) {
-        width: 970px;
-    }
-    @media (min-width: 1200px) {
-        width: 1170px;
-    }
 `
 
 const CheckoutContainer = styled.div`
@@ -495,7 +481,7 @@ const Checkout = () => {
     <Wrapper>
         {pending ?
         <Suspense fallBack={<></>}>
-            <Pending/>
+            <PendingIndicator/>
         </Suspense>
         : null
         }

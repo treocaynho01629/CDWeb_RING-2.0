@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CartItem { //Sản phẩm trong Giỏ hàng
+public class CartItem {
 	
 	private Integer id;
 	private String title;

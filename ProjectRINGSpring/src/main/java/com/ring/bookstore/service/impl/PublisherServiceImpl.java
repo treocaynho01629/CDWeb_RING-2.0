@@ -13,16 +13,16 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class PublisherServiceImpl implements PublisherService { //Dịch vụ NXB
+public class PublisherServiceImpl implements PublisherService {
 	
 	private final PublisherRepository pubRepo;
 
-	//Lấy tất cả NXB
+	//Get all publishers
 	public List<Publisher> getAllPublishers() {
 		return pubRepo.findAll();
 	}
 
-	//Lấy NXB theo {id}
+	//Get publisher by {id}
 	public Publisher getPublisherById(Integer id) {
 		return pubRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Publisher does not exists!")); //exception nếu ko tồn tại
 	}

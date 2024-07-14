@@ -19,7 +19,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 	
-	//Lấy Secret key, Hạng sử dụng JWT từ file Properties
+	//Get secret key and expire times from application.properties
 	@Value("${application.security.jwt.secret-key}")
 	private String secretKey;
 	@Value("${application.security.jwt.expiration}")
@@ -27,23 +27,23 @@ public class JwtService {
 	@Value("${application.security.jwt.refresh-token.expiration}")
 	private long refreshExpirationTime;
 	
-	//Lấy tên người dùng từ JWT (Phần đầu)
+	//Extract username from token (First part)
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
 	}
 	
-	//Lấy dữ liệu claim kèm từ JWT (Phần giữa)
+	//Extract claims (Second part)
 	public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
 		final Claims claims = extractAllClaims(token);
 		return claimsResolver.apply(claims);
 	}
 	
-	//Tạo JWT mới từ Dữ liệu người dùng
+	//Generate token from user
 	public String generateToken(UserDetails userDetails) {
 		return generateToken(new HashMap<>(), userDetails);
 	}
 	
-	//Tạo JWT với Dữ liệu kèm (extraClaims)
+	//Generate token with extra claims
 	public String generateToken(
 			Map<String, Object> extraClaims,
 	        UserDetails userDetails
@@ -51,7 +51,7 @@ public class JwtService {
 	   return buildToken(extraClaims, userDetails, expirationTime);
 	}
 	
-	//Tạo Refresh Token
+	//Create refresh token
 	public String generateRefreshToken(
 	        UserDetails userDetails
 	) {
@@ -64,43 +64,43 @@ public class JwtService {
 	        UserDetails userDetails,
 	        long expiration
     ) {
-		 return Jwts //Tạo JWT
+		 return Jwts //Create JWT
 		            .builder()
-		            .setClaims(extraClaims) //Dữ liệu kèm
-		            .setSubject(userDetails.getUsername()) //Tên người dùng
-		            .setIssuedAt(new Date(System.currentTimeMillis())) //Ngày tạo
-		            .setExpiration(new Date(System.currentTimeMillis() + expiration)) //Ngày hết hạn
-		            .signWith(getSignInKey(), SignatureAlgorithm.HS256) //Mã hoá với key
+		            .setClaims(extraClaims) //Extra claims
+		            .setSubject(userDetails.getUsername()) //Name
+		            .setIssuedAt(new Date(System.currentTimeMillis())) //Create date
+		            .setExpiration(new Date(System.currentTimeMillis() + expiration)) //Expiration date
+		            .signWith(getSignInKey(), SignatureAlgorithm.HS256) //Encrypt
 		            .compact();
 	}
 	
-	//Kiểm tra JWT có hợp lệ không
+	//JWT validation
 	public boolean isTokenValid(String token, UserDetails userDetails) {
-		final String userName = extractUsername(token); //Lấy tên người dùng từ JWT
-		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token); //Tên hợp lê? và JWT hết hạn chưa ?
+		final String userName = extractUsername(token); //Extract name
+		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token); //Check expiration and valid username
 	}
 	
-	//Check JWT hết hạn chưa
+	//Check JWT expired or not
 	private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 	
-	//Lấy ngày hết hạn từ JWT
+	//Extract expiration time from token
 	private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 	
-	//Lấy thông tin kèm từ JWT
+	//Get all extra claims from token
 	private Claims extractAllClaims(String token) {
 		return Jwts
 				.parserBuilder()
-				.setSigningKey(getSignInKey()) //Kiểm tra token sử dụng signinkey
+				.setSigningKey(getSignInKey())
 				.build()
 				.parseClaimsJws(token)
 				.getBody();
 	}
 
-	//Giải mã Secret key
+	//Encrypt with secret key
 	private Key getSignInKey() {
 		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);

@@ -8,5 +8,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @AuthenticationPrincipal
-public @interface CurrentAccount { //Lấy người dùng hiện tại đang request
+public @interface CurrentAccount { //Get current authenticate user in request
 }

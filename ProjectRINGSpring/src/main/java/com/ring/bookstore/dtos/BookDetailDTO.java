@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 import com.ring.bookstore.model.Publisher;
 
-//Chi tiết Sách
+//Book details
 public record BookDetailDTO(Integer id,
 		String image,
 		Double price,

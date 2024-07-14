@@ -27,52 +27,52 @@ public class ImageServiceImpl implements ImageService {
 	@Autowired
 	private ImageMapper imageMapper;
 
-	//Tải Ảnh lên Server
+	//Upload to Database
 	public ImageDTO uploadImage(MultipartFile file) throws IOException {
 
-		//Kiểm tra file
+		//File validation
 		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 		
-		Image image = imageRepo.findByName(fileName).orElse( //Lấy ảnh nếu đã tồn tại || Tạo ảnh mới khi chưa có
+		Image image = imageRepo.findByName(fileName).orElse( //Create image if not already exists
 				Image.builder()
 				.name(fileName)
 				.type(file.getContentType())
 				.image(null)
 				.build());
 
-		image.setImage(ImageUtils.compressImage(file.getBytes())); //Set ảnh mới
-		imageRepo.save(image); //Lưu vào CSDL
-		ImageDTO dto = imageMapper.apply(image); //Trả ảnh đã Map về DTO
+		image.setImage(ImageUtils.compressImage(file.getBytes())); //Compress and set image
+		imageRepo.save(image); //Save to database
+		ImageDTO dto = imageMapper.apply(image); //Map to DTO
 		return dto;
 	}
 
-	//Lấy ảnh theo {name}
+	//Get image by {name}
 	public Image getImage(String name) {
 		Image image = imageRepo.findByName(name)
-				.orElseThrow(() -> new ResourceNotFoundException("Image does not exists!")); //Báo lỗi khi ko có
+				.orElseThrow(() -> new ResourceNotFoundException("Image does not exists!"));
 		return image;
 	}
 
-	//Lấy tất cả Ảnh
+	//Get all images
 	public List<ImageDTO> getAllImages() {
         List<Image> imagesList = imageRepo.findAll();
-        List<ImageDTO> imageDtos = imagesList.stream().map(imageMapper::apply).collect(Collectors.toList()); //Map sang DTO và trả về
+        List<ImageDTO> imageDtos = imagesList.stream().map(imageMapper::apply).collect(Collectors.toList()); //Map to DTO
 		return imageDtos;
 	}
 
-	//Xoá ảnh theo {id}
+	//Delete image by {id}
 	@Override
 	@Transactional
 	public ImageDTO deleteImage(Integer id) {
 		Image image = imageRepo.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Image does not exists!")); //Báo lỗi khi ko có
+				.orElseThrow(() -> new ResourceNotFoundException("Image does not exists!"));
 		imageRepo.deleteById(id);
 		
-		ImageDTO dto = imageMapper.apply(image); //Map DTO và trả về
+		ImageDTO dto = imageMapper.apply(image); //Map to DTO
 		return dto;
 	}
 
-	//Kiểm tra ảnh với {name} đã tồn tại?
+	//Check if image with {name} already exists
 	public boolean existsImage(String name) {
 		return imageRepo.existsByName(name);
 	}

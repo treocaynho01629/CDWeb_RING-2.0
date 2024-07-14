@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class BookDetail { //Chi tiết Sách
+public class BookDetail {
 
     @Id
     @Column(nullable = false, updatable = false)

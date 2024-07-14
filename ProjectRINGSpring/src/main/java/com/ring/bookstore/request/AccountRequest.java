@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountRequest { //Để tạo và cập nhật Người dùng
+public class AccountRequest { //Request body for account
 
 	@NotNull(message = "Tên đăng nhập không được để trống!")
 	@Size(min = 4, max = 24, message = "Tên đăng nhập dài 4-24 kí tự")

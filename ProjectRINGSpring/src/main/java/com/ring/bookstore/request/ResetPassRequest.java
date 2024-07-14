@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResetPassRequest { //Để khôi phục mật khẩu
+public class ResetPassRequest { //Request body for reset password
 
 	@NotNull(message = "Token không được để trống!")
 	private String token;

@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system'
 
-import { KeyboardArrowRight, KeyboardArrowLeft, Star as StarIcon, StarBorder as StarBorderIcon, ShoppingCart as ShoppingCartIcon} from '@mui/icons-material';
-import { Divider, Rating, Box, Tooltip } from '@mui/material'
+import { KeyboardArrowRight, KeyboardArrowLeft, Star as StarIcon, StarBorder as StarBorderIcon, ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
+import { Divider, Rating, Box, Tooltip, Skeleton } from '@mui/material'
 
 import { Link, useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux';
@@ -146,7 +146,7 @@ const Arrow = styled.div`
     }
 `
 
-const Extra= styled.div`
+const Extra = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -191,23 +191,25 @@ const StyledRating = muiStyled(Rating)({
 //#endregion
 const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY(-1)'];
 
-const Product = ({book}) => {
+const Product = ({ book }) => {
     const [slideIndex, setSlideIndex] = useState(1);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const avgRate = () =>{
+    const avgRate = () => {
         let rate = 0;
-        rate = Math.round((book?.rateTotal / book?.rateAmount)*2)/2
+        rate = Math.round((book?.rateTotal / book?.rateAmount) * 2) / 2
         rate = rate ? rate : '~';
         return rate;
     }
+
+    const calculatedRate = useMemo(() => avgRate(), [book]);
 
     const changeSlide = (event, n) => {
         event.stopPropagation();
         setSlideIndex(prev => prev + n);
 
-        if ((slideIndex + n) > multiImages.length){
+        if ((slideIndex + n) > multiImages.length) {
             setSlideIndex(1)
         }
         if ((slideIndex + n) < 1) {
@@ -229,80 +231,132 @@ const Product = ({book}) => {
         }))
     };
 
-  return (
-      <Container>
-        <ImageSlider>
-            {multiImages.map((style, index) => (
-            <>
-            <LazyLoadImage key={index + ":" + book.id}
-                src={book.image}
-                height={220}
-                width={'85%'}
-                style={{
-                    zIndex: -1,
-                    transition: 'all 0.5s ease',
-                    margin: '5px 0px 10px 0px',
-                    objectFit: 'contain',
-                    display: (index + 1) === slideIndex ? "block" : "none", 
-                    transform: style,
-                }}
-            />
-            </>
-            ))}
-        </ImageSlider>
-        <Info>
-            <Link to={`/product/${book.id}`} style={{color: 'inherit'}}>
-                <Brand>{book.author}</Brand>
-                <Title>{book.title}</Title>
-                <Sale>{book.price.toLocaleString()}&nbsp;đ</Sale>
-                <Price>
-                    <p style={{textDecoration: 'line-through', marginTop: 0, marginBottom: 0}}>{Math.round(book.price * 1.1).toLocaleString()}&nbsp;đ</p>
-                    <Percent>10%</Percent>
-                </Price>
-            </Link>
-            <Divider/>
-            <Extra>
-                <AddToCart onClick={() => handleAddToCart(book)}><ShoppingCartIcon style={{fontSize: 14}}/>&nbsp;</AddToCart>
-                <Box display={{xs: 'none', lg: 'block'}} sx={{cursor: 'pointer'}}>
-                    <Tooltip title={avgRate() === '~' ? 'Chưa có đánh giá nào' : `Trên tổng ${book.rateAmount} đánh giá`}>
-                        <Box>
-                            <StyledRating
-                                name="product-rating"
-                                value={avgRate()}
-                                getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
-                                precision={0.5}
-                                icon={<StarIcon style={{fontSize: 16}}/>}
-                                emptyIcon={<StarBorderIcon style={{fontSize: 16}}/>}
-                                readOnly
+    if (book) {
+        return (
+            <Container>
+                <ImageSlider>
+                    {multiImages.map((style, index) => (
+                        <>
+                            <LazyLoadImage key={`${book?.id}-${index}`}
+                                src={book.image}
+                                height={220}
+                                width={'85%'}
+                                style={{
+                                    zIndex: -1,
+                                    transition: 'all 0.5s ease',
+                                    margin: '5px 0px 10px 0px',
+                                    objectFit: 'contain',
+                                    display: (index + 1) === slideIndex ? "block" : "none",
+                                    transform: style,
+                                }}
                             />
+                        </>
+                    ))}
+                </ImageSlider>
+                <Info>
+                    <Link to={`/product/${book.id}`} style={{ color: 'inherit' }}>
+                        <Brand>{book.author}</Brand>
+                        <Title>{book.title}</Title>
+                        <Sale>{book.price.toLocaleString()}&nbsp;đ</Sale>
+                        <Price>
+                            <p style={{ textDecoration: 'line-through', marginTop: 0, marginBottom: 0 }}>{Math.round(book.price * 1.1).toLocaleString()}&nbsp;đ</p>
+                            <Percent>10%</Percent>
+                        </Price>
+                    </Link>
+                    <Divider />
+                    <Extra>
+                        <AddToCart onClick={() => handleAddToCart(book)}><ShoppingCartIcon style={{ fontSize: 14 }} />&nbsp;</AddToCart>
+                        <Box display={{ xs: 'none', lg: 'block' }} sx={{ cursor: 'pointer' }}>
+                            <Tooltip title={calculatedRate === '~' ? 'Chưa có đánh giá nào' : `Trên tổng ${book.rateAmount} đánh giá`}>
+                                <Box>
+                                    <StyledRating
+                                        name="product-rating"
+                                        value={calculatedRate}
+                                        getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
+                                        precision={0.5}
+                                        icon={<StarIcon style={{ fontSize: 16 }} />}
+                                        emptyIcon={<StarBorderIcon style={{ fontSize: 16 }} />}
+                                        readOnly
+                                    />
+                                </Box>
+                            </Tooltip>
                         </Box>
-                    </Tooltip>
-                </Box>
-                <Box display={{xs: 'block', lg: 'none'}} sx={{cursor: 'pointer'}}>
-                    <Tooltip title={avgRate() === '~' ? 'Chưa có đánh giá nào' : `Trên tổng ${book.rateAmount} đánh giá`}>
-                        <Box sx={{display: 'flex', alignItems: 'center'}}> 
-                            <b style={{fontSize: '12px', marginRight: '5px'}}>{avgRate()}</b>
-                            <StarIcon style={{fontSize: 16,
-                                color: '#63e399',
-                                '&hover': {
-                                    color: '#00ff6a',
-                                }}}
-                            />
+                        <Box display={{ xs: 'block', lg: 'none' }} sx={{ cursor: 'pointer' }}>
+                            <Tooltip title={calculatedRate === '~' ? 'Chưa có đánh giá nào' : `Trên tổng ${book.rateAmount} đánh giá`}>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <b style={{ fontSize: '12px', marginRight: '5px' }}>{calculatedRate}</b>
+                                    <StarIcon style={{
+                                        fontSize: 16,
+                                        color: '#63e399',
+                                        '&hover': {
+                                            color: '#00ff6a',
+                                        }
+                                    }}
+                                    />
+                                </Box>
+                            </Tooltip>
                         </Box>
-                    </Tooltip>
-                </Box>
-            </Extra>
-        </Info>
-        <MoreInfo onClick={() => navigate(`/product/${book.id}`)}>
-            <Arrow direction="left" onClick={(e)=>changeSlide(e, -1)}>
-                <KeyboardArrowLeft style={{fontSize: 30}}/>
-            </Arrow>
-            <Arrow direction="right" onClick={(e)=>changeSlide(e, 1)}>
-                <KeyboardArrowRight style={{fontSize: 30}}/>
-            </Arrow>
-        </MoreInfo>
-    </Container>
-  )
+                    </Extra>
+                </Info>
+                <MoreInfo onClick={() => navigate(`/product/${book.id}`)}>
+                    <Arrow direction="left" onClick={(e) => changeSlide(e, -1)}>
+                        <KeyboardArrowLeft style={{ fontSize: 30 }} />
+                    </Arrow>
+                    <Arrow direction="right" onClick={(e) => changeSlide(e, 1)}>
+                        <KeyboardArrowRight style={{ fontSize: 30 }} />
+                    </Arrow>
+                </MoreInfo>
+            </Container>
+        )
+    } else {
+        return (
+            <Container>
+                <ImageSlider>
+                    <Skeleton variant="rectangular" width={150} height={210} sx={{ margin: '5px 0px 20px 0px', width: '85%' }} />
+                </ImageSlider>
+                <Info>
+                    <Skeleton variant="text" sx={{ fontSize: '16px' }} />
+                    <Skeleton variant="text" sx={{ fontSize: '14px' }} width="60%"/>
+                    <Skeleton variant="text" sx={{ fontSize: '20px' }} width="40%"/>
+                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width="50%"/>
+                    <Divider />
+                    <Extra>
+                        <AddToCart><ShoppingCartIcon style={{ fontSize: 14 }} />&nbsp;</AddToCart>
+                        <Box display={{ xs: 'none', lg: 'block' }} sx={{ cursor: 'pointer' }}>
+                            <Tooltip title={'Chưa có đánh giá nào'}>
+                                <Box>
+                                    <StyledRating
+                                        name="product-rating"
+                                        value={0}
+                                        getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
+                                        precision={0.5}
+                                        icon={<StarIcon style={{ fontSize: 16 }} />}
+                                        emptyIcon={<StarBorderIcon style={{ fontSize: 16 }} />}
+                                        readOnly
+                                    />
+                                </Box>
+                            </Tooltip>
+                        </Box>
+                        <Box display={{ xs: 'block', lg: 'none' }} sx={{ cursor: 'pointer' }}>
+                            <Tooltip title={'Chưa có đánh giá nào'}>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <b style={{ fontSize: '12px', marginRight: '5px' }}>{0}</b>
+                                    <StarIcon style={{
+                                        fontSize: 16,
+                                        color: '#63e399',
+                                        '&hover': {
+                                            color: '#00ff6a',
+                                        }
+                                    }}
+                                    />
+                                </Box>
+                            </Tooltip>
+                        </Box>
+                    </Extra>
+                </Info>
+            </Container >
+        )
+    }
 }
 
 export default Product

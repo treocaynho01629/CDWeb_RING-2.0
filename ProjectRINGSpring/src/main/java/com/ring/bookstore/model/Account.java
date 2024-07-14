@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Account implements UserDetails { //Người dùng
+public class Account implements UserDetails {
 
     /**
 	 * 

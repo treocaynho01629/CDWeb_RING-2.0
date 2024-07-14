@@ -1,13 +1,11 @@
-import { useState, useEffect } from "react"
-
 import styled from "styled-components"
-import Carousel from 'react-material-ui-carousel'
-
+import { useState, useEffect } from "react"
 import { Paper, Grid, Skeleton } from '@mui/material';
-
 import { Link } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import Carousel from 'react-material-ui-carousel'
+import CustomButton from "./custom/CustomButton";
 import useFetch from '../hooks/useFetch'
 
 //#region styled
@@ -70,36 +68,11 @@ const Description = styled.p`
         min-width: auto;
     }
 `
-
-const Button = styled.button`
-    background-color: #63e399;
-    padding: 10px 20px;;
-    font-size: 16px;
-    font-weight: 500;
-    border-radius: 0;
-    border: none;
-    transition: all 0.5s ease;
-    z-index: 5;
-
-    &:hover {
-        background-color: lightgray;
-        color: black;
-    };
-
-    &:focus {
-        outline: none;
-        border: none;
-        border: 0;
-    };
-
-    outline: none;
-    border: 0;
-`
 //#endregion
 
 const RANDOMBOOKS_URL = 'api/books/random';
 
-function Item({book}){
+function Item({ book }) {
     const dispatch = useDispatch();
 
     const handleAddToCart = async (book) => {
@@ -116,107 +89,114 @@ function Item({book}){
         }))
     };
 
-    return (
-        <Paper sx={{maxHeight: '800px'}}>
-            <Grid container sx={{alignItems: 'center'}}>
-                <Grid item xs={12} md={5}>
-                    <Link to={`/product/${book.id}`}>
-                        <ImgContainer>
-                            <LazyLoadImage src={book.image}
-                            height={400}
-                            width={400} 
-                            style={{
-                                objectFit: 'contain',
-                            }}
-                            /> 
-                        </ImgContainer>
-                    </Link>
-                </Grid>
-                <Grid item xs={12} md={7}>
-                    <InfoContainer>
-                        <Link to={`/product/${book.id}`} style={{color: 'inherit'}}>
-                            <Title>{book.title}</Title>
-                            <Description>{book.description}</Description>
+    if (book) {
+        return (
+            <Paper sx={{ minHeight: '515px', maxHeight: '800px' }}>
+                <Grid container sx={{ alignItems: 'center' }}>
+                    <Grid item xs={12} md={5}>
+                        <Link to={`/product/${book.id}`}>
+                            <ImgContainer>
+                                <LazyLoadImage src={book.image}
+                                    height={400}
+                                    width={400}
+                                    style={{
+                                        objectFit: 'contain',
+                                        minHeight: '400px'
+                                    }}
+                                />
+                            </ImgContainer>
                         </Link>
-                        <Button onClick={() => handleAddToCart(book)}>Mua ngay</Button>
-                    </InfoContainer>
+                    </Grid>
+                    <Grid item xs={12} md={7}>
+                        <InfoContainer>
+                            <Link to={`/product/${book.id}`} style={{ color: 'inherit' }}>
+                                <Title>{book.title}</Title>
+                                <Description>{book.description}</Description>
+                            </Link>
+                            <CustomButton
+                                variant="contained"
+                                color="secondary"
+                                size="large"
+                                onClick={() => handleAddToCart(book)}
+                            >
+                                Mua ngay
+                            </CustomButton>
+                        </InfoContainer>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </Paper>
-    )
+            </Paper>
+        )
+    } else {
+        return (
+            <Paper sx={{ minHeight: '515px', maxHeight: '800px' }}>
+                <Grid container sx={{ alignItems: 'center' }}>
+                    <Grid item xs={12} sm={12} md={5}>
+                        <ImgContainer>
+                            <Skeleton variant="rectangular" width={400} height={400} sx={{width: '400px'}}/>
+                        </ImgContainer>
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={7}>
+                        <InfoContainer>
+                            <Skeleton variant="text" sx={{ fontSize: '30px' }} />
+                            <Skeleton variant="text" sx={{ fontSize: '30px' }} />
+                            <Skeleton variant="text" sx={{ fontSize: '18px' }} />
+                            <Skeleton variant="text" sx={{ fontSize: '18px' }} />
+                            <Skeleton variant="text" sx={{ fontSize: '18px' }} />
+                            <Skeleton variant="rectangular" width={109} height={39} />
+                        </InfoContainer>
+                    </Grid>
+                </Grid>
+            </Paper>
+        )
+    }
 }
 
 const Slider = () => {
-    const [booskList, setBooksList] = useState([])
+    const [booksList, setBooksList] = useState([])
     const { loading, data } = useFetch(RANDOMBOOKS_URL);
 
     //Load
-    useEffect(()=>{
+    useEffect(() => {
         loadBooks();
     }, [loading == false]);
 
-    const loadBooks = async()=>{
+    const loadBooks = async () => {
         setBooksList(data);
     };
 
-    let skeleton = 
-    <Paper sx={{maxHeight: '800px'}}>
-        <Grid container sx={{alignItems: 'center'}}>
-            <Grid item xs={12} sm={12} md={5}>
-                <ImgContainer>
-                    <Skeleton variant="rectangular" width={400} height={400} />
-                </ImgContainer>
-            </Grid>
-            <Grid item xs={12} sm={12} md={7}>
-                <InfoContainer>
-                    <Skeleton variant="text" sx={{ fontSize: '30px' }}/>
-                    <Skeleton variant="text" sx={{ fontSize: '30px' }}/>
-                    <Skeleton variant="text" sx={{ fontSize: '18px' }}/>
-                    <Skeleton variant="text" sx={{ fontSize: '18px' }}/>
-                    <Skeleton variant="text" sx={{ fontSize: '18px' }}/>
-                    <Skeleton variant="rectangular" width={109} height={39} />
-                </InfoContainer>
-            </Grid>
-        </Grid>
-    </Paper>
-    
+    return (
+        <Carousel animation="slide" duration="700" interval={15000}
+            sx={{
+                marginBottom: '20px'
+            }}
+            navButtonsProps={{
+                style: {
+                    backgroundColor: '#63e399',
+                    borderRadius: 0,
+                    outline: 'none',
+                    border: 0,
 
-  return (
-    <Carousel animation="slide" duration="700" interval={15000}
-    sx={{
-        marginBottom: '20px'
-    }}
-    navButtonsProps={{       
-        style: {
-            backgroundColor: '#63e399',
-            borderRadius: 0,
-            outline: 'none',
-            border: 0,
+                    '&:focus': {
+                        outline: 'none',
+                    },
+                }
+            }}
+            activeIndicatorIconButtonProps={{
+                style: {
+                    color: '#63e399'
+                }
+            }}
+            indicatorContainerProps={{
+                style: {
+                    marginTop: '-50px',
+                }
 
-            '&:focus':{
-                outline: 'none',
-            },
-        }
-    }} 
-    activeIndicatorIconButtonProps={{
-        style: {
-            color: '#63e399'
-        }
-    }}
-    indicatorContainerProps={{
-        style: {
-            marginTop: '-50px',
-        }
-
-    }}>
-        {loading ? 
-            <div>
-                {skeleton}
-            </div>
-        : booskList?.map((book, index) => <Item key={index} book={book} /> )
-        }
-    </Carousel>
-  )
+            }}>
+            {
+                (loading || !booksList?.length ? Array.from(new Array(2)) : booksList)?.map((book, index) => <Item key={`${book?.id}-${index}`} book={book} />)
+            }
+        </Carousel>
+    )
 }
 
 export default Slider

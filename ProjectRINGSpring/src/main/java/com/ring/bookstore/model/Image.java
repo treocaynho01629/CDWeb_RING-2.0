@@ -28,7 +28,7 @@ import org.hibernate.type.SqlTypes;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Image { //Ảnh
+public class Image {
 	@Id
     @Column(nullable = false, updatable = false)
     @SequenceGenerator(

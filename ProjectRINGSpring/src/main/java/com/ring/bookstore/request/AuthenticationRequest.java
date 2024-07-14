@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationRequest { //Để xác thực đăng nhập
+public class AuthenticationRequest { //Request body for auth
 
 	@NotNull(message = "Tên đăng nhập không được để trống!")	
 	private String userName;

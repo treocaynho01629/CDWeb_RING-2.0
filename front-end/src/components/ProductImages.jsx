@@ -12,6 +12,10 @@ const ImgContainer = styled.div`
     justify-content: center;
     text-align: center;
     border: 0.5px solid lightgray;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
 `
 
 const MoreImageContainer = styled.div`
@@ -22,11 +26,15 @@ const MoreImageContainer = styled.div`
 `
 
 const ImageSlider = styled.div`
-    padding: 5px;
+    padding: 0;
     overflow: hidden;
     position: relative;
     display: 'flex';
     justify-content: 'center';
+
+    @media (min-width: 768px) {
+        padding: 5px;
+    }
 `
 
 const ImageSlide = styled.div`
@@ -50,13 +58,17 @@ const SmallImageSlider = styled.div`
     overflow-x: scroll;
     width: 95%;
     margin: 0px 10px;
-    padding: 10px;
     user-select: none;
     scroll-behavior: smooth;
     white-space: nowrap;
+    padding: 0;
 
     &::-webkit-scrollbar {
         display: none;
+    }
+
+    @media (min-width: 768px) {
+        padding: 10px;
     }
 `
 
@@ -90,8 +102,8 @@ const ImageButton = styled.div`
     color: inherit;
     position: absolute;
     top: 50%;
-    left: ${prop=> prop.direction === "left" && "2%"};
-    right: ${prop=> prop.direction === "right" && "2%"};
+    left: ${prop => prop.direction === "left" && "2%"};
+    right: ${prop => prop.direction === "right" && "2%"};
 
     &:hover{
         background-color: #63e399;
@@ -100,8 +112,8 @@ const ImageButton = styled.div`
 `
 //#endregion
 
-const ProductImages = ({images}) => {
-    const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY(-1)'];
+const ProductImages = ({ images }) => {
+    const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY(-1)']; //Temp
 
     const [width, setWidth] = useState(0);
     const [start, setStart] = useState(0);
@@ -112,7 +124,7 @@ const ProductImages = ({images}) => {
     const slideRef = useRef();
 
     useEffect(() => {
-        if(!slideRef.current) return;
+        if (!slideRef.current) return;
         const scrollWidth = slideRef.current.scrollWidth;
         const childrenElementCount = slideRef.current.childElementCount;
         const width = scrollWidth / childrenElementCount;
@@ -120,7 +132,7 @@ const ProductImages = ({images}) => {
     }, [])
 
     useEffect(() => {
-        if(!slideRef.current || !width) return;
+        if (!slideRef.current || !width) return;
         let numOfThumb = Math.round(slideRef.current.offsetWidth / width);
         slideRef.current.scrollLeft = slideIndex > numOfThumb - 1 ? (slideIndex - 1) * width : 0;
     }, [width, slideIndex])
@@ -129,7 +141,7 @@ const ProductImages = ({images}) => {
     const changeSlide = (n) => {
         setSlideIndex(prev => prev + n);
 
-        if ((slideIndex + n) > multiImages.length){
+        if ((slideIndex + n) > multiImages.length) {
             setSlideIndex(1)
         }
         if ((slideIndex + n) < 1) {
@@ -147,59 +159,60 @@ const ProductImages = ({images}) => {
         setChange(start - touch);
     }
     const dragEnd = (e) => {
-        if (change > 0){
+        if (change > 0) {
             slideRef.current.scrollLeft += width;
         } else {
             slideRef.current.scrollLeft -= width;
         }
     }
 
-  return (
-    <ImgContainer>
-        <ImageSlider>
-            {multiImages.map((style, index) => (
-            <ImageSlide key={index}
-            style={{display: (index + 1) === slideIndex ? "block" : "none"}}>
-                <ImageNumber>{index + 1} / {multiImages.length}</ImageNumber>
-                <LazyLoadImage src={images}
-                width={'95%'} 
-                style={{
-                    padding: '15px 20px',
-                    objectFit: 'contain',
-                    transform: style
-                }}
-                />        
-            </ImageSlide>
-            ))}
-            <ImageButton direction="left" onClick={()=>changeSlide(-1)}>
-                <KeyboardArrowLeft style={{fontSize: 50}}/>
-            </ImageButton>
-            <ImageButton direction="right" onClick={()=>changeSlide(1)}>
-                <KeyboardArrowRight style={{fontSize: 50}}/>
-            </ImageButton>
-        </ImageSlider>
-        <MoreImageContainer>
-            <SmallImageSlider draggable={true} ref={slideRef}
-            onDragStart={dragStart} onDragOver={dragOver} onDragEnd={dragEnd}>
+    return (
+        <ImgContainer>
+            <ImageSlider>
                 {multiImages.map((style, index) => (
-                <SmallImageSlide key={index} 
-                className={`${index + 1 === slideIndex && 'active'}`}
-                onClick={()=>setSlideIndex(index + 1)}>
-                    <LazyLoadImage src={images}
-                        height={80}
-                        width={80} 
-                        style={{
-                            objectFit: 'contain',
-                            display: 'inline-block',
-                            transform: style
-                        }}
-                    />
-                </SmallImageSlide>
+                    <ImageSlide key={index}
+                        style={{ display: (index + 1) === slideIndex ? "block" : "none" }}>
+                        <ImageNumber>{index + 1} / {multiImages.length}</ImageNumber>
+                        <LazyLoadImage src={images}
+                            width={'95%'}
+                            style={{
+                                padding: '15px 10px',
+                                objectFit: 'contain',
+                                transform: style,
+                                minHeight: 500,
+                            }}
+                        />
+                    </ImageSlide>
                 ))}
-            </SmallImageSlider>
-        </MoreImageContainer>    
-    </ImgContainer>
-  )
+                <ImageButton direction="left" onClick={() => changeSlide(-1)}>
+                    <KeyboardArrowLeft style={{ fontSize: 50 }} />
+                </ImageButton>
+                <ImageButton direction="right" onClick={() => changeSlide(1)}>
+                    <KeyboardArrowRight style={{ fontSize: 50 }} />
+                </ImageButton>
+            </ImageSlider>
+            <MoreImageContainer>
+                <SmallImageSlider draggable={true} ref={slideRef}
+                    onDragStart={dragStart} onDragOver={dragOver} onDragEnd={dragEnd}>
+                    {multiImages.map((style, index) => (
+                        <SmallImageSlide key={index}
+                            className={`${index + 1 === slideIndex && 'active'}`}
+                            onClick={() => setSlideIndex(index + 1)}>
+                            <LazyLoadImage src={images}
+                                height={80}
+                                width={80}
+                                style={{
+                                    objectFit: 'contain',
+                                    display: 'inline-block',
+                                    transform: style
+                                }}
+                            />
+                        </SmallImageSlide>
+                    ))}
+                </SmallImageSlider>
+            </MoreImageContainer>
+        </ImgContainer>
+    )
 }
 
 export default ProductImages

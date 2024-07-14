@@ -1,7 +1,9 @@
 import styled from "styled-components"
 
-import { Facebook as FacebookIcon, YouTube as YouTubeIcon, Instagram as InstagramIcon, Twitter as TwitterIcon, 
-    QrCode as QrCodeIcon, LocalAtm as LocalAtmIcon, SystemSecurityUpdateGood as SystemSecurityUpdateGoodIcon, CreditCard as CreditCardIcon} from '@mui/icons-material';
+import {
+    Facebook as FacebookIcon, YouTube as YouTubeIcon, Instagram as InstagramIcon, Twitter as TwitterIcon,
+    QrCode as QrCodeIcon, LocalAtm as LocalAtmIcon, SystemSecurityUpdateGood as SystemSecurityUpdateGoodIcon, CreditCard as CreditCardIcon
+} from '@mui/icons-material';
 
 import Grid from '@mui/material/Grid';
 
@@ -59,19 +61,20 @@ const Description = styled.p`
 const Social = styled.div`
     display: flex;
     margin-top: 10px;
+    flex-wrap: wrap;
 `
 
 const SocialIcon = styled.div`
-width: 40px;
-height: 40px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     color: white;
-    background-color: #${props=>props.color};
+    background-color: #${props => props.color};
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 20px;
-
+    margin-bottom: 20px;
     cursor: pointer;
     transition: all 0.5s ease;
 
@@ -171,84 +174,84 @@ const Group = styled.p`
 //#endregion
 
 const Footer = () => {
-  return (
-      <Container>
-        <Wrapper>
-            <Grid container>
-                <Grid item xs={12} md={3}>
-                    <Left>
-                        <Logo>RING!&nbsp; <p style={{color: '#424242', margin: 0}}>- BOOKSTORE</p></Logo>
-                        <Description>Khu phố 6, Phường Linh Trung, TP. Thủ Đức - TP. Hồ Chí Minh</Description>
-                        <Social>
-                            <SocialIcon color="3B5999">
-                                <FacebookIcon/>
-                            </SocialIcon>
-                            <SocialIcon color="FF0000">
-                                <YouTubeIcon/>
-                            </SocialIcon>
-                            <SocialIcon color="E4405F">
-                                <InstagramIcon/>
-                            </SocialIcon>
-                            <SocialIcon color="55ACEE">
-                                <TwitterIcon/>
-                            </SocialIcon>
-                        </Social>
-                    </Left>
+    return (
+        <Container>
+            <Wrapper>
+                <Grid container>
+                    <Grid item xs={12} md={3}>
+                        <Left>
+                            <Logo>RING!&nbsp; <p style={{ color: '#424242', margin: 0 }}>- BOOKSTORE</p></Logo>
+                            <Description>Khu phố 6, Phường Linh Trung, TP. Thủ Đức - TP. Hồ Chí Minh</Description>
+                            <Social>
+                                <SocialIcon color="3B5999">
+                                    <FacebookIcon />
+                                </SocialIcon>
+                                <SocialIcon color="FF0000">
+                                    <YouTubeIcon />
+                                </SocialIcon>
+                                <SocialIcon color="E4405F">
+                                    <InstagramIcon />
+                                </SocialIcon>
+                                <SocialIcon color="55ACEE">
+                                    <TwitterIcon />
+                                </SocialIcon>
+                            </Social>
+                        </Left>
+                    </Grid>
+                    <Grid item xs={12} md={9}>
+                        <Right>
+                            <Grid container spacing={1}>
+                                <Grid item xs={6} md={3}>
+                                    <Title>HỖ TRỢ</Title>
+                                    <List>
+                                        <ListItem>Chính sách đổi - trả - hoàn tiền</ListItem>
+                                        <ListItem>Phương thức vận chuyển</ListItem>
+                                        <ListItem>Phương thức thanh toán</ListItem>
+                                        <ListItem>Câu hỏi thường gặp</ListItem>
+                                        <ListItem>Hướng dẫn đặt hàng</ListItem>
+                                    </List>
+                                </Grid>
+                                <Grid item xs={6} md={3}>
+                                    <Title>THÔNG TIN</Title>
+                                    <List>
+                                        <ListItem>Giới thiệu</ListItem>
+                                        <ListItem>Tuyển dụng</ListItem>
+                                        <ListItem>Chính sách khiếu nại</ListItem>
+                                        <ListItem>Điều khoản sử dụng</ListItem>
+                                    </List>
+                                </Grid>
+                                <Grid item xs={6} md={3}>
+                                    <Title>DỊCH VỤ</Title>
+                                    <List>
+                                        <ListItem>Chính sách bảo mật</ListItem>
+                                        <ListItem>Hệ thống hàng</ListItem>
+                                    </List>
+                                </Grid>
+                                <Grid item xs={6} md={3}>
+                                    <Title>THANH TOÁN</Title>
+                                    <List>
+                                        <ListItem>Phương thức thanh toán</ListItem>
+                                        <ListItem style={{ display: 'flex' }}>
+                                            <Payment><QrCodeIcon sx={{ fontSize: 30 }} /><p style={{ fontSize: 14, margin: 0 }}>QR Code</p></Payment>
+                                            <Payment><LocalAtmIcon sx={{ fontSize: 30 }} /><p style={{ fontSize: 14, margin: 0 }}>Tiền mặt</p></Payment>
+                                        </ListItem>
+                                        <ListItem style={{ display: 'flex' }}>
+                                            <Payment><SystemSecurityUpdateGoodIcon sx={{ fontSize: 30 }} /><p style={{ fontSize: 14, margin: 0 }}>Internet Banking</p></Payment>
+                                            <Payment><CreditCardIcon sx={{ fontSize: 30 }} /><p style={{ fontSize: 14, margin: 0 }}>Thẻ ATM</p></Payment>
+                                        </ListItem>
+                                    </List>
+                                </Grid>
+                            </Grid>
+                        </Right>
+                    </Grid>
                 </Grid>
-                <Grid item xs={12} md={9}>
-                    <Right>
-                        <Grid container spacing={1}>
-                            <Grid item xs={6} md={3}>
-                                <Title>HỖ TRỢ</Title>
-                                <List>
-                                    <ListItem>Chính sách đổi - trả - hoàn tiền</ListItem>
-                                    <ListItem>Phương thức vận chuyển</ListItem>
-                                    <ListItem>Phương thức thanh toán</ListItem>
-                                    <ListItem>Câu hỏi thường gặp</ListItem>
-                                    <ListItem>Hướng dẫn đặt hàng</ListItem>
-                                </List>
-                            </Grid>
-                            <Grid item xs={6} md={3}>
-                                <Title>THÔNG TIN</Title>
-                                <List>
-                                    <ListItem>Giới thiệu</ListItem>
-                                    <ListItem>Tuyển dụng</ListItem>
-                                    <ListItem>Chính sách khiếu nại</ListItem>
-                                    <ListItem>Điều khoản sử dụng</ListItem>
-                                </List>
-                            </Grid>
-                            <Grid item xs={6} md={3}>
-                                <Title>DỊCH VỤ</Title>
-                                <List>
-                                    <ListItem>Chính sách bảo mật</ListItem>
-                                    <ListItem>Hệ thống hàng</ListItem>
-                                </List>
-                            </Grid>
-                            <Grid item xs={6} md={3}>
-                                <Title>THANH TOÁN</Title>
-                                <List>
-                                    <ListItem>Phương thức thanh toán</ListItem>
-                                    <ListItem style={{display: 'flex'}}>
-                                        <Payment><QrCodeIcon sx={{fontSize: 30}}/><p style={{fontSize: 14, margin: 0}}>QR Code</p></Payment>
-                                        <Payment><LocalAtmIcon sx={{fontSize: 30}}/><p style={{fontSize: 14, margin: 0}}>Tiền mặt</p></Payment>
-                                    </ListItem>
-                                    <ListItem style={{display: 'flex'}}>
-                                        <Payment><SystemSecurityUpdateGoodIcon sx={{fontSize: 30}}/><p style={{fontSize: 14, margin: 0}}>Internet Banking</p></Payment>
-                                        <Payment><CreditCardIcon sx={{fontSize: 30}}/><p style={{fontSize: 14, margin: 0}}>Thẻ ATM</p></Payment>
-                                    </ListItem>
-                                </List>
-                            </Grid>
-                        </Grid>
-                    </Right>
-                </Grid>
-            </Grid>
-        </Wrapper>
-        <BotFooter>
-            <BotText>Giấy chứng nhận Đăng ý kính doanh do NLU - TP.HCM cấp ngày 01/01/2022.</BotText>
-            <Group>DoraZ</Group>
-        </BotFooter>
-    </Container>
-  )
+            </Wrapper>
+            <BotFooter>
+                <BotText>Giấy chứng nhận Đăng ý kính doanh do NLU - TP.HCM cấp ngày 01/01/2022.</BotText>
+                <Group>DoraZ</Group>
+            </BotFooter>
+        </Container>
+    )
 }
 
 export default Footer

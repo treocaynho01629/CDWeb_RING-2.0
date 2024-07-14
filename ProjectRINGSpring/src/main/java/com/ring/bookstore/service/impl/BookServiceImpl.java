@@ -62,30 +62,30 @@ public class BookServiceImpl implements BookService {
 	@Autowired
 	private BookDetailMapper bookDetailMapper;
 	
-	//Lấy tất cả Sách
+	//Get all books
     public Page<BookDTO> getAllBooks(Integer pageNo, Integer pageSize) {
-    	//Tạo phân trang
+    	//Pagination
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         Page<Book> booksList = bookRepo.findAll(pageable);
-        //Map dữ liệu sang DTO
+        //Map to DTO
         List<BookDTO> bookDtos = booksList.stream().map(bookMapper::apply).collect(Collectors.toList());
-        return new PageImpl<BookDTO>(bookDtos, pageable, booksList.getTotalElements()); //Trả dữ liệu đã phần trang và Map
+        return new PageImpl<BookDTO>(bookDtos, pageable, booksList.getTotalElements()); //Return paginated books
     }
     
-    //Lấy Sách ngẫu nhiên
+    //Get random books
 	public List<BookDTO> getRandomBooks(Integer amount) {
 	    List<Book> booksList = bookRepo.findRandomBooks(amount);
-	    List<BookDTO> bookDtos = booksList.stream().map(bookMapper::apply).collect(Collectors.toList()); //Trả dữ liệu đã Map
+	    List<BookDTO> bookDtos = booksList.stream().map(bookMapper::apply).collect(Collectors.toList()); //Return books
         return bookDtos;
 	}
     
-	//Lấy Sách theo bộ lọc
+	//Get books by filtering
     public Page<BookDTO> getBooksByFilter(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
     		String keyword, Integer cateId, List<Integer> pubId, String seller, String type, Double fromRange, Double toRange) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Tạo phân trang
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 											: Sort.by(sortBy).descending());
         
-        //Chuyển bộ lọc sang String
+        //Convert these to string
         String cateIdString = "";
         String[] pubListString = {""};
         
@@ -96,7 +96,7 @@ public class BookServiceImpl implements BookService {
         	pubListString = Arrays.toString(pubList.toArray()).split("[\\[\\]]")[1].split(", "); 
         }
         
-        //Lấy Sách từ CSDL
+        //Fetch from database
         Page<IBookDisplay> booksList = bookRepo.findBooksWithFilter(keyword
 										        		, cateIdString
 										        		, pubListString
@@ -105,31 +105,31 @@ public class BookServiceImpl implements BookService {
 										        		, fromRange
 										        		, toRange
 										        		, pageable);
-        List<BookDTO> bookDtos = booksList.stream().map(bookDisplayMapper::apply).collect(Collectors.toList()); //Map dữ liệu sang DTO
-        return new PageImpl<BookDTO>(bookDtos, pageable, booksList.getTotalElements()); //Trả dữ liệu đã phần trang và Map
+        List<BookDTO> bookDtos = booksList.stream().map(bookDisplayMapper::apply).collect(Collectors.toList()); //Map to DTO
+        return new PageImpl<BookDTO>(bookDtos, pageable, booksList.getTotalElements()); //Return paginated books
     }
     
-    //Lấy Sách theo {id}
+    //Get book by {id}
   	public Book getBookById(Integer id) {
   		Book book= bookRepo.findById(id).orElseThrow(() -> 
-  			new ResourceNotFoundException("Product does not exists!")); //Báo lỗi khi ko có
+  			new ResourceNotFoundException("Product does not exists!"));
   		return book;
   	}
 
-	//Lấy Sách hiển thị theo {id}
+	//Get display book info by {id}
 	public BookDetailDTO getBookDetailById(Integer id) {
 		Book book= bookRepo.findById(id).orElseThrow(() -> 
-			new ResourceNotFoundException("Product does not exists!")); //Báo lỗi khi không có
-		BookDetailDTO bookDetailDTO = bookDetailMapper.apply(book); //Map sang DTO
-		return bookDetailDTO; //Trả về
+			new ResourceNotFoundException("Product does not exists!"));
+		BookDetailDTO bookDetailDTO = bookDetailMapper.apply(book); //Map to DTO
+		return bookDetailDTO;
 	}
 	
-	//Thêm Sách mới (SELLER)
+	//Aadd book (SELLER)
 	@Transactional
 	public Book addBook(BookRequest request, MultipartFile file, Account seller) throws IOException {
-		//Kiểm tra ảnh
+		//Image validation
 		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-		Image image = imageRepo.findByName(fileName).orElse( //Lấy ảnh cũ nếu tồn tại || Tạo ảnh mới nếu chưa tồn tại
+		Image image = imageRepo.findByName(fileName).orElse( //Add image info if not yet exists
 			Image.builder()
     		.name(fileName)
     		.type(file.getContentType())
@@ -137,13 +137,13 @@ public class BookServiceImpl implements BookService {
 			.build()
 		);
 	    		
-		//Kiểm tra Danh mục và NXB có tồn tại
+		//Category & publisher validation
 		Category cate = cateRepo.findById(request.getCateId()).orElseThrow(()-> new ResourceNotFoundException("Category not found"));
 		Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(()-> new ResourceNotFoundException("Publisher not found"));
 		
-		Image savedImage = imageRepo.save(image); //Lưu ảnh vào CSDL
+		Image savedImage = imageRepo.save(image); //Upload and save image to database
 		
-		//Tạo Sách mới và set thông tin
+		//Create new book
         var book = Book.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -156,9 +156,9 @@ public class BookServiceImpl implements BookService {
                 .amount(request.getAmount())
                 .type(request.getType())
                 .build();
-        Book addedBook = bookRepo.save(book); //Lưu Sách vào CSDL
+        Book addedBook = bookRepo.save(book); //Save to database
 
-        //Tạo Chi tiết sách và set thông tin
+        //Create book details
         var bookDetail = BookDetail.builder()
         		.book(addedBook)
         		.bWeight(request.getWeight())
@@ -167,19 +167,19 @@ public class BookServiceImpl implements BookService {
         		.bLanguage(request.getLanguage())
         		.bDate(request.getDate())
                 .build();
-        BookDetail addedDetail = detailRepo.save(bookDetail); //Lưu Chi tiết sách vào CSDL
+        BookDetail addedDetail = detailRepo.save(bookDetail); //Save details to databasae
 
-        //Set chi tiết vào Sách và trả về Sách đã thêm
+        //Return added book
         addedBook.setBookDetail(addedDetail);
         return addedBook;
 	}
 
-	//Sửa Sách (SELLER)
+	//Update book (SELLER)
 	@Transactional
 	public Book updateBook(BookRequest request, MultipartFile file, Integer id, Account seller) throws IOException {
-		//Kiểm tra ảnh
+		//Image validation
 		Image newImage = null;
-		if (file != null) { //Tạo Ảnh mới nếu có file Ảnh mới
+		if (file != null) { //If different image, upload again
 			String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 			Image image = imageRepo.findByName(fileName).orElse(
 				Image.builder()
@@ -191,24 +191,24 @@ public class BookServiceImpl implements BookService {
 			newImage = image;
 		}
 		
-	    //Kiểm tra thông tin Sách, Danh mục, NXB có tồn tại?
+	    //Check book exists & category, publisher validation
 		Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found"));
 		Category cate = cateRepo.findById(request.getCateId()).orElseThrow(()-> new ResourceNotFoundException("Category not found"));
 		Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(()-> new ResourceNotFoundException("Publisher not found"));
 		
-		//Kiểm trả Nhân viên hợp lệ (Là Admin hoặc đúng sách Người dùng bán)
+		//Check if correct seller or admin
 		if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
 		
-		//Set thông tin mới cho Chi tiết sách
+		//Set new details info
 		BookDetail currDetail = book.getBookDetail();
 		currDetail.setBWeight(request.getWeight());
 		currDetail.setSize(request.getSize());
 		currDetail.setPages(request.getPages());
 		currDetail.setBLanguage(request.getLanguage());
 		currDetail.setBDate(request.getDate());
-        detailRepo.save(currDetail); //Lưu Chi tiết sách vào CSDL
+        detailRepo.save(currDetail); //Save new details to database
 		
-        //Set thông tin mới cho Sách
+        //Set new info
 		book.setTitle(request.getTitle());
 		book.setDescription(request.getDescription());
 		book.setPrice(request.getPrice());
@@ -219,38 +219,38 @@ public class BookServiceImpl implements BookService {
 		book.setType(request.getType());
 		if (file != null) {
 			Image savedImage = imageRepo.save(newImage);
-			book.setImages(savedImage); //Nếu có ảnh mới >> set ảnh mới
+			book.setImages(savedImage); //If new image, replace path
 		}
 		
-		//Lưu Sách vào CSDL và trả về
+		//Return updated book
 		Book savedBook = bookRepo.save(book);
         return savedBook;
 	}
 
-	//Xoá Sách (SELLER)
+	//Delete book (SELLER)
 	@Transactional
 	public Book deleteBook(Integer id, Account seller) {
 		Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found")); //Kiểm tra sách tồn tại?
-		//Kiểm trả Nhân viên hợp lệ (Là Admin hoặc đúng sách Người dùng bán)
+		//Check if correct seller or admin
 		if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
 
-		bookRepo.deleteById(id); //Xoá sách khỏi CSDL
+		bookRepo.deleteById(id); //Delete from database
 		return book;
 	}
 	
-	//Xoá nhiều sách (SELLER)
+	//Delete multiples books (SELLER)
 	@Transactional
 	public void deleteBooks(List<Integer> ids, Account seller) {
-		//Duyệt từng cuốn sách
+		//Loop and delete
 		for (Integer id : ids) {
 			Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found")); //Kiểm tra sách tồn tại?
-			//Kiểm trả Nhân viên hợp lệ (Là Admin hoặc đúng sách Người dùng bán)
+			//Check if correct seller or admin
 			if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
-			bookRepo.deleteById(id); //Xoá sách khỏi CSDL
+			bookRepo.deleteById(id); //Delete from database
 		}
 	}
 	
-	//Xoá tất cả sách (SELLER)
+	//Delete all books (SELLER)
 	@Transactional
 	public void deleteAllBooks(Account seller) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Lấy người dùng trong Security Context Holder
@@ -261,11 +261,11 @@ public class BookServiceImpl implements BookService {
 		}
 	}
 	
-	//Kiểm trả Nhân viên hợp lệ (Là Admin hoặc đúng sách Người dùng bán)
+	//Check valid role function
 	protected boolean isSellerValid(Book book, Account seller){
         boolean result = false;
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Lấy người dùng trong Security Context Holder
-        //Có role ADMIN hoặc là Người bán cuốn Sách
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current user
+        //Check if is admin or valid seller id
         if (book.getUser().getId().equals(seller.getId()) 
         		|| (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())))) {
             result = true;

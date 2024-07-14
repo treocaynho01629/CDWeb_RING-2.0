@@ -13,7 +13,7 @@ import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
-import AppPagination from "../components/AppPagination"
+import AppPagination from "../components/custom/AppPagination"
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -25,24 +25,10 @@ import dayjs from 'dayjs';
 import usePrivateFetch from '../hooks/usePrivateFetch'
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 
-const Pending = lazy(() => import('../components/authorize/Pending'));
+const PendingIndicator = lazy(() => import('../components/authorize/PendingIndicator'));
 
 //#region styled
 const Wrapper = styled.div`
-    padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
-
-    @media (min-width: 768px) {
-        width: 750px;
-    }
-    @media (min-width: 992px) {
-        width: 970px;
-    }
-    @media (min-width: 1200px) {
-        width: 1170px;
-    }
 `
 
 const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
@@ -724,7 +710,7 @@ const Profile = () => {
     <Wrapper>
         {pending ?
         <Suspense fallBack={<></>}>
-            <Pending/>
+            <PendingIndicator/>
         </Suspense>
         : null
         }

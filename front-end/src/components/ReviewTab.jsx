@@ -1,21 +1,17 @@
-import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
+import { useEffect, useState } from 'react'
 import { styled as muiStyled } from '@mui/system';
-
-import AppPagination from '../components/AppPagination';
-
-import { AccessTime as AccessTimeIcon, CalendarMonth as CalendarMonthIcon, Star as StarIcon, StarBorder as StarBorderIcon} from '@mui/icons-material';
-import { Avatar, Rating, Box, Grid, TextareaAutosize} from '@mui/material';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
-
+import { AccessTime as AccessTimeIcon, CalendarMonth as CalendarMonthIcon, Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
+import { Avatar, Rating, Box, Grid, TextareaAutosize } from '@mui/material';
 import { useNavigate } from "react-router-dom";
+import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import AppPagination from './custom/AppPagination';
+import CustomButton from './custom/CustomButton';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import useFetch from '../hooks/useFetch'
 import useAuth from "../hooks/useAuth";
 
 //#region styled
-const RatingTab = styled.div``
-
 const RatingSelect = styled.div`
     display: flex;
     justify-content: space-between;
@@ -27,30 +23,6 @@ const RateSelect = styled.div`
     flex-wrap: wrap;
     align-items: center;
     text-align: center;
-`
-
-const RateButton = styled.button`
-    border-radius: 0;
-    padding: 10px 20px;
-    margin-top: -15px;
-    border: none;
-    outline: none;
-    background-color: #63e399;
-    color: white;
-    font-size: 16px;
-    justify-content: center;
-    font-weight: bold;
-    transition: all 0.5s ease;
-
-    &:hover {
-        background-color: lightgray;
-        color: gray;
-    };
-
-    &:focus {
-        border: none;
-        outline: none;
-    }
 `
 
 const StyledRating = muiStyled(Rating)({
@@ -93,56 +65,66 @@ const RatingInfo = styled.p`
 
 const REVIEW_URL = `/api/reviews/`
 
-const Review = ({review, user}) => {
+const Review = ({ review, user }) => {
     const date = new Date(review.date)
-  
+
     return (
-      <div>
-        <Profiler style={{borderBottom: '1px solid', borderColor: user?.userName === review.userName ? '#63e399' : 'white'}}>
-          <Box sx={{display: 'flex', alignItems: 'center'}}>
-              <RatingInfo><Avatar sx={{width: '20px', height: '20px', marginRight: '5px'}}>A</Avatar>{review.userName}</RatingInfo>
-              <Box display={{xs: 'none', sm: 'flex'}}>
-                <RatingInfo><AccessTimeIcon sx={{fontSize: 18, marginRight: '5px', color: '#63e399'}}/>{date.getHours() + ":" + date.getMinutes()}</RatingInfo>
-              </Box>
-              <RatingInfo><CalendarMonthIcon sx={{fontSize: 18, marginRight: '5px', color: '#63e399'}}/>{date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear()}</RatingInfo>
-          </Box>
-          <RatingInfo><StarIcon sx={{fontSize: 18, marginRight: '5px', color: '#63e399'}}/>{review.rating}</RatingInfo>
-        </Profiler>
-        <Box sx={{margin: '20px 0px 50px'}}>{review.content}</Box>
-      </div>
+        <div>
+            <Profiler style={{ borderBottom: '1px solid', borderColor: user?.userName === review.userName ? '#63e399' : 'white' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <RatingInfo><Avatar sx={{ width: '20px', height: '20px', marginRight: '5px' }}>A</Avatar>{review.userName}</RatingInfo>
+                    <Box display={{ xs: 'none', sm: 'flex' }}>
+                        <RatingInfo><AccessTimeIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />{date.getHours() + ":" + date.getMinutes()}</RatingInfo>
+                    </Box>
+                    <RatingInfo><CalendarMonthIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />{date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear()}</RatingInfo>
+                </Box>
+                <RatingInfo><StarIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />{review.rating}</RatingInfo>
+            </Profiler>
+            <Box sx={{ margin: '20px 0px 50px' }}>{review.content}</Box>
+        </div>
     )
 }
 
 const ReviewTab = (props) => {
     //#region construct
-    const {id} = props;
+    const { id } = props;
+
+    //Initial value
     const [content, setContent] = useState('');
     const [rating, setRating] = useState(5);
+
+    //Error
     const [err, setErr] = useState([]);
     const [errMsg, setErrMsg] = useState('');
+
+    //Pagination
     const [pagination, setPagination] = useState({
         currPage: 0,
         pageSize: 8,
         totalPages: 0
-    })
+    });
+
+    //Other
+    const { auth } = useAuth();
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
-    const { auth } = useAuth();
 
+    //Fetch reviews
     const { loading: loadingReview, data: reviews, refetch } = useFetch(REVIEW_URL + id
-        + "?pSize=" + pagination.pageSize 
+        + "?pSize=" + pagination.pageSize
         + "&pageNo=" + pagination.currPage);
 
+    //Set reviews after fetch
     useEffect(() => {
-        if (!loadingReview){
-            setPagination({ ...pagination, totalPages: reviews?.totalPages});
+        if (!loadingReview) {
+            setPagination({ ...pagination, totalPages: reviews?.totalPages });
             if (pagination?.currPage > pagination?.pageSize) handlePageChange(1);
         }
     }, [loadingReview])
 
     //Change page
     const handlePageChange = (page) => {
-        setPagination({...pagination, currPage: page - 1});
+        setPagination({ ...pagination, currPage: page - 1 });
     };
 
     const handleChangeContent = (event) => {
@@ -151,11 +133,12 @@ const ReviewTab = (props) => {
 
     const handleChangeSize = (newValue) => {
         handlePageChange(1);
-        setPagination({...pagination, pageSize: newValue});
+        setPagination({ ...pagination, pageSize: newValue });
     };
 
+    //Review
     const handleSubmitReview = async (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
         const { enqueueSnackbar } = await import('notistack');
 
         try {
@@ -163,7 +146,7 @@ const ReviewTab = (props) => {
                 JSON.stringify({
                     content: content,
                     rating: rating
-                } ),
+                }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
@@ -178,7 +161,7 @@ const ReviewTab = (props) => {
             setRating(5);
             handlePageChange(1);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             setErr(err);
             if (!err?.response) {
                 setErrMsg("Server không phản hồi!");
@@ -195,93 +178,122 @@ const ReviewTab = (props) => {
 
     //Review
     let review;
-    if (loadingReview){
-        review = <CustomLinearProgress/>
-    } else if (reviews?.totalElements != 0){
-        review = 
-        <Box>
-            {reviews?.content?.map((review, index) => (
-                <Grid key={index}>
-                    <Review review={review} user={auth}/>
-                </Grid>
-            ))}
-            <AppPagination pagination={pagination}
-            onPageChange={handlePageChange}
-            onSizeChange={handleChangeSize}/>
-        </Box>
+    if (loadingReview) {
+        review = <CustomLinearProgress sx={{ marginBottom: 5 }} />
+    } else if (reviews?.totalElements != 0) {
+        review =
+            <Box>
+                {reviews?.content?.map((review, index) => (
+                    <Grid key={index}>
+                        <Review review={review} user={auth} />
+                    </Grid>
+                ))}
+                <AppPagination pagination={pagination}
+                    onPageChange={handlePageChange}
+                    onSizeChange={handleChangeSize} />
+            </Box>
     } else {
-        review = <Box sx={{marginBottom: 5}}>Chưa có ai bình luận, hãy trở thành người đầu tiên!</Box>
+        review = <Box sx={{ marginBottom: 5 }}>Chưa có ai bình luận, hãy trở thành người đầu tiên!</Box>
     }
     //#endregion
 
-  return (
-    <RatingTab>
-        {review}
-        <Box>
-            {auth.userName ? (err?.response?.data?.code === 208 ?
-                <Box>
-                    <Box><strong style={{fontSize: '16px'}}>{errMsg}</strong></Box>
-                    <br/>
-                    <RateButton onClick={() => navigate('/login')}>Xem đánh giá</RateButton>
-                </Box>
-                : err?.response?.data?.code === 204 ?
-                <Box>
-                    <Box><strong style={{fontSize: '16px'}}>{errMsg}</strong></Box>
-                    <br/>
-                    <RateButton onClick={() => scrollTo(0, 0)}>Mua ngay</RateButton>
-                </Box>
-                :
-                <Box>
-                    <Box><strong style={{fontSize: '16px', color: errMsg && !content ? 'red' : 'black'}}>
-                        {errMsg ? errMsg : "Để lại đánh giá của bạn"}
-                    </strong></Box>
-                    <form onSubmit={handleSubmitReview}>
-                        <TextareaAutosize
-                            aria-label="comment"
-                            minRows={7}
-                            value={content}
-                            onChange={handleChangeContent}
-                            placeholder="Đánh giá của bạn ..."
-                            style={{ width: '100%', 
-                            margin: '30px 0px', 
-                            backgroundColor: 'white', 
-                            outline: 'none',
-                            borderRadius: '0', 
-                            resize: 'none', 
-                            color: 'black', 
-                            borderColor: err?.response?.data?.errors?.content && !content ? 'red' : 'black',
-                            fontSize: '16px'}}
-                        />
-                        <RatingSelect>
-                            <RateSelect>
-                                <strong>Đánh giá: </strong>
-                                <StyledRating
-                                    sx={{marginLeft: '5px'}} 
-                                    name="product-rating"
-                                    value={rating}
-                                    onChange={(event, newValue) => {
-                                        setRating(newValue);
-                                    }}
-                                    getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
-                                    icon={<StarIcon fontSize="10px"/>}
-                                    emptyIcon={<StarBorderIcon fontSize="10"/>}
-                                /> 
-                            </RateSelect>
-                            <RateButton>Gửi đánh giá</RateButton>
-                        </RatingSelect>
-                    </form>
-                </Box>
-            )
-            : 
+    return (
+        <>
+            {review}
             <Box>
-                <Box><strong style={{fontSize: '16px'}}>Bạn chưa đăng nhập, hãy Đăng nhập để đánh giá</strong></Box>
-                <br/>
-                <RateButton onClick={() => navigate('/login')}>Đăng nhập ngay</RateButton>
+                {auth.userName ? (err?.response?.data?.code === 208 ?
+                    <Box>
+                        <Box><strong style={{ fontSize: '16px' }}>{errMsg}</strong></Box>
+                        <br />
+                        <CustomButton
+                            variant="contained"
+                            color="secondary"
+                            size="small"
+                            onClick={() => navigate('/login')}
+                        >
+                            Xem đánh giá
+                        </CustomButton>
+                    </Box>
+                    : err?.response?.data?.code === 204 ?
+                        <Box>
+                            <Box><strong style={{ fontSize: '16px' }}>{errMsg}</strong></Box>
+                            <br />
+                            <CustomButton
+                                variant="contained"
+                                color="secondary"
+                                size="small"
+                                onClick={() => scrollTo(0, 0)}
+                            >
+                                Mua ngay
+                            </CustomButton>
+                        </Box>
+                        :
+                        <Box>
+                            <Box><strong style={{ fontSize: '16px', color: errMsg && !content ? 'red' : 'black' }}>
+                                {errMsg ? errMsg : "Để lại đánh giá của bạn"}
+                            </strong></Box>
+                            <form onSubmit={handleSubmitReview}>
+                                <TextareaAutosize
+                                    aria-label="comment"
+                                    minRows={7}
+                                    value={content}
+                                    onChange={handleChangeContent}
+                                    placeholder="Đánh giá của bạn ..."
+                                    style={{
+                                        width: '100%',
+                                        margin: '30px 0px',
+                                        backgroundColor: 'white',
+                                        outline: 'none',
+                                        borderRadius: '0',
+                                        resize: 'none',
+                                        color: 'black',
+                                        borderColor: err?.response?.data?.errors?.content && !content ? 'red' : 'black',
+                                        fontSize: '16px'
+                                    }}
+                                />
+                                <RatingSelect>
+                                    <RateSelect>
+                                        <strong>Đánh giá: </strong>
+                                        <StyledRating
+                                            sx={{ marginLeft: '5px' }}
+                                            name="product-rating"
+                                            value={rating}
+                                            onChange={(event, newValue) => {
+                                                setRating(newValue);
+                                            }}
+                                            getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
+                                            icon={<StarIcon fontSize="10px" />}
+                                            emptyIcon={<StarBorderIcon fontSize="10" />}
+                                        />
+                                    </RateSelect>
+                                    <CustomButton
+                                        variant="contained"
+                                        color="secondary"
+                                        size="small"
+                                    >
+                                        Gửi đánh giá
+                                    </CustomButton>
+                                </RatingSelect>
+                            </form>
+                        </Box>
+                )
+                    :
+                    <Box>
+                        <Box><strong style={{ fontSize: '16px' }}>Bạn chưa đăng nhập, hãy Đăng nhập để đánh giá</strong></Box>
+                        <br />
+                        <CustomButton
+                            variant="contained"
+                            color="secondary"
+                            size="small"
+                            onClick={() => navigate('/login')}
+                        >
+                            Đăng nhập ngay
+                        </CustomButton>
+                    </Box>
+                }
             </Box>
-            }
-        </Box>
-    </RatingTab>
-  )
+        </>
+    )
 }
 
 export default ReviewTab

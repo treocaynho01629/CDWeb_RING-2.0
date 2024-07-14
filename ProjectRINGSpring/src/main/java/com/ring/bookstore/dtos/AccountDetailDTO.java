@@ -2,7 +2,7 @@ package com.ring.bookstore.dtos;
 
 import java.time.LocalDate;
 
-//Chi tiết Người dùng
+//Account details
 public record AccountDetailDTO(Integer id,
 		String userName,
 		String email,

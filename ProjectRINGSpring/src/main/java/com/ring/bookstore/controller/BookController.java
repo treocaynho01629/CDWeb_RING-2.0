@@ -37,12 +37,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
 @Validated
-public class BookController { //Controller Sách
+public class BookController {
 	
 	private final BookService bookService;
 	private final AccountRepository accRepo;
 	
-	//Lấy tất cả Sách
+	//Gett all books
 	@GetMapping()
     public ResponseEntity<?> getAllBooks(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
 										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo){
@@ -50,14 +50,14 @@ public class BookController { //Controller Sách
         return new ResponseEntity< >(books, HttpStatus.OK);
     }
 	
-	//Lấy Sách ngẫu nhiên
+	//Get random books
 	@GetMapping("/random")
     public ResponseEntity<?> getRandomBooks(@RequestParam(value = "amount", defaultValue = "5") Integer amount){
         List<BookDTO> books =  bookService.getRandomBooks(amount);
         return new ResponseEntity< >(books, HttpStatus.OK);
     }
 	
-	//Lấy Sách theo bộ lọc
+	//Get books by filtering
 	@GetMapping("/filters")
     public ResponseEntity<?> getBooksByFilter(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
     										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
@@ -74,13 +74,13 @@ public class BookController { //Controller Sách
         return new ResponseEntity< >(books, HttpStatus.OK);
     }
 	
-	//Lấy Sách chi tiết theo {id}
+	//Get book details by {id}
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getBookDetailById(@PathVariable("id") Integer bookId) {
 		return new ResponseEntity< >(bookService.getBookDetailById(bookId), HttpStatus.OK);
 	}
 	
-	//Thêm sách mới
+	//Add new book
 	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> addBook(@Valid @RequestPart("request") BookRequest request,
@@ -95,7 +95,7 @@ public class BookController { //Controller Sách
 		}
     }
 	
-	//Cập nhật Sách
+	//Update book by id
     @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> updateBook(@Valid @RequestPart("request") BookRequest request, 
@@ -112,7 +112,7 @@ public class BookController { //Controller Sách
 		}
     }
     
-    //Xoá Sách theo {id}
+    //Delete book by {id}
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<Book> deleteBook(@PathVariable("id") int id,
@@ -121,7 +121,7 @@ public class BookController { //Controller Sách
         return new ResponseEntity<>(deletedBook, HttpStatus.OK);
     }
     
-    //Xoá nhiều Sách theo list id
+    //Delete multiple books by lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> deleteBooks(@RequestParam("ids") List<Integer> ids,
@@ -130,7 +130,7 @@ public class BookController { //Controller Sách
         return new ResponseEntity<>("Gỡ sách thành công", HttpStatus.OK);
     }
     
-    //Xoá tất cả Sách
+    //Delete all books
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> deleteAllBooks(@CurrentAccount Account currUser) {
@@ -138,7 +138,7 @@ public class BookController { //Controller Sách
         return new ResponseEntity<>("Gỡ sách thành công", HttpStatus.OK);
     }
 	
-	//Test
+	//Test purpose
 	@GetMapping("/test/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getTest(@PathVariable("id") long bookId){

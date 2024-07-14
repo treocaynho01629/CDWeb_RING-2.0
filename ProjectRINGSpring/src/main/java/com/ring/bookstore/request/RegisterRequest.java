@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest { //Để đăng ký
+public class RegisterRequest { //Request body for sign-up
 
 	@NotNull(message = "Tên đăng nhập không được để trống!")
 	@Size(min = 4, max = 24, message = "Tên đăng nhập dài 4-24 kí tự")
