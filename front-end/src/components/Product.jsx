@@ -236,21 +236,19 @@ const Product = ({ book }) => {
             <Container>
                 <ImageSlider>
                     {multiImages.map((style, index) => (
-                        <>
-                            <LazyLoadImage key={`${book?.id}-${index}`}
-                                src={book.image}
-                                height={220}
-                                width={'85%'}
-                                style={{
-                                    zIndex: -1,
-                                    transition: 'all 0.5s ease',
-                                    margin: '5px 0px 10px 0px',
-                                    objectFit: 'contain',
-                                    display: (index + 1) === slideIndex ? "block" : "none",
-                                    transform: style,
-                                }}
-                            />
-                        </>
+                        <LazyLoadImage key={`${book?.id}-${index}`}
+                            src={book?.image}
+                            height={220}
+                            width={'85%'}
+                            style={{
+                                zIndex: -1,
+                                transition: 'all 0.5s ease',
+                                margin: '5px 0px 10px 0px',
+                                objectFit: 'contain',
+                                display: (index + 1) === slideIndex ? "block" : "none",
+                                transform: style,
+                            }}
+                        />
                     ))}
                 </ImageSlider>
                 <Info>
@@ -316,9 +314,9 @@ const Product = ({ book }) => {
                 </ImageSlider>
                 <Info>
                     <Skeleton variant="text" sx={{ fontSize: '16px' }} />
-                    <Skeleton variant="text" sx={{ fontSize: '14px' }} width="60%"/>
-                    <Skeleton variant="text" sx={{ fontSize: '20px' }} width="40%"/>
-                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width="50%"/>
+                    <Skeleton variant="text" sx={{ fontSize: '14px' }} width="60%" />
+                    <Skeleton variant="text" sx={{ fontSize: '20px' }} width="40%" />
+                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width="50%" />
                     <Divider />
                     <Extra>
                         <AddToCart><ShoppingCartIcon style={{ fontSize: 14 }} />&nbsp;</AddToCart>

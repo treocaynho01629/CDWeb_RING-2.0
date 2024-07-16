@@ -25,25 +25,14 @@ const RateSelect = styled.div`
     text-align: center;
 `
 
-const StyledRating = muiStyled(Rating)({
-    color: '#63e399',
+const StyledRating = muiStyled(Rating)(({theme}) => ({
+    color: theme.palette.secondary.main,
     fontSize: 18,
     '& .MuiRating-iconFilled': {
-        color: '#63e399',
+        color: theme.palette.secondary.main,
     },
     '& .MuiRating-iconHover': {
-        color: '#00ff6a',
-    },
-});
-
-const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
-    borderRadius: 0,
-    [`&.${linearProgressClasses.colorPrimary}`]: {
-        backgroundColor: 'white',
-    },
-    [`& .${linearProgressClasses.bar}`]: {
-        borderRadius: 0,
-        backgroundColor: '#63e399',
+        color: theme.palette.secondary.dark,
     },
 }));
 
@@ -62,8 +51,6 @@ const RatingInfo = styled.p`
     text-transform: uppercase;
 `
 //#endregion
-
-const REVIEW_URL = `/api/reviews/`
 
 const Review = ({ review, user }) => {
     const date = new Date(review.date)

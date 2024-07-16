@@ -3,12 +3,12 @@ import { lazy, Suspense } from 'react'
 import { styled as muiStyled } from '@mui/system';
 import { Link } from 'react-router-dom';
 import { Box, Skeleton, Tab, TextareaAutosize } from '@mui/material';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import { useGetBooksByFilterQuery } from '../features/books/booksApiSlice';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import ProductsSlider from '../components/ProductsSlider';
-import useFetch from '../hooks/useFetch';
+import CustomProgress from './custom/CustomProgress';
 
 const ReviewTab = lazy(() => import('../components/ReviewTab'));
 
@@ -59,28 +59,18 @@ const StyledTab = muiStyled((props) => <Tab {...props} />)(
 const DetailContainer = styled.div`
     margin: 50px 0px;
 `
-
-const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
-  borderRadius: 0,
-  [`&.${linearProgressClasses.colorPrimary}`]: {
-    backgroundColor: 'white',
-  },
-  [`& .${linearProgressClasses.bar}`]: {
-    borderRadius: 0,
-    backgroundColor: theme.palette.secondary.main,
-  },
-}));
 //#endregion
 
-const BOOKS_RELATED_URL = 'api/books/filters?pSize=10&cateId=';
-
 const ProductDetailContainer = (props) => {
-  //Fetch
   const { loading, book, tab, onTabChange } = props;
-  const { loading: loadingRelated, data: booksRelated } = useFetch(BOOKS_RELATED_URL + (book ? book?.cateId : ""));
+
+  //Fetch retalted books
+  const { data: relatedBooks, isLoading: loadRelated, isSuccess: doneRelated, isError: errorRelated } = useGetBooksByFilterQuery({ 
+    cateId: book?.cateId 
+  }, { skip: (!book?.cateId || tab !== "3") });
 
   //Change tab
-  const handleChange = (event, newValue) => {if (onTabChange) onTabChange(newValue)};
+  const handleChange = (e, newValue) => {if (onTabChange) onTabChange(newValue)};
 
   let fullInfo;
 
@@ -147,13 +137,13 @@ const ProductDetailContainer = (props) => {
             {fullInfo}
           </TabPanel>
           <TabPanel value="2">
-            <Suspense fallback={<CustomLinearProgress />}>
+            <Suspense fallback={<CustomProgress color="secondary" />}>
               <ReviewTab id={book?.id} rateAmount={book?.rateAmount} />
             </Suspense>
           </TabPanel>
           <TabPanel value="3">
             <div>
-              <ProductsSlider booksList={booksRelated?.content} loading={loadingRelated} />
+              <ProductsSlider {...{ loading: loadRelated, data: relatedBooks, isSuccess: doneRelated, isError: errorRelated }} />
             </div>
           </TabPanel>
         </TabContext>

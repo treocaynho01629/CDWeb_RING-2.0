@@ -1,15 +1,16 @@
 import styled from 'styled-components';
 import { useState, useEffect } from "react";
-import { Grid, Divider, ToggleButton, ToggleButtonGroup, Skeleton } from '@mui/material';
+import { Grid, ToggleButton, ToggleButtonGroup, Skeleton } from '@mui/material';
 import { styled as muiStyled } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
+import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
 import Categories from '../components/Categories';
 import Products from '../components/Products';
 import Slider from '../components/Slider';
 import ProductsSlider from '../components/ProductsSlider';
 import CustomButton from '../components/custom/CustomButton';
 import CustomDivider from '../components/custom/CustomDivider';
-import useFetch from '../hooks/useFetch';
+import { useGetBooksByFilterQuery, useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 
 //#region styled
 const Wrapper = styled.div`
@@ -78,27 +79,23 @@ const orderGroup = [
   },
 ];
 
-const BOOKS_FETCH_URL = 'api/books/filters?pageNo=0&pSize=15';
-const MORE_BOOKS_URL = 'api/books/filters?pSize=5';
-const BOOKS_RANDOM_URL = 'api/books/random?amount=5';
-const BOOKS_SORT_URL = 'api/books/filters?pageNo=0&pSize=5';
-const CATEGORIES_URL = 'api/categories';
+const defaultMore = 5;
 
 const Home = () => {
   //Initial value
-  const [booksList, setBooksList] = useState([]);
   const [orderBy, setOrderBy] = useState(orderGroup[0].value);
-  const [randomCates, setRandomCates] = useState([]);
-  const [currCate, setCurrCate] = useState('none');
+  const [randomCateIds, setRandomCateIds] = useState([]);
+  const [currCate, setCurrCate] = useState(null);
   const [count, setCount] = useState(3);
+  const [more, setMore] = useState(false);
 
   //Fetch data
-  const { loading: loadingCate, data: cates } = useFetch(CATEGORIES_URL);
-  const { loading, data } = useFetch(BOOKS_FETCH_URL);
-  const { loading: loadingByOrder, data: dataByOrder } = useFetch(BOOKS_SORT_URL + "&sortBy=" + orderBy);
-  const { loading: loadingByCate, data: dataByCate } = useFetch(BOOKS_SORT_URL + "&cateId=" + currCate);
-  const { loading: loadingRandom, data: dataRandom, refetch } = useFetch(BOOKS_RANDOM_URL);
-  const { loading: loadingMore, data: more } = useFetch(MORE_BOOKS_URL + "&pageNo=" + count);
+  const { data, isLoading, isSuccess, isError } = useGetBooksQuery();
+  const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom, refetch } = useGetRandomBooksQuery();
+  const { data: cateBooks, isLoading: loadByCate, isSuccess: doneByCate, isError: errorByCate } = useGetBooksByFilterQuery({ cateId: currCate }, { skip: !currCate });
+  const { data: orderBooks, isLoading: loadByOrder, isSuccess: doneByOrder, isError: errorByOrder } = useGetBooksByFilterQuery({ sortBy: orderBy }, { skip: !orderBy });
+  const { isLoading: loadMore, isSuccess: doneMore } = useGetBooksQuery({ page: count, size: defaultMore, loadMore: more }, { skip: (count === -1 || !more) });
+  const { data: cates, isLoading: loadCates, isSuccess: doneCates, isError: errorCates } = useGetCategoriesQuery();
 
   //Other
   const navigate = useNavigate();
@@ -111,16 +108,31 @@ const Home = () => {
 
   //Load
   useEffect(() => {
-    if (!loading) { setBooksList(data?.content) }
-  }, [loading]);
+    if (!isLoading && isSuccess && data) {
+      setMore(false);
+      setCount(data?.ids?.length / defaultMore);
+    }
+  }, [isLoading]);
 
   useEffect(() => {
-    if (!loadingCate) {
-      let randoms = (cates?.sort(() => 0.5 - Math.random()).slice(0, 4));
-      setCurrCate(randoms ? randoms[0]?.id : null);
-      setRandomCates(randoms);
+    if (!loadMore && doneMore) {
+      setMore(false);
+      setCount(prev => prev + 1);
+      console.log('b')
     }
-  }, [loadingCate]);
+  }, [loadMore]);
+
+  useEffect(() => {
+    if (!loadCates && doneCates && cates) {
+      const { ids } = cates;
+      let tempIds = [...ids];
+
+      //Get 4 random cates
+      let randomIds = (tempIds?.sort(() => 0.5 - Math.random()).slice(0, 4));
+      setCurrCate(randomIds ? randomIds[0] : null);
+      setRandomCateIds(randomIds);
+    }
+  }, [loadCates]);
 
   //Change order tab
   const handleChangeOrder = (e, newValue) => {
@@ -133,24 +145,55 @@ const Home = () => {
   };
 
   //Show more
-  const handleShowMore = async () => {
-    if (count == 6) {
+  const handleShowMore = () => {
+    if (count === 5) {
       navigate('/filters');
-    } else if (!loadingMore && more) {
-      setBooksList(current => [...current, ...more?.content]);
-      setCount(prev => prev + 1);
+    } else {
+      console.log(count);
+      setMore(true);
     }
+  }
+
+  let catesContent;
+
+  if (loadCates || errorCates) {
+    catesContent = (
+      Array.from(new Array(4)).map((index) => (
+        <StyledToggleButton key={index}>
+          <Skeleton variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
+        </StyledToggleButton>
+      ))
+    )
+  } else if (doneCates) {
+    const { entities } = cates;
+
+    catesContent = randomCateIds?.length
+      ? randomCateIds?.map((id, index) => {
+        const cate = entities[id];
+
+        return (
+          <StyledToggleButton key={`${id}-${index}`} value={id}>
+            {cate?.categoryName}
+          </StyledToggleButton>
+        )
+      })
+      :
+      Array.from(new Array(4)).map((index) => (
+        <StyledToggleButton key={index}>
+          <Skeleton variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
+        </StyledToggleButton>
+      ))
   }
 
   return (
     <Wrapper>
       <Slider />
-      <Categories loading={loadingCate} data={cates} />
+      <Categories />
       <Grid sx={{ my: 3 }} container spacing={5}>
         <Grid item xs={12} md={12}>
           <CustomDivider>SẢN PHẨM MỚI NHẤT</CustomDivider>
           <br />
-          <Products booksList={booksList} loading={loading}/>
+          <Products {...{ loading: isLoading, data, isSuccess, isError }} />
           <ButtonContainer>
             <CustomButton color="secondary" variant="contained" size="medium" onClick={handleShowMore}>Xem thêm</CustomButton>
           </ButtonContainer>
@@ -175,7 +218,7 @@ const Home = () => {
               ))}
             </StyledToggleButtonGroup>
           </ToggleGroupContainer>
-          <ProductsSlider loading={loadingByOrder} booksList={dataByOrder?.content} />
+          <ProductsSlider {...{ loading: loadByOrder, data: orderBooks, isSuccess: doneByOrder, isError: errorByOrder }} />
           <ButtonContainer>
             <CustomButton variant="contained" color="secondary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</CustomButton>
           </ButtonContainer>
@@ -188,26 +231,17 @@ const Home = () => {
               exclusive
               onChange={handleChangeCate}
             >
-              {(!randomCates?.length ? Array.from(new Array(4)) : randomCates)?.map((cate, index) => (
-                <StyledToggleButton key={`${cate?.id}-${index}`} value={cate?.id}>
-                  {cate
-                    ?
-                    cate?.categoryName
-                    :
-                    <Skeleton variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
-                  }
-                </StyledToggleButton>
-              ))}
+              {catesContent}
             </StyledToggleButtonGroup>
           </ToggleGroupContainer>
-          <ProductsSlider loading={loadingByCate} booksList={dataByCate?.content} />
+          <ProductsSlider {...{ loading: loadByCate, data: cateBooks, isSuccess: doneByCate, isError: errorByCate }} />
           <ButtonContainer>
             <CustomButton variant="contained" color="secondary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</CustomButton>
           </ButtonContainer>
           <br />
           <CustomDivider>CÓ THỂ BẠN SẼ THÍCH</CustomDivider>
           <br />
-          <ProductsSlider loading={loadingRandom} booksList={dataRandom?.content} />
+          <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
           <ButtonContainer>
             <CustomButton variant="contained" color="secondary" size="medium" onClick={refetch}>Làm mới</CustomButton>
           </ButtonContainer>

@@ -57,11 +57,46 @@ const PriceInput = styled.input`
 `
 //#endregion
 
-const CateFilter = ({ loadCates, cates, cateId, setCateId }) => {
+const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, setCateId }) => {
 
   //Change cate
   const handleCateChange = (id) => {
     setCateId(id);
+  }
+
+  let catesContent;
+
+  if (loadCates || errorCates) {
+    catesContent = (
+      Array.from(new Array(5)).map((index) => (
+        <Skeleton
+          key={index}
+          variant="rectangular"
+          animation="wave"
+          sx={{ borderRadius: '1em' }}
+          height={32}
+          width={106}
+        />
+      ))
+    )
+  } else if (doneCates) {
+    const { ids, entities } = cates;
+
+    catesContent = ids?.length
+      ? ids?.map((id, index) => {
+        const cate = entities[id];
+
+        return (
+          <Chip
+            key={`${id}-${index}`}
+            variant={cateId == id ? 'filled' : 'outlined'}
+            color={cateId == id ? 'secondary' : 'primary'}
+            onClick={() => handleCateChange(id)}
+            label={cate?.categoryName}
+          />
+        )
+      })
+      : null
   }
 
   return (
@@ -71,32 +106,13 @@ const CateFilter = ({ loadCates, cates, cateId, setCateId }) => {
       </TitleContainer>
 
       <Stack spacing={{ xs: .5 }} direction="row" useFlexGap flexWrap="wrap">
-        {(loadCates || !cates?.length ? Array.from(new Array(5)) : cates).map((cate, index) => (
-          cate
-            ?
-            <Chip
-              key={`${cate?.id}-${index}`}
-              variant={cateId == cate?.id ? 'filled' : 'outlined'}
-              color={cateId == cate?.id ? 'secondary' : 'primary'}
-              onClick={() => handleCateChange(cate?.id)}
-              label={cate?.categoryName}
-            />
-            :
-            <Skeleton
-              key={`${cate?.id}-${index}`}
-              variant="rectangular"
-              animation="wave"
-              sx={{ borderRadius: '1em' }}
-              height={32}
-              width={106}
-            />
-        ))}
+        {catesContent}
       </Stack>
     </Filter>
   )
 }
 
-const PublisherFilter = ({ loadPubs, pubs, selectedPub, setSelectedPub }) => {
+const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, setSelectedPub }) => {
   //Change pub
   const handleChangePub = (pubId) => {
     const selectedIndex = selectedPub.indexOf(pubId);
@@ -120,38 +136,49 @@ const PublisherFilter = ({ loadPubs, pubs, selectedPub, setSelectedPub }) => {
 
   const isSelected = (id) => selectedPub.indexOf(id) !== -1;
 
+  let pubsContent;
+
+  if (loadPubs || errorPubs) {
+    pubsContent = (
+      Array.from(new Array(10)).map((index) => (
+        <Skeleton
+          key={index}
+          variant="rectangular"
+          animation="wave"
+          sx={{ borderRadius: '1em' }}
+          height={32}
+          width={106}
+        />
+      ))
+    )
+  } else if (donePubs) {
+    const { ids, entities } = pubs;
+
+    pubsContent = ids?.length
+      ? ids?.map((id, index) => {
+        const pub = entities[id];
+        const isItemSelected = isSelected(`${id}`);
+
+        return (
+          <Chip
+            key={`${id}-${index}`}
+            variant={isItemSelected ? 'filled' : 'outlined'}
+            color={isItemSelected ? 'secondary' : 'primary'}
+            onClick={() => handleChangePub(id)}
+            label={pub?.pubName}
+          />
+        )
+      })
+      : null
+  }
+
   return (
     <Filter>
       <TitleContainer>
         <FilterText><ClassIcon />&nbsp;Nhà xuất bản</FilterText>
       </TitleContainer>
       <Stack spacing={{ xs: .5 }} direction="row" useFlexGap flexWrap="wrap">
-        {(loadPubs || !pubs?.length ? Array.from(new Array(10)) : pubs).map((pub, index) => {
-          const isItemSelected = isSelected(pub?.id);
-
-          if (pub) {
-            return (
-              <Chip
-                key={`${pub?.id}-${index}`}
-                variant={isItemSelected ? 'filled' : 'outlined'}
-                color={isItemSelected ? 'secondary' : 'primary'}
-                onClick={() => handleChangePub(pub?.id)}
-                label={pub?.pubName}
-              />
-            )
-          } else {
-            return (
-              <Skeleton
-                key={`${pub?.id}-${index}`}
-                variant="rectangular"
-                animation="wave"
-                sx={{ borderRadius: '1em' }}
-                height={32}
-                width={106}
-              />
-            )
-          }
-        })}
+        {pubsContent}
       </Stack>
     </Filter>
   )
@@ -378,8 +405,9 @@ const OtherFilters = ({ type, setType, seller, setSeller }) => {
 
 const FilterDialog = (props) => {
   //#region construct
-  const { filters, setFilters, onChangeCate, onChangeRange, onChangePub, onChangeType, onChangeSeller, open, handleClose, resetFilter
-    , loadCates, cates, loadPubs, pubs
+  const { filters, setFilters, onChangeCate, onChangeRange, onChangePub, onChangeType
+    , onChangeSeller, open, handleClose, resetFilter
+    , loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs
   } = props;
 
   //Initial value
@@ -436,6 +464,11 @@ const FilterDialog = (props) => {
       seller: seller
     })
   }
+
+  const handleResetFilter = () => {
+    handleClose();
+    resetFilter();
+  }
   //#endregion
 
   return (
@@ -449,8 +482,8 @@ const FilterDialog = (props) => {
           flexWrap="wrap"
           divider={<Divider flexItem />}
         >
-          <CateFilter {...{ loadCates, cates, cateId, setCateId }} />
-          <PublisherFilter {...{ loadPubs, pubs, selectedPub, setSelectedPub }} />
+          <CateFilter {...{ loadCates, doneCates, errorCates, cates, cateId, setCateId }} />
+          <PublisherFilter {...{ loadPubs, donePubs, errorPubs, pubs, selectedPub, setSelectedPub }} />
           <RangeFilter {...{ valueInput, setValueInput }} />
           <OtherFilters {...{ type, setType, seller, setSeller }} />
         </Stack>
@@ -461,7 +494,7 @@ const FilterDialog = (props) => {
           color="error"
           size="large"
           sx={{ marginY: '10px' }}
-          onClick={resetFilter}
+          onClick={handleResetFilter}
         >
           <FilterAltOff />Xoá bộ lọc
         </CustomButton>

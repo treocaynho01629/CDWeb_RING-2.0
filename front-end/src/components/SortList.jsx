@@ -97,7 +97,6 @@ const StyledToggleButton = muiStyled(ToggleButton)(({ theme }) => ({
         backgroundColor: theme.palette.secondary.main,
     },
     '&.Mui-selected': {
-        fontWeight: 'bold',
         backgroundColor: theme.palette.secondary.main,
         color: 'white',
     },
@@ -182,7 +181,7 @@ const SortList = (props) => {
                                 <IconButton aria-label="search"
                                     onClick={handleToggleSearch}
                                     onMouseDown={(e) => e.preventDefault}
-                                    sx={{ marginRight: 0, zIndex: 10 }}>
+                                    sx={{ marginRight: 0, zIndex: 10, display: { xs: 'none', sm: 'block' } }}>
                                     {toggleSearch ?
                                         <SearchIcon sx={{ fontSize: '26px', color: '#63e399' }} />
                                         : <SearchOff sx={{ fontSize: '26px' }} />}

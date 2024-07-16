@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react'
 import { Divider, Grid } from '@mui/material';
 import { styled as muiStyled } from '@mui/system';
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import useFetch from '../hooks/useFetch'
+import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice";
+import { useGetPublishersQuery } from "../features/publishers/publishersApiSlice";
+import { useGetBooksByFilterQuery } from "../features/books/booksApiSlice";
 import AppPagination from '../components/custom/AppPagination'
 import FilterList from "../components/FilterList"
 import FilteredProducts from "../components/FilteredProducts"
@@ -43,10 +45,6 @@ const Title = muiStyled(Divider)({
 });
 //#endregion
 
-const BOOKS_URL = 'api/books/filters';
-const CATEGORIES_URL = 'api/categories';
-const PUBLISHERS_URL = 'api/publishers';
-
 const FiltersPage = () => {
     //#region construct
     const [searchParams, setSearchParams] = useSearchParams();
@@ -69,50 +67,41 @@ const FiltersPage = () => {
         sortDir: searchParams.get("sortDir") ?? "desc",
     })
 
-    //Initial data
-    const [cates, setCates] = useState([]);
-    const [pubs, setPubs] = useState([]);
-    const [booksList, setBooksList] = useState([]);
-
     //Fetch data
-    const { loading: loadCates, data: catesData } = useFetch(CATEGORIES_URL); //Publishers
-    const { loading: loadPubs, data: pubsData } = useFetch(PUBLISHERS_URL); //Publishers
-    const { loading, data, error } = useFetch(BOOKS_URL
-        + "?pageNo=" + pagination?.currPage
-        + "&pSize=" + pagination?.pageSize
-        + "&sortBy=" + pagination?.sortBy
-        + "&sortDir=" + pagination?.sortDir
-        + "&cateId=" + filters?.cateId
-        + "&pubId=" + filters?.pubId
-        + "&type=" + filters?.type
-        + "&keyword=" + filters?.keyword
-        + "&seller=" + filters?.seller
-        + "&fromRange=" + filters?.value[0]
-        + "&toRange=" + filters?.value[1]);
+    const { data: cates, isLoading: loadCates, isSuccess: doneCates, isError: errorCates } = useGetCategoriesQuery(); //Categories
+    const { data: pubs, isLoading: loadPubs, isSuccess: donePubs, isError: errorPubs } = useGetPublishersQuery(); //Publishers
+    const { data, isError, error, isLoading, isSuccess } = useGetBooksByFilterQuery({ //Books
+        page: pagination?.currPage,
+        size: pagination?.pageSize,
+        sortBy: pagination?.sortBy,
+        sortDir: pagination?.sortDir,
+        keyword: filters?.keyword,
+        cateId: filters?.cateId,
+        type: filters?.type,
+        seller: filters?.seller,
+        pubId: filters?.pubId,
+        value: filters?.value
+    });
 
     //Dialog open state
     const [open, setOpen] = useState(false);
 
     //Set data after fetch
     useEffect(() => {
-        if (!loading && data) {
-            setPagination({ ...pagination, totalPages: data?.totalPages });
-            setBooksList(data?.content);
+        if (!isLoading && isSuccess && data) {
+            setPagination({
+                ...pagination,
+                totalPages: data?.info?.totalPages,
+                currPage: data?.info?.currPage,
+                pageSize: data?.info?.pageSize
+            });
         }
-
-        if (!loadCates && catesData) setCates(catesData);
-        if (!loadPubs && pubsData) setPubs(pubsData);
-    }, [loading, loadCates, loadPubs])
+    }, [isLoading])
 
     //Set title
     useEffect(() => {
         document.title = 'RING! - Cửa hàng';
         window.scrollTo(0, 0);
-    }, [])
-
-    //Update filters
-    useEffect(() =>{
-
     }, [])
 
     //Handle change: replace filters value & set search params
@@ -259,7 +248,7 @@ const FiltersPage = () => {
     return (
         <Wrapper>
             <FilterDialog
-                {...{ filters, setFilters, resetFilter, open, handleClose, loadCates, cates, loadPubs, pubs }}
+                {...{ filters, setFilters, resetFilter, open, handleClose, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
                 onChangeCate={handleChangeCate}
                 onChangeRange={handleChangeRange}
                 onChangePub={handleChangePub}
@@ -269,7 +258,7 @@ const FiltersPage = () => {
             <Grid container spacing={5} sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Grid item xs={12} md={3.5} lg={3} display={{ xs: "none", md: "block" }} sx={{ overflowX: 'visible' }}>
                     <FilterList
-                        {...{ filters, resetFilter, loadCates, cates, loadPubs, pubs }}
+                        {...{ filters, resetFilter, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
                         onChangeCate={handleChangeCate}
                         onChangeRange={handleChangeRange}
                         onChangePub={handleChangePub}
@@ -285,7 +274,7 @@ const FiltersPage = () => {
                         onChangeSearch={handleChangeSearch}
                         onSizeChange={handleChangeSize}
                         setOpen={setOpen} />
-                    <FilteredProducts {...{ loading, booksList, error, totalPages: pagination?.totalPages }} />
+                    <FilteredProducts {...{ data, isError, error, isLoading, isSuccess, pageSize: pagination?.pageSize }} />
                     <AppPagination pagination={pagination}
                         onPageChange={handlePageChange}
                         onSizeChange={handleChangeSize} />

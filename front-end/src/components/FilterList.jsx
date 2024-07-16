@@ -63,7 +63,7 @@ const PriceInput = styled.input`
 `
 //#endregion
 
-const CateFilter = ({ loadCates, cates, cateId, onChangeCate }) => {
+const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeCate }) => {
   const [open, setOpen] = useState(false); //Open sub cate
 
   //Change cate
@@ -76,64 +76,79 @@ const CateFilter = ({ loadCates, cates, cateId, onChangeCate }) => {
     setOpen((prevState) => ({ ...prevState, [id]: !prevState[id] }));
   };
 
-  return (
-    <Filter>
-      <TitleContainer>
-        <FilterText><CategoryIcon />&nbsp;Danh mục</FilterText>
-      </TitleContainer>
+  let catesContent;
 
-      <List
-        sx={{ width: '100%', maxWidth: 250, py: 0 }}
-        component="nav"
-        aria-labelledby="nested-list"
-      >
-        {(loadCates || !cates?.length ? Array.from(new Array(5)) : cates).map((cate, index) => (
-          <Grid key={`${cate?.id}-${index}`}>
-            {cate
-              ?
-              <ListItemButton
-                sx={{
-                  pl: 0, py: 0,
-                  justifyContent: 'space-between',
-                  '&.Mui-selected': {
-                    color: '#63e399'
-                  },
-                }}
-                selected={cateId == cate?.id}>
-                <FilterText onClick={() => handleCateChange(cate?.id)}>{cate?.categoryName}</FilterText>
-                {cate.cateSubs.length == 0
-                  ? null
-                  : <>
-                    {open[cate?.id] ? <ExpandLess onClick={() => handleClick(cate?.id)} />
-                      : <ExpandMore onClick={() => handleClick(cate?.id)} />}
-                  </>
-                }
+  if (loadCates || errorCates) {
+    catesContent = (
+      Array.from(new Array(5)).map((index) => (
+        <Grid key={index}>
+          <ListItemButton>
+            <Skeleton variant="text" sx={{ fontSize: '16px' }} width="70%" />
+          </ListItemButton>
+        </Grid>
+      ))
+    )
+  } else if (doneCates) {
+    const { ids, entities } = cates;
 
-              </ListItemButton>
-              :
-              <ListItemButton>
-                <Skeleton variant="text" sx={{ fontSize: '16px' }} width="70%" />
-              </ListItemButton>
-            }
-            {cate?.cateSubs?.map((sub, index) => (
-              <Grid key={index}>
-                <Collapse in={open[cate?.id]} timeout="auto" unmountOnExit>
+    catesContent = ids?.length
+      ? ids?.map((id, index) => {
+        const cate = entities[id];
+
+        return (
+          <Grid key={`${id}-${index}`}>
+            <ListItemButton
+              sx={{
+                pl: 0, py: 0,
+                justifyContent: 'space-between',
+                '&.Mui-selected': {
+                  color: '#63e399'
+                },
+              }}
+              selected={cateId == id}>
+              <FilterText onClick={() => handleCateChange(id)}>{cate?.categoryName}</FilterText>
+              {cate.cateSubs.length == 0
+                ? null
+                : <>
+                  {open[id] ? <ExpandLess onClick={() => handleClick(id)} />
+                    : <ExpandMore onClick={() => handleClick(id)} />}
+                </>
+              }
+            </ListItemButton>
+            {cate?.cateSubs?.map((sub, subIndex) => (
+              <Grid key={`${sub?.subName}-${subIndex}`}>
+                <Collapse in={open[id]} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     <ListItemButton sx={{ pl: 2, py: 0, color: 'gray' }}>
-                      <FilterText>{sub.subName}</FilterText>
+                      <FilterText>{sub?.subName}</FilterText>
                     </ListItemButton>
                   </List>
                 </Collapse>
               </Grid>
             ))}
           </Grid>
-        ))}
+        )
+      })
+      : null
+  }
+
+  return (
+    <Filter>
+      <TitleContainer>
+        <FilterText><CategoryIcon />&nbsp;Danh mục</FilterText>
+      </TitleContainer>
+      <List
+        sx={{ width: '100%', maxWidth: 250, py: 0 }}
+        component="nav"
+        aria-labelledby="nested-list"
+      >
+        {catesContent}
       </List>
     </Filter>
   )
 }
 
-const PublisherFilter = ({ loadPubs, pubs, selectedPub, setSelectedPub, onChangePub }) => {
+const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, setSelectedPub, onChangePub }) => {
 
   //Change pub
   const handleChangePub = (e) => {
@@ -161,6 +176,54 @@ const PublisherFilter = ({ loadPubs, pubs, selectedPub, setSelectedPub, onChange
 
   const isSelected = (id) => selectedPub.indexOf(id) !== -1;
 
+  let pubsContent;
+
+  if (loadPubs || errorPubs) {
+    pubsContent = (
+      Array.from(new Array(10)).map((index) => (
+        <div key={index} style={{ display: 'flex', justifyContent: 'flex-start' }}>
+          <Checkbox disabled
+            disableRipple
+            sx={{
+              paddingLeft: 0,
+              '&.Mui-checked': {
+                color: '#63e399',
+              }
+            }} />
+          <Skeleton variant="text" sx={{ fontSize: '14px' }} width={200} />
+        </div>
+      ))
+    )
+  } else if (donePubs) {
+    const { ids, entities } = pubs;
+
+    pubsContent = ids?.length
+      ? ids?.map((id, index) => {
+        const pub = entities[id];
+        const isItemSelected = isSelected(`${id}`);
+
+        return (
+          <FormControlLabel key={`${id}-${index}`}
+            control={
+              <Checkbox value={id}
+                checked={isItemSelected}
+                onChange={handleChangePub}
+                disableRipple
+                name={pub?.pubName}
+                sx={{
+                  paddingLeft: 0,
+                  '&.Mui-checked': {
+                    color: '#63e399',
+                  }
+                }} />
+            }
+            label={pub?.pubName}
+          />
+        )
+      })
+      : null
+  }
+
   return (
     <Filter>
       <TitleContainer>
@@ -168,44 +231,7 @@ const PublisherFilter = ({ loadPubs, pubs, selectedPub, setSelectedPub, onChange
       </TitleContainer>
 
       <FormGroup sx={{ padding: 0 }}>
-        {(loadPubs || !pubs?.length ? Array.from(new Array(10)) : pubs).map((pub, index) => {
-          const isItemSelected = isSelected(`${pub?.id}`);
-
-          if (pub) {
-            return (
-              <FormControlLabel key={`${pub?.id}-${index}`}
-                control={
-                  <Checkbox value={pub?.id}
-                    checked={isItemSelected}
-                    onChange={handleChangePub}
-                    disableRipple
-                    name={pub?.pubName}
-                    sx={{
-                      paddingLeft: 0,
-                      '&.Mui-checked': {
-                        color: '#63e399',
-                      }
-                    }} />
-                }
-                label={pub?.pubName}
-              />
-            )
-          } else {
-            return (
-              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <Checkbox disabled
-                  disableRipple
-                  sx={{
-                    paddingLeft: 0,
-                    '&.Mui-checked': {
-                      color: '#63e399',
-                    }
-                  }} />
-                <Skeleton variant="text" sx={{ fontSize: '14px' }} width={200} />
-              </div>
-            )
-          }
-        })}
+        {pubsContent}
       </FormGroup>
     </Filter>
   )
@@ -452,7 +478,7 @@ const OtherFilters = ({ type, seller, setSeller, onChangeType, onChangeSeller })
 const FilterList = (props) => {
   //#region construct
   const { filters, onChangeCate, onChangeRange, onChangePub, onChangeType, onChangeSeller,
-    loadCates, cates, loadPubs, pubs, resetFilter
+    loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs, resetFilter
   } = props;
 
   //Initial data
@@ -495,8 +521,8 @@ const FilterList = (props) => {
         divider={<Divider flexItem />}
       >
         <RangeFilter {...{ valueInput, setValueInput, onChangeRange }} />
-        <CateFilter {...{ loadCates, cates, cateId, onChangeCate }} />
-        <PublisherFilter {...{ loadPubs, pubs, selectedPub, setSelectedPub, onChangePub }} />
+        <CateFilter {...{ loadCates, doneCates, errorCates, cates, cateId, onChangeCate }} />
+        <PublisherFilter {...{ loadPubs, donePubs, errorPubs, pubs, selectedPub, setSelectedPub, onChangePub }} />
         <OtherFilters {...{ type, seller, setSeller, onChangeType, onChangeSeller }} />
       </Stack>
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>

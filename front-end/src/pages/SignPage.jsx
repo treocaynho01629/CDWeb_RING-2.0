@@ -58,7 +58,7 @@ const Wrapper = styled.div`
 
 const TabContainer = styled.div`
     justify-content: center;
-    flex-grow: 3;
+    flex-grow: 20;
     display: none;
 
     &.active {

@@ -1,10 +1,9 @@
-import { useRef, useState, useEffect } from "react"
 import styled from "styled-components"
-
-import { KeyboardArrowRight, KeyboardArrowLeft, Category as CategoryIcon, Class as ClassIcon, Storefront} from '@mui/icons-material';
+import { useRef } from "react"
+import { KeyboardArrowRight, KeyboardArrowLeft, Category as CategoryIcon, Class as ClassIcon, Storefront } from '@mui/icons-material';
+import { Link } from "react-router-dom"
+import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice";
 import Skeleton from '@mui/material/Skeleton';
-
-import { Link, useNavigate } from "react-router-dom"
 
 //#region styled
 const ItemContainer = styled.div`
@@ -14,7 +13,7 @@ const ItemContainer = styled.div`
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    padding: 3px 10px;
+    padding: 0px 10px;
     border: 2px solid lightgray;
     border-radius: 2%;
     color: inherit;
@@ -31,6 +30,7 @@ const ItemContainer = styled.div`
 const Title = styled.p`
     font-size: 14px;
     font-weight: bold;
+    margin: 0;
     margin-left: 10px;
     margin-right: 12px;
     clear: both;
@@ -41,10 +41,18 @@ const Title = styled.p`
 `
 
 const CateContainer = styled.div`
+    position: relative;
     display: flex;
     border-bottom: 0.5px solid lightgray;
     justify-content: space-between;
     padding: 5px 10px 5px 15px;
+
+    &:hover {
+        .button-container {
+            opacity: 1;
+            visibility: visible;
+        }
+    }
 `
 
 const Container = styled.div`
@@ -52,6 +60,8 @@ const Container = styled.div`
 `
 
 const Wrapper = styled.div`
+    position: relative;
+    left: 0;
     display: flex;
     align-items: center;
     padding: 0;
@@ -68,8 +78,24 @@ const Wrapper = styled.div`
 `
 
 const ButtonContainer = styled.div`
-    display: flex;
+    position: absolute;
+    right: 5px;
     padding: 5px 0px 5px 15px;
+    background-color: white;
+    border-left: 0.5px solid lightgray;
+    display: none;
+    transition: all .3s ease;
+    opacity: 0;
+    visibility: hidden;
+
+    &:hover {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    @media (min-width: 900px) {
+        display: flex;
+    }
 `
 
 const Arrow = styled.div`
@@ -111,62 +137,67 @@ const Explore = styled.div`
 `
 //#endregion
 
-const Categories = (props) => {
+const Categories = () => {
+    const { data: categories, isLoading, isSuccess, isError } = useGetCategoriesQuery();
     const slideRef = useRef();
-    const [catesList, setCatesList] = useState([])
-    const { loading, data } = props;
-    const navigate = useNavigate();
-
-    //Load
-    useEffect(()=>{
-        loadCategories();
-    }, [loading]);
-
-    const loadCategories = async()=>{
-        if (!loading){
-            setCatesList(data);
-        }
-    };
 
     //Scroll
     const scrollSlide = (n) => {
         slideRef.current.scrollLeft += n;
     }
 
-  return (
-    <Container>
-        <CateContainer>
-        <Wrapper draggable={true} ref={slideRef}>
-            {(loading || !catesList?.length ? Array.from(new Array(15)) : catesList)?.map((cate, index) => (
+    let catesContent;
+
+    if (isLoading || isError) {
+        catesContent = (
+            Array.from(new Array(15)).map((index) => (
                 <div key={index}>
-                    {cate ? (
-                        <Link to={`/filters?cateId=${cate.id}`} style={{color: '#424242'}}>
-                            <ItemContainer>
-                                {index % 2 == 0 ? 
-                                <CategoryIcon/>
-                                : <ClassIcon/>
-                                }
-                                <Title>{cate.categoryName}</Title>
-                            </ItemContainer>
-                        </Link>
-                    ) : (
-                        <Skeleton variant="rectangular" animation="wave" width={150} height={50} sx={{ mx: '3px' }} />
-                    )}
+                    <Skeleton variant="rectangular" animation="wave" width={150} height={50} sx={{ mx: '3px' }} />
                 </div>
-            ))}
-        </Wrapper>
-        <ButtonContainer>
-            <Arrow direction="left" onClick={()=>scrollSlide(-500)}>
-                <KeyboardArrowLeft style={{fontSize: 30}}/>
-            </Arrow>
-            <Arrow direction="right" onClick={()=>scrollSlide(500)}>
-                <KeyboardArrowRight style={{fontSize: 30}}/>
-            </Arrow>
-        </ButtonContainer>
-        </CateContainer>
-        <Explore onClick={() => navigate('/filters')}><Storefront/>&nbsp;DUYỆT CỬA HÀNG</Explore>
-    </Container>
-  )
+            ))
+        )
+    } else if (isSuccess) {
+        const { ids, entities } = categories;
+
+        catesContent = ids?.length
+            ? ids?.map((cateId, index) => {
+                const cate = entities[cateId];
+
+                return (
+                    <Link to={`/filters?cateId=${cateId}`} style={{ color: '#424242' }}>
+                        <ItemContainer>
+                            {index % 2 == 0 ?
+                                <CategoryIcon />
+                                : <ClassIcon />
+                            }
+                            <Title>{cate?.categoryName}</Title>
+                        </ItemContainer>
+                    </Link>
+                )
+            })
+            : null
+    }
+
+    return (
+        <Container>
+            <CateContainer>
+                <Wrapper draggable={true} ref={slideRef}>
+                    {catesContent}
+                </Wrapper>
+                <ButtonContainer className="button-container">
+                    <Arrow direction="left" onClick={() => scrollSlide(-500)}>
+                        <KeyboardArrowLeft style={{ fontSize: 30 }} />
+                    </Arrow>
+                    <Arrow direction="right" onClick={() => scrollSlide(500)}>
+                        <KeyboardArrowRight style={{ fontSize: 30 }} />
+                    </Arrow>
+                </ButtonContainer>
+            </CateContainer>
+            <Link to={'/filters'}>
+                <Explore><Storefront />&nbsp;DUYỆT CỬA HÀNG</Explore>
+            </Link>
+        </Container>
+    )
 }
 
 export default Categories

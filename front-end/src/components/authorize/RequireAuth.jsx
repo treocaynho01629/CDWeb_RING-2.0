@@ -7,10 +7,10 @@ const RequireAuth = ({ allowedRoles }) => {
 
     return (
         auth?.roles?.find(role => allowedRoles?.includes(role.roleName)) 
-            ? <Outlet /> //Người dùng có đúng ROLE
+            ? <Outlet /> //Auth with ROLE
             : auth?.userName
-                ? <Navigate to="/unauthorized" state={{ from: location }} replace /> //Sai Role và đã Đăng nhập
-                : <Navigate to="/login" state={{ from: location }} replace /> //Chưa đăng nhập
+                ? <Navigate to="/unauthorized" state={{ from: location }} replace /> //To error page
+                : <Navigate to="/login" state={{ from: location }} replace /> //To login if not logged in
     );
 }
 
