@@ -463,23 +463,25 @@ const Navbar = (props) => {
                                                 </Badge>
                                                 <p style={{ fontSize: '13px', marginLeft: '5px' }}>Thông báo</p>
                                             </StyledIconButton>
-                                            <Link to={`/cart`}>
-                                                <StyledIconButton
-                                                    aria-label="cart"
-                                                    aria-owns={openCart ? "mouse-over-popover" : undefined}
-                                                    aria-haspopup="true"
-                                                    onMouseEnter={handlePopoverOpen}
-                                                    onMouseLeave={handlePopoverClose}>
-                                                    <Badge color="secondary" badgeContent={products?.length} anchorOrigin={{
-                                                        vertical: 'top',
-                                                        horizontal: 'left',
-                                                    }}>
-                                                        <ShoppingCartIcon />
-                                                    </Badge>
-                                                    <p style={{ fontSize: '13px', marginLeft: '5px' }}>Giỏ hàng</p>
-                                                    <MiniCart {...{ openCart, anchorElCart, handlePopoverClose, products }} />
-                                                </StyledIconButton>
-                                            </Link>
+                                            <div
+                                                aria-owns={openCart ? "mouse-over-popover" : undefined}
+                                                aria-haspopup="true"
+                                                onMouseEnter={handlePopoverOpen}
+                                                onMouseLeave={handlePopoverClose}
+                                            >
+                                                <Link to={`/cart`}>
+                                                    <StyledIconButton aria-label="cart">
+                                                        <Badge color="secondary" badgeContent={products?.length} anchorOrigin={{
+                                                            vertical: 'top',
+                                                            horizontal: 'left',
+                                                        }}>
+                                                            <ShoppingCartIcon />
+                                                        </Badge>
+                                                        <p style={{ fontSize: '13px', marginLeft: '5px' }}>Giỏ hàng</p>
+                                                    </StyledIconButton>
+                                                </Link>
+                                                <MiniCart {...{ openCart, anchorElCart, handlePopoverClose, products }} />
+                                            </div>
                                             {auth.userName ? (
                                                 <Tooltip title="Tài khoản">
                                                     <StyledIconButton
@@ -490,7 +492,7 @@ const Navbar = (props) => {
                                                         aria-haspopup="true"
                                                         aria-expanded={open ? 'true' : undefined}
                                                     >
-                                                        <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+                                                        <Avatar sx={{ width: 32, height: 32 }}>{auth?.userName?.charAt(0) ?? 'P'}</Avatar>
                                                         <p style={{ fontSize: '13px', marginLeft: '5px' }}>{auth?.userName}</p>
                                                     </StyledIconButton>
                                                 </Tooltip>

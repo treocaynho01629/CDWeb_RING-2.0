@@ -1,9 +1,9 @@
 import styled from "styled-components";
 import CustomProgress from '../components/custom/CustomProgress';
-import OwlCarousel from 'react-owl-carousel';
+import Carousel from "react-multi-carousel";
 import ProductSimple from "./ProductSimple"
-import 'owl.carousel/dist/assets/owl.carousel.css';
-import 'owl.carousel/dist/assets/owl.theme.default.css';
+import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import "react-multi-carousel/lib/styles.css";
 
 //#region styled
 const Container = styled.div`
@@ -16,66 +16,135 @@ const Container = styled.div`
         padding: auto;
     }
 `
+
+const CustomArrow = styled.button`
+  border-radius: 0;
+  background-color: #0000005e;
+  border: none;
+  outline: none;
+  height: 55px;
+  width: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  opacity: .8;
+  transition: all .3s ease;
+
+  &:hover {
+    opacity: 1;
+    background-color: #63e399;
+  }
+
+  svg {
+    font-size: 2em;
+  }
+
+  &.custom-left-arrow {
+    left: 1%;
+  }
+
+  &.custom-right-arrow {
+    right: 1%;
+  }
+`
 //#endregion
 
-const responsive =
-{
-  0: {
-    items: 2
+const responsive = {
+  widescreen: {
+    breakpoint: { max: 3000, min: 1200 },
+    items: 5
   },
-  600: {
-    items: 3
-  },
-  768: {
-    items: 3
-  },
-  992: {
+  desktop: {
+    breakpoint: { max: 1200, min: 992 },
     items: 4
   },
-  1200: {
-    items: 5
+  tablet: {
+    breakpoint: { max: 992, min: 600 },
+    items: 3
+  },
+  mobile: {
+    breakpoint: { max: 600, min: 0 },
+    items: 2
   }
-}
+};
+
+const CustomLeftArrow = ({ onClick }) => (
+  <CustomArrow className="custom-left-arrow" onClick={() => onClick()}><KeyboardArrowLeft /></CustomArrow>
+);
+
+const CustomRightArrow = ({ onClick }) => (
+  <CustomArrow className="custom-right-arrow" onClick={() => onClick()}><KeyboardArrowRight /></CustomArrow>
+);
 
 const ProductsSlider = ({ data, isError, isLoading, isSuccess }) => {
 
-  let productsContent;
+  let productsCarousel;
 
   if (isLoading || isError) {
-    productsContent = (
-      Array.from(new Array(5)).map((index) => (
-        <div className="item" key={index} style={{ display: 'flex' }}>
-          <ProductSimple />
-        </div>
-      ))
+    productsCarousel = (
+      <Carousel
+        responsive={responsive}
+        customLeftArrow={<CustomLeftArrow />}
+        customRightArrow={<CustomRightArrow />}
+        removeArrowOnDeviceType={["tablet", "mobile"]}
+      >
+        {
+          Array.from(new Array(5)).map((index) => (
+            <div key={index} style={{ display: 'flex' }}>
+              <ProductSimple />
+            </div>
+          ))
+        }
+      </Carousel>
     )
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    productsContent = ids?.length
-      ? ids?.map((id, index) => {
-        const book = entities[id];
+    productsCarousel = ids?.length
+      ?
+      <Carousel
+        responsive={responsive}
+        infinite={true}
+        autoPlay={true}
+        autoPlaySpeed={10000}
+        customLeftArrow={<CustomLeftArrow />}
+        customRightArrow={<CustomRightArrow />}
+        removeArrowOnDeviceType={["tablet", "mobile"]}
+        pauseOnHover
+        keyBoardControl
+        minimumTouchDrag={80}
+      >
 
-        return (
-          <div className="item" key={`${id}-${index}`} style={{ display: 'flex' }}>
-            <ProductSimple book={book} />
-          </div>
-        )
-      })
+        {ids?.map((id, index) => {
+          const book = entities[id];
+
+          return (
+            <div key={`${id}-${index}`} style={{ display: 'flex' }}>
+              <ProductSimple book={book} />
+            </div>
+          )
+        })}
+      </Carousel>
       :
-      Array.from(new Array(5)).map((index) => (
-        <div className="item" key={index} style={{ display: 'flex' }}>
-          <ProductSimple />
-        </div>
-      ))
+      <Carousel
+        responsive={responsive}
+        customLeftArrow={<CustomLeftArrow />}
+        customRightArrow={<CustomRightArrow />}
+        removeArrowOnDeviceType={["tablet", "mobile"]}
+      >
+        {Array.from(new Array(5)).map((index) => (
+          <div key={index} style={{ display: 'flex' }}>
+            <ProductSimple />
+          </div>
+        ))}
+      </Carousel>
   }
 
   return (
     <Container>
-      {(isLoading || isError) && <CustomProgress color={`${isError ? 'error' : 'secondary'}`}/>}
-      <OwlCarousel className="owl-theme" autoPlay={true} rewind lazyLoad dots={false} margin={10} responsive={responsive}>
-        {productsContent}
-      </OwlCarousel>
+      {(isLoading || isError) && <CustomProgress color={`${isError ? 'error' : 'secondary'}`} />}
+      {productsCarousel}
     </Container>
   )
 }

@@ -49,6 +49,9 @@ const StyledTab = muiStyled((props) => <Tab {...props} />)(
       outline: 'none',
       border: 'none',
     },
+    '&:hover': {
+      backgroundColor: theme.palette.secondary.main,
+    },
     '&:focus': {
       outline: 'none',
       border: 'none',

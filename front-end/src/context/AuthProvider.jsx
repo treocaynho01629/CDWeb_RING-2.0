@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        createNoti();
+        // createNoti();
     }, [])
 
     return (

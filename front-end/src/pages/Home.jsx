@@ -79,6 +79,7 @@ const orderGroup = [
   },
 ];
 
+const defaultSize = 15;
 const defaultMore = 5;
 
 const Home = () => {
@@ -86,15 +87,21 @@ const Home = () => {
   const [orderBy, setOrderBy] = useState(orderGroup[0].value);
   const [randomCateIds, setRandomCateIds] = useState([]);
   const [currCate, setCurrCate] = useState(null);
-  const [count, setCount] = useState(3);
-  const [more, setMore] = useState(false);
+  const [pagination, setPagination] = useState({
+    currPage: 0,
+    pageSize: defaultSize,
+    isMore: true,
+  })
 
   //Fetch data
-  const { data, isLoading, isSuccess, isError } = useGetBooksQuery();
-  const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom, refetch } = useGetRandomBooksQuery();
+  const { data, isLoading, isSuccess, isError } = useGetBooksQuery({
+    page: pagination?.currPage,
+    size: pagination?.pageSize,
+    loadMore: pagination?.isMore
+  });
+  const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom, refetch: refetchRandom } = useGetRandomBooksQuery({ amount: 10 });
   const { data: cateBooks, isLoading: loadByCate, isSuccess: doneByCate, isError: errorByCate } = useGetBooksByFilterQuery({ cateId: currCate }, { skip: !currCate });
   const { data: orderBooks, isLoading: loadByOrder, isSuccess: doneByOrder, isError: errorByOrder } = useGetBooksByFilterQuery({ sortBy: orderBy }, { skip: !orderBy });
-  const { isLoading: loadMore, isSuccess: doneMore } = useGetBooksQuery({ page: count, size: defaultMore, loadMore: more }, { skip: (count === -1 || !more) });
   const { data: cates, isLoading: loadCates, isSuccess: doneCates, isError: errorCates } = useGetCategoriesQuery();
 
   //Other
@@ -107,21 +114,6 @@ const Home = () => {
   }, []);
 
   //Load
-  useEffect(() => {
-    if (!isLoading && isSuccess && data) {
-      setMore(false);
-      setCount(data?.ids?.length / defaultMore);
-    }
-  }, [isLoading]);
-
-  useEffect(() => {
-    if (!loadMore && doneMore) {
-      setMore(false);
-      setCount(prev => prev + 1);
-      console.log('b')
-    }
-  }, [loadMore]);
-
   useEffect(() => {
     if (!loadCates && doneCates && cates) {
       const { ids } = cates;
@@ -146,11 +138,11 @@ const Home = () => {
 
   //Show more
   const handleShowMore = () => {
-    if (count === 5) {
+    if (pagination?.currPage >= 5) {
       navigate('/filters');
     } else {
-      console.log(count);
-      setMore(true);
+      let nextPage = (data?.ids?.length / defaultMore);
+      setPagination({ ...pagination, currPage: nextPage, pageSize: defaultMore })
     }
   }
 
@@ -159,7 +151,7 @@ const Home = () => {
   if (loadCates || errorCates) {
     catesContent = (
       Array.from(new Array(4)).map((index) => (
-        <StyledToggleButton key={index}>
+        <StyledToggleButton key={index} value='none' disabled={true}>
           <Skeleton variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
         </StyledToggleButton>
       ))
@@ -189,11 +181,11 @@ const Home = () => {
     <Wrapper>
       <Slider />
       <Categories />
-      <Grid sx={{ my: 3 }} container spacing={5}>
+      <Grid sx={{ mb: 3, mt: -1 }} container spacing={5}>
         <Grid item xs={12} md={12}>
           <CustomDivider>SẢN PHẨM MỚI NHẤT</CustomDivider>
           <br />
-          <Products {...{ loading: isLoading, data, isSuccess, isError }} />
+          <Products {...{ isLoading, data, isSuccess, isError }} />
           <ButtonContainer>
             <CustomButton color="secondary" variant="contained" size="medium" onClick={handleShowMore}>Xem thêm</CustomButton>
           </ButtonContainer>
@@ -212,13 +204,13 @@ const Home = () => {
                     ?
                     order?.label
                     :
-                    <Skeleton variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
+                    <Skeleton key={index} variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
                   }
                 </StyledToggleButton>
               ))}
             </StyledToggleButtonGroup>
           </ToggleGroupContainer>
-          <ProductsSlider {...{ loading: loadByOrder, data: orderBooks, isSuccess: doneByOrder, isError: errorByOrder }} />
+          <ProductsSlider {...{ isLoading: loadByOrder, data: orderBooks, isSuccess: doneByOrder, isError: errorByOrder }} />
           <ButtonContainer>
             <CustomButton variant="contained" color="secondary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</CustomButton>
           </ButtonContainer>
@@ -234,16 +226,16 @@ const Home = () => {
               {catesContent}
             </StyledToggleButtonGroup>
           </ToggleGroupContainer>
-          <ProductsSlider {...{ loading: loadByCate, data: cateBooks, isSuccess: doneByCate, isError: errorByCate }} />
+          <ProductsSlider {...{ isLoading: loadByCate, data: cateBooks, isSuccess: doneByCate, isError: errorByCate }} />
           <ButtonContainer>
             <CustomButton variant="contained" color="secondary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</CustomButton>
           </ButtonContainer>
           <br />
           <CustomDivider>CÓ THỂ BẠN SẼ THÍCH</CustomDivider>
           <br />
-          <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
+          <ProductsSlider {...{ isLoading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
           <ButtonContainer>
-            <CustomButton variant="contained" color="secondary" size="medium" onClick={refetch}>Làm mới</CustomButton>
+            <CustomButton variant="contained" color="secondary" size="medium" onClick={refetchRandom}>Làm mới</CustomButton>
           </ButtonContainer>
         </Grid>
       </Grid>

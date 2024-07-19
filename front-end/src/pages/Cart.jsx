@@ -1,43 +1,49 @@
-import { useState, useEffect } from "react";
-
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
-
+import { useState, useEffect } from "react";
 import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, Sell as SellIcon, ShoppingCart as ShoppingCartIcon, Payments as PaymentsIcon } from '@mui/icons-material';
 import { Checkbox, Grid, IconButton, Breadcrumbs, Table, TableBody, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import PropTypes from 'prop-types';
-
 import { useSnackbar } from 'notistack';
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { removeItem, increaseQuantity, decreaseQuantity, changeQuantity } from '../redux/cartReducer';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import useAuth from "../hooks/useAuth";
 
 //#region styled
+const BreadcrumbsContainer = styled.div`
+    margin: 20px 10px;
+    display: none;
+
+    @media (min-width: 768px) {
+        display: block;
+    }
+`
+
 const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: '#63e399',
-    color: theme.palette.common.white,
-    fontSize: 14,
-    fontWeight: 'bold',
-    paddingTop: 5,
-    paddingBottom: 5
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14
-  },
+    [`&.${tableCellClasses.head}`]: {
+        backgroundColor: '#63e399',
+        color: theme.palette.common.white,
+        fontSize: 14,
+        fontWeight: 'bold',
+        paddingTop: 5,
+        paddingBottom: 5
+    },
+    [`&.${tableCellClasses.body}`]: {
+        fontSize: 14
+    },
 }));
 
 const StyledTableRow = muiStyled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
-  },
-  // hide last border
-  '&:last-child td, &:last-child th': {
-    border: 0,
-  },
+    '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.action.hover,
+    },
+    // hide last border
+    '&:last-child td, &:last-child th': {
+        border: 0,
+    },
 }));
 
 const Wrapper = styled.div`
@@ -296,28 +302,27 @@ const Cart = () => {
     const { enqueueSnackbar } = useSnackbar();
     const { auth } = useAuth();
 
-    useEffect(() => { 
+    useEffect(() => {
         document.title = `RING! - Giỏ hàng`;
-        window.scrollTo(0, 0); 
+        window.scrollTo(0, 0);
     }, [])
 
-    //Tính tổng tiền
-    const totalPrice = () =>{
+    const totalPrice = () => {
         let total = 0;
         products.forEach((item) => (total += item.quantity * item.price));
         return total;
     }
 
-    //Chọn tất cả
+    //Select all checkboxes
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-          const newSelected = products.map((n) => n.id);
-          setSelected(newSelected);
-          return;
+            const newSelected = products.map((n) => n.id);
+            setSelected(newSelected);
+            return;
         }
         setSelected([]);
     };
-    
+
     const handleSelect = (id) => {
         const selectedIndex = selected.indexOf(id);
         let newSelected = [];
@@ -330,8 +335,8 @@ const Cart = () => {
             newSelected = newSelected.concat(selected.slice(0, -1));
         } else if (selectedIndex > 0) {
             newSelected = newSelected.concat(
-            selected.slice(0, selectedIndex),
-            selected.slice(selectedIndex + 1),
+                selected.slice(0, selectedIndex),
+                selected.slice(selectedIndex + 1),
             );
         }
 
@@ -352,7 +357,7 @@ const Cart = () => {
     const handleChangeQuantity = (quantity, id) => {
         console.log(quantity);
         if (quantity < 1 && isSelected(id)) handleSelect(id);
-        dispatch(changeQuantity({quantity, id}));
+        dispatch(changeQuantity({ quantity, id }));
     }
 
     const handleDeleteMultiple = () => {
@@ -367,200 +372,206 @@ const Cart = () => {
 
     function EnhancedTableHead(props) {
         const { onSelectAllClick, numSelected, rowCount } =
-          props;
-      
+            props;
+
         return (
-          <TableHead>
-            <TableRow sx={{padding: 0}}>
-                <StyledTableCell>
-                    <Checkbox
-                    color="primary"
-                    indeterminate={numSelected > 0 && numSelected < rowCount}
-                    checked={rowCount > 0 && numSelected === rowCount}
-                    onChange={onSelectAllClick}
-                    inputProps={{
-                        'aria-label': 'select all',
-                    }}
-                    sx={{color: 'white',
-                    '&.Mui-checked': {
-                          color: 'white',
-                    },
-                    '&.MuiCheckbox-indeterminate': {
-                        color: 'white',
-                    }}}
-                    />
-                    SẢN PHẨM ({selected.length})
-                </StyledTableCell>
-                <StyledTableCell align="left">Đơn giá</StyledTableCell>
-                <StyledTableCell align="center">Số lượng</StyledTableCell>
-                <StyledTableCell align="center">Tổng</StyledTableCell>
-            </TableRow>
-        </TableHead>
+            <TableHead>
+                <TableRow sx={{ padding: 0 }}>
+                    <StyledTableCell>
+                        <Checkbox
+                            color="primary"
+                            indeterminate={numSelected > 0 && numSelected < rowCount}
+                            checked={rowCount > 0 && numSelected === rowCount}
+                            onChange={onSelectAllClick}
+                            inputProps={{
+                                'aria-label': 'select all',
+                            }}
+                            sx={{
+                                color: 'white',
+                                '&.Mui-checked': {
+                                    color: 'white',
+                                },
+                                '&.MuiCheckbox-indeterminate': {
+                                    color: 'white',
+                                }
+                            }}
+                        />
+                        SẢN PHẨM ({selected.length})
+                    </StyledTableCell>
+                    <StyledTableCell align="left">Đơn giá</StyledTableCell>
+                    <StyledTableCell align="center">Số lượng</StyledTableCell>
+                    <StyledTableCell align="center">Tổng</StyledTableCell>
+                </TableRow>
+            </TableHead>
         );
-      }
-      
+    }
+
     EnhancedTableHead.propTypes = {
-    numSelected: PropTypes.number.isRequired,
-    onSelectAllClick: PropTypes.func.isRequired,
-    rowCount: PropTypes.number.isRequired,
+        numSelected: PropTypes.number.isRequired,
+        onSelectAllClick: PropTypes.func.isRequired,
+        rowCount: PropTypes.number.isRequired,
     };
     //#endregion
 
-  return (
-    <Wrapper>
-        <div role="presentation" style={{margin: '20px 10px'}}>
-            <Breadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
-                <Link to={`/`} style={{backgroundColor: '#63e399', padding: '5px 15px', color: 'white'}}>
-                Trang chủ
-                </Link>
-                <strong style={{textDecoration: 'underline'}}>Giỏ hàng</strong>
-            </Breadcrumbs>
-        </div>
-        
-        {products.length == 0 ?
-        <div style={{display: 'flex', 
-        flexDirection: 'column', 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        height: '550px'}}>
-            <LazyLoadImage src="/empty.svg"
-                height={250}
-            /> 
-            <h2>Giỏ hàng của bạn đang trống</h2>
-            <BackButton onClick={() => navigate('/')}>
-                Tiếp tục mua sắm
-            </BackButton>
-        </div>
-        :
-        <Grid container spacing={3} sx={{mb: 10}}>
-            <Grid item xs={12} lg={8}>
-                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 0px'}}>
-                    <Title><ShoppingCartIcon/>&nbsp;GIỎ HÀNG ({products.length})</Title>
-                    <DeleteAllButton style={{display: selected.length > 0 ? "flex" : "none"}} onClick={handleDeleteMultiple}>Xoá mục đã chọn&nbsp;<DeleteIcon/></DeleteAllButton>
-                </div>
-                <TableContainer component={Paper} sx={{borderRadius: '0%'}} >
-                    <Table sx={{ minWidth: 500, borderRadius: '0%'}} aria-label="cart-table">
-                        <EnhancedTableHead
-                            numSelected={selected.length}
-                            onSelectAllClick={handleSelectAllClick}
-                            rowCount={products.length}
-                        />
-                        <TableBody>
-                        {products.map((product, index) => {
-                            const isItemSelected = isSelected(product.id);
-                            const labelId = `enhanced-table-checkbox-${index}`;
+    return (
+        <Wrapper>
+            <BreadcrumbsContainer>
+                <Breadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
+                    <NavLink to={`/`} sx={{ backgroundColor: '#63e399', padding: '5px 15px', color: 'white' }}>
+                        Trang chủ
+                    </NavLink>
+                    <strong style={{ textDecoration: 'underline' }}>Giỏ hàng</strong>
+                </Breadcrumbs>
+            </BreadcrumbsContainer>
 
-                            return (
-                                <StyledTableRow hover
-                                    role="checkbox"
-                                    aria-checked={isItemSelected}
-                                    tabIndex={-1}
-                                    key={product.id}
-                                    selected={isItemSelected}
-                                >
-                                    <StyledTableCell component="th" scope="product" onClick={() => handleSelect(product.id)}>
-                                        <div style={{display: 'flex'}}>
-                                            <Checkbox
-                                            disableRipple
-                                            disableFocusRipple
-                                            color="primary"
-                                            checked={isItemSelected}
-                                            inputProps={{
-                                                'aria-labelledby': labelId,
-                                            }}
-                                            sx={{marginRight: 2,
-                                                '&.Mui-checked': {
-                                                color: 'gray',
-                                            }}}
-                                            />
-                                            <Link to={`/product/${product.id}`}>
-                                                <ItemContainer>
-                                                    <LazyLoadImage src={product.image}
-                                                        height={90}
-                                                        width={90} 
-                                                        style={{
-                                                            border: '0.5px solid lightgray',
-                                                            objectFit: 'contain'
-                                                        }}
-                                                    /> 
-                                                    <ItemSummary>
-                                                        <ItemTitle>{product.title}</ItemTitle>
-                                                    </ItemSummary>
-                                                </ItemContainer>
-                                            </Link>
-                                        </div>
-                                    </StyledTableCell>
-                                    <StyledTableCell align="right">
-                                        <Price>{product.price.toLocaleString()}đ</Price>
-                                        <Discount>{Math.round(product.price * 1.1).toLocaleString()}đ</Discount>
-                                    </StyledTableCell>
-                                    <StyledTableCell align="center">
-                                        <div style={{display: 'flex', justifyContent: 'center'}}>
-                                            <AmountButton direction="remove" onClick={() => handleDecrease(product.quantity, product.id)}>
-                                                <RemoveIcon style={{fontSize: 12}}/>
-                                            </AmountButton>
-                                            <InputContainer>
-                                                <AmountInput type="number" onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)} value={product.quantity}/>    
-                                            </InputContainer>
-                                            <AmountButton direction="add" onClick={() => dispatch(increaseQuantity(product.id))}>
-                                                <AddIcon style={{fontSize: 12}}/>
-                                            </AmountButton>
-                                        </div>
-                                        <IconButton sx={hoverIcon} onClick={() => handleDelete(product.id)}>
-                                            <DeleteIcon/>
-                                        </IconButton>
-                                    </StyledTableCell>
-                                    <StyledTableCell align="right"><Price>{(product.price * product.quantity).toLocaleString()}đ</Price></StyledTableCell>
-                                </StyledTableRow>
-                            )
-                        })}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Grid>
-            <Grid item xs={12} lg={4}> 
-                <div style={{display: 'flex', justifyContent: 'end', alignItems: 'center', padding: '20px 0px'}}>
-                    <Title>ĐƠN DỰ TÍNH&nbsp;</Title><SellIcon/>
+            {products.length == 0 ?
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '550px'
+                }}>
+                    <LazyLoadImage src="/empty.svg"
+                        height={250}
+                    />
+                    <h2>Giỏ hàng của bạn đang trống</h2>
+                    <BackButton onClick={() => navigate('/')}>
+                        Tiếp tục mua sắm
+                    </BackButton>
                 </div>
-                <Payout>
-                    <PayoutTitle>KHUYẾN MÃI</PayoutTitle>
-                    <CouponRow>
-                        <PayoutText>Nhập mã:</PayoutText>
-                        <CouponContainer>
-                            <Input/>
-                            <SellIcon style={{color:"gray"}}/>
-                        </CouponContainer>
-                    </CouponRow>
-                </Payout>
-                <Payout>
-                    <PayoutTitle>THANH TOÁN</PayoutTitle>
-                    <PayoutRow>
-                        <PayoutText>Thành tiền:</PayoutText>
-                        <PayoutText>{totalPrice().toLocaleString()} đ</PayoutText>
-                    </PayoutRow>
-                    <PayoutRow>
-                        <PayoutText>VAT:</PayoutText>
-                        <PayoutText>10%</PayoutText>
-                    </PayoutRow>
-                    <PayoutRow>
-                        <PayoutText>Phí ship:</PayoutText>
-                        <PayoutText>10,000 đ</PayoutText>
-                    </PayoutRow>
-                    <PayoutRow>
-                        <PayoutText>Tổng:</PayoutText>
-                        <PayoutPrice>{Math.round(totalPrice() * 1.1 + 10000).toLocaleString()}&nbsp;đ</PayoutPrice>
-                    </PayoutRow>
-                    <PayButton disabled={products.length == 0} 
-                        onClick={() => navigate('/checkout')}>
-                        <PaymentsIcon style={{fontSize: 18}}/>&nbsp;{auth.userName ? 'THANH TOÁN' : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
-                    </PayButton>
-                </Payout>
-            </Grid>
-        </Grid>
-        }
-        <br/><br/>
-    </Wrapper>
-  )
+                :
+                <Grid container spacing={3} sx={{ mb: 10 }}>
+                    <Grid item xs={12} lg={8}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 0px' }}>
+                            <Title><ShoppingCartIcon />&nbsp;GIỎ HÀNG ({products.length})</Title>
+                            <DeleteAllButton style={{ display: selected.length > 0 ? "flex" : "none" }} onClick={handleDeleteMultiple}>Xoá mục đã chọn&nbsp;<DeleteIcon /></DeleteAllButton>
+                        </div>
+                        <TableContainer component={Paper} sx={{ borderRadius: '0%' }} >
+                            <Table sx={{ minWidth: 500, borderRadius: '0%' }} aria-label="cart-table">
+                                <EnhancedTableHead
+                                    numSelected={selected.length}
+                                    onSelectAllClick={handleSelectAllClick}
+                                    rowCount={products.length}
+                                />
+                                <TableBody>
+                                    {products.map((product, index) => {
+                                        const isItemSelected = isSelected(product.id);
+                                        const labelId = `enhanced-table-checkbox-${index}`;
+
+                                        return (
+                                            <StyledTableRow hover
+                                                role="checkbox"
+                                                aria-checked={isItemSelected}
+                                                tabIndex={-1}
+                                                key={product.id}
+                                                selected={isItemSelected}
+                                            >
+                                                <StyledTableCell component="th" scope="product" onClick={() => handleSelect(product.id)}>
+                                                    <div style={{ display: 'flex' }}>
+                                                        <Checkbox
+                                                            disableRipple
+                                                            disableFocusRipple
+                                                            color="primary"
+                                                            checked={isItemSelected}
+                                                            inputProps={{
+                                                                'aria-labelledby': labelId,
+                                                            }}
+                                                            sx={{
+                                                                marginRight: 2,
+                                                                '&.Mui-checked': {
+                                                                    color: 'gray',
+                                                                }
+                                                            }}
+                                                        />
+                                                        <NavLink to={`/product/${product.id}`}>
+                                                            <ItemContainer>
+                                                                <LazyLoadImage src={product.image}
+                                                                    height={90}
+                                                                    width={90}
+                                                                    style={{
+                                                                        border: '0.5px solid lightgray',
+                                                                        objectFit: 'contain'
+                                                                    }}
+                                                                />
+                                                                <ItemSummary>
+                                                                    <ItemTitle>{product.title}</ItemTitle>
+                                                                </ItemSummary>
+                                                            </ItemContainer>
+                                                        </NavLink>
+                                                    </div>
+                                                </StyledTableCell>
+                                                <StyledTableCell align="right">
+                                                    <Price>{product.price.toLocaleString()}đ</Price>
+                                                    <Discount>{Math.round(product.price * 1.1).toLocaleString()}đ</Discount>
+                                                </StyledTableCell>
+                                                <StyledTableCell align="center">
+                                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                        <AmountButton direction="remove" onClick={() => handleDecrease(product.quantity, product.id)}>
+                                                            <RemoveIcon style={{ fontSize: 12 }} />
+                                                        </AmountButton>
+                                                        <InputContainer>
+                                                            <AmountInput type="number" onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)} value={product.quantity} />
+                                                        </InputContainer>
+                                                        <AmountButton direction="add" onClick={() => dispatch(increaseQuantity(product.id))}>
+                                                            <AddIcon style={{ fontSize: 12 }} />
+                                                        </AmountButton>
+                                                    </div>
+                                                    <IconButton sx={hoverIcon} onClick={() => handleDelete(product.id)}>
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </StyledTableCell>
+                                                <StyledTableCell align="right"><Price>{(product.price * product.quantity).toLocaleString()}đ</Price></StyledTableCell>
+                                            </StyledTableRow>
+                                        )
+                                    })}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Grid>
+                    <Grid item xs={12} lg={4}>
+                        <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', padding: '20px 0px' }}>
+                            <Title>ĐƠN DỰ TÍNH&nbsp;</Title><SellIcon />
+                        </div>
+                        <Payout>
+                            <PayoutTitle>KHUYẾN MÃI</PayoutTitle>
+                            <CouponRow>
+                                <PayoutText>Nhập mã:</PayoutText>
+                                <CouponContainer>
+                                    <Input />
+                                    <SellIcon style={{ color: "gray" }} />
+                                </CouponContainer>
+                            </CouponRow>
+                        </Payout>
+                        <Payout>
+                            <PayoutTitle>THANH TOÁN</PayoutTitle>
+                            <PayoutRow>
+                                <PayoutText>Thành tiền:</PayoutText>
+                                <PayoutText>{totalPrice().toLocaleString()} đ</PayoutText>
+                            </PayoutRow>
+                            <PayoutRow>
+                                <PayoutText>VAT:</PayoutText>
+                                <PayoutText>10%</PayoutText>
+                            </PayoutRow>
+                            <PayoutRow>
+                                <PayoutText>Phí ship:</PayoutText>
+                                <PayoutText>10,000 đ</PayoutText>
+                            </PayoutRow>
+                            <PayoutRow>
+                                <PayoutText>Tổng:</PayoutText>
+                                <PayoutPrice>{Math.round(totalPrice() * 1.1 + 10000).toLocaleString()}&nbsp;đ</PayoutPrice>
+                            </PayoutRow>
+                            <PayButton disabled={products.length == 0}
+                                onClick={() => navigate('/checkout')}>
+                                <PaymentsIcon style={{ fontSize: 18 }} />&nbsp;{auth.userName ? 'THANH TOÁN' : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
+                            </PayButton>
+                        </Payout>
+                    </Grid>
+                </Grid>
+            }
+            <br /><br />
+        </Wrapper>
+    )
 }
 
 export default Cart

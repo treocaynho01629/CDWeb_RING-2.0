@@ -12,11 +12,46 @@ import { styled as muiStyled } from '@mui/material/styles';
 import { Close } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { store, persistor } from './app/store';
+import { createTheme, ThemeProvider } from '@mui/material';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#424242",
+      contrastText: "#ffffffb3",
+    },
+    secondary: {
+      main: "#63e399",
+      contrastText: "#ffffff",
+    },
+    error: {
+      main: "#e66161"
+    },
+    success: {
+      main: "#63e399",
+      contrastText: "#ffffff",
+    },
+  },
+  shape: {
+    borderRadius: 0,
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          display: 'flex',
+          alignItems: 'center',
+          textTransform: 'none',
+        },
+      },
+    }
+  },
+});
 
 const StyledMaterialDesignContent = muiStyled(MaterialDesignContent)(({ theme }) => ({
   '&.notistack-MuiContent-success': {
     borderRadius: '0',
-    backgroundColor: theme.palette.secondary.main ,
+    backgroundColor: theme.palette.secondary.main,
   },
   '&.notistack-MuiContent-error': {
     borderRadius: '0',
@@ -29,26 +64,28 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <AuthProvider>
-            <SnackbarProvider
-              autoHideDuration={1500}
-              action={(snackbarId) => (
-                <IconButton
-                  aria-label="dismiss snack"
-                  onClick={() => closeSnackbar(snackbarId)}
-                >
-                  <Close />
-                </IconButton>
-              )}
-              Components={{
-                success: StyledMaterialDesignContent,
-                error: StyledMaterialDesignContent,
-              }}>
-              <Routes>
-                <Route path="/*" element={<App />} />
-              </Routes>
-            </SnackbarProvider>
-          </AuthProvider>
+          <ThemeProvider theme={theme}>
+            <AuthProvider>
+              <SnackbarProvider
+                autoHideDuration={1500}
+                action={(snackbarId) => (
+                  <IconButton
+                    aria-label="dismiss snack"
+                    onClick={() => closeSnackbar(snackbarId)}
+                  >
+                    <Close />
+                  </IconButton>
+                )}
+                Components={{
+                  success: StyledMaterialDesignContent,
+                  error: StyledMaterialDesignContent,
+                }}>
+                <Routes>
+                  <Route path="/*" element={<App />} />
+                </Routes>
+              </SnackbarProvider>
+            </AuthProvider>
+          </ThemeProvider>
         </PersistGate>
       </Provider>
     </BrowserRouter>

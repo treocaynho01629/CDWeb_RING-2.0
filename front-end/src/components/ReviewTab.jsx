@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react'
 import { styled as muiStyled } from '@mui/system';
 import { AccessTime as AccessTimeIcon, CalendarMonth as CalendarMonthIcon, Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
 import { Avatar, Rating, Box, Grid, TextareaAutosize } from '@mui/material';
-import { useNavigate } from "react-router-dom";
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import { Link } from "react-router-dom";
+import { useGetReviewsByBookIdQuery } from '../features/reviews/reviewsApiSlice';
 import AppPagination from './custom/AppPagination';
 import CustomButton from './custom/CustomButton';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
-import useFetch from '../hooks/useFetch'
 import useAuth from "../hooks/useAuth";
+import CustomProgress from './custom/CustomProgress';
 
 //#region styled
 const RatingSelect = styled.div`
@@ -25,7 +25,7 @@ const RateSelect = styled.div`
     text-align: center;
 `
 
-const StyledRating = muiStyled(Rating)(({theme}) => ({
+const StyledRating = muiStyled(Rating)(({ theme }) => ({
     color: theme.palette.secondary.main,
     fontSize: 18,
     '& .MuiRating-iconFilled': {
@@ -53,21 +53,25 @@ const RatingInfo = styled.p`
 //#endregion
 
 const Review = ({ review, user }) => {
-    const date = new Date(review.date)
+    const date = new Date(review?.date);
 
     return (
         <div>
-            <Profiler style={{ borderBottom: '1px solid', borderColor: user?.userName === review.userName ? '#63e399' : 'white' }}>
+            <Profiler style={{ borderBottom: '1px solid', borderColor: user?.userName === review?.userName ? '#63e399' : 'white' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <RatingInfo><Avatar sx={{ width: '20px', height: '20px', marginRight: '5px' }}>A</Avatar>{review.userName}</RatingInfo>
+                    <RatingInfo><Avatar sx={{ width: '20px', height: '20px', marginRight: '5px' }}>{review?.userName?.charAt(0) ?? 'A'}</Avatar>{review?.userName}</RatingInfo>
                     <Box display={{ xs: 'none', sm: 'flex' }}>
-                        <RatingInfo><AccessTimeIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />{date.getHours() + ":" + date.getMinutes()}</RatingInfo>
+                        <RatingInfo><AccessTimeIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />
+                            {`${('0' + date?.getHours()).slice(-2)}:${('0' + date?.getMinutes()).slice(-2)}`}
+                        </RatingInfo>
                     </Box>
-                    <RatingInfo><CalendarMonthIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />{date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear()}</RatingInfo>
+                    <RatingInfo><CalendarMonthIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />
+                        {`${('0' + date.getDate()).slice(-2)}-${('0' + (date.getMonth() + 1)).slice(-2)}-${date.getFullYear()}`}
+                    </RatingInfo>
                 </Box>
                 <RatingInfo><StarIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />{review.rating}</RatingInfo>
             </Profiler>
-            <Box sx={{ margin: '20px 0px 50px' }}>{review.content}</Box>
+            <Box sx={{ margin: '20px 0px 50px' }}>{review?.content}</Box>
         </div>
     )
 }
@@ -94,20 +98,25 @@ const ReviewTab = (props) => {
     //Other
     const { auth } = useAuth();
     const axiosPrivate = useAxiosPrivate();
-    const navigate = useNavigate();
 
     //Fetch reviews
-    const { loading: loadingReview, data: reviews, refetch } = useFetch(REVIEW_URL + id
-        + "?pSize=" + pagination.pageSize
-        + "&pageNo=" + pagination.currPage);
+    const { data, isLoading, isSuccess, isError, error } = useGetReviewsByBookIdQuery({
+        id,
+        page: pagination?.currPage,
+        size: pagination?.pageSize
+    }, { skip: !id })
 
     //Set reviews after fetch
     useEffect(() => {
-        if (!loadingReview) {
-            setPagination({ ...pagination, totalPages: reviews?.totalPages });
-            if (pagination?.currPage > pagination?.pageSize) handlePageChange(1);
+        if (!isLoading && isSuccess && data) {
+            setPagination({
+                ...pagination,
+                totalPages: data?.info?.totalPages,
+                currPage: data?.info?.currPage,
+                pageSize: data?.info?.pageSize
+            });
         }
-    }, [loadingReview])
+    }, [isLoading])
 
     //Change page
     const handlePageChange = (page) => {
@@ -164,42 +173,58 @@ const ReviewTab = (props) => {
     }
 
     //Review
-    let review;
-    if (loadingReview) {
-        review = <CustomLinearProgress sx={{ marginBottom: 5 }} />
-    } else if (reviews?.totalElements != 0) {
-        review =
+    let reviewsContent;
+
+    if (isLoading) {
+        reviewsContent =
+            <>
+                <CustomProgress color="secondary" />
+                <br /><br />
+            </>
+    } else if (isSuccess) {
+        const { ids, entities } = data;
+
+        reviewsContent = ids?.length
+            ?
             <Box>
-                {reviews?.content?.map((review, index) => (
-                    <Grid key={index}>
-                        <Review review={review} user={auth} />
-                    </Grid>
-                ))}
+                {ids?.map((id, index) => {
+                    const review = entities[id];
+
+                    return (
+                        <Grid key={`${id}-${index}`}>
+                            <Review review={review} user={auth} />
+                        </Grid>
+                    )
+                })
+                }
                 <AppPagination pagination={pagination}
                     onPageChange={handlePageChange}
                     onSizeChange={handleChangeSize} />
             </Box>
-    } else {
-        review = <Box sx={{ marginBottom: 5 }}>Chưa có ai bình luận, hãy trở thành người đầu tiên!</Box>
+            :
+            <Box sx={{ marginBottom: 5 }}>Chưa có ai bình luận, hãy trở thành người đầu tiên!</Box>
+    } else if (isError) {
+        reviewsContent = <Box sx={{ marginBottom: 5 }}>{error}</Box>
     }
     //#endregion
 
     return (
         <>
-            {review}
+            {reviewsContent}
             <Box>
-                {auth.userName ? (err?.response?.data?.code === 208 ?
+                {auth?.userName ? (err?.response?.data?.code === 208 ?
                     <Box>
                         <Box><strong style={{ fontSize: '16px' }}>{errMsg}</strong></Box>
                         <br />
-                        <CustomButton
-                            variant="contained"
-                            color="secondary"
-                            size="small"
-                            onClick={() => navigate('/login')}
-                        >
-                            Xem đánh giá
-                        </CustomButton>
+                        <Link to={'/login'}>
+                            <CustomButton
+                                variant="contained"
+                                color="secondary"
+                                size="small"
+                            >
+                                Xem đánh giá
+                            </CustomButton>
+                        </Link>
                     </Box>
                     : err?.response?.data?.code === 204 ?
                         <Box>
@@ -268,14 +293,15 @@ const ReviewTab = (props) => {
                     <Box>
                         <Box><strong style={{ fontSize: '16px' }}>Bạn chưa đăng nhập, hãy Đăng nhập để đánh giá</strong></Box>
                         <br />
-                        <CustomButton
-                            variant="contained"
-                            color="secondary"
-                            size="small"
-                            onClick={() => navigate('/login')}
-                        >
-                            Đăng nhập ngay
-                        </CustomButton>
+                        <Link to={'/login'}>
+                            <CustomButton
+                                variant="contained"
+                                color="secondary"
+                                size="small"
+                            >
+                                Đăng nhập ngay
+                            </CustomButton>
+                        </Link>
                     </Box>
                 }
             </Box>

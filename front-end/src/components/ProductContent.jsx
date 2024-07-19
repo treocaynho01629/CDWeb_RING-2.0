@@ -614,7 +614,7 @@ const ProductContent = ({ book }) => {
                                         width={'100%'}
                                     >
                                         <SellerContainer>
-                                            <Avatar>H</Avatar>
+                                            <Avatar>{book?.sellerName?.charAt(0) ?? 'H'}</Avatar>
                                             <Link to={`/filters?seller=${book?.sellerName}`}>
                                                 &nbsp;{book?.sellerName}
                                             </Link>

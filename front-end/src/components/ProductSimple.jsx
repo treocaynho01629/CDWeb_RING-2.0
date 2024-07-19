@@ -81,9 +81,10 @@ const ProductSimple = ({ book }) => {
             <Container>
                 <Link to={`/product/${book?.id}`} style={{ color: 'inherit' }}>
                     <LazyLoadImage src={book?.image}
-                        height={250}
-                        width={190}
+                        width={'90%'}
+                        height={250} 
                         style={{
+                            aspectRatio: '1/1.2',
                             zIndex: -3,
                             marginBottom: '10px 0',
                             objectFit: 'contain',
@@ -107,7 +108,7 @@ const ProductSimple = ({ book }) => {
     } else {
         return (
             <Container>
-                <Skeleton variant="rectangular" width={190} height={240} sx={{ margin: '5px 5px 20px 5px' }} />
+                <Skeleton variant="rectangular" width={'90%'} height={250} sx={{ aspectRatio: '1/1.2', margin: '5px 5px 20px 5px' }} />
                 <Info>
                     <Skeleton variant="text" sx={{ fontSize: '21px' }} width="60%" />
                     <Skeleton variant="text" sx={{ fontSize: '16px' }} width="100%" />

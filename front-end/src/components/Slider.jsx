@@ -1,20 +1,20 @@
 import styled from "styled-components"
-import { useState, useEffect } from "react"
-import { Paper, Grid, Skeleton } from '@mui/material';
+import { Grid, Skeleton } from '@mui/material';
 import { Link } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import Carousel from 'react-material-ui-carousel'
+import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import { useGetRandomBooksQuery } from "../features/books/booksApiSlice";
+import Carousel from "react-multi-carousel";
 import CustomButton from "./custom/CustomButton";
-import useFetch from '../hooks/useFetch'
 
 //#region styled
 const ImgContainer = styled.div`
-    height: 450px;
+    height: 430px;
+    width: 105%;
     display: flex;
-    text-align: center;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
 `
 
 const InfoContainer = styled.div`
@@ -68,9 +68,71 @@ const Description = styled.p`
         min-width: auto;
     }
 `
+
+const CustomArrow = styled.button`
+  border-radius: 0;
+  background-color: #0000005e;
+  border: none;
+  outline: none;
+  height: 55px;
+  width: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  opacity: .8;
+  transition: all .3s ease;
+
+  &:hover {
+    opacity: 1;
+    background-color: #63e399;
+  }
+
+  svg {
+    font-size: 2em;
+  }
+
+  &.custom-left-arrow {
+    left: 1%;
+  }
+
+  &.custom-right-arrow {
+    right: 1%;
+  }
+`
 //#endregion
 
-const RANDOMBOOKS_URL = 'api/books/random';
+const responsive = {
+    desktop: {
+        breakpoint: {
+            max: 3000,
+            min: 1024
+        },
+        items: 1
+    },
+    mobile: {
+        breakpoint: {
+            max: 464,
+            min: 0
+        },
+        items: 1
+    },
+    tablet: {
+        breakpoint: {
+            max: 1024,
+            min: 464
+        },
+        items: 1
+    }
+};
+
+const CustomLeftArrow = ({ onClick }) => (
+    <CustomArrow className="custom-left-arrow" onClick={() => onClick()}><KeyboardArrowLeft /></CustomArrow>
+);
+
+const CustomRightArrow = ({ onClick }) => (
+    <CustomArrow className="custom-right-arrow" onClick={() => onClick()}><KeyboardArrowRight /></CustomArrow>
+);
 
 function Item({ book }) {
     const dispatch = useDispatch();
@@ -89,25 +151,44 @@ function Item({ book }) {
         }))
     };
 
-    if (book) {
-        return (
-            <Paper sx={{ minHeight: '515px', maxHeight: '800px' }}>
-                <Grid container sx={{ alignItems: 'center' }}>
-                    <Grid item xs={12} md={5}>
+    return (
+        <div style={{ minHeight: '450px', maxHeight: '800px' }}>
+            <Grid container sx={{ alignItems: 'center' }}>
+                <Grid item xs={12} md={5}
+                    sx={{
+                        marginBottom: { xs: '100px', md: 0 }
+                    }}
+                >
+                    {book
+                        ?
                         <Link to={`/product/${book.id}`}>
                             <ImgContainer>
                                 <LazyLoadImage src={book.image}
                                     height={400}
-                                    width={400}
+                                    width={'100%'}
                                     style={{
                                         objectFit: 'contain',
-                                        minHeight: '400px'
+                                        aspectRatio: '1/1'
                                     }}
                                 />
                             </ImgContainer>
                         </Link>
-                    </Grid>
-                    <Grid item xs={12} md={7}>
+                        :
+                        <ImgContainer>
+                            <Skeleton variant="rectangular" width={'100%'} height={400} sx={{ aspectRatio: '1/1' }} />
+                        </ImgContainer>
+                    }
+                </Grid>
+                <Grid item xs={12} md={7}
+                    sx={{
+                        position: { xs: 'absolute', md: 'relative' }
+                        , bottom: { xs: 0, md: 'auto' }
+                        , background: { xs: '#ffffff89', md: 'transparent'}
+                        , width: '100%'
+                    }}
+                >
+                    {book
+                        ?
                         <InfoContainer>
                             <Link to={`/product/${book.id}`} style={{ color: 'inherit' }}>
                                 <Title>{book.title}</Title>
@@ -122,20 +203,7 @@ function Item({ book }) {
                                 Mua ngay
                             </CustomButton>
                         </InfoContainer>
-                    </Grid>
-                </Grid>
-            </Paper>
-        )
-    } else {
-        return (
-            <Paper sx={{ minHeight: '515px', maxHeight: '800px' }}>
-                <Grid container sx={{ alignItems: 'center' }}>
-                    <Grid item xs={12} sm={12} md={5}>
-                        <ImgContainer>
-                            <Skeleton variant="rectangular" width={400} height={400} sx={{width: '400px'}}/>
-                        </ImgContainer>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={7}>
+                        :
                         <InfoContainer>
                             <Skeleton variant="text" sx={{ fontSize: '30px' }} />
                             <Skeleton variant="text" sx={{ fontSize: '30px' }} />
@@ -144,58 +212,54 @@ function Item({ book }) {
                             <Skeleton variant="text" sx={{ fontSize: '18px' }} />
                             <Skeleton variant="rectangular" width={109} height={39} />
                         </InfoContainer>
-                    </Grid>
+                    }
                 </Grid>
-            </Paper>
-        )
-    }
+            </Grid>
+        </div>
+    )
 }
 
 const Slider = () => {
-    const [booksList, setBooksList] = useState([])
-    const { loading, data } = useFetch(RANDOMBOOKS_URL);
+    const { data, isLoading, isSuccess, isError } = useGetRandomBooksQuery({ amount: 5 });
 
-    //Load
-    useEffect(() => {
-        loadBooks();
-    }, [loading == false]);
+    let productsCarousel;
 
-    const loadBooks = async () => {
-        setBooksList(data);
-    };
+    if (isLoading || isError) {
+        productsCarousel = <Item />
+    } else if (isSuccess) {
+        const { ids, entities } = data;
+
+        productsCarousel = ids?.length
+            ?
+            <Carousel
+                responsive={responsive}
+                infinite={true}
+                autoPlay={true}
+                autoPlaySpeed={15000}
+                customLeftArrow={<CustomLeftArrow />}
+                customRightArrow={<CustomRightArrow />}
+                removeArrowOnDeviceType={["tablet", "mobile"]}
+                pauseOnHover
+                keyBoardControl
+                minimumTouchDrag={80}
+            >
+
+                {ids?.map((id, index) => {
+                    const book = entities[id];
+
+                    return (
+                        <Item key={`${id}-${index}`} book={book} />
+                    )
+                })}
+            </Carousel>
+            :
+            <Item />
+    }
 
     return (
-        <Carousel animation="slide" duration="700" interval={15000}
-            sx={{
-                marginBottom: '20px'
-            }}
-            navButtonsProps={{
-                style: {
-                    backgroundColor: '#63e399',
-                    borderRadius: 0,
-                    outline: 'none',
-                    border: 0,
-
-                    '&:focus': {
-                        outline: 'none',
-                    },
-                }
-            }}
-            activeIndicatorIconButtonProps={{
-                style: {
-                    color: '#63e399'
-                }
-            }}
-            indicatorContainerProps={{
-                style: {
-                    marginTop: '-50px',
-                }
-
-            }}>
-            {
-                (loading || !booksList?.length ? Array.from(new Array(2)) : booksList)?.map((book, index) => <Item key={`${book?.id}-${index}`} book={book} />)
-            }
-        </Carousel>
+        <>
+            {productsCarousel}
+        </>
     )
 }
 

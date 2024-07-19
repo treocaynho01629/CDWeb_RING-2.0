@@ -55,14 +55,13 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 return endpointName
             },
             merge: (currentCache, newItems) => {
-                console.log(`${newItems.ids.length} more content loaded!`)
                 currentCache.info = newItems.info;
                 booksAdapter.addMany(
                     currentCache, booksSelector.selectAll(newItems)
                 )
             },
             forceRefetch: ({ currentArg, previousArg }) => {
-                const isForceRefetch = (currentArg?.loadMore && (currentArg?.page != previousArg?.page))
+                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
                 return isForceRefetch
             },
             providesTags: (result, error, arg) => {
@@ -159,7 +158,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         }),
         updateBook: builder.mutation({
             query: ({ id, updatedBook }) => ({
-                url: `/ api / books / ${id}`,
+                url: `/api/books/${id}`,
                 method: 'PUT',
                 credentials: 'include',
                 body: updatedBook,
@@ -171,11 +170,29 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         }),
         deleteBook: builder.mutation({
             query: (id) => ({
-                url: `/ api / books / ${id}`,
+                url: `/api/books/${id}`,
                 method: 'DELETE'
             }),
             invalidatesTags: (result, error, id) => [
                 { type: 'Book', id }
+            ]
+        }),
+        deleteBooks: builder.mutation({
+            query: (ids) => ({
+                url: `/api/books/delete-multiples?ids=${ids}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: (result, error, id) => [
+                { type: 'Book', id: "LIST" }
+            ]
+        }),
+        deleteAllBooks: builder.mutation({
+            query: () => ({
+                url: '/api/books/delete-all',
+                method: 'DELETE'
+            }),
+            invalidatesTags: (result, error, id) => [
+                { type: 'Book', id: "LIST" }
             ]
         }),
     }),
@@ -189,6 +206,8 @@ export const {
     useCreateBookMutation,
     useUpdateBookMutation,
     useDeleteBookMutation,
+    useDeleteBooksMutation,
+    useDeleteAllBooksMutation,
     usePrefetch: usePrefetchBooks
 } = booksApiSlice
 

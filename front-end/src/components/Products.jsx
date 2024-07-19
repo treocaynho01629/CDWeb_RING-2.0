@@ -3,7 +3,6 @@ import Product from './Product'
 import CustomProgress from "./custom/CustomProgress";
 
 const Products = ({ data, isError, isLoading, isSuccess }) => {
-
   let productsContent;
 
   if (isLoading || isError) {
@@ -27,8 +26,7 @@ const Products = ({ data, isError, isLoading, isSuccess }) => {
           </Grid>
         )
       })
-      :
-      Array.from(new Array(15)).map((index) => (
+      : Array.from(new Array(15)).map((index) => (
         <Grid key={index} item xs={6} sm={4} md={3} lg={2.4}>
           <Product />
         </Grid>

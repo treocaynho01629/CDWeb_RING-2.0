@@ -242,6 +242,7 @@ const Product = ({ book }) => {
                             width={'85%'}
                             style={{
                                 zIndex: -1,
+                                aspectRatio: '1/1.1',
                                 transition: 'all 0.5s ease',
                                 margin: '5px 0px 10px 0px',
                                 objectFit: 'contain',
@@ -310,7 +311,7 @@ const Product = ({ book }) => {
         return (
             <Container>
                 <ImageSlider>
-                    <Skeleton variant="rectangular" width={150} height={210} sx={{ margin: '5px 0px 20px 0px', width: '85%' }} />
+                    <Skeleton variant="rectangular" width={'85%'} height={210} sx={{ aspectRatio: '1/1.1', margin: '5px 0px 20px 0px', width: '85%' }} />
                 </ImageSlider>
                 <Info>
                     <Skeleton variant="text" sx={{ fontSize: '16px' }} />

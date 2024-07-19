@@ -119,20 +119,28 @@ const Arrow = styled.div`
 `
 
 const Explore = styled.div`
-    display: flex; 
+    display: none; 
     justify-content: center;
     align-items: center;
     padding: 10px 0px;
-    background-color: #ebebeb;
-    color: #5ea0ec;
+    background-color: #00000057;
+    color: white;
     font-weight: bold;
+    font-size: 1.2em;
+    letter-spacing: .1em;
     cursor: pointer;
-    transition: all 0.5s ease;
+    transition: all .3s ease;
+
+    svg {font-size: 1.5em}
 
     &:hover{
         background-color: #63e399;
         color: white;
         text-decoration: underline;
+    }
+
+    @media (min-width: 900px) {
+        display: flex;
     }
 `
 //#endregion
@@ -194,7 +202,7 @@ const Categories = () => {
                 </ButtonContainer>
             </CateContainer>
             <Link to={'/filters'}>
-                <Explore><Storefront />&nbsp;DUYỆT CỬA HÀNG</Explore>
+                <Explore><Storefront />&nbsp;ĐẾN CỬA HÀNG</Explore>
             </Link>
         </Container>
     )

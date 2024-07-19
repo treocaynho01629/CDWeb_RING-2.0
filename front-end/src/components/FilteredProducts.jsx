@@ -28,10 +28,10 @@ const FilteredProducts = ({ data, isError, error, isLoading, isSuccess, pageSize
         )
       })
       :
-      <Box sx={{ marginTop: 5, marginBottom: 150 }}>Không tìm thấy sản phẩm nào!</Box>
+      <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>Không tìm thấy sản phẩm nào!</Box>
   } else if (isError) {
     productsContent = (
-      <Box sx={{ marginTop: 5, marginBottom: 150 }}>{error}</Box>
+      <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>{error}</Box>
     )
   }
 
