@@ -1,6 +1,6 @@
 import { Grid } from "@mui/material"
 import Product from './Product'
-import CustomProgress from "./custom/CustomProgress";
+import CustomProgress from "../custom/CustomProgress";
 
 const Products = ({ data, isError, isLoading, isSuccess }) => {
   let productsContent;
@@ -34,7 +34,7 @@ const Products = ({ data, isError, isLoading, isSuccess }) => {
   }
 
   return (
-    <div style={{ padding: '20px 0px' }}>
+    <div style={{ paddingTop: '20px' }}>
       {(isLoading || isError) && <CustomProgress color={`${isError ? 'error' : 'secondary'}`} />}
       <Grid container spacing={1}>
         {productsContent}

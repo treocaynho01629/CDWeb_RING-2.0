@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import CustomProgress from '../components/custom/CustomProgress';
+import CustomProgress from '../custom/CustomProgress';
 import Carousel from "react-multi-carousel";
 import ProductSimple from "./ProductSimple"
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
@@ -33,7 +33,7 @@ const CustomArrow = styled.button`
 
   &:hover {
     opacity: 1;
-    background-color: #63e399;
+    background-color: ${props => props.theme.palette.secondary.main};
   }
 
   svg {

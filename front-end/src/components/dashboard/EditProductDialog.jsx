@@ -22,8 +22,8 @@ const CustomButton = styled.div`
     padding: 10px 15px;
     font-size: 16px;
     font-weight: 400;
-    background-color: #63e399;
-    color: white;
+    background-color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.secondary.contrastText};
     display: flex;
     flex-wrap: wrap;
     align-items: center;

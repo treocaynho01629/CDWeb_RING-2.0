@@ -7,10 +7,10 @@ import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice
 import { useGetPublishersQuery } from "../features/publishers/publishersApiSlice";
 import { useGetBooksByFilterQuery } from "../features/books/booksApiSlice";
 import AppPagination from '../components/custom/AppPagination'
-import FilterList from "../components/FilterList"
-import FilteredProducts from "../components/FilteredProducts"
-import SortList from "../components/SortList"
-import FilterDialog from '../components/FilterDialog'
+import FilterList from "../components/product/FilterList"
+import FilteredProducts from "../components/product/FilteredProducts"
+import SortList from "../components/product/SortList"
+import FilterDialog from '../components/product/FilterDialog'
 
 //#region styled
 const Wrapper = styled.div`

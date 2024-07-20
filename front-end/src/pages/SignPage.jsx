@@ -84,8 +84,8 @@ const SignDivider = styled.button`
     text-align: center;
     justify-content: center;
     align-items: center;
-    background-color: #63e399;
-    color: white;
+    background-color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.secondary.contrastText};
     border-radius: 0;
     border-radius: 50px;
     width: 60px;

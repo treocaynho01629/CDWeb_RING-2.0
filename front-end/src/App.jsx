@@ -6,7 +6,7 @@ import RequireAuth from './components/authorize/RequireAuth';
 import PersistLogin from './components/authorize/PersistsLogin';
 import Loadable from './components/authorize/Loadable';
 import Loader from './components/authorize/Loadable';
-import PageLayout from './components/PageLayout';
+import PageLayout from './components/layout/PageLayout';
 import Missing from './pages/error/Missing';
 import Unauthorized from './pages/error/Unauthorized';
 import SignPage from './pages/SignPage';

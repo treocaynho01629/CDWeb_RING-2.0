@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Skeleton } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import CustomButton from './custom/CustomButton';
+import CustomButton from '../custom/CustomButton';
 
 //#region styled
 const Container = styled.div`
@@ -50,7 +50,7 @@ const Title = styled.h5`
 const Price = styled.span`
     font-size: 21px;
     font-weight: bold;
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
     margin: 10px 0 10px;
     display: flex;
     flex-wrap: wrap;
@@ -63,7 +63,7 @@ const ProductSimple = ({ book }) => {
     const dispatch = useDispatch();
 
     const handleAddToCart = async (book) => {
-        const { addToCart } = await import('../redux/cartReducer');
+        const { addToCart } = await import('../../redux/cartReducer');
         const { enqueueSnackbar } = await import('notistack');
 
         enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });

@@ -5,9 +5,9 @@ import { styled as muiStyled } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
 import Categories from '../components/Categories';
-import Products from '../components/Products';
-import Slider from '../components/Slider';
-import ProductsSlider from '../components/ProductsSlider';
+import Products from '../components/product/Products';
+import Slider from '../components/product/Slider';
+import ProductsSlider from '../components/product/ProductsSlider';
 import CustomButton from '../components/custom/CustomButton';
 import CustomDivider from '../components/custom/CustomDivider';
 import { useGetBooksByFilterQuery, useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
@@ -31,6 +31,7 @@ const ToggleGroupContainer = styled.div`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
+  margin-top: 20px;
 `
 
 const StyledToggleButtonGroup = muiStyled(ToggleButtonGroup)(({ theme }) => ({
@@ -101,7 +102,7 @@ const Home = () => {
   });
   const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom, refetch: refetchRandom } = useGetRandomBooksQuery({ amount: 10 });
   const { data: cateBooks, isLoading: loadByCate, isSuccess: doneByCate, isError: errorByCate } = useGetBooksByFilterQuery({ cateId: currCate }, { skip: !currCate });
-  const { data: orderBooks, isLoading: loadByOrder, isSuccess: doneByOrder, isError: errorByOrder } = useGetBooksByFilterQuery({ sortBy: orderBy }, { skip: !orderBy });
+  const { data: orderBooks, isLoading: loadByOrder, isSuccess: doneByOrder, isError: errorByOrder } = useGetBooksByFilterQuery({ sortBy: orderBy, sortDir: "desc" }, { skip: !orderBy });
   const { data: cates, isLoading: loadCates, isSuccess: doneCates, isError: errorCates } = useGetCategoriesQuery();
 
   //Other

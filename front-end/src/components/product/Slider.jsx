@@ -4,9 +4,9 @@ import { Link } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
-import { useGetRandomBooksQuery } from "../features/books/booksApiSlice";
+import { useGetRandomBooksQuery } from "../../features/books/booksApiSlice";
 import Carousel from "react-multi-carousel";
-import CustomButton from "./custom/CustomButton";
+import CustomButton from "../custom/CustomButton";
 
 //#region styled
 const ImgContainer = styled.div`
@@ -85,7 +85,7 @@ const CustomArrow = styled.button`
 
   &:hover {
     opacity: 1;
-    background-color: #63e399;
+    background-color: ${props => props.theme.palette.secondary.main};
   }
 
   svg {
@@ -138,7 +138,7 @@ function Item({ book }) {
     const dispatch = useDispatch();
 
     const handleAddToCart = async (book) => {
-        const { addToCart } = await import('../redux/cartReducer');
+        const { addToCart } = await import('../../redux/cartReducer');
         const { enqueueSnackbar } = await import('notistack');
 
         enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });

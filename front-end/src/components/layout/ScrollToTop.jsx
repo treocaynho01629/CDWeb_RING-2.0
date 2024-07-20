@@ -56,7 +56,7 @@ const ScrollToTop = () => {
                     right: 15,
                     zIndex: 99,
 
-                    '@media screen and (min-width: 768px)': {
+                    '@media screen and (min-width: 600px)': {
                         bottom: 32,
                         right: 32,
                     },

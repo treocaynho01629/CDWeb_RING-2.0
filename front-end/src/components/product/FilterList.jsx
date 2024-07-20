@@ -2,11 +2,11 @@ import styled from 'styled-components'
 import { useState, useEffect, useMemo } from "react"
 import { Grid, Box, Divider, Checkbox, FormGroup, FormControlLabel, MenuItem, List, ListItemButton, Collapse, Skeleton, Stack } from '@mui/material';
 import { ExpandLess, ExpandMore, PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon, FilterAltOff } from '@mui/icons-material';
-import { marks, bookTypes } from "../ultils/filters";
-import CustomSlider from "./custom/CustomSlider";
-import CustomButton from "./custom/CustomButton";
-import CustomDivider from './custom/CustomDivider';
-import CustomInput from './custom/CustomInput';
+import { marks, bookTypes } from "../../ultils/filters";
+import CustomSlider from "../custom/CustomSlider";
+import CustomButton from "../custom/CustomButton";
+import CustomDivider from '../custom/CustomDivider';
+import CustomInput from '../custom/CustomInput';
 
 //#region styled
 const TitleContainer = styled.div`
@@ -31,7 +31,7 @@ const FilterText = styled.h3`
     align-items: center;
 
     &:hover {
-        color: #63e399;
+        color: ${props => props.theme.palette.secondary.main};
     }
 `
 

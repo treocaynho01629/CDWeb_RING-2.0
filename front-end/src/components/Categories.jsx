@@ -17,12 +17,12 @@ const ItemContainer = styled.div`
     border: 2px solid lightgray;
     border-radius: 2%;
     color: inherit;
-    transition: all 0.25s ease;
+    transition: all .3s ease;
 
     &:hover{
-      background-color: #63e399;
-      color: white;
-      border-color: white;
+      background-color: ${props => props.theme.palette.secondary.main};
+      color: ${props => props.theme.palette.secondary.contrastText};
+      border-color: ${props => props.theme.palette.secondary.contrastText};
       transform: scale(1.05);
     }
 `
@@ -81,7 +81,7 @@ const ButtonContainer = styled.div`
     position: absolute;
     right: 5px;
     padding: 5px 0px 5px 15px;
-    background-color: white;
+    background-color: ${props => props.theme.palette.background.default};
     border-left: 0.5px solid lightgray;
     display: none;
     transition: all .3s ease;
@@ -102,7 +102,7 @@ const Arrow = styled.div`
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: lightgray;
+    background-color: ${props => props.theme.palette.divider};
     display: flex;
     align-items: center;
     justify-content: center;
@@ -112,8 +112,8 @@ const Arrow = styled.div`
     transition: all 0.5s ease;
 
     &:hover{
-        background-color: #63e399;
-        color: white;
+        background-color: ${props => props.theme.palette.secondary.main};
+        color: ${props => props.theme.palette.secondary.contrastText};
         transform: scale(1.05);
     }
 `
@@ -134,8 +134,8 @@ const Explore = styled.div`
     svg {font-size: 1.5em}
 
     &:hover{
-        background-color: #63e399;
-        color: white;
+        background-color: ${props => props.theme.palette.secondary.main};
+        color: ${props => props.theme.palette.secondary.contrastText};
         text-decoration: underline;
     }
 

@@ -13,7 +13,7 @@ const DrawerLogo = styled.h2`
     font-size: 27px;
     text-transform: uppercase;
     font-weight: 500;
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
     cursor: pointer;
     align-items: center;
     display: flex;
@@ -29,7 +29,7 @@ const DrawerLogo = styled.h2`
 `
 //#endregion
 
-const NavDrawer = ({ openDrawer, toggleDrawer, auth, products, navigate, signOut, ImageLogo, Button }) => {
+const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, auth, products, navigate, signOut, ImageLogo, Button }) => {
     const role = auth?.roles?.length;
     
     return (

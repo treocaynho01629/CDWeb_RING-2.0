@@ -11,7 +11,7 @@ import usePrivateFetch from '../../hooks/usePrivateFetch'
 
 //#region styled
 const Percent = styled.p`
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
     font-size: 16px;
     font-weight: bold;
 `
@@ -19,7 +19,7 @@ const Percent = styled.p`
 const Income = styled.span`
     font-size: 20px;
     font-weight: bold;
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
     margin: 0;
     display: flex;
     flex-wrap: wrap;

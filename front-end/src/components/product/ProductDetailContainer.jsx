@@ -3,14 +3,14 @@ import { lazy, Suspense } from 'react'
 import { styled as muiStyled } from '@mui/system';
 import { Link } from 'react-router-dom';
 import { Box, Skeleton, Tab, TextareaAutosize } from '@mui/material';
-import { useGetBooksByFilterQuery } from '../features/books/booksApiSlice';
+import { useGetBooksByFilterQuery } from '../../features/books/booksApiSlice';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import ProductsSlider from '../components/ProductsSlider';
-import CustomProgress from './custom/CustomProgress';
+import ProductsSlider from './ProductsSlider';
+import CustomProgress from '../custom/CustomProgress';
 
-const ReviewTab = lazy(() => import('../components/ReviewTab'));
+const ReviewTab = lazy(() => import('./ReviewTab'));
 
 //#region styled
 const StyledTabList = muiStyled((props) => (

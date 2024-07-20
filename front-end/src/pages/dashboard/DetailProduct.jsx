@@ -20,8 +20,8 @@ const CustomButton = styled.button`
     margin-top: -15px;
     border: none;
     outline: none;
-    background-color: #63e399;
-    color: white;
+    background-color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.secondary.contrastText};
     font-size: 18px;
     justify-content: center;
     font-weight: bold;

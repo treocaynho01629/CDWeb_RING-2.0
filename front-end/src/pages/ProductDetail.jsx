@@ -3,10 +3,10 @@ import { useEffect, useState, useRef } from 'react'
 import { Skeleton, Breadcrumbs } from '@mui/material';
 import { useParams, Navigate, NavLink } from 'react-router-dom';
 import { useGetBookQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
-import ProductsSlider from '../components/ProductsSlider';
-import ProductDetailContainer from '../components/ProductDetailContainer';
+import ProductsSlider from '../components/product/ProductsSlider';
+import ProductDetailContainer from '../components/product/ProductDetailContainer';
 import CustomDivider from '../components/custom/CustomDivider';
-import ProductContent from '../components/ProductContent';
+import ProductContent from '../components/product/ProductContent';
 
 //#region styled
 const Wrapper = styled.div`
@@ -16,7 +16,7 @@ const BreadcrumbsContainer = styled.div`
     margin: 20px 10px;
     display: none;
 
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
         display: block;
     }
 `
@@ -62,7 +62,7 @@ const ProductDetail = () => {
                 {data
                     ?
                     <Breadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
-                        <NavLink to={`/`} sx={{ backgroundColor: '#63e399', padding: '5px 15px', color: 'white' }}>
+                        <NavLink to={`/`} style={{ backgroundColor: '#63e399', padding: '5px 15px', color: 'white' }}>
                             Trang chủ
                         </NavLink>
                         <NavLink to={`/filters`}>

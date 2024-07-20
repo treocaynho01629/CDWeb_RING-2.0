@@ -1,11 +1,10 @@
 import { Outlet } from "react-router-dom";
 import styled from 'styled-components'
-import Navbar from "./navbar/Navbar";
+import Navbar from "../navbar/Navbar";
 import Footer from "./Footer";
 import ScrollToTop from "./ScrollToTop";
 
 const LayoutWrapper = styled.div`
-    padding-top: 70px;
     overflow-x: hidden;
 
     @media (min-width: 768px) {
@@ -15,9 +14,6 @@ const LayoutWrapper = styled.div`
         margin-right: auto;
         margin-left: auto;
         width: 750px;
-    }
-    @media (min-width: 900px) {
-        padding-top: 115px;
     }
     @media (min-width: 992px) {
         width: 970px;

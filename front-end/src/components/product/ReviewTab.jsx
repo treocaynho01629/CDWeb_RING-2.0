@@ -4,12 +4,12 @@ import { styled as muiStyled } from '@mui/system';
 import { AccessTime as AccessTimeIcon, CalendarMonth as CalendarMonthIcon, Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
 import { Avatar, Rating, Box, Grid, TextareaAutosize } from '@mui/material';
 import { Link } from "react-router-dom";
-import { useGetReviewsByBookIdQuery } from '../features/reviews/reviewsApiSlice';
-import AppPagination from './custom/AppPagination';
-import CustomButton from './custom/CustomButton';
-import useAxiosPrivate from '../hooks/useAxiosPrivate';
-import useAuth from "../hooks/useAuth";
-import CustomProgress from './custom/CustomProgress';
+import { useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
+import AppPagination from '../custom/AppPagination';
+import CustomButton from '../custom/CustomButton';
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
+import useAuth from "../../hooks/useAuth";
+import CustomProgress from '../custom/CustomProgress';
 
 //#region styled
 const RatingSelect = styled.div`
@@ -281,7 +281,6 @@ const ReviewTab = (props) => {
                                     <CustomButton
                                         variant="contained"
                                         color="secondary"
-                                        size="small"
                                     >
                                         Gửi đánh giá
                                     </CustomButton>
@@ -297,7 +296,6 @@ const ReviewTab = (props) => {
                             <CustomButton
                                 variant="contained"
                                 color="secondary"
-                                size="small"
                             >
                                 Đăng nhập ngay
                             </CustomButton>

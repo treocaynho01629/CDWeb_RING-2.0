@@ -7,8 +7,8 @@ import {
 } from '@mui/icons-material';
 import { Skeleton, Rating, Box, Divider, Grid, Avatar, Container } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import ProductImages from '../components/ProductImages';
 import { Link } from 'react-router-dom';
+import ProductImages from './ProductImages';
 
 //#region styled
 const StuffContainer = styled.div`
@@ -16,7 +16,7 @@ const StuffContainer = styled.div`
     padding: 10px 20px;
     margin-bottom: 20px;
 
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
         padding: 20px 10px;
     }
 `
@@ -26,7 +26,7 @@ const StuffTitle = styled.h5`
     text-decoration: underline;
     display: none;
 
-    @media (min-width: 992px) {
+    @media (min-width: 900px) {
         display: flex;
     }
 `
@@ -57,15 +57,15 @@ const VisitButton = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    border: solid .5px #63e399;
-    color: #63e399;
+    border: solid .5px ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.secondary.main};
     padding: 7px 5px;
     cursor: pointer;
     transition: all .3s ease;
 
     &:hover {
-        background-color: #63e399;
-        color: white;
+        background-color: ${props => props.theme.palette.secondary.main};
+        color: ${props => props.theme.palette.secondary.contrastText};
     }
 `
 
@@ -84,8 +84,8 @@ const CouponTab = styled.div`
     transition: all .3s ease;
 
     &:hover{
-        background-color: #63e399;
-        color: white;
+        background-color: ${props => props.theme.palette.secondary.main};
+        color: ${props => props.theme.palette.secondary.contrastText};
     }
 `
 
@@ -97,7 +97,7 @@ const InfoContainer = styled.div`
     justify-content: space-between;
     border: 0.5px solid lightgray;
 
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
         padding: 0 40px;
     }
 `
@@ -184,7 +184,7 @@ const FilterContainer = styled.div`
     width: 100%;
     display: none;
 
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
         display: block;
     }
 `
@@ -200,7 +200,7 @@ const AltFilterContainer = styled.div`
     align-items: flex-end;
     display: flex;
 
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
         display: none;
     }
 `
@@ -210,7 +210,7 @@ const Filter = styled.div`
     margin-bottom: 30px;
     display: none;
 
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
         display: block;
     }
 `
@@ -224,7 +224,7 @@ const SubFilterContainer = styled.div`
 const DetailContainer = styled.div`
     display: none;
 
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
         display: block;
     }
 `
@@ -238,9 +238,9 @@ const InputContainer = styled.div`
     align-items: center;
     justify-content: space-between;
     align-items: center;
-    background-color: white;
+    background-color: ${props => props.theme.palette.background.default};
 
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
         border: .5px solid lightgray;
     }
 `
@@ -319,8 +319,8 @@ const AmountButton = styled.div`
     transition: all 0.5s ease;
 
     &:hover{
-        background-color: #63e399;
-        color: white;
+        background-color: ${props => props.theme.palette.secondary.main};
+        color: ${props => props.theme.palette.secondary.contrastText};
     }
 `
 
@@ -331,8 +331,8 @@ const BuyButton = styled.button`
     margin-top: -15px;
     border: none;
     outline: none;
-    background-color: #63e399;
-    color: white;
+    background-color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.secondary.contrastText};
     font-size: 14px;
     justify-content: center;
     font-weight: bold;
@@ -343,7 +343,7 @@ const BuyButton = styled.button`
     justify-content: center;
     transition: all 0.5s ease;
 
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
         width: 90%;
     }
 
@@ -390,7 +390,7 @@ const ProductContent = ({ book }) => {
 
     //Add to cart
     const handleAddToCart = async (book) => {
-        const { addToCart } = await import('../redux/cartReducer');
+        const { addToCart } = await import('../../redux/cartReducer');
         const { enqueueSnackbar } = await import('notistack');
 
         //Queue snackbar

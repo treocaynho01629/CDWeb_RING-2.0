@@ -30,7 +30,7 @@ const ProductTitle = styled.h5`
 const ProductPrice = styled.span`
     font-size: 16px;
     font-weight: bold;
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
     display: flex;
     flex-wrap: wrap;
     align-items: center;

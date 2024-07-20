@@ -124,7 +124,7 @@ const TextButton = styled.div`
     transition: all 0.5s ease;
 
     &:hover {
-        color: #63e399;
+        color: ${props => props.theme.palette.secondary.main};
     }
 `
 
@@ -165,8 +165,8 @@ const CustomButton = styled.div`
     padding: 10px 15px;
     font-size: 16px;
     font-weight: 400;
-    background-color: #63e399;
-    color: white;
+    background-color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.secondary.contrastText};
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -220,7 +220,7 @@ const ItemTitle = styled.p`
 const Price = styled.p`
     font-size: 16px;
     font-weight: bold;
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
     margin: 10px 0 0;
     display: flex;
     flex-wrap: wrap;
@@ -270,7 +270,7 @@ const PayoutPrice = styled.p`
 `
 
 const PayButton = styled.button`
-    background-color: #63e399;
+    background-color: ${props => props.theme.palette.secondary.main};
     padding: 15px 20px;
     margin-top: 20px;
     font-size: 14px;

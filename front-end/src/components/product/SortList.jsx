@@ -3,9 +3,9 @@ import { useEffect, useState, useRef } from 'react'
 import { styled as muiStyled } from '@mui/system';
 import { Grid, TextField, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip, IconButton } from '@mui/material';
 import { Search as SearchIcon, SearchOff, FilterAlt } from '@mui/icons-material';
-import { orderGroup } from "../ultils/filters";
-import CustomInput from "./custom/CustomInput";
-import CustomButton from "./custom/CustomButton";
+import { orderGroup } from "../../ultils/filters";
+import CustomInput from "../custom/CustomInput";
+import CustomButton from "../custom/CustomButton";
 
 //#region styled
 const Container = styled.div`

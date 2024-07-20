@@ -13,7 +13,7 @@ const DropZoneContainer = styled.div`
     background-color: #d6e2db;
     height: 350px;
     cursor: pointer;
-    border: 5px dashed #63e399;
+    border: 5px dashed ${props => props.theme.palette.secondary.main};
 `
 
 const ThumbContainer = styled.div`

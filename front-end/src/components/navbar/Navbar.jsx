@@ -5,7 +5,7 @@ import {
     Search as SearchIcon, ShoppingCart as ShoppingCartIcon, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
     Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, NotificationsActive as NotificationsActiveIcon, Storefront
 } from '@mui/icons-material';
-import { Stack, Badge, IconButton, Avatar, Tooltip, Box, Grid, TextField, AppBar, useScrollTrigger, Collapse } from '@mui/material';
+import { Stack, Badge, IconButton, Avatar, Tooltip, Box, Grid, TextField, AppBar, useScrollTrigger, Collapse, Toolbar } from '@mui/material';
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import PropTypes from 'prop-types';
@@ -17,10 +17,6 @@ import ProfilePopover from './ProfilePopover';
 
 //#region styled
 const Container = styled.div`
-    background-color: white;
-    border-bottom: 0.5px solid;
-    border-color: lightgray;
-    align-items: center;
 `
 
 const Wrapper = styled.div`
@@ -29,7 +25,6 @@ const Wrapper = styled.div`
     padding: 5px 20px;
     justify-content: space-between;
     align-items: center;
-    position: sticky;
 
     @media (min-width: 768px) {
         width: 750px;
@@ -178,7 +173,7 @@ const Logo = styled.h2`
     font-size: 27px;
     text-transform: uppercase;
     font-weight: 500;
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
     cursor: pointer;
     align-items: center;
     display: flex;
@@ -279,6 +274,8 @@ function HideOnScroll(props) {
     const { children, window } = props;
 
     const trigger = useScrollTrigger({
+        disableHysteresis: true,
+        threshold: 100,
         target: window ? window() : undefined,
     });
 
@@ -370,7 +367,7 @@ const Navbar = (props) => {
 
     return (
         <Container>
-            <AppBar sx={{ backgroundColor: 'white' }} position="fixed">
+            <AppBar sx={{ backgroundColor: 'background.default' }} position="fixed">
                 <Stack>
                     <HideOnScroll {...props}>
                         <TopHeader>
@@ -398,7 +395,7 @@ const Navbar = (props) => {
                                 <Left>
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <Button onClick={toggleDrawer(true)}><MenuIcon sx={{ fontSize: 26 }} /></Button>
-                                        <NavDrawer {...{ openDrawer, toggleDrawer, auth, products, navigate, signOut, ImageLogo, Button }} />
+                                        <NavDrawer {...{ openDrawer, setOpen, toggleDrawer, auth, products, navigate, signOut, ImageLogo, Button }} />
                                     </Box>
                                     <Link to={`/`}>
                                         <Logo className={searchField || hover || focus ? 'active' : ''}>
@@ -513,6 +510,7 @@ const Navbar = (props) => {
                     </Wrapper>
                 </Stack>
             </AppBar>
+            <Toolbar sx={{ marginTop: { xs: 0, md: '35px' }, marginBottom: '9px' }} />
         </Container>
     )
 }

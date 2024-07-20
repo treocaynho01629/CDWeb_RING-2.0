@@ -123,13 +123,13 @@ const Title = styled.h3`
     flex-wrap: wrap;
     align-items: center;
     text-align: center;
-    border-bottom: 0.5px solid #63e399;
+    border-bottom: 0.5px solid ${props => props.theme.palette.secondary.main};
     padding-bottom: 15px;
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
 `
 
 const Button = styled.button`
-  background-color: #63e399;
+  background-color: ${props => props.theme.palette.secondary.main};
   padding: 10px 20px;;
   font-size: 16px;
   font-weight: 500;
@@ -175,7 +175,7 @@ const ItemTitle = styled.p`
 const Price = styled.p`
     font-size: 16px;
     font-weight: bold;
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
     margin: 0 0;
 `
 
@@ -186,7 +186,7 @@ const StatusTag = styled.p`
     margin: 0;
     font-weight: bold;
     font-size: 16px;
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
 `
 
 const Discount = styled.p`
@@ -288,7 +288,7 @@ const Profiler = styled.div`
     justify-content: space-between;
     padding: 0px 10px;
     background-color: #f7f7f7;
-    border-bottom: 0.5px solid #63e399;
+    border-bottom: 0.5px solid ${props => props.theme.palette.secondary.main};
 `
 
 const RatingInfo = styled.p`

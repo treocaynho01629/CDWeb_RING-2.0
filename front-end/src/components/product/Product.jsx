@@ -32,7 +32,7 @@ const ImageSlider = styled.div`
     padding: 2px 2px 0px 2px;
     margin: 2px 2px 0px 2px;
     transition: all 0.25s ease;
-    z-Index: -1;
+    z-Index: 1;
 `
 
 const Container = styled.div`
@@ -68,7 +68,7 @@ const Container = styled.div`
 const Info = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 0px 10px;
+    padding: 0px 3px;
     margin-top: -20px;
     width: 92%;
     z-index: 4;
@@ -110,14 +110,14 @@ const Price = styled.span`
 `
 
 const Percent = styled.p`
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
     margin: 0 0 0 10px;
 `
 
 const Sale = styled.span`
     font-size: 20px;
     font-weight: bold;
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
     margin: 10px 0 0;
     display: flex;
     flex-wrap: wrap;
@@ -140,8 +140,8 @@ const Arrow = styled.div`
     z-index: 5;
 
     &:hover{
-        background-color: #63e399;
-        color: white;
+        background-color: ${props => props.theme.palette.secondary.main};
+        color: ${props => props.theme.palette.secondary.contrastText};
         transform: scale(1.05);
     }
 `
@@ -169,7 +169,7 @@ const AddToCart = styled.p`
     cursor: pointer;
 
     &:hover {
-        color: #63e399;
+        color: ${props => props.theme.palette.secondary.main};
     }
 
     &:after {
@@ -218,7 +218,7 @@ const Product = ({ book }) => {
     }
 
     const handleAddToCart = async (book) => {
-        const { addToCart } = await import('../redux/cartReducer');
+        const { addToCart } = await import('../../redux/cartReducer');
         const { enqueueSnackbar } = await import('notistack');
 
         enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });

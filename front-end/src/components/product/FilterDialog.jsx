@@ -2,10 +2,10 @@ import styled from 'styled-components'
 import { useState, useEffect, useMemo } from "react"
 import { Box, Divider, MenuItem, Skeleton, Chip, Stack, DialogContent, Dialog, DialogActions, DialogTitle, useMediaQuery, useTheme } from '@mui/material';
 import { PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon, Check, FilterAltOff } from '@mui/icons-material';
-import { marks, bookTypes } from "../ultils/filters";
-import CustomButton from "./custom/CustomButton";
-import CustomInput from "./custom/CustomInput";
-import CustomSlider from "./custom/CustomSlider";
+import { marks, bookTypes } from "../../ultils/filters";
+import CustomButton from "../custom/CustomButton";
+import CustomInput from "../custom/CustomInput";
+import CustomSlider from "../custom/CustomSlider";
 
 //#region styled
 const TitleContainer = styled.div`
@@ -25,7 +25,7 @@ const FilterText = styled.h3`
     align-items: center;
 
     &:hover {
-        color: #63e399;
+        color: ${props => props.theme.palette.secondary.main};
     }
 `
 

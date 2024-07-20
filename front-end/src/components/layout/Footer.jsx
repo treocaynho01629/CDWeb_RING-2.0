@@ -49,7 +49,7 @@ const BotFooter = styled.div`
 const Logo = styled.h1`
     font-size: 30px;
     font-family: abel;
-    color: #63e399;
+    color: ${props => props.theme.palette.secondary.main};
     display: flex;
     flex-wrap: wrap;
 `
@@ -114,7 +114,7 @@ width: 90%;
     transition: all 0.5s ease;
     
     &:hover{
-        color: #63e399;
+        color: ${props => props.theme.palette.secondary.main};
     }
     `
 
@@ -127,7 +127,7 @@ const Payment = styled.div`
     transition: all 0.5s ease;
     
     &:hover{
-        color: #63e399;
+        color: ${props => props.theme.palette.secondary.main};
     }
 `
 

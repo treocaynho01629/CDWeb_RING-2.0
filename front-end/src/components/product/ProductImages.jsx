@@ -13,7 +13,7 @@ const ImgContainer = styled.div`
     text-align: center;
     border: 0.5px solid lightgray;
 
-    @media (max-width: 768px) {
+    @media (max-width: 600px) {
         width: 100%;
     }
 `
@@ -32,7 +32,7 @@ const ImageSlider = styled.div`
     display: 'flex';
     justify-content: 'center';
 
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
         padding: 5px;
     }
 `
@@ -67,7 +67,7 @@ const SmallImageSlider = styled.div`
         display: none;
     }
 
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
         padding: 10px;
     }
 `
@@ -80,7 +80,7 @@ const SmallImageSlide = styled.div`
     transition: all 0.5s ease;
 
     &.active {
-        border: 1px solid #63e399;
+        border: 1px solid ${props => props.theme.palette.secondary.main};
         opacity: 1;
     }
 
@@ -106,8 +106,8 @@ const ImageButton = styled.div`
     right: ${prop => prop.direction === "right" && "2%"};
 
     &:hover{
-        background-color: #63e399;
-        color: white;
+        background-color: ${props => props.theme.palette.secondary.main};
+        color: ${props => props.theme.palette.secondary.contrastText};
     }
 `
 //#endregion

@@ -1,6 +1,6 @@
 import { Box, Grid } from "@mui/material";
 import Product from './Product';
-import CustomProgress from '../components/custom/CustomProgress';
+import CustomProgress from '../custom/CustomProgress';
 
 const FilteredProducts = ({ data, isError, error, isLoading, isSuccess, pageSize = 16 }) => {
 

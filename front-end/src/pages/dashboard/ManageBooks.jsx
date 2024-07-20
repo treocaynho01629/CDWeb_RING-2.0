@@ -60,7 +60,7 @@ const BookTitle = styled.p`
 const BookPrice = styled.p`
   font-size: 18px;
   font-weight: bold;
-  color: #63e399;
+  color: ${props => props.theme.palette.secondary.main};
   margin: 10px 0 0;
 `
 //#endregion
