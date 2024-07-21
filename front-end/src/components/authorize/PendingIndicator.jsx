@@ -2,10 +2,10 @@ import { Backdrop, CircularProgress } from '@mui/material';
 
 const PendingIndicator = ({ open, message }) => {
   return (
-    <Backdrop sx={{ color: 'white', zIndex: 9999 }} open={open}>
+    <Backdrop sx={{ color: 'background.default', zIndex: 9999 }} open={open}>
       <CircularProgress
         sx={{
-          color: '#63e399',
+          color: 'secondary.main',
           marginRight: '10px',
         }}
         size={40}

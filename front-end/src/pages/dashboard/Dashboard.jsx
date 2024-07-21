@@ -40,8 +40,8 @@ const Dashboard = () => {
   const [bookCount, setBookCount] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [receiptCount, setReceiptCount] = useState(0);
-  const { auth } = useAuth();
-  const [admin, setAdmin] = useState((auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
+  const { roles, username } = useAuth();
+  const [admin, setAdmin] = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -50,7 +50,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <h2>Chào mừng {auth.userName}!</h2>
+      <h2>Chào mừng {username}!</h2>
       <h3 style={{color: 'darkgray'}}>Dashboard</h3>
       <Grid container spacing={3} sx={{marginBottom: '20px'}}>
         <Grid item sm={6} md={3}>

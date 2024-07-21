@@ -20,10 +20,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { useDispatch } from "react-redux"
 import dayjs from 'dayjs';
 import usePrivateFetch from '../hooks/usePrivateFetch'
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import useCart from '../hooks/useCart';
 
 const PendingIndicator = lazy(() => import('../components/authorize/PendingIndicator'));
 
@@ -312,23 +312,18 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%:]).{8,24}$/;
 const ReceiptsTable = () => {
     const [count, setCount] = useState(1);
     const [receipts, setReceipts] = useState([]);
+    const { addProduct } = useCart();
     const { loading: loadingReceipts, data: dataReceipts } = usePrivateFetch(RECEIPTS_URL + "&pageNo=" + 0);
     const { loading: loadingMore, data: more } = usePrivateFetch(RECEIPTS_URL + "&pageNo=" + count);
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
 
-    const handleAddToCart = async (detail) => {
-        const { addToCart } = await import('../redux/cartReducer');
-        const { enqueueSnackbar } = await import('notistack');
-
-        enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });
-        dispatch(addToCart({
-            id: detail.bookId,
-            title: detail.bookTitle,
-            price: detail.price,
-            image: detail.image,
+    const handleAddToCart = (book) => {
+        addProduct({
+            id: book.id,
+            title: book.title,
+            price: book.price,
+            image: book.image,
             quantity: 1,
-        }))
+        })
     };
 
     //Load

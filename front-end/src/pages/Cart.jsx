@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState, useEffect } from "react";
-import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
-import { Checkbox, Grid, IconButton, Breadcrumbs, Table, TableBody, TableContainer, TableHead, TableRow, Box } from '@mui/material';
+import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search } from '@mui/icons-material';
+import { Checkbox, Grid, IconButton, Breadcrumbs, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
 import { NavLink } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -37,6 +37,7 @@ const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
 
 const StyledTableRow = muiStyled(TableRow)(({ theme }) => ({
     border: '.5px solid lightgray',
+    position: 'relative',
 
     '&:nth-of-type(odd)': {
         backgroundColor: theme.palette.action.hover,
@@ -56,9 +57,9 @@ const Wrapper = styled.div`
 
 const MainTitleContainer = styled.div`
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 20px 7px;
+    justify-content: space-between;
+    padding: 20px 10px;
 
     @media (min-width: ${props => props.theme.breakpoints.values['md']}px) {
         padding: 20px 0px;
@@ -72,24 +73,6 @@ const Title = styled.h3`
     align-items: center;
     text-align: center;
     justify-content: center;
-`
-
-const DeleteAllButton = styled.div`
-    font-size: 14px;
-    font-weight: 400;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    color: #424242;
-    cursor: pointer;
-    transition: all 0.5s ease;
-
-    &:hover {
-        transform: scale(1.05);
-        color: #e66161;
-    }
 `
 
 const InputContainer = styled.div`
@@ -188,103 +171,10 @@ const Discount = styled.p`
     text-decoration: line-through;
 `
 
-const Payout = styled.div`
-    border: 0.5px solid lightgray;
-    padding: 20px;
-    margin-bottom: 20px;
-`
-
-const PayoutTitle = styled.h5`
-    margin: 0;
-`
-
-const CouponContainer = styled.div`
-    width: 70%;
-    margin-left: 10px;
-    border: 0.5px solid lightgray;
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-`
-
-const Input = styled.input`
-    border: none;
-    background: transparent;
-    color: black;
-    resize: none;
-    outline: none;
-    display: flex;
-`
-
-const PayoutRow = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: lightgray;
-    margin-top: 10px;
-    padding: 0px 10px;
-`
-
-const CouponRow = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: lightgray;
-    margin-top: 10px;
-    padding: 0px 10px;
-`
-
-const PayoutText = styled.p`
-    font-size: 14px;
-    font-weight: 500;
-    margin: 8px 0;
-`
-
-const PayoutPrice = styled.p`
-    font-size: 16px;
-    font-weight: bold;
-    color: red;
-`
-
-const PayButton = styled.button`
-    background-color: ${props => props.theme.palette.secondary.main};
-    padding: 15px 20px;
-    margin-top: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    width: 100%;
-    font-weight: 500;
-    border-radius: 0;
-    border: none;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    transition: all 0.5s ease;
-
-    &:hover {
-        background-color: lightgray;
-        color: black;
-    }
-
-    &:disabled {
-        background-color: gray;
-        color: darkslategray;
-    }
-
-    &:focus {
-        outline: none;
-        border: none;
-    }
-`
-
 const hoverIcon = {
-    "&:hover": {
-        transform: 'scale(1.05)',
-        color: '#e66161',
-    },
+    position: 'absolute',
+    right: 1,
+    top: 2,
 };
 //#endregion
 
@@ -292,11 +182,25 @@ const Cart = () => {
     //#region construct
     const { cartProducts, removeProduct, decreaseAmount, increaseAmount, changeAmount } = useCart();
     const [selected, setSelected] = useState([]);
+    const [contextProduct, setContextProduct] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
 
     useEffect(() => {
         document.title = `Giỏ hàng`;
         window.scrollTo(0, 0);
     }, [])
+
+    //Open context menu
+    const handleClick = (event, product) => {
+        setAnchorEl(event.currentTarget);
+        setContextProduct(product);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+        setContextProduct(null);
+    };
 
     //Select all checkboxes
     const handleSelectAllClick = (event) => {
@@ -328,9 +232,19 @@ const Cart = () => {
         setSelected(newSelected);
     };
 
+    const handleDeleteContext = () => {
+        handleDelete(contextProduct?.id);
+        handleClose();
+    }
+
+    const handleFindSimilar = () => {
+        handleClose();
+    }
+
     const handleDelete = (id) => {
         if (isSelected(id)) handleSelect(id);
         removeProduct(id);
+        handleClose();
     }
 
     const handleDecrease = (quantity, id) => {
@@ -358,7 +272,7 @@ const Cart = () => {
 
         return (
             <TableHead sx={{ display: { xs: 'none', sm: 'table-header-group' } }}>
-                <TableRow sx={{ padding: 0 }}>
+                <TableRow sx={{ padding: 0, border: '.5px solid lightgray', backgroundColor: 'secondary.main' }}>
                     <StyledTableCell>
                         <Checkbox
                             color="primary"
@@ -422,7 +336,17 @@ const Cart = () => {
                     <Grid item xs={12} lg={8}>
                         <MainTitleContainer>
                             <Title><ShoppingCartIcon />&nbsp;GIỎ HÀNG ({cartProducts?.length})</Title>
-                            <DeleteAllButton style={{ display: selected.length > 0 ? "flex" : "none" }} onClick={handleDeleteMultiple}>Xoá mục đã chọn&nbsp;<DeleteIcon /></DeleteAllButton>
+                            <CustomButton
+                                variant="outlined"
+                                color="error"
+                                sx={{
+                                    opacity: selected.length > 0 ? 1 : 0,
+                                    visibility: selected.length > 0 ? 'visible' : 'hidden',
+                                    transition: 'all .25s ease'
+                                }}
+                                onClick={handleDeleteMultiple}>
+                                Xoá &nbsp;<DeleteIcon />
+                            </CustomButton>
                         </MainTitleContainer>
                         <TableContainer >
                             <Table aria-label="cart-table">
@@ -437,7 +361,8 @@ const Cart = () => {
                                         const labelId = `enhanced-table-checkbox-${index}`;
 
                                         return (
-                                            <StyledTableRow hover
+                                            <StyledTableRow 
+                                                hover
                                                 role="checkbox"
                                                 aria-checked={isItemSelected}
                                                 tabIndex={-1}
@@ -507,11 +432,11 @@ const Cart = () => {
                                                             <AddIcon style={{ fontSize: 12 }} />
                                                         </AmountButton>
                                                     </Box>
-                                                    <IconButton sx={hoverIcon} onClick={() => handleDelete(product.id)}>
-                                                        <DeleteIcon />
-                                                    </IconButton>
                                                 </StyledTableCell>
                                                 <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}><Price>{(product.price * product.quantity).toLocaleString()}đ</Price></StyledTableCell>
+                                                <IconButton sx={hoverIcon} onClick={(e) => handleClick(e, product)}>
+                                                    <MoreHoriz />
+                                                </IconButton>
                                             </StyledTableRow>
                                         )
                                     })}
@@ -525,6 +450,27 @@ const Cart = () => {
                 </Grid>
             }
             <br /><br />
+            <Menu
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                    'aria-labelledby': 'basic-button',
+                }}
+                anchorEl={anchorEl}
+            >
+                <MenuItem onClick={handleDeleteContext}>
+                    <ListItemIcon >
+                        <DeleteIcon sx={{ color: 'error.main' }} fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText sx={{ color: 'error.main' }}>Xoá khỏi giỏ</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                    <ListItemIcon>
+                        <Search fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Tìm sản phẩm tương tự</ListItemText>
+                </MenuItem>
+            </Menu>
         </Wrapper >
     )
 }

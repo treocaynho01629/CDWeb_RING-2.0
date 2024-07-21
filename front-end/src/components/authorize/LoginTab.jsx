@@ -5,10 +5,12 @@ import { Check as CheckIcon } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { jwtDecode } from 'jwt-decode';
+import { useDispatch } from 'react-redux';
+import { setAuth, setPersist } from '../../features/auth/authSlice';
 import CustomInput from '../custom/CustomInput';
 import CustomButton from '../custom/CustomButton';
-import useAuth from "../../hooks/useAuth";
-import axios from '../../api/axios';
+import axios from '../../app/api/axios';
+import useAuth from '../../hooks/useAuth';
 
 //#region styled
 const Title = styled.h1`
@@ -26,11 +28,11 @@ const Instruction = styled.p`
 //#endregion
 
 const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-const LOGIN_URL = '/api/v1/auth/authenticate';
 const FORGOT_URL = '/api/v1/auth/forgot-password?email=';
 
-const LoginTab = ({ setPending }) => {
-    const { setAuth, persist, setPersist } = useAuth(); //Authorize context
+const LoginTab = ({ setPending, authenticate }) => {
+    const dispatch = useDispatch();
+    const { persist } = useAuth();
 
     //Router
     const navigate = useNavigate();
@@ -48,17 +50,12 @@ const LoginTab = ({ setPending }) => {
 
     //Error
     const [err, setErr] = useState([]);
-    const [errMsgLogin, setErrMsgLogin] = useState('');
+    const [errMsgLogin, setErrMsgLogin] = useState(location.state?.errorMsg ?? '');
     const [errMsgReset, setErrMsgReset] = useState('');
 
     //Other
     const [open, setOpen] = useState(false);
     const [cookies, setCookie] = useCookies(['refreshToken']);
-
-    //Update persist
-    useEffect(() => {
-        localStorage.setItem("persist", persist);
-    }, [persist])
 
     //Error message reset when reinput stuff
     useEffect(() => {
@@ -72,7 +69,7 @@ const LoginTab = ({ setPending }) => {
     }, [email])
 
     //Toggle persist
-    const togglePersist = () => { setPersist(prev => !prev) }
+    const togglePersist = () => { dispatch(setPersist({ persist: !persist }))}
 
     //Forgot pass dialog open state 
     const handleOpen = () => setOpen(true);
@@ -89,28 +86,16 @@ const LoginTab = ({ setPending }) => {
         const { enqueueSnackbar } = await import('notistack');
 
         try {
-            const response = await axios.post(LOGIN_URL,
-                JSON.stringify({ userName: username, pass: password }),
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
-                }
-            );
+            const { token, refreshToken } = await authenticate({ userName: username, pass: password }).unwrap();
 
-            //Store token with user info
-            const accessToken = response?.data?.token;
-            const refreshToken = response?.data?.refreshToken;
-            const roles = response?.data?.roles;
-            const authorize = { userName: username, roles, accessToken };
+            //Store access token to auth
+            dispatch(setAuth({ token }));
 
-            //Set auth
-            setAuth(authorize);
-
-            if (persist) {
-                //Set refresh token on cookie
+            if (persist) { //Set refresh token on cookie
                 const refreshTokenData = jwtDecode(refreshToken);
                 const expires = new Date(0);
                 expires.setUTCSeconds(refreshTokenData.exp);
+                console.log(refreshToken);
                 setCookie('refreshToken', refreshToken, { path: '/', expires });
             }
 
@@ -118,12 +103,12 @@ const LoginTab = ({ setPending }) => {
             //Redirect to previous page
             navigate(from, { replace: true });
         } catch (err) {
-            console.log(err);
-            if (!err?.response) {
+            console.error(err);
+            if (!err?.status) {
                 setErrMsgLogin('Server không phản hồi');
-            } else if (err.response?.status === 404) {
+            } else if (err?.status === 404) {
                 setErrMsgLogin('Sai tên tài khoản hoặc mật khẩu!');
-            } else if (err.response?.status === 400) {
+            } else if (err?.status === 400) {
                 setErrMsgLogin('Sai định dạng thông tin!');
             } else {
                 setErrMsgLogin('Đăng nhập thất bại');

@@ -1,29 +1,23 @@
-import axios from "../api/axios";
-import useAuth from "./useAuth";
-import { useCookies  } from 'react-cookie';
+import { useDispatch } from "react-redux";
+import { useCookies } from 'react-cookie';
+import { logOut } from "../features/auth/authSlice";
+import { apiSlice } from "../app/api/apiSlice";
+import { useSignoutMutation } from "../features/auth/authApiSlice";
 
 const useLogout = () => {
-    const { auth, setAuth } = useAuth();
-    const [ cookies, removeCookie ] = useCookies(['refreshToken'])
+    const dispatch = useDispatch();
+    const [signout] = useSignoutMutation();
+    const [cookies, removeCookie] = useCookies(['refreshToken'])
 
     const logout = async () => {
         try {
-            const response = await axios.get('/api/v1/auth/logout',
-                {
-                    headers: { 'Content-Type': 'application/json' ,
-                            'Authorization': 'Bearer ' + auth?.accessToken},
-                    withCredentials: true
-                }
-            );
+            await signout().unwrap();
+            removeCookie('refreshToken', { path: '/' }); //Remove cookies
+            dispatch(logOut()); //Reset auth state
+            dispatch(apiSlice.util.resetApiState()); //Reset redux
         } catch (err) {
             console.error(err);
         }
-
-        //Xoá auth, xoá cookie
-        setAuth({});
-        removeCookie('refreshToken', { path: '/'});
-        localStorage.removeItem("auth");
-        localStorage.removeItem("persist");
     }
 
     return logout;

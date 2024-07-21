@@ -254,7 +254,7 @@ EnhancedTableToolbar.propTypes = {
 export default function TableBooks(props) {
   //#region construct
   const { setBookCount, sellerName ,mini } = props;
-  const { auth } = useAuth();
+  const { roles } = useAuth();
   const [id, setId] = useState([]);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('id');
@@ -262,7 +262,7 @@ export default function TableBooks(props) {
   const [selectedAll, setSelectedAll] = useState(false);
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(true);
-  const [seller, setSeller] = useState(!(auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
+  const [seller, setSeller] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
   const [openEdit, setOpenEdit] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(mini ? 5 : 10);
   const { loading, data: rows , refetch} = useFetch(BOOKS_URL 
@@ -552,7 +552,7 @@ export default function TableBooks(props) {
             checked={dense} onChange={handleChangeDense} />}
             label="Thu gọn"
           />
-          {auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName)) && !sellerName
+          {roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName)) && !sellerName
             ? <FormControlLabel
               control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
                 color: '#63e399',

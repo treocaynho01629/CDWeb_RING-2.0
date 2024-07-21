@@ -77,8 +77,8 @@ const DashboardDrawer = (props) => {
     const [openList, setOpenList] = useState(true);
     const theme = useTheme();
     const navigate = useNavigate();
-    const { auth } = useAuth();
-    const [admin, setAdmin] = useState((auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
+    const { roles } = useAuth();
+    const [admin, setAdmin] = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
 
     const handleClick = (id) => {
       setOpenList((prevState) => ({ ...prevState, [id]: !prevState[id] }));

@@ -1,8 +1,8 @@
 import { DeliveryDining as DeliveryDiningIcon, Logout, Speed as SpeedIcon } from '@mui/icons-material';
 import { Avatar, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
 
-const ProfilePopover = ({ open, anchorEl, handleClose, navigate, auth, signOut }) => {
-    const role = auth?.roles?.length;
+const ProfilePopover = ({ open, anchorEl, handleClose, navigate, roles, signOut }) => {
+    const role = roles?.length;
 
     return (
         <Menu

@@ -30,39 +30,11 @@ const PayoutTitle = styled.h5`
     margin: 0;
 `
 
-const CouponContainer = styled.div`
-    width: 70%;
-    margin-left: 10px;
-    border: 0.5px solid lightgray;
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-`
-
-const Input = styled.input`
-    border: none;
-    background: transparent;
-    color: black;
-    resize: none;
-    outline: none;
-    display: flex;
-`
-
 const PayoutRow = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: lightgray;
-    margin-top: 10px;
-    padding: 0px 10px;
-`
-
-const CouponRow = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: lightgray;
+    background-color: ${props => props.theme.palette.action.focus};
     margin-top: 10px;
     padding: 0px 10px;
 `
@@ -71,12 +43,28 @@ const PayoutText = styled.p`
     font-size: 14px;
     font-weight: 500;
     margin: 8px 0;
+    display: flex;
+    align-items: center;
 `
 
 const PayoutPrice = styled.p`
     font-size: 16px;
     font-weight: bold;
     color: red;
+`
+
+const CouponButton = styled.p`
+    font-size: 14px;
+    font-weight: 500;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    color: ${props => props.theme.palette.info.dark};
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
 `
 
 const PayButton = styled.button`
@@ -114,7 +102,7 @@ const PayButton = styled.button`
 //#endregion
 
 const CheckoutDialog = ({ cartProducts, selected }) => {
-    const { auth } = useAuth();
+    const { token } = useAuth();
     const [selectedProducts, setSelectedProducts] = useState([]);
 
     useEffect(() => {
@@ -135,13 +123,12 @@ const CheckoutDialog = ({ cartProducts, selected }) => {
             </SecondaryTitleContainer>
             <Payout>
                 <PayoutTitle>KHUYẾN MÃI</PayoutTitle>
-                <CouponRow>
-                    <PayoutText>Nhập mã:</PayoutText>
-                    <CouponContainer>
-                        <Input />
-                        <SellIcon style={{ color: "gray" }} />
-                    </CouponContainer>
-                </CouponRow>
+                <PayoutRow>
+                    <PayoutText>Voucher RING:</PayoutText>
+                    <CouponButton>Chọn hoặc nhập mã&nbsp;
+                        <SellIcon />
+                    </CouponButton>
+                </PayoutRow>
             </Payout>
             <Payout>
                 <PayoutTitle>THANH TOÁN</PayoutTitle>
@@ -163,7 +150,7 @@ const CheckoutDialog = ({ cartProducts, selected }) => {
                 </PayoutRow>
                 <PayButton disabled={cartProducts?.length == 0}
                     onClick={() => navigate('/checkout')}>
-                    <PaymentsIcon style={{ fontSize: 18 }} />&nbsp;{auth.userName ? 'THANH TOÁN' : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
+                    <PaymentsIcon style={{ fontSize: 18 }} />&nbsp;{token ? 'THANH TOÁN' : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
                 </PayButton>
             </Payout>
         </div>

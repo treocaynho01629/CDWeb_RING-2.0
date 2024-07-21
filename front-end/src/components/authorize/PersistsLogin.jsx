@@ -1,15 +1,17 @@
-import { lazy, Suspense } from "react";
-import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
-import useRefreshToken from '../../hooks/useRefreshToken';
+import { Navigate, Outlet } from "react-router-dom";
+import { useRefreshMutation } from "../../features/auth/authApiSlice";
 import useAuth from '../../hooks/useAuth';
-
-const PendingIndicator = lazy(() => import('../../components/authorize/PendingIndicator'));
+import PendingIndicator from "../../components/authorize/PendingIndicator";
 
 const PersistLogin = () => {
-    const refresh = useRefreshToken();
-    const { auth, persist } = useAuth();
+    const { token, persist } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
+    const [refresh, {
+        isLoading: refreshing,
+        isSuccess,
+        isError,
+    }] = useRefreshMutation();
 
     useEffect(() => {
         let isMounted = true;
@@ -26,20 +28,25 @@ const PersistLogin = () => {
             }
         }
 
-        !auth?.accessToken && persist ? verifyRefreshToken() : setIsLoading(false);
+        (!token && persist) ? verifyRefreshToken() : setIsLoading(false);
 
         return () => isMounted = false;
     }, [])
 
+    const pending = [persist, isLoading].every(Boolean);
+
     return (
         <>
-            {(persist && isLoading)
-                    &&
-                    <Suspense fallBack={<></>}>
-                        <PendingIndicator open={isLoading} message="Đang xác thực đăng nhập ..."/>
-                    </Suspense>
+            {!persist
+                ? <Outlet />
+                : isLoading
+                    ?
+                    <PendingIndicator open={pending} message="Đang xác thực đăng nhập ..." />
+                    : isSuccess
+                        ? <Outlet />
+                        : isError
+                        && <Navigate to="/login" state={{ from: location, errorMsg: 'Đã xảy ra lỗi xác thực, vui lòng đăng nhập lại!' }} replace /> //To login page if error
             }
-            <Outlet />
         </>
     )
 }

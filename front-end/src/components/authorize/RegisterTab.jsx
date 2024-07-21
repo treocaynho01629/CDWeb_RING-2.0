@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useState, useRef, useEffect } from 'react';
 import { Stack } from '@mui/material';
-import axios from "../../api/axios";
+import axios from "../../app/api/axios";
 import CustomInput from '../custom/CustomInput';
 import CustomButton from '../custom/CustomButton';
 

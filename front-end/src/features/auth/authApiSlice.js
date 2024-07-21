@@ -1,5 +1,5 @@
 import { apiSlice } from "../../app/api/apiSlice";
-import { logOut, setAuth } from "./authSlice";
+import { setAuth } from "./authSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -18,10 +18,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
                 try { //Set new auth token after refresh
                     const { data } = await queryFulfilled
-                    const { accessToken } = data
-                    dispatch(setAuth({ accessToken }))
+                    const { token } = data
+                    dispatch(setAuth({ token }))
                 } catch (err) {
-                    console.log(err)
+                    console.error(err)
                 }
             }
         }),
@@ -42,23 +42,12 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 url: '/api/v1/auth/logout',
                 method: 'DELETE',
             }),
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-                try {
-                    await queryFulfilled
-                    dispatch(logOut()); //Logout redux state
-                    setTimeout(() => {
-                        dispatch(apiSlice.util.resetApiState()) //Unmount api state
-                    }, 1000);
-                } catch (err) {
-                    console.log(err)
-                }
-            }
         }),
     })
 })
 
 export const {
-    useLoginMutation,
+    useAuthenticateMutation,
     useSignoutMutation,
     useRegisterMutation,
     useRefreshMutation,

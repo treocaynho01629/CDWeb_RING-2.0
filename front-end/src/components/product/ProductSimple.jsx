@@ -1,10 +1,10 @@
 import styled from 'styled-components'
 import { Link } from "react-router-dom"
-import { useDispatch } from 'react-redux';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Skeleton } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import CustomButton from '../custom/CustomButton';
+import useCart from '../../hooks/useCart';
 
 //#region styled
 const Container = styled.div`
@@ -60,20 +60,16 @@ const Price = styled.span`
 //#endregion
 
 const ProductSimple = ({ book }) => {
-    const dispatch = useDispatch();
+    const { addProduct } = useCart();
 
-    const handleAddToCart = async (book) => {
-        const { addToCart } = await import('../../redux/cartReducer');
-        const { enqueueSnackbar } = await import('notistack');
-
-        enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });
-        dispatch(addToCart({
+    const handleAddToCart = (book) => {
+        addProduct({
             id: book.id,
             title: book.title,
             price: book.price,
             image: book.image,
             quantity: 1,
-        }))
+        })
     };
 
     if (book) {
@@ -82,7 +78,7 @@ const ProductSimple = ({ book }) => {
                 <Link to={`/product/${book?.id}`} style={{ color: 'inherit' }}>
                     <LazyLoadImage src={book?.image}
                         width={'90%'}
-                        height={250} 
+                        height={250}
                         style={{
                             aspectRatio: '1/1.2',
                             zIndex: -3,

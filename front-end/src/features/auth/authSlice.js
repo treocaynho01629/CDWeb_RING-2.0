@@ -5,8 +5,8 @@ const authSlice = createSlice({
     initialState: { token: null, persist: JSON.parse(localStorage.getItem("persist")) || false },
     reducers: {
         setAuth: (state, action) => {
-            const { accessToken } = action.payload;
-            state.token = accessToken;
+            const { token } = action.payload;
+            state.token = token;
         },
         setPersist: (state, action) => {
             const { persist } = action.payload;

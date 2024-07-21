@@ -6,9 +6,9 @@ import {
     ShoppingCart as ShoppingCartIcon, Sell as SellIcon, Storefront as StorefrontIcon, Check as CheckIcon
 } from '@mui/icons-material';
 import { Skeleton, Rating, Box, Divider, Grid, Avatar, Container } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ProductImages from './ProductImages';
+import useCart from '../../hooks/useCart';
 
 //#region styled
 const StuffContainer = styled.div`
@@ -361,7 +361,7 @@ const BuyButton = styled.button`
 
 const ProductContent = ({ book }) => {
     const [amountIndex, setAmountIndex] = useState(1); //Amount add to cart
-    const dispatch = useDispatch();
+    const { addProduct } = useCart();
 
     //Calculate rating
     const avgRate = () => {
@@ -389,19 +389,14 @@ const ProductContent = ({ book }) => {
     };
 
     //Add to cart
-    const handleAddToCart = async (book) => {
-        const { addToCart } = await import('../../redux/cartReducer');
-        const { enqueueSnackbar } = await import('notistack');
-
-        //Queue snackbar
-        enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });
-        dispatch(addToCart({
+    const handleAddToCart = (book) => {
+        addProduct({
             id: book.id,
             title: book.title,
             price: book.price,
             image: book.image,
-            quantity: amountIndex,
-        }))
+            quantity: 1,
+        })
     };
 
     return (

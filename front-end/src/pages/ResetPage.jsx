@@ -3,7 +3,7 @@ import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { Stack } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
-import axios from "../api/axios";
+import axios from "../app/api/axios";
 import CustomInput from '../components/custom/CustomInput';
 import CustomButton from '../components/custom/CustomButton';
 

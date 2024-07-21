@@ -1,14 +1,11 @@
-import { useMemo, useState } from 'react'
-
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system'
-
+import { useMemo, useState } from 'react'
 import { KeyboardArrowRight, KeyboardArrowLeft, Star as StarIcon, StarBorder as StarBorderIcon, ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
 import { Divider, Rating, Box, Tooltip, Skeleton } from '@mui/material'
-
 import { Link, useNavigate } from "react-router-dom"
-import { useDispatch } from 'react-redux';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import useCart from '../../hooks/useCart';
 
 //#region styled
 const MoreInfo = styled.div`
@@ -193,7 +190,7 @@ const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY
 
 const Product = ({ book }) => {
     const [slideIndex, setSlideIndex] = useState(1);
-    const dispatch = useDispatch();
+    const { addProduct } = useCart();
     const navigate = useNavigate();
 
     const avgRate = () => {
@@ -217,18 +214,14 @@ const Product = ({ book }) => {
         }
     }
 
-    const handleAddToCart = async (book) => {
-        const { addToCart } = await import('../../redux/cartReducer');
-        const { enqueueSnackbar } = await import('notistack');
-
-        enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });
-        dispatch(addToCart({
+    const handleAddToCart = (book) => {
+        addProduct({
             id: book.id,
             title: book.title,
             price: book.price,
             image: book.image,
             quantity: 1,
-        }))
+        })
     };
 
     if (book) {

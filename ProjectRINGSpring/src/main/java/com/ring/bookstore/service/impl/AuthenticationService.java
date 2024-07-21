@@ -1,5 +1,6 @@
 package com.ring.bookstore.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.exc.StreamWriteException;
 import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
@@ -89,7 +89,10 @@ public class AuthenticationService {
 			emailService.sendHtmlMessage(request.getEmail(), subject, content); //Send
 			
 			//Return authentication response
-			return AuthenticationResponse.builder().token(jwtToken).refreshToken(refreshToken).roles(roles).build();
+			return AuthenticationResponse.builder()
+					.token(jwtToken)
+					.refreshToken(refreshToken)
+					.build();
 		}
 	}
 
@@ -98,8 +101,6 @@ public class AuthenticationService {
 		//Check if user with this username exists
 		var user = accountRepo.findByUserName(request.getUserName())
 				.orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
-
-		Set<Role> roles = user.getRoles();
 
 		//Validate token
 		try {
@@ -116,7 +117,11 @@ public class AuthenticationService {
 		var refreshToken = jwtService.generateRefreshToken(user);
 
 		//Return authentication response
-		return AuthenticationResponse.builder().token(jwtToken).refreshToken(refreshToken).roles(roles).build();
+		return AuthenticationResponse
+				.builder()
+				.token(jwtToken)
+				.refreshToken(refreshToken)
+				.build();
 	}
 
 	//Refresh JWT
@@ -130,20 +135,20 @@ public class AuthenticationService {
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) { return; } //Not valid Bearer header
 
 		refreshToken = authHeader.substring(7); //After "Bearer "
-		userName = jwtService.extractUsername(refreshToken); //Get username from token
+		userName = jwtService.extractRefreshUsername(refreshToken); //Get username from token
 
 		if (userName != null) { //Check if this username exists
 			var user = this.accountRepo.findByUserName(userName)
 					.orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
 
-			Set<Role> roles = user.getRoles();
-			
-			if (jwtService.isTokenValid(refreshToken, user)) { //Validate token
+			if (jwtService.isRefreshTokenValid(refreshToken, user)) { //Validate token
 				var jwtToken = jwtService.generateToken(user);
 
 				//Generate and return new authentication response
-				var authResponse = AuthenticationResponse.builder().token(jwtToken).refreshToken(refreshToken)
-						.roles(roles).build();
+				var authResponse = AuthenticationResponse.builder()
+						.token(jwtToken)
+						.refreshToken(refreshToken) //Return the same refresh token
+						.build();
 				new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
 			}
 		}

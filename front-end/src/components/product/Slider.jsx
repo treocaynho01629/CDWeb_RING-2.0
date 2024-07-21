@@ -1,12 +1,12 @@
 import styled from "styled-components"
 import { Grid, Skeleton } from '@mui/material';
 import { Link } from "react-router-dom"
-import { useDispatch } from "react-redux"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useGetRandomBooksQuery } from "../../features/books/booksApiSlice";
 import Carousel from "react-multi-carousel";
 import CustomButton from "../custom/CustomButton";
+import useCart from "../../hooks/useCart";
 
 //#region styled
 const ImgContainer = styled.div`
@@ -135,20 +135,16 @@ const CustomRightArrow = ({ onClick }) => (
 );
 
 function Item({ book }) {
-    const dispatch = useDispatch();
+    const { addProduct } = useCart();
 
-    const handleAddToCart = async (book) => {
-        const { addToCart } = await import('../../redux/cartReducer');
-        const { enqueueSnackbar } = await import('notistack');
-
-        enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });
-        dispatch(addToCart({
+    const handleAddToCart = (book) => {
+        addProduct({
             id: book.id,
             title: book.title,
             price: book.price,
             image: book.image,
             quantity: 1,
-        }))
+        })
     };
 
     return (

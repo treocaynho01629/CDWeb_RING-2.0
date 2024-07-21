@@ -2,7 +2,6 @@ import './index.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import { AuthProvider } from './context/AuthProvider';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from "redux-persist/integration/react";
@@ -69,26 +68,24 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <ThemeProvider theme={theme}>
               <CssBaseline enableColorScheme />
               <ScThemeProvider theme={theme}>
-                <AuthProvider>
-                  <SnackbarProvider
-                    autoHideDuration={1500}
-                    action={(snackbarId) => (
-                      <IconButton
-                        aria-label="dismiss snack"
-                        onClick={() => closeSnackbar(snackbarId)}
-                      >
-                        <Close />
-                      </IconButton>
-                    )}
-                    Components={{
-                      success: StyledMaterialDesignContent,
-                      error: StyledMaterialDesignContent,
-                    }}>
-                    <Routes>
-                      <Route path="/*" element={<App />} />
-                    </Routes>
-                  </SnackbarProvider>
-                </AuthProvider>
+                <SnackbarProvider
+                  autoHideDuration={1500}
+                  action={(snackbarId) => (
+                    <IconButton
+                      aria-label="dismiss snack"
+                      onClick={() => closeSnackbar(snackbarId)}
+                    >
+                      <Close />
+                    </IconButton>
+                  )}
+                  Components={{
+                    success: StyledMaterialDesignContent,
+                    error: StyledMaterialDesignContent,
+                  }}>
+                  <Routes>
+                    <Route path="/*" element={<App />} />
+                  </Routes>
+                </SnackbarProvider>
               </ScThemeProvider>
             </ThemeProvider>
           </StyledEngineProvider>

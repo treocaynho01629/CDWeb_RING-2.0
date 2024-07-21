@@ -29,8 +29,8 @@ const DrawerLogo = styled.h2`
 `
 //#endregion
 
-const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, auth, products, navigate, signOut, ImageLogo, Button }) => {
-    const role = auth?.roles?.length;
+const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, signOut, ImageLogo, Button }) => {
+    const role = roles?.length;
     
     return (
         <SwipeableDrawer
@@ -96,7 +96,7 @@ const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, auth, products, navigate
                     </ListItem>
                 </List>
                 <Divider />
-                {auth?.userName
+                {username
                     ?
                     <Grid>
                         <List sx={{ marginLeft: '15px' }}>
@@ -108,7 +108,7 @@ const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, auth, products, navigate
                                     <ListItemIcon>
                                         <Avatar />
                                     </ListItemIcon>
-                                    <ListItemText primary={auth?.userName} />
+                                    <ListItemText primary={username} />
                                 </ListItemButton>
                             </ListItem>
 

@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import CustomProgress from '../custom/CustomProgress';
 
 export const Loader = () => {
@@ -10,9 +10,9 @@ export const Loader = () => {
 };
 
 const Loadable = (Component) => (props) => (
-  <Suspense fallback={<Loader />}>
+  // <Suspense fallback={<Loader />}>
     <Component {...props} />
-  </Suspense>
+  // </Suspense>
 );
 
 export default Loadable;

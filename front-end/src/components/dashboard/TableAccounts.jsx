@@ -245,7 +245,7 @@ const ACCOUNTS_URL = 'api/accounts';
 export default function TableAccounts(props) {
   //#region construct
   const { setAccCount, mini } = props;
-  const { auth } = useAuth();
+  const { roles } = useAuth();
   const [id, setId] = useState([]);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('id');
@@ -256,7 +256,7 @@ export default function TableAccounts(props) {
   const [openEdit, setOpenEdit] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(mini ? 5 : 10);
   const [filter, setFilter] = useState(false);
-  const [seller, setSeller] = useState(!(auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
+  const [seller, setSeller] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
   const { loading, data: rows , refetch} = usePrivateFetch(ACCOUNTS_URL + (filter ? "/employees" : "") 
     + "?pageNo=" + page
     + "&pSize=" + rowsPerPage
@@ -528,7 +528,7 @@ export default function TableAccounts(props) {
             checked={dense} onChange={handleChangeDense} />}
             label="Thu gọn"
           />
-          {auth?.roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))
+          {roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))
             ? <FormControlLabel
               control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
                 color: '#63e399',

@@ -305,7 +305,7 @@ const Navbar = (props) => {
     const [searchField, setSearchField] = useState('');
 
     //Other
-    const { auth } = useAuth();
+    const { username, roles } = useAuth();
     const navigate = useNavigate();
     const logout = useLogout();
 
@@ -395,7 +395,7 @@ const Navbar = (props) => {
                                 <Left>
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <Button onClick={toggleDrawer(true)}><MenuIcon sx={{ fontSize: 26 }} /></Button>
-                                        <NavDrawer {...{ openDrawer, setOpen, toggleDrawer, auth, products, navigate, signOut, ImageLogo, Button }} />
+                                        <NavDrawer {...{ openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, signOut, ImageLogo, Button }} />
                                     </Box>
                                     <Link to={`/`}>
                                         <Logo className={searchField || hover || focus ? 'active' : ''}>
@@ -479,7 +479,7 @@ const Navbar = (props) => {
                                                 </Link>
                                                 <MiniCart {...{ openCart, anchorElCart, handlePopoverClose, products }} />
                                             </div>
-                                            {auth.userName ? (
+                                            {username ? (
                                                 <Tooltip title="Tài khoản">
                                                     <StyledIconButton
                                                         onClick={handleClick}
@@ -489,8 +489,8 @@ const Navbar = (props) => {
                                                         aria-haspopup="true"
                                                         aria-expanded={open ? 'true' : undefined}
                                                     >
-                                                        <Avatar sx={{ width: 32, height: 32 }}>{auth?.userName?.charAt(0) ?? 'P'}</Avatar>
-                                                        <p style={{ fontSize: '13px', marginLeft: '5px' }}>{auth?.userName}</p>
+                                                        <Avatar sx={{ width: 32, height: 32 }}>{username?.charAt(0) ?? 'P'}</Avatar>
+                                                        <p style={{ fontSize: '13px', marginLeft: '5px' }}>{username}</p>
                                                     </StyledIconButton>
                                                 </Tooltip>
                                             ) : (
@@ -502,7 +502,7 @@ const Navbar = (props) => {
                                                 </Link>
                                             )}
                                         </Stack>
-                                        <ProfilePopover {...{ open, anchorEl, handleClose, navigate, auth, signOut }} />
+                                        <ProfilePopover {...{ open, anchorEl, handleClose, navigate, roles, signOut }} />
                                     </NavItem>
                                 </Right>
                             </Grid>

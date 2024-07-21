@@ -52,12 +52,12 @@ const RatingInfo = styled.p`
 `
 //#endregion
 
-const Review = ({ review, user }) => {
+const Review = ({ review, username }) => {
     const date = new Date(review?.date);
 
     return (
         <div>
-            <Profiler style={{ borderBottom: '1px solid', borderColor: user?.userName === review?.userName ? '#63e399' : 'white' }}>
+            <Profiler style={{ borderBottom: '1px solid', borderColor: username === review?.userName ? '#63e399' : 'white' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <RatingInfo><Avatar sx={{ width: '20px', height: '20px', marginRight: '5px' }}>{review?.userName?.charAt(0) ?? 'A'}</Avatar>{review?.userName}</RatingInfo>
                     <Box display={{ xs: 'none', sm: 'flex' }}>
@@ -96,7 +96,7 @@ const ReviewTab = (props) => {
     });
 
     //Other
-    const { auth } = useAuth();
+    const { username } = useAuth();
     const axiosPrivate = useAxiosPrivate();
 
     //Fetch reviews
@@ -192,7 +192,7 @@ const ReviewTab = (props) => {
 
                     return (
                         <Grid key={`${id}-${index}`}>
-                            <Review review={review} user={auth} />
+                            <Review {...{ username, review }} />
                         </Grid>
                     )
                 })
@@ -212,7 +212,7 @@ const ReviewTab = (props) => {
         <>
             {reviewsContent}
             <Box>
-                {auth?.userName ? (err?.response?.data?.code === 208 ?
+                {username ? (err?.response?.data?.code === 208 ?
                     <Box>
                         <Box><strong style={{ fontSize: '16px' }}>{errMsg}</strong></Box>
                         <br />
