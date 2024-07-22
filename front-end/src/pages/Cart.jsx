@@ -3,8 +3,9 @@ import { styled as muiStyled } from '@mui/material/styles';
 import { useState, useEffect } from "react";
 import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search } from '@mui/icons-material';
 import { Checkbox, Grid, IconButton, Breadcrumbs, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { booksApiSlice } from '../features/books/booksApiSlice';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import PropTypes from 'prop-types';
 import useCart from '../hooks/useCart';
@@ -185,6 +186,10 @@ const Cart = () => {
     const [contextProduct, setContextProduct] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
+    const navigate = useNavigate();
+
+    //Get similar
+    const [getBook] = booksApiSlice.useLazyGetBookQuery();
 
     useEffect(() => {
         document.title = `Giỏ hàng`;
@@ -237,7 +242,11 @@ const Cart = () => {
         handleClose();
     }
 
-    const handleFindSimilar = () => {
+    const handleFindSimilar = async () => {
+        getBook({ id: contextProduct?.id })
+            .unwrap()
+            .then((book) => navigate(`/filters?cateId=${book?.cateId}&pubId=${book?.publisher?.id}&type=${book?.type}`))
+            .catch((rejected) => console.error(rejected));
         handleClose();
     }
 
@@ -342,7 +351,7 @@ const Cart = () => {
                                 sx={{
                                     opacity: selected.length > 0 ? 1 : 0,
                                     visibility: selected.length > 0 ? 'visible' : 'hidden',
-                                    transition: 'all .25s ease'
+                                    transition: 'all .25s ease',
                                 }}
                                 onClick={handleDeleteMultiple}>
                                 Xoá &nbsp;<DeleteIcon />
@@ -361,7 +370,7 @@ const Cart = () => {
                                         const labelId = `enhanced-table-checkbox-${index}`;
 
                                         return (
-                                            <StyledTableRow 
+                                            <StyledTableRow
                                                 hover
                                                 role="checkbox"
                                                 aria-checked={isItemSelected}
@@ -444,8 +453,9 @@ const Cart = () => {
                             </Table>
                         </TableContainer>
                     </Grid>
-                    <Grid item xs={12} md={8} lg={4} display={{ xs: 'none', sm: 'block' }}>
-                        <CheckoutDialog {...{ cartProducts, selected }} />
+                    <Grid item xs={12} md={8} lg={4}>
+                        <CheckoutDialog {...{ cartProducts, selected, navigate, handleSelectAllClick, 
+                            numSelected: selected.length, rowCount: cartProducts?.length }} />
                     </Grid>
                 </Grid>
             }
@@ -464,7 +474,7 @@ const Cart = () => {
                     </ListItemIcon>
                     <ListItemText sx={{ color: 'error.main' }}>Xoá khỏi giỏ</ListItemText>
                 </MenuItem>
-                <MenuItem onClick={handleClose}>
+                <MenuItem onClick={handleFindSimilar}>
                     <ListItemIcon>
                         <Search fontSize="small" />
                     </ListItemIcon>

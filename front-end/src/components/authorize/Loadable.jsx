@@ -10,9 +10,9 @@ export const Loader = () => {
 };
 
 const Loadable = (Component) => (props) => (
-  // <Suspense fallback={<Loader />}>
+  <Suspense fallback={<Loader />}>
     <Component {...props} />
-  // </Suspense>
+  </Suspense>
 );
 
 export default Loadable;

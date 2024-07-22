@@ -1,7 +1,7 @@
 import { DeliveryDining as DeliveryDiningIcon, Logout, Speed as SpeedIcon } from '@mui/icons-material';
 import { Avatar, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
 
-const ProfilePopover = ({ open, anchorEl, handleClose, navigate, roles, signOut }) => {
+const ProfilePopover = ({ open, anchorEl, handleClose, navigate, roles, logout }) => {
     const role = roles?.length;
 
     return (
@@ -65,7 +65,7 @@ const ProfilePopover = ({ open, anchorEl, handleClose, navigate, roles, signOut 
                     Dashboard
                 </MenuItem>
             )}
-            <MenuItem onClick={signOut}>
+            <MenuItem onClick={() => logout()}>
                 <ListItemIcon>
                     <Logout fontSize="small" />
                 </ListItemIcon>

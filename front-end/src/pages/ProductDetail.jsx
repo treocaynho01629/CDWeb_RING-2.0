@@ -14,10 +14,10 @@ const Wrapper = styled.div`
 
 const BreadcrumbsContainer = styled.div`
     margin: 20px 10px;
-    display: none;
+    display: block;
 
-    @media (min-width: 600px) {
-        display: block;
+    ${props => props.theme.breakpoints.down("sm")} {
+        display: none;
     }
 `
 //#endregion
@@ -37,13 +37,17 @@ const ProductDetail = () => {
         handleTabChange("1");
 
         if (!isLoading) {
-            document.title = `RING! - ${data?.title}`;
+            document.title = `${data?.title ?? 'RING - Bookstore!'}`;
         }
     }, []);
 
     //Change detail tab
     const handleTabChange = (tab) => {
         setTab(tab);
+    }
+
+    const scrollIntoTab = () => {
+        ref?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     let product;
@@ -53,7 +57,7 @@ const ProductDetail = () => {
     } else if (isLoading || isError) {
         product = <ProductContent />
     } else if (isSuccess) {
-        product = <ProductContent book={data} />
+        product = <ProductContent {...{ book: data, scrollIntoTab, handleTabChange }} />
     }
 
     return (
@@ -78,7 +82,7 @@ const ProductDetail = () => {
                     </Breadcrumbs>
                     :
                     <Breadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
-                        <NavLink to={`/`} sx={{ backgroundColor: '#63e399', padding: '5px 15px', color: 'white' }}>
+                        <NavLink to={`/`} sx={{ backgroundColor: 'secondary.main', padding: '5px 15px', color: 'white' }}>
                             Trang chủ
                         </NavLink>
                         <Skeleton variant="text" sx={{ fontSize: '16px' }} width={300} />
@@ -86,7 +90,7 @@ const ProductDetail = () => {
                 }
             </BreadcrumbsContainer>
             {product}
-            <div ref={ref} >
+            <div ref={ref}>
                 <ProductDetailContainer loading={isLoading}
                     book={data}
                     tab={tab}

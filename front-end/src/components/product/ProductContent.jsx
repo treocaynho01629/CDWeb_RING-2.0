@@ -12,22 +12,21 @@ import useCart from '../../hooks/useCart';
 
 //#region styled
 const StuffContainer = styled.div`
-    border: 0.5px solid lightgray;
-    padding: 10px 20px;
-    margin-bottom: 20px;
+    border: 0.5px solid ${props => props.theme.palette.action.focus};
+    padding: 20px 10px;
 
-    @media (min-width: 600px) {
-        padding: 20px 10px;
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 10px 20px;
     }
 `
 
 const StuffTitle = styled.h5`
     margin: 0;
     text-decoration: underline;
-    display: none;
+    display: flex;
 
-    @media (min-width: 900px) {
-        display: flex;
+    ${props => props.theme.breakpoints.down("md")} {
+        display: none;
     }
 `
 
@@ -57,6 +56,8 @@ const VisitButton = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
     border: solid .5px ${props => props.theme.palette.secondary.main};
     color: ${props => props.theme.palette.secondary.main};
     padding: 7px 5px;
@@ -70,7 +71,7 @@ const VisitButton = styled.div`
 `
 
 const CouponTab = styled.div`
-    background-color: lightgray;   
+    background-color: ${props => props.theme.palette.action.focus};
     margin-top: 10px; 
     padding: 10px;
     display: flex;
@@ -91,14 +92,14 @@ const CouponTab = styled.div`
 
 const InfoContainer = styled.div`
     height: 100%;
-    padding: 0 10px;
+    padding: 0 40px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border: 0.5px solid lightgray;
+    border: 0.5px solid ${props => props.theme.palette.action.focus};
 
-    @media (min-width: 600px) {
-        padding: 0 40px;
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 0 10px;
     }
 `
 
@@ -149,6 +150,11 @@ const Description = styled.p`
 const TotalRatingContainer = styled.div`
     display: flex;
     align-items: center;
+    cursor: pointer;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        display: none;
+    }
 `
 
 const StyledRating = muiStyled(Rating)(({ theme }) => ({
@@ -158,7 +164,7 @@ const StyledRating = muiStyled(Rating)(({ theme }) => ({
         color: theme.palette.secondary.main,
     },
     '& .MuiRating-iconHover': {
-        color: theme.palette.secondary.dark,
+        color: theme.palette.secondary.light,
     },
 }));
 
@@ -169,6 +175,10 @@ const PriceContainer = styled.div`
 
 const Price = styled.h2`
     font-size: 24px;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+       margin: 0;
+    }
 `
 
 const OldPrice = styled.p`
@@ -182,10 +192,10 @@ const OldPrice = styled.p`
 const FilterContainer = styled.div`
     margin: 30px 0px;
     width: 100%;
-    display: none;
-
-    @media (min-width: 600px) {
-        display: block;
+    display: block;
+    
+    ${props => props.theme.breakpoints.down("sm")} {
+        display: none;
     }
 `
 
@@ -197,21 +207,22 @@ const AltFilterContainer = styled.div`
     height: 48px;
     z-index: 99;
     box-shadow: 3px 3px 10px 3px #b7b7b7;
+    background-color: ${props => props.theme.palette.secondary.main};
     align-items: flex-end;
-    display: flex;
+    display: none;
 
-    @media (min-width: 600px) {
-        display: none;
+    ${props => props.theme.breakpoints.down("sm")} {
+        display: flex;
     }
 `
 
 const Filter = styled.div`
     align-items: center;
     margin-bottom: 30px;
-    display: none;
+    display: block;
 
-    @media (min-width: 600px) {
-        display: block;
+    ${props => props.theme.breakpoints.down("sm")} {
+        display: none;
     }
 `
 
@@ -222,10 +233,10 @@ const SubFilterContainer = styled.div`
 `
 
 const DetailContainer = styled.div`
-    display: none;
+    display: block;
 
-    @media (min-width: 600px) {
-        display: block;
+    ${props => props.theme.breakpoints.down("sm")} {
+        display: none;
     }
 `
 
@@ -239,9 +250,9 @@ const InputContainer = styled.div`
     justify-content: space-between;
     align-items: center;
     background-color: ${props => props.theme.palette.background.default};
-
-    @media (min-width: 600px) {
-        border: .5px solid lightgray;
+    
+    ${props => props.theme.breakpoints.up("sm")} {
+        border: .5px solid ${props => props.theme.palette.action.focus};
     }
 `
 
@@ -266,7 +277,7 @@ const CartButton = styled.button`
     transition: all 0.5s ease;
 
     &:hover {
-        background-color: lightgray;
+        background-color: ${props => props.theme.palette.action.hover};
         color: gray;
     };
 
@@ -310,7 +321,7 @@ const AltAmountInput = styled.input`
 const AmountButton = styled.div`
     width: 34px;
     height: 34px;
-    background-color: lightgray;
+    background-color: ${props => props.theme.palette.action.focus};
     display: flex;
     align-items: center;
     justify-content: center;
@@ -325,7 +336,7 @@ const AmountButton = styled.div`
 `
 
 const BuyButton = styled.button`
-    width: 100%;
+    width: 90%;
     border-radius: 0;
     padding: 15px;
     margin-top: -15px;
@@ -338,17 +349,19 @@ const BuyButton = styled.button`
     font-weight: bold;
     display: flex;
     flex-wrap: wrap;
+    white-space: nowrap;
+    overflow: hidden;
     align-items: center;
     text-align: center;
     justify-content: center;
     transition: all 0.5s ease;
 
-    @media (min-width: 600px) {
-        width: 90%;
+    ${props => props.theme.breakpoints.down("sm")} {
+        width: 100%;
     }
 
     &:hover {
-        background-color: lightgray;
+        background-color: ${props => props.theme.palette.action.hover};
         color: gray;
     };
 
@@ -359,14 +372,15 @@ const BuyButton = styled.button`
 `
 //#endregion
 
-const ProductContent = ({ book }) => {
+const ProductContent = ({ book, scrollIntoTab, handleTabChange }) => {
     const [amountIndex, setAmountIndex] = useState(1); //Amount add to cart
     const { addProduct } = useCart();
 
     //Calculate rating
     const avgRate = () => {
         let rate = 0;
-        rate = Math.round((book?.rateTotal / book?.rateAmount) * 2) / 2
+        rate = Math.round((book?.rateTotal / book?.rateAmount) * 2) / 2;
+        rate = rate ? rate : '~';
         return rate;
     }
     const calculatedRate = avgRate();
@@ -383,9 +397,15 @@ const ProductContent = ({ book }) => {
     }
 
     //Scroll to more detail tab
-    const handleViewMore = () => {
+    const handleViewMore = (e) => {
+        e.preventDefault();
         handleTabChange("1");
-        ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        scrollIntoTab();
+    };
+
+    const handleViewRating = () => {
+        handleTabChange("2");
+        scrollIntoTab();
     };
 
     //Add to cart
@@ -400,35 +420,18 @@ const ProductContent = ({ book }) => {
     };
 
     return (
-        <Grid container spacing={2}>
+        <Grid container spacing={{ xs: .5, sm: 2 }}>
             <Grid item xs={12} lg={10}>
-                <Grid container spacing={2} justifyContent="flex-start" alignItems="stretch">
+                <Grid
+                    container
+                    spacing={{ xs: .5, sm: 2 }}
+                    justifyContent="flex-start"
+                    alignItems="stretch"
+                >
                     <Grid item xs={12} md={6}>
                         {!book
                             ?
-                            <Container sx={{ border: '0.5px solid lightgray' }}>
-                                <Skeleton
-                                    variant="rectangular"
-                                    animation="wave"
-                                    width={'95%'}
-                                    height={500}
-                                    style={{
-                                        margin: '15px 10px',
-                                    }}
-                                />
-                                <Container sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', padding: '10px', paddingLeft: 0 }}>
-                                    {Array.from(new Array(4)).map((index) => (
-                                        <Skeleton
-                                            key={index}
-                                            variant="rectangular"
-                                            animation="wave"
-                                            height={80}
-                                            width={80}
-                                            sx={{ marginRight: '5px' }}
-                                        />
-                                    ))}
-                                </Container>
-                            </Container>
+                            <ProductImages />
                             :
                             <ProductImages images={book?.image} />
                         }
@@ -456,10 +459,16 @@ const ProductContent = ({ book }) => {
                                         />
                                         <strong style={{ paddingLeft: 10 }}>(~) Đánh giá</strong>
                                     </TotalRatingContainer>
-                                    <PriceContainer>
-                                        <Skeleton variant="text" sx={{ fontSize: '24px', marginY: '20px' }} width="35%" />&nbsp;
-                                        <Skeleton variant="text" sx={{ fontSize: '18px', marginY: '20px' }} width="25%" />
-                                    </PriceContainer>
+                                    <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+                                        <PriceContainer>
+                                            <Skeleton variant="text" sx={{ fontSize: '24px', marginY: '20px' }} width="35%" />&nbsp;
+                                            <Skeleton variant="text" sx={{ fontSize: '18px', marginY: '20px' }} width="25%" />
+                                        </PriceContainer>
+                                        <Box display={{ xs: 'flex', sm: 'none' }} alignItems={'center'} justifyContent={'space-between'}>
+                                            <strong style={{ paddingRight: 10 }}>(~) Đánh giá</strong>
+                                            <StarIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
+                                        </Box>
+                                    </Box>
                                     <DetailContainer>
                                         <DetailTitle>Chi tiết:</DetailTitle>
                                         <Detail>
@@ -478,7 +487,7 @@ const ProductContent = ({ book }) => {
                                             <Skeleton variant="text" sx={{ fontSize: '14px' }} />
                                         </Description>
                                         <Detail>
-                                            <Link onClick={handleViewMore}>Xem thêm...</Link>
+                                            <Skeleton variant="text" sx={{ fontSize: '14px' }} />
                                         </Detail>
                                     </DetailContainer>
                                 </div>
@@ -491,7 +500,7 @@ const ProductContent = ({ book }) => {
                                             {book?.publisher?.pubName}
                                         </Link>
                                     </Detail>
-                                    <TotalRatingContainer>
+                                    <TotalRatingContainer onClick={() => handleViewRating()}>
                                         <StyledRating
                                             name="product-rating"
                                             value={calculatedRate}
@@ -503,10 +512,17 @@ const ProductContent = ({ book }) => {
                                         />
                                         <strong style={{ paddingLeft: 10 }}>({book?.rateAmount}) Đánh giá</strong>
                                     </TotalRatingContainer>
-                                    <PriceContainer>
-                                        <Price>{book?.price?.toLocaleString()} đ</Price>
-                                        <OldPrice>{Math.round(book?.price * 1.1).toLocaleString()} đ</OldPrice>
-                                    </PriceContainer>
+                                    <Box onClick={() => handleViewRating()} sx={{ curosr: 'pointer' }}
+                                        display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+                                        <PriceContainer>
+                                            <Price>{book?.price?.toLocaleString()} đ</Price>
+                                            <OldPrice>{Math.round(book?.price * 1.1).toLocaleString()} đ</OldPrice>
+                                        </PriceContainer>
+                                        <Box display={{ xs: 'flex', sm: 'none' }} alignItems={'center'} justifyContent={'space-between'}>
+                                            <strong style={{ paddingRight: 10 }}>({calculatedRate}) Đánh giá</strong>
+                                            <StarIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
+                                        </Box>
+                                    </Box>
                                     <DetailContainer>
                                         <DetailTitle>Chi tiết:</DetailTitle>
                                         <Detail>
@@ -527,7 +543,7 @@ const ProductContent = ({ book }) => {
                                             {book?.description}
                                         </Description>
                                         <Detail>
-                                            <Link onClick={handleViewMore}>Xem thêm...</Link>
+                                            <Link onClick={(e) => handleViewMore(e)}>Xem thêm...</Link>
                                         </Detail>
                                     </DetailContainer>
                                 </>
@@ -550,18 +566,15 @@ const ProductContent = ({ book }) => {
                                 </Filter>
                                 <BuyButton disabled={!book} onClick={() => handleAddToCart(book)}>
                                     <ShoppingCartIcon style={{ fontSize: 18 }} />
-                                    THÊM VÀO GIỎ
+                                    THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
                                 </BuyButton>
                             </FilterContainer>
                             <AltFilterContainer>
                                 <Link to={`/cart`}>
                                     <CartButton><ShoppingCartIcon style={{ fontSize: 24 }} /></CartButton>
                                 </Link>
-                                <InputContainer>
-                                    <AltAmountInput type="number" onChange={(e) => handleChangeAmount(e.target.valueAsNumber)} value={amountIndex} />
-                                </InputContainer>
                                 <BuyButton disabled={!book} onClick={() => handleAddToCart(book)}>
-                                    THÊM VÀO GIỎ
+                                    THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
                                 </BuyButton>
                             </AltFilterContainer>
                         </InfoContainer>
@@ -590,15 +603,7 @@ const ProductContent = ({ book }) => {
                                             <Skeleton variant="text" sx={{ fontSize: '16px' }} width={100} />
                                             &nbsp;&nbsp;&nbsp;
                                         </SellerContainer>
-                                        <VisitButton>
-                                            <h4 style={{
-                                                margin: '0 5px',
-                                                display: 'flex',
-                                                alignItems: 'center'
-                                            }}>
-                                                ĐỐI TÁC RING!&nbsp;<CheckIcon />
-                                            </h4>
-                                        </VisitButton>
+                                        <VisitButton>ĐỐI TÁC RING!&nbsp;<CheckIcon /></VisitButton>
                                     </Box>
                                     :
                                     <Box
@@ -616,15 +621,7 @@ const ProductContent = ({ book }) => {
                                             &nbsp;&nbsp;&nbsp;
                                         </SellerContainer>
                                         <Link to={`/filters?seller=${book?.sellerName}`}>
-                                            <VisitButton>
-                                                <h4 style={{
-                                                    margin: '0 5px',
-                                                    display: 'flex',
-                                                    alignItems: 'center'
-                                                }}>
-                                                    ĐỐI TÁC RING!&nbsp;<CheckIcon />
-                                                </h4>
-                                            </VisitButton>
+                                            <VisitButton>ĐỐI TÁC RING!&nbsp;<CheckIcon /></VisitButton>
                                         </Link>
                                     </Box>
                                 }

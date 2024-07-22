@@ -29,21 +29,16 @@ public class JwtService {
 	
 	//Extract username from token (First part)
 	public String extractUsername(String token) {
-		return extractClaim(token, Claims::getSubject);
-	}
-	
-	//Extract claims (Second part)
-	public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-		final Claims claims = extractAllClaims(token, getSignInKey());
-		return claimsResolver.apply(claims);
+		return extractClaim(token, Claims::getSubject, getSignInKey());
 	}
 
 	public String extractRefreshUsername(String token) {
-		return extractRefreshClaim(token, Claims::getSubject);
+		return extractClaim(token, Claims::getSubject, getRefreshSignInKey());
 	}
-
-	public <T> T extractRefreshClaim(String token, Function<Claims, T> claimsResolver) {
-		final Claims claims = extractAllClaims(token, getRefreshSignInKey());
+	
+	//Extract claims (Second part)
+	public <T> T extractClaim(String token, Function<Claims, T> claimsResolver, Key key) {
+		final Claims claims = extractAllClaims(token, key);
 		return claimsResolver.apply(claims);
 	}
 	
@@ -94,32 +89,24 @@ public class JwtService {
 	//JWT validation
 	public boolean isTokenValid(String token, UserDetails userDetails) {
 		final String userName = extractUsername(token); //Extract name
-		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token); //Check expiration and valid username
+		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token, getSignInKey()); //Check expiration and valid username
 	}
 
 	public boolean isRefreshTokenValid(String token, UserDetails userDetails) {
 		final String userName = extractRefreshUsername(token); //Extract refresh username
-		return (userName.equals(userDetails.getUsername())) && !isRefreshTokenExpired(token); //Check expiration and valid username
+		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token, getRefreshSignInKey()); //Check expiration and valid username
 	}
 	
 	//Check JWT expired or not
-	private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+	private boolean isTokenExpired(String token, Key key) {
+        return extractExpiration(token, key).before(new Date());
     }
 
-	private boolean isRefreshTokenExpired(String token) {
-		return extractRefreshExpiration(token).before(new Date());
-	}
-	
 	//Extract expiration time from token
-	private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+	private Date extractExpiration(String token, Key key) {
+        return extractClaim(token, Claims::getExpiration, key);
     }
 
-	private Date extractRefreshExpiration(String token) {
-		return extractRefreshClaim(token, Claims::getExpiration);
-	}
-	
 	//Get all extra claims from token
 	private Claims extractAllClaims(String token, Key key) {
 		return Jwts

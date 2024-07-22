@@ -71,7 +71,8 @@ const Description = styled.p`
 
 const CustomArrow = styled.button`
   border-radius: 0;
-  background-color: #0000005e;
+  background-color: transparent;
+  color: inherit;
   border: none;
   outline: none;
   height: 55px;

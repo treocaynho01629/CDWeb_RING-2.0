@@ -32,7 +32,7 @@ const StyledRating = muiStyled(Rating)(({ theme }) => ({
         color: theme.palette.secondary.main,
     },
     '& .MuiRating-iconHover': {
-        color: theme.palette.secondary.dark,
+        color: theme.palette.secondary.light,
     },
 }));
 

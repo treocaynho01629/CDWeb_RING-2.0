@@ -29,7 +29,7 @@ const DrawerLogo = styled.h2`
 `
 //#endregion
 
-const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, signOut, ImageLogo, Button }) => {
+const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, logout, ImageLogo, Button }) => {
     const role = roles?.length;
     
     return (
@@ -138,7 +138,7 @@ const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, username, roles, product
                             )}
 
                             <ListItem disablePadding>
-                                <ListItemButton onClick={signOut}>
+                                <ListItemButton onClick={() => logout()}>
                                     <ListItemIcon>
                                         <Logout />
                                     </ListItemIcon>

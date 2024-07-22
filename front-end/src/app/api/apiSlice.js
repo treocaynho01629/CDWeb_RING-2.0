@@ -5,7 +5,6 @@ import { Cookies } from 'react-cookie';
 const cookies = new Cookies();
 const getCookieValue = (cookieName) => {
     let result = cookies.get(cookieName);
-    console.log(result);
     if (result.path) return null;
     return result;
 };
@@ -16,7 +15,6 @@ const baseQuery = fetchBaseQuery({
     prepareHeaders: (headers, { getState }) => {
         const token = getState().auth.token;
         const refreshToken = getCookieValue('refreshToken');
-        console.log(refreshToken)
         if (token) {
             headers.set("Authorization", `Bearer ${token}`)
         } else if (refreshToken) {
@@ -40,19 +38,17 @@ const baseQueryForRefresh = fetchBaseQuery({
 const baseQueryWithRefresh = async (args, api, extraOptions) => {
     let result = await baseQuery(args, api, extraOptions)
 
-    if (result?.error?.status === 403) {
+    if (result?.meta?.response?.status === 401 || result?.meta?.response?.status === 403) {
         const { data } = await baseQueryForRefresh("/api/v1/auth/refresh-token", api, extraOptions)
-        const { token } = data;
+        const { token, code, errors } = data;
 
         if (token) {
             api.dispatch(setAuth({ token })) //Re-auth
             result = await baseQuery(args, api, extraOptions) //Refetch
         } else {
-            if (refreshData?.error?.status === 401) {
-                refreshData.error.data.message = "Your token has expired."
-            }
+            if (code === 500) console.error(errors?.errorMessage ?? 'Your token is not valid');
             api.dispatch(logOut());
-            return refreshData
+            return data;
         }
     }
 

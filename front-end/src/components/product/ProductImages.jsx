@@ -1,19 +1,28 @@
+import styled, { keyframes } from 'styled-components'
 import { useRef, useEffect, useState } from 'react'
-import styled from 'styled-components'
-
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { Skeleton } from '@mui/material';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-
 //#region styled
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+`
+
 const ImgContainer = styled.div`
     align-items: center;
     justify-content: center;
     text-align: center;
-    border: 0.5px solid lightgray;
+    border: 0.5px solid ${props => props.theme.palette.action.focus};
 
-    @media (max-width: 600px) {
+    ${props => props.theme.breakpoints.up("sm")} {
         width: 100%;
     }
 `
@@ -26,31 +35,41 @@ const MoreImageContainer = styled.div`
 `
 
 const ImageSlider = styled.div`
-    padding: 0;
+    padding: 5px;
     overflow: hidden;
     position: relative;
-    display: 'flex';
-    justify-content: 'center';
+    display: flex;
+    justify-content: center;
 
-    @media (min-width: 600px) {
-        padding: 5px;
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 0;
     }
 `
 
 const ImageSlide = styled.div`
     position: relative;
-    transition: all 1.0s ease;
+    animation: ${fadeIn} .3s ease;
 `
 
 const ImageNumber = styled.p`
     color: inherit;
     font-size: 16px;
     font-weight: bold;
-    padding: 8px 12px;
+    padding: 2px 10px;
     position: absolute;
     z-index: 5;
-    top: 0;
-    left: 0;
+    color: ${props => props.theme.palette.secondary.contrastText};
+    background-color: ${props => props.theme.palette.secondary.main};
+    border-radius: 50px;
+    top: 5px;
+    left: 10px;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        bottom: 5px;
+        right: 15px;
+        top: auto;
+        left: auto;
+    }
 `
 
 const SmallImageSlider = styled.div`
@@ -61,19 +80,19 @@ const SmallImageSlider = styled.div`
     user-select: none;
     scroll-behavior: smooth;
     white-space: nowrap;
-    padding: 0;
+    padding: 10px;
 
     &::-webkit-scrollbar {
         display: none;
     }
 
-    @media (min-width: 600px) {
-        padding: 10px;
+    ${props => props.theme.breakpoints.down("sm")} {
+       padding: 0;
     }
 `
 
 const SmallImageSlide = styled.div`
-    border: 0.5px solid lightgray;
+    border: .5px solid ${props => props.theme.palette.action.focus};
     margin-right: 5px;
     cursor: pointer;
     opacity: 0.5;
@@ -85,30 +104,85 @@ const SmallImageSlide = styled.div`
     }
 
     &:hover {
-        border: 1px solid #00ff6a;
+        border: 1px solid ${props => props.theme.palette.secondary.light};
         opacity: 1;
     }
 `
 
-const ImageButton = styled.div`
+const ImageButton = styled.button`
+    border-radius: 0;
+    background-color: transparent;
+    color: inherit;
+    border: none;
+    outline: none;
+    height: 55px;
     width: 35px;
-    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: auto;
-    cursor: pointer;
-    transition: all 0.5s ease;
-    color: inherit;
     position: absolute;
+    opacity: .8;
+    transition: all .3s ease;
     top: 50%;
+    opacity: .8;
     left: ${prop => prop.direction === "left" && "2%"};
     right: ${prop => prop.direction === "right" && "2%"};
 
     &:hover{
+        opacity: 1;
         background-color: ${props => props.theme.palette.secondary.main};
         color: ${props => props.theme.palette.secondary.contrastText};
     }
+`
+
+const StyledLazyImage = styled(LazyLoadImage)`
+    padding: 15px 10px;
+    object-fit: contain;
+    transform: ${props => props.imageStyle};
+    width: 95%;
+    min-height: 500px;
+
+  ${props => props.theme.breakpoints.down("sm")} {
+    padding: 5px 0;
+    min-height: 300px;
+    width: 85%;
+  }
+`
+
+const StyledSmallLazyImage = styled(LazyLoadImage)`
+    display: inline-block;
+    object-fit: contain;
+    transform: ${props => props.imageStyle};
+    height: 80px;
+    width: 80px;
+
+  ${props => props.theme.breakpoints.down("sm")} {
+    height: 55px;
+    width: 55px;
+  }
+`
+
+const StyledSkeleton = styled(Skeleton)`
+    margin: 15px 10px;
+    width: 95%;
+    min-height: 500px;
+
+  ${props => props.theme.breakpoints.down("sm")} {
+    padding: 5px 0;
+    min-height: 300px;
+    width: 85%;
+  }
+`
+
+const StyledSmallSkeleton = styled(Skeleton)`
+    height: 80px;
+    width: 80px;
+    margin-right: 5px;
+
+  ${props => props.theme.breakpoints.down("sm")} {
+    height: 55px;
+    width: 55px;
+  }
 `
 //#endregion
 
@@ -158,6 +232,7 @@ const ProductImages = ({ images }) => {
         let touch = e.clientX;
         setChange(start - touch);
     }
+
     const dragEnd = (e) => {
         if (change > 0) {
             slideRef.current.scrollLeft += width;
@@ -166,53 +241,67 @@ const ProductImages = ({ images }) => {
         }
     }
 
-    return (
-        <ImgContainer>
-            <ImageSlider>
-                {multiImages.map((style, index) => (
-                    <ImageSlide key={index}
-                        style={{ display: (index + 1) === slideIndex ? "block" : "none" }}>
-                        <ImageNumber>{index + 1} / {multiImages.length}</ImageNumber>
-                        <LazyLoadImage src={images}
-                            width={'95%'}
-                            style={{
-                                padding: '15px 10px',
-                                objectFit: 'contain',
-                                transform: style,
-                                minHeight: 500,
-                            }}
-                        />
-                    </ImageSlide>
-                ))}
-                <ImageButton direction="left" onClick={() => changeSlide(-1)}>
-                    <KeyboardArrowLeft style={{ fontSize: 50 }} />
-                </ImageButton>
-                <ImageButton direction="right" onClick={() => changeSlide(1)}>
-                    <KeyboardArrowRight style={{ fontSize: 50 }} />
-                </ImageButton>
-            </ImageSlider>
-            <MoreImageContainer>
-                <SmallImageSlider draggable={true} ref={slideRef}
-                    onDragStart={dragStart} onDragOver={dragOver} onDragEnd={dragEnd}>
+    if (images) {
+        return (
+            <ImgContainer>
+                <ImageSlider>
                     {multiImages.map((style, index) => (
-                        <SmallImageSlide key={index}
-                            className={`${index + 1 === slideIndex && 'active'}`}
-                            onClick={() => setSlideIndex(index + 1)}>
-                            <LazyLoadImage src={images}
-                                height={80}
-                                width={80}
-                                style={{
-                                    objectFit: 'contain',
-                                    display: 'inline-block',
-                                    transform: style
-                                }}
+                        <ImageSlide key={index}
+                            style={{ display: (index + 1) === slideIndex ? "block" : "none" }}>
+                            <ImageNumber>{index + 1} / {multiImages.length}</ImageNumber>
+                            <StyledLazyImage
+                                src={images}
+                                imageStyle={style}
                             />
-                        </SmallImageSlide>
+                        </ImageSlide>
                     ))}
-                </SmallImageSlider>
-            </MoreImageContainer>
-        </ImgContainer>
-    )
+                    <ImageButton direction="left" onClick={() => changeSlide(-1)}>
+                        <KeyboardArrowLeft style={{ fontSize: 50 }} />
+                    </ImageButton>
+                    <ImageButton direction="right" onClick={() => changeSlide(1)}>
+                        <KeyboardArrowRight style={{ fontSize: 50 }} />
+                    </ImageButton>
+                </ImageSlider>
+                <MoreImageContainer>
+                    <SmallImageSlider draggable={true} ref={slideRef}
+                        onDragStart={dragStart} onDragOver={dragOver} onDragEnd={dragEnd}>
+                        {multiImages.map((style, index) => (
+                            <SmallImageSlide key={index}
+                                className={`${index + 1 === slideIndex && 'active'}`}
+                                onClick={() => setSlideIndex(index + 1)}>
+                                <StyledSmallLazyImage
+                                    src={images}
+                                    imageStyle={style}
+                                />
+                            </SmallImageSlide>
+                        ))}
+                    </SmallImageSlider>
+                </MoreImageContainer>
+            </ImgContainer>
+        )
+    } else {
+        return (
+            <ImgContainer>
+                <ImageSlider>
+                    <StyledSkeleton
+                        variant="rectangular"
+                        animation="wave"
+                    />
+                </ImageSlider>
+                <MoreImageContainer>
+                    <SmallImageSlider>
+                        {Array.from(new Array(4)).map((index) => (
+                            <StyledSmallSkeleton
+                                key={index}
+                                variant="rectangular"
+                                animation="wave"
+                            />
+                        ))}
+                    </SmallImageSlider>
+                </MoreImageContainer>
+            </ImgContainer>
+        )
+    }
 }
 
 export default ProductImages

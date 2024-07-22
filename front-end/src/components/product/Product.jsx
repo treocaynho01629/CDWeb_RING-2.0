@@ -174,17 +174,17 @@ const AddToCart = styled.p`
     }
 `
 
-const StyledRating = muiStyled(Rating)({
+const StyledRating = muiStyled(Rating)(({ theme }) => ({
     fontSize: 14,
     display: 'flex',
     alignItems: 'center',
     '& .MuiRating-iconFilled': {
-        color: '#63e399',
+        color: theme.palette.secondary.main,
     },
     '& .MuiRating-iconHover': {
-        color: '#00ff6a',
+        color: theme.palette.secondary.light,
     },
-});
+}));
 //#endregion
 const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY(-1)'];
 
@@ -277,11 +277,11 @@ const Product = ({ book }) => {
                             <Tooltip title={calculatedRate === '~' ? 'Chưa có đánh giá nào' : `Trên tổng ${book.rateAmount} đánh giá`}>
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                     <b style={{ fontSize: '12px', marginRight: '5px' }}>{calculatedRate}</b>
-                                    <StarIcon style={{
+                                    <StarIcon sx={{
                                         fontSize: 16,
-                                        color: '#63e399',
+                                        color: 'secondary.main',
                                         '&hover': {
-                                            color: '#00ff6a',
+                                            color: 'secondary.light',
                                         }
                                     }}
                                     />

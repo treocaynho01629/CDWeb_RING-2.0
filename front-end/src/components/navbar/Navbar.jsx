@@ -331,14 +331,6 @@ const Navbar = (props) => {
         setAnchorEl(null);
     };
 
-    //Logout
-    const signOut = async () => {
-        await logout();
-        const { enqueueSnackbar } = await import('notistack');
-        navigate('/');
-        enqueueSnackbar('Đã đăng xuất!', { variant: 'error' });
-    }
-
     //Toggle drawer open state
     const toggleDrawer = (open) => (e) => {
         setOpen(open)
@@ -395,7 +387,7 @@ const Navbar = (props) => {
                                 <Left>
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <Button onClick={toggleDrawer(true)}><MenuIcon sx={{ fontSize: 26 }} /></Button>
-                                        <NavDrawer {...{ openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, signOut, ImageLogo, Button }} />
+                                        <NavDrawer {...{ openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, logout, ImageLogo, Button }} />
                                     </Box>
                                     <Link to={`/`}>
                                         <Logo className={searchField || hover || focus ? 'active' : ''}>
@@ -404,15 +396,16 @@ const Navbar = (props) => {
                                     </Link>
                                     <Box sx={{ display: 'flex' }} flexDirection={{ xs: 'row-reverse', md: 'row' }}>
                                         <Tooltip title="Duyệt cửa hàng">
-                                            <StyledIconButton aria-label="explore"
-                                                onClick={() => navigate('/filters')}
-                                                sx={{
-                                                    marginLeft: 2,
-                                                    marginRight: 0,
-                                                    zIndex: 10,
-                                                }}>
-                                                <Storefront sx={{ fontSize: '26px' }} />
-                                            </StyledIconButton>
+                                            <Link to={'/filters'}>
+                                                <StyledIconButton aria-label="explore"
+                                                    sx={{
+                                                        marginLeft: 2,
+                                                        marginRight: 0,
+                                                        zIndex: 10,
+                                                    }}>
+                                                    <Storefront sx={{ fontSize: '26px' }} />
+                                                </StyledIconButton>
+                                            </Link>
                                         </Tooltip>
                                         <Box
                                             sx={{ display: 'flex', alignItems: 'center', marginLeft: '-40' }}
@@ -502,7 +495,7 @@ const Navbar = (props) => {
                                                 </Link>
                                             )}
                                         </Stack>
-                                        <ProfilePopover {...{ open, anchorEl, handleClose, navigate, roles, signOut }} />
+                                        <ProfilePopover {...{ open, anchorEl, handleClose, navigate, roles, logout }} />
                                     </NavItem>
                                 </Right>
                             </Grid>
