@@ -15,8 +15,7 @@ const Title = styled.h1`
 const Instruction = styled.p`
     font-size: 14px;
     font-style: italic;
-    color: red;
-    display: ${props => props.display};;
+    color: ${props => props.theme.palette.error.main};
 `
 //#endregion
 
@@ -132,13 +131,15 @@ const RegisterTab = ({ setPending }) => {
         }
     }
 
+    const validRegister = [validName, validPass, validMatch, validEmail].every(Boolean);
+
     return (
         <>
             <form onSubmit={handleSubmit}>
                 <Title>Đăng ký tài khoản mới</Title>
                 <Stack spacing={1} direction="column">
                     <Instruction ref={errRef}
-                        display={errMsg ? "block" : "none"}
+                        style={{ display: errMsg ? "block" : "none" }}
                         aria-live="assertive">
                         {errMsg}
                     </Instruction>
@@ -211,7 +212,7 @@ const RegisterTab = ({ setPending }) => {
                         size="large"
                         type="submit"
                         sx={{ width: '50%' }}
-                        disabled={!validName || !validPass || !validMatch || !validEmail ? true : false}
+                        disabled={!validRegister}
                     >
                         Đăng ký
                     </CustomButton>

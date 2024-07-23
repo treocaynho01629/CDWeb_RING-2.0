@@ -1,5 +1,6 @@
 import { DeliveryDining as DeliveryDiningIcon, Logout, Speed as SpeedIcon } from '@mui/icons-material';
 import { Avatar, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 const ProfilePopover = ({ open, anchorEl, handleClose, navigate, roles, logout }) => {
     const role = roles?.length;
@@ -41,29 +42,29 @@ const ProfilePopover = ({ open, anchorEl, handleClose, navigate, roles, logout }
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-            <MenuItem onClick={() => {
-                navigate('/profile/detail')
-            }}>
-                <Avatar /> Thông tin tài khoản
-            </MenuItem>
-            <MenuItem onClick={() => {
-                navigate('/profile/receipts')
-            }}>
-                <ListItemIcon>
-                    <DeliveryDiningIcon fontSize="small" />
-                </ListItemIcon>
-                Đơn giao
-            </MenuItem>
+            <Link to={'/profile/detail'} style={{ color: 'inherit' }}>
+                <MenuItem onClick={() => handleClose()}>
+                    <Avatar /> Thông tin tài khoản
+                </MenuItem>
+            </Link>
+            <Link to={'/profile/receipts'} style={{ color: 'inherit' }}>
+                <MenuItem onClick={() => handleClose()}>
+                    <ListItemIcon>
+                        <DeliveryDiningIcon fontSize="small" />
+                    </ListItemIcon>
+                    Đơn giao
+                </MenuItem>
+            </Link>
             <Divider />
             {role >= 2 && (
-                <MenuItem onClick={() => {
-                    navigate('/dashboard')
-                }}>
-                    <ListItemIcon>
-                        <SpeedIcon fontSize="small" />
-                    </ListItemIcon>
-                    Dashboard
-                </MenuItem>
+                <Link to={'/dashboard'} style={{ color: 'inherit' }}>
+                    <MenuItem onClick={() => handleClose()}>
+                        <ListItemIcon>
+                            <SpeedIcon fontSize="small" />
+                        </ListItemIcon>
+                        Dashboard
+                    </MenuItem>
+                </Link>
             )}
             <MenuItem onClick={() => logout()}>
                 <ListItemIcon>

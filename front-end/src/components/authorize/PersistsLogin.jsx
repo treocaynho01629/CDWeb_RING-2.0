@@ -39,7 +39,7 @@ const PersistLogin = () => {
         <>
             {!persist
                 ? <Outlet />
-                : isLoading
+                : pending
                     ?
                     <PendingIndicator open={pending} message="Đang xác thực đăng nhập ..." />
                     : isSuccess

@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState, useEffect } from "react";
 import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search } from '@mui/icons-material';
-import { Checkbox, Grid, IconButton, Breadcrumbs, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
+import { Checkbox, Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
 import { NavLink, useNavigate } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { booksApiSlice } from '../features/books/booksApiSlice';
@@ -11,17 +11,9 @@ import PropTypes from 'prop-types';
 import useCart from '../hooks/useCart';
 import CustomButton from '../components/custom/CustomButton';
 import CheckoutDialog from '../components/cart/CheckoutDialog';
+import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 
 //#region styled
-const BreadcrumbsContainer = styled.div`
-    margin: 20px 10px;
-    display: none;
-
-    @media (min-width: ${props => props.theme.breakpoints.values['sm']}px) {
-        display: block;
-    }
-`
-
 const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.secondary.main,
@@ -60,10 +52,10 @@ const MainTitleContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 10px;
+    padding: 20px 0px;
 
-    @media (min-width: ${props => props.theme.breakpoints.values['md']}px) {
-        padding: 20px 0px;
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 20px 10px;
     }
 `
 
@@ -155,10 +147,6 @@ const Price = styled.p`
     font-weight: bold;
     color: ${props => props.theme.palette.secondary.main};
     margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
 `
 
 const Discount = styled.p`
@@ -276,8 +264,7 @@ const Cart = () => {
     const isSelected = (id) => selected.indexOf(id) !== -1;
 
     function EnhancedTableHead(props) {
-        const { onSelectAllClick, numSelected, rowCount } =
-            props;
+        const { onSelectAllClick, numSelected, rowCount } = props;
 
         return (
             <TableHead sx={{ display: { xs: 'none', sm: 'table-header-group' } }}>
@@ -321,14 +308,9 @@ const Cart = () => {
 
     return (
         <Wrapper>
-            <BreadcrumbsContainer>
-                <Breadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
-                    <NavLink to={`/`} style={{ backgroundColor: '#63e399', padding: '5px 15px', color: 'white' }}>
-                        Trang chủ
-                    </NavLink>
-                    <strong style={{ textDecoration: 'underline' }}>Giỏ hàng</strong>
-                </Breadcrumbs>
-            </BreadcrumbsContainer>
+            <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
+                <strong style={{ textDecoration: 'underline' }}>Giỏ hàng</strong>
+            </CustomBreadcrumbs>
 
             {cartProducts?.length == 0 ?
                 <EmptyWrapper>
@@ -406,7 +388,7 @@ const Cart = () => {
                                                                 </NavLink>
                                                                 <ItemAction>
                                                                     <Box display={{ xs: 'block', md: 'none' }}>
-                                                                        <Discount>{(product.price * product.quantity).toLocaleString()}đ</Discount>
+                                                                        <Discount>{Math.round(product.price * 1.1).toLocaleString()}đ</Discount>
                                                                         <Price>{product.price.toLocaleString()}đ</Price>
                                                                     </Box>
                                                                     <Box display={{ xs: 'flex', sm: 'none' }} justifyContent={'center'}>
@@ -454,8 +436,10 @@ const Cart = () => {
                         </TableContainer>
                     </Grid>
                     <Grid item xs={12} md={8} lg={4}>
-                        <CheckoutDialog {...{ cartProducts, selected, navigate, handleSelectAllClick, 
-                            numSelected: selected.length, rowCount: cartProducts?.length }} />
+                        <CheckoutDialog {...{
+                            cartProducts, selected, navigate, handleSelectAllClick,
+                            numSelected: selected.length, rowCount: cartProducts?.length
+                        }} />
                     </Grid>
                 </Grid>
             }

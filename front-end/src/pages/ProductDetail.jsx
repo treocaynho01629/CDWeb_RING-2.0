@@ -1,24 +1,16 @@
 import styled from 'styled-components'
 import { useEffect, useState, useRef } from 'react'
-import { Skeleton, Breadcrumbs } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import { useParams, Navigate, NavLink } from 'react-router-dom';
 import { useGetBookQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import ProductsSlider from '../components/product/ProductsSlider';
 import ProductDetailContainer from '../components/product/ProductDetailContainer';
 import CustomDivider from '../components/custom/CustomDivider';
 import ProductContent from '../components/product/ProductContent';
+import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 
 //#region styled
 const Wrapper = styled.div`
-`
-
-const BreadcrumbsContainer = styled.div`
-    margin: 20px 10px;
-    display: block;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        display: none;
-    }
 `
 //#endregion
 
@@ -62,33 +54,25 @@ const ProductDetail = () => {
 
     return (
         <Wrapper>
-            <BreadcrumbsContainer>
+            <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
                 {data
                     ?
-                    <Breadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
-                        <NavLink to={`/`} style={{ backgroundColor: '#63e399', padding: '5px 15px', color: 'white' }}>
-                            Trang chủ
-                        </NavLink>
+                    [
                         <NavLink to={`/filters`}>
                             Danh mục sản phẩm
-                        </NavLink>
+                        </NavLink>,
                         <NavLink to={`/filters?cateId=${data?.cateId}`}>
                             {data?.cateName}
-                        </NavLink>
+                        </NavLink>,
                         <NavLink to={`/filters?pubId=${data?.publisher?.id}`}>
                             {data?.publisher?.pubName}
-                        </NavLink>
+                        </NavLink>,
                         <strong style={{ textDecoration: 'underline' }}>{data?.title}</strong>
-                    </Breadcrumbs>
+                    ]
                     :
-                    <Breadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
-                        <NavLink to={`/`} sx={{ backgroundColor: 'secondary.main', padding: '5px 15px', color: 'white' }}>
-                            Trang chủ
-                        </NavLink>
-                        <Skeleton variant="text" sx={{ fontSize: '16px' }} width={300} />
-                    </Breadcrumbs>
+                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width={300} />
                 }
-            </BreadcrumbsContainer>
+            </CustomBreadcrumbs>
             {product}
             <div ref={ref}>
                 <ProductDetailContainer loading={isLoading}

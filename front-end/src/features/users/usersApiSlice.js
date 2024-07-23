@@ -5,47 +5,101 @@ const usersAdapter = createEntityAdapter({});
 
 const initialState = usersAdapter.getInitialState({
     info: {
-      currPage: 0,
-      pageSize: 0,
-      totalElements: 0,
-      numbersOfPages: 0,
+        currPage: 0,
+        pageSize: 0,
+        totalElements: 0,
+        totalPages: 0,
     },
 });
 
 export const usersApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
-        getUser: builder.query({
-            query: ({ id }) => ({
-                url: `/users/${id}`,
+        getProfile: builder.query({
+            query: () => ({
+                url: `/api/accounts/profile`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError
                 },
             }),
-            transformResponse: responseData => {
-                const user = { ...responseData, id: responseData._id};
-                return user;
-            },
+            providesTags: (result, error, id) => [{ type: 'User', id }]
+        }),
+        getUser: builder.query({
+            query: ({ id }) => ({
+                url: `/api/accounts/${id}`,
+                validateStatus: (response, result) => {
+                    return response.status === 200 && !result.isError
+                },
+            }),
             providesTags: (result, error, id) => [{ type: 'User', id }]
         }),
         getUsers: builder.query({
             query: (args) => {
-                const { page, size } = args;
+                const { page, size, sortBy, sortDir } = args || {};
+
+                //Params
+                const params = new URLSearchParams();
+                if (page) params.append('pageNo', page);
+                if (size) params.append('pSize', size);
+                if (sortBy) params.append('sortBy', sortBy);
+                if (sortDir) params.append('sortDir', sortDir);
 
                 return {
-                    url: '/users',
-                    params: { page, size },
+                    url: `/api/accounts?${params.toString()}`,
                     validateStatus: (response, result) => {
                         return response.status === 200 && !result.isError
                     },
                 }
             },
             transformResponse: responseData => {
-                const { info, data } = responseData;
-                const loadedUsers = data.map(user => {
-                    user.id = user._id
-                    return user
-                });
-                return usersAdapter.setAll({ ...initialState, info }, loadedUsers);
+                const { number, size, totalElements, totalPages, content } = responseData;
+                return usersAdapter.setAll({
+                    ...initialState,
+                    info: {
+                        currPage: number,
+                        pageSize: size,
+                        totalElements,
+                        totalPages
+                    }
+                }, content)
+            },
+            providesTags: (result, error, arg) => {
+                if (result?.ids) {
+                    return [
+                        { type: 'User', id: 'LIST' },
+                        ...result.ids.map(id => ({ type: 'User', id }))
+                    ]
+                } else return [{ type: 'User', id: 'LIST' }]
+            }
+        }),
+        getSellers: builder.query({
+            query: (args) => {
+                const { page, size, sortBy, sortDir } = args || {};
+
+                //Params
+                const params = new URLSearchParams();
+                if (page) params.append('pageNo', page);
+                if (size) params.append('pSize', size);
+                if (sortBy) params.append('sortBy', sortBy);
+                if (sortDir) params.append('sortDir', sortDir);
+
+                return {
+                    url: `/api/accounts/employees?${params.toString()}`,
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result.isError
+                    },
+                }
+            },
+            transformResponse: responseData => {
+                const { number, size, totalElements, totalPages, content } = responseData;
+                return usersAdapter.setAll({
+                    ...initialState,
+                    info: {
+                        currPage: number,
+                        pageSize: size,
+                        totalElements,
+                        totalPages
+                    }
+                }, content)
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
@@ -57,12 +111,10 @@ export const usersApiSlice = apiSlice.injectEndpoints({
             }
         }),
         createUser: builder.mutation({
-            query: initialUser => ({
-                url: '/users',
+            query: newUser => ({
+                url: '/api/accounts',
                 method: 'POST',
-                body: {
-                    ...initialUser,
-                }
+                body: { ...newUser }
             }),
             invalidatesTags: [
                 { type: 'User', id: "LIST" }
@@ -70,7 +122,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         }),
         updateUser: builder.mutation({
             query: ({ id, updatedUser }) => ({
-                url: `/users/${id}`,
+                url: `/api/accounts/${id}`,
                 method: 'PUT',
                 credentials: 'include',
                 body: updatedUser,
@@ -81,22 +133,44 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         }),
         deleteUser: builder.mutation({
             query: (id) => ({
-                url: `/users/${id}`,
+                url: `/api/accounts/${id}`,
                 method: 'DELETE'
             }),
             invalidatesTags: (result, error, id) => [
                 { type: 'User', id }
             ]
         }),
+        deleteUsers: builder.mutation({
+            query: (ids) => ({
+                url: `/api/accounts/delete-multiples?ids=${ids}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: (result, error, id) => [
+                { type: 'User', id: "LIST" }
+            ]
+        }),
+        deleteAllUsers: builder.mutation({
+            query: () => ({
+                url: '/api/accounts/delete-all',
+                method: 'DELETE'
+            }),
+            invalidatesTags: (result, error, id) => [
+                { type: 'User', id: "LIST" }
+            ]
+        }),
     }),
 })
 
 export const {
+    useGetProfileQuery,
     useGetUserQuery,
     useGetUsersQuery,
+    useGetSellersQuery,
     useCreateUserMutation,
     useUpdateUserMutation,
     useDeleteUserMutation,
+    useDeleteUsersMutation,
+    useDeleteAllUsersMutation,
     usePrefetch: usePrefetchUsers
 } = usersApiSlice
 

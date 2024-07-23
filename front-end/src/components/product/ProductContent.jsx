@@ -204,7 +204,7 @@ const AltFilterContainer = styled.div`
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 48px;
+    height: 50px;
     z-index: 99;
     box-shadow: 3px 3px 10px 3px #b7b7b7;
     background-color: ${props => props.theme.palette.secondary.main};
@@ -257,7 +257,7 @@ const InputContainer = styled.div`
 `
 
 const CartButton = styled.button`
-    height: 48px;
+    height: 50px;
     width: 80px;
     border-radius: 0;
     padding: 15px;
@@ -337,6 +337,7 @@ const AmountButton = styled.div`
 
 const BuyButton = styled.button`
     width: 90%;
+    height: 50px;
     border-radius: 0;
     padding: 15px;
     margin-top: -15px;

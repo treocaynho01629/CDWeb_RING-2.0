@@ -6,6 +6,7 @@ import SimpleNavbar from "../components/navbar/SimpleNavbar";
 import LoginTab from '../components/authorize/LoginTab';
 import RegisterTab from '../components/authorize/RegisterTab';
 import CustomButton from '../components/custom/CustomButton';
+import useAuth from '../hooks/useAuth';
 
 const PendingIndicator = lazy(() => import('../components/authorize/PendingIndicator'));
 
@@ -100,6 +101,7 @@ const SignDivider = styled.button`
 //#endregion
 
 function SignPage() {
+    const { persist } = useAuth(); //Is user logged in
     const location = useLocation();
     const [isLogin, setIsLogin] = useState(location.pathname === '/login');
     const [pending, setPending] = useState(false);
@@ -118,7 +120,7 @@ function SignPage() {
         setIsLogin(location.pathname == '/login');
     }, [location])
 
-    const toggleTab = () => { setIsLogin(prev => !prev)}
+    const toggleTab = () => { setIsLogin(prev => !prev) }
 
     const altPending = [isLoading].every(Boolean) || pending;
 
@@ -127,25 +129,30 @@ function SignPage() {
             <SimpleNavbar />
             {(altPending) ?
                 <Suspense fallBack={<></>}>
-                    <PendingIndicator open={altPending} message="Đang gửi yêu cầu..."/>
+                    <PendingIndicator open={altPending} message="Đang gửi yêu cầu..." />
                 </Suspense>
                 : null
             }
             <Wrapper className={`${isLogin ? 'login' : 'signup'}`}>
-                <TabContainer className={`${isLogin ? 'active' : ''}`}>
-                    <LoginTab {...{ setPending, authenticate }} />
-                </TabContainer>
-                <DividerContainer>
-                    <SignDivider onClick={toggleTab}>HOẶC</SignDivider>
-                    <CustomButton
-                        sx={{ display: { xs: 'block', md: 'none' } }}
-                        variant="outlined"
-                        color="secondary"
-                        onClick={toggleTab}
-                    >
-                        {isLogin ? 'CHƯA CÓ TÀI KHOẢN?' : 'ĐÃ CÓ TÀI KHOẢN?'}
-                    </CustomButton>
-                </DividerContainer>
+                {!persist
+                    &&
+                    <>
+                        <TabContainer className={`${isLogin ? 'active' : ''}`}>
+                            <LoginTab {...{ setPending, authenticate }} />
+                        </TabContainer>
+                        <DividerContainer>
+                            <SignDivider onClick={toggleTab}>HOẶC</SignDivider>
+                            <CustomButton
+                                sx={{ display: { xs: 'block', md: 'none' } }}
+                                variant="outlined"
+                                color="secondary"
+                                onClick={toggleTab}
+                            >
+                                {isLogin ? 'CHƯA CÓ TÀI KHOẢN?' : 'ĐÃ CÓ TÀI KHOẢN?'}
+                            </CustomButton>
+                        </DividerContainer>
+                    </>
+                }
                 <TabContainer className={`${isLogin ? '' : 'active'}`}>
                     <RegisterTab {...{ setPending }} />
                 </TabContainer>

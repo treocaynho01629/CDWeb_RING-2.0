@@ -67,7 +67,7 @@ export default function CustomInput(props) {
                         }
                     }}
                 >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                    {showPassword ? <Visibility/> : <VisibilityOff />}
                 </IconButton>
             </InputAdornment>
 

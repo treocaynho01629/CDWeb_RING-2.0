@@ -1,14 +1,18 @@
-import { useState, useEffect, lazy, Suspense} from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 
 import styled from "styled-components"
 import { styled as muiStyled } from '@mui/material/styles';
 
-import { Grid, TextField, List, ListItemButton, Collapse, Divider, Avatar, Table, TableBody, 
-TableContainer, Dialog, DialogTitle, DialogContent, DialogActions, TableCell, TableRow, Paper, 
-Stack, FormControl, Radio, RadioGroup, FormControlLabel, Box, InputAdornment, IconButton} from '@mui/material';
-import { ExpandLess, ExpandMore, Edit as EditIcon, Person as PersonIcon, Receipt as ReceiptIcon, 
-Try as TryIcon, Check as CheckIcon, Close as CloseIcon, AccessTime as AccessTimeIcon, CalendarMonth as CalendarMonthIcon,
-Star as StarIcon, VisibilityOff, Visibility} from '@mui/icons-material';
+import {
+    Grid, TextField, List, ListItemButton, Collapse, Divider, Avatar, Table, TableBody,
+    TableContainer, Dialog, DialogTitle, DialogContent, DialogActions, TableCell, TableRow, Paper,
+    Stack, FormControl, Radio, RadioGroup, FormControlLabel, Box, InputAdornment, IconButton
+} from '@mui/material';
+import {
+    ExpandLess, ExpandMore, Edit as EditIcon, Person as PersonIcon, Receipt as ReceiptIcon,
+    Try as TryIcon, Check as CheckIcon, Close as CloseIcon, AccessTime as AccessTimeIcon, CalendarMonth as CalendarMonthIcon,
+    Star as StarIcon, VisibilityOff, Visibility
+} from '@mui/icons-material';
 import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
@@ -20,6 +24,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { useGetProfileQuery } from '../features/users/usersApiSlice';
 import dayjs from 'dayjs';
 import usePrivateFetch from '../hooks/usePrivateFetch'
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
@@ -33,14 +38,14 @@ const Wrapper = styled.div`
 
 const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
     '& .MuiDialog-paper': {
-      borderRadius: 0,
-      width: '90%',
+        borderRadius: 0,
+        width: '90%',
     },
     '& .MuiDialogContent-root': {
-      padding: theme.spacing(2),
+        padding: theme.spacing(2),
     },
     '& .MuiDialogActions-root': {
-      padding: theme.spacing(1),
+        padding: theme.spacing(1),
     },
 }));
 
@@ -96,7 +101,7 @@ const MiniProfile = styled.div`
 `
 
 const listStyle = {
-    py: '5px', 
+    py: '5px',
     justifyContent: 'space-between',
 
     '&:hover': {
@@ -105,8 +110,8 @@ const listStyle = {
     },
 
     '&.Mui-selected': {
-    color: '#63e399',
-    backgroundColor: 'white'
+        color: '#63e399',
+        backgroundColor: 'white'
     },
 }
 
@@ -114,7 +119,7 @@ const Instruction = styled.p`
     font-size: 14px;
     font-style: italic;
     color: red;
-    display: ${props=>props.display};;
+    display: ${props => props.display};;
 `
 
 const Title = styled.h3`
@@ -207,7 +212,7 @@ const CustomInput = muiStyled(TextField)(({ theme }) => ({
         borderBottomColor: '#B2BAC2',
     },
     '& .MuiOutlinedInput-root': {
-    borderRadius: 0,
+        borderRadius: 0,
         '& fieldset': {
             borderRadius: 0,
             borderColor: '#E0E3E7',
@@ -235,51 +240,51 @@ const CustomInput = muiStyled(TextField)(({ theme }) => ({
         borderColor: '#63e399',
         borderLeftWidth: 4,
         borderRadius: 0,
-        padding: '4px !important', 
+        padding: '4px !important',
     },
 }));
 
 const CustomDatePicker = styled(DatePicker)({
     '& .MuiInputBase-root': {
-      borderRadius: 0,
-      width: '80%',
+        borderRadius: 0,
+        width: '80%',
     },
     '& label.Mui-focused': {
-      color: '#A0AAB4'
+        color: '#A0AAB4'
     },
     '& .MuiInput-underline:after': {
-      borderBottomColor: '#B2BAC2',
+        borderBottomColor: '#B2BAC2',
     },
     '& .MuiOutlinedInput-root': {
-      borderRadius: 0,
-      '& fieldset': {
         borderRadius: 0,
-        borderColor: '#E0E3E7',
-      },
-      '&:hover fieldset': {
-        borderRadius: 0,
-        borderColor: '#B2BAC2',
-      },
-      '&.Mui-focused fieldset': {
-        borderRadius: 0,
-        borderColor: '#6F7E8C',
-      },
+        '& fieldset': {
+            borderRadius: 0,
+            borderColor: '#E0E3E7',
+        },
+        '&:hover fieldset': {
+            borderRadius: 0,
+            borderColor: '#B2BAC2',
+        },
+        '&.Mui-focused fieldset': {
+            borderRadius: 0,
+            borderColor: '#6F7E8C',
+        },
     },
     '& input:valid + fieldset': {
-      borderColor: 'lightgray',
-      borderRadius: 0,
-      borderWidth: 1,
+        borderColor: 'lightgray',
+        borderRadius: 0,
+        borderWidth: 1,
     },
     '& input:invalid + fieldset': {
-      borderColor: '#e66161',
-      borderRadius: 0,
-      borderWidth: 1,
+        borderColor: '#e66161',
+        borderRadius: 0,
+        borderWidth: 1,
     },
     '& input:valid:focus + fieldset': {
-      borderColor: '#63e399',
-      borderLeftWidth: 4,
-      borderRadius: 0,
-      padding: '4px !important', 
+        borderColor: '#63e399',
+        borderLeftWidth: 4,
+        borderRadius: 0,
+        padding: '4px !important',
     },
 });
 
@@ -305,7 +310,6 @@ const RatingInfo = styled.p`
 const PHONE_REGEX = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/;
 const RECEIPTS_URL = "/api/orders/user?pSize=5";
 const REVIEWS_URL = "/api/reviews/user";
-const PROFILE_URL = "/api/accounts/profile";
 const CHANGE_PASS_URL = "/api/accounts/change-password";
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%:]).{8,24}$/;
 
@@ -327,98 +331,100 @@ const ReceiptsTable = () => {
     };
 
     //Load
-    useEffect(()=>{
-        if (!loadingReceipts){
+    useEffect(() => {
+        if (!loadingReceipts) {
             setReceipts(current => [...current, ...dataReceipts?.content]);
         }
     }, [loadingReceipts]);
 
     const handleShowMoreReceipts = async () => {
-        if (!loadingMore && more){
+        if (!loadingMore && more) {
             setReceipts(current => [...current, ...more?.content]);
-          setCount(prev => prev + 1);
+            setCount(prev => prev + 1);
         }
     }
 
-    if (loadingReceipts){
-        return (<CustomLinearProgress/>)
+    if (loadingReceipts) {
+        return (<CustomLinearProgress />)
     }
 
     return (
         <>
-        { dataReceipts?.totalElements == 0 ?
-        <Box sx={{height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <h3>Bạn chưa mua sản phẩm nào</h3>
-        </Box>
-        :
-        <div>
-            <TableContainer component={Paper} sx={{borderRadius: '0%'}} >
-                <Table sx={{ minWidth: 500, borderRadius: '0%'}} aria-label="cart-table">
-                    <TableBody>
-                    { receipts?.map((receipt) => {
-                        return (
-                            receipt?.orderDetails?.map((detail, index) => {
-                                return (
-                                    <>
-                                    <TableRow key={detail.id + "a" + index} sx={{backgroundColor: '#f7f7f7'}}>
-                                        <TableCell colSpan={1}><ItemTitle>Giao tới: {receipt.address}</ItemTitle></TableCell>
-                                        <TableCell align="right"><StatusTag><CheckIcon/>ĐÃ GIAO</StatusTag></TableCell>
-                                    </TableRow>
-                                    <TableRow key={detail.id + "b" + index}>
-                                        <TableCell>
-                                            <div style={{display: 'flex'}}>
-                                                <Link to={`/product/${detail.bookId}`} style={{color: 'inherit'}}>
-                                                    <div style={{display: 'flex'}}>
-                                                        <LazyLoadImage src={detail.image}
-                                                            height={90}
-                                                            width={90} 
-                                                            style={{
-                                                                border: '0.5px solid lightgray',
-                                                                objectFit: 'contain'
-                                                            }}
-                                                        /> 
-                                                        <div style={{marginLeft: '20px', marginTop: '10px'}}>
-                                                            <ItemTitle>{detail.bookTitle}</ItemTitle>
-                                                            <p>Số lượng: {detail.amount}</p>
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <Price>{detail.price.toLocaleString()} đ</Price>
-                                            <Discount>{Math.round(detail.price * 1.1).toLocaleString()} đ</Discount>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow key={detail.id + "c" + index}>
-                                        <TableCell colSpan={1} sx={{cursor: 'pointer'}} onClick={() => navigate(`/product/${detail.bookId}`)}>Đánh giá sản phẩm?</TableCell>
-                                        <TableCell align="right">
-                                            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '10px'}}>
-                                                <b style={{margin: 0}}>Tổng:</b>
-                                                <Price>&nbsp;&nbsp;{(detail.price * detail.amount).toLocaleString()} đ</Price>
-                                            </div>
-                                            <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-                                                <Button onClick={() => handleAddToCart(detail)} style={{marginRight: 0}}>MUA LẠI</Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                    <br/>
-                                    </>
-                                )
-                            })
-                        )
-                    })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <div style={{display: more?.last ? 'none' : 'flex', 
-            justifyContent: 'center', 
-            margin: '20px 0px'}}>
-                <Button onClick={handleShowMoreReceipts}>Xem thêm</Button>
-            </div>
-        </div>
-        }
-      </>
+            {dataReceipts?.totalElements == 0 ?
+                <Box sx={{ height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <h3>Bạn chưa mua sản phẩm nào</h3>
+                </Box>
+                :
+                <div>
+                    <TableContainer component={Paper} sx={{ borderRadius: '0%' }} >
+                        <Table sx={{ minWidth: 500, borderRadius: '0%' }} aria-label="cart-table">
+                            <TableBody>
+                                {receipts?.map((receipt) => {
+                                    return (
+                                        receipt?.orderDetails?.map((detail, index) => {
+                                            return (
+                                                <>
+                                                    <TableRow key={detail.id + "a" + index} sx={{ backgroundColor: '#f7f7f7' }}>
+                                                        <TableCell colSpan={1}><ItemTitle>Giao tới: {receipt.address}</ItemTitle></TableCell>
+                                                        <TableCell align="right"><StatusTag><CheckIcon />ĐÃ GIAO</StatusTag></TableCell>
+                                                    </TableRow>
+                                                    <TableRow key={detail.id + "b" + index}>
+                                                        <TableCell>
+                                                            <div style={{ display: 'flex' }}>
+                                                                <Link to={`/product/${detail.bookId}`} style={{ color: 'inherit' }}>
+                                                                    <div style={{ display: 'flex' }}>
+                                                                        <LazyLoadImage src={detail.image}
+                                                                            height={90}
+                                                                            width={90}
+                                                                            style={{
+                                                                                border: '0.5px solid lightgray',
+                                                                                objectFit: 'contain'
+                                                                            }}
+                                                                        />
+                                                                        <div style={{ marginLeft: '20px', marginTop: '10px' }}>
+                                                                            <ItemTitle>{detail.bookTitle}</ItemTitle>
+                                                                            <p>Số lượng: {detail.amount}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </Link>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell align="right">
+                                                            <Price>{detail.price.toLocaleString()} đ</Price>
+                                                            <Discount>{Math.round(detail.price * 1.1).toLocaleString()} đ</Discount>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                    <TableRow key={detail.id + "c" + index}>
+                                                        <TableCell colSpan={1} sx={{ cursor: 'pointer' }} onClick={() => navigate(`/product/${detail.bookId}`)}>Đánh giá sản phẩm?</TableCell>
+                                                        <TableCell align="right">
+                                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '10px' }}>
+                                                                <b style={{ margin: 0 }}>Tổng:</b>
+                                                                <Price>&nbsp;&nbsp;{(detail.price * detail.amount).toLocaleString()} đ</Price>
+                                                            </div>
+                                                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                                                <Button onClick={() => handleAddToCart(detail)} style={{ marginRight: 0 }}>MUA LẠI</Button>
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                    <br />
+                                                </>
+                                            )
+                                        })
+                                    )
+                                })}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <div style={{
+                        display: more?.last ? 'none' : 'flex',
+                        justifyContent: 'center',
+                        margin: '20px 0px'
+                    }}>
+                        <Button onClick={handleShowMoreReceipts}>Xem thêm</Button>
+                    </div>
+                </div>
+            }
+        </>
     )
 }
 
@@ -428,83 +434,83 @@ const ReviewTable = () => {
         pageSize: 8,
         totalPages: 0
     })
-    const { loading: loadingReviews, data: reviews } = usePrivateFetch(REVIEWS_URL 
+    const { loading: loadingReviews, data: reviews } = usePrivateFetch(REVIEWS_URL
         + "?pSize=" + pagination.pageSize
         + "&pageNo=" + pagination.currPage);
 
     useEffect(() => {
-        if (!loadingReviews){
-            setPagination({ ...pagination, totalPages: reviews?.totalPages});
+        if (!loadingReviews) {
+            setPagination({ ...pagination, totalPages: reviews?.totalPages });
             if (pagination?.currPage > pagination?.pageSize) handlePageChange(1);
         }
     }, [loadingReviews])
 
     const handleChangeSize = (newValue) => {
         handlePageChange(1);
-        setPagination({...pagination, pageSize: newValue});
+        setPagination({ ...pagination, pageSize: newValue });
     };
 
     const handlePageChange = (page) => {
-        setPagination({...pagination, currPage: page - 1});
+        setPagination({ ...pagination, currPage: page - 1 });
     };
 
-    if (loadingReviews){
-        return (<CustomLinearProgress/>)
+    if (loadingReviews) {
+        return (<CustomLinearProgress />)
     }
 
     return (
         <>
-        { reviews?.totalElements == 0 ?
-        <Box sx={{height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <h3>Bạn chưa có đánh giá nào</h3>
-        </Box>
-        :
-        <Box>
-            {reviews?.content?.map((review, index) => (
-                <Grid key={review.id + ":" + index}>
-                    <Review review={review}/>
-                </Grid>
-            ))}
-            <AppPagination pagination={pagination}
-            onPageChange={handlePageChange}
-            onSizeChange={handleChangeSize}/>
-        </Box>
-        }
+            {reviews?.totalElements == 0 ?
+                <Box sx={{ height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <h3>Bạn chưa có đánh giá nào</h3>
+                </Box>
+                :
+                <Box>
+                    {reviews?.content?.map((review, index) => (
+                        <Grid key={review.id + ":" + index}>
+                            <Review review={review} />
+                        </Grid>
+                    ))}
+                    <AppPagination pagination={pagination}
+                        onPageChange={handlePageChange}
+                        onSizeChange={handleChangeSize} />
+                </Box>
+            }
         </>
     )
 }
 
-const Review = ({review}) => {
+const Review = ({ review }) => {
     const date = new Date(review.date)
     const navigate = useNavigate();
 
     return (
-      <div>
-        <Profiler>
-          <Box sx={{display: 'flex', alignItems: 'center'}}>
-            <Box display={{xs: 'none', md: 'flex'}}>
-              <RatingInfo><Avatar sx={{width: '20px', height: '20px', marginRight: '5px'}}>A</Avatar>{review.userName}</RatingInfo>
-              <RatingInfo><AccessTimeIcon sx={{fontSize: 18, marginRight: '5px', color: '#63e399'}}/>{date.getHours() + ":" + date.getMinutes()}</RatingInfo>
-            </Box>
-              <RatingInfo><CalendarMonthIcon sx={{fontSize: 18, marginRight: '5px', color: '#63e399'}}/>{date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear()}</RatingInfo>
-          </Box>
-          <Box sx={{display: 'flex', alignItems: 'center'}}>
-            <RatingInfo style={{marginRight: '20px', fontWeight: 'bold', cursor: 'pointer'}} 
-                onClick={() => navigate(`/product/${review.bookId}`)}>
-                Đi đến sản phẩm
-              </RatingInfo>
-            <RatingInfo><StarIcon sx={{fontSize: 18, marginRight: '5px', color: '#63e399'}}/>{review.rating}</RatingInfo>
-          </Box>
-        </Profiler>
-        <Box sx={{margin: '20px 0px 50px'}}>{review.content}</Box>
-      </div>
+        <div>
+            <Profiler>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box display={{ xs: 'none', md: 'flex' }}>
+                        <RatingInfo><Avatar sx={{ width: '20px', height: '20px', marginRight: '5px' }}>A</Avatar>{review.userName}</RatingInfo>
+                        <RatingInfo><AccessTimeIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />{date.getHours() + ":" + date.getMinutes()}</RatingInfo>
+                    </Box>
+                    <RatingInfo><CalendarMonthIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />{date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear()}</RatingInfo>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <RatingInfo style={{ marginRight: '20px', fontWeight: 'bold', cursor: 'pointer' }}
+                        onClick={() => navigate(`/product/${review.bookId}`)}>
+                        Đi đến sản phẩm
+                    </RatingInfo>
+                    <RatingInfo><StarIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />{review.rating}</RatingInfo>
+                </Box>
+            </Profiler>
+            <Box sx={{ margin: '20px 0px 50px' }}>{review.content}</Box>
+        </div>
     )
 }
 
 const Profile = () => {
     //#region construct
     const [pending, setPending] = useState(false);
-    const {tab} = useParams();
+    const { tab } = useParams();
     const [open, setOpen] = useState(false);
     const [err, setErr] = useState([]);
     const [errMsg, setErrMsg] = useState([]);
@@ -525,10 +531,10 @@ const Profile = () => {
     const [validNewPass, setValidNewPass] = useState(true);
     const [validNewPassRe, setValidNewPassRe] = useState(true);
     const [newPassFocus, setNewPassFocus] = useState(false);
-    
+
     const navigate = useNavigate();
     const axiosPrivate = useAxiosPrivate();
-    const { loading, data, refetch } = usePrivateFetch(PROFILE_URL);
+    const { data, isLoading, isSuccess, isError, refetch } = useGetProfileQuery();
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -551,14 +557,14 @@ const Profile = () => {
     }, [newPass, newPassRe, pass])
 
     useEffect(() => {
-        if (!loading){
+        if (!isLoading && isSuccess && data) {
             setName(data?.name);
             setPhone(data?.phone);
             setAddress(data?.address);
             setGender(data?.gender);
             setDob(dayjs(data?.dob));
         }
-    }, [loading])
+    }, [isLoading])
 
     useEffect(() => {
         const result = PHONE_REGEX.test(phone);
@@ -598,7 +604,7 @@ const Profile = () => {
                     gender: gender,
                     address: address,
                     dob: dob.format('YYYY-MM-DD')
-                } ),
+                }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
@@ -623,29 +629,29 @@ const Profile = () => {
     const handleChangePassword = async (e) => {
         e.preventDefault();
 
-       const v1 = PWD_REGEX.test(newPass);
+        const v1 = PWD_REGEX.test(newPass);
 
-       if (!v1) {
-           setOtherErrMsg("Sai định dạng thông tin!");
-           return;
-       }
+        if (!v1) {
+            setOtherErrMsg("Sai định dạng thông tin!");
+            return;
+        }
 
-       if (!newPass || !newPassRe){
-           setOtherErrMsg("Không được bỏ trống mật khẩu mới!");
-           setValidNewPass(false);
-           setValidNewPassRe(false);
-           return;
-       }
+        if (!newPass || !newPassRe) {
+            setOtherErrMsg("Không được bỏ trống mật khẩu mới!");
+            setValidNewPass(false);
+            setValidNewPassRe(false);
+            return;
+        }
 
-       if (newPass !== newPassRe){
-           setOtherErrMsg("Không trùng mật khẩu!");
-           setValidNewPass(false);
-           setValidNewPassRe(false);
-           return;
-       }
+        if (newPass !== newPassRe) {
+            setOtherErrMsg("Không trùng mật khẩu!");
+            setValidNewPass(false);
+            setValidNewPassRe(false);
+            return;
+        }
 
-       setPending(true);
-       setOpenDialog(false);
+        setPending(true);
+        setOpenDialog(false);
 
         try {
             const response = await axiosPrivate.put(CHANGE_PASS_URL,
@@ -653,7 +659,7 @@ const Profile = () => {
                     pass: pass,
                     newPass: newPass,
                     newPassRe: newPassRe
-                } ),
+                }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
@@ -688,248 +694,251 @@ const Profile = () => {
         }
     }
 
-    const endAdornment=
-    <InputAdornment position="end">
-        <IconButton
-            aria-label="toggle password visibility"
-            onClick={handleClickShowPassword}
-            onMouseDown={handleMouseDownPassword}
-            edge="end"
-        >
-            {show ? <VisibilityOff /> : <Visibility />}
-        </IconButton>
-    </InputAdornment>
+    const endAdornment =
+        <InputAdornment position="end">
+            <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+                edge="end"
+            >
+                {show ? <VisibilityOff /> : <Visibility />}
+            </IconButton>
+        </InputAdornment>
     //#endregion
 
-  return (
-    <Wrapper>
-        {pending ?
-        <Suspense fallBack={<></>}>
-            <PendingIndicator/>
-        </Suspense>
-        : null
-        }
-        <Grid container spacing={2}>
-            <Grid item xs={12} md={3.5} lg={3} sx={{display: 'flex', justifyContent: 'center'}}>
-                <ListContainer>
-                    <MiniProfile>
-                        <Grid container spacing={1}>
-                            <Grid item xs={6} md={12} sx={{display: 'flex', alignItems: 'center'}}>
-                                <Avatar sx={{ width: 50, height: 50, marginRight: 2}}/><h3>{data?.userName}</h3>
+    return (
+        <Wrapper>
+            {pending ?
+                <Suspense fallBack={<></>}>
+                    <PendingIndicator />
+                </Suspense>
+                : null
+            }
+            <Grid container spacing={2}>
+                <Grid item xs={12} md={3.5} lg={3} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <ListContainer>
+                        <MiniProfile>
+                            <Grid container spacing={1}>
+                                <Grid item xs={6} md={12} sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Avatar sx={{ width: 50, height: 50, marginRight: 2 }} /><h3>{data?.userName}</h3>
+                                </Grid>
+                                <Grid item xs={6} md={12} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <ChangeText onClick={() => navigate('/profile/detail')}><EditIcon />Sửa hồ sơ</ChangeText>
+                                </Grid>
                             </Grid>
-                            <Grid item xs={6} md={12} sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                                <ChangeText onClick={() => navigate('/profile/detail')}><EditIcon/>Sửa hồ sơ</ChangeText>
-                            </Grid>
-                        </Grid>
-                    </MiniProfile>
-                    <Divider sx={{margin: '20px 0px'}}/>
-                    <List
-                    sx={{ width: '100%', py: 0}}
-                    component="nav"
-                    >
-                        <ListItemButton sx={listStyle} selected={false} onClick={() => handleOpen()}>
-                            <ItemText><PersonIcon/>&nbsp;Tài khoản của tôi</ItemText>
-                            {open ? <ExpandLess/> 
-                                : <ExpandMore/>}
-                        </ListItemButton>
-                        <Collapse in={open} timeout="auto" unmountOnExit>
-                            <List component="div" disablePadding>
-                                <ListItemButton sx={{ pl: 8 , py: 0, color: 'gray'}} onClick={() => navigate('/profile/detail')}>
-                                <ItemText>Hồ sơ</ItemText>
-                                </ListItemButton>
-                            </List>
-                            <List component="div" disablePadding>
-                                <ListItemButton sx={{ pl: 8 , py: 0, color: 'gray'}} onClick={handleOpenDialog}>
-                                <ItemText>Đổi mật khẩu</ItemText>
-                                </ListItemButton>
-                            </List>
-                        </Collapse>
+                        </MiniProfile>
+                        <Divider sx={{ margin: '20px 0px' }} />
+                        <List
+                            sx={{ width: '100%', py: 0 }}
+                            component="nav"
+                        >
+                            <ListItemButton sx={listStyle} selected={false} onClick={() => handleOpen()}>
+                                <ItemText><PersonIcon />&nbsp;Tài khoản của tôi</ItemText>
+                                {open ? <ExpandLess />
+                                    : <ExpandMore />}
+                            </ListItemButton>
+                            <Collapse in={open} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
+                                    <ListItemButton sx={{ pl: 8, py: 0, color: 'gray' }} onClick={() => navigate('/profile/detail')}>
+                                        <ItemText>Hồ sơ</ItemText>
+                                    </ListItemButton>
+                                </List>
+                                <List component="div" disablePadding>
+                                    <ListItemButton sx={{ pl: 8, py: 0, color: 'gray' }} onClick={handleOpenDialog}>
+                                        <ItemText>Đổi mật khẩu</ItemText>
+                                    </ListItemButton>
+                                </List>
+                            </Collapse>
 
-                        <ListItemButton sx={listStyle} selected={false} onClick={() => navigate('/profile/receipts')}>
-                            <ItemText><ReceiptIcon/>&nbsp;Đơn hàng</ItemText>
-                        </ListItemButton>
-                        <ListItemButton sx={listStyle} selected={false} onClick={() => navigate('/profile/reviews')}>
-                            <ItemText><TryIcon/>&nbsp;Đánh giá</ItemText>
-                        </ListItemButton>
-                    </List>
-                </ListContainer>
-            </Grid>
-            <Grid item xs={12} md={8.5} lg={9}>
-                <TabContext value={tab}>
-                    <TabPanel value="detail">
-                    <ContentContainer>
-                        <Title><PersonIcon/>&nbsp;HỒ SƠ CỦA BẠN</Title>
-                        {loading ? 
-                        <CustomLinearProgress/>
-                        :    
-                        <Box sx={{paddingBottom: '100px'}}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={4} lg={3}>
-                                    <Stack spacing={0}>
-                                        <InfoStack><InfoText>Tên đăng nhập: </InfoText></InfoStack>
-                                        <InfoStack><InfoText>Email: </InfoText></InfoStack>
-                                        <InfoStack><InfoText>Tên: </InfoText></InfoStack>
-                                        <InfoStack><InfoText>Số điện thoại: </InfoText></InfoStack>
-                                        <InfoStack><InfoText>Ngày sinh: </InfoText></InfoStack>
-                                        <InfoStack><InfoText>Địa chỉ: </InfoText></InfoStack>
-                                        <InfoStack><InfoText>Giới tính: </InfoText></InfoStack>
+                            <ListItemButton sx={listStyle} selected={false} onClick={() => navigate('/profile/receipts')}>
+                                <ItemText><ReceiptIcon />&nbsp;Đơn hàng</ItemText>
+                            </ListItemButton>
+                            <ListItemButton sx={listStyle} selected={false} onClick={() => navigate('/profile/reviews')}>
+                                <ItemText><TryIcon />&nbsp;Đánh giá</ItemText>
+                            </ListItemButton>
+                        </List>
+                    </ListContainer>
+                </Grid>
+                <Grid item xs={12} md={8.5} lg={9}>
+                    <TabContext value={tab}>
+                        <TabPanel value="detail">
+                            <ContentContainer>
+                                <Title><PersonIcon />&nbsp;HỒ SƠ CỦA BẠN</Title>
+                                {isLoading ?
+                                    <CustomLinearProgress />
+                                    :
+                                    <Box sx={{ paddingBottom: '100px' }}>
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={4} lg={3}>
+                                                <Stack spacing={0}>
+                                                    <InfoStack><InfoText>Tên đăng nhập: </InfoText></InfoStack>
+                                                    <InfoStack><InfoText>Email: </InfoText></InfoStack>
+                                                    <InfoStack><InfoText>Tên: </InfoText></InfoStack>
+                                                    <InfoStack><InfoText>Số điện thoại: </InfoText></InfoStack>
+                                                    <InfoStack><InfoText>Ngày sinh: </InfoText></InfoStack>
+                                                    <InfoStack><InfoText>Địa chỉ: </InfoText></InfoStack>
+                                                    <InfoStack><InfoText>Giới tính: </InfoText></InfoStack>
+                                                </Stack>
+                                            </Grid>
+                                            <Grid item xs={8} lg={6}>
+                                                <Stack spacing={0}>
+                                                    <InfoStack><InfoText>{data?.userName} </InfoText></InfoStack>
+                                                    <InfoStack><InfoText>{data?.email} </InfoText></InfoStack>
+                                                    <InfoStack>
+                                                        <CustomInput
+                                                            type="text"
+                                                            id="name"
+                                                            onChange={(e) => setName(e.target.value)}
+                                                            value={name}
+                                                            error={err?.response?.data?.errors?.firstName}
+                                                            helperText={err?.response?.data?.errors?.firstName}
+                                                            size="small"
+                                                            sx={{ width: '80%' }}
+                                                        />
+                                                    </InfoStack>
+                                                    <InfoStack>
+                                                        <CustomInput
+                                                            id="phone"
+                                                            onChange={(e) => setPhone(e.target.value)}
+                                                            value={phone}
+                                                            error={(phone && !validPhone) || err?.response?.data?.errors?.phone}
+                                                            helperText={(phone && !validPhone) ? "Sai định dạng số điện thoại!" : err?.response?.data?.errors?.phone}
+                                                            size="small"
+                                                            sx={{ width: '80%' }}
+                                                        />
+                                                    </InfoStack>
+                                                    <InfoStack>
+                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                            <FormControl margin="dense" fullWidth>
+                                                                <CustomDatePicker
+                                                                    value={dob}
+                                                                    className="DatePicker"
+                                                                    onChange={(newValue) => setDob(newValue)}
+                                                                    size="small"
+                                                                    slotProps={{
+                                                                        textField: {
+                                                                            size: "small",
+                                                                            error: err?.response?.data?.errors?.dob,
+                                                                            helperText: err?.response?.data?.errors?.dob,
+                                                                        },
+                                                                    }}
+                                                                />
+                                                            </FormControl>
+                                                        </LocalizationProvider>
+                                                    </InfoStack>
+                                                    <InfoStack>
+                                                        <CustomInput
+                                                            type="text"
+                                                            id="address"
+                                                            onChange={(e) => setAddress(e.target.value)}
+                                                            value={address}
+                                                            error={err?.response?.data?.errors?.address}
+                                                            helperText={err?.response?.data?.errors?.address}
+                                                            size="small"
+                                                            sx={{ width: '80%' }}
+                                                        />
+                                                    </InfoStack>
+                                                    <InfoStack>
+                                                        <RadioGroup spacing={1} row value={gender} onChange={(e) => setGender(e.target.value)}>
+                                                            <FormControlLabel value="Nam" control={<Radio sx={{
+                                                                '&.Mui-checked': {
+                                                                    color: '#63e399',
+                                                                }
+                                                            }} />}
+                                                                label="Nam" />
+                                                            <FormControlLabel value="Nữ" control={<Radio sx={{
+                                                                '&.Mui-checked': {
+                                                                    color: '#63e399',
+                                                                }
+                                                            }} />}
+                                                                label="Nữ" />
+                                                            <FormControlLabel value="" control={<Radio sx={{
+                                                                '&.Mui-checked': {
+                                                                    color: '#63e399',
+                                                                }
+                                                            }} />}
+                                                                label="Không" />
+                                                        </RadioGroup>
+                                                    </InfoStack>
+                                                </Stack>
+                                            </Grid>
+                                            <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'flex' }} sx={{ justifyContent: 'center' }}>
+                                                <Avatar sx={{ height: 150, width: 150 }} />
+                                            </Grid>
+                                        </Grid>
+                                        <InfoStack><Button onClick={handleChangeInfo}>Lưu thông tin</Button></InfoStack>
+                                    </Box>
+                                }
+                            </ContentContainer>
+                            <CustomDialog open={openDialog}
+                                scroll="body"
+                                onClose={handleCloseDialog}>
+                                <DialogTitle sx={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>Thay đổi mật khẩu</DialogTitle>
+                                <DialogContent sx={{ marginTop: 0, marginX: '10px' }}>
+                                    <Stack spacing={2} direction="column">
+                                        <Instruction display={otherErrMsg ? "block" : "none"} aria-live="assertive">{otherErrMsg}</Instruction>
+                                        <CustomInput label='Nhập mật khẩu hiện tại'
+                                            type={show ? 'text' : 'password'}
+                                            onChange={(e) => setPass(e.target.value)}
+                                            value={pass}
+                                            error={errr?.response?.data?.errors?.password}
+                                            helperText={errr?.response?.data?.errors?.password}
+                                            size="small"
+                                            InputProps={{
+                                                endAdornment: endAdornment
+                                            }}
+                                        />
+                                        <CustomInput label='Nhập mật khẩu mới'
+                                            type={show ? 'text' : 'password'}
+                                            onChange={(e) => setNewPass(e.target.value)}
+                                            value={newPass}
+                                            aria-invalid={validNewPass ? "false" : "true"}
+                                            onFocus={() => setNewPassFocus(true)}
+                                            onBlur={() => setNewPassFocus(false)}
+                                            error={newPass && !validNewPass || errr?.response?.data?.errors?.newPass}
+                                            helperText={newPassFocus && newPass && !validNewPass ? "8 đến 24 kí tự. Phải bao gồm chữ in hoa và ký tự đặc biệt." : errr?.response?.data?.errors?.newPass} size="small"
+                                            InputProps={{
+                                                endAdornment: endAdornment
+                                            }}
+                                        />
+                                        <CustomInput label='Nhập lại mật khẩu mới'
+                                            type={show ? 'text' : 'password'}
+                                            onChange={(e) => setNewPassRe(e.target.value)}
+                                            value={newPassRe}
+                                            aria-invalid={validNewPassRe ? "false" : "true"}
+                                            error={newPassRe && !validNewPassRe || errr?.response?.data?.errors?.newPassRe}
+                                            helperText={newPassRe && !validNewPassRe ? "Không trùng mật khẩu." : errr?.response?.data?.errors?.newPassRe}
+                                            size="small"
+                                            InputProps={{
+                                                endAdornment: endAdornment
+                                            }}
+                                        />
                                     </Stack>
-                                </Grid>
-                                <Grid item xs={8} lg={6}>
-                                    <Stack spacing={0}>
-                                        <InfoStack><InfoText>{data?.userName} </InfoText></InfoStack>
-                                        <InfoStack><InfoText>{data?.email} </InfoText></InfoStack>
-                                        <InfoStack>
-                                            <CustomInput
-                                            type="text"
-                                            id="name"
-                                            onChange={(e) => setName(e.target.value)}
-                                            value={name}
-                                            error = {err?.response?.data?.errors?.firstName}
-                                            helperText= {err?.response?.data?.errors?.firstName}
-                                            size="small"
-                                            sx={{width: '80%'}}
-                                            />
-                                        </InfoStack>
-                                        <InfoStack>
-                                            <CustomInput
-                                            id="phone"
-                                            onChange={(e) => setPhone(e.target.value)}
-                                            value={phone}
-                                            error={(phone && !validPhone) || err?.response?.data?.errors?.phone}
-                                            helperText={(phone && !validPhone) ? "Sai định dạng số điện thoại!" : err?.response?.data?.errors?.phone}
-                                            size="small"
-                                            sx={{width: '80%'}}
-                                            />
-                                        </InfoStack>
-                                        <InfoStack>
-                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <FormControl margin="dense" fullWidth>
-                                                <CustomDatePicker
-                                                value={dob}
-                                                className="DatePicker"
-                                                onChange={(newValue) => setDob(newValue)}
-                                                size="small"
-                                                slotProps={{
-                                                    textField: {
-                                                    size: "small",
-                                                    error: err?.response?.data?.errors?.dob,
-                                                    helperText: err?.response?.data?.errors?.dob,
-                                                    },
-                                                }}
-                                                />
-                                            </FormControl>
-                                            </LocalizationProvider>
-                                        </InfoStack>
-                                        <InfoStack>
-                                            <CustomInput
-                                            type="text"
-                                            id="address"
-                                            onChange={(e) => setAddress(e.target.value)}
-                                            value={address}
-                                            error = {err?.response?.data?.errors?.address}
-                                            helperText= {err?.response?.data?.errors?.address}
-                                            size="small"
-                                            sx={{width: '80%'}}
-                                            />
-                                        </InfoStack>
-                                        <InfoStack>
-                                            <RadioGroup spacing={1} row value={gender} onChange={(e) => setGender(e.target.value)}>
-                                                <FormControlLabel value="Nam" control={<Radio  sx={{
-                                                    '&.Mui-checked': {
-                                                    color: '#63e399',
-                                                }}}/>} 
-                                                label="Nam"/>
-                                                <FormControlLabel value="Nữ" control={<Radio  sx={{
-                                                    '&.Mui-checked': {
-                                                    color: '#63e399',
-                                                }}}/>} 
-                                                label="Nữ"/>
-                                                <FormControlLabel value="" control={<Radio  sx={{
-                                                    '&.Mui-checked': {
-                                                    color: '#63e399',
-                                                }}}/>} 
-                                                label="Không"/>
-                                            </RadioGroup>
-                                        </InfoStack>
-                                    </Stack>
-                                </Grid>
-                                <Grid item xs={12} lg={3} display={{xs: 'none', lg: 'flex'}} sx={{justifyContent: 'center'}}>
-                                    <Avatar sx={{height: 150, width: 150}}/>
-                                </Grid>
-                            </Grid>
-                            <InfoStack><Button onClick={handleChangeInfo}>Lưu thông tin</Button></InfoStack>
-                        </Box>
-                        }
-                    </ContentContainer>
-                    <CustomDialog open={openDialog} 
-                    scroll="body"
-                    onClose={handleCloseDialog}>
-                        <DialogTitle sx={{display: 'flex', alignItems: 'center', marginTop: '10px'}}>Thay đổi mật khẩu</DialogTitle>
-                        <DialogContent sx={{marginTop: 0, marginX: '10px'}}>
-                            <Stack spacing={2} direction="column">
-                                <Instruction display={otherErrMsg ? "block" : "none"} aria-live="assertive">{otherErrMsg}</Instruction>
-                                <CustomInput label='Nhập mật khẩu hiện tại' 
-                                    type={show ? 'text' : 'password'}
-                                    onChange={(e) => setPass(e.target.value)}
-                                    value={pass}
-                                    error = {errr?.response?.data?.errors?.password}
-                                    helperText= {errr?.response?.data?.errors?.password}
-                                    size="small"
-                                    InputProps={{
-                                        endAdornment: endAdornment
-                                    }}
-                                />
-                                <CustomInput label='Nhập mật khẩu mới' 
-                                    type={show ? 'text' : 'password'}
-                                    onChange={(e) => setNewPass(e.target.value)}
-                                    value={newPass}
-                                    aria-invalid={validNewPass ? "false" : "true"}
-                                    onFocus={() => setNewPassFocus(true)}
-                                    onBlur={() => setNewPassFocus(false)}
-                                    error = {newPass && !validNewPass || errr?.response?.data?.errors?.newPass}
-                                    helperText= {newPassFocus && newPass && !validNewPass ? "8 đến 24 kí tự. Phải bao gồm chữ in hoa và ký tự đặc biệt." : errr?.response?.data?.errors?.newPass}                                        size="small"
-                                    InputProps={{
-                                        endAdornment: endAdornment
-                                    }}
-                                />
-                                <CustomInput label='Nhập lại mật khẩu mới' 
-                                    type={show ? 'text' : 'password'}
-                                    onChange={(e) => setNewPassRe(e.target.value)}
-                                    value={newPassRe}
-                                    aria-invalid={validNewPassRe ? "false" : "true"}
-                                    error = {newPassRe && !validNewPassRe || errr?.response?.data?.errors?.newPassRe}
-                                    helperText= {newPassRe && !validNewPassRe ? "Không trùng mật khẩu." : errr?.response?.data?.errors?.newPassRe}
-                                    size="small"
-                                    InputProps={{
-                                        endAdornment: endAdornment
-                                    }}
-                                />
-                            </Stack>
-                        </DialogContent>
-                        <DialogActions sx={{marginBottom: '20px'}}>
-                            <Button onClick={handleChangePassword}><CheckIcon sx={{marginRight: '10px'}}/>Xác nhận</Button>
-                            <Button style={{backgroundColor: '#e66161'}} onClick={handleCloseDialog}><CloseIcon sx={{marginRight: '10px'}}/>Huỷ</Button>
-                        </DialogActions>
-                    </CustomDialog>
-                    </TabPanel>
-                    <TabPanel value="receipts">
-                    <ContentContainer>
-                        <Title><ReceiptIcon/>&nbsp;ĐƠN HÀNG CỦA BẠN</Title>
-                        <ReceiptsTable/>
-                    </ContentContainer>
-                    </TabPanel>
-                    <TabPanel value="reviews">
-                    <ContentContainer>
-                        <Title><TryIcon/>&nbsp;ĐÁNH GIÁ CỦA BẠN</Title>
-                        <ReviewTable/>
-                    </ContentContainer>
-                    </TabPanel>
-                </TabContext>
+                                </DialogContent>
+                                <DialogActions sx={{ marginBottom: '20px' }}>
+                                    <Button onClick={handleChangePassword}><CheckIcon sx={{ marginRight: '10px' }} />Xác nhận</Button>
+                                    <Button style={{ backgroundColor: '#e66161' }} onClick={handleCloseDialog}><CloseIcon sx={{ marginRight: '10px' }} />Huỷ</Button>
+                                </DialogActions>
+                            </CustomDialog>
+                        </TabPanel>
+                        <TabPanel value="receipts">
+                            <ContentContainer>
+                                <Title><ReceiptIcon />&nbsp;ĐƠN HÀNG CỦA BẠN</Title>
+                                <ReceiptsTable />
+                            </ContentContainer>
+                        </TabPanel>
+                        <TabPanel value="reviews">
+                            <ContentContainer>
+                                <Title><TryIcon />&nbsp;ĐÁNH GIÁ CỦA BẠN</Title>
+                                <ReviewTable />
+                            </ContentContainer>
+                        </TabPanel>
+                    </TabContext>
+                </Grid>
             </Grid>
-        </Grid>
-    </Wrapper>
-  )
+        </Wrapper>
+    )
 }
 
 export default Profile  

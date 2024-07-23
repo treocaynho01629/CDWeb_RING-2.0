@@ -188,8 +188,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 url: `/api/reviews${id}`,
                 method: 'POST',
                 credentials: 'include',
-                body: newReview,
-                formData: true
+                body: { ...newReview }
             }),
             invalidatesTags: [
                 { type: 'Review', id: "LIST" }

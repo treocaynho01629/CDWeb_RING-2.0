@@ -21,7 +21,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                     return response.status === 200 && !result.isError
                 },
             }),
-            providesTags: (result, error, id) => [{ type: 'Book', id: result?.id }]
+            providesTags: (result, error, id) => [{ type: 'Book', id }]
         }),
         getBooks: builder.query({
             query: (args) => {

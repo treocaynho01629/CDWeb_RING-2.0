@@ -10,7 +10,6 @@ import { setAuth, setPersist } from '../../features/auth/authSlice';
 import CustomInput from '../custom/CustomInput';
 import CustomButton from '../custom/CustomButton';
 import axios from '../../app/api/axios';
-import useAuth from '../../hooks/useAuth';
 
 //#region styled
 const Title = styled.h1`
@@ -22,8 +21,7 @@ const Title = styled.h1`
 const Instruction = styled.p`
     font-size: 14px;
     font-style: italic;
-    color: red;
-    display: ${props => props.display};;
+    color: ${props => props.theme.palette.error.main};
 `
 //#endregion
 
@@ -32,7 +30,6 @@ const FORGOT_URL = '/api/v1/auth/forgot-password?email=';
 
 const LoginTab = ({ setPending, authenticate }) => {
     const dispatch = useDispatch();
-    const { persist } = useAuth();
 
     //Router
     const navigate = useNavigate();
@@ -47,6 +44,7 @@ const LoginTab = ({ setPending, authenticate }) => {
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
     const [validEmail, setValidEmail] = useState(false);
+    const [currPersist, setCurrPersist] = useState(false);
 
     //Error
     const [err, setErr] = useState([]);
@@ -69,7 +67,7 @@ const LoginTab = ({ setPending, authenticate }) => {
     }, [email])
 
     //Toggle persist
-    const togglePersist = () => { dispatch(setPersist({ persist: !persist }))}
+    const togglePersist = () => { setCurrPersist(prev => !prev) }
 
     //Forgot pass dialog open state 
     const handleOpen = () => setOpen(true);
@@ -91,7 +89,8 @@ const LoginTab = ({ setPending, authenticate }) => {
             //Store access token to auth
             dispatch(setAuth({ token }));
 
-            if (persist) { //Set refresh token on cookie
+            if (currPersist) { //Set refresh token on cookie
+                dispatch(setPersist(currPersist)); //Set persist in state
                 const refreshTokenData = jwtDecode(refreshToken);
                 const expires = new Date(0);
                 expires.setUTCSeconds(refreshTokenData.exp);
@@ -157,7 +156,7 @@ const LoginTab = ({ setPending, authenticate }) => {
                 <Title>Đăng nhập</Title>
                 <Stack spacing={1} direction="column">
                     <Instruction ref={errRef}
-                        display={errMsgLogin ? "block" : "none"}
+                        style={{ display: errMsgLogin ? "block" : "none" }}
                         aria-live="assertive">
                         {errMsgLogin}
                     </Instruction>
@@ -184,7 +183,7 @@ const LoginTab = ({ setPending, authenticate }) => {
                     <div className="persistCheck" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <FormControlLabel control={
                             <Checkbox id="persist"
-                                checked={persist}
+                                checked={currPersist}
                                 onChange={togglePersist}
                                 disableRipple
                                 name="Persist"
@@ -214,7 +213,11 @@ const LoginTab = ({ setPending, authenticate }) => {
             <Dialog open={open} onClose={handleClose} maxWidth="md">
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>Nhập email tài khoản</DialogTitle>
                 <DialogContent sx={{ minWidth: '275px', overflow: 'visible' }}>
-                    <Instruction display={errMsgReset ? "block" : "none"} aria-live="assertive">{errMsgReset}</Instruction>
+                    <Instruction ref={errRef}
+                        style={{ display: errMsgReset ? "block" : "none" }}
+                        aria-live="assertive">
+                        {errMsgReset}
+                    </Instruction>
                     <CustomInput
                         placeholder='Nhập email tài khoản'
                         id="email"

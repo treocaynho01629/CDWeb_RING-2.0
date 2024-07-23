@@ -6,10 +6,10 @@ import useAuth from "../../hooks/useAuth";
 
 //#region styled
 const CheckoutContainer = styled.div`
-    display: none;
+    display: block;
 
-    @media (min-width: ${props => props.theme.breakpoints.values['sm']}px) {
-        display: block;
+    ${props => props.theme.breakpoints.down("sm")} {
+        display: none;
     }
 `
 
@@ -18,26 +18,17 @@ const AltCheckoutContainer = styled.div`
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 100px;
+    height: 50px;
     z-index: 99;
     background-color: white;
     box-shadow: 3px 3px 10px 3px #b7b7b7;
     align-items: flex-end;
-    display: flex;
-    flex-direction: column;
-
-    @media (min-width: ${props => props.theme.breakpoints.values['sm']}px)  {
-        display: none;
-    }
-`
-
-const AltCheckoutContent = styled.div`
-    width: 100%;
-    height: 50%;
-    align-items: flex-end;
     justify-content: space-between;
-    display: flex;
-    border: .5px solid ${props => props.theme.palette.action.focus};
+    display: none;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        display: flex;
+    }
 `
 
 const SecondaryTitleContainer = styled.div`
@@ -57,13 +48,13 @@ const Title = styled.h3`
 `
 
 const Payout = styled.div`
-    border: .5px solid ${props => props.theme.palette.action.hover};
+    border: .5px solid ${props => props.theme.palette.action.focus};
     padding: 20px;
     margin-bottom: 20px;
 `
 
 const AltPayout = styled.div`
-    width: 50%;
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -118,7 +109,8 @@ const PayButton = styled.button`
     margin-top: 20px;
     font-size: 15px;
     font-weight: bold;
-    width: 40%;
+    width: 100%;
+    height: 50px;
     font-weight: 500;
     border-radius: 0;
     border: none;
@@ -131,8 +123,8 @@ const PayButton = styled.button`
     justify-content: center;
     transition: all 0.5s ease;
 
-    @media (min-width: 600px) {
-        width: 100%;
+    ${props => props.theme.breakpoints.down("sm")} {
+        width: 80%;
     }
 
     &:hover {
@@ -198,7 +190,7 @@ const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick
                         <PayoutText>{selectedProducts?.length ? 10 : 0}%</PayoutText>
                     </PayoutRow>
                     <PayoutRow>
-                        <PayoutText>Phí ship:</PayoutText>
+                        <PayoutText>Phí vận chuyển:</PayoutText>
                         <PayoutText>{selectedProducts?.length ? '10,000' : 0}&nbsp;đ</PayoutText>
                     </PayoutRow>
                     <PayoutRow>
@@ -215,46 +207,40 @@ const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick
                 </Payout>
             </CheckoutContainer >
             <AltCheckoutContainer>
-                <AltCheckoutContent style={{ padding: '0 15px' }}>
-                    <PayoutText><SellIcon />&nbsp;Voucher RING:</PayoutText>
-                    <CouponButton>Chọn hoặc nhập mã</CouponButton>
-                </AltCheckoutContent>
-                <AltCheckoutContent>
-                    <AltPayout>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    disableRipple
-                                    disableFocusRipple
-                                    indeterminate={numSelected > 0 && numSelected < rowCount}
-                                    checked={rowCount > 0 && numSelected === rowCount}
-                                    color="secondary"
-                                    inputProps={{
-                                        'aria-label': 'select all',
-                                    }}
-                                    onChange={handleSelectAllClick}
-                                />
-                            }
-                            sx={{ marginRight: 0 }}
-                            label="Tất cả" />
-                        <Divider orientation="vertical" flexItem />
-                        <PayoutPrice onClick={toggleDrawer(true)}>
-                            {selectedProducts?.length ? Math.round(totalPrice() * 1.1 + 10000).toLocaleString() : 0}&nbsp;đ
-                        </PayoutPrice>
-                    </AltPayout>
-                    <PayButton
-                        disabled={selectedProducts?.length == 0}
-                        onClick={() => navigate('/checkout', { state: { products: selectedProducts } })}
-                    >
-                        {token ? `THANH TOÁN (${selectedProducts.length})` : 'ĐĂNG NHẬP'}
-                    </PayButton>
-                </AltCheckoutContent>
+                <AltPayout>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                disableRipple
+                                disableFocusRipple
+                                indeterminate={numSelected > 0 && numSelected < rowCount}
+                                checked={rowCount > 0 && numSelected === rowCount}
+                                color="secondary"
+                                inputProps={{
+                                    'aria-label': 'select all',
+                                }}
+                                onChange={handleSelectAllClick}
+                            />
+                        }
+                        sx={{ marginRight: 0 }}
+                        label="Tất cả" />
+                    <Divider orientation="vertical" flexItem />
+                    <PayoutPrice onClick={toggleDrawer(true)} style={{ cursor: 'pointer' }}>
+                        {selectedProducts?.length ? Math.round(totalPrice() * 1.1 + 10000).toLocaleString() : 0}&nbsp;đ
+                    </PayoutPrice>
+                </AltPayout>
+                <PayButton
+                    disabled={selectedProducts?.length == 0}
+                    onClick={() => navigate('/checkout', { state: { products: selectedProducts } })}
+                >
+                    {token ? `THANH TOÁN (${selectedProducts.length})` : 'ĐĂNG NHẬP'}
+                </PayButton>
                 <Drawer
                     anchor={'bottom'}
                     open={open}
                     onClose={toggleDrawer(false)}
                 >
-                    <Payout>
+                    <Payout style={{ marginBottom: 0 }}>
                         <PayoutTitle>THANH TOÁN</PayoutTitle>
                         <PayoutRow>
                             <PayoutText>Thành tiền:</PayoutText>
@@ -265,7 +251,7 @@ const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick
                             <PayoutText>{selectedProducts?.length ? 10 : 0}%</PayoutText>
                         </PayoutRow>
                         <PayoutRow>
-                            <PayoutText>Phí ship:</PayoutText>
+                            <PayoutText>Phí vận chuyển:</PayoutText>
                             <PayoutText>{selectedProducts?.length ? '10,000' : 0}&nbsp;đ</PayoutText>
                         </PayoutRow>
                         <PayoutRow>
