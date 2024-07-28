@@ -21,7 +21,7 @@ const usePrivateFetch = (url) => {
         isMounted && setData(res.data);
       } catch (err) {
         setError(true);
-        console.log(err);
+        console.error(err);
       }
       setLoading(false);
     };
@@ -46,7 +46,7 @@ const usePrivateFetch = (url) => {
         isMounted && setData(res.data);
       } catch (err) {
         setError(true);
-        console.log(err);
+        console.error(err);
       }
       setLoading(false);
     };

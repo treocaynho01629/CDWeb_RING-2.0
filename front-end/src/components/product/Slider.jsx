@@ -180,7 +180,7 @@ function Item({ book }) {
                     sx={{
                         position: { xs: 'absolute', md: 'relative' }
                         , bottom: { xs: 0, md: 'auto' }
-                        , background: { xs: '#ffffff89', md: 'transparent'}
+                        , background: { xs: '#ffffff89', md: 'transparent' }
                         , width: '100%'
                     }}
                 >
@@ -226,31 +226,45 @@ const Slider = () => {
     } else if (isSuccess) {
         const { ids, entities } = data;
 
-        productsCarousel = ids?.length
-            ?
-            <Carousel
-                responsive={responsive}
-                infinite={true}
-                autoPlay={true}
-                autoPlaySpeed={15000}
-                customLeftArrow={<CustomLeftArrow />}
-                customRightArrow={<CustomRightArrow />}
-                removeArrowOnDeviceType={["tablet", "mobile"]}
-                pauseOnHover
-                keyBoardControl
-                minimumTouchDrag={80}
-            >
+        productsCarousel =
+            ids?.length
+                ?
+                <Carousel
+                    responsive={responsive}
+                    infinite={true}
+                    autoPlay={true}
+                    autoPlaySpeed={15000}
+                    customLeftArrow={<CustomLeftArrow />}
+                    customRightArrow={<CustomRightArrow />}
+                    removeArrowOnDeviceType={["tablet", "mobile"]}
+                    pauseOnHover
+                    keyBoardControl
+                    minimumTouchDrag={80}
+                >
 
-                {ids?.map((id, index) => {
-                    const book = entities[id];
+                    {ids?.map((id, index) => {
+                        const book = entities[id];
 
-                    return (
-                        <Item key={`${id}-${index}`} book={book} />
-                    )
-                })}
-            </Carousel>
-            :
-            <Item />
+                        return (
+                            <Item key={`${id}-${index}`} book={book} />
+                        )
+                    })}
+                </Carousel>
+                :
+                <Carousel
+                    responsive={responsive}
+                    infinite={true}
+                    autoPlay={true}
+                    autoPlaySpeed={15000}
+                    customLeftArrow={<CustomLeftArrow />}
+                    customRightArrow={<CustomRightArrow />}
+                    removeArrowOnDeviceType={["tablet", "mobile"]}
+                    pauseOnHover
+                    keyBoardControl
+                    minimumTouchDrag={80}
+                >
+                    <Item />
+                </Carousel>
     }
 
     return (

@@ -11,7 +11,7 @@ const useLogout = () => {
     const [signout] = useSignoutMutation();
     const [cookies, removeCookie] = useCookies(['refreshToken'])
 
-    const logout = async () => {
+    const logout = async (noQueue) => {
         try {
             await signout().unwrap();
             removeCookie('refreshToken', { path: '/' }); //Remove cookies
@@ -19,9 +19,11 @@ const useLogout = () => {
             dispatch(apiSlice.util.resetApiState()); //Reset redux
 
             //Queue snack + goes to home
-            const { enqueueSnackbar } = await import('notistack');
-            enqueueSnackbar('Đã đăng xuất!', { variant: 'error' });
-            navigate('/');
+            if (!noQueue) {
+                const { enqueueSnackbar } = await import('notistack');
+                enqueueSnackbar('Đã đăng xuất!', { variant: 'error' });
+                navigate('/');
+            }
         } catch (err) {
             console.error(err);
         }

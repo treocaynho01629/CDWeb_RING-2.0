@@ -297,7 +297,7 @@ const EditProductDialog = (props) => {
           setFiles([]);
           setOpen(false);
       } catch (err) {
-          console.log(err);
+          console.error(err);
           setErr(err);
           if (!err?.response) {
               setErrMsg('Server không phản hồi');

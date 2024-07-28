@@ -19,7 +19,7 @@ function useFetch(url) {
         isMounted && setData(res.data);
       } catch (err) {
         setError(true);
-        console.log(err);
+        console.error(err);
       }
       setLoading(false);
     };
@@ -44,7 +44,7 @@ function useFetch(url) {
         isMounted && setData(res.data);
       } catch (err) {
         setError(true);
-        console.log(err);
+        console.error(err);
       }
       setLoading(false);
     };

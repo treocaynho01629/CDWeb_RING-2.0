@@ -355,7 +355,7 @@ export default function TableAccounts(props) {
         refetch();
         enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         if (!err?.response) {
         } else if (err.response?.status === 409) {
         } else if (err.response?.status === 400) {
@@ -382,7 +382,7 @@ export default function TableAccounts(props) {
         setSelectedAll(false);
         enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         if (!err?.response) {
         } else if (err.response?.status === 409) {
         } else if (err.response?.status === 400) {

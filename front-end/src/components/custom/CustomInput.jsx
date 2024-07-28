@@ -42,8 +42,10 @@ const StyledInput = styled(TextField)(({ theme }) => ({
         borderRadius: 0,
         padding: '4px !important',
     },
+    '& .MuiFormHelperText-root': {
+        width: 250,
+    },
 }));
-
 
 export default function CustomInput(props) {
     const { typeToggle } = props;
@@ -61,13 +63,8 @@ export default function CustomInput(props) {
                     onClick={handleClickShowPassword}
                     onMouseDown={handleMouseDownPassword}
                     edge="end"
-                    sx={{
-                        "&:focus": {
-                            outline: 'none',
-                        }
-                    }}
                 >
-                    {showPassword ? <Visibility/> : <VisibilityOff />}
+                    {showPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
             </InputAdornment>
 

@@ -4,22 +4,78 @@ import { useEffect, useRef, useState, lazy, Suspense } from 'react'
 import { ShoppingCart as ShoppingCartIcon, LocationOn as LocationOnIcon, CreditCard as CreditCardIcon, KeyboardDoubleArrowDown, Person } from '@mui/icons-material';
 import { TextareaAutosize, Table, TableBody, TableContainer, TableHead, TableRow, Stepper, Step, StepLabel, StepContent, Typography, Box, } from '@mui/material';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import { useDispatch } from "react-redux";
-import { resetCart } from '../redux/cartReducer';
 import { Navigate, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component'
-import { useSnackbar } from 'notistack';
 import { useGetProfileQuery } from '../features/users/usersApiSlice';
-import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import { useCheckoutMutation } from '../features/orders/orderApiSlice';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 import CustomButton from '../components/custom/CustomButton';
 import AddressComponent from '../components/cart/AddressComponent';
 import FinalCheckoutDialog from '../components/cart/FinalCheckoutDialog';
+import useCart from '../hooks/useCart';
 
 const PendingIndicator = lazy(() => import('../components/authorize/PendingIndicator'));
 
 //#region styled
 const Wrapper = styled.div`
+`
+
+const AltCheckoutContainer = styled.div`
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    z-index: 99;
+    background-color: white;
+    box-shadow: 3px 3px 10px 3px #b7b7b7;
+    align-items: flex-end;
+    justify-content: flex-end;
+    display: none;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        display: flex;
+    }
+`
+
+const PayButton = styled.button`
+    background-color: ${props => props.theme.palette.secondary.main};
+    padding: 15px 20px;
+    margin-top: 20px;
+    font-size: 15px;
+    font-weight: bold;
+    width: 100%;
+    height: 50px;
+    font-weight: 500;
+    border-radius: 0;
+    border: none;
+    flex-wrap: wrap;
+    white-space: nowrap;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    transition: all 0.5s ease;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        width: 40%;
+    }
+
+    &:hover {
+        background-color: ${props => props.theme.palette.action.hover};
+        color: black;
+    }
+
+    &:disabled {
+        background-color: gray;
+        color: darkslategray;
+    }
+
+    &:focus {
+        outline: none;
+        border: none;
+    }
 `
 
 const CheckoutContainer = styled.div`
@@ -137,6 +193,7 @@ const Price = styled.p`
     &.total {
         font-size: 18px;
         color: red;
+        text-align: end;
     }
 `
 
@@ -192,16 +249,16 @@ const StyledStepLabel = muiStyled(StepLabel)(({ theme }) => ({
 //#endregion
 
 const PHONE_REGEX = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/;
-const CHECKOUT_URL = '/api/orders';
 
 const Checkout = () => {
     //#region construct
     //Products from state
     const { state: checkState } = useLocation();
+    const { clearCart } = useCart();
     const products = checkState.products;
+    const checkRef = useRef(null);
 
     //Initial value
-    const [pending, setPending] = useState(false);
     const [addressInfo, setAddressInfo] = useState({
         fullName: '',
         phone: '',
@@ -216,16 +273,17 @@ const Checkout = () => {
     const [activeStep, setActiveStep] = useState(0);
     const [value, setValue] = useState("1");
     const fullAddress = `${addressInfo?.city}${addressInfo?.ward ? `/ ${addressInfo?.ward}/` : ''}${addressInfo?.address}`
+    const maxSteps = 3;
+
+    //Checkout hook
+    const [checkout, { isLoading }] = useCheckoutMutation();
 
     //Fetch current profile
     const { data: profile, isLoading: loadProfile, isSuccess: profileDone } = useGetProfileQuery();
 
     //Other
-    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const axiosPrivate = useAxiosPrivate();
     const errRef = useRef();
-    const { enqueueSnackbar } = useSnackbar();
 
     //Error message reset when reinput stuff
     useEffect(() => {
@@ -258,6 +316,7 @@ const Checkout = () => {
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        if (activeStep == 1) checkRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     const handleBack = () => {
@@ -274,7 +333,8 @@ const Checkout = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const valid = PHONE_REGEX.test(phone);
+        //Validation
+        const valid = PHONE_REGEX.test(addressInfo.phone);
 
         if (!valid && addressInfo.phone) {
             setErrMsg("Sai định dạng số điện thoại!");
@@ -285,55 +345,51 @@ const Checkout = () => {
             errRef.current.focus();
             return;
         }
-        setPending(true);
 
-        try {
-            let fullNameSplit = addressInfo.fullName.split(' ');
-            let lastName = fullNameSplit[fullNameSplit.length - 1];
-            let firstName = '';
-            if (fullNameSplit.length > 2) firstName = fullNameSplit.slice(0, -1).join(' ');
+        const { enqueueSnackbar } = await import('notistack');
 
-            const response = await axiosPrivate.post(CHECKOUT_URL,
-                JSON.stringify({
-                    cart: products,
-                    firstName,
-                    lastName,
-                    phone: addressInfo.phone,
-                    address: fullAddress,
-                    message: message
-                }),
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
+        //Split name
+        let fullNameSplit = addressInfo.fullName.split(' ');
+        let lastName = fullNameSplit[fullNameSplit.length - 1];
+        let firstName = '';
+        if (fullNameSplit.length > 2) firstName = fullNameSplit.slice(0, -1).join(' ');
+
+        checkout({
+            cart: products,
+            firstName,
+            lastName,
+            phone: addressInfo.phone,
+            address: fullAddress,
+            message: message
+        }).unwrap()
+            .then((data) => {
+                clearCart();
+                enqueueSnackbar('Đặt hàng thành công!', { variant: 'success' });
+                navigate('/cart');
+            })
+            .catch((err) => {
+                console.error(err);
+                setErr(err);
+                if (!err?.status) {
+                    setErrMsg('No Server Response');
+                } else if (err?.status === 409) {
+                    setErrMsg(err?.data?.errors?.errorMessage);
+                } else if (err?.status === 400) {
+                    setErrMsg('Sai định dạng thông tin!');
+                } else {
+                    setErrMsg('Đặt hàng thất bại!')
                 }
-            );
-            dispatch(resetCart());
-            enqueueSnackbar('Đặt hàng thành công!', { variant: 'success' });
-            navigate('/cart');
-            setPending(false);
-        } catch (err) {
-            console.error(err);
-            setErr(err);
-            if (!err?.response) {
-                setErrMsg('No Server Response');
-            } else if (err.response?.status === 409) {
-                setErrMsg(err.response?.data?.errors?.errorMessage);
-            } else if (err.response?.status === 400) {
-                setErrMsg('Sai định dạng thông tin!');
-            } else {
-                setErrMsg('Đặt hàng thất bại!')
-            }
-            errRef.current.focus();
-        }
+                errRef.current.focus();
+            })
     }
     //#endregion
 
     if (products.length) {
         return (
             <Wrapper>
-                {pending ?
+                {isLoading ?
                     <Suspense fallBack={<></>}>
-                        <PendingIndicator />
+                        <PendingIndicator open={isLoading} message="Đang xử lý đơn hàng..." />
                     </Suspense>
                     : null
                 }
@@ -461,16 +517,32 @@ const Checkout = () => {
                                 }
                             </StyledStepContent>
                         </Step>
-                        <Step key={2}>
+                        <Step key={2} ref={checkRef}>
                             <StyledStepLabel>
                                 <MiniTitle><CreditCardIcon />&nbsp;Thanh toán</MiniTitle>
                             </StyledStepLabel>
-                            <StyledStepContent TransitionProps={{ unmountOnExit: false }}>
-                                <FinalCheckoutDialog {...{ MiniTitle, SmallContainer, Title, value, handleChange, products, handleSubmit, validAddressInfo }} />
+                            <StyledStepContent>
+                                <FinalCheckoutDialog {...{
+                                    MiniTitle, SmallContainer, Title, value, handleChange,
+                                    products, handleSubmit, validAddressInfo, AltCheckoutContainer, PayButton
+                                }} />
                             </StyledStepContent>
                         </Step>
                     </StyledStepper>
                 </CheckoutContainer>
+                {
+                    activeStep < 2
+                    &&
+                    <AltCheckoutContainer>
+                        <Box sx={{ padding: '0px 5px' }}>
+                            <strong>Kiểm tra đơn:</strong>
+                            <Price className="total">{`${activeStep + 1}/${maxSteps}`}</Price>
+                        </Box>
+                        <PayButton disabled={!(activeStep === 1)} onClick={handleNext}>
+                            Tiếp tục<KeyboardDoubleArrowDown />
+                        </PayButton>
+                    </AltCheckoutContainer>
+                }
             </Wrapper>
         )
     } else {

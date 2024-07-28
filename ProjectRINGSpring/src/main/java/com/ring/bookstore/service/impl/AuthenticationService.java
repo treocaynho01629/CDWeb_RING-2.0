@@ -186,7 +186,7 @@ public class AuthenticationService {
                 + "</h2>\n"
                 + "<h3>Tài khoản RING!:</h3>\n"
                 + resetContent 
-                + "<p>- Chức bạn có trả nghiệm vui vẻ khi mua sách tại RING! - BOOKSTORE</p>\n"
+                + "<p>- Chúc bạn có trả nghiệm vui vẻ khi mua sách tại RING! - BOOKSTORE</p>\n"
                 + "<br><p>Không phải bạn thực hiện thay đổi trên? Liên hệ và yêu cầu xử lý tại: <b>ringbookstore@ring.email</b></p>\n"
                 + "<br><br><h3>Cảm ơn đã sử dụng dịch vụ!</h3>\n";
         emailService.sendHtmlMessage(email, subject, content); //Send

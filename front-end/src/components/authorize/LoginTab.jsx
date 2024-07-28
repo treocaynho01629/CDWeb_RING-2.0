@@ -7,9 +7,9 @@ import { useCookies } from 'react-cookie';
 import { jwtDecode } from 'jwt-decode';
 import { useDispatch } from 'react-redux';
 import { setAuth, setPersist } from '../../features/auth/authSlice';
+import { useAuthenticateMutation, useForgotMutation } from '../../features/auth/authApiSlice';
 import CustomInput from '../custom/CustomInput';
 import CustomButton from '../custom/CustomButton';
-import axios from '../../app/api/axios';
 
 //#region styled
 const Title = styled.h1`
@@ -20,16 +20,18 @@ const Title = styled.h1`
 
 const Instruction = styled.p`
     font-size: 14px;
+    margin-top: 0;
     font-style: italic;
     color: ${props => props.theme.palette.error.main};
 `
 //#endregion
 
 const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-const FORGOT_URL = '/api/v1/auth/forgot-password?email=';
 
-const LoginTab = ({ setPending, authenticate }) => {
+const LoginTab = ({ setPending }) => {
     const dispatch = useDispatch();
+    const [authenticate, { isLoading }] = useAuthenticateMutation();
+    const [sendForgot, { isLoading: sending }] = useForgotMutation();
 
     //Router
     const navigate = useNavigate();
@@ -81,73 +83,84 @@ const LoginTab = ({ setPending, authenticate }) => {
     //Login
     const handleSubmitLogin = async (e) => {
         e.preventDefault();
+        setPending(true);
         const { enqueueSnackbar } = await import('notistack');
 
-        try {
-            const { token, refreshToken } = await authenticate({ userName: username, pass: password }).unwrap();
+        authenticate({ userName: username, pass: password }).unwrap()
+            .then((data) => {
+                const { token, refreshToken } = data;
 
-            //Store access token to auth
-            dispatch(setAuth({ token }));
+                //Store access token to auth
+                dispatch(setAuth({ token }));
 
-            if (currPersist) { //Set refresh token on cookie
-                dispatch(setPersist(currPersist)); //Set persist in state
-                const refreshTokenData = jwtDecode(refreshToken);
-                const expires = new Date(0);
-                expires.setUTCSeconds(refreshTokenData.exp);
-                console.log(refreshToken);
-                setCookie('refreshToken', refreshToken, { path: '/', expires });
-            }
+                if (currPersist) { //Set refresh token on cookie
+                    dispatch(setPersist({persist: true})); //Set persist in state
+                    const refreshTokenData = jwtDecode(refreshToken);
+                    const expires = new Date(0);
+                    expires.setUTCSeconds(refreshTokenData.exp);
+                    setCookie('refreshToken', refreshToken, { path: '/', expires });
+                }
 
-            enqueueSnackbar('Đăng nhập thành công', { variant: 'success' });
-            //Redirect to previous page
-            navigate(from, { replace: true });
-        } catch (err) {
-            console.error(err);
-            if (!err?.status) {
-                setErrMsgLogin('Server không phản hồi');
-            } else if (err?.status === 404) {
-                setErrMsgLogin('Sai tên tài khoản hoặc mật khẩu!');
-            } else if (err?.status === 400) {
-                setErrMsgLogin('Sai định dạng thông tin!');
-            } else {
-                setErrMsgLogin('Đăng nhập thất bại');
-            }
-            errRef.current.focus();
-            enqueueSnackbar('Đăng nhập thất bại', { variant: 'error' });
-        }
+                //Queue snack
+                enqueueSnackbar('Đăng nhập thành công', { variant: 'success' });
+                navigate(from, { replace: true }); //Redirect to previous page
+                setPending(false);
+            })
+            .catch((err) => {
+                console.error(err);
+                if (!err?.status) {
+                    setErrMsgLogin('Server không phản hồi');
+                } else if (err?.status === 404) {
+                    setErrMsgLogin('Sai tên tài khoản hoặc mật khẩu!');
+                } else if (err?.status === 400) {
+                    setErrMsgLogin('Sai định dạng thông tin!');
+                } else {
+                    setErrMsgLogin('Đăng nhập thất bại');
+                }
+                errRef.current.focus();
+                setPending(false);
+            })
     }
 
     //Forgot pass
     const handleForgotPassword = async (e) => {
         e.preventDefault();
-
         setPending(true);
-        setOpen(false);
-        try {
-            const response = await axios.post(FORGOT_URL + email);
 
-            setEmail('');
-            setErr([]);
-            setErrMsgReset('');
-            const { enqueueSnackbar } = await import('notistack');
-            enqueueSnackbar('Đã gửi yêu cầu về email!', { variant: 'success' });
-            setPending(false);
-            setOpen(true);
-        } catch (err) {
-            console.log(err);
-            setErr(err);
-            if (!err?.response) {
-                setErrMsgReset('Server không phản hồi');
-            } else if (err.response?.status === 404) {
-                setErrMsgReset('Tài khoản với email không tồn tại!');
-            } else if (err.response?.status === 400) {
-                setErrMsgReset('Sai định dạng thông tin!');
-            } else {
-                setErrMsgReset('Gửi yêu cầu thất bại');
-            }
-            setPending(false);
-            setOpen(true);
+        //Validation
+        if (!validEmail) {
+            setErrMsgReset('Sai định dạng email!');
+            return;
         }
+
+        const { enqueueSnackbar } = await import('notistack');
+
+        //Send mutation
+        sendForgot(email).unwrap()
+            .then((data) => {
+                //Reset input
+                setEmail('');
+                setErr([]);
+                setErrMsgReset('');
+
+                //Queue snack
+                enqueueSnackbar('Đã gửi yêu cầu về email!', { variant: 'success' });
+                setPending(false);
+            })
+            .catch((err) => {
+                console.error(err);
+                setErr(err);
+                if (!err?.status) {
+                    setErrMsgReset('Server không phản hồi');
+                } else if (err?.status === 404) {
+                    setErrMsgReset('Tài khoản với email không tồn tại!');
+                } else if (err?.status === 400) {
+                    setErrMsgReset('Sai định dạng thông tin!');
+                } else {
+                    setErrMsgReset('Gửi yêu cầu thất bại');
+                }
+                setPending(false);
+            })
     }
 
     return (
@@ -200,44 +213,49 @@ const LoginTab = ({ setPending, authenticate }) => {
                             onClick={handleOpen}>Quên mật khẩu</a>
                     </div>
                     <CustomButton
+                        disabled={isLoading}
                         variant="contained"
                         color="secondary"
                         size="large"
-                        sx={{ width: '50%' }}
                         type="submit"
+                        aria-label="submit login"
+                        sx={{ width: '50%' }}
                     >
                         Đăng nhập
                     </CustomButton>
                 </Stack>
             </form>
-            <Dialog open={open} onClose={handleClose} maxWidth="md">
+            <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>Nhập email tài khoản</DialogTitle>
-                <DialogContent sx={{ minWidth: '275px', overflow: 'visible' }}>
-                    <Instruction ref={errRef}
-                        style={{ display: errMsgReset ? "block" : "none" }}
-                        aria-live="assertive">
-                        {errMsgReset}
-                    </Instruction>
-                    <CustomInput
-                        placeholder='Nhập email tài khoản'
-                        id="email"
-                        autoComplete="email"
-                        onChange={(e) => setEmail(e.target.value)}
-                        value={email}
-                        fullWidth
-                        error={(email && !validEmail) || err?.response?.data?.errors?.email}
-                        helperText={email && !validEmail ? "Email không hợp lệ!" : err?.response?.data?.errors?.email}
-                        size="small"
-
-                    />
+                <DialogContent sx={{ overflow: 'visible' }}>
+                    <form onSubmit={handleForgotPassword}>
+                        <Instruction
+                            style={{ display: errMsgReset ? "block" : "none" }}
+                            aria-live="assertive">
+                            {errMsgReset}
+                        </Instruction>
+                        <CustomInput
+                            placeholder='Nhập email tài khoản cần khôi phục'
+                            id="email"
+                            autoComplete="email"
+                            onChange={(e) => setEmail(e.target.value)}
+                            value={email}
+                            fullWidth
+                            error={(email && !validEmail) || err?.data?.errors?.email}
+                            helperText={email && !validEmail ? "Email không hợp lệ!" : err?.data?.errors?.email}
+                            size="small"
+                        />
+                    </form>
                 </DialogContent>
-                <DialogActions sx={{ width: '90%', marginBottom: '10px' }}>
+                <DialogActions sx={{ marginBottom: '10px' }}>
                     <CustomButton variant="outlined" color="error" size="large" onClick={handleClose}>Huỷ</CustomButton>
                     <CustomButton
+                        disabled={!email || !validEmail || sending}
                         variant="contained"
                         color="secondary"
                         type="submit"
                         size="large"
+                        aria-label="submit sending recover email"
                         onClick={handleForgotPassword}
                     >
                         <CheckIcon sx={{ marginRight: '5px' }} />Gửi

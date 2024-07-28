@@ -365,7 +365,7 @@ export default function TableBooks(props) {
         refetch();
         enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         if (!err?.response) {
         } else if (err.response?.status === 409) {
         } else if (err.response?.status === 400) {
@@ -392,7 +392,7 @@ export default function TableBooks(props) {
         setSelectedAll(false);
         enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         if (!err?.response) {
         } else if (err.response?.status === 409) {
         } else if (err.response?.status === 400) {

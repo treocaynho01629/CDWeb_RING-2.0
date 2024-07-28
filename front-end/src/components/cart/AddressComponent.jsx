@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { useState } from 'react'
-import { LocationOn as LocationOnIcon, Check, Person as PersonIcon, Phone as PhoneIcon, Home as HomeIcon, Close as CloseIcon } from '@mui/icons-material';
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, Stack, useMediaQuery } from '@mui/material'
+import { LocationOn as LocationOnIcon, Check, Person as PersonIcon, Phone as PhoneIcon, Home as HomeIcon, Close as CloseIcon, KeyboardArrowRight } from '@mui/icons-material';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, MenuItem, Stack, useMediaQuery } from '@mui/material'
 import { useTheme } from 'styled-components';
 import { location } from '../../ultils/location';
 import CustomButton from '../custom/CustomButton';
@@ -88,7 +88,23 @@ const AddressComponent = ({ addressInfo, setAddressInfo, fullAddress, errMsg, er
                     </Box>
                     <Box>{fullAddress}</Box>
                 </Box>
-                <CustomButton variant="outlined" color={errMsg ? "error" : "secondary"} onClick={handleOpen}>Thay đổi</CustomButton>
+                <CustomButton
+                    sx={{ display: { xs: 'none', sm: 'flex' } }}
+                    aria-label="toggle address dialog"
+                    variant="outlined"
+                    color={errMsg ? "error" : "secondary"}
+                    onClick={handleOpen}
+                >
+                    Thay đổi
+                </CustomButton>
+                <IconButton
+                    sx={{ display: { xs: 'block', sm: 'none' } }}
+                    aria-label="mobile toggle address dialog"
+                    onClick={handleOpen}
+                    edge="end"
+                >
+                    <KeyboardArrowRight/>
+                </IconButton>
             </Box>
             <Dialog open={open} scroll={'paper'} maxWidth={'sm'} fullWidth onClose={handleClose} fullScreen={fullScreen}>
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><LocationOnIcon />&nbsp;Địa chỉ người nhận</DialogTitle>

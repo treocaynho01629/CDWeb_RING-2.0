@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const authSlice = createSlice({
     name: 'auth',
-    initialState: { token: null, persist: JSON.parse(localStorage.getItem("persist")) || false },
+    initialState: { token: null, persist: localStorage.getItem("persist") !== "undefined" ? JSON.parse(localStorage.getItem("persist")) : false },
     reducers: {
         setAuth: (state, action) => {
             const { token } = action.payload;

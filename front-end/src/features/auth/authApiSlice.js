@@ -21,7 +21,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
                     const { token } = data;
                     if (token) dispatch(setAuth({ token })) //Reauth
                 } catch (err) {
-                    dispatch(logOut()); 
+                    dispatch(logOut());
                     console.error(err)
                 }
             }
@@ -32,6 +32,25 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: {
                     ...initialUser,
+                }
+            }),
+            invalidatesTags: [
+                { type: 'User', id: "LIST" }
+            ]
+        }),
+        forgot: builder.mutation({
+            query: (email) => ({
+                url: `/api/v1/auth/forgot-password?email=${email}`,
+                method: 'POST',
+                responseHandler: "text",
+            }),
+        }),
+        reset: builder.mutation({
+            query: resetBody => ({
+                url: '/api/v1/auth/reset-password',
+                method: 'PUT',
+                body: {
+                    ...resetBody,
                 }
             }),
             invalidatesTags: [
@@ -51,5 +70,7 @@ export const {
     useAuthenticateMutation,
     useSignoutMutation,
     useRegisterMutation,
+    useForgotMutation,
+    useResetMutation,
     useRefreshMutation,
 } = authApiSlice 

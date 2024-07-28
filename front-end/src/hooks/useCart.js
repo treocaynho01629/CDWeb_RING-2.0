@@ -14,11 +14,7 @@ const useCart = () => {
     const decreaseAmount = (id) => dispatch(decreaseQuantity(id));
     const changeAmount = ({ id, quantity }) => dispatch(changeQuantity({ id, quantity }));
     const removeProduct = (id) => dispatch(removeItem(id));
-    const clearCart = async () => {
-        const { enqueueSnackbar } = await import('notistack');
-        enqueueSnackbar('Đã làm mới giỏ hàng!', { variant: 'error' });
-        dispatch(resetCart());
-    }
+    const clearCart = () => dispatch(resetCart());
 
     return { cartProducts, addProduct, decreaseAmount, increaseAmount, changeAmount, removeProduct, clearCart }
 }

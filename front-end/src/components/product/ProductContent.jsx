@@ -5,10 +5,11 @@ import {
     Remove as RemoveIcon, Add as AddIcon, Star as StarIcon, StarBorder as StarBorderIcon,
     ShoppingCart as ShoppingCartIcon, Sell as SellIcon, Storefront as StorefrontIcon, Check as CheckIcon
 } from '@mui/icons-material';
-import { Skeleton, Rating, Box, Divider, Grid, Avatar, Container } from '@mui/material';
+import { Skeleton, Rating, Box, Divider, Grid, Avatar, Container, Drawer } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ProductImages from './ProductImages';
 import useCart from '../../hooks/useCart';
+import CustomButton from '../custom/CustomButton';
 
 //#region styled
 const StuffContainer = styled.div`
@@ -375,6 +376,7 @@ const BuyButton = styled.button`
 
 const ProductContent = ({ book, scrollIntoTab, handleTabChange }) => {
     const [amountIndex, setAmountIndex] = useState(1); //Amount add to cart
+    const [open, setOpen] = useState(false);
     const { addProduct } = useCart();
 
     //Calculate rating
@@ -409,8 +411,13 @@ const ProductContent = ({ book, scrollIntoTab, handleTabChange }) => {
         scrollIntoTab();
     };
 
+    const toggleDrawer = (newOpen) => () => {
+        setOpen(newOpen);
+    };
+
     //Add to cart
     const handleAddToCart = (book) => {
+        setOpen(false); //Close drawer
         addProduct({
             id: book.id,
             title: book.title,
@@ -574,10 +581,39 @@ const ProductContent = ({ book, scrollIntoTab, handleTabChange }) => {
                                 <Link to={`/cart`}>
                                     <CartButton><ShoppingCartIcon style={{ fontSize: 24 }} /></CartButton>
                                 </Link>
-                                <BuyButton disabled={!book} onClick={() => handleAddToCart(book)}>
+                                <BuyButton disabled={!book} onClick={toggleDrawer(true)}>
                                     THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
                                 </BuyButton>
                             </AltFilterContainer>
+                            <Drawer
+                                anchor={'bottom'}
+                                open={open}
+                                onClose={toggleDrawer(false)}
+                            >
+                                <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} padding={'0 10px'}>
+                                    <DetailTitle>Số lượng:</DetailTitle>
+                                    <SubFilterContainer>
+                                        <AmountButton direction="add" onClick={() => changeAmount(-1)}>
+                                            <RemoveIcon style={{ fontSize: 12 }} />
+                                        </AmountButton>
+                                        <InputContainer>
+                                            <AmountInput type="number" onChange={(e) => handleChangeAmount(e.target.valueAsNumber)} value={amountIndex} />
+                                        </InputContainer>
+                                        <AmountButton direction="remove" onClick={() => changeAmount(1)}>
+                                            <AddIcon style={{ fontSize: 12 }} />
+                                        </AmountButton>
+                                    </SubFilterContainer>
+                                </Box>
+                                <CustomButton
+                                    variant="outlined"
+                                    color="secondary"
+                                    size="large"
+                                    sx={{margin: '5px'}}
+                                    onClick={() => handleAddToCart(book)}
+                                >
+                                    THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
+                                </CustomButton>
+                            </Drawer>
                         </InfoContainer>
                     </Grid>
                 </Grid>

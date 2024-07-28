@@ -359,7 +359,7 @@ export default function TableReviews(props) {
 
         refetch();
     } catch (err) {
-        console.log(err);
+        console.error(err);
         if (!err?.response) {
         } else if (err.response?.status === 409) {
         } else if (err.response?.status === 400) {
@@ -386,7 +386,7 @@ export default function TableReviews(props) {
         setSelectedAll(false);
         enqueueSnackbar('Đã xoá đánh giá!', { variant: 'success' });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         if (!err?.response) {
         } else if (err.response?.status === 409) {
         } else if (err.response?.status === 400) {

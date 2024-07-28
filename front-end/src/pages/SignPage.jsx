@@ -1,7 +1,6 @@
 import styled, { keyframes } from 'styled-components'
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useLocation } from 'react-router-dom';
-import { useAuthenticateMutation } from '../features/auth/authApiSlice';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 import LoginTab from '../components/authorize/LoginTab';
 import RegisterTab from '../components/authorize/RegisterTab';
@@ -101,13 +100,12 @@ const SignDivider = styled.button`
 //#endregion
 
 function SignPage() {
-    const { persist } = useAuth(); //Is user logged in
     const location = useLocation();
+    const { persist } = useAuth(); //Is user logged in
     const [isLogin, setIsLogin] = useState(location.pathname === '/login');
     const [pending, setPending] = useState(false);
 
     //Hooks
-    const [authenticate, { isLoading }] = useAuthenticateMutation();
 
     //Update title
     useEffect(() => {
@@ -122,14 +120,12 @@ function SignPage() {
 
     const toggleTab = () => { setIsLogin(prev => !prev) }
 
-    const altPending = [isLoading].every(Boolean) || pending;
-
     return (
         <Container>
             <SimpleNavbar />
-            {(altPending) ?
+            {(pending) ?
                 <Suspense fallBack={<></>}>
-                    <PendingIndicator open={altPending} message="Đang gửi yêu cầu..." />
+                    <PendingIndicator open={pending} message="Đang gửi yêu cầu..." />
                 </Suspense>
                 : null
             }
@@ -138,7 +134,7 @@ function SignPage() {
                     &&
                     <>
                         <TabContainer className={`${isLogin ? 'active' : ''}`}>
-                            <LoginTab {...{ setPending, authenticate }} />
+                            <LoginTab {...{ setPending }} />
                         </TabContainer>
                         <DividerContainer>
                             <SignDivider onClick={toggleTab}>HOẶC</SignDivider>

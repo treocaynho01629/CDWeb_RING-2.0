@@ -4,24 +4,6 @@ import { Grid, Radio, RadioGroup, FormControlLabel, Box } from '@mui/material';
 import CustomInput from '../custom/CustomInput';
 
 //#region styled
-const AltCheckoutContainer = styled.div`
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 50px;
-    z-index: 99;
-    background-color: white;
-    box-shadow: 3px 3px 10px 3px #b7b7b7;
-    align-items: flex-end;
-    justify-content: flex-end;
-    display: none;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        display: flex;
-    }
-`
-
 const Payout = styled.div`
     border: .5px solid ${props => props.theme.palette.action.focus};
     padding: 20px;
@@ -71,49 +53,9 @@ const CouponButton = styled.p`
         text-decoration: underline;
     }
 `
-
-const PayButton = styled.button`
-    background-color: ${props => props.theme.palette.secondary.main};
-    padding: 15px 20px;
-    margin-top: 20px;
-    font-size: 15px;
-    font-weight: bold;
-    width: 100%;
-    height: 50px;
-    font-weight: 500;
-    border-radius: 0;
-    border: none;
-    flex-wrap: wrap;
-    white-space: nowrap;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    transition: all 0.5s ease;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        width: 40%;
-    }
-
-    &:hover {
-        background-color: ${props => props.theme.palette.action.hover};
-        color: black;
-    }
-
-    &:disabled {
-        background-color: gray;
-        color: darkslategray;
-    }
-
-    &:focus {
-        outline: none;
-        border: none;
-    }
-`
 //#endregion
 
-const FinalCheckoutDialog = ({ MiniTitle, SmallContainer, Title, handleChange, value, products, handleSubmit, validAddressInfo }) => {
+const FinalCheckoutDialog = ({ MiniTitle, SmallContainer, Title, handleChange, value, products, handleSubmit, validAddressInfo, AltCheckoutContainer, PayButton  }) => {
 
     const totalPrice = () => {
         let total = 0;
