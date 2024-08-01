@@ -1,11 +1,11 @@
 import { lazy, Suspense } from 'react'
 import './App.css';
 
-import Layout from './components/authorize/Layout';
+import Layout from './components/layout/Layout';
 import RequireAuth from './components/authorize/RequireAuth';
 import PersistLogin from './components/authorize/PersistsLogin';
-import Loadable from './components/authorize/Loadable';
-import Loader from './components/authorize/Loadable';
+import Loadable from './components/layout/Loadable';
+import Loader from './components/layout/Loadable';
 import PageLayout from './components/layout/PageLayout';
 import Missing from './pages/error/Missing';
 import Unauthorized from './pages/error/Unauthorized';

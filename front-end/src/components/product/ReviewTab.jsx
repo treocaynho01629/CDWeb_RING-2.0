@@ -116,7 +116,7 @@ const ReviewTab = (props) => {
                 pageSize: data?.info?.pageSize
             });
         }
-    }, [isLoading])
+    }, [data])
 
     //Change page
     const handlePageChange = (page) => {
@@ -159,12 +159,12 @@ const ReviewTab = (props) => {
         } catch (err) {
             console.error(err);
             setErr(err);
-            if (!err?.response) {
+            if (!err?.status) {
                 setErrMsg("Server không phản hồi!");
-            } else if (err.response?.status === 400) {
-                setErrMsg(err.response.data.errors.content);
-            } else if (err.response?.status === 409) {
-                setErrMsg(err.response.data.errors.errorMessage);
+            } else if (err?.status === 400) {
+                setErrMsg(err.data.errors.content);
+            } else if (err?.status === 409) {
+                setErrMsg(err.data.errors.errorMessage);
             } else {
                 setErrMsg("Đánh giá thất bại!");
             }
@@ -212,7 +212,7 @@ const ReviewTab = (props) => {
         <>
             {reviewsContent}
             <Box>
-                {username ? (err?.response?.data?.code === 208 ?
+                {username ? (err?.data?.code === 208 ?
                     <Box>
                         <Box><strong style={{ fontSize: '16px' }}>{errMsg}</strong></Box>
                         <br />
@@ -226,7 +226,7 @@ const ReviewTab = (props) => {
                             </CustomButton>
                         </Link>
                     </Box>
-                    : err?.response?.data?.code === 204 ?
+                    : err?.data?.code === 204 ?
                         <Box>
                             <Box><strong style={{ fontSize: '16px' }}>{errMsg}</strong></Box>
                             <br />
@@ -259,7 +259,7 @@ const ReviewTab = (props) => {
                                         borderRadius: '0',
                                         resize: 'none',
                                         color: 'black',
-                                        borderColor: err?.response?.data?.errors?.content && !content ? 'red' : 'black',
+                                        borderColor: err?.data?.errors?.content && !content ? 'red' : 'black',
                                         fontSize: '16px'
                                     }}
                                 />

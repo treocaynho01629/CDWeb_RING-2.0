@@ -21,10 +21,10 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                     return response.status === 200 && !result.isError
                 },
             }),
-            providesTags: (result, error, id) => [{ type: 'User', id }]
+            providesTags: ['Profile'],
         }),
         getUser: builder.query({
-            query: ({ id }) => ({
+            query: (id) => ({
                 url: `/api/accounts/${id}`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError
@@ -114,11 +114,21 @@ export const usersApiSlice = apiSlice.injectEndpoints({
             query: newUser => ({
                 url: '/api/accounts',
                 method: 'POST',
-                body: { ...newUser }
+                credentials: 'include',
+                body: { ...newUser },
             }),
             invalidatesTags: [
                 { type: 'User', id: "LIST" }
             ]
+        }),
+        updateProfile: builder.mutation({
+            query: (updatedProfile) => ({
+                url: '/api/accounts/profile',
+                method: 'PUT',
+                credentials: 'include',
+                body: { ...updatedProfile },
+            }),
+            invalidatesTags: ['Profile'],
         }),
         updateUser: builder.mutation({
             query: ({ id, updatedUser }) => ({
@@ -134,7 +144,8 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         deleteUser: builder.mutation({
             query: (id) => ({
                 url: `/api/accounts/${id}`,
-                method: 'DELETE'
+                method: 'DELETE',
+                credentials: 'include',
             }),
             invalidatesTags: (result, error, id) => [
                 { type: 'User', id }
@@ -143,7 +154,8 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         deleteUsers: builder.mutation({
             query: (ids) => ({
                 url: `/api/accounts/delete-multiples?ids=${ids}`,
-                method: 'DELETE'
+                method: 'DELETE',
+                credentials: 'include',
             }),
             invalidatesTags: (result, error, id) => [
                 { type: 'User', id: "LIST" }
@@ -152,7 +164,8 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         deleteAllUsers: builder.mutation({
             query: () => ({
                 url: '/api/accounts/delete-all',
-                method: 'DELETE'
+                method: 'DELETE',
+                credentials: 'include',
             }),
             invalidatesTags: (result, error, id) => [
                 { type: 'User', id: "LIST" }
@@ -167,6 +180,7 @@ export const {
     useGetUsersQuery,
     useGetSellersQuery,
     useCreateUserMutation,
+    useUpdateProfileMutation,
     useUpdateUserMutation,
     useDeleteUserMutation,
     useDeleteUsersMutation,

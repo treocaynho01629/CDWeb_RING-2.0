@@ -15,7 +15,7 @@ const initialState = ordersAdapter.getInitialState({
 export const ordersApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getOrder: builder.query({
-            query: ({ id }) => ({
+            query: (id) => ({
                 url: `/api/orders/${id}`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError
@@ -158,7 +158,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                     return response.status === 200 && !result.isError
                 },
             }),
-            providesTags: (result, error, id) => [{ type: 'Chart', id }]
+            providesTags: ['Chart'],
         }),
         checkout: builder.mutation({
             query: (newOrder) => ({

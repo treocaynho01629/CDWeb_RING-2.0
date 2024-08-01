@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { logOut, setAuth } from '../../features/auth/authSlice';
+import { logOut, setAuth } from '../../features/auth/authReducer';
 import { Cookies } from 'react-cookie';
 
 const cookies = new Cookies();
 const getCookieValue = (cookieName) => {
     let result = cookies.get(cookieName);
-    if (result.path) return null;
+    if (result?.path) return null;
     return result;
 };
 
@@ -14,10 +14,11 @@ const baseQuery = fetchBaseQuery({
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
         const token = getState().auth.token;
+        const persist = getState().auth.persist;
         const refreshToken = getCookieValue('refreshToken');
         if (token) {
             headers.set("Authorization", `Bearer ${token}`)
-        } else if (refreshToken) {
+        } else if (persist && refreshToken) {
             headers.set("Authorization", `Bearer ${refreshToken}`)
         }
         return headers
@@ -28,9 +29,10 @@ const baseQuery = fetchBaseQuery({
 const baseQueryForRefresh = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_PORT_SOCKET_SPRING,
     credentials: "include",
-    prepareHeaders: (headers) => {
+    prepareHeaders: (headers, { getState }) => {
+        const persist = getState().auth.persist;
         const refreshToken = getCookieValue('refreshToken');
-        if (refreshToken) headers.set("Authorization", `Bearer ${refreshToken}`);
+        if (persist && refreshToken) headers.set("Authorization", `Bearer ${refreshToken}`);
         return headers
     }
 })
@@ -57,6 +59,6 @@ const baseQueryWithRefresh = async (args, api, extraOptions) => {
 
 export const apiSlice = createApi({
     baseQuery: baseQueryWithRefresh,
-    tagTypes: ['Book', 'User', 'Category', 'Publisher', 'Review', 'Order'],
+    tagTypes: ['Book', 'User', 'Profile', 'Category', 'Publisher', 'Review', 'Order', 'Chart'],
     endpoints: builder => ({})
 })

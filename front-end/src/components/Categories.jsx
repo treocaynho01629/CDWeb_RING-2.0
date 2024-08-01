@@ -45,6 +45,7 @@ const CateContainer = styled.div`
     display: flex;
     border-bottom: 0.5px solid lightgray;
     justify-content: space-between;
+    overflow: hidden;
     padding: 5px 10px 5px 15px;
 
     &:hover {

@@ -11,11 +11,11 @@ import {
 } from "redux-persist";
 import { apiSlice } from './api/apiSlice'
 import storage from "redux-persist/lib/storage";
-import cartReducer from "../redux/cartReducer";
-import authReducer from '../features/auth/authSlice'
+import cartReducer from "../features/cart/cartReducer";
+import authReducer from '../features/auth/authReducer'
 
 const persistConfig = {
-    key: "root",
+    key: "rootbook",
     version: 1,
     storage,
 };

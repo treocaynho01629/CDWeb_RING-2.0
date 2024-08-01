@@ -125,7 +125,7 @@ const Home = () => {
       setCurrCate(randomIds ? randomIds[0] : null);
       setRandomCateIds(randomIds);
     }
-  }, [loadCates]);
+  }, [cates]);
 
   //Change order tab
   const handleChangeOrder = (e, newValue) => {

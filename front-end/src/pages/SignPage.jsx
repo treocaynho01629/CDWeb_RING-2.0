@@ -7,7 +7,7 @@ import RegisterTab from '../components/authorize/RegisterTab';
 import CustomButton from '../components/custom/CustomButton';
 import useAuth from '../hooks/useAuth';
 
-const PendingIndicator = lazy(() => import('../components/authorize/PendingIndicator'));
+const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
 
 //#region styled
 const fadeIn = keyframes`
@@ -134,7 +134,7 @@ function SignPage() {
                     &&
                     <>
                         <TabContainer className={`${isLogin ? 'active' : ''}`}>
-                            <LoginTab {...{ setPending }} />
+                            <LoginTab {...{ pending, setPending }} />
                         </TabContainer>
                         <DividerContainer>
                             <SignDivider onClick={toggleTab}>HOẶC</SignDivider>
@@ -150,7 +150,7 @@ function SignPage() {
                     </>
                 }
                 <TabContainer className={`${isLogin ? '' : 'active'}`}>
-                    <RegisterTab {...{ setPending }} />
+                    <RegisterTab {...{ pending, setPending }} />
                 </TabContainer>
             </Wrapper>
         </Container>

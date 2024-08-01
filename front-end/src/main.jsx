@@ -46,6 +46,17 @@ const theme = createTheme({
       },
     }
   },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      sm_md: 768,
+      md: 900,
+      md_lg: 992,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
 });
 
 const StyledMaterialDesignContent = muiStyled(MaterialDesignContent)(({ theme }) => ({

@@ -6,8 +6,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { jwtDecode } from 'jwt-decode';
 import { useDispatch } from 'react-redux';
-import { setAuth, setPersist } from '../../features/auth/authSlice';
+import { setAuth, setPersist } from '../../features/auth/authReducer';
 import { useAuthenticateMutation, useForgotMutation } from '../../features/auth/authApiSlice';
+import { EMAIL_REGEX } from '../../ultils/regex';
 import CustomInput from '../custom/CustomInput';
 import CustomButton from '../custom/CustomButton';
 
@@ -26,9 +27,7 @@ const Instruction = styled.p`
 `
 //#endregion
 
-const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-
-const LoginTab = ({ setPending }) => {
+const LoginTab = ({ pending, setPending }) => {
     const dispatch = useDispatch();
     const [authenticate, { isLoading }] = useAuthenticateMutation();
     const [sendForgot, { isLoading: sending }] = useForgotMutation();
@@ -83,6 +82,8 @@ const LoginTab = ({ setPending }) => {
     //Login
     const handleSubmitLogin = async (e) => {
         e.preventDefault();
+        if (pending) return;
+
         setPending(true);
         const { enqueueSnackbar } = await import('notistack');
 
@@ -94,7 +95,7 @@ const LoginTab = ({ setPending }) => {
                 dispatch(setAuth({ token }));
 
                 if (currPersist) { //Set refresh token on cookie
-                    dispatch(setPersist({persist: true})); //Set persist in state
+                    dispatch(setPersist({ persist: true })); //Set persist in state
                     const refreshTokenData = jwtDecode(refreshToken);
                     const expires = new Date(0);
                     expires.setUTCSeconds(refreshTokenData.exp);
@@ -125,6 +126,8 @@ const LoginTab = ({ setPending }) => {
     //Forgot pass
     const handleForgotPassword = async (e) => {
         e.preventDefault();
+        if (pending) return;
+
         setPending(true);
 
         //Validation

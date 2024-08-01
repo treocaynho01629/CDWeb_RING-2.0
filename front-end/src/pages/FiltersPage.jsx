@@ -96,7 +96,7 @@ const FiltersPage = () => {
                 pageSize: data?.info?.pageSize
             });
         }
-    }, [isLoading])
+    }, [data])
 
     //Set title
     useEffect(() => {

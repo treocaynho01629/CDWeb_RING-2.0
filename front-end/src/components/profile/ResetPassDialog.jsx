@@ -2,6 +2,7 @@ import styled from "styled-components"
 import { useEffect, useState } from 'react'
 import { Dialog, DialogActions, DialogContent, DialogTitle, Stack } from '@mui/material';
 import { Check, Close } from "@mui/icons-material";
+import { PWD_REGEX } from "../../ultils/regex";
 import CustomInput from "../custom/CustomInput";
 import CustomButton from "../custom/CustomButton";
 
@@ -13,8 +14,6 @@ const Instruction = styled.p`
     color: ${props => props.theme.palette.error.main};
 `
 //#endregion
-
-const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%:]).{8,24}$/;
 
 const ResetPassDialog = ({ openDialog, handleCloseDialog }) => {
     const [errr, setErrr] = useState([]);
@@ -82,11 +81,11 @@ const ResetPassDialog = ({ openDialog, handleCloseDialog }) => {
         } catch (err) {
             console.error(err);
             setErrr(err);
-            if (!err?.response) {
+            if (!err?.status) {
                 setOtherErrMsg("Server không phản hồi!");
-            } else if (err.response?.status === 409) {
-                setOtherErrMsg(err.response?.data?.errors?.errorMessage);
-            } else if (err.response?.status === 400) {
+            } else if (err?.status === 409) {
+                setOtherErrMsg(err?.data?.errors?.errorMessage);
+            } else if (err?.status === 400) {
             } else {
                 setOtherErrMsg("Đổi mật khẩu thất bại!");
             }

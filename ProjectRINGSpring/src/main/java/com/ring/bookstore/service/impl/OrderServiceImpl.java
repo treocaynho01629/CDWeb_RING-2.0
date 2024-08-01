@@ -53,7 +53,6 @@ public class OrderServiceImpl implements OrderService {
 	public OrderReceipt checkout(OrderRequest request, Account user) {
 		
 		//Info validation
-		String fullName = request.getFirstName() + " " + request.getLastName(); //Fullname
 		String cartContent = ""; //For email
 		double total = 0.0; //Total price
 		
@@ -62,7 +61,7 @@ public class OrderServiceImpl implements OrderService {
 		
 		//Create new receipt
 		var orderReceipt = OrderReceipt.builder()
-				.fullName(fullName)
+				.fullName(request.getName())
 				.email(user.getEmail())
 				.phone(request.getPhone())
 				.oAddress(request.getAddress())
@@ -112,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
                 + "Đơn hàng của bạn đã được xác nhận!\r\n"
                 + "</h2>\n"
                 + "<h3>Chi tiết đơn hàng:</h3>\n"
-                + "<p><b>Tên người nhận: </b>" + fullName + "</p>\n"
+                + "<p><b>Tên người nhận: </b>" + request.getName() + "</p>\n"
                 + "<p><b>SĐT người nhận: </b>" + request.getPhone() + "</p>\n"
                 + "<p><b>Địa chỉ: </b>" + request.getAddress() + "</p>\n"
                 + "<br><p>Lời nhắn cho shipper: <b>" + request.getMessage() + "</b></p>\n"

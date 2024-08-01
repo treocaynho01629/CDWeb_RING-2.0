@@ -3,11 +3,12 @@ import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { Stack } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useResetMutation } from '../features/auth/authApiSlice';
+import { PWD_REGEX } from '../ultils/regex';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 import CustomInput from '../components/custom/CustomInput';
 import CustomButton from '../components/custom/CustomButton';
 
-const PendingIndicator = lazy(() => import('../components/authorize/PendingIndicator'));
+const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
 
 //#region styled
 const Container = styled.div`
@@ -37,9 +38,6 @@ const Instruction = styled.p`
     display: ${props => props.display};;
 `
 //#endregion
-
-//Validate input
-const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%:]).{8,24}$/;
 
 function ResetPage() {
     //Password validation
@@ -77,6 +75,7 @@ function ResetPage() {
     //Reset passowrd
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (pending) return;
 
         //Validation
         const v2 = PWD_REGEX.test(pwd);

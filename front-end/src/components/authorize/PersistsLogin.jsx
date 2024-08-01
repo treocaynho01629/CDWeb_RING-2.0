@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useRefreshMutation } from "../../features/auth/authApiSlice";
 import useAuth from '../../hooks/useAuth';
-import PendingIndicator from "../../components/authorize/PendingIndicator";
+import PendingIndicator from "../../components/layout/PendingIndicator";
 import CustomButton from "../custom/CustomButton";
 import useLogout from "../../hooks/useLogout";
 

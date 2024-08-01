@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useState, useRef, useEffect } from 'react';
 import { Stack } from '@mui/material';
 import { useRegisterMutation } from '../../features/auth/authApiSlice';
+import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from '../../ultils/regex';
 import CustomInput from '../custom/CustomInput';
 import CustomButton from '../custom/CustomButton';
 
@@ -19,12 +20,7 @@ const Instruction = styled.p`
 `
 //#endregion
 
-//Validate input
-const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
-const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%:]).{8,24}$/;
-const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-
-const RegisterTab = ({ setPending }) => {
+const RegisterTab = ({ pending, setPending }) => {
     const userRef = useRef();
     const errRef = useRef();
 
@@ -84,6 +80,7 @@ const RegisterTab = ({ setPending }) => {
     //Register
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (pending) return;
 
         //Validation
         const v1 = USER_REGEX.test(username);

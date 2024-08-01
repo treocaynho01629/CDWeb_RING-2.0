@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { useCookies } from 'react-cookie';
-import { logOut } from "../features/auth/authSlice";
+import { logOut } from "../features/auth/authReducer";
 import { apiSlice } from "../app/api/apiSlice";
 import { useSignoutMutation } from "../features/auth/authApiSlice";
 import { useNavigate } from "react-router-dom";

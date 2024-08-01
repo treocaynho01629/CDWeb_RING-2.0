@@ -1,10 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { addToCart, changeQuantity, decreaseQuantity, increaseQuantity, removeItem, resetCart, selectCartProducts } from '../redux/cartReducer';
+import { addAddress, addToCart, changeQuantity, decreaseQuantity, increaseQuantity, 
+    removeItem, resetCart, selectAddresses, selectCartProducts, removeStateAddress } from '../features/cart/cartReducer';
 
 const useCart = () => {
     const dispatch = useDispatch();
     const cartProducts = useSelector(selectCartProducts);
+    const addresses = useSelector(selectAddresses);
 
+    //Cart
     const addProduct = async (product) => {
         const { enqueueSnackbar } = await import('notistack');
         enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });
@@ -16,7 +19,12 @@ const useCart = () => {
     const removeProduct = (id) => dispatch(removeItem(id));
     const clearCart = () => dispatch(resetCart());
 
-    return { cartProducts, addProduct, decreaseAmount, increaseAmount, changeAmount, removeProduct, clearCart }
+    //Address
+    const addNewAddress = (address) => {dispatch(addAddress(address))}
+    const removeAddress = (id) => dispatch(removeStateAddress(id));
+
+    return { cartProducts, addresses, addProduct, decreaseAmount, increaseAmount, 
+        changeAmount, removeProduct, clearCart, addNewAddress, removeAddress }
 }
 
 export default useCart

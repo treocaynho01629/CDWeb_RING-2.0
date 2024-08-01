@@ -1,97 +1,82 @@
 import styled from "styled-components"
-import { styled as muiStyled } from '@mui/material/styles';
 import { useEffect, useState } from "react";
-import { useGetProfileQuery } from "../../features/users/usersApiSlice";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { Box, FormControl, FormControlLabel, Grid, Radio, RadioGroup, Stack, Avatar } from "@mui/material";
-import { Person } from "@mui/icons-material";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Box, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton } from "@mui/material";
+import { Check, Person } from "@mui/icons-material";
+import { PHONE_REGEX } from "../../ultils/regex";
+import { useGetProfileQuery, useUpdateProfileMutation } from "../../features/users/usersApiSlice";
 import dayjs from 'dayjs';
-import ResetPassDialog from "./ResetPassDialog";
-import CustomProgress from "../custom/CustomProgress"
 import CustomInput from "../custom/CustomInput";
 import CustomButton from "../custom/CustomButton";
+import CustomDatePicker from "../custom/CustomDatePicker";
 
 //#region styled
 const InfoText = styled.h4`
     margin: 15px 0px;
+    white-space: nowrap;
+
+    &.edit {
+        white-space: nowrap;
+        margin-left: 15px;
+        text-decoration: underline;
+        cursor: pointer;
+        color: ${props => props.theme.palette.secondary.main};
+    }
+
+    &.disabled {
+        pointer-events: none;
+        color: ${props => props.theme.palette.action.disabled};
+    }
 `
 
-const InfoStack = styled.div`
+const InfoTitle = styled.td`
+    height: 56px;
+    width: 35%;
+`
+
+const InfoStack = styled.td`
+    height: 56px;
+    padding-left: 10px;
+`
+
+const InfoStackContainer = styled.div`
     height: 56px;
     display: flex;
     align-items: center;
-`
 
-const CustomDatePicker = muiStyled(DatePicker)(({ theme }) => ({
-    '& .MuiInputBase-root': {
-        borderRadius: 0,
-        width: '80%',
-    },
-    '& label.Mui-focused': {
-        color: theme.palette.action.focus
-    },
-    '& .MuiInput-underline:after': {
-        borderBottomColor: theme.palette.action.focus,
-    },
-    '& .MuiOutlinedInput-root': {
-        borderRadius: 0,
-        '& fieldset': {
-            borderRadius: 0,
-            borderColor: theme.palette.action.focus,
-        },
-        '&:hover fieldset': {
-            borderRadius: 0,
-            borderColor: theme.palette.action.hover,
-        },
-        '&.Mui-focused fieldset': {
-            borderRadius: 0,
-            borderColor: theme.palette.action.focus,
-        },
-    },
-    '& input:valid + fieldset': {
-        borderColor: theme.palette.action.focus,
-        borderRadius: 0,
-        borderWidth: 1,
-    },
-    '& input:invalid + fieldset': {
-        borderColor: theme.palette.error.main,
-        borderRadius: 0,
-        borderWidth: 1,
-    },
-    '& input:valid:focus + fieldset': {
-        borderColor: theme.palette.secondary.main,
-        borderLeftWidth: 4,
-        borderRadius: 0,
-        padding: '4px !important',
-    },
-}));
+    ${props => props.theme.breakpoints.down("sm")} {
+        justify-content: space-between;
+    }
+`
 //#endregion
 
-const PHONE_REGEX = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/;
-
-const ProfileDetail = ({ ContentContainer, Title, openDialog, handleCloseDialog }) => {
+const ProfileDetail = ({ Title, pending, setPending, Instruction }) => {
     //Initial value
+    const [errMsg, setErrMsg] = useState('');
     const [err, setErr] = useState([]);
     const [name, setName] = useState('');
     const [validPhone, setValidPhone] = useState(false);
     const [phone, setPhone] = useState('');
-    const [address, setAddress] = useState('');
     const [gender, setGender] = useState('');
     const [dob, setDob] = useState(dayjs('2000-01-01'));
+    const [editPhone, setEditPhone] = useState(false);
+    const [editDob, setEditDob] = useState(false);
 
     //Fetch current profile
-    const { data, isLoading, isSuccess } = useGetProfileQuery();
+    //Fetch current profile address
+    const { data: profile, isLoading: loadProfile, isSuccess: profileDone, isError: profileError } = useGetProfileQuery();
 
+    //Update profile hook
+    const [updateProfile, { isLoading: updating }] = useUpdateProfileMutation();
+
+    //Set data
     useEffect(() => {
-        if (!isLoading && isSuccess && data) {
-            setName(data?.name);
-            setPhone(data?.phone);
-            setAddress(data?.address);
-            setGender(data?.gender);
-            setDob(dayjs(data?.dob));
+        if (!loadProfile && profileDone && profile) {
+            setName(profile?.name);
+            setPhone(profile?.phone);
+            setGender(profile?.gender);
+            setDob(dayjs(profile?.dob));
         }
-    }, [isLoading])
+    }, [profile])
 
     useEffect(() => {
         const result = PHONE_REGEX.test(phone);
@@ -100,148 +85,212 @@ const ProfileDetail = ({ ContentContainer, Title, openDialog, handleCloseDialog 
 
     const handleChangeInfo = async (e) => {
         e.preventDefault();
+        if (pending) return;
 
+        //Validation
         const valid = PHONE_REGEX.test(phone);
+        if (!valid && phone) { return }
 
-        if (!valid && phone) {
-            return;
-        }
+        setPending(true);
+        const { enqueueSnackbar } = await import('notistack');
 
-        try {
-            const response = await axiosPrivate.put(PROFILE_URL,
-                JSON.stringify({
-                    name: name,
-                    phone: phone,
-                    gender: gender,
-                    address: address,
-                    dob: dob.format('YYYY-MM-DD')
-                }),
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
+        updateProfile({
+            name,
+            phone,
+            gender,
+            dob: dob.format('YYYY-MM-DD'),
+            address: profile?.address
+        }).unwrap()
+            .then((data) => {
+                setErrMsg('');
+                setErr([]);
+                enqueueSnackbar('Sửa thông tin thành công!', { variant: 'success' });
+                setPending(false);
+            })
+            .catch((err) => {
+                console.error(err);
+                setErr(err);
+                if (!err?.status) {
+                    setErrMsg('Server không phản hồi');
+                } else if (err?.status === 400) {
+                    setErrMsg('Sai định dạng thông tin!');
+                } else {
+                    setErrMsg('Cập nhật hồ sơ thất bại');
                 }
-            );
-
-            setErr([]);
-            const { enqueueSnackbar } = await import('notistack');
-            enqueueSnackbar('Sửa thông tin thành công!', { variant: 'success' });
-            refetch();
-        } catch (err) {
-            console.error(err);
-            setErr(err);
-            if (!err?.response) {
-            } else if (err.response?.status === 409) {
-            } else if (err.response?.status === 400) {
-            } else {
-            }
-        }
+                setPending(false);
+            })
     }
 
-    return <>
-        <ContentContainer>
+    return (
+        <>
             <Title><Person />&nbsp;HỒ SƠ CỦA BẠN</Title>
-            {isLoading ? <CustomProgress color="secondary" /> : <Box sx={{ paddingBottom: '100px' }}>
-                <Grid container spacing={2}>
-                    <Grid item xs={4} lg={3}>
-                        <Stack spacing={0}>
-                            <InfoStack><InfoText>Tên đăng nhập: </InfoText></InfoStack>
-                            <InfoStack><InfoText>Email: </InfoText></InfoStack>
-                            <InfoStack><InfoText>Tên: </InfoText></InfoStack>
-                            <InfoStack><InfoText>Số điện thoại: </InfoText></InfoStack>
-                            <InfoStack><InfoText>Ngày sinh: </InfoText></InfoStack>
-                            <InfoStack><InfoText>Địa chỉ: </InfoText></InfoStack>
-                            <InfoStack><InfoText>Giới tính: </InfoText></InfoStack>
-                        </Stack>
-                    </Grid>
-                    <Grid item xs={8} lg={6}>
-                        <Stack spacing={0}>
-                            <InfoStack><InfoText>{data?.userName} </InfoText></InfoStack>
-                            <InfoStack><InfoText>{data?.email.replace(/(\w{3})[\w.-]+@([\w.]+\w)/, "$1***@$2")}</InfoText></InfoStack>
-                            <InfoStack>
-                                <CustomInput
-                                    type="text"
-                                    id="name"
-                                    onChange={e => setName(e.target.value)}
-                                    value={name}
-                                    error={err?.data?.errors?.firstName}
-                                    helperText={err?.data?.errors?.firstName}
-                                    size="small"
-                                    sx={{ width: '80%' }}
-                                />
-                            </InfoStack>
-                            <InfoStack>
-                                <CustomInput
-                                    id="phone"
-                                    onChange={e => setPhone(e.target.value)}
-                                    value={phone.replace(/\d(?=\d{2})/g, '*')}
-                                    error={phone && !validPhone || err?.data?.errors?.phone}
-                                    helperText={phone && !validPhone ? "Sai định dạng số điện thoại!" : err?.data?.errors?.phone}
-                                    size="small"
-                                    sx={{ width: '80%' }}
-                                />
-                            </InfoStack>
-                            <InfoStack>
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <FormControl margin="dense" fullWidth>
-                                        <CustomDatePicker value={dob} className="DatePicker" onChange={newValue => setDob(newValue)} size="small" slotProps={{
+            <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
+            <Box sx={{ paddingBottom: '100px' }}>
+                <table style={{ width: '100%' }}>
+                    <tr>
+                        <InfoTitle><InfoText>Tên đăng nhập: </InfoText></InfoTitle>
+                        <InfoStack><InfoStackContainer>
+                            {loadProfile
+                                ?
+                                <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
+                                :
+                                <InfoText>{profile?.userName}</InfoText>
+                            }
+                        </InfoStackContainer></InfoStack>
+                    </tr>
+                    <tr>
+                        <InfoTitle><InfoText>Email: </InfoText></InfoTitle>
+                        <InfoStack>
+                            <InfoStackContainer>
+                                {loadProfile
+                                    ?
+                                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width="40%" />
+                                    :
+                                    <InfoText>{profile?.email.replace(/(\w{3})[\w.-]+@([\w.]+\w)/, "$1***@$2")}</InfoText>
+                                }
+                            </InfoStackContainer>
+                        </InfoStack>
+                    </tr>
+                    <tr>
+                        <InfoTitle><InfoText>Tên: </InfoText></InfoTitle>
+                        <InfoStack>
+                            <InfoStackContainer>
+                                {loadProfile
+                                    ?
+                                    <Skeleton variant="rectangular" height={40} width={'100%'} />
+                                    :
+                                    <CustomInput
+                                        required
+                                        type="text"
+                                        id="name"
+                                        onChange={e => setName(e.target.value)}
+                                        value={name}
+                                        error={err?.data?.errors?.name}
+                                        helperText={err?.data?.errors?.name}
+                                        size="small"
+                                        fullWidth
+                                    />
+                                }
+                            </InfoStackContainer>
+                        </InfoStack>
+                    </tr>
+                    <tr>
+                        <InfoTitle><InfoText>Số điện thoại: </InfoText></InfoTitle>
+                        <InfoStack>
+                            <InfoStackContainer>
+                                {editPhone
+                                    ?
+                                    <CustomInput
+                                        required
+                                        id="phone"
+                                        onChange={e => setPhone(e.target.value)}
+                                        value={phone}
+                                        error={phone && !validPhone || err?.data?.errors?.phone}
+                                        helperText={phone && !validPhone ? "Sai định dạng số điện thoại!" : err?.data?.errors?.phone}
+                                        size="small"
+                                        fullWidth
+                                    />
+                                    :
+                                    <>
+                                        {loadProfile
+                                            ?
+                                            <Skeleton variant="text" sx={{ fontSize: '16px' }} width="25%" />
+                                            :
+                                            <InfoText>{phone.replace(/\d(?=\d{2})/g, '*')}</InfoText>
+                                        }
+                                        <InfoText className={`edit ${loadProfile ? 'disabled' : ''}`} onClick={() => setEditPhone(true)}>Thay đổi</InfoText>
+                                    </>
+                                }
+                            </InfoStackContainer>
+                        </InfoStack>
+                    </tr>
+                    <tr>
+                        <InfoTitle><InfoText>Ngày sinh: </InfoText></InfoTitle>
+                        <InfoStack>
+                            <InfoStackContainer>
+                                {editDob
+                                    ?
+                                    <CustomDatePicker
+                                        required
+                                        value={dob}
+                                        className="custom-date-picker"
+                                        onChange={newValue => setDob(newValue)}
+                                        size="small"
+                                        slotProps={{
                                             textField: {
                                                 size: "small",
-                                                error: err?.response?.data?.errors?.dob,
-                                                helperText: err?.response?.data?.errors?.dob
-                                            }
-                                        }} />
-                                    </FormControl>
-                                </LocalizationProvider>
-                            </InfoStack>
-                            <InfoStack>
-                                <CustomInput type="text" id="address" onChange={e => setAddress(e.target.value)} value={address} error={err?.response?.data?.errors?.address} helperText={err?.response?.data?.errors?.address} size="small" sx={{
-                                    width: '80%'
-                                }} />
-                            </InfoStack>
-                            <InfoStack>
-                                <RadioGroup spacing={1} row value={gender} onChange={e => setGender(e.target.value)}>
-                                    <FormControlLabel value="Nam" control={<Radio sx={{
-                                        '&.Mui-checked': {
-                                            color: '#63e399'
+                                                fullWidth: true,
+                                                error: err?.data?.errors?.dob,
+                                                helperText: err?.data?.errors?.dob,
+                                            },
+                                        }}
+                                    />
+                                    :
+                                    <>
+                                        {loadProfile
+                                            ?
+                                            <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
+                                            :
+                                            <InfoText>{dob.format('DD/MM/YYYY')}</InfoText>
                                         }
-                                    }} />} label="Nam" />
-                                    <FormControlLabel value="Nữ" control={<Radio sx={{
-                                        '&.Mui-checked': {
-                                            color: '#63e399'
-                                        }
-                                    }} />} label="Nữ" />
-                                    <FormControlLabel value="" control={<Radio sx={{
-                                        '&.Mui-checked': {
-                                            color: '#63e399'
-                                        }
-                                    }} />} label="Không" />
+                                        <InfoText className={`edit ${loadProfile ? 'disabled' : ''}`} onClick={() => setEditDob(true)}>Thay đổi</InfoText>
+                                    </>
+                                }
+                            </InfoStackContainer>
+                        </InfoStack>
+                    </tr>
+                    <tr>
+                        <InfoTitle><InfoText>Giới tính: </InfoText></InfoTitle>
+                        <InfoStack>
+                            <InfoStackContainer>
+                                <RadioGroup
+                                    spacing={1}
+                                    row
+                                    value={gender}
+                                    onChange={e => setGender(e.target.value)}
+                                    sx={{ display: { xs: 'none', sm: 'block' } }}
+                                >
+                                    <FormControlLabel disabled={loadProfile} value="Nam" control={<Radio color="secondary" />} label="Nam" />
+                                    <FormControlLabel disabled={loadProfile} value="Nữ" control={<Radio color="secondary" />} label="Nữ" />
+                                    <FormControlLabel disabled={loadProfile} value="" control={<Radio color="secondary" />} label="Không" />
                                 </RadioGroup>
-                            </InfoStack>
-                        </Stack>
-                    </Grid>
-                    <Grid item xs={12} lg={3}
-                        display={{ xs: 'none', lg: 'flex' }}
-                        justifyContent={'center'}
-                    >
-                        <Avatar sx={{
-                            height: 150,
-                            width: 150
-                        }} />
-                    </Grid>
-                </Grid>
-                <InfoStack>
+                                {loadProfile
+                                    ?
+                                    <Skeleton variant="rectangular" height={40} width={'100%'} sx={{ display: { xs: 'flex', sm: 'none' } }} />
+                                    :
+                                    <CustomInput
+                                        required
+                                        select
+                                        value={gender}
+                                        onChange={(e) => setGender(e.target.value)}
+                                        size="small"
+                                        fullWidth
+                                        sx={{ display: { xs: 'flex', sm: 'none' } }}
+                                    >
+                                        <MenuItem value="Nam">Nam</MenuItem>
+                                        <MenuItem value="Nữ">Nữ</MenuItem>
+                                        <MenuItem value="">Không</MenuItem>
+                                    </CustomInput>
+                                }
+                            </InfoStackContainer>
+                        </InfoStack>
+                    </tr>
+                </table>
+                <InfoStackContainer>
                     <CustomButton
                         variant="contained"
                         color="secondary"
+                        size="large"
+                        disabled={loadProfile}
+                        sx={{ marginTop: 5 }}
                         onClick={handleChangeInfo}
                     >
-                        Lưu thông tin
+                        <Check /> Lưu thông tin
                     </CustomButton>
-                </InfoStack>
-            </Box>}
-        </ContentContainer>
-        <ResetPassDialog {...{ openDialog, handleCloseDialog }} />
-    </>;
+                </InfoStackContainer>
+            </Box>
+        </>
+    )
 }
 
 export default ProfileDetail

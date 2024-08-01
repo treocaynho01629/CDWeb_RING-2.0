@@ -182,7 +182,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 url: `/api/books/delete-multiples?ids=${ids}`,
                 method: 'DELETE'
             }),
-            invalidatesTags: (result, error, id) => [
+            invalidatesTags: (result, error) => [
                 { type: 'Book', id: "LIST" }
             ]
         }),
@@ -191,7 +191,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 url: '/api/books/delete-all',
                 method: 'DELETE'
             }),
-            invalidatesTags: (result, error, id) => [
+            invalidatesTags: (result, error) => [
                 { type: 'Book', id: "LIST" }
             ]
         }),

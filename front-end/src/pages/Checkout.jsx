@@ -8,13 +8,14 @@ import { Navigate, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useGetProfileQuery } from '../features/users/usersApiSlice';
 import { useCheckoutMutation } from '../features/orders/orderApiSlice';
+import { PHONE_REGEX } from '../ultils/regex';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 import CustomButton from '../components/custom/CustomButton';
-import AddressComponent from '../components/cart/AddressComponent';
+import AddressItem from '../components/address/AddressItem';
 import FinalCheckoutDialog from '../components/cart/FinalCheckoutDialog';
 import useCart from '../hooks/useCart';
 
-const PendingIndicator = lazy(() => import('../components/authorize/PendingIndicator'));
+const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
 
 //#region styled
 const Wrapper = styled.div`
@@ -248,8 +249,6 @@ const StyledStepLabel = muiStyled(StepLabel)(({ theme }) => ({
 }));
 //#endregion
 
-const PHONE_REGEX = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/;
-
 const Checkout = () => {
     //#region construct
     //Products from state
@@ -258,28 +257,20 @@ const Checkout = () => {
     const products = checkState.products;
     const checkRef = useRef(null);
 
-    //Initial value
-    const [addressInfo, setAddressInfo] = useState({
-        fullName: '',
-        phone: '',
-        city: '',
-        state: '',
-        address: ''
-    })
+    
+    const [fullAddress, setFullAddress] = useState('');
     const [validPhone, setValidPhone] = useState(false);
     const [message, setMessage] = useState('');
     const [errMsg, setErrMsg] = useState('');
     const [err, setErr] = useState([]);
     const [activeStep, setActiveStep] = useState(0);
     const [value, setValue] = useState("1");
-    const fullAddress = `${addressInfo?.city}${addressInfo?.ward ? `/ ${addressInfo?.ward}/` : ''}${addressInfo?.address}`
     const maxSteps = 3;
 
     //Checkout hook
     const [checkout, { isLoading }] = useCheckoutMutation();
 
-    //Fetch current profile
-    const { data: profile, isLoading: loadProfile, isSuccess: profileDone } = useGetProfileQuery();
+ 
 
     //Other
     const navigate = useNavigate();
@@ -298,11 +289,9 @@ const Checkout = () => {
         }
     }, [addressInfo.fullName, addressInfo.phone, addressInfo.address])
 
-    useEffect(() => { //Load user info
-        if (!loadProfile && profileDone && profile) {
-            setAddressInfo({ ...addressInfo, address: profile?.address, phone: profile?.phone, fullName: profile?.name });
-        }
-    }, [loadProfile])
+    
+
+    
 
     useEffect(() => { //Check phone number
         const result = PHONE_REGEX.test(addressInfo.phone);
@@ -332,6 +321,7 @@ const Checkout = () => {
     //Submit checkout
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (isLoading) return;
 
         //Validation
         const valid = PHONE_REGEX.test(addressInfo.phone);
@@ -348,16 +338,9 @@ const Checkout = () => {
 
         const { enqueueSnackbar } = await import('notistack');
 
-        //Split name
-        let fullNameSplit = addressInfo.fullName.split(' ');
-        let lastName = fullNameSplit[fullNameSplit.length - 1];
-        let firstName = '';
-        if (fullNameSplit.length > 2) firstName = fullNameSplit.slice(0, -1).join(' ');
-
         checkout({
             cart: products,
-            firstName,
-            lastName,
+            name: addressInfo.fullName,
             phone: addressInfo.phone,
             address: fullAddress,
             message: message
@@ -394,9 +377,7 @@ const Checkout = () => {
                     : null
                 }
                 <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
-                    <NavLink to={`/cart`}>
-                        Giỏ hàng
-                    </NavLink>
+                    <NavLink to={`/cart`}>Giỏ hàng</NavLink>
                     <strong style={{ textDecoration: 'underline' }}>Thanh toán</strong>
                 </CustomBreadcrumbs>
                 <CheckoutContainer>
@@ -415,7 +396,7 @@ const Checkout = () => {
                             </StyledStepLabel>
                             <StyledStepContent>
                                 <SmallContainer className={`${validAddressInfo ? '' : 'error'}`}>
-                                    <AddressComponent {...{ addressInfo, setAddressInfo, fullAddress, errMsg, err, validPhone }} />
+                                    <AddressItem {...{ addressInfo, setAddressInfo, fullAddress, errMsg, err, validPhone }} />
                                 </SmallContainer>
                             </StyledStepContent>
                         </Step>
