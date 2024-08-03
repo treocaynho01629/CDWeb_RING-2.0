@@ -2,7 +2,7 @@ import { DeliveryDining as DeliveryDiningIcon, Logout, Speed as SpeedIcon } from
 import { Avatar, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-const ProfilePopover = ({ open, anchorEl, handleClose, navigate, roles, logout }) => {
+const ProfilePopover = ({ open, anchorEl, handleClose, roles, logout }) => {
     const role = roles?.length;
 
     return (
@@ -12,6 +12,9 @@ const ProfilePopover = ({ open, anchorEl, handleClose, navigate, roles, logout }
             anchorEl={anchorEl}
             onClose={handleClose}
             onClick={handleClose}
+            disableRestoreFocus
+            disableScrollLock
+            sx={{ pointerEvents: 'none', }}
             PaperProps={{
                 elevation: 0,
                 sx: {
@@ -19,6 +22,8 @@ const ProfilePopover = ({ open, anchorEl, handleClose, navigate, roles, logout }
                     filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
                     mt: 1.5,
                     borderRadius: 0,
+                    pointerEvents: 'auto',
+
                     '& .MuiAvatar-root': {
                         width: 32,
                         height: 32,
@@ -38,17 +43,18 @@ const ProfilePopover = ({ open, anchorEl, handleClose, navigate, roles, logout }
                         zIndex: 0,
                     },
                 },
+                onMouseLeave: handleClose
             }}
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
             <Link to={'/profile/detail'} style={{ color: 'inherit' }}>
-                <MenuItem onClick={() => handleClose()}>
+                <MenuItem>
                     <Avatar /> Thông tin tài khoản
                 </MenuItem>
             </Link>
-            <Link to={'/profile/receipts'} style={{ color: 'inherit' }}>
-                <MenuItem onClick={() => handleClose()}>
+            <Link to={'/profile/orders'} style={{ color: 'inherit' }}>
+                <MenuItem>
                     <ListItemIcon>
                         <DeliveryDiningIcon fontSize="small" />
                     </ListItemIcon>
@@ -58,7 +64,7 @@ const ProfilePopover = ({ open, anchorEl, handleClose, navigate, roles, logout }
             <Divider />
             {role >= 2 && (
                 <Link to={'/dashboard'} style={{ color: 'inherit' }}>
-                    <MenuItem onClick={() => handleClose()}>
+                    <MenuItem>
                         <ListItemIcon>
                             <SpeedIcon fontSize="small" />
                         </ListItemIcon>

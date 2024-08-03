@@ -1,10 +1,10 @@
-import styled from "styled-components"
-import { useEffect, useState } from 'react'
+import styled, { useTheme } from "styled-components"
+import { useState } from 'react'
 import { useGetProfileQuery, useUpdateProfileMutation } from '../../features/users/usersApiSlice';
-import { Box, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
+import { Box, CircularProgress, Dialog, ListItemIcon, ListItemText, Menu, MenuItem, useMediaQuery } from '@mui/material';
 import { AddHome, Delete, Home, LocationOn } from '@mui/icons-material';
 import AddressItem from './AddressItem'
-import AddressDialog from './AddressDialog'
+import AddressForm from './AddressForm'
 import useCart from '../../hooks/useCart';
 import CustomButton from '../custom/CustomButton';
 
@@ -22,6 +22,7 @@ const Title = styled.h3`
 
     ${props => props.theme.breakpoints.down("sm")} {
         font-size: 15px;
+        margin: 20px 15px;
     }
 `
 //#endregion
@@ -34,29 +35,14 @@ const AddressComponent = ({ pending, setPending }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [contextAddress, setContextAddress] = useState(null);
   const openContext = Boolean(anchorEl);
-
-  //Initial default address
-  const [addressInfo, setAddressInfo] = useState({
-    name: '',
-    phone: '',
-    address: ''
-  })
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   //Fetch current profile address
   const { data: profile, isLoading: loadProfile, isSuccess: profileDone } = useGetProfileQuery();
 
   //Update profile hook
   const [updateProfile, { isLoading: updating }] = useUpdateProfileMutation();
-
-  useEffect(() => { //Load default address info
-    if (profile && !loadProfile && profileDone) {
-      setAddressInfo({
-        address: profile?.address,
-        phone: profile?.phone,
-        name: profile?.name
-      });
-    }
-  }, [profile])
 
   const getFullAddress = (addressInfo) => {
     const tempAddress = [];
@@ -74,7 +60,8 @@ const AddressComponent = ({ pending, setPending }) => {
 
   const handleClose = () => {
     setContextAddress(null);
-    setErr('');
+    setErrMsg('');
+    setErr([]);
     setOpen(false);
   }
 
@@ -97,27 +84,31 @@ const AddressComponent = ({ pending, setPending }) => {
 
   //Move current default address to redux store
   const defaultAddressToStore = () => {
-    if (!loadProfile) { addNewAddress(addressInfo); }
+    if (!loadProfile) {
+      const newAddress = {
+        name: profile?.name,
+        phone: profile?.phone,
+        address: profile?.address
+      }
+      addNewAddress(newAddress);
+    }
   }
 
   const handleUpdateAddress = (newAddress) => {
-    if (loadProfile || pending) return;
+    if (loadProfile || updating) return;
 
-    setPending(true);
     updateProfile({
       name: newAddress.name,
       phone: newAddress.phone,
       address: newAddress.address,
       gender: profile.gender,
       dob: profile.dob,
-    }).unwrap()
+    })
+      .unwrap()
       .then((data) => {
-        setErrMsg('');
-        setErr([]);
-        setPending(false);
+        handleClose();
       })
       .catch((err) => {
-        setPending(false);
         console.error(err);
         setErr(err);
         if (!err?.status) {
@@ -131,9 +122,28 @@ const AddressComponent = ({ pending, setPending }) => {
   }
 
   const handleSetDefault = (newAddress) => {
-    defaultAddressToStore(); //Move current default address to redux store
-    handleRemoveAddress(newAddress?.id); //Remove select address from redux store
-    handleUpdateAddress(newAddress); //Update profile's address
+    if (pending) return;
+    setPending(true);
+    try {
+      defaultAddressToStore(); //Move current default address to redux store
+      handleRemoveAddress(newAddress?.id); //Remove select address from redux store
+      handleUpdateAddress(newAddress); //Update profile's address
+
+      setErrMsg('');
+      setErr([]);
+      setPending(false);
+    } catch (err) {
+      console.error(err);
+      setErr(err);
+      if (!err?.status) {
+        setErrMsg('Server không phản hồi');
+      } else if (err?.status === 400) {
+        setErrMsg('Sai định dạng thông tin!');
+      } else {
+        setErrMsg('Cập nhật thất bại');
+      }
+      setPending(false);
+    }
   }
 
   const isDefault = (contextAddress != null && contextAddress?.id == null);
@@ -148,37 +158,57 @@ const AddressComponent = ({ pending, setPending }) => {
           Thêm địa chỉ <AddHome />
         </CustomButton>
       </Title>
-      <AddressItem {...{ addressInfo, handleOpen, handleClick }} />
-      {addresses?.map((address, index) => (
-        <AddressItem key={`${address?.id}-${index}`} {...{ addressInfo: address, handleOpen, handleClick }} />
-      ))}
-      <br />
-      <AddressDialog {...{
-        open, handleClose, addressInfo: contextAddress, err, setErr, errMsg, setErrMsg, getFullAddress,
-        addNewAddress, pending, setPending, handleRemoveAddress, handleUpdateAddress, defaultAddressToStore
-      }} />
-      <Menu
-        open={openContext}
-        onClose={handleCloseContext}
-        anchorEl={anchorEl}
-        sx={{ display: { xs: 'none', sm: 'block' } }}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-        }}
-      >
-        <MenuItem disabled={isDefault} onClick={() => handleRemoveAddress(contextAddress?.id)}>
-          <ListItemIcon >
-            <Delete sx={{ color: 'error.main' }} fontSize="small" />
-          </ListItemIcon>
-          <ListItemText sx={{ color: 'error.main' }}>Xoá địa chỉ</ListItemText>
-        </MenuItem>
-        <MenuItem disabled={isDefault} onClick={() => handleSetDefault(contextAddress)}>
-          <ListItemIcon>
-            <Home fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Đặt làm mặc định</ListItemText>
-        </MenuItem>
-      </Menu >
+      {
+        (loadProfile && !profile)
+          ?
+          <Box display={'flex'} alignItems={'center'} justifyContent={'center'} height={'40dvh'}>
+            <CircularProgress
+              color="secondary"
+              size={40}
+              thickness={5}
+            />
+          </Box>
+          :
+          <>
+            <Box sx={{ marginBottom: '5px' }}>
+              <AddressItem {...{ addressInfo: profile, handleOpen, handleClick }} />
+            </Box>
+            {addresses?.map((address, index) => (
+              <Box key={`${address?.id}-${index}`} sx={{ marginBottom: '5px' }}>
+                <AddressItem {...{ addressInfo: address, handleOpen, handleClick }} />
+              </Box>
+            ))}
+            <br />
+            <Dialog open={open} scroll={'paper'} maxWidth={'sm'} fullWidth onClose={handleClose} fullScreen={fullScreen}>
+              <AddressForm {...{
+                open, handleClose, addressInfo: contextAddress, err, setErr, errMsg, setErrMsg, getFullAddress,
+                addNewAddress, pending, setPending, handleRemoveAddress, handleUpdateAddress, defaultAddressToStore
+              }} />
+            </Dialog>
+            <Menu
+              open={openContext}
+              onClose={handleCloseContext}
+              anchorEl={anchorEl}
+              sx={{ display: { xs: 'none', sm: 'block' } }}
+              MenuListProps={{
+                'aria-labelledby': 'basic-button',
+              }}
+            >
+              <MenuItem disabled={isDefault} onClick={() => handleRemoveAddress(contextAddress?.id)}>
+                <ListItemIcon >
+                  <Delete sx={{ color: 'error.main' }} fontSize="small" />
+                </ListItemIcon>
+                <ListItemText sx={{ color: 'error.main' }}>Xoá địa chỉ</ListItemText>
+              </MenuItem>
+              <MenuItem disabled={isDefault} onClick={() => handleSetDefault(contextAddress)}>
+                <ListItemIcon>
+                  <Home fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Đặt làm mặc định</ListItemText>
+              </MenuItem>
+            </Menu >
+          </>
+      }
     </>
   )
 }

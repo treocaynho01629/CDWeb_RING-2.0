@@ -29,7 +29,8 @@ public class OrderMapper implements Function<OrderReceipt, OrderDTO> {
     	String userName = "Người dùng RING!";
     	if (user != null) userName = user.getUsername();
         
-    	return new OrderDTO(order.getFullName(), 
+    	return new OrderDTO(order.getId(),
+				order.getFullName(),
         		order.getEmail(), 
         		order.getPhone(),
         		order.getOAddress(),

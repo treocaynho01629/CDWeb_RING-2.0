@@ -63,6 +63,7 @@ const ImageNumber = styled.p`
     border-radius: 50px;
     top: 5px;
     left: 10px;
+    white-space: nowrap;
 
     ${props => props.theme.breakpoints.down("sm")} {
         bottom: 5px;

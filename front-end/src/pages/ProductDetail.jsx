@@ -1,13 +1,14 @@
 import styled from 'styled-components'
 import { useEffect, useState, useRef } from 'react'
 import { Skeleton } from '@mui/material';
-import { useParams, Navigate, NavLink } from 'react-router-dom';
+import { useParams, Navigate, NavLink, useSearchParams } from 'react-router-dom';
 import { useGetBookQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import ProductsSlider from '../components/product/ProductsSlider';
 import ProductDetailContainer from '../components/product/ProductDetailContainer';
 import CustomDivider from '../components/custom/CustomDivider';
 import ProductContent from '../components/product/ProductContent';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
+import useTitle from '../hooks/useTitle';
 
 //#region styled
 const Wrapper = styled.div`
@@ -16,26 +17,37 @@ const Wrapper = styled.div`
 
 const ProductDetail = () => {
     const { id } = useParams(); //Book ids
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [tab, setTab] = useState(searchParams.get("tab") ?? "detail"); //Current tab under detail
     const ref = useRef(null); //Ref for scroll
-    const [tab, setTab] = useState("1"); //Current tab under detail
 
     //Fetch data
     const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom } = useGetRandomBooksQuery({ amount: 10 });
     const { data, isLoading, isSuccess, isError, error } = useGetBookQuery({ id }, { skip: !id });
 
     //Set title
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        handleTabChange("1");
+    useTitle(`${data?.title ?? 'RING - Bookstore!'}`);
 
-        if (!isLoading) {
-            document.title = `${data?.title ?? 'RING - Bookstore!'}`;
+    useEffect(() => {
+        const newTab = searchParams.get("tab");
+        if (newTab) {
+            handleTabChange(newTab)
+        } else {
+            handleTabChange("detail", false);
         }
-    }, []);
+    }, [searchParams]);
 
     //Change detail tab
-    const handleTabChange = (tab) => {
+    const handleTabChange = (tab, scroll = true) => {
         setTab(tab);
+        if (tab == "detail") {
+            searchParams.delete("tab");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("tab", tab);
+            setSearchParams(searchParams);
+        }
+        if (scroll) scrollIntoTab();
     }
 
     const scrollIntoTab = () => {
@@ -49,7 +61,7 @@ const ProductDetail = () => {
     } else if (isLoading || isError) {
         product = <ProductContent />
     } else if (isSuccess) {
-        product = <ProductContent {...{ book: data, scrollIntoTab, handleTabChange }} />
+        product = <ProductContent {...{ book: data, handleTabChange }} />
     }
 
     return (
@@ -75,10 +87,7 @@ const ProductDetail = () => {
             </CustomBreadcrumbs>
             {product}
             <div ref={ref}>
-                <ProductDetailContainer loading={isLoading}
-                    book={data}
-                    tab={tab}
-                    onTabChange={handleTabChange} />
+                <ProductDetailContainer {...{ loading: isLoading, book: data, tab, handleTabChange }} />
             </div>
             <CustomDivider>CÓ THỂ BẠN SẼ THÍCH</CustomDivider>
             <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />

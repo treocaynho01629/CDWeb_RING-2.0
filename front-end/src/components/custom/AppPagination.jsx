@@ -17,7 +17,7 @@ const StyledPageItem = muiStyled(PaginationItem)(({ theme }) => ({
 
     '&:hover': {
         backgroundColor: theme.palette.secondary.main,
-        color: 'white',
+        color: theme.palette.secondary.contrastText,
     },
 
     '&:focus': {
@@ -36,7 +36,7 @@ const StyledPageItem = muiStyled(PaginationItem)(({ theme }) => ({
 
     '&.Mui-selected': {
         backgroundColor: theme.palette.secondary.main,
-        color: 'white',
+        color: theme.palette.secondary.contrastText,
     },
 }));
 //#endregion

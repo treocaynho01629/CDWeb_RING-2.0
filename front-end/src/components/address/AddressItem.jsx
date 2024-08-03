@@ -10,8 +10,8 @@ const AddressItemContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
     padding: 20px;
-    margin-bottom: 5px;
     border: 0.5px solid ${props => props.theme.palette.action.focus};
 
     &.active {
@@ -30,12 +30,15 @@ const AddressTag = styled.div`
     font-weight: bold;
     font-size: 12px;
     padding: 2px 10px;
-    background-color: ${props => props.theme.palette.secondary.main};
-    color: ${props => props.theme.palette.secondary.contrastText};
+    border-right: .5px solid;
+    border-bottom: .5px solid;
+    border-color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.secondary.dark};
+    pointer-events: none;
 
     &.error {
-        background-color: ${props => props.theme.palette.error.main};
-        color: ${props => props.theme.palette.error.contrastText};
+        border-color: ${props => props.theme.palette.error.main};
+        color: ${props => props.theme.palette.error.dark};
     }
 `
 
@@ -46,8 +49,10 @@ const UserInfo = styled.b`
 `
 //#endregion
 
-const AddressItem = ({ addressInfo, handleOpen, handleClick }) => {
+const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue }) => {
     const isValid = () => {
+        if (!addressInfo) return false;
+
         const { name, phone } = addressInfo;
         let addressSplit = addressInfo?.address.split(', ');
         let address = addressSplit[addressSplit.length - 1];
@@ -62,8 +67,7 @@ const AddressItem = ({ addressInfo, handleOpen, handleClick }) => {
     }
     const isNotValid = !isValid();
     const isDefault = (addressInfo != null && addressInfo?.id == null);
-
-    // console.log(addressInfo)
+    const isSelected = (selectedValue != null && selectedValue == addressInfo?.id);
 
     return (
         <AddressItemContainer className={`${isNotValid ? 'error' : isDefault ? 'active' : ''}`}>
@@ -92,7 +96,7 @@ const AddressItem = ({ addressInfo, handleOpen, handleClick }) => {
             >
                 <KeyboardArrowRight />
             </IconButton>
-            {!isDefault &&
+            {(!isDefault && !isSelected) &&
                 <IconButton
                     sx={{
                         display: { xs: 'none', sm: 'flex' },

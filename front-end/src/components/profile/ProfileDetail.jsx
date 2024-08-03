@@ -49,21 +49,20 @@ const InfoStackContainer = styled.div`
 `
 //#endregion
 
-const ProfileDetail = ({ Title, pending, setPending, Instruction }) => {
+const ProfileDetail = ({ Title, Instruction, Wrapper, pending, setPending }) => {
+    //Fetch current profile
+    const { data: profile, isLoading: loadProfile, isSuccess: profileDone, isError: profileError } = useGetProfileQuery();
+
     //Initial value
     const [errMsg, setErrMsg] = useState('');
     const [err, setErr] = useState([]);
-    const [name, setName] = useState('');
+    const [name, setName] = useState(profile?.name || '');
+    const [dob, setDob] = useState(profile?.dob ? dayjs(profile?.dob) : dayjs('2000-01-01'));
+    const [gender, setGender] = useState(profile?.gender || '');
+    const [phone, setPhone] = useState(profile?.phone || '');
     const [validPhone, setValidPhone] = useState(false);
-    const [phone, setPhone] = useState('');
-    const [gender, setGender] = useState('');
-    const [dob, setDob] = useState(dayjs('2000-01-01'));
     const [editPhone, setEditPhone] = useState(false);
     const [editDob, setEditDob] = useState(false);
-
-    //Fetch current profile
-    //Fetch current profile address
-    const { data: profile, isLoading: loadProfile, isSuccess: profileDone, isError: profileError } = useGetProfileQuery();
 
     //Update profile hook
     const [updateProfile, { isLoading: updating }] = useUpdateProfileMutation();
@@ -124,171 +123,173 @@ const ProfileDetail = ({ Title, pending, setPending, Instruction }) => {
     return (
         <>
             <Title><Person />&nbsp;HỒ SƠ CỦA BẠN</Title>
-            <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
-            <Box sx={{ paddingBottom: '100px' }}>
-                <table style={{ width: '100%' }}>
-                    <tr>
-                        <InfoTitle><InfoText>Tên đăng nhập: </InfoText></InfoTitle>
-                        <InfoStack><InfoStackContainer>
-                            {loadProfile
-                                ?
-                                <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
-                                :
-                                <InfoText>{profile?.userName}</InfoText>
-                            }
-                        </InfoStackContainer></InfoStack>
-                    </tr>
-                    <tr>
-                        <InfoTitle><InfoText>Email: </InfoText></InfoTitle>
-                        <InfoStack>
-                            <InfoStackContainer>
+            <Wrapper>
+                <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
+                <Box sx={{ paddingBottom: '100px' }}>
+                    <table style={{ width: '100%' }}>
+                        <tr>
+                            <InfoTitle><InfoText>Tên đăng nhập: </InfoText></InfoTitle>
+                            <InfoStack><InfoStackContainer>
                                 {loadProfile
                                     ?
-                                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width="40%" />
+                                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
                                     :
-                                    <InfoText>{profile?.email.replace(/(\w{3})[\w.-]+@([\w.]+\w)/, "$1***@$2")}</InfoText>
+                                    <InfoText>{profile?.userName}</InfoText>
                                 }
-                            </InfoStackContainer>
-                        </InfoStack>
-                    </tr>
-                    <tr>
-                        <InfoTitle><InfoText>Tên: </InfoText></InfoTitle>
-                        <InfoStack>
-                            <InfoStackContainer>
-                                {loadProfile
-                                    ?
-                                    <Skeleton variant="rectangular" height={40} width={'100%'} />
-                                    :
-                                    <CustomInput
-                                        required
-                                        type="text"
-                                        id="name"
-                                        onChange={e => setName(e.target.value)}
-                                        value={name}
-                                        error={err?.data?.errors?.name}
-                                        helperText={err?.data?.errors?.name}
-                                        size="small"
-                                        fullWidth
-                                    />
-                                }
-                            </InfoStackContainer>
-                        </InfoStack>
-                    </tr>
-                    <tr>
-                        <InfoTitle><InfoText>Số điện thoại: </InfoText></InfoTitle>
-                        <InfoStack>
-                            <InfoStackContainer>
-                                {editPhone
-                                    ?
-                                    <CustomInput
-                                        required
-                                        id="phone"
-                                        onChange={e => setPhone(e.target.value)}
-                                        value={phone}
-                                        error={phone && !validPhone || err?.data?.errors?.phone}
-                                        helperText={phone && !validPhone ? "Sai định dạng số điện thoại!" : err?.data?.errors?.phone}
-                                        size="small"
-                                        fullWidth
-                                    />
-                                    :
-                                    <>
-                                        {loadProfile
-                                            ?
-                                            <Skeleton variant="text" sx={{ fontSize: '16px' }} width="25%" />
-                                            :
-                                            <InfoText>{phone.replace(/\d(?=\d{2})/g, '*')}</InfoText>
-                                        }
-                                        <InfoText className={`edit ${loadProfile ? 'disabled' : ''}`} onClick={() => setEditPhone(true)}>Thay đổi</InfoText>
-                                    </>
-                                }
-                            </InfoStackContainer>
-                        </InfoStack>
-                    </tr>
-                    <tr>
-                        <InfoTitle><InfoText>Ngày sinh: </InfoText></InfoTitle>
-                        <InfoStack>
-                            <InfoStackContainer>
-                                {editDob
-                                    ?
-                                    <CustomDatePicker
-                                        required
-                                        value={dob}
-                                        className="custom-date-picker"
-                                        onChange={newValue => setDob(newValue)}
-                                        size="small"
-                                        slotProps={{
-                                            textField: {
-                                                size: "small",
-                                                fullWidth: true,
-                                                error: err?.data?.errors?.dob,
-                                                helperText: err?.data?.errors?.dob,
-                                            },
-                                        }}
-                                    />
-                                    :
-                                    <>
-                                        {loadProfile
-                                            ?
-                                            <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
-                                            :
-                                            <InfoText>{dob.format('DD/MM/YYYY')}</InfoText>
-                                        }
-                                        <InfoText className={`edit ${loadProfile ? 'disabled' : ''}`} onClick={() => setEditDob(true)}>Thay đổi</InfoText>
-                                    </>
-                                }
-                            </InfoStackContainer>
-                        </InfoStack>
-                    </tr>
-                    <tr>
-                        <InfoTitle><InfoText>Giới tính: </InfoText></InfoTitle>
-                        <InfoStack>
-                            <InfoStackContainer>
-                                <RadioGroup
-                                    spacing={1}
-                                    row
-                                    value={gender}
-                                    onChange={e => setGender(e.target.value)}
-                                    sx={{ display: { xs: 'none', sm: 'block' } }}
-                                >
-                                    <FormControlLabel disabled={loadProfile} value="Nam" control={<Radio color="secondary" />} label="Nam" />
-                                    <FormControlLabel disabled={loadProfile} value="Nữ" control={<Radio color="secondary" />} label="Nữ" />
-                                    <FormControlLabel disabled={loadProfile} value="" control={<Radio color="secondary" />} label="Không" />
-                                </RadioGroup>
-                                {loadProfile
-                                    ?
-                                    <Skeleton variant="rectangular" height={40} width={'100%'} sx={{ display: { xs: 'flex', sm: 'none' } }} />
-                                    :
-                                    <CustomInput
-                                        required
-                                        select
+                            </InfoStackContainer></InfoStack>
+                        </tr>
+                        <tr>
+                            <InfoTitle><InfoText>Email: </InfoText></InfoTitle>
+                            <InfoStack>
+                                <InfoStackContainer>
+                                    {loadProfile
+                                        ?
+                                        <Skeleton variant="text" sx={{ fontSize: '16px' }} width="40%" />
+                                        :
+                                        <InfoText>{profile?.email.replace(/(\w{3})[\w.-]+@([\w.]+\w)/, "$1***@$2")}</InfoText>
+                                    }
+                                </InfoStackContainer>
+                            </InfoStack>
+                        </tr>
+                        <tr>
+                            <InfoTitle><InfoText>Tên: </InfoText></InfoTitle>
+                            <InfoStack>
+                                <InfoStackContainer>
+                                    {loadProfile
+                                        ?
+                                        <Skeleton variant="rectangular" height={40} width={'100%'} />
+                                        :
+                                        <CustomInput
+                                            required
+                                            type="text"
+                                            id="name"
+                                            onChange={e => setName(e.target.value)}
+                                            value={name}
+                                            error={err?.data?.errors?.name}
+                                            helperText={err?.data?.errors?.name}
+                                            size="small"
+                                            fullWidth
+                                        />
+                                    }
+                                </InfoStackContainer>
+                            </InfoStack>
+                        </tr>
+                        <tr>
+                            <InfoTitle><InfoText>Số điện thoại: </InfoText></InfoTitle>
+                            <InfoStack>
+                                <InfoStackContainer>
+                                    {editPhone
+                                        ?
+                                        <CustomInput
+                                            required
+                                            id="phone"
+                                            onChange={e => setPhone(e.target.value)}
+                                            value={phone}
+                                            error={phone && !validPhone || err?.data?.errors?.phone}
+                                            helperText={phone && !validPhone ? "Sai định dạng số điện thoại!" : err?.data?.errors?.phone}
+                                            size="small"
+                                            fullWidth
+                                        />
+                                        :
+                                        <>
+                                            {loadProfile
+                                                ?
+                                                <Skeleton variant="text" sx={{ fontSize: '16px' }} width="25%" />
+                                                :
+                                                <InfoText>{phone.replace(/\d(?=\d{2})/g, '*')}</InfoText>
+                                            }
+                                            <InfoText className={`edit ${loadProfile ? 'disabled' : ''}`} onClick={() => setEditPhone(true)}>Thay đổi</InfoText>
+                                        </>
+                                    }
+                                </InfoStackContainer>
+                            </InfoStack>
+                        </tr>
+                        <tr>
+                            <InfoTitle><InfoText>Ngày sinh: </InfoText></InfoTitle>
+                            <InfoStack>
+                                <InfoStackContainer>
+                                    {editDob
+                                        ?
+                                        <CustomDatePicker
+                                            required
+                                            value={dob}
+                                            className="custom-date-picker"
+                                            onChange={newValue => setDob(newValue)}
+                                            size="small"
+                                            slotProps={{
+                                                textField: {
+                                                    size: "small",
+                                                    fullWidth: true,
+                                                    error: err?.data?.errors?.dob,
+                                                    helperText: err?.data?.errors?.dob,
+                                                },
+                                            }}
+                                        />
+                                        :
+                                        <>
+                                            {loadProfile
+                                                ?
+                                                <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
+                                                :
+                                                <InfoText>{dob.format('DD/MM/YYYY')}</InfoText>
+                                            }
+                                            <InfoText className={`edit ${loadProfile ? 'disabled' : ''}`} onClick={() => setEditDob(true)}>Thay đổi</InfoText>
+                                        </>
+                                    }
+                                </InfoStackContainer>
+                            </InfoStack>
+                        </tr>
+                        <tr>
+                            <InfoTitle><InfoText>Giới tính: </InfoText></InfoTitle>
+                            <InfoStack>
+                                <InfoStackContainer>
+                                    <RadioGroup
+                                        spacing={1}
+                                        row
                                         value={gender}
-                                        onChange={(e) => setGender(e.target.value)}
-                                        size="small"
-                                        fullWidth
-                                        sx={{ display: { xs: 'flex', sm: 'none' } }}
+                                        onChange={e => setGender(e.target.value)}
+                                        sx={{ display: { xs: 'none', sm: 'block' } }}
                                     >
-                                        <MenuItem value="Nam">Nam</MenuItem>
-                                        <MenuItem value="Nữ">Nữ</MenuItem>
-                                        <MenuItem value="">Không</MenuItem>
-                                    </CustomInput>
-                                }
-                            </InfoStackContainer>
-                        </InfoStack>
-                    </tr>
-                </table>
-                <InfoStackContainer>
-                    <CustomButton
-                        variant="contained"
-                        color="secondary"
-                        size="large"
-                        disabled={loadProfile}
-                        sx={{ marginTop: 5 }}
-                        onClick={handleChangeInfo}
-                    >
-                        <Check /> Lưu thông tin
-                    </CustomButton>
-                </InfoStackContainer>
-            </Box>
+                                        <FormControlLabel disabled={loadProfile} value="Nam" control={<Radio color="secondary" />} label="Nam" />
+                                        <FormControlLabel disabled={loadProfile} value="Nữ" control={<Radio color="secondary" />} label="Nữ" />
+                                        <FormControlLabel disabled={loadProfile} value="" control={<Radio color="secondary" />} label="Không" />
+                                    </RadioGroup>
+                                    {loadProfile
+                                        ?
+                                        <Skeleton variant="rectangular" height={40} width={'100%'} sx={{ display: { xs: 'flex', sm: 'none' } }} />
+                                        :
+                                        <CustomInput
+                                            required
+                                            select
+                                            value={gender}
+                                            onChange={(e) => setGender(e.target.value)}
+                                            size="small"
+                                            fullWidth
+                                            sx={{ display: { xs: 'flex', sm: 'none' } }}
+                                        >
+                                            <MenuItem value="Nam">Nam</MenuItem>
+                                            <MenuItem value="Nữ">Nữ</MenuItem>
+                                            <MenuItem value="">Không</MenuItem>
+                                        </CustomInput>
+                                    }
+                                </InfoStackContainer>
+                            </InfoStack>
+                        </tr>
+                    </table>
+                    <InfoStackContainer>
+                        <CustomButton
+                            variant="contained"
+                            color="secondary"
+                            size="large"
+                            disabled={loadProfile}
+                            sx={{ marginTop: 5 }}
+                            onClick={handleChangeInfo}
+                        >
+                            <Check /> Lưu thông tin
+                        </CustomButton>
+                    </InfoStackContainer>
+                </Box>
+            </Wrapper>
         </>
     )
 }

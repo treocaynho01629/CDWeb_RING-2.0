@@ -64,16 +64,16 @@ const DetailContainer = styled.div`
 `
 //#endregion
 
-const ProductDetailContainer = (props) => {
-  const { loading, book, tab, onTabChange } = props;
-
-  //Fetch retalted books
-  const { data: relatedBooks, isLoading: loadRelated, isSuccess: doneRelated, isError: errorRelated } = useGetBooksByFilterQuery({ 
-    cateId: book?.cateId 
-  }, { skip: (!book?.cateId || tab !== "3") });
+const ProductDetailContainer = ({ loading, book, tab, handleTabChange }) => {
+  //Fetch related books
+  const { data: relatedBooks, isLoading: loadRelated, isSuccess: doneRelated, isError: errorRelated } = useGetBooksByFilterQuery({
+    cateId: book?.cateId
+  }, { skip: (!book?.cateId || tab !== "related") });
 
   //Change tab
-  const handleChange = (e, newValue) => {if (onTabChange) onTabChange(newValue)};
+  const handleChangeTab = (e, newTab) => {
+    if (handleTabChange) handleTabChange(newTab)
+  };
 
   let fullInfo;
 
@@ -130,21 +130,21 @@ const ProductDetailContainer = (props) => {
       <Box sx={{ width: '100%', typography: 'body1' }}>
         <TabContext value={tab}>
           <Box sx={{ color: '#1eff00', backgroundColor: '#272727' }}>
-            <StyledTabList onChange={handleChange} aria-label="tab">
-              <StyledTab label="THÔNG TIN CHI TIẾT" value="1" />
-              <StyledTab label="ĐÁNH GIÁ" value="2" />
-              <StyledTab label="SẢN PHẨM LIÊN QUAN" value="3" />
+            <StyledTabList onChange={handleChangeTab} aria-label="tab">
+              <StyledTab label="THÔNG TIN CHI TIẾT" value="detail" />
+              <StyledTab label="ĐÁNH GIÁ" value="reviews" />
+              <StyledTab label="SẢN PHẨM LIÊN QUAN" value="related" />
             </StyledTabList>
           </Box>
-          <TabPanel value="1">
+          <TabPanel value="detail">
             {fullInfo}
           </TabPanel>
-          <TabPanel value="2">
+          <TabPanel value="reviews">
             <Suspense fallback={<CustomProgress color="secondary" />}>
               <ReviewTab id={book?.id} rateAmount={book?.rateAmount} />
             </Suspense>
           </TabPanel>
-          <TabPanel value="3">
+          <TabPanel value="related">
             <div>
               <ProductsSlider {...{ loading: loadRelated, data: relatedBooks, isSuccess: doneRelated, isError: errorRelated }} />
             </div>

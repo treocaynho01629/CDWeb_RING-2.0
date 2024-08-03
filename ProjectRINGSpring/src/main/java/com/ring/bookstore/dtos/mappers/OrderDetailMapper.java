@@ -22,7 +22,9 @@ public class OrderDetailMapper implements Function<OrderDetail, OrderDetailDTO> 
 					.path(book.getImages().getName())
 					.toUriString();
 
-        return new OrderDetailDTO(detail.getAmount(),
+        return new OrderDetailDTO(detail.getId(),
+				detail.getBook().getUser().getUsername(),
+				detail.getAmount(),
         		detail.getPrice(),
         		detail.getBook().getId(),
         		fileDownloadUri,

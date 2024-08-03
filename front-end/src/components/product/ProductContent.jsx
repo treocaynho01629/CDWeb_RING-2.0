@@ -374,7 +374,7 @@ const BuyButton = styled.button`
 `
 //#endregion
 
-const ProductContent = ({ book, scrollIntoTab, handleTabChange }) => {
+const ProductContent = ({ book, handleTabChange }) => {
     const [amountIndex, setAmountIndex] = useState(1); //Amount add to cart
     const [open, setOpen] = useState(false);
     const { addProduct } = useCart();
@@ -399,16 +399,9 @@ const ProductContent = ({ book, scrollIntoTab, handleTabChange }) => {
         setAmountIndex(newValue);
     }
 
-    //Scroll to more detail tab
-    const handleViewMore = (e) => {
+    const handleChangeTab = (e, tab) => {
         e.preventDefault();
-        handleTabChange("1");
-        scrollIntoTab();
-    };
-
-    const handleViewRating = () => {
-        handleTabChange("2");
-        scrollIntoTab();
+        if (handleTabChange) handleTabChange(tab);
     };
 
     const toggleDrawer = (newOpen) => () => {
@@ -508,7 +501,7 @@ const ProductContent = ({ book, scrollIntoTab, handleTabChange }) => {
                                             {book?.publisher?.pubName}
                                         </Link>
                                     </Detail>
-                                    <TotalRatingContainer onClick={() => handleViewRating()}>
+                                    <TotalRatingContainer onClick={(e) => handleChangeTab(e, "reviews")}>
                                         <StyledRating
                                             name="product-rating"
                                             value={calculatedRate}
@@ -520,7 +513,7 @@ const ProductContent = ({ book, scrollIntoTab, handleTabChange }) => {
                                         />
                                         <strong style={{ paddingLeft: 10 }}>({book?.rateAmount}) Đánh giá</strong>
                                     </TotalRatingContainer>
-                                    <Box onClick={() => handleViewRating()} sx={{ curosr: 'pointer' }}
+                                    <Box onClick={(e) => handleChangeTab(e, "reviews")} sx={{ curosr: 'pointer' }}
                                         display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
                                         <PriceContainer>
                                             <Price>{book?.price?.toLocaleString()} đ</Price>
@@ -551,7 +544,7 @@ const ProductContent = ({ book, scrollIntoTab, handleTabChange }) => {
                                             {book?.description}
                                         </Description>
                                         <Detail>
-                                            <Link onClick={(e) => handleViewMore(e)}>Xem thêm...</Link>
+                                            <Link onClick={(e) => handleChangeTab(e, "detail")}>Xem thêm...</Link>
                                         </Detail>
                                     </DetailContainer>
                                 </>
@@ -608,7 +601,7 @@ const ProductContent = ({ book, scrollIntoTab, handleTabChange }) => {
                                     variant="outlined"
                                     color="secondary"
                                     size="large"
-                                    sx={{margin: '5px'}}
+                                    sx={{ margin: '5px' }}
                                     onClick={() => handleAddToCart(book)}
                                 >
                                     THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)

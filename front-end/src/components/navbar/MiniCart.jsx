@@ -38,19 +38,18 @@ const ProductPrice = styled.span`
 `
 //#endregion
 
-const MiniCart = ({ openCart, anchorElCart, handlePopoverClose, products }) => {
+const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
     return (
         <Popover
             id="mouse-over-popover"
-            sx={{
-                pointerEvents: 'none',
-            }}
             open={openCart}
             anchorEl={anchorElCart}
-            onClose={handlePopoverClose}
+            onClose={handleClose}
+            onClick={handleClose}
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            disableRestoreFocus
+            disableScrollLock
+            sx={{ pointerEvents: 'none' }}
             PaperProps={{
                 elevation: 0,
                 sx: {
@@ -73,7 +72,7 @@ const MiniCart = ({ openCart, anchorElCart, handlePopoverClose, products }) => {
                         zIndex: 0,
                     },
                 },
-                onMouseLeave: handlePopoverClose
+                onMouseLeave: handleClose
             }}
         >
             <MiniCartContainer>

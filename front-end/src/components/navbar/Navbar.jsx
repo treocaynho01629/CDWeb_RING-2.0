@@ -5,15 +5,15 @@ import {
     Search as SearchIcon, ShoppingCart as ShoppingCartIcon, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
     Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, NotificationsActive as NotificationsActiveIcon, Storefront
 } from '@mui/icons-material';
-import { Stack, Badge, IconButton, Avatar, Tooltip, Box, Grid, TextField, AppBar, useScrollTrigger, Collapse, Toolbar } from '@mui/material';
+import { Stack, Badge, IconButton, Avatar, Box, Grid, TextField, AppBar, useScrollTrigger, Collapse, Toolbar } from '@mui/material';
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 import PropTypes from 'prop-types';
 import useLogout from "../../hooks/useLogout";
 import useAuth from "../../hooks/useAuth";
 import NavDrawer from './NavDrawer';
 import MiniCart from './MiniCart';
 import ProfilePopover from './ProfilePopover';
+import useCart from '../../hooks/useCart';
 
 //#region styled
 const Container = styled.div`
@@ -177,34 +177,30 @@ const Logo = styled.h2`
     cursor: pointer;
     align-items: center;
     display: flex;
-    margin: 5px 0px 5px 0px;
-    width: 110px;
+    width: 251px;
+    margin: 5px 0px 5px 15px;
     white-space: nowrap;
     overflow: hidden;
-    transform: translateX(20px);
     transition: all .3s ease;
 
-    p { width: 0; }
 
     &.active {
-        width: 0px;
-
-        @media (min-width: 600px) {
-            width: 110px;
+        width: 110px;
+        
+        ${props => props.theme.breakpoints.down("sm")} {
+            width: 0px;
         }
     }
 
-    @media (min-width: 768px) {
-        width: 251px;
-        margin: 5px 0px 5px 15px;
-
-        p {
-            width: auto;
-        }
+    ${props => props.theme.breakpoints.down("md")} {
+        transform: translateX(20px);
     }
 
-    @media (min-width: 900px) {
-        transform: none;
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        margin: 5px 0px 5px 0px;
+        width: 110px;
+
+        p { width: 0; }
     }
 `
 
@@ -223,6 +219,8 @@ const NavItem = styled.div`
 `
 
 const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
+    borderRadius: '0',
+
     '&:hover': {
         backgroundColor: 'transparent',
         color: theme.palette.secondary.main,
@@ -231,40 +229,18 @@ const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
     '&:focus': {
         outline: 'none',
     },
-
-    outline: 'none',
-    border: '0',
-    borderRadius: '0',
 }));
 
-const Button = styled.button`
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    border-radius: 0;
-    padding: 0;
-    width: 40px;
-    height: 40px;
-    background-color: transparent;
-    color: gray;
-    outline: none;
-    border: none;
-    transition: all 0.25s ease;
+const IconText = styled.p`
+    font-size: 13px;
+    margin-left: 5px;
 
-    &:hover {
-        transform: scaleY(1.1);
-        color: black,
-    }
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        display: none;
 
-    &:focus {
-        outline: none;
-        border: none;
-    }
-
-    @media (min-width: 900px) {
-        display: none
+        &.username {
+            display: block;
+        }
     }
 `
 //#endregion
@@ -293,7 +269,7 @@ HideOnScroll.propTypes = {
 
 const Navbar = (props) => {
     //#region construct
-    const products = useSelector(state => state.cart.products); //Products from redux carts
+    const { cartProducts } = useCart();
 
     //Drawer open state
     const [openDrawer, setOpen] = useState(false);
@@ -315,19 +291,19 @@ const Navbar = (props) => {
     const open = Boolean(anchorEl);
     const openCart = Boolean(anchorElCart);
 
-    const handlePopoverOpen = (event) => {
+    const hanldeCartPopover = (event) => {
         setAnchorElCart(event.currentTarget);
     };
 
-    const handlePopoverClose = () => {
+    const handleCartClose = () => {
         setAnchorElCart(null);
     };
 
-    const handleClick = (event) => {
+    const handleProfilePopover = (event) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleClose = () => {
+    const handleProfileClose = () => {
         setAnchorEl(null);
     };
 
@@ -385,9 +361,9 @@ const Navbar = (props) => {
                         <Grid container>
                             <Grid item xs={12} md={6.5} sx={{ display: 'flex', alignItems: 'center' }}>
                                 <Left>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Button onClick={toggleDrawer(true)}><MenuIcon sx={{ fontSize: 26 }} /></Button>
-                                        <NavDrawer {...{ openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, logout, ImageLogo, Button }} />
+                                    <Box display={{ xs: 'flex', md: 'none' }} alignItems={'center'}>
+                                        <IconButton onClick={toggleDrawer(true)}><MenuIcon sx={{ fontSize: 26 }} /></IconButton>
+                                        <NavDrawer {...{ openDrawer, setOpen, toggleDrawer, username, roles, products: cartProducts, navigate, logout, ImageLogo }} />
                                     </Box>
                                     <Link to={`/`}>
                                         <Logo className={searchField || hover || focus ? 'active' : ''}>
@@ -395,18 +371,16 @@ const Navbar = (props) => {
                                         </Logo>
                                     </Link>
                                     <Box sx={{ display: 'flex' }} flexDirection={{ xs: 'row-reverse', md: 'row' }}>
-                                        <Tooltip title="Duyệt cửa hàng">
-                                            <Link to={'/filters'}>
-                                                <StyledIconButton aria-label="explore"
-                                                    sx={{
-                                                        marginLeft: 2,
-                                                        marginRight: 0,
-                                                        zIndex: 10,
-                                                    }}>
-                                                    <Storefront sx={{ fontSize: '26px' }} />
-                                                </StyledIconButton>
-                                            </Link>
-                                        </Tooltip>
+                                        <Link to={'/filters'} title="Duyệt cửa hàng">
+                                            <StyledIconButton aria-label="explore"
+                                                sx={{
+                                                    marginLeft: 2,
+                                                    marginRight: 0,
+                                                    zIndex: 10,
+                                                }}>
+                                                <Storefront sx={{ fontSize: '26px' }} />
+                                            </StyledIconButton>
+                                        </Link>
                                         <Box
                                             sx={{ display: 'flex', alignItems: 'center', marginLeft: '-40' }}
                                         >
@@ -443,59 +417,59 @@ const Navbar = (props) => {
                             <Grid item xs={12} md={5.5}>
                                 <Right>
                                     <NavItem>
-                                        <Stack spacing={1} direction="row" sx={{ color: 'action.active' }}>
+                                        <Stack spacing={1} direction="row" sx={{ color: 'action.active' }} alignItems={'center'}>
                                             <StyledIconButton aria-label="notification">
                                                 <Badge badgeContent={0} anchorOrigin={{
                                                     vertical: 'top',
-                                                    horizontal: 'left',
+                                                    horizontal: 'right',
                                                 }}>
                                                     <NotificationsActiveIcon />
                                                 </Badge>
-                                                <p style={{ fontSize: '13px', marginLeft: '5px' }}>Thông báo</p>
+                                                <IconText>Thông báo</IconText>
                                             </StyledIconButton>
                                             <div
                                                 aria-owns={openCart ? "mouse-over-popover" : undefined}
                                                 aria-haspopup="true"
-                                                onMouseEnter={handlePopoverOpen}
-                                                onMouseLeave={handlePopoverClose}
+                                                onMouseEnter={hanldeCartPopover}
+                                                onMouseLeave={handleCartClose}
                                             >
-                                                <Link to={`/cart`}>
+                                                <Link to={'/cart'} title="Giỏ hàng">
                                                     <StyledIconButton aria-label="cart">
-                                                        <Badge color="secondary" badgeContent={products?.length} anchorOrigin={{
+                                                        <Badge color="secondary" badgeContent={cartProducts?.length} anchorOrigin={{
                                                             vertical: 'top',
-                                                            horizontal: 'left',
+                                                            horizontal: 'right',
                                                         }}>
                                                             <ShoppingCartIcon />
                                                         </Badge>
-                                                        <p style={{ fontSize: '13px', marginLeft: '5px' }}>Giỏ hàng</p>
+                                                        <IconText>Giỏ hàng</IconText>
                                                     </StyledIconButton>
                                                 </Link>
-                                                <MiniCart {...{ openCart, anchorElCart, handlePopoverClose, products }} />
+                                                <MiniCart {...{ openCart, anchorElCart, handleClose: handleCartClose, products: cartProducts }} />
                                             </div>
                                             {username ? (
-                                                <Tooltip title="Tài khoản">
-                                                    <StyledIconButton
-                                                        onClick={handleClick}
-                                                        size="small"
-                                                        sx={{ ml: 2 }}
-                                                        aria-controls={open ? 'account-menu' : undefined}
-                                                        aria-haspopup="true"
-                                                        aria-expanded={open ? 'true' : undefined}
-                                                    >
-                                                        <Avatar sx={{ width: 32, height: 32 }}>{username?.charAt(0) ?? 'P'}</Avatar>
-                                                        <p style={{ fontSize: '13px', marginLeft: '5px' }}>{username}</p>
-                                                    </StyledIconButton>
-                                                </Tooltip>
+                                                <div
+                                                    aria-owns={open ? "mouse-over-popover" : undefined}
+                                                    aria-haspopup="true"
+                                                    onMouseEnter={handleProfilePopover}
+                                                    onMouseLeave={handleProfileClose}
+                                                >
+                                                    <Link to={'/profile/detail'} title="Tài khoản">
+                                                        <StyledIconButton aria-label="profile">
+                                                            <Avatar sx={{ width: 32, height: 32 }}>{username?.charAt(0) ?? 'P'}</Avatar>
+                                                            <IconText className="username">{username}</IconText>
+                                                        </StyledIconButton>
+                                                    </Link>
+                                                    <ProfilePopover {...{ open, anchorEl, handleClose: handleProfileClose, navigate, roles, logout }} />
+                                                </div>
                                             ) : (
-                                                <Link to={`/login`}>
+                                                <Link to={'/login'} title="Đăng nhập">
                                                     <StyledIconButton aria-label="login">
                                                         <LockIcon />
-                                                        <p style={{ fontSize: '13px', marginLeft: '5px' }}>Đăng nhập</p>
+                                                        <IconText className="username">Đăng nhập</IconText>
                                                     </StyledIconButton>
                                                 </Link>
                                             )}
                                         </Stack>
-                                        <ProfilePopover {...{ open, anchorEl, handleClose, navigate, roles, logout }} />
                                     </NavItem>
                                 </Right>
                             </Grid>

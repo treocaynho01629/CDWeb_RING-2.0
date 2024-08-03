@@ -185,7 +185,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
         }),
         createReview: builder.mutation({
             query: ({ id, newReview }) => ({
-                url: `/api/reviews${id}`,
+                url: `/api/reviews/${id}`,
                 method: 'POST',
                 credentials: 'include',
                 body: { ...newReview }

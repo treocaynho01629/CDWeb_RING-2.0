@@ -4,7 +4,7 @@ import { styled as muiStyled } from '@mui/system';
 import { AccessTime as AccessTimeIcon, CalendarMonth as CalendarMonthIcon, Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
 import { Avatar, Rating, Box, Grid, TextareaAutosize } from '@mui/material';
 import { Link } from "react-router-dom";
-import { useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
+import { useCreateReviewMutation, useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
 import AppPagination from '../custom/AppPagination';
 import CustomButton from '../custom/CustomButton';
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
@@ -79,6 +79,8 @@ const Review = ({ review, username }) => {
 const ReviewTab = (props) => {
     //#region construct
     const { id } = props;
+    const { username } = useAuth();
+
 
     //Initial value
     const [content, setContent] = useState('');
@@ -96,7 +98,6 @@ const ReviewTab = (props) => {
     });
 
     //Other
-    const { username } = useAuth();
     const axiosPrivate = useAxiosPrivate();
 
     //Fetch reviews
@@ -105,6 +106,9 @@ const ReviewTab = (props) => {
         page: pagination?.currPage,
         size: pagination?.pageSize
     }, { skip: !id })
+
+    //Review hook
+    const [review, { isLoading: reviewing }] = useCreateReviewMutation();
 
     //Set reviews after fetch
     useEffect(() => {
@@ -135,41 +139,39 @@ const ReviewTab = (props) => {
     //Review
     const handleSubmitReview = async (e) => {
         e.preventDefault();
+        if (reviewing) return;
+
         const { enqueueSnackbar } = await import('notistack');
 
-        try {
-            const response = await axiosPrivate.post(REVIEW_URL + id,
-                JSON.stringify({
-                    content: content,
-                    rating: rating
-                }),
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
+        review({
+            id,
+            newReview: {
+                content: content,
+                rating: rating
+            },
+        }).unwrap()
+            .then((data) => {
+                enqueueSnackbar('Đánh giá thành công!', { variant: 'success' });
+                setContent('');
+                setErr([]);
+                setErrMsg('');
+                setRating(5);
+                handlePageChange(1);
+            })
+            .catch((err) => {
+                console.error(err);
+                setErr(err);
+                if (!err?.status) {
+                    setErrMsg("Server không phản hồi!");
+                } else if (err?.status === 400) {
+                    setErrMsg(err.data.errors.content);
+                } else if (err?.status === 409) {
+                    setErrMsg(err.data.errors.errorMessage);
+                } else {
+                    setErrMsg("Đánh giá thất bại!");
                 }
-            );
-
-            refetch();
-            enqueueSnackbar('Đánh giá thành công!', { variant: 'success' });
-            setContent('');
-            setErr([]);
-            setErrMsg('');
-            setRating(5);
-            handlePageChange(1);
-        } catch (err) {
-            console.error(err);
-            setErr(err);
-            if (!err?.status) {
-                setErrMsg("Server không phản hồi!");
-            } else if (err?.status === 400) {
-                setErrMsg(err.data.errors.content);
-            } else if (err?.status === 409) {
-                setErrMsg(err.data.errors.errorMessage);
-            } else {
-                setErrMsg("Đánh giá thất bại!");
-            }
-            enqueueSnackbar('Đánh giá thất bại!', { variant: 'error' });
-        }
+                enqueueSnackbar('Đánh giá thất bại!', { variant: 'error' });
+            })
     }
 
     //Review
@@ -281,6 +283,7 @@ const ReviewTab = (props) => {
                                     <CustomButton
                                         variant="contained"
                                         color="secondary"
+                                        type="submit"
                                     >
                                         Gửi đánh giá
                                     </CustomButton>

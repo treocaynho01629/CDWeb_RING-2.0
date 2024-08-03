@@ -3,7 +3,7 @@ import {
     ShoppingCart as ShoppingCartIcon, DeliveryDining as DeliveryDiningIcon, Lock as LockIcon,
     Logout, Speed as SpeedIcon, NotificationsActive as NotificationsActiveIcon, Storefront, KeyboardArrowLeft
 } from '@mui/icons-material';
-import { Avatar, ListItemIcon, Divider, Box, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText, Grid } from '@mui/material';
+import { Avatar, ListItemIcon, Divider, Box, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText, Grid, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 //#region styled
@@ -29,7 +29,7 @@ const DrawerLogo = styled.h2`
 `
 //#endregion
 
-const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, logout, ImageLogo, Button }) => {
+const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, logout, ImageLogo }) => {
     const role = roles?.length;
     
     return (
@@ -56,7 +56,7 @@ const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, username, roles, product
                             <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p style={{ color: '#424242', margin: 0 }}>- BOOKSTORE</p>
                         </DrawerLogo>
                     </Link>
-                    <Button style={{ marginRight: '15px' }} onClick={toggleDrawer(false)}><KeyboardArrowLeft sx={{ fontSize: 26 }} /></Button>
+                    <IconButton sx={{ marginRight: '15px' }} onClick={toggleDrawer(false)}><KeyboardArrowLeft sx={{ fontSize: 26 }} /></IconButton>
                 </Box>
                 <Divider />
                 <List sx={{ marginLeft: '15px' }}>
@@ -114,7 +114,7 @@ const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, username, roles, product
 
                             <ListItem disablePadding>
                                 <ListItemButton onClick={() => {
-                                    navigate('/profile/receipts')
+                                    navigate('/profile/orders')
                                     setOpen(false)
                                 }}>
                                     <ListItemIcon>

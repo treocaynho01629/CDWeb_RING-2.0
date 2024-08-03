@@ -53,9 +53,14 @@ const CouponButton = styled.p`
         text-decoration: underline;
     }
 `
+
+const SmallContainer = styled.div`
+    border: 0.5px solid ${props => props.theme.palette.action.focus};
+    padding: 20px;
+`
 //#endregion
 
-const FinalCheckoutDialog = ({ MiniTitle, SmallContainer, Title, handleChange, value, products, handleSubmit, validAddressInfo, AltCheckoutContainer, PayButton  }) => {
+const FinalCheckoutDialog = ({ MiniTitle, Title, handleChange, value, products, handleSubmit, validAddressInfo, AltCheckoutContainer, PayButton }) => {
 
     const totalPrice = () => {
         let total = 0;

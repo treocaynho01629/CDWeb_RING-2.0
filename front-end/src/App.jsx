@@ -1,23 +1,26 @@
-import { lazy, Suspense } from 'react'
 import './App.css';
-
-import Layout from './components/layout/Layout';
-import RequireAuth from './components/authorize/RequireAuth';
-import PersistLogin from './components/authorize/PersistsLogin';
+import { lazy, Suspense } from 'react'
+import { Routes, Route } from 'react-router-dom';
 import Loadable from './components/layout/Loadable';
 import Loader from './components/layout/Loadable';
+import Layout from './components/layout/Layout';
 import PageLayout from './components/layout/PageLayout';
-import Missing from './pages/error/Missing';
-import Unauthorized from './pages/error/Unauthorized';
+import RequireAuth from './components/authorize/RequireAuth';
+import PersistLogin from './components/authorize/PersistsLogin';
 import SignPage from './pages/SignPage';
 import Home from './pages/Home';
-import FiltersPage from './pages/FiltersPage';
-import ProductDetail from './pages/ProductDetail';
-import Cart from './pages/Cart';
 
+const Missing = Loadable(lazy(() => import('./pages/error/Missing')));
+const Unauthorized = Loadable(lazy(() => import('./pages/error/Unauthorized')));
+const FiltersPage = Loadable(lazy(() => import('./pages/FiltersPage')));
+const ProductDetail = Loadable(lazy(() => import('./pages/ProductDetail')));
+const Cart = Loadable(lazy(() => import('./pages/Cart')));
+
+const ProfileLayout = Loadable(lazy(() => import('./components/layout/ProfileLayout')));
 const ResetPage = Loadable(lazy(() => import('./pages/ResetPage')));
 const Checkout = Loadable(lazy(() => import('./pages/Checkout')));
 const Profile = Loadable(lazy(() => import('./pages/Profile')));
+const Orders = Loadable(lazy(() => import('./pages/Orders')));
 
 const DashboardLayout = lazy(() => import('./components/dashboard/DashboardLayout'));
 const ManageBooks = Loadable(lazy(() => import('./pages/dashboard/ManageBooks')));
@@ -28,7 +31,6 @@ const DetailProduct = Loadable(lazy(() => import('./pages/dashboard/DetailProduc
 const DetailAccount = Loadable(lazy(() => import('./pages/dashboard/DetailAccount.jsx')));
 const Dashboard = Loadable(lazy(() => import('./pages/dashboard/Dashboard')));
 
-import { Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
@@ -55,7 +57,11 @@ function App() {
               //USER
               <Route element={<RequireAuth allowedRoles={['ROLE_USER']} />}>
                 <Route path="/checkout" element={<Checkout />} />
-                <Route path="/profile/:tab" element={<Profile />} />
+
+                <Route element={<ProfileLayout />}>
+                  <Route path="/profile/detail/:tab?" element={<Profile />} />
+                  <Route path="/profile/orders/:id?" element={<Orders />} />
+                </Route>
               </Route>
             </Route>
 

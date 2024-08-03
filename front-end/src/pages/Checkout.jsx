@@ -11,9 +11,10 @@ import { useCheckoutMutation } from '../features/orders/orderApiSlice';
 import { PHONE_REGEX } from '../ultils/regex';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 import CustomButton from '../components/custom/CustomButton';
-import AddressItem from '../components/address/AddressItem';
 import FinalCheckoutDialog from '../components/cart/FinalCheckoutDialog';
 import useCart from '../hooks/useCart';
+import AddressDisplay from '../components/address/AddressDisplay';
+import AddressSelectDialog from '../components/address/AddressSelectDialog';
 
 const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
 
@@ -122,14 +123,7 @@ const MiniTitle = styled.h4`
     color: inherit;
 `
 
-const SmallContainer = styled.div`
-    border: 0.5px solid ${props => props.theme.palette.action.focus};
-    padding: 20px;
 
-    &.error {
-        border-color: ${props => props.theme.palette.error.main};
-    }
-`
 
 const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -146,7 +140,8 @@ const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = muiStyled(TableRow)(({ theme }) => ({
-    border: '.5px solid lightgray',
+    border: '.5px solid',
+    borderColor: theme.palette.action.focus,
     position: 'relative',
 
     '&:nth-of-type(odd)': {
@@ -254,44 +249,33 @@ const Checkout = () => {
     //Products from state
     const { state: checkState } = useLocation();
     const { clearCart } = useCart();
-    const products = checkState.products;
+    const products = checkState?.products;
     const checkRef = useRef(null);
 
-    
-    const [fullAddress, setFullAddress] = useState('');
+    const [addressInfo, setAddressInfo] = useState({
+        name: '',
+        phone: '',
+        address: ''
+    })
     const [validPhone, setValidPhone] = useState(false);
     const [message, setMessage] = useState('');
     const [errMsg, setErrMsg] = useState('');
     const [err, setErr] = useState([]);
     const [activeStep, setActiveStep] = useState(0);
     const [value, setValue] = useState("1");
+    const [openDialog, setOpenDialog] = useState(false);
+    const [pending, setPending] = useState(false);
     const maxSteps = 3;
 
     //Checkout hook
     const [checkout, { isLoading }] = useCheckoutMutation();
 
- 
+    //Fetch current profile address
+    const { data: profile, isLoading: loadProfile, isSuccess: profileDone } = useGetProfileQuery();
 
     //Other
     const navigate = useNavigate();
     const errRef = useRef();
-
-    //Error message reset when reinput stuff
-    useEffect(() => {
-        if ((!addressInfo.fullName || !addressInfo.phone || !addressInfo.address) && !loadProfile) {
-            setErrMsg("Vui lòng nhập địa chỉ giao hàng!");
-            errRef.current.focus();
-            setActiveStep(0);
-            return;
-        } else {
-            setErrMsg('');
-            setActiveStep(1);
-        }
-    }, [addressInfo.fullName, addressInfo.phone, addressInfo.address])
-
-    
-
-    
 
     useEffect(() => { //Check phone number
         const result = PHONE_REGEX.test(addressInfo.phone);
@@ -308,15 +292,19 @@ const Checkout = () => {
         if (activeStep == 1) checkRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
-    const handleBack = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep - 1);
-    };
-
     const handleChange = (event) => {
         setValue(event.target.value);
     };
 
-    const validAddressInfo = [addressInfo.fullName, addressInfo.phone, addressInfo.address, validPhone].every(Boolean);
+    const handleOpenDialog = () => {
+        setOpenDialog(true);
+    }
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    }
+
+    const validAddressInfo = [addressInfo.name, addressInfo.phone, addressInfo.address, validPhone].every(Boolean);
 
     //Submit checkout
     const handleSubmit = async (e) => {
@@ -330,7 +318,7 @@ const Checkout = () => {
             setErrMsg("Sai định dạng số điện thoại!");
             errRef.current.focus();
             return;
-        } else if (!addressInfo.fullName || !addressInfo.phone || !fullAddress) {
+        } else if (!addressInfo.name || !addressInfo.phone || !addressInfo.address) {
             setErrMsg("Vui lòng nhập địa chỉ giao hàng!");
             errRef.current.focus();
             return;
@@ -340,9 +328,9 @@ const Checkout = () => {
 
         checkout({
             cart: products,
-            name: addressInfo.fullName,
+            name: addressInfo.name,
             phone: addressInfo.phone,
-            address: fullAddress,
+            address: addressInfo.address,
             message: message
         }).unwrap()
             .then((data) => {
@@ -367,7 +355,7 @@ const Checkout = () => {
     }
     //#endregion
 
-    if (products.length) {
+    if (products?.length) {
         return (
             <Wrapper>
                 {isLoading ?
@@ -395,9 +383,8 @@ const Checkout = () => {
                                 <SemiTitle><LocationOnIcon />&nbsp;Địa chỉ người nhận</SemiTitle>
                             </StyledStepLabel>
                             <StyledStepContent>
-                                <SmallContainer className={`${validAddressInfo ? '' : 'error'}`}>
-                                    <AddressItem {...{ addressInfo, setAddressInfo, fullAddress, errMsg, err, validPhone }} />
-                                </SmallContainer>
+                                <AddressDisplay {...{ addressInfo, isValid: validAddressInfo, handleOpen: handleOpenDialog, loadProfile }} />
+                                <AddressSelectDialog {...{ profile, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }} />
                             </StyledStepContent>
                         </Step>
                         <Step key={1} expanded>
@@ -413,7 +400,7 @@ const Checkout = () => {
                                                 display: { xs: 'none', sm: 'table-header-group' }
                                             }}
                                         >
-                                            <TableRow sx={{ padding: 0, border: '.5px solid lightgray', backgroundColor: 'secondary.main' }}>
+                                            <TableRow sx={{ padding: 0, border: '.5px solid', borderColor: 'action.focus', backgroundColor: 'secondary.main' }}>
                                                 <StyledTableCell sx={{ height: '42px' }}>Sản phẩm ({products?.length ?? 0})</StyledTableCell>
                                                 <StyledTableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Đơn giá</StyledTableCell>
                                                 <StyledTableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>Số lượng</StyledTableCell>
@@ -487,7 +474,7 @@ const Checkout = () => {
                                     activeStep < 2
                                     &&
                                     <CustomButton
-                                        disabled={!(activeStep === 1)}
+                                        disabled={!validAddressInfo}
                                         variant="contained"
                                         color="secondary"
                                         onClick={handleNext}
@@ -504,7 +491,7 @@ const Checkout = () => {
                             </StyledStepLabel>
                             <StyledStepContent>
                                 <FinalCheckoutDialog {...{
-                                    MiniTitle, SmallContainer, Title, value, handleChange,
+                                    MiniTitle, Title, value, handleChange,
                                     products, handleSubmit, validAddressInfo, AltCheckoutContainer, PayButton
                                 }} />
                             </StyledStepContent>
@@ -519,7 +506,7 @@ const Checkout = () => {
                             <strong>Kiểm tra đơn:</strong>
                             <Price className="total">{`${activeStep + 1}/${maxSteps}`}</Price>
                         </Box>
-                        <PayButton disabled={!(activeStep === 1)} onClick={handleNext}>
+                        <PayButton disabled={!validAddressInfo} onClick={handleNext}>
                             Tiếp tục<KeyboardDoubleArrowDown />
                         </PayButton>
                     </AltCheckoutContainer>

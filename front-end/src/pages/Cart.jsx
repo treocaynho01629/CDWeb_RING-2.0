@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search } from '@mui/icons-material';
 import { Checkbox, Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
 import { NavLink, useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ import { booksApiSlice } from '../features/books/booksApiSlice';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import PropTypes from 'prop-types';
 import useCart from '../hooks/useCart';
+import useTitle from '../hooks/useTitle';
 import CustomButton from '../components/custom/CustomButton';
 import CheckoutDialog from '../components/cart/CheckoutDialog';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
@@ -29,7 +30,8 @@ const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = muiStyled(TableRow)(({ theme }) => ({
-    border: '.5px solid lightgray',
+    border: '.5px solid',
+    borderColor: theme.palette.action.focus,
     position: 'relative',
 
     '&:nth-of-type(odd)': {
@@ -69,7 +71,8 @@ const Title = styled.h3`
 `
 
 const InputContainer = styled.div`
-    border: 0.5px solid lightgray;
+    border: 0.5px solid;
+    border-color: ${props => props.theme.palette.action.focus};
     align-items: center;
     justify-content: space-between;
     align-items: center;
@@ -95,7 +98,7 @@ const AmountInput = styled.input`
 const AmountButton = styled.div`
     width: 25px;
     height: 25px;
-    background-color: lightgray;
+    background-color: ${props => props.theme.palette.action.focus};
     display: flex;
     align-items: center;
     justify-content: center;
@@ -179,10 +182,8 @@ const Cart = () => {
     //Get similar
     const [getBook] = booksApiSlice.useLazyGetBookQuery();
 
-    useEffect(() => {
-        document.title = `Giỏ hàng`;
-        window.scrollTo(0, 0);
-    }, [])
+    //Set title
+    useTitle('Giỏ hàng');
 
     //Open context menu
     const handleClick = (event, product) => {
@@ -268,7 +269,7 @@ const Cart = () => {
 
         return (
             <TableHead sx={{ display: { xs: 'none', sm: 'table-header-group' } }}>
-                <TableRow sx={{ padding: 0, border: '.5px solid lightgray', backgroundColor: 'secondary.main' }}>
+                <TableRow sx={{ padding: 0, border: '.5px solid', borderColor: 'action.focus', backgroundColor: 'secondary.main' }}>
                     <StyledTableCell>
                         <Checkbox
                             color="primary"
