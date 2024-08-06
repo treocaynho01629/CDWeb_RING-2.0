@@ -1,5 +1,6 @@
 package com.ring.bookstore.exception.advice;
 
+import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,12 +18,11 @@ import java.util.Map;
 @RestControllerAdvice
 public class ApplicationExceptionHandler{
 
-
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ExceptionMessage handleInvalidArgument(MethodArgumentNotValidException ex) {
+    public ExceptionMessage handleInvalidArgument(MethodArgumentNotValidException e) {
         Map<String, String> errorMap = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error -> {
+        e.getBindingResult().getFieldErrors().forEach(error -> {
             errorMap.put(error.getField(), error.getDefaultMessage());
         });
         return new ExceptionMessage(400, "Invalid argument", errorMap);
@@ -48,6 +48,13 @@ public class ApplicationExceptionHandler{
     @ExceptionHandler(ResourceNotFoundException.class)
     public ExceptionMessage processResourceNotFoundException(ResourceNotFoundException e) {
         return e.getExceptionMessage();
+    }
+
+    @ExceptionHandler(ImageResizerException.class)
+    public ExceptionMessage processSocialException(ImageResizerException e) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("errorMessage", e.getMessage());
+        return new ExceptionMessage(e.getStatus().value(), e.getMessage(), errorMap);
     }
     
     @ResponseStatus(HttpStatus.EXPECTATION_FAILED)

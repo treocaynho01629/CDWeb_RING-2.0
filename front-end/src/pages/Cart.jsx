@@ -48,6 +48,7 @@ const EmptyWrapper = styled.div`
 `
 
 const Wrapper = styled.div`
+    min-height: 90dvh;
 `
 
 const MainTitleContainer = styled.div`
@@ -148,8 +149,13 @@ const ItemAction = styled.div`
 const Price = styled.p`
     font-size: 16px;
     font-weight: bold;
+    text-align: left;
     color: ${props => props.theme.palette.secondary.main};
     margin: 0;
+
+    &.total {
+        color: ${props => props.theme.palette.warning.light};
+    }
 `
 
 const Discount = styled.p`
@@ -268,7 +274,7 @@ const Cart = () => {
         const { onSelectAllClick, numSelected, rowCount } = props;
 
         return (
-            <TableHead sx={{ display: { xs: 'none', sm: 'table-header-group' } }}>
+            <TableHead sx={{ display: { xs: 'none', sm: 'table-header-group' }}}>
                 <TableRow sx={{ padding: 0, border: '.5px solid', borderColor: 'action.focus', backgroundColor: 'secondary.main' }}>
                     <StyledTableCell>
                         <Checkbox
@@ -295,6 +301,7 @@ const Cart = () => {
                     <StyledTableCell align="left" sx={{ display: { xs: 'none', md: 'table-cell' } }}>Đơn giá</StyledTableCell>
                     <StyledTableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>Số lượng</StyledTableCell>
                     <StyledTableCell align="center" sx={{ display: { xs: 'none', md: 'table-cell' } }}>Tổng</StyledTableCell>
+                    <StyledTableCell sx={{ width: 0 }}></StyledTableCell>
                 </TableRow>
             </TableHead>
         );
@@ -336,8 +343,10 @@ const Cart = () => {
                                     visibility: selected.length > 0 ? 'visible' : 'hidden',
                                     transition: 'all .25s ease',
                                 }}
-                                onClick={handleDeleteMultiple}>
-                                Xoá &nbsp;<DeleteIcon />
+                                onClick={handleDeleteMultiple}
+                                endIcon={<DeleteIcon />}
+                            >
+                                Xoá
                             </CustomButton>
                         </MainTitleContainer>
                         <TableContainer >
@@ -374,7 +383,9 @@ const Cart = () => {
                                                         />
                                                         <ItemContainer>
                                                             <NavLink to={`/product/${product.id}`}>
-                                                                <LazyLoadImage src={product.image}
+                                                                <LazyLoadImage
+                                                                    src={`${product.image}?size=small`}
+                                                                    alt={`${product.title} Cart item`}
                                                                     height={90}
                                                                     width={90}
                                                                     style={{
@@ -425,10 +436,14 @@ const Cart = () => {
                                                         </AmountButton>
                                                     </Box>
                                                 </StyledTableCell>
-                                                <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}><Price>{(product.price * product.quantity).toLocaleString()}đ</Price></StyledTableCell>
-                                                <IconButton sx={hoverIcon} onClick={(e) => handleClick(e, product)}>
-                                                    <MoreHoriz />
-                                                </IconButton>
+                                                <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                                                    <Price className="total">{(product.price * product.quantity).toLocaleString()}đ</Price>
+                                                </StyledTableCell>
+                                                <td>
+                                                    <IconButton sx={hoverIcon} onClick={(e) => handleClick(e, product)}>
+                                                        <MoreHoriz />
+                                                    </IconButton>
+                                                </td>
                                             </StyledTableRow>
                                         )
                                     })}
@@ -444,7 +459,6 @@ const Cart = () => {
                     </Grid>
                 </Grid>
             }
-            <br /><br />
             <Menu
                 open={open}
                 onClose={handleClose}

@@ -172,7 +172,7 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
           :
           <>
             <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><LocationOn />&nbsp;Địa chỉ của bạn</DialogTitle>
-            <DialogContent>
+            <DialogContent sx={{ padding: { xs: 1, sm: '20px 24px' }, paddingTop: 0}}>
               <Box display={'flex'} mb={'5px'}>
                 <StyledRadio
                   checked={selectedValue == -1}
@@ -212,8 +212,9 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
                 size="large"
                 sx={{ marginY: '10px' }}
                 onClick={handleCloseDialog}
+                startIcon={<Close />}
               >
-                <Close />Huỷ
+                Huỷ
               </CustomButton>
               <CustomButton
                 variant="contained"
@@ -221,8 +222,9 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
                 size="large"
                 sx={{ marginY: '10px' }}
                 onClick={handleSubmit}
+                startIcon={<Check />}
               >
-                <Check />Chọn
+                Chọn
               </CustomButton>
             </DialogActions>
             <Menu

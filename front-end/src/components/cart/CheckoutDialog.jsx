@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { useEffect, useState } from 'react';
 import { Sell as SellIcon, Payments as PaymentsIcon } from '@mui/icons-material';
-import { Checkbox, Divider, Drawer, FormControlLabel } from '@mui/material';
+import { Checkbox, Divider, Drawer, FormControlLabel, useMediaQuery, useTheme } from '@mui/material';
 import useAuth from "../../hooks/useAuth";
 
 //#region styled
@@ -146,6 +146,8 @@ const PayButton = styled.button`
 
 const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick, numSelected, rowCount }) => {
     const { token } = useAuth();
+    const theme = useTheme();
+    const desktopMode = useMediaQuery(theme.breakpoints.up('sm'));
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [open, setOpen] = useState(false);
 
@@ -166,81 +168,22 @@ const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick
 
     return (
         <>
-            <CheckoutContainer>
-                <SecondaryTitleContainer>
-                    <Title>ĐƠN DỰ TÍNH&nbsp;</Title><SellIcon />
-                </SecondaryTitleContainer>
-                <Payout>
-                    <PayoutTitle>KHUYẾN MÃI</PayoutTitle>
-                    <PayoutRow>
-                        <PayoutText>Voucher RING:</PayoutText>
-                        <CouponButton>Chọn hoặc nhập mã&nbsp;
-                            <SellIcon />
-                        </CouponButton>
-                    </PayoutRow>
-                </Payout>
-                <Payout>
-                    <PayoutTitle>THANH TOÁN</PayoutTitle>
-                    <PayoutRow>
-                        <PayoutText>Thành tiền:</PayoutText>
-                        <PayoutText>{totalPrice().toLocaleString()} đ</PayoutText>
-                    </PayoutRow>
-                    <PayoutRow>
-                        <PayoutText>VAT:</PayoutText>
-                        <PayoutText>{selectedProducts?.length ? 10 : 0}%</PayoutText>
-                    </PayoutRow>
-                    <PayoutRow>
-                        <PayoutText>Phí vận chuyển:</PayoutText>
-                        <PayoutText>{selectedProducts?.length ? '10,000' : 0}&nbsp;đ</PayoutText>
-                    </PayoutRow>
-                    <PayoutRow>
-                        <PayoutText>Tổng:</PayoutText>
-                        <PayoutPrice>{selectedProducts?.length ? Math.round(totalPrice() * 1.1 + 10000).toLocaleString() : 0}&nbsp;đ</PayoutPrice>
-                    </PayoutRow>
-                    <PayButton
-                        disabled={selectedProducts?.length == 0}
-                        onClick={() => navigate('/checkout', { state: { products: selectedProducts } })}
-                    >
-                        <PaymentsIcon style={{ fontSize: 18 }} />&nbsp;
-                        {token ? `THANH TOÁN (${selectedProducts.length} SẢN PHẨM)` : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
-                    </PayButton>
-                </Payout>
-            </CheckoutContainer >
-            <AltCheckoutContainer>
-                <AltPayout>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                disableRipple
-                                disableFocusRipple
-                                indeterminate={numSelected > 0 && numSelected < rowCount}
-                                checked={rowCount > 0 && numSelected === rowCount}
-                                color="secondary"
-                                inputProps={{
-                                    'aria-label': 'select all',
-                                }}
-                                onChange={handleSelectAllClick}
-                            />
-                        }
-                        sx={{ marginRight: 0 }}
-                        label="Tất cả" />
-                    <Divider orientation="vertical" flexItem />
-                    <PayoutPrice onClick={toggleDrawer(true)} style={{ cursor: 'pointer' }}>
-                        {selectedProducts?.length ? Math.round(totalPrice() * 1.1 + 10000).toLocaleString() : 0}&nbsp;đ
-                    </PayoutPrice>
-                </AltPayout>
-                <PayButton
-                    disabled={selectedProducts?.length == 0}
-                    onClick={() => navigate('/checkout', { state: { products: selectedProducts } })}
-                >
-                    {token ? `THANH TOÁN (${selectedProducts.length})` : 'ĐĂNG NHẬP'}
-                </PayButton>
-                <Drawer
-                    anchor={'bottom'}
-                    open={open}
-                    onClose={toggleDrawer(false)}
-                >
-                    <Payout style={{ marginBottom: 0 }}>
+            {desktopMode
+                ?
+                <CheckoutContainer>
+                    <SecondaryTitleContainer>
+                        <Title>ĐƠN DỰ TÍNH&nbsp;</Title><SellIcon />
+                    </SecondaryTitleContainer>
+                    <Payout>
+                        <PayoutTitle>KHUYẾN MÃI</PayoutTitle>
+                        <PayoutRow>
+                            <PayoutText>Voucher RING:</PayoutText>
+                            <CouponButton>Chọn hoặc nhập mã&nbsp;
+                                <SellIcon />
+                            </CouponButton>
+                        </PayoutRow>
+                    </Payout>
+                    <Payout>
                         <PayoutTitle>THANH TOÁN</PayoutTitle>
                         <PayoutRow>
                             <PayoutText>Thành tiền:</PayoutText>
@@ -258,9 +201,72 @@ const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick
                             <PayoutText>Tổng:</PayoutText>
                             <PayoutPrice>{selectedProducts?.length ? Math.round(totalPrice() * 1.1 + 10000).toLocaleString() : 0}&nbsp;đ</PayoutPrice>
                         </PayoutRow>
+                        <PayButton
+                            disabled={selectedProducts?.length == 0}
+                            onClick={() => navigate('/checkout', { state: { products: selectedProducts } })}
+                        >
+                            <PaymentsIcon style={{ fontSize: 18 }} />&nbsp;
+                            {token ? `THANH TOÁN (${selectedProducts.length} SẢN PHẨM)` : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
+                        </PayButton>
                     </Payout>
-                </Drawer>
-            </AltCheckoutContainer>
+                </CheckoutContainer >
+                :
+                <AltCheckoutContainer>
+                    <AltPayout>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    disableRipple
+                                    disableFocusRipple
+                                    indeterminate={numSelected > 0 && numSelected < rowCount}
+                                    checked={rowCount > 0 && numSelected === rowCount}
+                                    color="secondary"
+                                    inputProps={{
+                                        'aria-label': 'select all',
+                                    }}
+                                    onChange={handleSelectAllClick}
+                                />
+                            }
+                            sx={{ marginRight: 0 }}
+                            label="Tất cả" />
+                        <Divider orientation="vertical" flexItem />
+                        <PayoutPrice onClick={toggleDrawer(true)} style={{ cursor: 'pointer' }}>
+                            {selectedProducts?.length ? Math.round(totalPrice() * 1.1 + 10000).toLocaleString() : 0}&nbsp;đ
+                        </PayoutPrice>
+                    </AltPayout>
+                    <PayButton
+                        disabled={selectedProducts?.length == 0}
+                        onClick={() => navigate('/checkout', { state: { products: selectedProducts } })}
+                    >
+                        {token ? `THANH TOÁN (${selectedProducts.length})` : 'ĐĂNG NHẬP'}
+                    </PayButton>
+                    <Drawer
+                        anchor={'bottom'}
+                        open={open}
+                        onClose={toggleDrawer(false)}
+                    >
+                        <Payout style={{ marginBottom: 0 }}>
+                            <PayoutTitle>THANH TOÁN</PayoutTitle>
+                            <PayoutRow>
+                                <PayoutText>Thành tiền:</PayoutText>
+                                <PayoutText>{totalPrice().toLocaleString()} đ</PayoutText>
+                            </PayoutRow>
+                            <PayoutRow>
+                                <PayoutText>VAT:</PayoutText>
+                                <PayoutText>{selectedProducts?.length ? 10 : 0}%</PayoutText>
+                            </PayoutRow>
+                            <PayoutRow>
+                                <PayoutText>Phí vận chuyển:</PayoutText>
+                                <PayoutText>{selectedProducts?.length ? '10,000' : 0}&nbsp;đ</PayoutText>
+                            </PayoutRow>
+                            <PayoutRow>
+                                <PayoutText>Tổng:</PayoutText>
+                                <PayoutPrice>{selectedProducts?.length ? Math.round(totalPrice() * 1.1 + 10000).toLocaleString() : 0}&nbsp;đ</PayoutPrice>
+                            </PayoutRow>
+                        </Payout>
+                    </Drawer>
+                </AltCheckoutContainer>
+            }
         </>
     )
 }

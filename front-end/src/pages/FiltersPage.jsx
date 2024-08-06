@@ -1,7 +1,6 @@
 import styled from "styled-components"
 import { useEffect, useState } from 'react'
-import { Divider, Grid } from '@mui/material';
-import { styled as muiStyled } from '@mui/system';
+import { Grid, useTheme, useMediaQuery } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice";
 import { useGetPublishersQuery } from "../features/publishers/publishersApiSlice";
@@ -11,14 +10,14 @@ import FilterList from "../components/product/FilterList"
 import FilteredProducts from "../components/product/FilteredProducts"
 import SortList from "../components/product/SortList"
 import FilterDialog from '../components/product/FilterDialog'
+import CustomDivider from "../components/custom/CustomDivider";
+import useTitle from "../hooks/useTitle";
 
 //#region styled
 const Wrapper = styled.div`
     display: flex;
-    overflow-x: hidden;
     
     @media (min-width: 600px) {
-        overflow-x: visible;
         margin-right: auto;
         margin-left: auto;
         width: 600px;
@@ -33,22 +32,14 @@ const Wrapper = styled.div`
         width: 1170px;
     }
 `
-
-const Title = muiStyled(Divider)({
-    fontSize: 18,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    color: '#63e399',
-    textAlign: 'center',
-    justifyContent: 'center',
-    margin: '10px 0px',
-});
 //#endregion
 
 const FiltersPage = () => {
     //#region construct
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
+    const theme = useTheme();
+    const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
 
     //Filter & pagination
     const [filters, setFilters] = useState({
@@ -60,7 +51,7 @@ const FiltersPage = () => {
         cateId: searchParams.get("cateId") ?? "",
     })
     const [pagination, setPagination] = useState({
-        currPage: searchParams.get("pageNo") ?? 0,
+        currPage: searchParams.get("pageNo") ? searchParams.get("pageNo") - 1 : 0,
         pageSize: searchParams.get("pSize") ?? 16,
         totalPages: 0,
         sortBy: searchParams.get("sortBy") ?? "id",
@@ -98,15 +89,18 @@ const FiltersPage = () => {
         }
     }, [data])
 
-    //Set title
+    //Update keyword from navbar
     useEffect(() => {
-        document.title = 'RING! - Cửa hàng';
-        window.scrollTo(0, 0);
-    }, [])
+        const keyword = searchParams.get("keyword");
+        if ((keyword != filters.keyword)) handleChangeSearch(keyword);
+    }, [searchParams])
+
+    //Set title
+    useTitle('RING! - Cửa hàng');
 
     //Handle change: replace filters value & set search params
     const handleChangeCate = (id) => {
-        handlePageChange(1);
+        handleChangePage(1);
         if (filters?.cateId == id || id == "") {
             searchParams.delete("cateId");
             setSearchParams(searchParams);
@@ -118,7 +112,7 @@ const FiltersPage = () => {
     }
 
     const handleChangeRange = (newValue) => {
-        handlePageChange(1);
+        handleChangePage(1);
         if (newValue.toString() == [1000, 10000000].toString()) {
             searchParams.delete("value");
             setSearchParams(searchParams);
@@ -129,7 +123,7 @@ const FiltersPage = () => {
         setFilters({ ...filters, value: newValue });
     }
 
-    const handlePageChange = (page) => {
+    const handleChangePage = (page) => {
         if (page == 1) {
             searchParams.delete("pageNo");
             setSearchParams(searchParams);
@@ -160,7 +154,7 @@ const FiltersPage = () => {
     }
 
     const handleChangeSize = (newValue) => {
-        handlePageChange(1);
+        handleChangePage(1);
         if (newValue == 16) {
             searchParams.delete("pSize");
             setSearchParams(searchParams);
@@ -172,8 +166,8 @@ const FiltersPage = () => {
     }
 
     const handleChangeSearch = (newValue) => {
-        handlePageChange(1);
-        if (newValue == "") {
+        handleChangePage(1);
+        if (newValue == "" || newValue == null) {
             searchParams.delete("keyword");
             setSearchParams(searchParams);
         } else {
@@ -184,7 +178,7 @@ const FiltersPage = () => {
     }
 
     const handleChangePub = (newValue) => {
-        handlePageChange(1);
+        handleChangePage(1);
         if (newValue.length == 0) {
             searchParams.delete("pubId");
             setSearchParams(searchParams);
@@ -196,7 +190,7 @@ const FiltersPage = () => {
     }
 
     const handleChangeType = (newValue) => {
-        handlePageChange(1);
+        handleChangePage(1);
         if (newValue == "") {
             searchParams.delete("type");
             setSearchParams(searchParams);
@@ -208,7 +202,7 @@ const FiltersPage = () => {
     }
 
     const handleChangeSeller = (newValue) => {
-        handlePageChange(1);
+        handleChangePage(1);
         if (newValue == "") {
             searchParams.delete("seller");
             setSearchParams(searchParams);
@@ -230,9 +224,9 @@ const FiltersPage = () => {
             cateId: "",
         })
         setPagination({
+            ...pagination,
             currPage: 0,
             pageSize: 16,
-            totalPages: 0,
             sortBy: "id",
             sortDir: "desc",
         })
@@ -247,36 +241,39 @@ const FiltersPage = () => {
 
     return (
         <Wrapper>
-            <FilterDialog
-                {...{ filters, setFilters, resetFilter, open, handleClose, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
-                onChangeCate={handleChangeCate}
-                onChangeRange={handleChangeRange}
-                onChangePub={handleChangePub}
-                onChangeType={handleChangeType}
-                onChangeSeller={handleChangeSeller}
-            />
             <Grid container spacing={5} sx={{ display: 'flex', justifyContent: 'center' }}>
-                <Grid item xs={12} md={3.5} lg={3} display={{ xs: "none", md: "block" }} sx={{ overflowX: 'visible' }}>
-                    <FilterList
-                        {...{ filters, resetFilter, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
+                {mobileMode ?
+                    <FilterDialog
+                        {...{ filters, setFilters, resetFilter, open, handleClose, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
                         onChangeCate={handleChangeCate}
                         onChangeRange={handleChangeRange}
                         onChangePub={handleChangePub}
                         onChangeType={handleChangeType}
-                        onChangeSeller={handleChangeSeller} />
-                </Grid>
-                <Grid item xs={12} md={8.5} lg={9}>
-                    <Title>DANH MỤC SẢN PHẨM</Title>
+                        onChangeSeller={handleChangeSeller}
+                    />
+                    :
+                    <Grid item xs={12} md={3} display={{ xs: "none", md: "block" }} sx={{ overflowX: 'visible', zIndex: 1 }}>
+                        <FilterList
+                            {...{ filters, resetFilter, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
+                            onChangeCate={handleChangeCate}
+                            onChangeRange={handleChangeRange}
+                            onChangePub={handleChangePub}
+                            onChangeType={handleChangeType}
+                            onChangeSeller={handleChangeSeller} />
+                    </Grid>
+                }
+                <Grid item xs={12} md={9}>
+                    <CustomDivider>DANH MỤC SẢN PHẨM</CustomDivider>
                     <SortList filters={filters}
                         pagination={pagination}
                         onChangeOrder={handleChangeOrder}
                         onChangeDir={handleChangeDir}
-                        onChangeSearch={handleChangeSearch}
                         onSizeChange={handleChangeSize}
+                        onPageChange={handleChangePage}
                         setOpen={setOpen} />
                     <FilteredProducts {...{ data, isError, error, isLoading, isSuccess, pageSize: pagination?.pageSize }} />
                     <AppPagination pagination={pagination}
-                        onPageChange={handlePageChange}
+                        onPageChange={handleChangePage}
                         onSizeChange={handleChangeSize} />
                 </Grid>
             </Grid>

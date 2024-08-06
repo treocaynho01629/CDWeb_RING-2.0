@@ -230,7 +230,8 @@ const Product = ({ book }) => {
                 <ImageSlider>
                     {multiImages.map((style, index) => (
                         <LazyLoadImage key={`${book?.id}-${index}`}
-                            src={book?.image}
+                            src={`${book?.image}?size=small`}
+                            alt={`${book?.title} Thumbnail`}
                             height={220}
                             width={'85%'}
                             style={{

@@ -2,21 +2,16 @@ import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 
 const StyledButton = styled(Button)(({ theme }) => ({
-    '&.Mui-focused': {
-        outline: 'none',
-        border: 0
-    },
-
     //Filled
     '&.MuiButton-contained': {
         '&:hover': {
-            backgroundColor: 'lightgray',
-            color: 'black'
+            backgroundColor: theme.palette.grey[300],
+            color: theme.palette.text.primary
         },
 
         '&:disabled': {
-            backgroundColor: 'gray',
-            color: 'darkslategray'
+            backgroundColor: theme.palette.grey[500],
+            color: theme.palette.text.disabled
         }
     },
 }));

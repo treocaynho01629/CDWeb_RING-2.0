@@ -315,8 +315,9 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                     size="large"
                     sx={{ marginY: '10px' }}
                     onClick={handleClose}
+                    startIcon={<CloseIcon />}
                 >
-                    <CloseIcon />Huỷ
+                    Huỷ
                 </CustomButton>
                 <CustomButton
                     variant="contained"
@@ -324,8 +325,9 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                     size="large"
                     sx={{ marginY: '10px' }}
                     onClick={handleSubmit}
+                    startIcon={<Check />}
                 >
-                    <Check />Áp dụng
+                    Áp dụng
                 </CustomButton>
             </DialogActions>
         </>

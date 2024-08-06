@@ -5,7 +5,7 @@ import {
     Remove as RemoveIcon, Add as AddIcon, Star as StarIcon, StarBorder as StarBorderIcon,
     ShoppingCart as ShoppingCartIcon, Sell as SellIcon, Storefront as StorefrontIcon, Check as CheckIcon
 } from '@mui/icons-material';
-import { Skeleton, Rating, Box, Divider, Grid, Avatar, Container, Drawer } from '@mui/material';
+import { Skeleton, Rating, Box, Divider, Grid, Avatar, Drawer, useTheme, useMediaQuery } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ProductImages from './ProductImages';
 import useCart from '../../hooks/useCart';
@@ -375,6 +375,8 @@ const BuyButton = styled.button`
 //#endregion
 
 const ProductContent = ({ book, handleTabChange }) => {
+    const theme = useTheme();
+    const mobileMode = useMediaQuery(theme.breakpoints.down('sm'));
     const [amountIndex, setAmountIndex] = useState(1); //Amount add to cart
     const [open, setOpen] = useState(false);
     const { addProduct } = useCart();
@@ -549,64 +551,70 @@ const ProductContent = ({ book, handleTabChange }) => {
                                     </DetailContainer>
                                 </>
                             }
-                            <FilterContainer>
-                                <Divider sx={{ my: 2, display: { xs: 'none', md: 'block' } }} />
-                                <Filter>
-                                    <DetailTitle>Số lượng:</DetailTitle>
-                                    <SubFilterContainer>
-                                        <AmountButton direction="add" onClick={() => changeAmount(-1)}>
-                                            <RemoveIcon style={{ fontSize: 12 }} />
-                                        </AmountButton>
-                                        <InputContainer>
-                                            <AmountInput type="number" onChange={(e) => handleChangeAmount(e.target.valueAsNumber)} value={amountIndex} />
-                                        </InputContainer>
-                                        <AmountButton direction="remove" onClick={() => changeAmount(1)}>
-                                            <AddIcon style={{ fontSize: 12 }} />
-                                        </AmountButton>
-                                    </SubFilterContainer>
-                                </Filter>
-                                <BuyButton disabled={!book} onClick={() => handleAddToCart(book)}>
-                                    <ShoppingCartIcon style={{ fontSize: 18 }} />
-                                    THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
-                                </BuyButton>
-                            </FilterContainer>
-                            <AltFilterContainer>
-                                <Link to={`/cart`}>
-                                    <CartButton><ShoppingCartIcon style={{ fontSize: 24 }} /></CartButton>
-                                </Link>
-                                <BuyButton disabled={!book} onClick={toggleDrawer(true)}>
-                                    THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
-                                </BuyButton>
-                            </AltFilterContainer>
-                            <Drawer
-                                anchor={'bottom'}
-                                open={open}
-                                onClose={toggleDrawer(false)}
-                            >
-                                <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} padding={'0 10px'}>
-                                    <DetailTitle>Số lượng:</DetailTitle>
-                                    <SubFilterContainer>
-                                        <AmountButton direction="add" onClick={() => changeAmount(-1)}>
-                                            <RemoveIcon style={{ fontSize: 12 }} />
-                                        </AmountButton>
-                                        <InputContainer>
-                                            <AmountInput type="number" onChange={(e) => handleChangeAmount(e.target.valueAsNumber)} value={amountIndex} />
-                                        </InputContainer>
-                                        <AmountButton direction="remove" onClick={() => changeAmount(1)}>
-                                            <AddIcon style={{ fontSize: 12 }} />
-                                        </AmountButton>
-                                    </SubFilterContainer>
-                                </Box>
-                                <CustomButton
-                                    variant="outlined"
-                                    color="secondary"
-                                    size="large"
-                                    sx={{ margin: '5px' }}
-                                    onClick={() => handleAddToCart(book)}
-                                >
-                                    THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
-                                </CustomButton>
-                            </Drawer>
+                            {mobileMode ?
+                                <>
+                                    <AltFilterContainer>
+                                        <Link to={`/cart`}>
+                                            <CartButton><ShoppingCartIcon style={{ fontSize: 24 }} /></CartButton>
+                                        </Link>
+                                        <BuyButton disabled={!book} onClick={toggleDrawer(true)}>
+                                            THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
+                                        </BuyButton>
+                                    </AltFilterContainer>
+                                    <Drawer
+                                        anchor={'bottom'}
+                                        open={open}
+                                        onClose={toggleDrawer(false)}
+                                    >
+                                        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} padding={'0 10px'}>
+                                            <DetailTitle>Số lượng:</DetailTitle>
+                                            <SubFilterContainer>
+                                                <AmountButton direction="add" onClick={() => changeAmount(-1)}>
+                                                    <RemoveIcon style={{ fontSize: 12 }} />
+                                                </AmountButton>
+                                                <InputContainer>
+                                                    <AmountInput type="number" onChange={(e) => handleChangeAmount(e.target.valueAsNumber)} value={amountIndex} />
+                                                </InputContainer>
+                                                <AmountButton direction="remove" onClick={() => changeAmount(1)}>
+                                                    <AddIcon style={{ fontSize: 12 }} />
+                                                </AmountButton>
+                                            </SubFilterContainer>
+                                        </Box>
+                                        <CustomButton
+                                            variant="outlined"
+                                            color="secondary"
+                                            size="large"
+                                            sx={{ margin: '5px' }}
+                                            onClick={() => handleAddToCart(book)}
+                                        >
+                                            THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
+                                        </CustomButton>
+                                    </Drawer>
+                                </>
+                                :
+                                <FilterContainer>
+                                    <Divider sx={{ my: 2, display: { xs: 'none', md: 'block' } }} />
+                                    <Filter>
+                                        <DetailTitle>Số lượng:</DetailTitle>
+                                        <SubFilterContainer>
+                                            <AmountButton direction="add" onClick={() => changeAmount(-1)}>
+                                                <RemoveIcon style={{ fontSize: 12 }} />
+                                            </AmountButton>
+                                            <InputContainer>
+                                                <AmountInput type="number" onChange={(e) => handleChangeAmount(e.target.valueAsNumber)} value={amountIndex} />
+                                            </InputContainer>
+                                            <AmountButton direction="remove" onClick={() => changeAmount(1)}>
+                                                <AddIcon style={{ fontSize: 12 }} />
+                                            </AmountButton>
+                                        </SubFilterContainer>
+                                    </Filter>
+                                    <BuyButton disabled={!book} onClick={() => handleAddToCart(book)}>
+                                        <ShoppingCartIcon style={{ fontSize: 18 }} />
+                                        THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
+                                    </BuyButton>
+                                </FilterContainer>
+                            }
+
                         </InfoContainer>
                     </Grid>
                 </Grid>

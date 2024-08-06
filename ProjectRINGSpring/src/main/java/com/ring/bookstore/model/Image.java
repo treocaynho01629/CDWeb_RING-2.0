@@ -1,25 +1,18 @@
 package com.ring.bookstore.model;
 
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.*;
 import org.hibernate.type.SqlTypes;
 
 @Entity
@@ -59,4 +52,27 @@ public class Image {
 			fetch = FetchType.LAZY)
 	@JsonIgnore
     private List<Book> books;
+
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@JoinColumn(name = "parent_id")
+	@JsonIgnore
+	private Image parent;
+
+	@OneToMany(cascade = CascadeType.ALL,
+			orphanRemoval = true,
+			mappedBy = "parent",
+			fetch = FetchType.LAZY)
+	@LazyCollection(LazyCollectionOption.EXTRA)
+	@JsonIgnore
+	private List<Image> subImages;
+
+	public void addSubImage(Image subImage) {
+		subImages.add(subImage);
+		subImage.setParent(this);
+	}
+
+	public void removeSubImage(Image subImage) {
+		subImages.remove(subImage);
+		subImage.setParent(null);
+	}
 }

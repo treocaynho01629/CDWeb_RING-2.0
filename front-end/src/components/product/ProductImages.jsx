@@ -252,6 +252,9 @@ const ProductImages = ({ images }) => {
                             <ImageNumber>{index + 1} / {multiImages.length}</ImageNumber>
                             <StyledLazyImage
                                 src={images}
+                                srcSet={`${images}?size=medium 350w, ${images} 600w`}
+                                alt={`Big image number ${index}`}
+                                sizes='400px'
                                 imageStyle={style}
                             />
                         </ImageSlide>

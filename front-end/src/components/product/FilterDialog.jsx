@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { useState, useEffect, useMemo } from "react"
-import { Box, Divider, MenuItem, Skeleton, Chip, Stack, DialogContent, Dialog, DialogActions, DialogTitle, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Divider, MenuItem, Skeleton, Chip, Stack, DialogContent, Dialog, DialogActions, DialogTitle, useMediaQuery, useTheme, InputAdornment } from '@mui/material';
 import { PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon, Check, FilterAltOff } from '@mui/icons-material';
 import { marks, bookTypes } from "../../ultils/filters";
 import CustomButton from "../custom/CustomButton";
@@ -23,10 +23,6 @@ const FilterText = styled.h3`
     color: inherit;
     display: flex;
     align-items: center;
-
-    &:hover {
-        color: ${props => props.theme.palette.secondary.main};
-    }
 `
 
 const InputContainer = styled.div`
@@ -299,6 +295,8 @@ const RangeFilter = ({ valueInput, setValueInput }) => {
     }
   };
 
+  const endAdornment = <InputAdornment position="end">đ</InputAdornment>
+
   return (
     <Filter>
       <TitleContainer>
@@ -321,15 +319,11 @@ const RangeFilter = ({ valueInput, setValueInput }) => {
         />
       </Box>
       <InputContainer>
-        <PriceInputContainer>
-          <PriceInput
-            type="number"
-            min="1000"
-            max="10000000"
-            step="5000"
+        <CustomInput
             onChange={handleInputChange}
             onBlur={handleBlur}
             value={valueInput[0]}
+            size="small"
             inputProps={{
               step: 1000,
               min: 1000,
@@ -337,27 +331,27 @@ const RangeFilter = ({ valueInput, setValueInput }) => {
               type: 'number',
               'aria-labelledby': 'input-slider',
             }}
-          />đ&nbsp;
-        </PriceInputContainer>
+            InputProps={{
+              endAdornment: endAdornment,
+            }}
+          />
         &nbsp;đến&nbsp;
-        <PriceInputContainer>
-          <PriceInput
-            type="number"
-            min="1000"
-            max="10000000"
-            step="5000"
-            onChange={handleInputChange2}
-            onBlur={handleBlur}
-            value={valueInput[1]}
-            inputProps={{
-              step: 1000,
-              min: 1000,
-              max: 10000000,
-              type: 'number',
-              'aria-labelledby': 'input-slider',
-            }}
-          />đ&nbsp;
-        </PriceInputContainer>
+        <CustomInput
+          onChange={handleInputChange2}
+          onBlur={handleBlur}
+          value={valueInput[1]}
+          size="small"
+          inputProps={{
+            step: 1000,
+            min: 1000,
+            max: 10000000,
+            type: 'number',
+            'aria-labelledby': 'input-slider',
+          }}
+          InputProps={{
+            endAdornment: endAdornment,
+          }}
+        />
       </InputContainer>
     </Filter>
   )
@@ -495,16 +489,19 @@ const FilterDialog = (props) => {
           size="large"
           sx={{ marginY: '10px' }}
           onClick={handleResetFilter}
+          startIcon={<FilterAltOff />}
         >
-          <FilterAltOff />Xoá bộ lọc
+          Xoá bộ lọc
         </CustomButton>
         <CustomButton
           variant="contained"
           color="secondary"
           size="large"
           sx={{ marginY: '10px' }}
-          onClick={applyFilter}>
-          <Check />Áp dụng
+          onClick={applyFilter}
+          startIcon={<Check />}
+          >
+          Áp dụng
         </CustomButton>
       </DialogActions>
     </Dialog>

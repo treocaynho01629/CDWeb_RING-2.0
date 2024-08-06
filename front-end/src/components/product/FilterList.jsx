@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { useState, useEffect, useMemo } from "react"
-import { Grid, Box, Divider, Checkbox, FormGroup, FormControlLabel, MenuItem, List, ListItemButton, Collapse, Skeleton, Stack } from '@mui/material';
+import { Grid, Box, Divider, Checkbox, FormGroup, FormControlLabel, MenuItem, List, ListItemButton, Collapse, Skeleton, Stack, InputAdornment } from '@mui/material';
 import { ExpandLess, ExpandMore, PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon, FilterAltOff } from '@mui/icons-material';
 import { marks, bookTypes } from "../../ultils/filters";
 import CustomSlider from "../custom/CustomSlider";
@@ -29,37 +29,12 @@ const FilterText = styled.h3`
     color: inherit;
     display: flex;
     align-items: center;
-
-    &:hover {
-        color: ${props => props.theme.palette.secondary.main};
-    }
 `
 
 const InputContainer = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-`
-
-const PriceInputContainer = styled.div`
-    width: 90px;
-    border: 0.5px solid lightgray;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-`
-
-const PriceInput = styled.input`
-    height: 45px;
-    width: 100%;
-    padding-left: 10px;
-    background: transparent;
-    color: black;
-    resize: none;
-    outline: none;
-    border: none;
-    display: flex;
-    flex: 1;
 `
 //#endregion
 
@@ -72,8 +47,9 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
   }
 
   //Open sub cate
-  const handleClick = (id) => {
+  const handleClick = (e, id) => {
     setOpen((prevState) => ({ ...prevState, [id]: !prevState[id] }));
+    e.stopPropagation();
   };
 
   let catesContent;
@@ -102,16 +78,19 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
                 pl: 0, py: 0,
                 justifyContent: 'space-between',
                 '&.Mui-selected': {
-                  color: '#63e399'
+                  color: 'secondary.main'
                 },
               }}
-              selected={cateId == id}>
-              <FilterText onClick={() => handleCateChange(id)}>{cate?.categoryName}</FilterText>
+              selected={cateId == id}
+              onClick={() => handleCateChange(id)}
+            >
+              <FilterText>{cate?.categoryName}</FilterText>
               {cate.cateSubs.length == 0
                 ? null
-                : <>
-                  {open[id] ? <ExpandLess onClick={() => handleClick(id)} />
-                    : <ExpandMore onClick={() => handleClick(id)} />}
+                :
+                <>
+                  {open[id] ? <ExpandLess onClick={(e) => handleClick(e, id)} />
+                    : <ExpandMore onClick={(e) => handleClick(e, id)} />}
                 </>
               }
             </ListItemButton>
@@ -119,7 +98,7 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
               <Grid key={`${sub?.subName}-${subIndex}`}>
                 <Collapse in={open[id]} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 2, py: 0, color: 'gray' }}>
+                    <ListItemButton sx={{ pl: 2, py: 0, color: 'text.secondary' }}>
                       <FilterText>{sub?.subName}</FilterText>
                     </ListItemButton>
                   </List>
@@ -184,12 +163,8 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
         <div key={index} style={{ display: 'flex', justifyContent: 'flex-start' }}>
           <Checkbox disabled
             disableRipple
-            sx={{
-              paddingLeft: 0,
-              '&.Mui-checked': {
-                color: '#63e399',
-              }
-            }} />
+            color="secondary"
+            sx={{paddingLeft: 0}} />
           <Skeleton variant="text" sx={{ fontSize: '14px' }} width={200} />
         </div>
       ))
@@ -210,12 +185,8 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
                 onChange={handleChangePub}
                 disableRipple
                 name={pub?.pubName}
-                sx={{
-                  paddingLeft: 0,
-                  '&.Mui-checked': {
-                    color: '#63e399',
-                  }
-                }} />
+                color="secondary"
+                sx={{paddingLeft: 0}} />
             }
             label={pub?.pubName}
           />
@@ -293,10 +264,6 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
     setValueInput(newInputValue);
   };
 
-  const handleChangeRangeCommited = () => {
-    onChangeRange(valueInput);
-  };
-
   const handleInputChange = (event) => {
     //Input
     let newValue = [...valueInput];
@@ -315,7 +282,6 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
     //Set
     setValueInput(newValue);
     setValue(rangeValue);
-    onChangeRange(newValue);
   };
 
   const handleInputChange2 = (event) => {
@@ -335,7 +301,6 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
     //Set
     setValueInput(newValue);
     setValue(rangeValue);
-    onChangeRange(newValue);
   };
 
   const handleBlur = () => {
@@ -343,23 +308,25 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
     if (newValue[0] < 0) {
       newValue[0] = 1000;
       setValueInput(newValue);
-      onChangeRange(newValue);
     } else if (newValue[0] > 10000000) {
       newValue[0] = 10000000;
       setValueInput(newValue);
-      onChangeRange(newValue);
     }
 
     if (newValue[1] < 0) {
       newValue[1] = 1000;
       setValueInput(newValue);
-      onChangeRange(newValue);
     } else if (newValue[1] > 10000000) {
       newValue[1] = 10000000;
       setValueInput(newValue);
-      onChangeRange(newValue);
     }
   };
+
+  const handleApply = () => {
+    if (onChangeRange) onChangeRange(valueInput);
+  }
+
+  const endAdornment = <InputAdornment position="end">đ</InputAdornment>
 
   return (
     <Filter>
@@ -379,50 +346,54 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
           getAriaValueText={valuetext}
           valueLabelFormat={valuetext}
           onChange={handleChangeRange}
-          onChangeCommitted={handleChangeRangeCommited}
           onBlur={handleBlur}
-          size="lg"
         />
       </Box>
       <InputContainer>
-        <PriceInputContainer>
-          <PriceInput
-            type="number"
-            min="1000"
-            max="10000000"
-            step="5000"
-            onChange={handleInputChange}
-            onBlur={handleBlur}
-            value={valueInput[0]}
-            inputProps={{
-              step: 1000,
-              min: 1000,
-              max: 10000000,
-              type: 'number',
-              'aria-labelledby': 'input-slider',
-            }}
-          />đ&nbsp;
-        </PriceInputContainer>
+        <CustomInput
+          onChange={handleInputChange}
+          onBlur={handleBlur}
+          value={valueInput[0]}
+          size="small"
+          inputProps={{
+            step: 1000,
+            min: 1000,
+            max: 10000000,
+            type: 'number',
+            'aria-labelledby': 'input-slider',
+          }}
+          InputProps={{
+            endAdornment: endAdornment,
+          }}
+        />
         &nbsp;đến&nbsp;
-        <PriceInputContainer>
-          <PriceInput
-            type="number"
-            min="1000"
-            max="10000000"
-            step="5000"
-            onChange={handleInputChange2}
-            onBlur={handleBlur}
-            value={valueInput[1]}
-            inputProps={{
-              step: 1000,
-              min: 1000,
-              max: 10000000,
-              type: 'number',
-              'aria-labelledby': 'input-slider',
-            }}
-          />đ&nbsp;
-        </PriceInputContainer>
+        <CustomInput
+          onChange={handleInputChange2}
+          onBlur={handleBlur}
+          value={valueInput[1]}
+          size="small"
+          inputProps={{
+            step: 1000,
+            min: 1000,
+            max: 10000000,
+            type: 'number',
+            'aria-labelledby': 'input-slider',
+          }}
+          InputProps={{
+            endAdornment: endAdornment,
+          }}
+        />
       </InputContainer>
+      <CustomButton
+        variant="contained"
+        color="secondary"
+        size="large"
+        fullWidth
+        sx={{ marginTop: 2 }}
+        onClick={handleApply}
+      >
+        Áp dụng
+      </CustomButton>
     </Filter>
   )
 }
@@ -449,6 +420,7 @@ const OtherFilters = ({ type, seller, setSeller, onChangeType, onChangeSeller })
         label="Hình thức bìa"
         select
         margin="dense"
+        size="small"
         fullWidth
         id="type"
         value={type}
@@ -465,6 +437,7 @@ const OtherFilters = ({ type, seller, setSeller, onChangeType, onChangeSeller })
         margin="dense"
         id="seller"
         label="Tên người bán"
+        size="small"
         fullWidth
         variant="outlined"
         value={seller}
@@ -515,7 +488,6 @@ const FilterList = (props) => {
       <CustomDivider>BỘ LỌC</CustomDivider>
       <Stack
         spacing={{ xs: 1 }}
-        direction={'column'}
         useFlexGap
         flexWrap="wrap"
         divider={<Divider flexItem />}
@@ -525,9 +497,17 @@ const FilterList = (props) => {
         <PublisherFilter {...{ loadPubs, donePubs, errorPubs, pubs, selectedPub, setSelectedPub, onChangePub }} />
         <OtherFilters {...{ type, seller, setSeller, onChangeType, onChangeSeller }} />
       </Stack>
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-        <CustomButton variant="contained" color="error" size="large" onClick={resetFilter}><FilterAltOff />Xoá bộ lọc</CustomButton>
-      </div>
+      <CustomButton
+        variant="contained"
+        color="error"
+        size="large"
+        fullWidth
+        sx={{ marginTop: 1 }}
+        onClick={resetFilter}
+        startIcon={<FilterAltOff />}
+      >
+        Xoá bộ lọc
+      </CustomButton>
     </>
   )
 }

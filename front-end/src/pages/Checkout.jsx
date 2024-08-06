@@ -414,7 +414,9 @@ const Checkout = () => {
                                                         <StyledTableCell>
                                                             <ItemContainer>
                                                                 <NavLink to={`/product/${product.id}`}>
-                                                                    <LazyLoadImage src={product.image}
+                                                                    <LazyLoadImage 
+                                                                        src={`${product.image}?size=small`}
+                                                                        alt={`${product.title} Checkout item`}
                                                                         height={90}
                                                                         width={90}
                                                                         style={{
@@ -429,7 +431,7 @@ const Checkout = () => {
                                                                     </NavLink>
                                                                     <ItemAction>
                                                                         <Box width={'100%'} display={{ xs: 'flex', md: 'none' }} justifyContent={'space-between'}>
-                                                                            <Box display={{ xs: 'block', md: 'none' }}>
+                                                                            <Box>
                                                                                 <Price>{product.price.toLocaleString()}đ</Price>
                                                                                 <Box display={'flex'} alignItems={'center'} sx={{ fontWeight: 'bold' }}>
                                                                                     Tổng: &nbsp;&nbsp;<Price className="total">{(product.price * product.quantity).toLocaleString()}đ</Price>
@@ -479,8 +481,9 @@ const Checkout = () => {
                                         color="secondary"
                                         onClick={handleNext}
                                         sx={{ display: { xs: 'none', sm: 'flex' } }}
+                                        endIcon={<KeyboardDoubleArrowDown />}
                                     >
-                                        Tiếp tục<KeyboardDoubleArrowDown />
+                                        Tiếp tục
                                     </CustomButton>
                                 }
                             </StyledStepContent>

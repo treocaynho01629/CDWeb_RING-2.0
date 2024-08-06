@@ -284,8 +284,9 @@ const ProfileDetail = ({ Title, Instruction, Wrapper, pending, setPending }) => 
                             disabled={loadProfile}
                             sx={{ marginTop: 5 }}
                             onClick={handleChangeInfo}
+                            startIcon={<Check /> }
                         >
-                            <Check /> Lưu thông tin
+                            Lưu thông tin
                         </CustomButton>
                     </InfoStackContainer>
                 </Box>

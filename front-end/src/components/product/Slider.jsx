@@ -160,8 +160,12 @@ function Item({ book }) {
                         ?
                         <Link to={`/product/${book.id}`}>
                             <ImgContainer>
-                                <LazyLoadImage src={book.image}
+                                <LazyLoadImage 
+                                    src={book.image}
+                                    srcSet={`${book.images}?size=medium 350w, ${book.image} 600w`}
+                                    sizes='400px'
                                     height={400}
+                                    alt={`${book.title} Big product item`}
                                     width={'100%'}
                                     style={{
                                         objectFit: 'contain',

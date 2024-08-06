@@ -12,17 +12,11 @@ const Container = styled.div`
 `
 
 const StyledPageItem = muiStyled(PaginationItem)(({ theme }) => ({
-    borderRadius: 0,
-    backgroundColor: 'lightgray',
+    backgroundColor: theme.palette.action.focus,
 
     '&:hover': {
-        backgroundColor: theme.palette.secondary.main,
+        backgroundColor: theme.palette.secondary.light,
         color: theme.palette.secondary.contrastText,
-    },
-
-    '&:focus': {
-        outline: 'none',
-        border: 'none'
     },
 
     '&.Mui-disabled': {
@@ -32,11 +26,6 @@ const StyledPageItem = muiStyled(PaginationItem)(({ theme }) => ({
     '&.MuiPaginationItem-ellipsis': {
         backgroundColor: 'transparent',
         fontWeight: 'bold',
-    },
-
-    '&.Mui-selected': {
-        backgroundColor: theme.palette.secondary.main,
-        color: theme.palette.secondary.contrastText,
     },
 }));
 //#endregion
@@ -63,26 +52,28 @@ const AppPagination = (props) => {
     }
 
     //Change amount display
-    const handleChangeSize = (event) => {if (onSizeChange) onSizeChange(event.target.value)}
+    const handleChangeSize = (event) => { if (onSizeChange) onSizeChange(event.target.value) }
 
     return (
         <Container>
             <Stack spacing={2} sx={{ my: 5 }}>
-                <Pagination count={count ? count : 0} shape="rounded"
+                <Pagination 
+                count={count ? count : 0} 
+                    shape="rounded"
                     page={page}
                     onChange={handlePageChange}
+                    color="secondary"
                     renderItem={(item) => (
-                        <StyledPageItem
-                            {...item}
-                        />
-                    )} />
+                        <StyledPageItem  {...item} />
+                    )}
+                />
             </Stack>
             <CustomInput
                 size="small"
                 select
                 value={pagination?.pageSize}
                 onChange={handleChangeSize}
-                sx={{ display: { xs: 'none', sm: 'block'}}}
+                sx={{ display: { xs: 'none', sm: 'block' } }}
             >
                 <MenuItem value={8}>Hiển thị 8</MenuItem>
                 <MenuItem value={16}>Hiển thị 16</MenuItem>

@@ -90,7 +90,8 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
                                     loading="lazy"
                                     component="img"
                                     sx={{ width: 50, height: 50 }}
-                                    image={product?.image}
+                                    image={`${product?.image}?size=small`}
+                                    alt={`${product?.title} Cart item`}
                                 />
                                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                     <CardContent >

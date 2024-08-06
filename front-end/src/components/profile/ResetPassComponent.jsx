@@ -152,8 +152,9 @@ const ResetPassComponent = ({ Instruction, Title, Wrapper, pending, setPending }
                                 color="secondary"
                                 onClick={handleChangePassword}
                                 disabled={!validReset || pending || changing}
+                                startIcon={<Check />}
                             >
-                                <Check sx={{ marginRight: '10px' }} />Xác nhận
+                                Xác nhận
                             </CustomButton>
                         </Box>
                     </Stack>

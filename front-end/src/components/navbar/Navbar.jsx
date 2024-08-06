@@ -5,9 +5,8 @@ import {
     Search as SearchIcon, ShoppingCart as ShoppingCartIcon, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
     Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, NotificationsActive as NotificationsActiveIcon, Storefront
 } from '@mui/icons-material';
-import { Stack, Badge, IconButton, Avatar, Box, Grid, TextField, AppBar, useScrollTrigger, Collapse, Toolbar } from '@mui/material';
+import { Stack, Badge, IconButton, Avatar, Box, Grid, TextField, AppBar, Collapse, useTheme, useMediaQuery } from '@mui/material';
 import { Link, useNavigate } from "react-router-dom";
-import PropTypes from 'prop-types';
 import useLogout from "../../hooks/useLogout";
 import useAuth from "../../hooks/useAuth";
 import NavDrawer from './NavDrawer';
@@ -16,9 +15,6 @@ import ProfilePopover from './ProfilePopover';
 import useCart from '../../hooks/useCart';
 
 //#region styled
-const Container = styled.div`
-`
-
 const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
@@ -26,51 +22,53 @@ const Wrapper = styled.div`
     justify-content: space-between;
     align-items: center;
 
-    @media (min-width: 768px) {
+    ${props => props.theme.breakpoints.up("sm_md")} {
         width: 750px;
         margin-left: auto;
         margin-right: auto;
     }
-    @media (min-width: 992px) {
+
+    ${props => props.theme.breakpoints.up("md_lg")} {
         width: 970px;
     }
-    @media (min-width: 1200px) {
+
+    ${props => props.theme.breakpoints.up("lg")} {
         width: 1170px;
     }
 `
 
 const TopHeader = styled.div`
     padding: 0 30px;
-    background-color: #ebebeb;
-    color: #424242;
-    display: none;
+    background-color: ${props => props.theme.palette.divider};
     justify-content: space-between;
-    align-items: center;
     font-size: 15px;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    margin-bottom: -1px;
 
-    @media (min-width: 900px) {
-        display: flex
+    ${props => props.theme.breakpoints.down("md")} {
+        display: none;
     }
 `
 
 const ContactContainer = styled.div`
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: flex-start;
 
-    @media (min-width: 900px) {
-        justify-content: flex-start;
+    ${props => props.theme.breakpoints.down("md")} {
+        justify-content: center;
     }
 `
 
 const SocialContainer = styled.div`
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: flex-end;
 
-    @media (min-width: 900px) {
-        justify-content: flex-end;
+    ${props => props.theme.breakpoints.down("md")} {
+        justify-content: center;
     }
 `
 
@@ -86,12 +84,12 @@ const Contact = styled.p`
     align-items: center;
     text-align: center;
     justify-content: center;
-    color: #424242;
+    color: ${props => props.theme.palette.text.secondary};
 `
 
 const Social = styled.p`
+    color: ${props => props.theme.palette.text.secondary};
     background-color: 'transparent';
-    color: #424242;
     font-size: 14px;
     display: flex;
     flex-wrap: wrap;
@@ -113,22 +111,22 @@ const Left = styled.div`
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
 
-    @media (min-width: 900px) {
-        justify-content: flex-start;
+    ${props => props.theme.breakpoints.down("md")} {
+        justify-content: space-between;
     }
 `
 
 const Right = styled.div`
     flex: 1;
-    display: none;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: flex-end;
+    display: flex;
 
-    @media (min-width: 900px) {
-        justify-content: flex-end;
-        display: flex;
+    ${props => props.theme.breakpoints.down("md")} {
+        justify-content: space-evenly;
+        display: none;
     }
 `
 
@@ -182,7 +180,6 @@ const Logo = styled.h2`
     white-space: nowrap;
     overflow: hidden;
     transition: all .3s ease;
-
 
     &.active {
         width: 110px;
@@ -245,31 +242,11 @@ const IconText = styled.p`
 `
 //#endregion
 
-//Hide top header bar onscroll
-function HideOnScroll(props) {
-    const { children, window } = props;
-
-    const trigger = useScrollTrigger({
-        disableHysteresis: true,
-        threshold: 100,
-        target: window ? window() : undefined,
-    });
-
-    return (
-        <Collapse className={"top-header"} in={!trigger} sx={{ display: { xs: 'none', md: 'block' } }}>
-            {children}
-        </Collapse>
-    );
-}
-
-HideOnScroll.propTypes = {
-    children: PropTypes.element.isRequired,
-    window: PropTypes.func,
-};
-
-const Navbar = (props) => {
+const Navbar = () => {
     //#region construct
     const { cartProducts } = useCart();
+    const theme = useTheme();
+    const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
 
     //Drawer open state
     const [openDrawer, setOpen] = useState(false);
@@ -316,7 +293,6 @@ const Navbar = (props) => {
     const handleSubmitSearch = (e) => {
         e.preventDefault();
         navigate(`/filters?keyword=${searchField}`);
-        setSearchField('');
     }
 
     //Hover search field
@@ -334,87 +310,87 @@ const Navbar = (props) => {
     //#endregion
 
     return (
-        <Container>
-            <AppBar sx={{ backgroundColor: 'background.default' }} position="fixed">
-                <Stack>
-                    <HideOnScroll {...props}>
-                        <TopHeader>
-                            <Grid container>
-                                <Grid item xs={12} md={6}>
-                                    <ContactContainer>
-                                        <Contact><PhoneIcon sx={{ fontSize: 18, marginRight: 1 }} />+8419130248</Contact>
-                                        <Contact><MailIcon sx={{ fontSize: 18, marginRight: 1 }} />haductrong01629@gmail.com</Contact>
-                                    </ContactContainer>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <SocialContainer>
-                                        <Social color="3B5999"><FacebookIcon sx={{ fontSize: 18 }} /></Social>
-                                        <Social color="FF0000"><YouTubeIcon sx={{ fontSize: 18 }} /></Social>
-                                        <Social color="E4405F"><InstagramIcon sx={{ fontSize: 18 }} /></Social>
-                                        <Social color="55ACEE"><TwitterIcon sx={{ fontSize: 18 }} /></Social>
-                                    </SocialContainer>
-                                </Grid>
-                            </Grid>
-                        </TopHeader>
-                    </HideOnScroll>
-                    <Wrapper>
-                        <Grid container>
-                            <Grid item xs={12} md={6.5} sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Left>
+        <>
+            <TopHeader>
+                <Grid container>
+                    <Grid item xs={12} md={6}>
+                        <ContactContainer>
+                            <Contact><PhoneIcon sx={{ fontSize: 18, marginRight: 1 }} />+8419130248</Contact>
+                            <Contact><MailIcon sx={{ fontSize: 18, marginRight: 1 }} />haductrong01629@gmail.com</Contact>
+                        </ContactContainer>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <SocialContainer>
+                            <Social color="3B5999"><FacebookIcon sx={{ fontSize: 18 }} /></Social>
+                            <Social color="FF0000"><YouTubeIcon sx={{ fontSize: 18 }} /></Social>
+                            <Social color="E4405F"><InstagramIcon sx={{ fontSize: 18 }} /></Social>
+                            <Social color="55ACEE"><TwitterIcon sx={{ fontSize: 18 }} /></Social>
+                        </SocialContainer>
+                    </Grid>
+                </Grid>
+            </TopHeader>
+            <AppBar sx={{ backgroundColor: 'background.default', marginBottom: 2 }} position="sticky">
+                <Wrapper>
+                    <Grid container>
+                        <Grid item xs={12} md={6.5} sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Left>
+                                {mobileMode &&
                                     <Box display={{ xs: 'flex', md: 'none' }} alignItems={'center'}>
                                         <IconButton onClick={toggleDrawer(true)}><MenuIcon sx={{ fontSize: 26 }} /></IconButton>
                                         <NavDrawer {...{ openDrawer, setOpen, toggleDrawer, username, roles, products: cartProducts, navigate, logout, ImageLogo }} />
                                     </Box>
-                                    <Link to={`/`}>
-                                        <Logo className={searchField || hover || focus ? 'active' : ''}>
-                                            <ImageLogo src="/bell.svg" className="logo" alt="RING! Logo" />RING!&nbsp; <p style={{ color: '#424242', margin: 0 }}>- BOOKSTORE</p>
-                                        </Logo>
+                                }
+                                <Link to={`/`}>
+                                    <Logo className={searchField || hover || focus ? 'active' : ''}>
+                                        <ImageLogo src="/bell.svg" className="logo" alt="RING! Logo" />RING!&nbsp; <p style={{ color: '#424242', margin: 0 }}>- BOOKSTORE</p>
+                                    </Logo>
+                                </Link>
+                                <Box sx={{ display: 'flex' }} flexDirection={{ xs: 'row-reverse', md: 'row' }}>
+                                    <Link to={'/filters'} title="Duyệt cửa hàng">
+                                        <StyledIconButton aria-label="explore"
+                                            sx={{
+                                                marginLeft: 2,
+                                                marginRight: 0,
+                                                zIndex: 10,
+                                            }}>
+                                            <Storefront sx={{ fontSize: '26px' }} />
+                                        </StyledIconButton>
                                     </Link>
-                                    <Box sx={{ display: 'flex' }} flexDirection={{ xs: 'row-reverse', md: 'row' }}>
-                                        <Link to={'/filters'} title="Duyệt cửa hàng">
-                                            <StyledIconButton aria-label="explore"
-                                                sx={{
-                                                    marginLeft: 2,
-                                                    marginRight: 0,
-                                                    zIndex: 10,
-                                                }}>
-                                                <Storefront sx={{ fontSize: '26px' }} />
-                                            </StyledIconButton>
-                                        </Link>
-                                        <Box
-                                            sx={{ display: 'flex', alignItems: 'center', marginLeft: '-40' }}
+                                    <Box
+                                        sx={{ display: 'flex', alignItems: 'center', marginLeft: '-40' }}
+                                    >
+                                        <Collapse
+                                            orientation="horizontal"
+                                            timeout={300}
+                                            easing={'ease'}
+                                            in={searchField || hover || focus}
+                                            collapsedSize={40}
                                         >
-                                            <Collapse
-                                                orientation="horizontal"
-                                                timeout={300}
-                                                easing={'ease'}
-                                                in={searchField || hover || focus}
-                                                collapsedSize={40}
-                                            >
-                                                <form onSubmit={handleSubmitSearch}>
-                                                    <SearchInput
-                                                        className={searchField ? 'active' : ''}
-                                                        placeholder='Tìm kiếm... '
-                                                        onMouseEnter={handleMouseEnter}
-                                                        onMouseLeave={handlOnMouseLeave}
-                                                        onFocus={() => setFocus(true)}
-                                                        onBlur={() => setFocus(false)}
-                                                        onChange={(e) => setSearchField(e.target.value)}
-                                                        value={searchField}
-                                                        id="search"
-                                                        size="small"
-                                                        width={50}
-                                                        InputProps={{
-                                                            endAdornment: <SearchIcon style={{ color: "gray" }} />
-                                                        }}
-                                                    />
-                                                </form>
-                                            </Collapse>
-                                        </Box>
+                                            <form onSubmit={handleSubmitSearch}>
+                                                <SearchInput
+                                                    className={searchField ? 'active' : ''}
+                                                    placeholder='Tìm kiếm... '
+                                                    onMouseEnter={handleMouseEnter}
+                                                    onMouseLeave={handlOnMouseLeave}
+                                                    onFocus={() => setFocus(true)}
+                                                    onBlur={() => setFocus(false)}
+                                                    onChange={(e) => setSearchField(e.target.value)}
+                                                    value={searchField}
+                                                    id="search"
+                                                    size="small"
+                                                    width={50}
+                                                    InputProps={{
+                                                        endAdornment: <SearchIcon style={{ color: "gray" }} />
+                                                    }}
+                                                />
+                                            </form>
+                                        </Collapse>
                                     </Box>
-                                </Left>
-                            </Grid>
-                            <Grid item xs={12} md={5.5}>
+                                </Box>
+                            </Left>
+                        </Grid>
+                        {!mobileMode &&
+                            <Grid item xs={12} md={5.5} sx={{ display: { xs: 'none', md: 'flex' } }}>
                                 <Right>
                                     <NavItem>
                                         <Stack spacing={1} direction="row" sx={{ color: 'action.active' }} alignItems={'center'}>
@@ -473,12 +449,11 @@ const Navbar = (props) => {
                                     </NavItem>
                                 </Right>
                             </Grid>
-                        </Grid>
-                    </Wrapper>
-                </Stack>
+                        }
+                    </Grid>
+                </Wrapper>
             </AppBar>
-            <Toolbar sx={{ marginTop: { xs: 0, md: '35px' }, marginBottom: '9px' }} />
-        </Container>
+        </>
     )
 }
 

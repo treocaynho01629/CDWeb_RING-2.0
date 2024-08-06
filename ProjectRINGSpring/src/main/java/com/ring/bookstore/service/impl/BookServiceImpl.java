@@ -124,7 +124,7 @@ public class BookServiceImpl implements BookService {
 		return bookDetailDTO;
 	}
 	
-	//Aadd book (SELLER)
+	//Add book (SELLER)
 	@Transactional
 	public Book addBook(BookRequest request, MultipartFile file, Account seller) throws IOException {
 		//Image validation

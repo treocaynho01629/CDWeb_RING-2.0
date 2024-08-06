@@ -5,10 +5,7 @@ import Footer from "./Footer";
 import ScrollToTop from "./ScrollToTop";
 
 const LayoutWrapper = styled.div`
-    overflow-x: hidden;
-
     @media (min-width: 768px) {
-        overflow-x: visible;
         padding-right: 15px;
         padding-left: 15px;
         margin-right: auto;

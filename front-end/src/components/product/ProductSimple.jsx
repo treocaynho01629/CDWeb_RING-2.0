@@ -76,7 +76,9 @@ const ProductSimple = ({ book }) => {
         return (
             <Container>
                 <Link to={`/product/${book?.id}`} style={{ color: 'inherit' }}>
-                    <LazyLoadImage src={book?.image}
+                    <LazyLoadImage 
+                        src={`${book?.image}?size=small`}
+                        alt={`${book?.title} Thumbnail`}
                         width={'90%'}
                         height={250}
                         style={{
@@ -96,8 +98,9 @@ const ProductSimple = ({ book }) => {
                     variant="outlined"
                     onClick={() => handleAddToCart(book)}
                     sx={{ marginTop: '10px', marginBottom: '15px', padding: '6px 10px' }}
+                    startIcon={<ShoppingCartIcon/>}
                 >
-                    <ShoppingCartIcon style={{ fontSize: 14 }} />&nbsp;THÊM VÀO GIỎ
+                    THÊM VÀO GIỎ
                 </CustomButton>
             </Container>
         )
@@ -110,11 +113,13 @@ const ProductSimple = ({ book }) => {
                     <Skeleton variant="text" sx={{ fontSize: '16px' }} width="100%" />
                 </Info>
                 <CustomButton
+                    disabled
                     size="small"
                     variant="outlined"
                     sx={{ marginTop: '10px', marginBottom: '15px', padding: '6px 10px' }}
+                    startIcon={<ShoppingCartIcon/>}
                 >
-                    <ShoppingCartIcon style={{ fontSize: 14 }} />&nbsp;THÊM VÀO GIỎ
+                    THÊM VÀO GIỎ
                 </CustomButton>
             </Container>
         )

@@ -154,8 +154,13 @@ const AddressComponent = ({ pending, setPending }) => {
         <Box display={'flex'} alignItems={'center'}>
           <LocationOn />&nbsp;ĐỊA CHỈ CỦA BẠN
         </Box>
-        <CustomButton variant="contained" color="secondary" onClick={() => handleOpen()}>
-          Thêm địa chỉ <AddHome />
+        <CustomButton
+          variant="contained"
+          color="secondary"
+          onClick={() => handleOpen()}
+          endIcon={<AddHome />}
+        >
+          Thêm địa chỉ
         </CustomButton>
       </Title>
       {

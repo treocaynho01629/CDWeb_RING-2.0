@@ -260,8 +260,9 @@ const LoginTab = ({ pending, setPending }) => {
                         size="large"
                         aria-label="submit sending recover email"
                         onClick={handleForgotPassword}
+                        startIcon={<CheckIcon />}
                     >
-                        <CheckIcon sx={{ marginRight: '5px' }} />Gửi
+                        Gửi
                     </CustomButton>
                 </DialogActions>
             </Dialog>

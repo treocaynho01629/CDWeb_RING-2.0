@@ -186,8 +186,9 @@ const OrdersList = ({ Title }) => {
                                             paddingRight: '7px',
                                             whiteSpace: 'nowrap'
                                         }}
+                                        startIcon={<Storefront/>}
                                     >
-                                        <Storefront fontSize="small" />&nbsp;Xem Shop
+                                        Xem Shop
                                     </CustomButton>
                                 </Link>
                                 <Link to={`/profile/orders/${order.id}--${detail.id}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
