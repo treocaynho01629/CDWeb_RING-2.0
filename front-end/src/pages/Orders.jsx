@@ -4,6 +4,7 @@ import { Box, Skeleton, CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
+import useTitle from '../hooks/useTitle';
 
 const OrdersList = lazy(() => import('../components/profile/OrdersList'));
 
@@ -76,14 +77,9 @@ const tempLoad = (
 const Orders = () => {
     const { id } = useParams();
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        document.title = 'RING! - Đơn hàng';
-    }, [])
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [id])
+    //Set title
+    useTitle('Đơn hàng');
+    useEffect(() => { window.scrollTo(0, 0) }, [id])
 
     return (
         <Wrapper>

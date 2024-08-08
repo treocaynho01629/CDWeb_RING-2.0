@@ -1,18 +1,16 @@
-import { useState, useEffect } from "react";
-
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
-
-import TableBook from '../../components/dashboard/TableBooks'
-import TableAccounts from "../../components/dashboard/TableAccounts";
-import TableReviews from "../../components/dashboard/TableReviews";
-import TableReceipts from "../../components/dashboard/TableReceipts";
-import ChartAccounts from "../../components/dashboard/ChartAccounts";
-import ChartSales from "../../components/dashboard/ChartSales";
-
+import { useState, useEffect } from "react";
 import { AutoStories as AutoStoriesIcon, Group as GroupIcon, Receipt as ReceiptIcon, Try as TryIcon } from "@mui/icons-material";
 import { Grid, Paper } from '@mui/material';
+import TableBook from '../../components/dashboard/table/TableBooks'
+import TableAccounts from "../../components/dashboard/table/TableAccounts";
+import TableReviews from "../../components/dashboard/table/TableReviews";
+import TableReceipts from "../../components/dashboard/table/TableReceipts";
+import ChartAccounts from "../../components/dashboard/chart/ChartAccounts";
+import ChartSales from "../../components/dashboard/chart/ChartSales";
 import useAuth from "../../hooks/useAuth";
+import useTitle from "../../hooks/useTitle";
 
 //#region preStyled
 const CountContainer = muiStyled(Paper)(({ theme }) => ({
@@ -41,12 +39,10 @@ const Dashboard = () => {
   const [reviewCount, setReviewCount] = useState(0);
   const [receiptCount, setReceiptCount] = useState(0);
   const { roles, username } = useAuth();
-  const [admin, setAdmin] = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
+  const [admin, setAdmin] = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.title = `RING! - Dashboard`;
-  }, [])
+  //Set title
+  useTitle('RING! - Dashboard');
 
   return (
     <>

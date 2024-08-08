@@ -6,7 +6,7 @@ import {
     Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, NotificationsActive as NotificationsActiveIcon, Storefront
 } from '@mui/icons-material';
 import { Stack, Badge, IconButton, Avatar, Box, Grid, TextField, AppBar, Collapse, useTheme, useMediaQuery } from '@mui/material';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import useLogout from "../../hooks/useLogout";
 import useAuth from "../../hooks/useAuth";
 import NavDrawer from './NavDrawer';
@@ -245,6 +245,7 @@ const IconText = styled.p`
 const Navbar = () => {
     //#region construct
     const { cartProducts } = useCart();
+    const location = useLocation();
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -337,7 +338,8 @@ const Navbar = () => {
                                 {mobileMode &&
                                     <Box display={{ xs: 'flex', md: 'none' }} alignItems={'center'}>
                                         <IconButton onClick={toggleDrawer(true)}><MenuIcon sx={{ fontSize: 26 }} /></IconButton>
-                                        <NavDrawer {...{ openDrawer, setOpen, toggleDrawer, username, roles, products: cartProducts, navigate, logout, ImageLogo }} />
+                                        <NavDrawer {...{ openDrawer, setOpen, toggleDrawer, username, roles, location,
+                                            products: cartProducts, navigate, logout, ImageLogo }} />
                                     </Box>
                                 }
                                 <Link to={`/`}>
@@ -438,7 +440,7 @@ const Navbar = () => {
                                                     <ProfilePopover {...{ open, anchorEl, handleClose: handleProfileClose, navigate, roles, logout }} />
                                                 </div>
                                             ) : (
-                                                <Link to={'/login'} title="Đăng nhập">
+                                                <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">
                                                     <StyledIconButton aria-label="login">
                                                         <LockIcon />
                                                         <IconText className="username">Đăng nhập</IconText>

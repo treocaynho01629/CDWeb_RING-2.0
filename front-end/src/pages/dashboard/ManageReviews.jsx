@@ -1,14 +1,12 @@
-import { useState, useEffect } from "react";
 
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
-
-import TableReviews from "../../components/dashboard/TableReviews";
-
-import TryIcon from '@mui/icons-material/Receipt';
+import { useState } from "react";
 import { Grid, Paper } from '@mui/material';
 import { useNavigate } from "react-router-dom"
-
+import TableReviews from "../../components/dashboard/TableReviews";
+import TryIcon from '@mui/icons-material/Receipt';
+import useTitle from '../../hooks/useTitle';
 
 //#region preStyled
 const CountContainer = muiStyled(Paper)(({ theme }) => ({
@@ -35,10 +33,8 @@ const ManageReviews = () => {
   const [reviewCount, setReviewCount] = useState(0);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.title = `RING! - Đánh giá`;
-  }, [])
+  //Set title
+  useTitle('RING! - Đánh giá');
 
   return (
     <>

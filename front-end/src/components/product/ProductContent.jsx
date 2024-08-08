@@ -367,6 +367,11 @@ const BuyButton = styled.button`
         color: gray;
     };
 
+    &:disabled {
+        background-color: gray;
+        color: darkslategray;
+    }
+
     &:focus {
         border: none;
         outline: none;
@@ -464,8 +469,8 @@ const ProductContent = ({ book, handleTabChange }) => {
                                     </TotalRatingContainer>
                                     <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
                                         <PriceContainer>
-                                            <Skeleton variant="text" sx={{ fontSize: '24px', marginY: '20px' }} width="35%" />&nbsp;
-                                            <Skeleton variant="text" sx={{ fontSize: '18px', marginY: '20px' }} width="25%" />
+                                            <Skeleton variant="text" sx={{ fontSize: '24px', marginY: '20px' }} width={105} />&nbsp;
+                                            <Skeleton variant="text" sx={{ fontSize: '18px', marginY: '20px' }} width={90} />
                                         </PriceContainer>
                                         <Box display={{ xs: 'flex', sm: 'none' }} alignItems={'center'} justifyContent={'space-between'}>
                                             <strong style={{ paddingRight: 10 }}>(~) Đánh giá</strong>
@@ -490,7 +495,7 @@ const ProductContent = ({ book, handleTabChange }) => {
                                             <Skeleton variant="text" sx={{ fontSize: '14px' }} />
                                         </Description>
                                         <Detail>
-                                            <Skeleton variant="text" sx={{ fontSize: '14px' }} />
+                                            <Link onClick={(e) => handleChangeTab(e, "detail")}>Xem thêm...</Link>
                                         </Detail>
                                     </DetailContainer>
                                 </div>

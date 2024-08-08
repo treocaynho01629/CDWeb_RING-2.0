@@ -3,7 +3,7 @@ import { BarChart, CartesianGrid, Pie, PieChart, Label,
     XAxis, YAxis, Tooltip, Legend, Bar, Cell, ResponsiveContainer } from 'recharts'
 import { Grid, Paper } from '@mui/material'
 import { BarChart as BarChartIcon, PieChart as PieChartIcon } from '@mui/icons-material';
-import usePrivateFetch from '../../hooks/usePrivateFetch'
+import usePrivateFetch from '../../../hooks/usePrivateFetch'
   
 const ACCOUNTS_URL = 'api/accounts/top-accounts';
 const SELLERS_URL = 'api/accounts/top-sellers';

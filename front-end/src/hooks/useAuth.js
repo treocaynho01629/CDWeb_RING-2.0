@@ -12,6 +12,6 @@ const useAuth = () => {
         return { token, id, username: sub, roles }
     }
 
-    return { token, id: null, username: null, isAdmin: null, persist }
+    return { token, id: null, username: null, roles: null, persist }
 }
 export default useAuth

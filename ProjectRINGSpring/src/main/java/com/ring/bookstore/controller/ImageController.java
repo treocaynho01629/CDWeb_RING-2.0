@@ -137,7 +137,7 @@ public class ImageController {
 					.body(image.getImage()); //Return image
 		} catch (ImageResizerException e) {
 			headers.setContentType(MediaType.TEXT_HTML);
-			return new ResponseEntity(e.getMessage(), headers, e.getStatusCode());
+			return new ResponseEntity(e.getMessage(), headers, e.getStatus());
 		}
 	}
 	

@@ -101,6 +101,12 @@ const CustomArrow = styled.button`
     right: 1%;
   }
 `
+
+const SlideItemContainer = styled.div`
+    position: relative;
+    min-height: 450px;
+    max-height: 800px;
+`
 //#endregion
 
 const responsive = {
@@ -149,8 +155,8 @@ function Item({ book }) {
     };
 
     return (
-        <div style={{ minHeight: '450px', maxHeight: '800px' }}>
-            <Grid container sx={{ alignItems: 'center' }}>
+        <SlideItemContainer>
+            <Grid container sx={{ alignItems: 'center', position: 'relative' }}>
                 <Grid item xs={12} md={5}
                     sx={{
                         marginBottom: { xs: '100px', md: 0 }
@@ -160,13 +166,13 @@ function Item({ book }) {
                         ?
                         <Link to={`/product/${book.id}`}>
                             <ImgContainer>
-                                <LazyLoadImage 
+                                <LazyLoadImage
                                     src={book.image}
                                     srcSet={`${book.images}?size=medium 350w, ${book.image} 600w`}
                                     sizes='400px'
                                     height={400}
-                                    alt={`${book.title} Big product item`}
                                     width={'100%'}
+                                    alt={`${book.title} Big product item`}
                                     style={{
                                         objectFit: 'contain',
                                         aspectRatio: '1/1'
@@ -176,7 +182,11 @@ function Item({ book }) {
                         </Link>
                         :
                         <ImgContainer>
-                            <Skeleton variant="rectangular" width={'100%'} height={400} sx={{ aspectRatio: '1/1' }} />
+                            <Skeleton 
+                            variant="rectangular" 
+                            height={400} 
+                            sx={{ width: {xs: '80%', md: '100%'} }} 
+                            />
                         </ImgContainer>
                     }
                 </Grid>
@@ -207,16 +217,24 @@ function Item({ book }) {
                         :
                         <InfoContainer>
                             <Skeleton variant="text" sx={{ fontSize: '30px' }} />
-                            <Skeleton variant="text" sx={{ fontSize: '30px' }} />
+                            <br/>
                             <Skeleton variant="text" sx={{ fontSize: '18px' }} />
                             <Skeleton variant="text" sx={{ fontSize: '18px' }} />
-                            <Skeleton variant="text" sx={{ fontSize: '18px' }} />
-                            <Skeleton variant="rectangular" width={109} height={39} />
+                            <Skeleton variant="text" sx={{ fontSize: '18px' }} width={'50%'} />
+                            <br/>
+                            <CustomButton
+                                disabled
+                                variant="contained"
+                                color="secondary"
+                                size="large"
+                            >
+                                Mua ngay
+                            </CustomButton>
                         </InfoContainer>
                     }
                 </Grid>
             </Grid>
-        </div>
+        </SlideItemContainer>
     )
 }
 

@@ -1,18 +1,12 @@
-import React, { useState, useEffect } from 'react';
-
 import styled from 'styled-components'
-import PropTypes from 'prop-types';
-import { styled as muiStyled } from '@mui/material/styles';
-
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel
-, Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch, Collapse} from '@mui/material';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
-import { Receipt as ReceiptIcon, KeyboardArrowDown as KeyboardArrowDownIcon, KeyboardArrowUp as KeyboardArrowUpIcon} from '@mui/icons-material';
+import { useState, useEffect, Fragment } from 'react';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch, Collapse } from '@mui/material';
+import { Receipt as ReceiptIcon, KeyboardArrowDown as KeyboardArrowDownIcon, KeyboardArrowUp as KeyboardArrowUpIcon } from '@mui/icons-material';
 import { visuallyHidden } from '@mui/utils';
-import { Link } from "react-router-dom";
-
-import usePrivateFetch from '../../hooks/usePrivateFetch'
-import useAxiosPrivate from '../../hooks/useAxiosPrivate';
+import { Link, useSearchParams } from "react-router-dom";
+import { useGetOrdersQuery } from '../../../features/orders/orderApiSlice';
+import PropTypes from 'prop-types';
+import CustomProgress from '../../custom/CustomProgress';
 
 //#region preStyled
 const ItemTitle = styled.p`
@@ -66,19 +60,6 @@ const ItemAddress = styled.p`
     }
 `
 
-const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
-  borderRadius: 0,
-  [`&.${linearProgressClasses.colorPrimary}`]: {
-      backgroundColor: 'white',
-  },
-  [`& .${linearProgressClasses.bar}`]: {
-      borderRadius: 0,
-      backgroundColor: '#63e399',
-  },
-}));
-
-const RECEIPTS_URL = 'api/orders';
-
 const headCells = [
   {
     id: 'user.userName',
@@ -122,30 +103,28 @@ const headCells = [
   }
 ];
 
-function EnhancedTableHead(props) {
-  const { order, orderBy, numSelected, rowCount, onRequestSort, selectedAll } =
-    props;
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
+function EnhancedTableHead({ order, orderBy, numSelected, rowCount, onRequestSort, selectedAll }) {
+  const createSortHandler = (property) => (e) => {
+    onRequestSort(e, property);
   };
 
   return (
     <TableHead>
-      <TableRow sx={{height: '58px'}}>
-        <TableCell/>
+      <TableRow sx={{ height: '58px' }}>
+        <TableCell />
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
             align={headCell.align}
             padding={headCell.disablePadding ? 'none' : 'normal'}
-            style={{ width: headCell.width}}
+            style={{ width: headCell.width }}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             {headCell.sortable ? (
               <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
+                active={orderBy === headCell.id}
+                direction={orderBy === headCell.id ? order : 'asc'}
+                onClick={createSortHandler(headCell.id)}
               >
                 {headCell.label}
                 {orderBy === headCell.id ? (
@@ -170,9 +149,7 @@ EnhancedTableHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
 };
 
-function EnhancedTableToolbar(props) {
-  const { numSelected } = props;
-
+function EnhancedTableToolbar({ numSelected }) {
   return (
     <Toolbar
       sx={{
@@ -185,12 +162,12 @@ function EnhancedTableToolbar(props) {
       }}
     >
       <Typography
-        sx={{ flex: '1 1 100%' , fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center'}}
+        sx={{ flex: '1 1 100%', fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center' }}
         variant="h6"
         id="tableTitle"
         component="div"
       >
-        <ReceiptIcon sx={{color: 'white', marginRight: '10px'}}/>
+        <ReceiptIcon sx={{ color: 'white', marginRight: '10px' }} />
         Danh sách đơn hàng
       </Typography>
     </Toolbar>
@@ -202,16 +179,15 @@ EnhancedTableToolbar.propTypes = {
   selectedAll: PropTypes.bool.isRequired,
 };
 
-function Row(props) {
-  const { row } = props;
+function OrderRow({ order }) {
   const [open, setOpen] = useState(false);
 
-  useEffect(() =>{
+  useEffect(() => {
     setOpen(false);
-  }, [row])
+  }, [order])
 
   return (
-    <React.Fragment>
+    <Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>
           <IconButton
@@ -222,11 +198,11 @@ function Row(props) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell align="left"><ItemTitle>{row.userName}</ItemTitle></TableCell>
-        <TableCell align="left"><ItemTitle>{row.email}</ItemTitle></TableCell>
-        <TableCell align="left"><ItemAddress>{row.address}</ItemAddress></TableCell>
-        <TableCell align="left"><ItemDate>{row.date}</ItemDate></TableCell>
-        <TableCell align="right">{Math.round(row.total).toLocaleString()} đ</TableCell>
+        <TableCell align="left"><ItemTitle>{order.userName}</ItemTitle></TableCell>
+        <TableCell align="left"><ItemTitle>{order.email}</ItemTitle></TableCell>
+        <TableCell align="left"><ItemAddress>{order.address}</ItemAddress></TableCell>
+        <TableCell align="left"><ItemDate>{order.date}</ItemDate></TableCell>
+        <TableCell align="right">{Math.round(order.total).toLocaleString()} đ</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -245,7 +221,7 @@ function Row(props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.orderDetails.map((detail, index) => (
+                  {order.orderDetails.map((detail, index) => (
                     <TableRow key={index}>
                       <TableCell component="th" scope="row">
                         {detail.bookId}
@@ -263,92 +239,140 @@ function Row(props) {
           </Collapse>
         </TableCell>
       </TableRow>
-    </React.Fragment>
-  );
+    </Fragment>
+  )
 }
 //#endregion
 
-export default function TableReceipts(props) {
+export default function TableReceipts({ setReceiptCount, mini }) {
   //#region construct
-  const { setReceiptCount, mini, id } = props;
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('id');
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selected, setSelected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
-  const [page, setPage] = useState(0);
   const [dense, setDense] = useState(true);
-  const [rowsPerPage, setRowsPerPage] = useState(mini ? 5 : 10);
-  const { loading, data: rows , refetch} = usePrivateFetch(RECEIPTS_URL + (id ? `/book/${id}` : "")
-    + "?pageNo=" + page
-    + "&pSize=" + rowsPerPage
-    + "&sortDir=" + order
-    + "&sortBy=" + orderBy);
+  const [pagination, setPagination] = useState({
+    currPage: searchParams.get("pageNo") ? searchParams.get("pageNo") - 1 : 0,
+    pageSize: searchParams.get("pSize") ?? (mini ? 5 : 10),
+    totalPages: 0,
+    sortBy: searchParams.get("sortBy") ?? "id",
+    sortDir: searchParams.get("sortDir") ?? "asc",
+  })
 
-  useEffect(()=>{
-    if (!loading && setReceiptCount){
-      setReceiptCount(rows?.totalElements);
+  //Fetch receipts
+  const { data, isLoading, isSuccess, isError } = useGetOrdersQuery({
+    page: pagination?.currPage,
+    size: pagination?.pageSize,
+    sortBy: pagination?.sortBy,
+    sortDir: pagination?.sortDir,
+  });
+
+  //Set pagination after fetch
+  useEffect(() => {
+    if (!isLoading && isSuccess && data) {
+      setPagination({
+        ...pagination,
+        totalPages: data?.info?.totalPages,
+        currPage: data?.info?.currPage,
+        pageSize: data?.info?.pageSize
+      });
     }
-  }, [loading]);
+  }, [data])
 
-  const handleRequestSort = (event, property) => {
+  const handleChangePage = (page) => {
+    if (page == 1) {
+      searchParams.delete("pageNo");
+      setSearchParams(searchParams);
+    } else {
+      searchParams.set("pageNo", page);
+      setSearchParams(searchParams);
+    }
+    setPagination({ ...pagination, currPage: page - 1 });
+  };
+
+  // useEffect(() => {
+  //   if (!loading && setBookCount) {
+  //     setBookCount(rows?.totalElements);
+  //   }
+  // }, [loading]);
+
+  const handleChangeRowsPerPage = (e) => {
+    const newValue = parseInt(e.target.value, 10);
+    handleChangePage(1);
+    if (newValue == 16) {
+      searchParams.delete("pSize");
+      setSearchParams(searchParams);
+    } else {
+      searchParams.set("pSize", newValue);
+      setSearchParams(searchParams);
+    }
+    setPagination({ ...pagination, pageSize: newValue });
+  };
+
+  const handleRequestSort = (property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleChangeDense = (e) => {
+    setDense(e.target.checked);
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
-
-  const emptyRows = Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements);
+  const emptyRows = Math.max(0, (pagination.currPage) * pagination.pageSize - data?.info?.totalElements);
   //#endregion
+
+  let ordersRows;
+
+  if (isLoading) {
+    ordersRows = (
+      <TableRow>
+        <TableCell
+          scope="row"
+          padding="none"
+          align="center"
+          colSpan={6}>
+        </TableCell>
+      </TableRow>
+    )
+  } else if (isSuccess) {
+    const { ids, entities } = data;
+
+    ordersRows = ids?.length
+      ? ids?.map((id, index) => {
+        const order = entities[id];
+
+        return (
+          <OrderRow key={index} order={order} />
+        )
+      })
+      :
+      <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>Không tìm thấy sản phẩm nào!</Box>
+  } else if (isError) {
+    ordersRows = (
+      <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>{error}</Box>
+    )
+  }
 
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: '2px' }}>
-        <EnhancedTableToolbar 
-        numSelected={selected.length} 
-        selectedAll={selectedAll} 
-        refetch={refetch}/>
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          selectedAll={selectedAll} />
         <TableContainer sx={{ maxHeight: mini ? 330 : 500 }}>
           <Table
             sx={{ minWidth: mini ? 500 : 750 }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
-            <EnhancedTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={rows?.totalElements}
-              selectedAll={selectedAll}
-            />
+            <EnhancedTableHead {...{
+              numSelected: selected.length, pagination, rowCount: data?.info?.totalElements,
+              selectedAll, onRequestSort: handleRequestSort
+            }} />
             <TableBody>
-              {rows?.content?.map((row, index) => (
-                <Row key={index} row={row} />
-              ))}
-              {loading && (
-                <TableRow>
-                  <TableCell 
-                  scope="row"
-                  padding="none"
-                  align="center"
-                  colSpan={6}>
-                  </TableCell>
-                </TableRow>
-              )}
+              {ordersRows}
               {emptyRows > 0 && (
-                <TableRow style={{height: (dense ? 63 : 83) * emptyRows}}>
+                <TableRow style={{ height: (dense ? 63 : 83) * emptyRows }}>
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
@@ -360,32 +384,34 @@ export default function TableReceipts(props) {
           component="div"
           labelRowsPerPage={"Hiển thị"}
           labelDisplayedRows={function defaultLabelDisplayedRows({ from, to, count }) { return `${from}–${to} trong số ${count !== -1 ? count : `Có hơn ${to}`}`; }}
-          count={rows?.totalElements ? rows?.totalElements : 0}
-          rowsPerPage={rowsPerPage}
-          page={page}
+          count={data?.info?.totalElements ?? 0}
+          rowsPerPage={pagination?.pageSize}
+          page={pagination?.currPage}
           showFirstButton
           showLastButton
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <Box sx={{height: '10px'}}>
-        {loading && (<CustomLinearProgress/>)}  
+      <Box sx={{ height: '10px' }}>
+        {isLoading && (<CustomProgress color="secondary" />)}
       </Box>
-      <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <FormControlLabel
-          control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
-            color: '#63e399',
-          },
-          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-            backgroundColor: '#63e399',
-          },}} 
-          checked={dense} onChange={handleChangeDense} />}
+          control={<Switch sx={{
+            '& .MuiSwitch-switchBase.Mui-checked': {
+              color: '#63e399',
+            },
+            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+              backgroundColor: '#63e399',
+            },
+          }}
+            checked={dense} onChange={handleChangeDense} />}
           label="Thu gọn"
         />
         {mini ?
-        <Link to={'/manage-receipts'} style={{display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10}}>Xem tất cả</Link>
-        : null
+          <Link to={'/manage-receipts'} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10 }}>Xem tất cả</Link>
+          : null
         }
       </Box>
     </Box>

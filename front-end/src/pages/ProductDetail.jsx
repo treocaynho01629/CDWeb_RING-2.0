@@ -58,9 +58,7 @@ const ProductDetail = () => {
 
     if (isError && error?.status === 404) {
         product = <Navigate to={'/missing'} />
-    } else if (isLoading || isError) {
-        product = <ProductContent />
-    } else if (isSuccess) {
+    } else {
         product = <ProductContent {...{ book: data, handleTabChange }} />
     }
 

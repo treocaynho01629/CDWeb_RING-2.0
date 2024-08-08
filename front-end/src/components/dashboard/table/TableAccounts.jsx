@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 
 import styled from 'styled-components'
 import PropTypes from 'prop-types';
@@ -7,54 +7,24 @@ import { styled as muiStyled } from '@mui/material/styles';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel
 , Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch} from '@mui/material';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
-import { Try as TryIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Group as GroupIcon, Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+
 import { visuallyHidden } from '@mui/utils';
 import { Link } from "react-router-dom";
+import useAuth from "../../../hooks/useAuth";
 
-import usePrivateFetch from '../../hooks/usePrivateFetch'
-import useAxiosPrivate from '../../hooks/useAxiosPrivate';
+import usePrivateFetch from '../../../hooks/usePrivateFetch'
+import useAxiosPrivate from '../../../hooks/useAxiosPrivate';
+
+const AddAccountDialog = lazy(() => import('../dialog/AddAccountDialog'));
+const EditAccountDialog = lazy(() => import('../dialog/EditAccountDialog'));
 
 //#region preStyled
 const ItemTitle = styled.p`
     font-size: 12px;
     text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    min-width: 100px;
-	
-	@supports (-webkit-line-clamp: 1) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: initial;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-    }
-`
-
-const ItemDate = styled.p`
-    font-size: 12px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    min-width: 150px;
-	
-	@supports (-webkit-line-clamp: 1) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: initial;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-    }
-`
-
-const ItemContent = styled.p`
-    font-size: 12px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    max-width: 500px;
+	overflow: hidden;
+	white-space: nowrap;
 	
 	@supports (-webkit-line-clamp: 1) {
       overflow: hidden;
@@ -87,49 +57,33 @@ const headCells = [
     label: 'ID',
   },
   {
-    id: 'user.userName',
+    id: 'userName',
     align: 'left',
     width: '200px',
     disablePadding: false,
     sortable: true,
-    label: 'Thành viên',
+    label: 'Tên đăng nhập',
   },
   {
-    id: 'rContent',
+    id: 'email',
     align: 'left',
-    width: '350px',
+    width: '250px',
     disablePadding: false,
     sortable: true,
-    label: 'Nội dung',
+    label: 'Email',
   },
   {
-    id: 'rating',
+    id: 'authorities',
     align: 'right',
-    width: '70px',
+    width: '150px',
     disablePadding: false,
-    sortable: true,
-    label: 'Đánh giá',
-  },
-  {
-    id: 'rDate',
-    align: 'left',
-    width: '220px',
-    disablePadding: false,
-    sortable: true,
-    label: 'Ngày',
-  },
-  {
-    id: 'book.id',
-    align: 'right',
-    width: '70px',
-    disablePadding: false,
-    sortable: true,
-    label: 'Sản phẩm',
+    sortable: false,
+    label: 'Quyền',
   },
   {
     id: 'action',
     align: 'right',
-    width: '70px',
+    width: '250px',
     disablePadding: false,
     sortable: false,
     label: 'Hành động',
@@ -169,7 +123,7 @@ function EnhancedTableHead(props) {
             key={headCell.id}
             align={headCell.align}
             padding={headCell.disablePadding ? 'none' : 'normal'}
-            style={{ width: headCell.width}}
+            style={{ width: headCell.width }}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             {headCell.sortable ? (
@@ -202,13 +156,18 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, selectedAll, handleDeleteMultiples } = props;
+  const { numSelected, selectedAll, refetch, handleDeleteMultiples } = props;
+  const [openNew, setOpenNew] = useState(false);
  
+  const handleClickOpenNew = () => {
+    setOpenNew(true);
+  };
+
   const handleDelete = () => {
     if (handleDeleteMultiples) {
       handleDeleteMultiples();
     }
-  };
+  }
 
   return (
     <Toolbar
@@ -227,8 +186,8 @@ function EnhancedTableToolbar(props) {
           variant="h6"
           component="div"
         >
-        <TryIcon sx={{marginRight: '10px'}}/>
-        {selectedAll ? "Chọn tất cả" : `Chọn ${numSelected} đánh giá`}
+        <GroupIcon sx={{marginRight: '10px'}}/>
+        {selectedAll ? "Chọn tất cả" : `Chọn ${numSelected} thành viên`}
         </Typography>
       ) : (
         <Typography
@@ -237,18 +196,40 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          <TryIcon sx={{color: 'white', marginRight: '10px'}}/>
-          Danh sách đánh giá
+          <GroupIcon sx={{color: 'white', marginRight: '10px'}}/>
+          Danh sách thành viên
         </Typography>
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Xoá đánh giá đã chọn">
+        <Tooltip title="Xoá thành viên đã chọn">
           <IconButton onClick={handleDelete}>
             <DeleteIcon sx={{color: 'white', "&:hover": {transform: 'scale(1.05)', color: '#e66161'}}} />
           </IconButton>
         </Tooltip>
-      ) : (<></>)}
+      ) : (
+      <>
+        <Tooltip title="Thêm thành viên mới">
+          <IconButton sx={{
+            "&:focus": {
+              outline: 'none',
+            }}}
+          onClick={handleClickOpenNew}>
+          <AddIcon sx={{color: 'white'}}/>
+          </IconButton>
+        </Tooltip>
+      </>
+      )}
+
+      <Suspense fallback={<></>}>
+        { openNew ?
+          <AddAccountDialog 
+          open={openNew} 
+          setOpen={setOpenNew}
+          refetch={refetch}/>
+          : null
+        }
+      </Suspense>
     </Toolbar>
   );
 }
@@ -259,20 +240,24 @@ EnhancedTableToolbar.propTypes = {
 };
 //#endregion
 
-const REVIEWS_URL = 'api/reviews';
+const ACCOUNTS_URL = 'api/accounts';
 
-export default function TableReviews(props) {
+export default function TableAccounts(props) {
   //#region construct
-  const { setReviewCount, id, userId, mini } = props;
+  const { setAccCount, mini } = props;
+  const { roles } = useAuth();
+  const [id, setId] = useState([]);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('id');
   const [selected, setSelected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(true);
+  const [openEdit, setOpenEdit] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(mini ? 5 : 10);
-  const { loading, data: rows , refetch} = usePrivateFetch(REVIEWS_URL + (id ? `/${id}` : '') 
-    + (userId ? `/user/${userId}` : '') 
+  const [filter, setFilter] = useState(false);
+  const [seller, setSeller] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
+  const { loading, data: rows , refetch} = usePrivateFetch(ACCOUNTS_URL + (filter ? "/employees" : "") 
     + "?pageNo=" + page
     + "&pSize=" + rowsPerPage
     + "&sortDir=" + order
@@ -281,8 +266,8 @@ export default function TableReviews(props) {
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(()=>{
-    if (!loading && setReviewCount){
-      setReviewCount(rows?.totalElements);
+    if (!loading && setAccCount){
+      setAccCount(rows?.totalElements);
     }
   }, [loading]);
 
@@ -337,11 +322,21 @@ export default function TableReviews(props) {
     setDense(event.target.checked);
   };
 
+  const handleChangeFilter = (event) => {
+    setFilter(event.target.checked);
+    setPage(0);
+  };
+
+  const handleClickOpenEdit = (id) => {
+    setId(id);
+    setOpenEdit(true);
+  };
+
   const handleDelete = async (id) => {
     const { enqueueSnackbar } = await import('notistack');
 
     try {
-        const response = await axiosPrivate.delete(REVIEWS_URL + "/" + id,
+        const response = await axiosPrivate.delete(ACCOUNTS_URL + "/" + id,
             {
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
@@ -358,6 +353,7 @@ export default function TableReviews(props) {
         }
 
         refetch();
+        enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
     } catch (err) {
         console.error(err);
         if (!err?.response) {
@@ -365,7 +361,7 @@ export default function TableReviews(props) {
         } else if (err.response?.status === 400) {
         } else {
         }
-        enqueueSnackbar('Xoá đánh giá thất bại!', { variant: 'error' });
+        enqueueSnackbar('Xoá thành viên thất bại!', { variant: 'error' });
     }
   };
 
@@ -373,7 +369,7 @@ export default function TableReviews(props) {
     const { enqueueSnackbar } = await import('notistack');
 
     try {
-        let DELETE_URL = ( selectedAll ? REVIEWS_URL + "/delete-all" : REVIEWS_URL + "/delete-multiples?ids=" + selected)
+        let DELETE_URL = ( selectedAll ? ACCOUNTS_URL + "/delete-all" : ACCOUNTS_URL + "/delete-multiples?ids=" + selected)
         const response = await axiosPrivate.delete(DELETE_URL,
             {
                 headers: { 'Content-Type': 'application/json' },
@@ -384,7 +380,7 @@ export default function TableReviews(props) {
         refetch();
         setSelected([]);
         setSelectedAll(false);
-        enqueueSnackbar('Đã xoá đánh giá!', { variant: 'success' });
+        enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
     } catch (err) {
         console.error(err);
         if (!err?.response) {
@@ -392,12 +388,11 @@ export default function TableReviews(props) {
         } else if (err.response?.status === 400) {
         } else {
         }
-        enqueueSnackbar('Xoá đánh giá thất bại!', { variant: 'error' });
+        enqueueSnackbar('Xoá thành viên thất bại!', { variant: 'error' });
     }
   };
 
   const isSelected = (name) => (selected.indexOf(name) !== -1 || selectedAll);
-
   const emptyRows = Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements);
   //#endregion
 
@@ -407,10 +402,11 @@ export default function TableReviews(props) {
         <EnhancedTableToolbar 
         numSelected={selected.length} 
         selectedAll={selectedAll} 
-        handleDeleteMultiples={handleDeleteMultiples}/>
+        handleDeleteMultiples={handleDeleteMultiples}
+        refetch={refetch}/>
         <TableContainer sx={{ maxHeight: mini ? 330 : 500 }}>
           <Table
-            sx={{ minWidth: mini ? 500 : 750 }}
+            sx={{ minWidth: mini? 500 : 750 }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
@@ -453,14 +449,20 @@ export default function TableReviews(props) {
                       />
                     </TableCell>
                     <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
-                      {row.id}
+                    <Link to={seller ? '' : `/user/${row.id}`}>{row.id}</Link>
                     </TableCell>
-                    <TableCell align="left"><ItemTitle>{row.userName}</ItemTitle></TableCell>
-                    <TableCell align="left"><ItemContent>{row.content}</ItemContent></TableCell>
-                    <TableCell align="center">{row.rating}</TableCell>
-                    <TableCell align="left"><ItemDate>{row.date}</ItemDate></TableCell>
-                    <TableCell align="center">{row.bookId}</TableCell>
-                    <TableCell align="center"> 
+                    <TableCell align="left">
+                    <Link to={seller ? '' : `/user/${row.id}`}><ItemTitle>{row.username}</ItemTitle></Link>
+                    </TableCell>
+                    <TableCell align="left">
+                    <Link to={seller ? '' : `/user/${row.id}`}><ItemTitle>{row.email}</ItemTitle></Link>
+                    </TableCell>
+                    <TableCell align="right">{row.authorities.length == 3 ? 'ADMIN' : row.authorities.length == 2 ? 'SELLER' : 'MEMBER'}</TableCell>
+                    <TableCell align="right"> 
+                      <IconButton sx={{"&:hover": {transform: 'scale(1.05)', color: '#63e399'}}}
+                      onClick={(e) => handleClickOpenEdit(row.id)}>
+                        <EditIcon/>
+                      </IconButton>
                       <IconButton sx={{"&:hover": {transform: 'scale(1.05)', color: '#e66161'}}} 
                       onClick={(e) => handleDelete(row.id)}>
                         <DeleteIcon/>
@@ -485,6 +487,16 @@ export default function TableReviews(props) {
                 </TableRow>
               )}
             </TableBody>
+            <Suspense fallback={<></>}>
+              { openEdit ?
+                <EditAccountDialog 
+                id={id}
+                open={openEdit} 
+                setOpen={setOpenEdit}
+                refetch={refetch}/>
+                : null
+              }
+            </Suspense>
           </Table>
         </TableContainer>
         <TablePagination
@@ -505,18 +517,33 @@ export default function TableReviews(props) {
         {loading && (<CustomLinearProgress/>)}  
       </Box>
       <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-        <FormControlLabel
-          control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
-            color: '#63e399',
-          },
-          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-            backgroundColor: '#63e399',
-          },}} 
-          checked={dense} onChange={handleChangeDense} />}
-          label="Thu gọn"
-        />
+        <Box>
+          <FormControlLabel
+            control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
+              color: '#63e399',
+            },
+            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+              backgroundColor: '#63e399',
+            },}} 
+            checked={dense} onChange={handleChangeDense} />}
+            label="Thu gọn"
+          />
+          {roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))
+            ? <FormControlLabel
+              control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
+                color: '#63e399',
+              },
+              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                backgroundColor: '#63e399',
+              },}} 
+              checked={filter} onChange={handleChangeFilter} />}
+              label="Lọc nhân viên"
+            />
+            : null
+          }
+        </Box>
         {mini ?
-        <Link to={'/manage-reviews'} style={{display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10}}>Xem tất cả</Link>
+        <Link to={'/manage-accounts'} style={{display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10}}>Xem tất cả</Link>
         : null
         }
       </Box>
@@ -524,6 +551,6 @@ export default function TableReviews(props) {
   );
 }
 
-TableReviews.defaultProps = {
+TableAccounts.defaultProps = {
   mini: false,
 };

@@ -17,7 +17,7 @@ const ItemContainer = styled.div`
     cursor: pointer;
     transition: all .25s ease;
 
-    &:hover{
+    &:hover {
       background-color: ${props => props.theme.palette.secondary.main};
       color: ${props => props.theme.palette.secondary.contrastText};
       transform: scale(1.025);
@@ -37,23 +37,23 @@ const CateContainer = styled.div`
         }
     }
 
-    &:before {
+    &::before, &::after {
         position: absolute;
         top: 0;
-        left: 0;
         width: 10%;
         height: 100%;
         content: "";
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    &:before {
+        left: 0;
         background-image: linear-gradient(to right, ${props => props.theme.palette.background.default}, transparent 90%);
     }
 
     &:after {
-        position: absolute;
-        top: 0;
         right: 0;
-        width: 10%;
-        height: 100%;
-        content: "";
         background-image: linear-gradient(to left, ${props => props.theme.palette.background.default}, transparent 90%);
     }
 `
@@ -70,6 +70,14 @@ const Wrapper = styled.div`
 
     &::-webkit-scrollbar {
         display: none;
+    }
+
+    a:first-child {
+        margin-left: 20px;
+    }
+
+    a:last-child {
+        margin-right: 40px;
     }
 `
 
@@ -115,12 +123,12 @@ const Categories = () => {
         catesContent = (
             Array.from(new Array(15)).map((index) => (
                 <div key={index}>
-                    <Skeleton 
+                    <Skeleton
                         variant="rectangular"
                         animation="wave"
                         height={40}
                         width={100}
-                        sx={{ mx: '3px'}}
+                        sx={{ mx: '3px' }}
                     />
                 </div>
             ))
@@ -133,14 +141,28 @@ const Categories = () => {
                 const cate = entities[cateId];
 
                 return (
-                    <Link
-                        to={`/filters?cateId=${cateId}`}
-                        style={{ color: 'inherit' }}
-                        title={cate?.categoryName}
-                        key={`${cateId}-${index}`}
-                    >
-                        <ItemContainer>{cate?.categoryName}</ItemContainer>
-                    </Link>
+                    <>
+                        <Link
+                            to={`/filters?cateId=${cateId}`}
+                            style={{ color: 'inherit' }}
+                            title={cate?.categoryName}
+                            key={`${cateId}-${index}`}
+                        >
+                            <ItemContainer>{cate?.categoryName}</ItemContainer>
+                        </Link>
+                        {
+                            cate?.cateSubs?.map((sub, subIndex) => (
+                                <Link
+                                    to={`/filters?cateId=${cateId}`}
+                                    style={{ color: 'inherit' }}
+                                    title={sub?.subName}
+                                    key={`${sub}-${subIndex}`}
+                                >
+                                    <ItemContainer>{sub?.subName}</ItemContainer>
+                                </Link>
+                            ))
+                        }
+                    </>
                 )
             })
             : null

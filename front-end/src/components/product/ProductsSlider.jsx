@@ -8,12 +8,11 @@ import "react-multi-carousel/lib/styles.css";
 //#region styled
 const Container = styled.div`
     position: relative;
-    height: 384px;
+    max-height: 380px;
     margin-bottom: 10px;
-    padding: 5px 5px;
 
-    @media (min-width: 768px) {
-        padding: auto;
+    ${props => props.theme.breakpoints.down("sm_md")} {
+      padding: 5px 5px;
     }
 `
 
@@ -77,11 +76,10 @@ const CustomRightArrow = ({ onClick }) => (
   <CustomArrow className="custom-right-arrow" onClick={() => onClick()}><KeyboardArrowRight /></CustomArrow>
 );
 
-const ProductsSlider = ({ data, isError, isLoading, isSuccess }) => {
-
+const ProductsSlider = ({ data, isError, isLoading, isSuccess, isUninitialized = false }) => {
   let productsCarousel;
 
-  if (isLoading || isError) {
+  if (isLoading || isError || isUninitialized) {
     productsCarousel = (
       <Carousel
         responsive={responsive}
@@ -139,11 +137,28 @@ const ProductsSlider = ({ data, isError, isLoading, isSuccess }) => {
           </div>
         ))}
       </Carousel>
+  } else {
+    productsCarousel = (
+      <Carousel
+        responsive={responsive}
+        customLeftArrow={<CustomLeftArrow />}
+        customRightArrow={<CustomRightArrow />}
+        removeArrowOnDeviceType={["tablet", "mobile"]}
+      >
+        {
+          Array.from(new Array(5)).map((index) => (
+            <div key={index} style={{ display: 'flex' }}>
+              <ProductSimple />
+            </div>
+          ))
+        }
+      </Carousel>
+    )
   }
 
   return (
     <Container>
-      {(isLoading || isError) && <CustomProgress color={`${isError ? 'error' : 'secondary'}`} />}
+      {(isLoading || isError || isUninitialized) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'secondary'}`} />}
       {productsCarousel}
     </Container>
   )

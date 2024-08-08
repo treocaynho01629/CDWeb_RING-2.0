@@ -13,12 +13,12 @@ const Container = styled.div`
     margin: 20px 0;
     background-color: ${props => props.theme.palette.background.default};
     
-    ${props => props.theme.breakpoints.down("sm_md")} {
+    /* ${props => props.theme.breakpoints.down("sm_md")} {
         position: sticky;
         top: 66.5px;
         left: 0;
         z-index: 100;
-    }
+    } */
 `
 
 const SortContainer = styled.div`
@@ -159,7 +159,7 @@ const SortList = (props) => {
                             <MenuItem value={24}>Hiển thị 24</MenuItem>
                             <MenuItem value={48}>Hiển thị 48</MenuItem>
                         </CustomInput>
-                        <QuickPagination {...{ pagination, onPageChange, onSizeChange }} />
+                        {/* <QuickPagination {...{ pagination, onPageChange, onSizeChange }} /> */}
                         <CustomButton
                             size="small"
                             variant="outlined"

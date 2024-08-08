@@ -29,9 +29,9 @@ const DrawerLogo = styled.h2`
 `
 //#endregion
 
-const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, logout, ImageLogo }) => {
+const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, logout, ImageLogo }) => {
     const role = roles?.length;
-    
+
     return (
         <SwipeableDrawer
             anchor='left'
@@ -149,18 +149,18 @@ const NavDrawer = ({ openDrawer, setOpen, toggleDrawer, username, roles, product
                     </Grid>
                     :
                     <List sx={{ marginLeft: '15px' }}>
-                        <ListItem disablePadding onClick={() => navigate('/login')}>
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    <LockIcon />
-                                </ListItemIcon>
-                                <ListItemText primary="ĐĂNG NHẬP" />
-                            </ListItemButton>
-                        </ListItem>
+                        <ListItem disablePadding onClick={() => navigate('/login', { state: { from: location }, replace: true })}>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <LockIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="ĐĂNG NHẬP" />
+                        </ListItemButton>
+                    </ListItem>
                     </List>
                 }
-            </Box>
-        </SwipeableDrawer>
+        </Box>
+        </SwipeableDrawer >
     )
 }
 

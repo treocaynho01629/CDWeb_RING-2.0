@@ -77,7 +77,7 @@ const FiltersPage = () => {
     //Dialog open state
     const [open, setOpen] = useState(false);
 
-    //Set data after fetch
+    //Set pagination after fetch
     useEffect(() => {
         if (!isLoading && isSuccess && data) {
             setPagination({
@@ -174,7 +174,7 @@ const FiltersPage = () => {
             searchParams.set("keyword", newValue);
             setSearchParams(searchParams);
         }
-        setFilters({ ...filters, keyword: newValue });
+        setFilters({ ...filters, keyword: newValue ?? '' });
     }
 
     const handleChangePub = (newValue) => {

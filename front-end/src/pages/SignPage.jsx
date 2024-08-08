@@ -6,6 +6,7 @@ import LoginTab from '../components/authorize/LoginTab';
 import RegisterTab from '../components/authorize/RegisterTab';
 import CustomButton from '../components/custom/CustomButton';
 import useAuth from '../hooks/useAuth';
+import useTitle from '../hooks/useTitle';
 
 const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
 
@@ -105,13 +106,8 @@ function SignPage() {
     const [isLogin, setIsLogin] = useState(location.pathname === '/login');
     const [pending, setPending] = useState(false);
 
-    //Hooks
-
-    //Update title
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        document.title = `RING! - Chào mừng`;
-    }, [])
+    //Set title
+    useTitle('RING! - Chào mừng');
 
     //Update tab
     useEffect(() => {

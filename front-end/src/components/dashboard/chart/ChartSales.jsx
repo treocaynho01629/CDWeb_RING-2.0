@@ -7,7 +7,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 
 import { Link } from "react-router-dom";
 import { TrendingUp, TrendingDown, SsidChart, Sell} from '@mui/icons-material';
-import usePrivateFetch from '../../hooks/usePrivateFetch'
+import usePrivateFetch from '../../../hooks/usePrivateFetch'
 
 //#region styled
 const Percent = styled.p`

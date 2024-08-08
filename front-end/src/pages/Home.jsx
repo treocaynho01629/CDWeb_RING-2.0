@@ -4,13 +4,14 @@ import { Grid, ToggleButton, ToggleButtonGroup, Skeleton } from '@mui/material';
 import { styled as muiStyled } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
+import { useGetBooksByFilterQuery, useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import Categories from '../components/Categories';
 import Products from '../components/product/Products';
 import Slider from '../components/product/Slider';
 import ProductsSlider from '../components/product/ProductsSlider';
 import CustomButton from '../components/custom/CustomButton';
 import CustomDivider from '../components/custom/CustomDivider';
-import { useGetBooksByFilterQuery, useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
+import useTitle from '../hooks/useTitle';
 
 //#region styled
 const Wrapper = styled.div`
@@ -101,18 +102,15 @@ const Home = () => {
     loadMore: pagination?.isMore
   });
   const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom, refetch: refetchRandom } = useGetRandomBooksQuery({ amount: 10 });
-  const { data: cateBooks, isLoading: loadByCate, isSuccess: doneByCate, isError: errorByCate } = useGetBooksByFilterQuery({ cateId: currCate }, { skip: !currCate });
+  const { data: cateBooks, isLoading: loadByCate, isSuccess: doneByCate, isError: errorByCate, isUninitialized } = useGetBooksByFilterQuery({ cateId: currCate }, { skip: !currCate });
   const { data: orderBooks, isLoading: loadByOrder, isSuccess: doneByOrder, isError: errorByOrder } = useGetBooksByFilterQuery({ sortBy: orderBy, sortDir: "desc" }, { skip: !orderBy });
   const { data: cates, isLoading: loadCates, isSuccess: doneCates, isError: errorCates } = useGetCategoriesQuery();
 
   //Other
   const navigate = useNavigate();
 
-  //Update title
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.title = `RING! - Bookstore`;
-  }, []);
+  //Set title
+  useTitle('RING! - Bookstore');
 
   //Load
   useEffect(() => {
@@ -153,7 +151,7 @@ const Home = () => {
     catesContent = (
       Array.from(new Array(4)).map((index) => (
         <StyledToggleButton key={index} value='none' disabled={true}>
-          <Skeleton variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
+          <Skeleton sx={{ bgcolor: 'grey.400', fontSize: '14px' }} variant="text" animation="wave" width={100} />
         </StyledToggleButton>
       ))
     )
@@ -227,7 +225,7 @@ const Home = () => {
               {catesContent}
             </StyledToggleButtonGroup>
           </ToggleGroupContainer>
-          <ProductsSlider {...{ isLoading: loadByCate, data: cateBooks, isSuccess: doneByCate, isError: errorByCate }} />
+          <ProductsSlider {...{ isLoading: loadByCate, data: cateBooks, isSuccess: doneByCate, isError: errorByCate, isUninitialized }} />
           <ButtonContainer>
             <CustomButton variant="contained" color="secondary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</CustomButton>
           </ButtonContainer>

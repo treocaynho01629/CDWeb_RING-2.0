@@ -12,9 +12,10 @@ import { PHONE_REGEX } from '../ultils/regex';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 import CustomButton from '../components/custom/CustomButton';
 import FinalCheckoutDialog from '../components/cart/FinalCheckoutDialog';
-import useCart from '../hooks/useCart';
 import AddressDisplay from '../components/address/AddressDisplay';
 import AddressSelectDialog from '../components/address/AddressSelectDialog';
+import useCart from '../hooks/useCart';
+import useTitle from '../hooks/useTitle';
 
 const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
 
@@ -282,10 +283,8 @@ const Checkout = () => {
         setValidPhone(result);
     }, [addressInfo.phone])
 
-    useEffect(() => {
-        document.title = `Thanh toán`;
-        window.scrollTo(0, 0);
-    }, [])
+    //Set title
+    useTitle('Thanh toán');
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -309,7 +308,8 @@ const Checkout = () => {
     //Submit checkout
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (isLoading) return;
+        if (isLoading || pending) return;
+        setPending(true);
 
         //Validation
         const valid = PHONE_REGEX.test(addressInfo.phone);
@@ -337,12 +337,13 @@ const Checkout = () => {
                 clearCart();
                 enqueueSnackbar('Đặt hàng thành công!', { variant: 'success' });
                 navigate('/cart');
+                setPending(false);
             })
             .catch((err) => {
                 console.error(err);
                 setErr(err);
                 if (!err?.status) {
-                    setErrMsg('No Server Response');
+                    setErrMsg('Server không phản hồi!');
                 } else if (err?.status === 409) {
                     setErrMsg(err?.data?.errors?.errorMessage);
                 } else if (err?.status === 400) {
@@ -351,6 +352,7 @@ const Checkout = () => {
                     setErrMsg('Đặt hàng thất bại!')
                 }
                 errRef.current.focus();
+                setPending(false);
             })
     }
     //#endregion
@@ -358,9 +360,9 @@ const Checkout = () => {
     if (products?.length) {
         return (
             <Wrapper>
-                {isLoading ?
+                {(isLoading || pending) ?
                     <Suspense fallBack={<></>}>
-                        <PendingIndicator open={isLoading} message="Đang xử lý đơn hàng..." />
+                        <PendingIndicator open={(isLoading || pending)} message="Đang xử lý đơn hàng..." />
                     </Suspense>
                     : null
                 }

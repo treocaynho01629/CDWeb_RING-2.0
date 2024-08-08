@@ -1,14 +1,12 @@
-import { useState, lazy, Suspense, useEffect } from 'react';
 import styled from 'styled-components'
-
+import { useState, lazy, Suspense, useEffect } from 'react';
+import { TextareaAutosize, Box, Card, CardContent, CardMedia, IconButton, Typography, Grid, Divider } from '@mui/material';
+import { useNavigate, useParams } from 'react-router-dom';
 import TableReviews from "../../components/dashboard/TableReviews";
 import TableReceipts from "../../components/dashboard/TableReceipts";
-
-import { TextareaAutosize, Box, Card, CardContent, CardMedia, IconButton, Typography, Grid, Divider } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-
 import useFetch from '../../hooks/useFetch'
-import { useNavigate, useParams } from 'react-router-dom';
+import useTitle from '../../hooks/useTitle'
 
 const EditProductDialog = lazy(() => import('../../components/dashboard/EditProductDialog'));
 
@@ -73,12 +71,8 @@ const DetailProduct = () => {
         setOpenEdit(true);
     };
 
-    useEffect(() => {
-        if (!loading){
-            window.scrollTo(0, 0);
-            document.title = `RING! - ${data?.title}`;
-        }
-    }, [loading])
+    //Set title
+    useTitle(`${data?.title ?? 'RING - Sản phẩm'}`);
 
     return (
     <>

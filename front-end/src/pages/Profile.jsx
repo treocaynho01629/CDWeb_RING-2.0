@@ -4,6 +4,7 @@ import { Box, Skeleton, CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
+import useTitle from '../hooks/useTitle';
 
 const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
 const ProfileDetail = lazy(() => import('../components/profile/ProfileDetail'));
@@ -70,14 +71,9 @@ const Profile = () => {
     const { tab } = useParams();
     const [pending, setPending] = useState(false);
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        document.title = 'RING! - Hồ sơ';
-    }, [])
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [tab])
+    //Set title
+    useTitle('Hồ sơ');
+    useEffect(() => { window.scrollTo(0, 0) }, [tab]);
 
     return (
         <>

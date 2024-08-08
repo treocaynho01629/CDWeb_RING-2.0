@@ -14,8 +14,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 
 import CustomDropZone from './CustomDropZone';
-import useFetch from '../../hooks/useFetch'
-import useAxiosPrivate from '../../hooks/useAxiosPrivate';
+import useFetch from '../../../hooks/useFetch'
+import useAxiosPrivate from '../../../hooks/useAxiosPrivate';
 
 //#region styled
 const CustomButton = styled.div`

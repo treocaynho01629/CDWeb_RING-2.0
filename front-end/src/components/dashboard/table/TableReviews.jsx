@@ -1,30 +1,22 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
-
 import styled from 'styled-components'
-import PropTypes from 'prop-types';
 import { styled as muiStyled } from '@mui/material/styles';
-
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel
-, Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch} from '@mui/material';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
-import { Group as GroupIcon, Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-
+import { useState, useEffect } from 'react';
+import {
+  Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel,
+  Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch
+} from '@mui/material';
+import { Try as TryIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { visuallyHidden } from '@mui/utils';
 import { Link } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
-
-import usePrivateFetch from '../../hooks/usePrivateFetch'
-import useAxiosPrivate from '../../hooks/useAxiosPrivate';
-
-const AddAccountDialog = lazy(() => import('./AddAccountDialog'));
-const EditAccountDialog = lazy(() => import('./EditAccountDialog'));
+import PropTypes from 'prop-types';
 
 //#region preStyled
 const ItemTitle = styled.p`
     font-size: 12px;
     text-overflow: ellipsis;
-	overflow: hidden;
-	white-space: nowrap;
+    overflow: hidden;
+    white-space: nowrap;
+    min-width: 100px;
 	
 	@supports (-webkit-line-clamp: 1) {
       overflow: hidden;
@@ -36,16 +28,39 @@ const ItemTitle = styled.p`
     }
 `
 
-const CustomLinearProgress = muiStyled(LinearProgress)(({ theme }) => ({
-  borderRadius: 0,
-  [`&.${linearProgressClasses.colorPrimary}`]: {
-      backgroundColor: 'white',
-  },
-  [`& .${linearProgressClasses.bar}`]: {
-      borderRadius: 0,
-      backgroundColor: '#63e399',
-  },
-}));
+const ItemDate = styled.p`
+    font-size: 12px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    min-width: 150px;
+	
+	@supports (-webkit-line-clamp: 1) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: initial;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+`
+
+const ItemContent = styled.p`
+    font-size: 12px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 500px;
+	
+	@supports (-webkit-line-clamp: 1) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: initial;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+`
 
 const headCells = [
   {
@@ -57,33 +72,49 @@ const headCells = [
     label: 'ID',
   },
   {
-    id: 'userName',
+    id: 'user.userName',
     align: 'left',
     width: '200px',
     disablePadding: false,
     sortable: true,
-    label: 'Tên đăng nhập',
+    label: 'Thành viên',
   },
   {
-    id: 'email',
+    id: 'rContent',
     align: 'left',
-    width: '250px',
+    width: '350px',
     disablePadding: false,
     sortable: true,
-    label: 'Email',
+    label: 'Nội dung',
   },
   {
-    id: 'authorities',
+    id: 'rating',
     align: 'right',
-    width: '150px',
+    width: '70px',
     disablePadding: false,
-    sortable: false,
-    label: 'Quyền',
+    sortable: true,
+    label: 'Đánh giá',
+  },
+  {
+    id: 'rDate',
+    align: 'left',
+    width: '220px',
+    disablePadding: false,
+    sortable: true,
+    label: 'Ngày',
+  },
+  {
+    id: 'book.id',
+    align: 'right',
+    width: '70px',
+    disablePadding: false,
+    sortable: true,
+    label: 'Sản phẩm',
   },
   {
     id: 'action',
     align: 'right',
-    width: '250px',
+    width: '70px',
     disablePadding: false,
     sortable: false,
     label: 'Hành động',
@@ -99,15 +130,15 @@ function EnhancedTableHead(props) {
 
   return (
     <TableHead>
-      <TableRow sx={{height: '58px'}}>
+      <TableRow sx={{ height: '58px' }}>
         <TableCell padding="checkbox">
           <Checkbox
             sx={{
               '&.Mui-checked': {
-              color: '#63e3a7',
+                color: '#63e3a7',
               },
               '&.MuiCheckbox-indeterminate': {
-              color: '#63e3a7',
+                color: '#63e3a7',
               },
             }}
             indeterminate={numSelected > 0 && selectedAll == false}
@@ -128,9 +159,9 @@ function EnhancedTableHead(props) {
           >
             {headCell.sortable ? (
               <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
+                active={orderBy === headCell.id}
+                direction={orderBy === headCell.id ? order : 'asc'}
+                onClick={createSortHandler(headCell.id)}
               >
                 {headCell.label}
                 {orderBy === headCell.id ? (
@@ -156,18 +187,13 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, selectedAll, refetch, handleDeleteMultiples } = props;
-  const [openNew, setOpenNew] = useState(false);
- 
-  const handleClickOpenNew = () => {
-    setOpenNew(true);
-  };
+  const { numSelected, selectedAll, handleDeleteMultiples } = props;
 
   const handleDelete = () => {
     if (handleDeleteMultiples) {
       handleDeleteMultiples();
     }
-  }
+  };
 
   return (
     <Toolbar
@@ -182,54 +208,32 @@ function EnhancedTableToolbar(props) {
     >
       {numSelected > 0 ? (
         <Typography
-          sx={{ flex: '1 1 100%' , fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center'}}
+          sx={{ flex: '1 1 100%', fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center' }}
           variant="h6"
           component="div"
         >
-        <GroupIcon sx={{marginRight: '10px'}}/>
-        {selectedAll ? "Chọn tất cả" : `Chọn ${numSelected} thành viên`}
+          <TryIcon sx={{ marginRight: '10px' }} />
+          {selectedAll ? "Chọn tất cả" : `Chọn ${numSelected} đánh giá`}
         </Typography>
       ) : (
         <Typography
-          sx={{ flex: '1 1 100%' , fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center'}}
+          sx={{ flex: '1 1 100%', fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center' }}
           variant="h6"
           id="tableTitle"
           component="div"
         >
-          <GroupIcon sx={{color: 'white', marginRight: '10px'}}/>
-          Danh sách thành viên
+          <TryIcon sx={{ color: 'white', marginRight: '10px' }} />
+          Danh sách đánh giá
         </Typography>
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Xoá thành viên đã chọn">
+        <Tooltip title="Xoá đánh giá đã chọn">
           <IconButton onClick={handleDelete}>
-            <DeleteIcon sx={{color: 'white', "&:hover": {transform: 'scale(1.05)', color: '#e66161'}}} />
+            <DeleteIcon sx={{ color: 'white', "&:hover": { transform: 'scale(1.05)', color: '#e66161' } }} />
           </IconButton>
         </Tooltip>
-      ) : (
-      <>
-        <Tooltip title="Thêm thành viên mới">
-          <IconButton sx={{
-            "&:focus": {
-              outline: 'none',
-            }}}
-          onClick={handleClickOpenNew}>
-          <AddIcon sx={{color: 'white'}}/>
-          </IconButton>
-        </Tooltip>
-      </>
-      )}
-
-      <Suspense fallback={<></>}>
-        { openNew ?
-          <AddAccountDialog 
-          open={openNew} 
-          setOpen={setOpenNew}
-          refetch={refetch}/>
-          : null
-        }
-      </Suspense>
+      ) : (<></>)}
     </Toolbar>
   );
 }
@@ -240,24 +244,21 @@ EnhancedTableToolbar.propTypes = {
 };
 //#endregion
 
-const ACCOUNTS_URL = 'api/accounts';
-
-export default function TableAccounts(props) {
+export default function TableReviews(props) {
   //#region construct
-  const { setAccCount, mini } = props;
-  const { roles } = useAuth();
-  const [id, setId] = useState([]);
+  const { setReviewCount, id, userId, mini } = props;
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('id');
   const [selected, setSelected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(true);
-  const [openEdit, setOpenEdit] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(mini ? 5 : 10);
-  const [filter, setFilter] = useState(false);
-  const [seller, setSeller] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
-  const { loading, data: rows , refetch} = usePrivateFetch(ACCOUNTS_URL + (filter ? "/employees" : "") 
+
+  //Fetch reviews
+  const {data, isLoading, isSuccess, isError} = useGetRev
+  const { loading: isLoading, data: data, refetch } = usePrivateFetch(REVIEWS_URL + (id ? `/${id}` : '')
+    + (userId ? `/user/${userId}` : '')
     + "?pageNo=" + page
     + "&pSize=" + rowsPerPage
     + "&sortDir=" + order
@@ -265,11 +266,11 @@ export default function TableAccounts(props) {
 
   const axiosPrivate = useAxiosPrivate();
 
-  useEffect(()=>{
-    if (!loading && setAccCount){
-      setAccCount(rows?.totalElements);
+  useEffect(() => {
+    if (!isLoading && setReviewCount) {
+      setReviewCount(data?.totalElements);
     }
-  }, [loading]);
+  }, [isLoading]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -279,7 +280,7 @@ export default function TableAccounts(props) {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = rows?.content?.map((n) => n.id);
+      const newSelected = data?.content?.map((n) => n.id);
       setSelected(newSelected);
       setSelectedAll(true);
       return;
@@ -322,46 +323,35 @@ export default function TableAccounts(props) {
     setDense(event.target.checked);
   };
 
-  const handleChangeFilter = (event) => {
-    setFilter(event.target.checked);
-    setPage(0);
-  };
-
-  const handleClickOpenEdit = (id) => {
-    setId(id);
-    setOpenEdit(true);
-  };
-
   const handleDelete = async (id) => {
     const { enqueueSnackbar } = await import('notistack');
 
     try {
-        const response = await axiosPrivate.delete(ACCOUNTS_URL + "/" + id,
-            {
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
-            }
-        );
-
-        //Bỏ selected
-        const selectedIndex = selected.indexOf(id);
-        let newSelected = [];
-
-        if (selectedIndex === 0) {
-          newSelected = newSelected.concat(selected.slice(1));
-          setSelected(newSelected);
+      const response = await axiosPrivate.delete(REVIEWS_URL + "/" + id,
+        {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true
         }
+      );
 
-        refetch();
-        enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
+      //Bỏ selected
+      const selectedIndex = selected.indexOf(id);
+      let newSelected = [];
+
+      if (selectedIndex === 0) {
+        newSelected = newSelected.concat(selected.slice(1));
+        setSelected(newSelected);
+      }
+
+      refetch();
     } catch (err) {
-        console.error(err);
-        if (!err?.response) {
-        } else if (err.response?.status === 409) {
-        } else if (err.response?.status === 400) {
-        } else {
-        }
-        enqueueSnackbar('Xoá thành viên thất bại!', { variant: 'error' });
+      console.error(err);
+      if (!err?.response) {
+      } else if (err.response?.status === 409) {
+      } else if (err.response?.status === 400) {
+      } else {
+      }
+      enqueueSnackbar('Xoá đánh giá thất bại!', { variant: 'error' });
     }
   };
 
@@ -369,44 +359,44 @@ export default function TableAccounts(props) {
     const { enqueueSnackbar } = await import('notistack');
 
     try {
-        let DELETE_URL = ( selectedAll ? ACCOUNTS_URL + "/delete-all" : ACCOUNTS_URL + "/delete-multiples?ids=" + selected)
-        const response = await axiosPrivate.delete(DELETE_URL,
-            {
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
-            }
-        );
-
-        refetch();
-        setSelected([]);
-        setSelectedAll(false);
-        enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
-    } catch (err) {
-        console.error(err);
-        if (!err?.response) {
-        } else if (err.response?.status === 409) {
-        } else if (err.response?.status === 400) {
-        } else {
+      let DELETE_URL = (selectedAll ? REVIEWS_URL + "/delete-all" : REVIEWS_URL + "/delete-multiples?ids=" + selected)
+      const response = await axiosPrivate.delete(DELETE_URL,
+        {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true
         }
-        enqueueSnackbar('Xoá thành viên thất bại!', { variant: 'error' });
+      );
+
+      refetch();
+      setSelected([]);
+      setSelectedAll(false);
+      enqueueSnackbar('Đã xoá đánh giá!', { variant: 'success' });
+    } catch (err) {
+      console.error(err);
+      if (!err?.response) {
+      } else if (err.response?.status === 409) {
+      } else if (err.response?.status === 400) {
+      } else {
+      }
+      enqueueSnackbar('Xoá đánh giá thất bại!', { variant: 'error' });
     }
   };
 
   const isSelected = (name) => (selected.indexOf(name) !== -1 || selectedAll);
-  const emptyRows = Math.max(0, (1 + page) * rowsPerPage - rows?.totalElements);
+
+  const emptyRows = Math.max(0, (1 + page) * rowsPerPage - data?.totalElements);
   //#endregion
 
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: '2px' }}>
-        <EnhancedTableToolbar 
-        numSelected={selected.length} 
-        selectedAll={selectedAll} 
-        handleDeleteMultiples={handleDeleteMultiples}
-        refetch={refetch}/>
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          selectedAll={selectedAll}
+          handleDeleteMultiples={handleDeleteMultiples} />
         <TableContainer sx={{ maxHeight: mini ? 330 : 500 }}>
           <Table
-            sx={{ minWidth: mini? 500 : 750 }}
+            sx={{ minWidth: mini ? 500 : 750 }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
@@ -416,11 +406,11 @@ export default function TableAccounts(props) {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows?.totalElements}
+              rowCount={data?.totalElements}
               selectedAll={selectedAll}
             />
             <TableBody>
-              {rows?.content?.map((row, index) => {
+              {data?.content?.map((row, index) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -438,7 +428,7 @@ export default function TableAccounts(props) {
                       <Checkbox
                         sx={{
                           '&.Mui-checked': {
-                          color: '#63e3a7',
+                            color: '#63e3a7',
                           },
                         }}
                         onChange={(event) => handleClick(event, row.id)}
@@ -449,54 +439,38 @@ export default function TableAccounts(props) {
                       />
                     </TableCell>
                     <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
-                    <Link to={seller ? '' : `/user/${row.id}`}>{row.id}</Link>
+                      {row.id}
                     </TableCell>
-                    <TableCell align="left">
-                    <Link to={seller ? '' : `/user/${row.id}`}><ItemTitle>{row.username}</ItemTitle></Link>
-                    </TableCell>
-                    <TableCell align="left">
-                    <Link to={seller ? '' : `/user/${row.id}`}><ItemTitle>{row.email}</ItemTitle></Link>
-                    </TableCell>
-                    <TableCell align="right">{row.authorities.length == 3 ? 'ADMIN' : row.authorities.length == 2 ? 'SELLER' : 'MEMBER'}</TableCell>
-                    <TableCell align="right"> 
-                      <IconButton sx={{"&:hover": {transform: 'scale(1.05)', color: '#63e399'}}}
-                      onClick={(e) => handleClickOpenEdit(row.id)}>
-                        <EditIcon/>
-                      </IconButton>
-                      <IconButton sx={{"&:hover": {transform: 'scale(1.05)', color: '#e66161'}}} 
-                      onClick={(e) => handleDelete(row.id)}>
-                        <DeleteIcon/>
+                    <TableCell align="left"><ItemTitle>{row.userName}</ItemTitle></TableCell>
+                    <TableCell align="left"><ItemContent>{row.content}</ItemContent></TableCell>
+                    <TableCell align="center">{row.rating}</TableCell>
+                    <TableCell align="left"><ItemDate>{row.date}</ItemDate></TableCell>
+                    <TableCell align="center">{row.bookId}</TableCell>
+                    <TableCell align="center">
+                      <IconButton sx={{ "&:hover": { transform: 'scale(1.05)', color: '#e66161' } }}
+                        onClick={(e) => handleDelete(row.id)}>
+                        <DeleteIcon />
                       </IconButton>
                     </TableCell>
                   </TableRow>
                 );
               })}
-              {loading && (
+              {isLoading && (
                 <TableRow>
-                  <TableCell 
-                  scope="row"
-                  padding="none"
-                  align="center"
-                  colSpan={6}>
+                  <TableCell
+                    scope="row"
+                    padding="none"
+                    align="center"
+                    colSpan={6}>
                   </TableCell>
                 </TableRow>
               )}
               {emptyRows > 0 && (
-                <TableRow style={{height: (dense ? 63 : 83) * emptyRows}}>
+                <TableRow style={{ height: (dense ? 63 : 83) * emptyRows }}>
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
             </TableBody>
-            <Suspense fallback={<></>}>
-              { openEdit ?
-                <EditAccountDialog 
-                id={id}
-                open={openEdit} 
-                setOpen={setOpenEdit}
-                refetch={refetch}/>
-                : null
-              }
-            </Suspense>
           </Table>
         </TableContainer>
         <TablePagination
@@ -504,7 +478,7 @@ export default function TableAccounts(props) {
           component="div"
           labelRowsPerPage={"Hiển thị"}
           labelDisplayedRows={function defaultLabelDisplayedRows({ from, to, count }) { return `${from}–${to} trong số ${count !== -1 ? count : `Có hơn ${to}`}`; }}
-          count={rows?.totalElements ? rows?.totalElements : 0}
+          count={data?.totalElements ? data?.totalElements : 0}
           rowsPerPage={rowsPerPage}
           page={page}
           showFirstButton
@@ -513,44 +487,31 @@ export default function TableAccounts(props) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <Box sx={{height: '10px'}}>
-        {loading && (<CustomLinearProgress/>)}  
+      <Box sx={{ height: '10px' }}>
+        {isLoading && (<CustomLinearProgress />)}
       </Box>
-      <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-        <Box>
-          <FormControlLabel
-            control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <FormControlLabel
+          control={<Switch sx={{
+            '& .MuiSwitch-switchBase.Mui-checked': {
               color: '#63e399',
             },
             '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
               backgroundColor: '#63e399',
-            },}} 
+            },
+          }}
             checked={dense} onChange={handleChangeDense} />}
-            label="Thu gọn"
-          />
-          {roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))
-            ? <FormControlLabel
-              control={<Switch sx={{'& .MuiSwitch-switchBase.Mui-checked': {
-                color: '#63e399',
-              },
-              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                backgroundColor: '#63e399',
-              },}} 
-              checked={filter} onChange={handleChangeFilter} />}
-              label="Lọc nhân viên"
-            />
-            : null
-          }
-        </Box>
+          label="Thu gọn"
+        />
         {mini ?
-        <Link to={'/manage-accounts'} style={{display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10}}>Xem tất cả</Link>
-        : null
+          <Link to={'/manage-reviews'} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10 }}>Xem tất cả</Link>
+          : null
         }
       </Box>
     </Box>
   );
 }
 
-TableAccounts.defaultProps = {
+TableReviews.defaultProps = {
   mini: false,
 };

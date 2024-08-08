@@ -47,7 +47,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
     useEffect(() => {
         setErrMsg('');
     }, [currAddress])
-
+    setPending(false);
     useEffect(() => { //Check phone number
         const result = PHONE_REGEX.test(currAddress.phone);
         setValidPhone(result);

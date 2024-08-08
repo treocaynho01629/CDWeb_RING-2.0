@@ -66,7 +66,7 @@ const DetailContainer = styled.div`
 
 const ProductDetailContainer = ({ loading, book, tab, handleTabChange }) => {
   //Fetch related books
-  const { data: relatedBooks, isLoading: loadRelated, isSuccess: doneRelated, isError: errorRelated } = useGetBooksByFilterQuery({
+  const { data: relatedBooks, isLoading: loadRelated, isSuccess: doneRelated, isError: errorRelated, isUninitialized } = useGetBooksByFilterQuery({
     cateId: book?.cateId
   }, { skip: (!book?.cateId || tab !== "related") });
 
@@ -146,7 +146,7 @@ const ProductDetailContainer = ({ loading, book, tab, handleTabChange }) => {
           </TabPanel>
           <TabPanel value="related">
             <div>
-              <ProductsSlider {...{ loading: loadRelated, data: relatedBooks, isSuccess: doneRelated, isError: errorRelated }} />
+              <ProductsSlider {...{ loading: loadRelated, data: relatedBooks, isSuccess: doneRelated, isError: errorRelated, isUninitialized }} />
             </div>
           </TabPanel>
         </TabContext>

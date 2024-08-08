@@ -1,17 +1,14 @@
-import { useState, useEffect } from "react";
-
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
-
-import TableBook from '../../components/dashboard/TableBooks'
-
+import { useState, useEffect } from "react";
 import { Grid, Paper, Stack } from '@mui/material';
-import { AutoStories as AutoStoriesIcon, LocalFireDepartment, Star} from '@mui/icons-material';
+import { AutoStories as AutoStoriesIcon, LocalFireDepartment, Star } from '@mui/icons-material';
 import { useNavigate } from "react-router-dom"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-
+import TableBook from '../../components/dashboard/table/TableBooks'
 import useFetch from '../../hooks/useFetch'
-import useAuth from "../../hooks/useAuth";
+import useAuth from "../../hooks/useAuth"
+import useTitle from "../../hooks/useTitle"
 
 //#region preStyled
 const CountContainer = muiStyled(Paper)(({ theme }) => ({
@@ -26,10 +23,10 @@ const CountInfo = styled.div`
 `
 
 const countIconStyle = {
-  color: '#63e399', 
-  backgroundColor: '#ebebeb', 
-  borderRadius: '50%', 
-  padding: '8px', 
+  color: '#63e399',
+  backgroundColor: '#ebebeb',
+  borderRadius: '50%',
+  padding: '8px',
   fontSize: '60px'
 }
 
@@ -75,71 +72,69 @@ const ManageBooks = () => {
   const { loading: loadingFav, data: fav } = useFetch(BOOKS_URL + "?pSize=5&sortBy=rateAmount&sortDir=desc&seller=" + (seller === false ? "" : username));
   const navigate = useNavigate();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.title = `RING! - Sản phẩm`;
-  }, [])
+  //Set title
+  useTitle('RING! - Sản phẩm');
 
   return (
     <>
       <h2>Quản lý sách</h2>
-      <h3 style={{color: 'darkgray', cursor: 'pointer'}} onClick={() => navigate('/dashboard')}>Dashboard / Quản lý sách</h3>
-      <Grid container spacing={3} sx={{marginBottom: '20px'}}>
+      <h3 style={{ color: 'darkgray', cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>Dashboard / Quản lý sách</h3>
+      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
         <Grid item sm={6} md={3}>
           <CountContainer elevation={3} >
-            <AutoStoriesIcon sx={countIconStyle}/>
-            <CountInfo><h2 style={{margin: 0}}>{bookCount}</h2><span>Cuốn sách</span></CountInfo>
+            <AutoStoriesIcon sx={countIconStyle} />
+            <CountInfo><h2 style={{ margin: 0 }}>{bookCount}</h2><span>Cuốn sách</span></CountInfo>
           </CountContainer>
         </Grid>
       </Grid>
 
-      <Grid container spacing={3} sx={{marginBottom: '20px'}}>
-        { loadingBest ? null
-        : 
-        <Grid item xs={12} lg={6}>
-          <Paper elevation={3} sx={{padding: '5px 15px'}}>
-            <h3 style={{display: 'flex', alignItems: 'center'}}><LocalFireDepartment/>Top 5 sách bán chạy</h3>
-            <Stack>
-              { best?.content?.map((book, index) => (
-                <Paper elevation={1} key={index}
-                onClick={() => navigate(`/detail/${book.id}`)}
-                sx={{width: '100%', display: 'flex', my: '5px', padding: 1, cursor: 'pointer'}}>
-                  <LazyLoadImage src={book.image} style={imageStyle}/>
-                  <div>
-                    <BookTitle>{book.title}</BookTitle>
-                    <BookPrice>{book.price.toLocaleString()} đ</BookPrice>
-                  </div>
-                </Paper>
-              ))}
-            </Stack>
-          </Paper>
-        </Grid>
+      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
+        {loadingBest ? null
+          :
+          <Grid item xs={12} lg={6}>
+            <Paper elevation={3} sx={{ padding: '5px 15px' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center' }}><LocalFireDepartment />Top 5 sách bán chạy</h3>
+              <Stack>
+                {best?.content?.map((book, index) => (
+                  <Paper elevation={1} key={index}
+                    onClick={() => navigate(`/detail/${book.id}`)}
+                    sx={{ width: '100%', display: 'flex', my: '5px', padding: 1, cursor: 'pointer' }}>
+                    <LazyLoadImage src={book.image} style={imageStyle} />
+                    <div>
+                      <BookTitle>{book.title}</BookTitle>
+                      <BookPrice>{book.price.toLocaleString()} đ</BookPrice>
+                    </div>
+                  </Paper>
+                ))}
+              </Stack>
+            </Paper>
+          </Grid>
         }
 
-        { loadingFav ? null
-        : 
-        <Grid item xs={12} lg={6}>
-          <Paper elevation={3} sx={{padding: '5px 15px'}}>
-            <h3 style={{display: 'flex', alignItems: 'center'}}><Star/>Top 5 sách được yêu thích</h3>
-            <Stack>
-              { fav?.content?.map((book) => (
-                <Paper elevation={1} 
-                onClick={() => navigate(`/detail/${book.id}`)}
-                sx={{width: '100%', display: 'flex', my: '5px', padding: 1, cursor: 'pointer'}}>
-                  <LazyLoadImage src={book.image} style={imageStyle}/>
-                  <div>
-                    <BookTitle>{book.title}</BookTitle>
-                    <BookPrice>{book.price.toLocaleString()} đ</BookPrice>
-                  </div>
-                </Paper>
-              ))}
-            </Stack>
-          </Paper>
-        </Grid>
+        {loadingFav ? null
+          :
+          <Grid item xs={12} lg={6}>
+            <Paper elevation={3} sx={{ padding: '5px 15px' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center' }}><Star />Top 5 sách được yêu thích</h3>
+              <Stack>
+                {fav?.content?.map((book) => (
+                  <Paper elevation={1}
+                    onClick={() => navigate(`/detail/${book.id}`)}
+                    sx={{ width: '100%', display: 'flex', my: '5px', padding: 1, cursor: 'pointer' }}>
+                    <LazyLoadImage src={book.image} style={imageStyle} />
+                    <div>
+                      <BookTitle>{book.title}</BookTitle>
+                      <BookPrice>{book.price.toLocaleString()} đ</BookPrice>
+                    </div>
+                  </Paper>
+                ))}
+              </Stack>
+            </Paper>
+          </Grid>
         }
       </Grid>
 
-      <TableBook setBookCount={setBookCount}/>
+      <TableBook setBookCount={setBookCount} />
     </>
   )
 }

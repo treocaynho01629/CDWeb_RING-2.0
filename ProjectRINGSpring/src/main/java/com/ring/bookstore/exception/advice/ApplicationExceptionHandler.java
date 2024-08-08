@@ -62,6 +62,6 @@ public class ApplicationExceptionHandler{
     public ExceptionMessage handleMaxSizeException(MaxUploadSizeExceededException e) {
     	Map<String, String> errorMap = new HashMap<>();
         errorMap.put("errorMessage", e.getMessage());
-        return new ExceptionMessage(417 , "File to large!", errorMap);
+        return new ExceptionMessage(417 , "File must be under 2mb!", errorMap);
     }
 }
