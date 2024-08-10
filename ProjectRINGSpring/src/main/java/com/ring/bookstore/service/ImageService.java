@@ -22,9 +22,13 @@ public interface ImageService {
 
     List<ImageDTO> getAllImages();
 
-    ImageDTO upload(MultipartFile file) throws ImageResizerException, IOException;
+    Image upload(MultipartFile file) throws ImageResizerException, IOException;
 
-    ImageDTO replace(MultipartFile file) throws ImageResizerException, IOException;
+    Image replace(MultipartFile file) throws ImageResizerException, IOException;
+
+    ImageDTO uploadAndMap(MultipartFile file) throws ImageResizerException, IOException;
+
+    ImageDTO replaceAndMap(MultipartFile file) throws ImageResizerException, IOException;
 
     Image save(BufferedImage bufferedImage, String fileName, String contentType) throws ImageResizerException;
 

@@ -89,7 +89,7 @@ public class BookController {
 		try {
 			Book addedBook = bookService.addBook(request, file, currUser);
 			return new ResponseEntity< >(addedBook, HttpStatus.CREATED);
-		} catch (IOException e) { //File ảnh lỗi >> Báo lỗi
+		} catch (Exception e) {
 			String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
 		}
@@ -106,7 +106,7 @@ public class BookController {
     	try {
     		Book savedBook = bookService.updateBook(request, file, id, currUser);
 			return new ResponseEntity< >(savedBook, HttpStatus.CREATED);
-		} catch (IOException e) { //File ảnh lỗi >> Báo lỗi
+		} catch (Exception e) {
 			String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
 		}

@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ring.bookstore.exception.ImageResizerException;
+import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.utils.ImageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -54,7 +56,9 @@ public class BookServiceImpl implements BookService {
 	private final BookDetailRepository detailRepo;
 	private final CategoryRepository cateRepo;
 	private final ImageRepository imageRepo;
-	
+
+	@Autowired
+	private ImageService imageService;
 	@Autowired
 	private BookMapper bookMapper;
 	@Autowired
@@ -126,23 +130,14 @@ public class BookServiceImpl implements BookService {
 	
 	//Add book (SELLER)
 	@Transactional
-	public Book addBook(BookRequest request, MultipartFile file, Account seller) throws IOException {
-		//Image validation
-		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-		Image image = imageRepo.findByName(fileName).orElse( //Add image info if not yet exists
-			Image.builder()
-    		.name(fileName)
-    		.type(file.getContentType())
-    		.image(ImageUtils.compressImage(file.getBytes()))
-			.build()
-		);
-	    		
+	public Book addBook(BookRequest request, MultipartFile file, Account seller) throws IOException, ImageResizerException {
 		//Category & publisher validation
 		Category cate = cateRepo.findById(request.getCateId()).orElseThrow(()-> new ResourceNotFoundException("Category not found"));
 		Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(()-> new ResourceNotFoundException("Publisher not found"));
-		
-		Image savedImage = imageRepo.save(image); //Upload and save image to database
-		
+
+		//Image upload
+		Image savedImage = imageService.upload(file);
+
 		//Create new book
         var book = Book.builder()
                 .title(request.getTitle())
@@ -176,29 +171,22 @@ public class BookServiceImpl implements BookService {
 
 	//Update book (SELLER)
 	@Transactional
-	public Book updateBook(BookRequest request, MultipartFile file, Integer id, Account seller) throws IOException {
-		//Image validation
-		Image newImage = null;
-		if (file != null) { //If different image, upload again
-			String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-			Image image = imageRepo.findByName(fileName).orElse(
-				Image.builder()
-	    		.name(fileName)
-	    		.type(file.getContentType())
-	    		.image(ImageUtils.compressImage(file.getBytes()))
-				.build()
-			);
-			newImage = image;
-		}
-		
+	public Book updateBook(BookRequest request, MultipartFile file, Integer id, Account seller) throws IOException, ImageResizerException {
 	    //Check book exists & category, publisher validation
 		Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found"));
 		Category cate = cateRepo.findById(request.getCateId()).orElseThrow(()-> new ResourceNotFoundException("Category not found"));
 		Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(()-> new ResourceNotFoundException("Publisher not found"));
-		
+
 		//Check if correct seller or admin
 		if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
-		
+
+		//Image upload/replace
+		if (file != null) { //Contain new image >> upload/replace
+			imageService.deleteImage(book.getImages().getId()); //Delete old image
+			Image savedImage = imageService.upload(file); //Upload new image
+			book.setImages(savedImage); //Save to database
+		}
+
 		//Set new details info
 		BookDetail currDetail = book.getBookDetail();
 		currDetail.setBWeight(request.getWeight());
@@ -217,10 +205,6 @@ public class BookServiceImpl implements BookService {
 		book.setAuthor(request.getAuthor());
 		book.setAmount(request.getAmount());
 		book.setType(request.getType());
-		if (file != null) {
-			Image savedImage = imageRepo.save(newImage);
-			book.setImages(savedImage); //If new image, replace path
-		}
 		
 		//Return updated book
 		Book savedBook = bookRepo.save(book);
@@ -230,7 +214,7 @@ public class BookServiceImpl implements BookService {
 	//Delete book (SELLER)
 	@Transactional
 	public Book deleteBook(Integer id, Account seller) {
-		Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found")); //Kiểm tra sách tồn tại?
+		Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found"));
 		//Check if correct seller or admin
 		if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
 
@@ -243,7 +227,7 @@ public class BookServiceImpl implements BookService {
 	public void deleteBooks(List<Integer> ids, Account seller) {
 		//Loop and delete
 		for (Integer id : ids) {
-			Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found")); //Kiểm tra sách tồn tại?
+			Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found"));
 			//Check if correct seller or admin
 			if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
 			bookRepo.deleteById(id); //Delete from database
@@ -253,7 +237,7 @@ public class BookServiceImpl implements BookService {
 	//Delete all books (SELLER)
 	@Transactional
 	public void deleteAllBooks(Account seller) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Lấy người dùng trong Security Context Holder
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString()))) {
 			bookRepo.deleteAll();
 		} else {

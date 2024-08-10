@@ -24,7 +24,7 @@ public class PublisherServiceImpl implements PublisherService {
 
 	//Get publisher by {id}
 	public Publisher getPublisherById(Integer id) {
-		return pubRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Publisher does not exists!")); //exception nếu ko tồn tại
+		return pubRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Publisher does not exists!"));
 	}
 	
 

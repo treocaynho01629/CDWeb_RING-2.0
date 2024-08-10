@@ -46,7 +46,7 @@ const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadProfile }) => {
                 sx={{ display: { xs: 'none', sm: 'flex' }, whiteSpace: 'nowrap' }}
                 aria-label="toggle address dialog"
                 variant="outlined"
-                color={!isValid ? "error" : "secondary"}
+                color={!isValid ? "error" : "primary"}
                 disabled={loadProfile}
                 onClick={handleOpen}
             >

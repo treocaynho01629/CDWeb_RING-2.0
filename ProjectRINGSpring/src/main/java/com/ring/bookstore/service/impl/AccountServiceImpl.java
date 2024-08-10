@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class AccountServiceImpl implements AccountService { //Dịch vụ Người dùng
+public class AccountServiceImpl implements AccountService {
 	
 	private final AccountRepository accountRepo;
 	private final AccountProfileRepository profileRepo;
@@ -68,7 +68,7 @@ public class AccountServiceImpl implements AccountService { //Dịch vụ Ngư�
 	//Get account by {id}
 	public AccountDetailDTO getAccountById(Integer id) {
 		Account account = accountRepo.findById(id).orElseThrow(() -> 
-					new ResourceNotFoundException("User does not exists!")); //Báo Exception nếu ko tồn tại
+					new ResourceNotFoundException("User does not exists!"));
 		return detailMapper.apply(account);
 	}
 	
@@ -140,7 +140,7 @@ public class AccountServiceImpl implements AccountService { //Dịch vụ Ngư�
 		currUser.setUserName(request.getUserName());
 		currUser.setEmail(request.getEmail());
 		currUser.setRoles(roles);
-		if (!request.isKeepOldPass())currUser.setPass(passwordEncoder.encode(request.getPass())); //Đổi pass với điều kiện
+		if (!request.isKeepOldPass())currUser.setPass(passwordEncoder.encode(request.getPass()));
 		
 	    Account updatedAccount = accountRepo.save(currUser); //Save to Database
 		

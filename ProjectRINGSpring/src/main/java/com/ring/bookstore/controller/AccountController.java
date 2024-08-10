@@ -89,8 +89,6 @@ public class AccountController {
 	@DeleteMapping("{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<String> deleteAccount(@PathVariable("id") Integer accountId){
-		
-		//Xoá khỏi DB
 		accountService.deleteAccount(accountId);
 		return new ResponseEntity<String>("Account deleted successfully!", HttpStatus.OK);
 	}

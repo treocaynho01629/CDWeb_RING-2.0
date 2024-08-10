@@ -2,7 +2,6 @@ package com.ring.bookstore.service.impl;
 
 import com.ring.bookstore.enums.ImageSize;
 import com.ring.bookstore.exception.ImageResizerException;
-import com.ring.bookstore.utils.ImageUtils;
 import jakarta.transaction.Transactional;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,36 +42,49 @@ public class ImageServiceImpl implements ImageService {
     @Autowired
     private ImageMapper imageMapper;
 
-    //Upload to Database
-    public ImageDTO upload(MultipartFile file) throws ImageResizerException, IOException {
-        //File name & data
-        String fileName = System.currentTimeMillis() + "_" + StringUtils.cleanPath(file.getOriginalFilename()); //With timestamp
-        BufferedImage originalImage = ImageIO.read(file.getInputStream());
-
-        BufferedImage compressImage = Scalr.resize(originalImage,
-                Scalr.Method.BALANCED,
-                Scalr.Mode.AUTOMATIC, //Keep dimension
-                originalImage.getWidth()); //Keep original size
-
-        Image savedImage = save(compressImage, fileName, file.getContentType());
+    //Map to DTO instead
+    public ImageDTO uploadAndMap(MultipartFile file) throws ImageResizerException, IOException {
+        Image savedImage = upload(file);
         ImageDTO dto = imageMapper.apply(savedImage); //Map to DTO
         return dto;
     }
 
-    //Replace on Database
-    public ImageDTO replace(MultipartFile file) throws ImageResizerException, IOException {
+    public ImageDTO replaceAndMap(MultipartFile file) throws ImageResizerException, IOException {
+        Image savedImage = replace(file);
+        ImageDTO dto = imageMapper.apply(savedImage); //Map to DTO
+        return dto;
+    }
+
+    //Upload to Database
+    public Image upload(MultipartFile file) throws ImageResizerException, IOException {
         //File name & data
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename()); //With timestamp
+        String fileName = System.currentTimeMillis() + "_" + StringUtils.cleanPath(file.getOriginalFilename()); //With timestamp
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
+        //Compress image
         BufferedImage compressImage = Scalr.resize(originalImage,
                 Scalr.Method.BALANCED,
                 Scalr.Mode.AUTOMATIC, //Keep dimension
                 originalImage.getWidth()); //Keep original size
 
         Image savedImage = save(compressImage, fileName, file.getContentType());
-        ImageDTO dto = imageMapper.apply(savedImage); //Map to DTO
-        return dto;
+        return savedImage;
+    }
+
+    //Replace on Database
+    public Image replace(MultipartFile file) throws ImageResizerException, IOException {
+        //File name & data
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
+
+        //Compress image
+        BufferedImage compressImage = Scalr.resize(originalImage,
+                Scalr.Method.BALANCED,
+                Scalr.Mode.AUTOMATIC, //Keep dimension
+                originalImage.getWidth()); //Keep original size
+
+        Image savedImage = save(compressImage, fileName, file.getContentType());
+        return savedImage;
     }
 
     //Get all images
@@ -109,7 +121,7 @@ public class ImageServiceImpl implements ImageService {
     @Transactional
     public Image save(BufferedImage bufferedImage, String fileName, String contentType) throws ImageResizerException {
         try {
-            Image image = imageRepo.findByName(fileName).orElse( //Create image if not already exists
+            Image image = imageRepo.findByName(fileName).orElse( //Create image row if not already exists
                     Image.builder()
                             .name(fileName)
                             .type(contentType)
@@ -120,14 +132,13 @@ public class ImageServiceImpl implements ImageService {
             ImageIO.write(bufferedImage, contentType.split("/")[1], baos);
             byte[] bytes = baos.toByteArray();
 
-            image.setImage(bytes); //Compress and set image
+            image.setImage(bytes); //Set image data
             imageRepo.save(image); //Save to database
             return image;
         } catch (IOException e) {
             throw new ImageResizerException(HttpStatus.INTERNAL_SERVER_ERROR, "Resized image could not be saved.");
         }
     }
-
     //Get image with {reference (name)} and {type (size)}
     public Image resolve(String type, String reference) throws ImageResizerException {
         if (!type.equalsIgnoreCase(ImageSize.ORIGINAL.toString())) {

@@ -83,7 +83,7 @@ const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue }) =>
                 sx={{ display: { xs: 'none', sm: 'flex' }, whiteSpace: 'nowrap', marginTop: 2 }}
                 aria-label="toggle address dialog"
                 variant="outlined"
-                color={isNotValid ? "error" : "secondary"}
+                color={isNotValid ? "error" : "primary"}
                 onClick={() => handleOpen(addressInfo)}
             >
                 Thay đổi
