@@ -34,7 +34,7 @@ const ChangeText = styled.p`
 
     &:hover {
         text-decoration: underline;
-        color: ${props => props.theme.palette.secondary.main};
+        color: ${props => props.theme.palette.primary.main};
         background-color: ${props => props.theme.palette.action.hover};
         transition: .25s ease;
     }
@@ -56,16 +56,21 @@ const MiniProfile = styled.div`
 `
 
 const StyledListItemButton = muiStyled(ListItemButton)(({ theme }) => ({
-    py: '5px',
     justifyContent: 'space-between',
 
+    '&.secondary': {
+        padding: 0,
+        paddingLeft: 48,
+        color: theme.palette.text.secondary,
+    },
+
     '&:hover': {
-        color: theme.palette.secondary.main,
+        color: theme.palette.primary.main,
         backgroundColor: theme.palette.background.default
     },
 
     '&.Mui-selected': {
-        color: theme.palette.secondary.light,
+        color: theme.palette.primary.light,
         backgroundColor: 'transparent',
         textDecoration: 'underline',
 
@@ -109,13 +114,7 @@ const ProfileTabsList = () => {
                     <List component="div" disablePadding>
                         <NavLink to={'/profile/detail'} end style={{ color: 'inherit' }}>
                             {({ isActive }) => (
-                                <StyledListItemButton
-                                    selected={isActive}
-                                    sx={{
-                                        pl: 6,
-                                        py: 0,
-                                        color: 'primary.light'
-                                    }}>
+                                <StyledListItemButton selected={isActive} className="secondary">
                                     <ItemText>Hồ sơ</ItemText>
                                 </StyledListItemButton>
                             )}
@@ -124,13 +123,7 @@ const ProfileTabsList = () => {
                     <List component="div" disablePadding>
                         <NavLink to={'/profile/detail/address'} end style={{ color: 'inherit' }}>
                             {({ isActive }) => (
-                                <StyledListItemButton
-                                    selected={isActive}
-                                    sx={{
-                                        pl: 6,
-                                        py: 0,
-                                        color: 'primary.light'
-                                    }}>
+                                <StyledListItemButton selected={isActive}className="secondary" >
                                     <ItemText>Địa chỉ</ItemText>
                                 </StyledListItemButton>
                             )}
@@ -139,13 +132,7 @@ const ProfileTabsList = () => {
                     <List component="div" disablePadding>
                         <NavLink to={'/profile/detail/password'} end style={{ color: 'inherit' }}>
                             {({ isActive }) => (
-                                <StyledListItemButton
-                                    selected={isActive}
-                                    sx={{
-                                        pl: 6,
-                                        py: 0,
-                                        color: 'primary.light'
-                                    }}>
+                                <StyledListItemButton selected={isActive} className="secondary">
                                     <ItemText>Đổi mật khẩu</ItemText>
                                 </StyledListItemButton>
                             )}

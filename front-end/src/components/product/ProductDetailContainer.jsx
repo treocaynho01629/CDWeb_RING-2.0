@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { lazy, Suspense } from 'react'
 import { styled as muiStyled } from '@mui/system';
 import { Link } from 'react-router-dom';
-import { Box, Skeleton, Tab, TextareaAutosize } from '@mui/material';
+import { Box, Skeleton, Tab } from '@mui/material';
 import { useGetBooksByFilterQuery } from '../../features/books/booksApiSlice';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -28,7 +28,7 @@ const StyledTabList = muiStyled((props) => (
     '& .MuiTabs-indicatorSpan': {
       width: '100%',
       height: 100,
-      backgroundColor: theme.palette.secondary.main,
+      backgroundColor: theme.palette.primary.main,
     },
   }),
 );
@@ -39,28 +39,36 @@ const StyledTab = muiStyled((props) => <Tab {...props} />)(
     color: 'rgba(255, 255, 255, 0.7)',
     '&.Mui-selected': {
       fontWeight: 'bold',
-      backgroundColor: theme.palette.secondary.main,
+      backgroundColor: theme.palette.primary.main,
       color: 'white',
-      outline: 'none',
-      border: 'none',
     },
     '&.Mui-focusVisible': {
       backgroundColor: 'transparent',
-      outline: 'none',
-      border: 'none',
     },
     '&:hover': {
-      backgroundColor: theme.palette.secondary.main,
-    },
-    '&:focus': {
-      outline: 'none',
-      border: 'none',
+      backgroundColor: theme.palette.primary.main,
     },
   }),
 );
 
 const DetailContainer = styled.div`
     margin: 50px 0px;
+`
+
+const StyledTextarea = styled.textarea`
+  width: 95%;
+  margin-top: 50px;
+  padding: 0;
+  background-color: ${props => props.theme.palette.background.default};
+  resize: none;
+  border: none;
+
+  -ms-overflow-style: none;
+  scrollbar-width: none; 
+
+  &::-webkit-scrollbar {
+      display: none;
+  }
 `
 //#endregion
 
@@ -114,13 +122,12 @@ const ProductDetailContainer = ({ loading, book, tab, handleTabChange }) => {
             {book?.type}
           </Link>
         </p>
-        <TextareaAutosize
+        <StyledTextarea
           value={book?.description}
           cols={100}
           rows={20}
           readOnly
           disabled
-          style={{ width: '95%', marginTop: '50px', padding: '0', backgroundColor: 'white', resize: 'none', border: 'none' }}
         />
       </div>
   }
@@ -140,7 +147,7 @@ const ProductDetailContainer = ({ loading, book, tab, handleTabChange }) => {
             {fullInfo}
           </TabPanel>
           <TabPanel value="reviews">
-            <Suspense fallback={<CustomProgress color="secondary" />}>
+            <Suspense fallback={<CustomProgress color="primary" />}>
               <ReviewTab id={book?.id} rateAmount={book?.rateAmount} />
             </Suspense>
           </TabPanel>

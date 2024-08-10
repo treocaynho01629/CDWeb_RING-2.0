@@ -86,7 +86,7 @@ const CustomArrow = styled.button`
 
   &:hover {
     opacity: 1;
-    background-color: ${props => props.theme.palette.secondary.main};
+    background-color: ${props => props.theme.palette.primary.main};
   }
 
   svg {
@@ -207,7 +207,7 @@ function Item({ book }) {
                             </Link>
                             <CustomButton
                                 variant="contained"
-                                color="secondary"
+                                color="primary"
                                 size="large"
                                 onClick={() => handleAddToCart(book)}
                             >
@@ -225,7 +225,7 @@ function Item({ book }) {
                             <CustomButton
                                 disabled
                                 variant="contained"
-                                color="secondary"
+                                color="primary"
                                 size="large"
                             >
                                 Mua ngay

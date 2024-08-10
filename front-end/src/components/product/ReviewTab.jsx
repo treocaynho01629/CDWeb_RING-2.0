@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 import { useCreateReviewMutation, useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
 import AppPagination from '../custom/AppPagination';
 import CustomButton from '../custom/CustomButton';
-import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 import useAuth from "../../hooks/useAuth";
 import CustomProgress from '../custom/CustomProgress';
 
@@ -26,13 +25,13 @@ const RateSelect = styled.div`
 `
 
 const StyledRating = muiStyled(Rating)(({ theme }) => ({
-    color: theme.palette.secondary.main,
+    color: theme.palette.primary.main,
     fontSize: 18,
     '& .MuiRating-iconFilled': {
-        color: theme.palette.secondary.main,
+        color: theme.palette.primary.main,
     },
     '& .MuiRating-iconHover': {
-        color: theme.palette.secondary.light,
+        color: theme.palette.primary.light,
     },
 }));
 
@@ -96,9 +95,6 @@ const ReviewTab = (props) => {
         pageSize: 8,
         totalPages: 0
     });
-
-    //Other
-    const axiosPrivate = useAxiosPrivate();
 
     //Fetch reviews
     const { data, isLoading, isSuccess, isError, error } = useGetReviewsByBookIdQuery({
@@ -180,7 +176,7 @@ const ReviewTab = (props) => {
     if (isLoading) {
         reviewsContent =
             <>
-                <CustomProgress color="secondary" />
+                <CustomProgress color="primary" />
                 <br /><br />
             </>
     } else if (isSuccess) {
@@ -206,7 +202,7 @@ const ReviewTab = (props) => {
             :
             <Box sx={{ marginBottom: 5 }}>Chưa có ai bình luận, hãy trở thành người đầu tiên!</Box>
     } else if (isError) {
-        reviewsContent = <Box sx={{ marginBottom: 5 }}>{error}</Box>
+        reviewsContent = <Box sx={{ marginBottom: 5 }}>{error?.error}</Box>
     }
     //#endregion
 
@@ -221,7 +217,7 @@ const ReviewTab = (props) => {
                         <Link to={'/login'}>
                             <CustomButton
                                 variant="contained"
-                                color="secondary"
+                                color="primary"
                                 size="small"
                             >
                                 Xem đánh giá
@@ -234,7 +230,7 @@ const ReviewTab = (props) => {
                             <br />
                             <CustomButton
                                 variant="contained"
-                                color="secondary"
+                                color="primary"
                                 size="small"
                                 onClick={() => scrollTo(0, 0)}
                             >
@@ -282,7 +278,7 @@ const ReviewTab = (props) => {
                                     </RateSelect>
                                     <CustomButton
                                         variant="contained"
-                                        color="secondary"
+                                        color="primary"
                                         type="submit"
                                     >
                                         Gửi đánh giá
@@ -298,7 +294,7 @@ const ReviewTab = (props) => {
                         <Link to={'/login'}>
                             <CustomButton
                                 variant="contained"
-                                color="secondary"
+                                color="primary"
                             >
                                 Đăng nhập ngay
                             </CustomButton>

@@ -86,8 +86,8 @@ const SignDivider = styled.button`
     text-align: center;
     justify-content: center;
     align-items: center;
-    background-color: ${props => props.theme.palette.secondary.main};
-    color: ${props => props.theme.palette.secondary.contrastText};
+    background-color: ${props => props.theme.palette.primary.main};
+    color: ${props => props.theme.palette.primary.contrastText};
     border-radius: 0;
     border-radius: 50px;
     width: 60px;
@@ -137,7 +137,7 @@ function SignPage() {
                             <CustomButton
                                 sx={{ display: { xs: 'block', md: 'none' } }}
                                 variant="outlined"
-                                color="secondary"
+                                color="primary"
                                 onClick={toggleTab}
                             >
                                 {isLogin ? 'CHƯA CÓ TÀI KHOẢN?' : 'ĐÃ CÓ TÀI KHOẢN?'}

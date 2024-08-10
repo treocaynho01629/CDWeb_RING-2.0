@@ -1,12 +1,11 @@
 import styled from 'styled-components'
 import { useState, useEffect, useMemo } from "react"
-import { Grid, Box, Divider, Checkbox, FormGroup, FormControlLabel, MenuItem, List, ListItemButton, Collapse, Skeleton, Stack, InputAdornment } from '@mui/material';
+import { Grid, Box, Divider, Checkbox, FormGroup, FormControlLabel, MenuItem, List, ListItemButton, Collapse, Skeleton, Stack, InputAdornment, TextField } from '@mui/material';
 import { ExpandLess, ExpandMore, PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon, FilterAltOff } from '@mui/icons-material';
 import { marks, bookTypes } from "../../ultils/filters";
 import CustomSlider from "../custom/CustomSlider";
 import CustomButton from "../custom/CustomButton";
 import CustomDivider from '../custom/CustomDivider';
-import CustomInput from '../custom/CustomInput';
 
 //#region styled
 const TitleContainer = styled.div`
@@ -78,7 +77,7 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
                 pl: 0, py: 0,
                 justifyContent: 'space-between',
                 '&.Mui-selected': {
-                  color: 'secondary.main'
+                  color: 'primary.main'
                 },
               }}
               selected={cateId == id}
@@ -163,7 +162,7 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
         <div key={index} style={{ display: 'flex', justifyContent: 'flex-start' }}>
           <Checkbox disabled
             disableRipple
-            color="secondary"
+            color="primary"
             sx={{paddingLeft: 0}} />
           <Skeleton variant="text" sx={{ fontSize: '14px' }} width={200} />
         </div>
@@ -185,7 +184,7 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
                 onChange={handleChangePub}
                 disableRipple
                 name={pub?.pubName}
-                color="secondary"
+                color="primary"
                 sx={{paddingLeft: 0}} />
             }
             label={pub?.pubName}
@@ -350,7 +349,7 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
         />
       </Box>
       <InputContainer>
-        <CustomInput
+        <TextField
           onChange={handleInputChange}
           onBlur={handleBlur}
           value={valueInput[0]}
@@ -367,7 +366,7 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
           }}
         />
         &nbsp;đến&nbsp;
-        <CustomInput
+        <TextField
           onChange={handleInputChange2}
           onBlur={handleBlur}
           value={valueInput[1]}
@@ -386,7 +385,7 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
       </InputContainer>
       <CustomButton
         variant="contained"
-        color="secondary"
+        color="primary"
         size="large"
         fullWidth
         sx={{ marginTop: 2 }}
@@ -416,7 +415,7 @@ const OtherFilters = ({ type, seller, setSeller, onChangeType, onChangeSeller })
       <TitleContainer>
         <FilterText><TuneIcon />&nbsp;KHÁC</FilterText>
       </TitleContainer>
-      <CustomInput
+      <TextField
         label="Hình thức bìa"
         select
         margin="dense"
@@ -432,8 +431,8 @@ const OtherFilters = ({ type, seller, setSeller, onChangeType, onChangeSeller })
             {option.label}
           </MenuItem>
         ))}
-      </CustomInput>
-      <CustomInput
+      </TextField>
+      <TextField
         margin="dense"
         id="seller"
         label="Tên người bán"

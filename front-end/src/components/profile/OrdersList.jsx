@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import { Fragment, useState } from 'react';
-import { useGetOrdersByUserQuery } from '../../features/orders/orderApiSlice';
+import { useGetOrdersByUserQuery } from '../../features/orders/ordersApiSlice';
 import { Check, DeliveryDining, Receipt, Storefront } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import { Link } from "react-router-dom";
@@ -33,8 +33,8 @@ const ItemTitle = styled.p`
 `
 
 const SellerTag = styled.p`
-    background-color: ${props => props.theme.palette.secondary.main};
-    color: ${props => props.theme.palette.secondary.contrastText};
+    background-color: ${props => props.theme.palette.primary.main};
+    color: ${props => props.theme.palette.primary.contrastText};
     display: flex;
     align-items: center;
     margin: 0;
@@ -53,7 +53,7 @@ const StatusTag = styled.p`
     margin-left: 10px;
     border-left: .5px solid;
     border-color: ${props => props.theme.palette.action.focus};
-    color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.main};
 `
 
 const DetailText = styled.p`
@@ -62,7 +62,7 @@ const DetailText = styled.p`
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    color: ${props => props.theme.palette.secondary.dark};
+    color: ${props => props.theme.palette.primary.dark};
 `
 
 const Amount = styled.p`
@@ -85,7 +85,7 @@ const Price = styled.p`
 
     &.total {
         font-size: 16px;
-        color: ${props => props.theme.palette.secondary.main};
+        color: ${props => props.theme.palette.primary.main};
     }
 `
 
@@ -160,7 +160,7 @@ const OrdersList = ({ Title }) => {
     if (isLoading) {
         ordersContent =
             <>
-                <CustomProgress color="secondary" />
+                <CustomProgress color="primary" />
                 <br /><br />
             </>
     } else if (isSuccess) {
@@ -228,7 +228,7 @@ const OrdersList = ({ Title }) => {
                                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                                         <CustomButton
                                             variant="contained"
-                                            color="secondary"
+                                            color="primary"
                                             onClick={() => handleAddToCart(detail)}
                                         >
                                             Mua lại
@@ -250,7 +250,7 @@ const OrdersList = ({ Title }) => {
             :
             <Box sx={{ marginBottom: 5 }}>Chưa có đơn hàng nào</Box>
     } else if (isError) {
-        ordersContent = <Box sx={{ marginBottom: 5 }}>{error}</Box>
+        ordersContent = <Box sx={{ marginBottom: 5 }}>{error?.error}</Box>
     }
 
     return (

@@ -32,7 +32,7 @@ const CustomArrow = styled.button`
 
   &:hover {
     opacity: 1;
-    background-color: ${props => props.theme.palette.secondary.main};
+    background-color: ${props => props.theme.palette.primary.main};
   }
 
   svg {
@@ -158,7 +158,7 @@ const ProductsSlider = ({ data, isError, isLoading, isSuccess, isUninitialized =
 
   return (
     <Container>
-      {(isLoading || isError || isUninitialized) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'secondary'}`} />}
+      {(isLoading || isError || isUninitialized) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
       {productsCarousel}
     </Container>
   )

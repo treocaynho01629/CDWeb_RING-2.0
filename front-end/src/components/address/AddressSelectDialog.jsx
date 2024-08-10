@@ -10,17 +10,17 @@ import CustomButton from '../custom/CustomButton';
 
 const StyledRadio = styled(Radio)(({ theme }) => ({
   borderRadius: 0,
-  backgroundColor: 'lightgray',
+  backgroundColor: theme.palette.action.disabled,
   transition: 'all .25s ease',
 
   '&:hover': {
-    backgroundColor: theme.palette.secondary.light,
-    color: theme.palette.secondary.contrastText,
+    backgroundColor: theme.palette.primary.light,
+    color: theme.palette.primary.contrastText,
   },
 
   '&.Mui-checked': {
-    backgroundColor: theme.palette.secondary.main,
-    color: 'white',
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
   },
 }));
 
@@ -198,7 +198,7 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
               <CustomButton
                 variant="outlined"
                 size="large"
-                color="secondary"
+                color="primary"
                 sx={{ width: '100%', padding: '10px' }}
                 onClick={() => handleOpen()}
               >
@@ -218,7 +218,7 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
               </CustomButton>
               <CustomButton
                 variant="contained"
-                color="secondary"
+                color="primary"
                 size="large"
                 sx={{ marginY: '10px' }}
                 onClick={handleSubmit}

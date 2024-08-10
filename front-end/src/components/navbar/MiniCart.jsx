@@ -30,7 +30,7 @@ const ProductTitle = styled.h5`
 const ProductPrice = styled.span`
     font-size: 16px;
     font-weight: bold;
-    color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.main};
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -50,29 +50,31 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             disableScrollLock
             sx={{ pointerEvents: 'none' }}
-            PaperProps={{
-                elevation: 0,
-                sx: {
-                    overflow: 'visible',
-                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                    mt: 1.5,
-                    borderRadius: 0,
-                    pointerEvents: 'auto',
+            slotProps={{
+                paper: {
+                    elevation: 0,
+                    sx: {
+                        overflow: 'visible',
+                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                        mt: 1.5,
+                        borderRadius: 0,
+                        pointerEvents: 'auto',
 
-                    '&:before': {
-                        content: '""',
-                        display: 'block',
-                        position: 'absolute',
-                        top: 0,
-                        right: 14,
-                        width: 10,
-                        height: 10,
-                        bgcolor: 'background.paper',
-                        transform: 'translateY(-50%) rotate(45deg)',
-                        zIndex: 0,
+                        '&:before': {
+                            content: '""',
+                            display: 'block',
+                            position: 'absolute',
+                            top: 0,
+                            right: 14,
+                            width: 10,
+                            height: 10,
+                            bgcolor: 'background.paper',
+                            transform: 'translateY(-50%) rotate(45deg)',
+                            zIndex: 0,
+                        },
                     },
-                },
-                onMouseLeave: handleClose
+                    onMouseLeave: handleClose
+                }
             }}
         >
             <MiniCartContainer>
@@ -106,7 +108,7 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
                             <Link to={'/cart'}>
                                 <CustomButton
                                     variant="contained"
-                                    color="secondary"
+                                    color="primary"
                                     size="medium"
                                 >
                                     Xem giỏ hàng

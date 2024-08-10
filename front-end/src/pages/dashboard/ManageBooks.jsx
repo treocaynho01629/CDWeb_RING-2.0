@@ -6,7 +6,6 @@ import { AutoStories as AutoStoriesIcon, LocalFireDepartment, Star } from '@mui/
 import { useNavigate } from "react-router-dom"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import TableBook from '../../components/dashboard/table/TableBooks'
-import useFetch from '../../hooks/useFetch'
 import useAuth from "../../hooks/useAuth"
 import useTitle from "../../hooks/useTitle"
 
@@ -57,7 +56,7 @@ const BookTitle = styled.p`
 const BookPrice = styled.p`
   font-size: 18px;
   font-weight: bold;
-  color: ${props => props.theme.palette.secondary.main};
+  color: ${props => props.theme.palette.primary.main};
   margin: 10px 0 0;
 `
 //#endregion
@@ -65,78 +64,79 @@ const BookPrice = styled.p`
 const BOOKS_URL = 'api/books/filters';
 
 const ManageBooks = () => {
-  const { username, roles } = useAuth();
-  const [bookCount, setBookCount] = useState(0);
-  const [seller, setSeller] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
-  const { loading: loadingBest, data: best } = useFetch(BOOKS_URL + "?pSize=5&sortBy=orderTime&sortDir=desc&seller=" + (seller === false ? "" : username));
-  const { loading: loadingFav, data: fav } = useFetch(BOOKS_URL + "?pSize=5&sortBy=rateAmount&sortDir=desc&seller=" + (seller === false ? "" : username));
-  const navigate = useNavigate();
+  return (<p>TEMP</p>)
+  // const { username, roles } = useAuth();
+  // const [bookCount, setBookCount] = useState(0);
+  // const [seller, setSeller] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
+  // const { loading: loadingBest, data: best } = useFetch(BOOKS_URL + "?pSize=5&sortBy=orderTime&sortDir=desc&seller=" + (seller === false ? "" : username));
+  // const { loading: loadingFav, data: fav } = useFetch(BOOKS_URL + "?pSize=5&sortBy=rateAmount&sortDir=desc&seller=" + (seller === false ? "" : username));
+  // const navigate = useNavigate();
 
-  //Set title
-  useTitle('RING! - Sản phẩm');
+  // //Set title
+  // useTitle('RING! - Sản phẩm');
 
-  return (
-    <>
-      <h2>Quản lý sách</h2>
-      <h3 style={{ color: 'darkgray', cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>Dashboard / Quản lý sách</h3>
-      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
-        <Grid item sm={6} md={3}>
-          <CountContainer elevation={3} >
-            <AutoStoriesIcon sx={countIconStyle} />
-            <CountInfo><h2 style={{ margin: 0 }}>{bookCount}</h2><span>Cuốn sách</span></CountInfo>
-          </CountContainer>
-        </Grid>
-      </Grid>
+  // return (
+  //   <>
+  //     <h2>Quản lý sách</h2>
+  //     <h3 style={{ color: 'darkgray', cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>Dashboard / Quản lý sách</h3>
+  //     <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
+  //       <Grid item sm={6} md={3}>
+  //         <CountContainer elevation={3} >
+  //           <AutoStoriesIcon sx={countIconStyle} />
+  //           <CountInfo><h2 style={{ margin: 0 }}>{bookCount}</h2><span>Cuốn sách</span></CountInfo>
+  //         </CountContainer>
+  //       </Grid>
+  //     </Grid>
 
-      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
-        {loadingBest ? null
-          :
-          <Grid item xs={12} lg={6}>
-            <Paper elevation={3} sx={{ padding: '5px 15px' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center' }}><LocalFireDepartment />Top 5 sách bán chạy</h3>
-              <Stack>
-                {best?.content?.map((book, index) => (
-                  <Paper elevation={1} key={index}
-                    onClick={() => navigate(`/detail/${book.id}`)}
-                    sx={{ width: '100%', display: 'flex', my: '5px', padding: 1, cursor: 'pointer' }}>
-                    <LazyLoadImage src={book.image} style={imageStyle} />
-                    <div>
-                      <BookTitle>{book.title}</BookTitle>
-                      <BookPrice>{book.price.toLocaleString()} đ</BookPrice>
-                    </div>
-                  </Paper>
-                ))}
-              </Stack>
-            </Paper>
-          </Grid>
-        }
+  //     <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
+  //       {loadingBest ? null
+  //         :
+  //         <Grid item xs={12} lg={6}>
+  //           <Paper elevation={3} sx={{ padding: '5px 15px' }}>
+  //             <h3 style={{ display: 'flex', alignItems: 'center' }}><LocalFireDepartment />Top 5 sách bán chạy</h3>
+  //             <Stack>
+  //               {best?.content?.map((book, index) => (
+  //                 <Paper elevation={1} key={index}
+  //                   onClick={() => navigate(`/detail/${book.id}`)}
+  //                   sx={{ width: '100%', display: 'flex', my: '5px', padding: 1, cursor: 'pointer' }}>
+  //                   <LazyLoadImage src={book.image} style={imageStyle} />
+  //                   <div>
+  //                     <BookTitle>{book.title}</BookTitle>
+  //                     <BookPrice>{book.price.toLocaleString()} đ</BookPrice>
+  //                   </div>
+  //                 </Paper>
+  //               ))}
+  //             </Stack>
+  //           </Paper>
+  //         </Grid>
+  //       }
 
-        {loadingFav ? null
-          :
-          <Grid item xs={12} lg={6}>
-            <Paper elevation={3} sx={{ padding: '5px 15px' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center' }}><Star />Top 5 sách được yêu thích</h3>
-              <Stack>
-                {fav?.content?.map((book) => (
-                  <Paper elevation={1}
-                    onClick={() => navigate(`/detail/${book.id}`)}
-                    sx={{ width: '100%', display: 'flex', my: '5px', padding: 1, cursor: 'pointer' }}>
-                    <LazyLoadImage src={book.image} style={imageStyle} />
-                    <div>
-                      <BookTitle>{book.title}</BookTitle>
-                      <BookPrice>{book.price.toLocaleString()} đ</BookPrice>
-                    </div>
-                  </Paper>
-                ))}
-              </Stack>
-            </Paper>
-          </Grid>
-        }
-      </Grid>
+  //       {loadingFav ? null
+  //         :
+  //         <Grid item xs={12} lg={6}>
+  //           <Paper elevation={3} sx={{ padding: '5px 15px' }}>
+  //             <h3 style={{ display: 'flex', alignItems: 'center' }}><Star />Top 5 sách được yêu thích</h3>
+  //             <Stack>
+  //               {fav?.content?.map((book) => (
+  //                 <Paper elevation={1}
+  //                   onClick={() => navigate(`/detail/${book.id}`)}
+  //                   sx={{ width: '100%', display: 'flex', my: '5px', padding: 1, cursor: 'pointer' }}>
+  //                   <LazyLoadImage src={book.image} style={imageStyle} />
+  //                   <div>
+  //                     <BookTitle>{book.title}</BookTitle>
+  //                     <BookPrice>{book.price.toLocaleString()} đ</BookPrice>
+  //                   </div>
+  //                 </Paper>
+  //               ))}
+  //             </Stack>
+  //           </Paper>
+  //         </Grid>
+  //       }
+  //     </Grid>
 
-      <TableBook setBookCount={setBookCount} />
-    </>
-  )
+  //     <TableBook setBookCount={setBookCount} />
+  //   </>
+  // )
 }
 
 export default ManageBooks

@@ -7,13 +7,8 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 
 //#region styled
 const fadeIn = keyframes`
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0}
+  to { opacity: 1 }
 `
 
 const ImgContainer = styled.div`
@@ -58,8 +53,8 @@ const ImageNumber = styled.p`
     padding: 2px 10px;
     position: absolute;
     z-index: 5;
-    color: ${props => props.theme.palette.secondary.contrastText};
-    background-color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.contrastText};
+    background-color: ${props => props.theme.palette.primary.main};
     border-radius: 50px;
     top: 5px;
     left: 10px;
@@ -83,6 +78,9 @@ const SmallImageSlider = styled.div`
     white-space: nowrap;
     padding: 10px;
 
+    -ms-overflow-style: none;
+    scrollbar-width: none; 
+
     &::-webkit-scrollbar {
         display: none;
     }
@@ -97,15 +95,15 @@ const SmallImageSlide = styled.div`
     margin-right: 5px;
     cursor: pointer;
     opacity: 0.5;
-    transition: all 0.5s ease;
+    transition: all .25s ease;
 
     &.active {
-        border: 1px solid ${props => props.theme.palette.secondary.main};
+        border: 1px solid ${props => props.theme.palette.primary.main};
         opacity: 1;
     }
 
     &:hover {
-        border: 1px solid ${props => props.theme.palette.secondary.light};
+        border: 1px solid ${props => props.theme.palette.primary.light};
         opacity: 1;
     }
 `
@@ -131,8 +129,8 @@ const ImageButton = styled.button`
 
     &:hover{
         opacity: 1;
-        background-color: ${props => props.theme.palette.secondary.main};
-        color: ${props => props.theme.palette.secondary.contrastText};
+        background-color: ${props => props.theme.palette.primary.main};
+        color: ${props => props.theme.palette.primary.contrastText};
     }
 `
 

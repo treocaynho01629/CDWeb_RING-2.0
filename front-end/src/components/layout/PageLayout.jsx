@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import styled from 'styled-components'
 import Navbar from "../navbar/Navbar";
 import Footer from "./Footer";
-import ScrollToTop from "./ScrollToTop";
+import ScrollToTopButton from "./ScrollToTopButton";
 
 const LayoutWrapper = styled.div`
     @media (min-width: 768px) {
@@ -24,7 +24,7 @@ export default function PageLayout() {
     return (
         <>
             <Navbar />
-            <ScrollToTop />
+            <ScrollToTopButton />
             <LayoutWrapper>
                 <Outlet />
             </LayoutWrapper>

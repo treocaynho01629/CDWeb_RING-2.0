@@ -1,11 +1,10 @@
 import styled from "styled-components"
 import { useEffect, useState } from "react";
-import { Box, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton } from "@mui/material";
+import { Box, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton, TextField } from "@mui/material";
 import { Check, Person } from "@mui/icons-material";
 import { PHONE_REGEX } from "../../ultils/regex";
 import { useGetProfileQuery, useUpdateProfileMutation } from "../../features/users/usersApiSlice";
 import dayjs from 'dayjs';
-import CustomInput from "../custom/CustomInput";
 import CustomButton from "../custom/CustomButton";
 import CustomDatePicker from "../custom/CustomDatePicker";
 
@@ -19,7 +18,7 @@ const InfoText = styled.h4`
         margin-left: 15px;
         text-decoration: underline;
         cursor: pointer;
-        color: ${props => props.theme.palette.secondary.main};
+        color: ${props => props.theme.palette.primary.main};
     }
 
     &.disabled {
@@ -159,7 +158,7 @@ const ProfileDetail = ({ Title, Instruction, Wrapper, pending, setPending }) => 
                                         ?
                                         <Skeleton variant="rectangular" height={40} width={'100%'} />
                                         :
-                                        <CustomInput
+                                        <TextField
                                             required
                                             type="text"
                                             id="name"
@@ -180,7 +179,7 @@ const ProfileDetail = ({ Title, Instruction, Wrapper, pending, setPending }) => 
                                 <InfoStackContainer>
                                     {editPhone
                                         ?
-                                        <CustomInput
+                                        <TextField
                                             required
                                             id="phone"
                                             onChange={e => setPhone(e.target.value)}
@@ -250,15 +249,15 @@ const ProfileDetail = ({ Title, Instruction, Wrapper, pending, setPending }) => 
                                         onChange={e => setGender(e.target.value)}
                                         sx={{ display: { xs: 'none', sm: 'block' } }}
                                     >
-                                        <FormControlLabel disabled={loadProfile} value="Nam" control={<Radio color="secondary" />} label="Nam" />
-                                        <FormControlLabel disabled={loadProfile} value="Nữ" control={<Radio color="secondary" />} label="Nữ" />
-                                        <FormControlLabel disabled={loadProfile} value="" control={<Radio color="secondary" />} label="Không" />
+                                        <FormControlLabel disabled={loadProfile} value="Nam" control={<Radio color="primary" />} label="Nam" />
+                                        <FormControlLabel disabled={loadProfile} value="Nữ" control={<Radio color="primary" />} label="Nữ" />
+                                        <FormControlLabel disabled={loadProfile} value="" control={<Radio color="primary" />} label="Không" />
                                     </RadioGroup>
                                     {loadProfile
                                         ?
                                         <Skeleton variant="rectangular" height={40} width={'100%'} sx={{ display: { xs: 'flex', sm: 'none' } }} />
                                         :
-                                        <CustomInput
+                                        <TextField
                                             required
                                             select
                                             value={gender}
@@ -270,7 +269,7 @@ const ProfileDetail = ({ Title, Instruction, Wrapper, pending, setPending }) => 
                                             <MenuItem value="Nam">Nam</MenuItem>
                                             <MenuItem value="Nữ">Nữ</MenuItem>
                                             <MenuItem value="">Không</MenuItem>
-                                        </CustomInput>
+                                        </TextField>
                                     }
                                 </InfoStackContainer>
                             </InfoStack>
@@ -279,7 +278,7 @@ const ProfileDetail = ({ Title, Instruction, Wrapper, pending, setPending }) => 
                     <InfoStackContainer>
                         <CustomButton
                             variant="contained"
-                            color="secondary"
+                            color="primary"
                             size="large"
                             disabled={loadProfile}
                             sx={{ marginTop: 5 }}

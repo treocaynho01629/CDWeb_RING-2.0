@@ -7,7 +7,7 @@ import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import { Navigate, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useGetProfileQuery } from '../features/users/usersApiSlice';
-import { useCheckoutMutation } from '../features/orders/orderApiSlice';
+import { useCheckoutMutation } from '../features/orders/ordersApiSlice';
 import { PHONE_REGEX } from '../ultils/regex';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 import CustomButton from '../components/custom/CustomButton';
@@ -42,7 +42,7 @@ const AltCheckoutContainer = styled.div`
 `
 
 const PayButton = styled.button`
-    background-color: ${props => props.theme.palette.secondary.main};
+    background-color: ${props => props.theme.palette.primary.main};
     padding: 15px 20px;
     margin-top: 20px;
     font-size: 15px;
@@ -128,7 +128,7 @@ const MiniTitle = styled.h4`
 
 const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.secondary.main,
+        backgroundColor: theme.palette.primary.main,
         color: theme.palette.common.white,
         fontSize: 14,
         fontWeight: 'bold',
@@ -184,7 +184,7 @@ const ItemTitle = styled.p`
 const Price = styled.p`
     font-size: 16px;
     font-weight: bold;
-    color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.main};
     margin: 0;
  
     &.total {
@@ -217,10 +217,10 @@ const StyledStepper = muiStyled(Stepper)(({ theme }) => ({
         }
     },
     '& .MuiStepLabel-root .Mui-completed': {
-        color: theme.palette.secondary.main,
+        color: theme.palette.primary.main,
     },
     '& .MuiStepLabel-root .Mui-active': {
-        color: theme.palette.secondary.main,
+        color: theme.palette.primary.main,
         textDecoration: 'underline'
     },
     '& .MuiStepLabel-root .Mui-error': {
@@ -398,11 +398,11 @@ const Checkout = () => {
                                     <Table aria-label="checkout-table">
                                         <TableHead
                                             sx={{
-                                                backgroundColor: 'secondary.main',
+                                                backgroundColor: 'primary.main',
                                                 display: { xs: 'none', sm: 'table-header-group' }
                                             }}
                                         >
-                                            <TableRow sx={{ padding: 0, border: '.5px solid', borderColor: 'action.focus', backgroundColor: 'secondary.main' }}>
+                                            <TableRow sx={{ padding: 0, border: '.5px solid', borderColor: 'action.focus', backgroundColor: 'primary.main' }}>
                                                 <StyledTableCell sx={{ height: '42px' }}>Sản phẩm ({products?.length ?? 0})</StyledTableCell>
                                                 <StyledTableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Đơn giá</StyledTableCell>
                                                 <StyledTableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>Số lượng</StyledTableCell>
@@ -480,7 +480,7 @@ const Checkout = () => {
                                     <CustomButton
                                         disabled={!validAddressInfo}
                                         variant="contained"
-                                        color="secondary"
+                                        color="primary"
                                         onClick={handleNext}
                                         sx={{ display: { xs: 'none', sm: 'flex' } }}
                                         endIcon={<KeyboardDoubleArrowDown />}

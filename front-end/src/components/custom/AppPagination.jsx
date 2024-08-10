@@ -1,8 +1,7 @@
 import styled from "styled-components"
 import { useEffect, useState } from 'react'
 import { styled as muiStyled } from '@mui/system';
-import { Pagination, PaginationItem, Stack, MenuItem } from '@mui/material';
-import CustomInput from './CustomInput';
+import { Pagination, PaginationItem, Stack, MenuItem, TextField } from '@mui/material';
 
 //#region styled
 const Container = styled.div`
@@ -15,8 +14,8 @@ const StyledPageItem = muiStyled(PaginationItem)(({ theme }) => ({
     backgroundColor: theme.palette.action.focus,
 
     '&:hover': {
-        backgroundColor: theme.palette.secondary.light,
-        color: theme.palette.secondary.contrastText,
+        backgroundColor: theme.palette.primary.light,
+        color: theme.palette.primary.contrastText,
     },
 
     '&.Mui-disabled': {
@@ -62,13 +61,13 @@ const AppPagination = (props) => {
                     shape="rounded"
                     page={page}
                     onChange={handlePageChange}
-                    color="secondary"
+                    color="primary"
                     renderItem={(item) => (
                         <StyledPageItem  {...item} />
                     )}
                 />
             </Stack>
-            <CustomInput
+            <TextField
                 size="small"
                 select
                 value={pagination?.pageSize}
@@ -79,7 +78,7 @@ const AppPagination = (props) => {
                 <MenuItem value={16}>Hiển thị 16</MenuItem>
                 <MenuItem value={24}>Hiển thị 24</MenuItem>
                 <MenuItem value={48}>Hiển thị 48</MenuItem>
-            </CustomInput>
+            </TextField>
         </Container>
     )
 }

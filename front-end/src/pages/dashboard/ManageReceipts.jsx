@@ -3,8 +3,8 @@ import { styled as muiStyled } from '@mui/material/styles';
 import { useState } from "react";
 import { Grid, Paper } from '@mui/material';
 import { useNavigate } from "react-router-dom"
-import ChartSales from '../../components/dashboard/ChartSales'
-import TableReceipts from "../../components/dashboard/TableReceipts";
+import ChartSales from '../../components/dashboard/chart/ChartSales'
+import TableReceipts from "../../components/dashboard/table/TableReceipts";
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import useTitle from '../../hooks/useTitle';
 

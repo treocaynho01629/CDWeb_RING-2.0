@@ -18,8 +18,8 @@ const ItemContainer = styled.div`
     transition: all .25s ease;
 
     &:hover {
-      background-color: ${props => props.theme.palette.secondary.main};
-      color: ${props => props.theme.palette.secondary.contrastText};
+      background-color: ${props => props.theme.palette.primary.main};
+      color: ${props => props.theme.palette.primary.contrastText};
       transform: scale(1.025);
     }
 `
@@ -67,6 +67,9 @@ const Wrapper = styled.div`
     padding: 0;
     overflow-x: scroll;
     scroll-behavior: smooth;
+
+    -ms-overflow-style: none;
+    scrollbar-width: none; 
 
     &::-webkit-scrollbar {
         display: none;

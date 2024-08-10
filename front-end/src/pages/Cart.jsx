@@ -17,7 +17,7 @@ import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 //#region styled
 const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.secondary.main,
+        backgroundColor: theme.palette.primary.main,
         color: theme.palette.common.white,
         fontSize: 14,
         fontWeight: 'bold',
@@ -108,8 +108,8 @@ const AmountButton = styled.div`
     transition: all 0.5s ease;
 
     &:hover{
-        background-color: ${props => props.theme.palette.secondary.main};
-        color: ${props => props.theme.palette.secondary.contrastText};
+        background-color: ${props => props.theme.palette.primary.main};
+        color: ${props => props.theme.palette.primary.contrastText};
     }
 `
 
@@ -150,7 +150,7 @@ const Price = styled.p`
     font-size: 16px;
     font-weight: bold;
     text-align: left;
-    color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.main};
     margin: 0;
 
     &.total {
@@ -275,10 +275,9 @@ const Cart = () => {
 
         return (
             <TableHead sx={{ display: { xs: 'none', sm: 'table-header-group' }}}>
-                <TableRow sx={{ padding: 0, border: '.5px solid', borderColor: 'action.focus', backgroundColor: 'secondary.main' }}>
+                <TableRow sx={{ padding: 0, border: '.5px solid', borderColor: 'action.focus', backgroundColor: 'primary.main' }}>
                     <StyledTableCell>
                         <Checkbox
-                            color="primary"
                             indeterminate={numSelected > 0 && numSelected < rowCount}
                             checked={rowCount > 0 && numSelected === rowCount}
                             onChange={onSelectAllClick}
@@ -327,7 +326,7 @@ const Cart = () => {
                     />
                     <h2>Giỏ hàng của bạn đang trống</h2>
                     <NavLink to={'/'}>
-                        <CustomButton variant="contained" color="secondary">Tiếp tục mua sắm</CustomButton>
+                        <CustomButton variant="contained" color="primary">Tiếp tục mua sắm</CustomButton>
                     </NavLink>
                 </EmptyWrapper>
                 :
@@ -375,7 +374,7 @@ const Cart = () => {
                                                         <Checkbox
                                                             disableRipple
                                                             disableFocusRipple
-                                                            color="primary"
+                                                            color="primary" xx 
                                                             checked={isItemSelected}
                                                             inputProps={{ 'aria-labelledby': labelId }}
                                                             sx={{ marginRight: { xs: 1, md: 2 }, marginLeft: { xs: -1.5, sm: 0 } }}

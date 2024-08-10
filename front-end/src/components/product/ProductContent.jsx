@@ -59,15 +59,15 @@ const VisitButton = styled.div`
     justify-content: center;
     white-space: nowrap;
     overflow: hidden;
-    border: solid .5px ${props => props.theme.palette.secondary.main};
-    color: ${props => props.theme.palette.secondary.main};
+    border: solid .5px ${props => props.theme.palette.primary.main};
+    color: ${props => props.theme.palette.primary.main};
     padding: 7px 5px;
     cursor: pointer;
     transition: all .3s ease;
 
     &:hover {
-        background-color: ${props => props.theme.palette.secondary.main};
-        color: ${props => props.theme.palette.secondary.contrastText};
+        background-color: ${props => props.theme.palette.primary.main};
+        color: ${props => props.theme.palette.primary.contrastText};
     }
 `
 
@@ -86,8 +86,8 @@ const CouponTab = styled.div`
     transition: all .3s ease;
 
     &:hover{
-        background-color: ${props => props.theme.palette.secondary.main};
-        color: ${props => props.theme.palette.secondary.contrastText};
+        background-color: ${props => props.theme.palette.primary.main};
+        color: ${props => props.theme.palette.primary.contrastText};
     }
 `
 
@@ -159,13 +159,13 @@ const TotalRatingContainer = styled.div`
 `
 
 const StyledRating = muiStyled(Rating)(({ theme }) => ({
-    color: theme.palette.secondary.main,
+    color: theme.palette.primary.main,
     fontSize: 18,
     '& .MuiRating-iconFilled': {
-        color: theme.palette.secondary.main,
+        color: theme.palette.primary.main,
     },
     '& .MuiRating-iconHover': {
-        color: theme.palette.secondary.light,
+        color: theme.palette.primary.light,
     },
 }));
 
@@ -208,7 +208,7 @@ const AltFilterContainer = styled.div`
     height: 50px;
     z-index: 99;
     box-shadow: 3px 3px 10px 3px #b7b7b7;
-    background-color: ${props => props.theme.palette.secondary.main};
+    background-color: ${props => props.theme.palette.primary.main};
     align-items: flex-end;
     display: none;
 
@@ -331,8 +331,8 @@ const AmountButton = styled.div`
     transition: all 0.5s ease;
 
     &:hover{
-        background-color: ${props => props.theme.palette.secondary.main};
-        color: ${props => props.theme.palette.secondary.contrastText};
+        background-color: ${props => props.theme.palette.primary.main};
+        color: ${props => props.theme.palette.primary.contrastText};
     }
 `
 
@@ -344,8 +344,8 @@ const BuyButton = styled.button`
     margin-top: -15px;
     border: none;
     outline: none;
-    background-color: ${props => props.theme.palette.secondary.main};
-    color: ${props => props.theme.palette.secondary.contrastText};
+    background-color: ${props => props.theme.palette.primary.main};
+    color: ${props => props.theme.palette.primary.contrastText};
     font-size: 14px;
     justify-content: center;
     font-weight: bold;
@@ -474,7 +474,7 @@ const ProductContent = ({ book, handleTabChange }) => {
                                         </PriceContainer>
                                         <Box display={{ xs: 'flex', sm: 'none' }} alignItems={'center'} justifyContent={'space-between'}>
                                             <strong style={{ paddingRight: 10 }}>(~) Đánh giá</strong>
-                                            <StarIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
+                                            <StarIcon sx={{ fontSize: 16, color: 'primary.main' }} />
                                         </Box>
                                     </Box>
                                     <DetailContainer>
@@ -528,7 +528,7 @@ const ProductContent = ({ book, handleTabChange }) => {
                                         </PriceContainer>
                                         <Box display={{ xs: 'flex', sm: 'none' }} alignItems={'center'} justifyContent={'space-between'}>
                                             <strong style={{ paddingRight: 10 }}>({calculatedRate}) Đánh giá</strong>
-                                            <StarIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
+                                            <StarIcon sx={{ fontSize: 16, color: 'primary.main' }} />
                                         </Box>
                                     </Box>
                                     <DetailContainer>
@@ -587,7 +587,7 @@ const ProductContent = ({ book, handleTabChange }) => {
                                         </Box>
                                         <CustomButton
                                             variant="outlined"
-                                            color="secondary"
+                                            color="primary"
                                             size="large"
                                             sx={{ margin: '5px' }}
                                             onClick={() => handleAddToCart(book)}

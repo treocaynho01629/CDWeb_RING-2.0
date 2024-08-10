@@ -16,9 +16,9 @@ const Title = styled.h3`
     align-items: center;
     justify-content: space-between;
     text-align: center;
-    border-bottom: 0.5px solid ${props => props.theme.palette.secondary.main};
     padding-bottom: 15px;
-    color: ${props => props.theme.palette.secondary.main};
+    border-bottom: 0.5px solid ${props => props.theme.palette.primary.main};
+    color: ${props => props.theme.palette.primary.main};
 
     ${props => props.theme.breakpoints.down("sm")} {
         font-size: 15px;
@@ -156,7 +156,7 @@ const AddressComponent = ({ pending, setPending }) => {
         </Box>
         <CustomButton
           variant="contained"
-          color="secondary"
+          color="primary"
           onClick={() => handleOpen()}
           endIcon={<AddHome />}
         >
@@ -168,7 +168,7 @@ const AddressComponent = ({ pending, setPending }) => {
           ?
           <Box display={'flex'} alignItems={'center'} justifyContent={'center'} height={'40dvh'}>
             <CircularProgress
-              color="secondary"
+              color="primary"
               size={40}
               thickness={5}
             />

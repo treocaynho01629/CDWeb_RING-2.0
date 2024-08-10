@@ -1,7 +1,6 @@
 import styled from 'styled-components'
 import { Check, CreditCard, LocalAtm, Payments, QrCode, Sell, SystemSecurityUpdateGood } from '@mui/icons-material';
-import { Grid, Radio, RadioGroup, FormControlLabel, Box } from '@mui/material';
-import CustomInput from '../custom/CustomInput';
+import { Grid, Radio, RadioGroup, FormControlLabel, Box, TextField } from '@mui/material';
 
 //#region styled
 const Payout = styled.div`
@@ -73,19 +72,19 @@ const FinalCheckoutDialog = ({ MiniTitle, Title, handleChange, value, products, 
             <MiniTitle style={{ marginTop: 0 }}><CreditCard />&nbsp;Hình thức thanh toán</MiniTitle>
             <SmallContainer>
                 <RadioGroup spacing={1} row value={value} onChange={handleChange}>
-                    <FormControlLabel value="1" control={<Radio color="secondary" />}
+                    <FormControlLabel value="1" control={<Radio color="primary" />}
                         label={<div style={{ display: 'flex', alignItems: 'center' }}>
                             <LocalAtm sx={{ fontSize: 30 }} />Tiền mặt
                         </div>} />
-                    <FormControlLabel value="2" control={<Radio color="secondary" />}
+                    <FormControlLabel value="2" control={<Radio color="primary" />}
                         label={<div style={{ display: 'flex', alignItems: 'center' }}>
                             <CreditCard sx={{ fontSize: 30 }} />Thẻ ATM
                         </div>} />
-                    <FormControlLabel value="3" control={<Radio color="secondary" />}
+                    <FormControlLabel value="3" control={<Radio color="primary" />}
                         label={<div style={{ display: 'flex', alignItems: 'center' }}>
                             <SystemSecurityUpdateGood sx={{ fontSize: 30 }} />Internet Banking
                         </div>} />
-                    <FormControlLabel value="4" control={<Radio color="secondary" />}
+                    <FormControlLabel value="4" control={<Radio color="primary" />}
                         label={<div style={{ display: 'flex', alignItems: 'center' }}>
                             <QrCode sx={{ fontSize: 30 }} />QR Code
                         </div>} />
@@ -95,7 +94,7 @@ const FinalCheckoutDialog = ({ MiniTitle, Title, handleChange, value, products, 
             <SmallContainer>
                 <Grid container spacing={1}>
                     <Grid item xs={6}>
-                        <CustomInput placeholder='Nhập mã giảm giá ...'
+                        <TextField placeholder='Nhập mã giảm giá ...'
                             size="small"
                             fullWidth
                             InputProps={{

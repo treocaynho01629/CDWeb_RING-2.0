@@ -104,7 +104,7 @@ const CouponButton = styled.p`
 `
 
 const PayButton = styled.button`
-    background-color: ${props => props.theme.palette.secondary.main};
+    background-color: ${props => props.theme.palette.primary.main};
     padding: 15px 20px;
     margin-top: 20px;
     font-size: 15px;
@@ -220,7 +220,7 @@ const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick
                                     disableFocusRipple
                                     indeterminate={numSelected > 0 && numSelected < rowCount}
                                     checked={rowCount > 0 && numSelected === rowCount}
-                                    color="secondary"
+                                    color="primary"
                                     inputProps={{
                                         'aria-label': 'select all',
                                     }}

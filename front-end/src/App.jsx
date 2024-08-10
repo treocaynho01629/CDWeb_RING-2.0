@@ -1,20 +1,22 @@
 import './App.css';
 import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom';
+import { Loader } from './components/layout/Loadable';
 import Loadable from './components/layout/Loadable';
-import Loader from './components/layout/Loadable';
+import useReachable from './hooks/useReachable';
 import Layout from './components/layout/Layout';
 import PageLayout from './components/layout/PageLayout';
 import RequireAuth from './components/authorize/RequireAuth';
 import PersistLogin from './components/authorize/PersistsLogin';
-import SignPage from './pages/SignPage';
-import Home from './pages/Home';
+import ScrollToTop from './components/layout/ScrollToTop.jsx';
 
 const Missing = Loadable(lazy(() => import('./pages/error/Missing')));
 const Unauthorized = Loadable(lazy(() => import('./pages/error/Unauthorized')));
 const FiltersPage = Loadable(lazy(() => import('./pages/FiltersPage')));
 const ProductDetail = Loadable(lazy(() => import('./pages/ProductDetail')));
 const Cart = Loadable(lazy(() => import('./pages/Cart')));
+const Home = Loadable(lazy(() => import('./pages/Home')));
+const SignPage = Loadable(lazy(() => import('./pages/SignPage')));
 
 const ProfileLayout = Loadable(lazy(() => import('./components/layout/ProfileLayout')));
 const ResetPage = Loadable(lazy(() => import('./pages/ResetPage')));
@@ -31,30 +33,32 @@ const DetailProduct = Loadable(lazy(() => import('./pages/dashboard/DetailProduc
 const DetailAccount = Loadable(lazy(() => import('./pages/dashboard/DetailAccount.jsx')));
 const Dashboard = Loadable(lazy(() => import('./pages/dashboard/Dashboard')));
 
-
 function App() {
+  useReachable(); //Test connection to server
+
   return (
     <Suspense fallback={<Loader />}>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Layout />}>
-          //PUBLIC
+            //PUBLIC
           <Route path="/login" element={<SignPage />} />
           <Route path="/signup" element={<SignPage />} />
           <Route path="/reset-password" element={<ResetPage />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
 
-          //MISSING
+            //MISSING
           <Route path="*" element={<Missing />} />
 
           <Route element={<PersistLogin />}>
             <Route element={<PageLayout />}>
-              //ANONYMOUS
+                //ANONYMOUS
               <Route path="/" element={<Home />} />
               <Route path="/filters" element={<FiltersPage />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />
 
-              //USER
+                //USER
               <Route element={<RequireAuth allowedRoles={['ROLE_USER']} />}>
                 <Route path="/checkout" element={<Checkout />} />
 
@@ -66,7 +70,7 @@ function App() {
             </Route>
 
             <Route element={<DashboardLayout />}>
-              //SELLER
+                //SELLER
               <Route element={<RequireAuth allowedRoles={['ROLE_SELLER']} />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/manage-books" element={<ManageBooks />} />
@@ -74,7 +78,7 @@ function App() {
                 <Route path="/detail/:id" element={<DetailProduct />} />
               </Route>
 
-              //ADMIN
+                //ADMIN
               <Route element={<RequireAuth allowedRoles={['ROLE_ADMIN']} />}>
                 <Route path="/manage-accounts" element={<ManageAccounts />} />
                 <Route path="/manage-reviews" element={<ManageReviews />} />

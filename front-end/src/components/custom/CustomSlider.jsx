@@ -2,7 +2,7 @@ import Slider from '@mui/material/Slider';
 import { styled } from '@mui/material/styles';
 
 const StyledSlider = styled(Slider)(({ theme }) => ({
-    color: theme.palette.secondary.main,
+    color: theme.palette.primary.main,
     height: 8,
 
     '& .MuiSlider-track': {
@@ -22,7 +22,7 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
         },
     },
     '& .MuiSlider-valueLabel': {
-        backgroundColor: theme.palette.secondary.main,
+        backgroundColor: theme.palette.primary.main,
     },
 }));
 

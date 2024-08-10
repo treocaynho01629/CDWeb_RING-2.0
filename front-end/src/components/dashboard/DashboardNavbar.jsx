@@ -51,7 +51,7 @@ const Logo = styled.h2`
     font-size: 27px;
     text-transform: uppercase;
     font-weight: 500;
-    color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.main};
     cursor: pointer;
     align-items: center;
     display: flex;

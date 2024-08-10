@@ -15,14 +15,18 @@ import useTitle from '../hooks/useTitle';
 
 //#region styled
 const Wrapper = styled.div`
+  overflow-x: hidden;
 `
 
 const ToggleGroupContainer = styled.div`
-  background-color: rgb(39, 39, 39);
+  background-color: #272727;
   margin-bottom: 10px;
   overflow-x: scroll;
   scroll-behavior: smooth;
   white-space: nowrap;
+
+  -ms-overflow-style: none;
+  scrollbar-width: none; 
 
   &::-webkit-scrollbar {
       display: none;
@@ -37,8 +41,8 @@ const ButtonContainer = styled.div`
 
 const StyledToggleButtonGroup = muiStyled(ToggleButtonGroup)(({ theme }) => ({
   '& .MuiToggleButtonGroup-grouped': {
-    backgroundColor: 'rgb(39, 39, 39)',
-    color: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: '#272727',
+    color: '#ffffffb2',
     fontWeight: 400,
     border: 0,
     borderRadius: 0,
@@ -52,11 +56,11 @@ const StyledToggleButton = muiStyled(ToggleButton)(({ theme }) => ({
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   '&:hover': {
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: theme.palette.primary.main,
   },
   '&.Mui-selected': {
     fontWeight: 'bold',
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: theme.palette.primary.main,
     color: 'white',
   },
   '&:focus': {
@@ -186,7 +190,7 @@ const Home = () => {
           <br />
           <Products {...{ isLoading, data, isSuccess, isError }} />
           <ButtonContainer>
-            <CustomButton color="secondary" variant="contained" size="medium" onClick={handleShowMore}>Xem thêm</CustomButton>
+            <CustomButton color="primary" variant="contained" size="medium" onClick={handleShowMore}>Xem thêm</CustomButton>
           </ButtonContainer>
           <br />
           <CustomDivider>SẢN PHẨM XẾP THEO</CustomDivider>
@@ -211,7 +215,7 @@ const Home = () => {
           </ToggleGroupContainer>
           <ProductsSlider {...{ isLoading: loadByOrder, data: orderBooks, isSuccess: doneByOrder, isError: errorByOrder }} />
           <ButtonContainer>
-            <CustomButton variant="contained" color="secondary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</CustomButton>
+            <CustomButton variant="contained" color="primary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</CustomButton>
           </ButtonContainer>
           <br />
           <CustomDivider>SẢN PHẨM DANH MỤC</CustomDivider>
@@ -227,14 +231,14 @@ const Home = () => {
           </ToggleGroupContainer>
           <ProductsSlider {...{ isLoading: loadByCate, data: cateBooks, isSuccess: doneByCate, isError: errorByCate, isUninitialized }} />
           <ButtonContainer>
-            <CustomButton variant="contained" color="secondary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</CustomButton>
+            <CustomButton variant="contained" color="primary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</CustomButton>
           </ButtonContainer>
           <br />
           <CustomDivider>CÓ THỂ BẠN SẼ THÍCH</CustomDivider>
           <br />
           <ProductsSlider {...{ isLoading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
           <ButtonContainer>
-            <CustomButton variant="contained" color="secondary" size="medium" onClick={refetchRandom}>Làm mới</CustomButton>
+            <CustomButton variant="contained" color="primary" size="medium" onClick={refetchRandom}>Làm mới</CustomButton>
           </ButtonContainer>
         </Grid>
       </Grid>

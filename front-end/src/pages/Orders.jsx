@@ -29,9 +29,9 @@ const Title = styled.h3`
     flex-wrap: wrap;
     align-items: center;
     text-align: center;
-    border-bottom: 0.5px solid ${props => props.theme.palette.secondary.main};
+    border-bottom: 0.5px solid ${props => props.theme.palette.primary.main};
     padding-bottom: 15px;
-    color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.main};
 
     ${props => props.theme.breakpoints.down("sm")} {
         font-size: 15px;
@@ -47,7 +47,7 @@ const Profiler = styled.div`
     justify-content: space-between;
     padding: 0px 10px;
     background-color: #f7f7f7;
-    border-bottom: 0.5px solid ${props => props.theme.palette.secondary.main};
+    border-bottom: 0.5px solid ${props => props.theme.palette.primary.main};
 `
 
 const RatingInfo = styled.p`
@@ -66,7 +66,7 @@ const tempLoad = (
         <Title><Skeleton variant="text" sx={{ fontSize: '19px' }} width="50%" /></Title>
         <Box display={'flex'} alignItems={'center'} justifyContent={'center'} height={'40dvh'}>
             <CircularProgress
-                color="secondary"
+                color="primary"
                 size={40}
                 thickness={5}
             />

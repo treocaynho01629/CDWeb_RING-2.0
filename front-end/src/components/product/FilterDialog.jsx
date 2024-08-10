@@ -1,10 +1,9 @@
 import styled from 'styled-components'
 import { useState, useEffect, useMemo } from "react"
-import { Box, Divider, MenuItem, Skeleton, Chip, Stack, DialogContent, Dialog, DialogActions, DialogTitle, useMediaQuery, useTheme, InputAdornment } from '@mui/material';
+import { Box, Divider, MenuItem, Skeleton, Chip, Stack, DialogContent, Dialog, DialogActions, DialogTitle, useMediaQuery, useTheme, InputAdornment, TextField } from '@mui/material';
 import { PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon, Check, FilterAltOff } from '@mui/icons-material';
 import { marks, bookTypes } from "../../ultils/filters";
 import CustomButton from "../custom/CustomButton";
-import CustomInput from "../custom/CustomInput";
 import CustomSlider from "../custom/CustomSlider";
 
 //#region styled
@@ -86,7 +85,7 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, setCateId
           <Chip
             key={`${id}-${index}`}
             variant={cateId == id ? 'filled' : 'outlined'}
-            color={cateId == id ? 'secondary' : 'primary'}
+            color={cateId == id ? 'primary' : 'secondary'}
             onClick={() => handleCateChange(id)}
             label={cate?.categoryName}
           />
@@ -159,7 +158,7 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
           <Chip
             key={`${id}-${index}`}
             variant={isItemSelected ? 'filled' : 'outlined'}
-            color={isItemSelected ? 'secondary' : 'primary'}
+            color={isItemSelected ? 'primary' : 'secondary'}
             onClick={() => handleChangePub(id)}
             label={pub?.pubName}
           />
@@ -319,7 +318,7 @@ const RangeFilter = ({ valueInput, setValueInput }) => {
         />
       </Box>
       <InputContainer>
-        <CustomInput
+        <TextField
             onChange={handleInputChange}
             onBlur={handleBlur}
             value={valueInput[0]}
@@ -336,7 +335,7 @@ const RangeFilter = ({ valueInput, setValueInput }) => {
             }}
           />
         &nbsp;đến&nbsp;
-        <CustomInput
+        <TextField
           onChange={handleInputChange2}
           onBlur={handleBlur}
           value={valueInput[1]}
@@ -368,7 +367,7 @@ const OtherFilters = ({ type, setType, seller, setSeller }) => {
       <TitleContainer>
         <FilterText><TuneIcon />&nbsp;KHÁC</FilterText>
       </TitleContainer>
-      <CustomInput
+      <TextField
         label="Hình thức bìa"
         select
         margin="dense"
@@ -383,8 +382,8 @@ const OtherFilters = ({ type, setType, seller, setSeller }) => {
             {option.label}
           </MenuItem>
         ))}
-      </CustomInput>
-      <CustomInput
+      </TextField>
+      <TextField
         margin="dense"
         id="seller"
         label="Tên người bán"
@@ -495,7 +494,7 @@ const FilterDialog = (props) => {
         </CustomButton>
         <CustomButton
           variant="contained"
-          color="secondary"
+          color="primary"
           size="large"
           sx={{ marginY: '10px' }}
           onClick={applyFilter}

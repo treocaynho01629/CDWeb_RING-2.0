@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { keyframes }  from 'styled-components'
 import { styled as muiStyled } from '@mui/system'
 import { useMemo, useState } from 'react'
 import { KeyboardArrowRight, KeyboardArrowLeft, Star as StarIcon, StarBorder as StarBorderIcon, ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
@@ -8,6 +8,11 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import useCart from '../../hooks/useCart';
 
 //#region styled
+const fadeIn = keyframes`
+  from { opacity: 0}
+  to { opacity: 1 }
+`
+
 const MoreInfo = styled.div`
     opacity: 0;
     width: 100%;
@@ -18,7 +23,7 @@ const MoreInfo = styled.div`
     display: flex;
     justify-content: end;
     align-items: center;
-    transition: all 0.5s ease;
+    transition: all .25s ease;
 `
 
 const ImageSlider = styled.div`
@@ -28,7 +33,7 @@ const ImageSlider = styled.div`
     justify-content: center;
     padding: 2px 2px 0px 2px;
     margin: 2px 2px 0px 2px;
-    transition: all 0.25s ease;
+    transition: all .25s ease;
     z-Index: 1;
 `
 
@@ -41,9 +46,9 @@ const Container = styled.div`
     align-items: center;
     justify-content: space-between;
     position: relative;
-    border: 0.5px solid lightgray;
+    border: 0.5px solid ${props => props.theme.palette.action.focus};
     overflow: hidden;
-    transition: all 0.5s ease;
+    transition: all .25s ease;
 
     &:hover ${MoreInfo}{
         opacity: 1;
@@ -54,7 +59,7 @@ const Container = styled.div`
     };
 
     &:hover {
-        border-color: gray;
+        border-color: ${props => props.theme.palette.action.hover};
     }
 
     @media (min-width: 1000px) {
@@ -107,14 +112,14 @@ const Price = styled.span`
 `
 
 const Percent = styled.p`
-    color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.main};
     margin: 0 0 0 10px;
 `
 
 const Sale = styled.span`
     font-size: 20px;
     font-weight: bold;
-    color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.main};
     margin: 10px 0 0;
     display: flex;
     flex-wrap: wrap;
@@ -126,19 +131,20 @@ const Arrow = styled.div`
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: lightgray;
+    background-color: ${props => props.theme.palette.action.hover};
+    color: ${props => props.theme.palette.common.black};
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 5px;
     opacity: 0.75;
-    transition: all 0.5s ease;
+    transition: all .25s ease;
     cursor: pointer;
     z-index: 5;
 
     &:hover{
-        background-color: ${props => props.theme.palette.secondary.main};
-        color: ${props => props.theme.palette.secondary.contrastText};
+        background-color: ${props => props.theme.palette.primary.main};
+        color: ${props => props.theme.palette.primary.contrastText};
         transform: scale(1.05);
     }
 `
@@ -159,14 +165,13 @@ const AddToCart = styled.p`
     align-items: center;
     text-align: center;
     justify-content: center;
-    color: #424242;
-    transition: all 0.5s ease;
+    transition: all .25s ease;
     z-index: 15;
     margin-bottom: 10px;
     cursor: pointer;
 
     &:hover {
-        color: ${props => props.theme.palette.secondary.main};
+        color: ${props => props.theme.palette.primary.main};
     }
 
     &:after {
@@ -174,17 +179,33 @@ const AddToCart = styled.p`
     }
 `
 
+const TextRating = styled.b`
+    margin-right: 5px;
+    font-size: 12px;
+`
+
 const StyledRating = muiStyled(Rating)(({ theme }) => ({
     fontSize: 14,
     display: 'flex',
     alignItems: 'center',
     '& .MuiRating-iconFilled': {
-        color: theme.palette.secondary.main,
+        color: theme.palette.primary.main,
     },
     '& .MuiRating-iconHover': {
-        color: theme.palette.secondary.light,
+        color: theme.palette.primary.light,
     },
 }));
+
+const StyledLazyImage = styled(LazyLoadImage)`
+    aspect-ratio: 1/1;
+    transition: all .25s ease;
+    margin: 5px 0 10px 0;
+    object-fit: contain;
+    display: ${props => props.display};
+    transform: ${props => props.imageStyle};
+    animation: ${fadeIn} .25s ease;
+    z-index: -1;
+`
 //#endregion
 const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY(-1)'];
 
@@ -229,20 +250,13 @@ const Product = ({ book }) => {
             <Container>
                 <ImageSlider>
                     {multiImages.map((style, index) => (
-                        <LazyLoadImage key={`${book?.id}-${index}`}
+                        <StyledLazyImage key={`${book?.id}-${index}`}
                             src={`${book?.image}?size=small`}
                             alt={`${book?.title} Thumbnail`}
                             height={220}
                             width={'85%'}
-                            style={{
-                                zIndex: -1,
-                                aspectRatio: '1/1.1',
-                                transition: 'all 0.5s ease',
-                                margin: '5px 0px 10px 0px',
-                                objectFit: 'contain',
-                                display: (index + 1) === slideIndex ? "block" : "none",
-                                transform: style,
-                            }}
+                            imageStyle={style}
+                            display={(index + 1) == slideIndex ? "block" : "none"}
                         />
                     ))}
                 </ImageSlider>
@@ -276,14 +290,11 @@ const Product = ({ book }) => {
                         </Box>
                         <Box display={{ xs: 'block', lg: 'none' }} sx={{ cursor: 'pointer' }}>
                             <Tooltip title={calculatedRate === '~' ? 'Chưa có đánh giá nào' : `Trên tổng ${book.rateAmount} đánh giá`}>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <b style={{ fontSize: '12px', marginRight: '5px' }}>{calculatedRate}</b>
+                                <Box sx={{ display: 'flex', alignItems: 'flex-start', height: '100%' }}>
+                                    <TextRating>{calculatedRate}</TextRating>
                                     <StarIcon sx={{
                                         fontSize: 16,
-                                        color: 'secondary.main',
-                                        '&hover': {
-                                            color: 'secondary.light',
-                                        }
+                                        color: 'primary.main',
                                     }}
                                     />
                                 </Box>
@@ -332,14 +343,11 @@ const Product = ({ book }) => {
                         </Box>
                         <Box display={{ xs: 'block', lg: 'none' }} sx={{ cursor: 'pointer' }}>
                             <Tooltip title={'Chưa có đánh giá nào'}>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <b style={{ fontSize: '12px', marginRight: '5px' }}>{0}</b>
-                                    <StarIcon style={{
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', height: '100%' }}>
+                                    <TextRating>0</TextRating>
+                                    <StarIcon sx={{
                                         fontSize: 16,
-                                        color: '#63e399',
-                                        '&hover': {
-                                            color: '#00ff6a',
-                                        }
+                                        color: 'primary.main',
                                     }}
                                     />
                                 </Box>

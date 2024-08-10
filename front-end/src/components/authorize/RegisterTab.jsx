@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 import { useState, useRef, useEffect } from 'react';
-import { Stack } from '@mui/material';
+import { Stack, TextField } from '@mui/material';
 import { useRegisterMutation } from '../../features/auth/authApiSlice';
 import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from '../../ultils/regex';
-import CustomInput from '../custom/CustomInput';
+import CustomPasswordInput from '../custom/CustomPasswordInput';
 import CustomButton from '../custom/CustomButton';
 
 //#region styled
@@ -142,7 +142,7 @@ const RegisterTab = ({ pending, setPending }) => {
                         aria-live="assertive">
                         {errMsg}
                     </Instruction>
-                    <CustomInput
+                    <TextField
                         label="Tên đăng nhập"
                         type="text"
                         id="new-username"
@@ -158,7 +158,7 @@ const RegisterTab = ({ pending, setPending }) => {
                         size="small"
                         margin="dense"
                     />
-                    <CustomInput
+                    <TextField
                         label='Địa chỉ email'
                         type="email"
                         id="email"
@@ -175,8 +175,7 @@ const RegisterTab = ({ pending, setPending }) => {
                         size="small"
                         margin="dense"
                     />
-                    <CustomInput
-                        typeToggle={true}
+                    <CustomPasswordInput
                         label='Mật khẩu'
                         onChange={(e) => setPassword(e.target.value)}
                         value={password}
@@ -190,8 +189,7 @@ const RegisterTab = ({ pending, setPending }) => {
                         size="small"
                         margin="dense"
                     />
-                    <CustomInput
-                        typeToggle={true}
+                    <CustomPasswordInput
                         label='Nhập lại mật khẩu'
                         onChange={(e) => setMatchPass(e.target.value)}
                         value={matchPass}
@@ -207,7 +205,7 @@ const RegisterTab = ({ pending, setPending }) => {
                     <br />
                     <CustomButton
                         variant="contained"
-                        color="secondary"
+                        color="primary"
                         size="large"
                         type="submit"
                         aria-label="submit register"

@@ -1,7 +1,7 @@
 import { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const ScrollToTop = ({ children }) => {
+const ScrollToTop = () => {
   const { pathname } = useLocation(); // Extracts pathname
 
   // Automatically scrolls to top whenever pathname changes
@@ -9,8 +9,6 @@ const ScrollToTop = ({ children }) => {
     console.log('dsa')
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [pathname]);
-
-  return children;
 }
 
 export default ScrollToTop;

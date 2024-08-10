@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 import {
     ShoppingCart as ShoppingCartIcon, DeliveryDining as DeliveryDiningIcon, Lock as LockIcon,
-    Logout, Speed as SpeedIcon, NotificationsActive as NotificationsActiveIcon, Storefront, KeyboardArrowLeft
+    Logout, Speed as SpeedIcon, NotificationsActive as NotificationsActiveIcon, Storefront, KeyboardArrowLeft,
+    Brightness3,
+    Brightness7
 } from '@mui/icons-material';
 import { Avatar, ListItemIcon, Divider, Box, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText, Grid, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -13,7 +15,7 @@ const DrawerLogo = styled.h2`
     font-size: 27px;
     text-transform: uppercase;
     font-weight: 500;
-    color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.main};
     cursor: pointer;
     align-items: center;
     display: flex;
@@ -29,7 +31,7 @@ const DrawerLogo = styled.h2`
 `
 //#endregion
 
-const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, logout, ImageLogo }) => {
+const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, logout, ImageLogo, theme, colorMode }) => {
     const role = roles?.length;
 
     return (
@@ -48,7 +50,6 @@ const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, role
                     width: 'auto',
                     ["@media (min-width:450px)"]: { width: 400 }
                 }}
-                role="presentation"
             >
                 <Box sx={{ marginY: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Link to={`/`} onClick={toggleDrawer(false)} style={{ paddingLeft: '20px' }}>
@@ -68,7 +69,7 @@ const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, role
                             <ListItemIcon>
                                 <Storefront />
                             </ListItemIcon>
-                            <ListItemText primary="CỬA HÀNG" />
+                            <ListItemText primary="Cửa hàng" />
                         </ListItemButton>
                     </ListItem>
                 </List>
@@ -79,7 +80,7 @@ const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, role
                             <ListItemIcon>
                                 <NotificationsActiveIcon />
                             </ListItemIcon>
-                            <ListItemText primary="THÔNG BÁO" />
+                            <ListItemText primary="Thông báo" />
                         </ListItemButton>
                     </ListItem>
 
@@ -91,7 +92,7 @@ const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, role
                             <ListItemIcon>
                                 <ShoppingCartIcon />
                             </ListItemIcon>
-                            <ListItemText>GIỎ HÀNG ({products?.length} SẢN PHẨM)</ListItemText>
+                            <ListItemText primary={`Giỏ hàng (${products?.length} sản phẩm)`}/>
                         </ListItemButton>
                     </ListItem>
                 </List>
@@ -120,7 +121,7 @@ const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, role
                                     <ListItemIcon>
                                         <DeliveryDiningIcon />
                                     </ListItemIcon>
-                                    <ListItemText primary="ĐƠN GIAO" />
+                                    <ListItemText primary="Đơn giao" />
                                 </ListItemButton>
                             </ListItem>
                         </List>
@@ -132,17 +133,24 @@ const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, role
                                         <ListItemIcon>
                                             <SpeedIcon />
                                         </ListItemIcon>
-                                        <ListItemText primary="DASHBOARD" />
+                                        <ListItemText primary="Dashboard" />
                                     </ListItemButton>
                                 </ListItem>
                             )}
-
+                            <ListItem disablePadding>
+                                <ListItemButton onClick={colorMode.toggleColorMode}>
+                                    <ListItemIcon>
+                                        {theme.palette.mode === 'dark' ? <Brightness3 fontSize="small" /> : <Brightness7 fontSize="small" />}
+                                    </ListItemIcon>
+                                    <ListItemText primary={theme.palette.mode === 'dark' ? 'Chủ đề tối' : 'Chủ đề mặc định' } />
+                                </ListItemButton>
+                            </ListItem>
                             <ListItem disablePadding>
                                 <ListItemButton onClick={() => logout()}>
                                     <ListItemIcon>
                                         <Logout />
                                     </ListItemIcon>
-                                    <ListItemText primary="ĐĂNG XUẤT" />
+                                    <ListItemText primary="Đăng xuất" />
                                 </ListItemButton>
                             </ListItem>
                         </List>
@@ -150,16 +158,16 @@ const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, role
                     :
                     <List sx={{ marginLeft: '15px' }}>
                         <ListItem disablePadding onClick={() => navigate('/login', { state: { from: location }, replace: true })}>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <LockIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="ĐĂNG NHẬP" />
-                        </ListItemButton>
-                    </ListItem>
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <LockIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Đăng nhập" />
+                            </ListItemButton>
+                        </ListItem>
                     </List>
                 }
-        </Box>
+            </Box>
         </SwipeableDrawer >
     )
 }

@@ -4,7 +4,7 @@ import { styled as muiStyled } from '@mui/material/styles';
 import { useState } from "react";
 import { Grid, Paper } from '@mui/material';
 import { useNavigate } from "react-router-dom"
-import TableReviews from "../../components/dashboard/TableReviews";
+import TableReviews from "../../components/dashboard/table/TableReviews";
 import TryIcon from '@mui/icons-material/Receipt';
 import useTitle from '../../hooks/useTitle';
 

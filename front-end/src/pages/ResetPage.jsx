@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useResetMutation } from '../features/auth/authApiSlice';
 import { PWD_REGEX } from '../ultils/regex';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
-import CustomInput from '../components/custom/CustomInput';
+import CustomPasswordInput from '../components/custom/CustomPasswordInput';
 import CustomButton from '../components/custom/CustomButton';
 
 const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
@@ -143,8 +143,7 @@ function ResetPage() {
                                 aria-live="assertive">
                                 {errMsg}
                             </Instruction>
-                            <CustomInput
-                                typeToggle={true}
+                            <CustomPasswordInput
                                 label='Mật khẩu mới'
                                 onChange={(e) => setPwd(e.target.value)}
                                 value={pwd}
@@ -158,8 +157,7 @@ function ResetPage() {
                                 size="small"
                                 margin="dense"
                             />
-                            <CustomInput
-                                typeToggle={true}
+                            <CustomPasswordInput
                                 label='Nhập lại mật khẩu mới'
                                 onChange={(e) => setMatchPwd(e.target.value)}
                                 value={matchPwd}
@@ -174,7 +172,7 @@ function ResetPage() {
                             <br />
                             <CustomButton
                                 variant="contained"
-                                color="secondary"
+                                color="primary"
                                 size="large"
                                 type="submit"
                                 sx={{ width: '50%' }}

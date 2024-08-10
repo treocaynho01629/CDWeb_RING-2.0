@@ -3,7 +3,7 @@ import { Box, Stack } from '@mui/material';
 import { Check, Password } from "@mui/icons-material";
 import { PWD_REGEX } from "../../ultils/regex";
 import { useChangePasswordMutation } from '../../features/users/usersApiSlice';
-import CustomInput from "../custom/CustomInput";
+import CustomPasswordInput from "../custom/CustomPasswordInput";
 import CustomButton from "../custom/CustomButton";
 
 const ResetPassComponent = ({ Instruction, Title, Wrapper, pending, setPending }) => {
@@ -100,7 +100,7 @@ const ResetPassComponent = ({ Instruction, Title, Wrapper, pending, setPending }
                 <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
                 <form style={{ marginTop: '30px' }} onSubmit={handleChangePassword}>
                     <Stack spacing={2} direction="column" alignItems={{ xs: 'center', md: 'start' }}>
-                        <CustomInput
+                        <CustomPasswordInput
                             label='Nhập mật khẩu hiện tại'
                             onChange={e => setPass(e.target.value)}
                             value={pass}
@@ -109,9 +109,8 @@ const ResetPassComponent = ({ Instruction, Title, Wrapper, pending, setPending }
                             fullWidth
                             size="small"
                             sx={{ width: { xs: '100%', sm: '80%' } }}
-                            typeToggle={true}
                         />
-                        <CustomInput
+                        <CustomPasswordInput
                             label='Nhập mật khẩu mới'
                             onChange={e => setNewPass(e.target.value)}
                             value={newPass}
@@ -127,9 +126,8 @@ const ResetPassComponent = ({ Instruction, Title, Wrapper, pending, setPending }
                             fullWidth
                             size="small"
                             sx={{ width: { xs: '100%', sm: '80%' } }}
-                            typeToggle={true}
                         />
-                        <CustomInput
+                        <CustomPasswordInput
                             label='Nhập lại mật khẩu mới'
                             onChange={e => setNewPassRe(e.target.value)}
                             value={newPassRe}
@@ -144,12 +142,11 @@ const ResetPassComponent = ({ Instruction, Title, Wrapper, pending, setPending }
                             fullWidth
                             size="small"
                             sx={{ width: { xs: '100%', sm: '80%' } }}
-                            typeToggle={true}
                         />
                         <Box sx={{ width: { xs: '100%', sm: '80%' } }}>
                             <CustomButton
                                 variant="contained"
-                                color="secondary"
+                                color="primary"
                                 onClick={handleChangePassword}
                                 disabled={!validReset || pending || changing}
                                 startIcon={<Check />}

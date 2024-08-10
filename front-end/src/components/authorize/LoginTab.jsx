@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useState, useRef, useEffect } from 'react';
-import { Stack, FormControlLabel, Checkbox, DialogContent, DialogActions, Dialog, DialogTitle } from '@mui/material';
+import { Stack, FormControlLabel, Checkbox, DialogContent, DialogActions, Dialog, DialogTitle, TextField } from '@mui/material';
 import { Check as CheckIcon } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import { setAuth, setPersist } from '../../features/auth/authReducer';
 import { useAuthenticateMutation, useForgotMutation } from '../../features/auth/authApiSlice';
 import { EMAIL_REGEX } from '../../ultils/regex';
-import CustomInput from '../custom/CustomInput';
+import CustomPasswordInput from '../custom/CustomPasswordInput';
 import CustomButton from '../custom/CustomButton';
 
 //#region styled
@@ -176,7 +176,7 @@ const LoginTab = ({ pending, setPending }) => {
                         aria-live="assertive">
                         {errMsgLogin}
                     </Instruction>
-                    <CustomInput
+                    <TextField
                         label="Tên đăng nhập"
                         type="text"
                         id="username"
@@ -187,8 +187,7 @@ const LoginTab = ({ pending, setPending }) => {
                         size="small"
                         margin="dense"
                     />
-                    <CustomInput
-                        typeToggle={true}
+                    <CustomPasswordInput
                         label="Mật khẩu"
                         autoComplete="password"
                         onChange={(e) => setPassword(e.target.value)}
@@ -218,7 +217,7 @@ const LoginTab = ({ pending, setPending }) => {
                     <CustomButton
                         disabled={isLoading}
                         variant="contained"
-                        color="secondary"
+                        color="primary"
                         size="large"
                         type="submit"
                         aria-label="submit login"
@@ -237,7 +236,7 @@ const LoginTab = ({ pending, setPending }) => {
                             aria-live="assertive">
                             {errMsgReset}
                         </Instruction>
-                        <CustomInput
+                        <TextField
                             placeholder='Nhập email tài khoản cần khôi phục'
                             id="email"
                             autoComplete="email"
@@ -255,7 +254,7 @@ const LoginTab = ({ pending, setPending }) => {
                     <CustomButton
                         disabled={!email || !validEmail || sending}
                         variant="contained"
-                        color="secondary"
+                        color="primary"
                         type="submit"
                         size="large"
                         aria-label="submit sending recover email"

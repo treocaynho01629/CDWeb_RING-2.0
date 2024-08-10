@@ -1,12 +1,13 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { styled as muiStyled } from '@mui/system';
 import {
     Search as SearchIcon, ShoppingCart as ShoppingCartIcon, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
-    Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, NotificationsActive as NotificationsActiveIcon, Storefront
+    Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, NotificationsActive as NotificationsActiveIcon, Storefront,
 } from '@mui/icons-material';
 import { Stack, Badge, IconButton, Avatar, Box, Grid, TextField, AppBar, Collapse, useTheme, useMediaQuery } from '@mui/material';
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ColorModeContext } from '../../ThemeContextProvider';
 import useLogout from "../../hooks/useLogout";
 import useAuth from "../../hooks/useAuth";
 import NavDrawer from './NavDrawer';
@@ -171,7 +172,7 @@ const Logo = styled.h2`
     font-size: 27px;
     text-transform: uppercase;
     font-weight: 500;
-    color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.main};
     cursor: pointer;
     align-items: center;
     display: flex;
@@ -179,7 +180,12 @@ const Logo = styled.h2`
     margin: 5px 0px 5px 15px;
     white-space: nowrap;
     overflow: hidden;
-    transition: all .3s ease;
+    transition: all .25s ease;
+
+    p {
+        color: ${props => props.theme.palette.text.secondary};
+        margin: 0;
+    }
 
     &.active {
         width: 110px;
@@ -216,28 +222,23 @@ const NavItem = styled.div`
 `
 
 const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
-    borderRadius: '0',
+    borderRadius: 0,
 
     '&:hover': {
         backgroundColor: 'transparent',
-        color: theme.palette.secondary.main,
-    },
-
-    '&:focus': {
-        outline: 'none',
+        color: theme.palette.primary.main,
     },
 }));
 
 const IconText = styled.p`
     font-size: 13px;
+    margin: 0;
     margin-left: 5px;
 
     ${props => props.theme.breakpoints.down("md_lg")} {
         display: none;
 
-        &.username {
-            display: block;
-        }
+        &.username { display: block;}
     }
 `
 //#endregion
@@ -246,6 +247,7 @@ const Navbar = () => {
     //#region construct
     const { cartProducts } = useCart();
     const location = useLocation();
+    const colorMode = useContext(ColorModeContext);
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -338,23 +340,26 @@ const Navbar = () => {
                                 {mobileMode &&
                                     <Box display={{ xs: 'flex', md: 'none' }} alignItems={'center'}>
                                         <IconButton onClick={toggleDrawer(true)}><MenuIcon sx={{ fontSize: 26 }} /></IconButton>
-                                        <NavDrawer {...{ openDrawer, setOpen, toggleDrawer, username, roles, location,
-                                            products: cartProducts, navigate, logout, ImageLogo }} />
+                                        <NavDrawer {...{
+                                            openDrawer, setOpen, toggleDrawer, username, roles, location,
+                                            products: cartProducts, navigate, logout, ImageLogo, theme, colorMode
+                                        }} />
                                     </Box>
                                 }
                                 <Link to={`/`}>
                                     <Logo className={searchField || hover || focus ? 'active' : ''}>
-                                        <ImageLogo src="/bell.svg" className="logo" alt="RING! Logo" />RING!&nbsp; <p style={{ color: '#424242', margin: 0 }}>- BOOKSTORE</p>
+                                        <ImageLogo src="/bell.svg" className="logo" alt="RING! Logo" />RING!&nbsp; <p>- BOOKSTORE</p>
                                     </Logo>
                                 </Link>
-                                <Box sx={{ display: 'flex' }} flexDirection={{ xs: 'row-reverse', md: 'row' }}>
+                                <Box display={'flex'} alignItems={'center'} flexDirection={{ xs: 'row-reverse', md: 'row' }}>
                                     <Link to={'/filters'} title="Duyệt cửa hàng">
                                         <StyledIconButton aria-label="explore"
                                             sx={{
                                                 marginLeft: 2,
                                                 marginRight: 0,
                                                 zIndex: 10,
-                                            }}>
+                                            }}
+                                        >
                                             <Storefront sx={{ fontSize: '26px' }} />
                                         </StyledIconButton>
                                     </Link>
@@ -413,7 +418,7 @@ const Navbar = () => {
                                             >
                                                 <Link to={'/cart'} title="Giỏ hàng">
                                                     <StyledIconButton aria-label="cart">
-                                                        <Badge color="secondary" badgeContent={cartProducts?.length} anchorOrigin={{
+                                                        <Badge color="primary" badgeContent={cartProducts?.length} anchorOrigin={{
                                                             vertical: 'top',
                                                             horizontal: 'right',
                                                         }}>
@@ -437,7 +442,8 @@ const Navbar = () => {
                                                             <IconText className="username">{username}</IconText>
                                                         </StyledIconButton>
                                                     </Link>
-                                                    <ProfilePopover {...{ open, anchorEl, handleClose: handleProfileClose, navigate, roles, logout }} />
+                                                    <ProfilePopover {...{ open, anchorEl, handleClose: handleProfileClose, 
+                                                        navigate, roles, logout, theme, colorMode }} />
                                                 </div>
                                             ) : (
                                                 <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">

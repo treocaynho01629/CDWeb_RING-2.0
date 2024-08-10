@@ -85,7 +85,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
       <TableRow sx={{ height: '58px' }}>
         <TableCell padding="checkbox">
           <Checkbox
-            color="secondary"
+            color="primary"
             indeterminate={numSelected > 0 && selectedAll == false}
             checked={selectedAll == true}
             onChange={onSelectAllClick}
@@ -436,7 +436,7 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
             sx={{ cursor: 'pointer' }}
           >
             <TableCell padding="checkbox">
-              <Checkbox color="secondary"
+              <Checkbox color="primary"
                 onChange={(event) => handleClick(event, book.id)}
                 checked={isItemSelected}
                 inputProps={{
@@ -477,7 +477,7 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
       <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>Không tìm thấy sản phẩm nào!</Box>
   } else if (isError) {
     booksRows = (
-      <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>{error}</Box>
+      <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>{error?.error}</Box>
     )
   }
 
@@ -527,7 +527,7 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
         />
       </Paper>
       <Box sx={{ height: '10px' }}>
-        {isLoading && (<CustomProgress color="secondary" />)}
+        {isLoading && (<CustomProgress color="primary" />)}
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Box>

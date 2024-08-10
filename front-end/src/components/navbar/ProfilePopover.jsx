@@ -1,8 +1,8 @@
-import { DeliveryDining as DeliveryDiningIcon, Logout, Speed as SpeedIcon } from '@mui/icons-material';
+import { Brightness3, Brightness7, DeliveryDining as DeliveryDiningIcon, Logout, Speed as SpeedIcon } from '@mui/icons-material';
 import { Avatar, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-const ProfilePopover = ({ open, anchorEl, handleClose, roles, logout }) => {
+const ProfilePopover = ({ open, anchorEl, handleClose, roles, logout, theme, colorMode }) => {
     const role = roles?.length;
 
     return (
@@ -15,35 +15,37 @@ const ProfilePopover = ({ open, anchorEl, handleClose, roles, logout }) => {
             disableRestoreFocus
             disableScrollLock
             sx={{ pointerEvents: 'none', }}
-            PaperProps={{
-                elevation: 0,
-                sx: {
-                    overflow: 'visible',
-                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                    mt: 1.5,
-                    borderRadius: 0,
-                    pointerEvents: 'auto',
+            slotProps={{
+                paper: {
+                    elevation: 0,
+                    sx: {
+                        overflow: 'visible',
+                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                        mt: 1.5,
+                        borderRadius: 0,
+                        pointerEvents: 'auto',
 
-                    '& .MuiAvatar-root': {
-                        width: 32,
-                        height: 32,
-                        ml: -0.5,
-                        mr: 1,
+                        '& .MuiAvatar-root': {
+                            width: 32,
+                            height: 32,
+                            ml: -0.5,
+                            mr: 1,
+                        },
+                        '&:before': {
+                            content: '""',
+                            display: 'block',
+                            position: 'absolute',
+                            top: 0,
+                            right: 14,
+                            width: 10,
+                            height: 10,
+                            bgcolor: 'background.paper',
+                            transform: 'translateY(-50%) rotate(45deg)',
+                            zIndex: 0,
+                        },
                     },
-                    '&:before': {
-                        content: '""',
-                        display: 'block',
-                        position: 'absolute',
-                        top: 0,
-                        right: 14,
-                        width: 10,
-                        height: 10,
-                        bgcolor: 'background.paper',
-                        transform: 'translateY(-50%) rotate(45deg)',
-                        zIndex: 0,
-                    },
-                },
-                onMouseLeave: handleClose
+                    onMouseLeave: handleClose
+                }
             }}
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
@@ -72,6 +74,12 @@ const ProfilePopover = ({ open, anchorEl, handleClose, roles, logout }) => {
                     </MenuItem>
                 </Link>
             )}
+            <MenuItem aria-label="toggle-mode" onClick={colorMode.toggleColorMode} >
+                <ListItemIcon>
+                    {theme.palette.mode === 'dark' ? <Brightness3 fontSize="small" /> : <Brightness7 fontSize="small" />}
+                </ListItemIcon>
+                {theme.palette.mode === 'dark' ? 'Chủ đề tối' : 'Chủ đề mặc định'}
+            </MenuItem>
             <MenuItem onClick={() => logout()}>
                 <ListItemIcon>
                     <Logout fontSize="small" />

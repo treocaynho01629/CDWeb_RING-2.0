@@ -4,7 +4,7 @@ import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagin
 import { Receipt as ReceiptIcon, KeyboardArrowDown as KeyboardArrowDownIcon, KeyboardArrowUp as KeyboardArrowUpIcon } from '@mui/icons-material';
 import { visuallyHidden } from '@mui/utils';
 import { Link, useSearchParams } from "react-router-dom";
-import { useGetOrdersQuery } from '../../../features/orders/orderApiSlice';
+import { useGetOrdersQuery } from '../../../features/orders/ordersApiSlice';
 import PropTypes from 'prop-types';
 import CustomProgress from '../../custom/CustomProgress';
 
@@ -349,7 +349,7 @@ export default function TableReceipts({ setReceiptCount, mini }) {
       <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>Không tìm thấy sản phẩm nào!</Box>
   } else if (isError) {
     ordersRows = (
-      <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>{error}</Box>
+      <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>{error?.error}</Box>
     )
   }
 
@@ -394,7 +394,7 @@ export default function TableReceipts({ setReceiptCount, mini }) {
         />
       </Paper>
       <Box sx={{ height: '10px' }}>
-        {isLoading && (<CustomProgress color="secondary" />)}
+        {isLoading && (<CustomProgress color="primary" />)}
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <FormControlLabel

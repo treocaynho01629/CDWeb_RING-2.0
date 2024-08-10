@@ -3,8 +3,8 @@ import { styled as muiStyled } from '@mui/material/styles';
 import { useState, useEffect } from "react";
 import { Grid, Paper } from '@mui/material';
 import { useNavigate } from "react-router-dom"
-import ChartAccounts from '../../components/dashboard/ChartAccounts'
-import TableAccounts from "../../components/dashboard/TableAccounts";
+import ChartAccounts from '../../components/dashboard/chart/ChartAccounts'
+import TableAccounts from "../../components/dashboard/table/TableAccounts";
 import GroupIcon from '@mui/icons-material/Group';
 import useTitle from '../../hooks/useTitle';
 

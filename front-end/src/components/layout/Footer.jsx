@@ -1,12 +1,11 @@
 import styled from "styled-components"
 import { Facebook, YouTube, Instagram, Twitter, QrCode, LocalAtm, SystemSecurityUpdateGood, CreditCard } from '@mui/icons-material';
-import Grid from '@mui/material/Grid';
-import { Box } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 
 //#region styled
 const Container = styled.div`
     background-color: ${props => props.theme.palette.divider};
-    border-top: 2px solid ${props => props.theme.palette.secondary.main};
+    border-top: 2px solid ${props => props.theme.palette.primary.main};
     margin-top: 15dvh;
     padding-top: 20px;
     width: 100%;
@@ -45,7 +44,7 @@ const BotFooter = styled.div`
 const Logo = styled.h1`
     font-size: 30px;
     font-family: abel;
-    color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.main};
     display: flex;
     white-space: nowrap;
 
@@ -110,7 +109,7 @@ const Title = styled.h4`
     ${props => props.theme.breakpoints.down("sm")} {
         margin: 7px 0;
         text-align: center;
-        color: ${props => props.theme.palette.secondary.dark};
+        color: ${props => props.theme.palette.primary.dark};
     }
 `
 
@@ -132,7 +131,7 @@ const ListItem = styled.li`
     transition: all .25s ease;
     
     &:hover{
-        color: ${props => props.theme.palette.secondary.main};
+        color: ${props => props.theme.palette.primary.main};
     }
 `
 
@@ -155,8 +154,8 @@ const Payment = styled.div`
     border: .5px solid ${props => props.theme.palette.action.focus};
     
     &:hover{
-        background-color: ${props => props.theme.palette.secondary.light};
-        color: ${props => props.theme.palette.secondary.contrastText};
+        background-color: ${props => props.theme.palette.primary.light};
+        color: ${props => props.theme.palette.primary.contrastText};
         transform: translateX(5px);
     }
 `

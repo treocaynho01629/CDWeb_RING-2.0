@@ -8,7 +8,7 @@ const PendingIndicator = (props) => {
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <CircularProgress
           sx={{
-            color: 'secondary.main',
+            color: 'primary.main',
             marginRight: '10px',
           }}
           size={40}

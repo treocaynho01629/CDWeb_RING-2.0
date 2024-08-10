@@ -18,7 +18,7 @@ export default function CustomBreadcrumbs(props) {
     return (
         <BreadcrumbsContainer>
             <Breadcrumbs {...props}>
-                <NavLink to={`/`} style={{ backgroundColor: theme.palette.secondary.main, padding: '5px 15px', color: theme.palette.secondary.contrastText }}>
+                <NavLink to={`/`} style={{ backgroundColor: theme.palette.primary.main, padding: '5px 15px', color: theme.palette.primary.contrastText }}>
                     Trang chủ
                 </NavLink>
                 {children}

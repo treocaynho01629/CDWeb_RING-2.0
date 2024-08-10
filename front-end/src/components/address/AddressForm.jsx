@@ -1,10 +1,9 @@
-import styled, { useTheme } from 'styled-components'
+import styled from 'styled-components'
 import { useEffect, useState } from 'react'
 import { LocationOn as LocationOnIcon, Check, Person as PersonIcon, Phone as PhoneIcon, Home as HomeIcon, Close as CloseIcon, Delete } from '@mui/icons-material';
-import { Checkbox, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, MenuItem, Skeleton } from '@mui/material'
+import { Checkbox, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, MenuItem, Skeleton, TextField } from '@mui/material'
 import { location } from '../../ultils/location'
 import { PHONE_REGEX } from '../../ultils/regex';
-import CustomInput from '../custom/CustomInput';
 import CustomButton from '../custom/CustomButton';
 
 const Instruction = styled.p`
@@ -155,7 +154,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
 
     if (!selectedCity) {
         selectWards = (
-            <CustomInput label='Phường/Xã'
+            <TextField label='Phường/Xã'
                 select
                 error={(errMsg != '' || addressInfo) && !currAddress?.ward}
                 defaultValue=""
@@ -163,11 +162,11 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                 size="small"
             >
                 <MenuItem disabled value=""><em>--Phường/Xã--</em></MenuItem>
-            </CustomInput>
+            </TextField>
         )
     } else {
         selectWards = (
-            <CustomInput label='Phường/Xã'
+            <TextField label='Phường/Xã'
                 required
                 value={currAddress?.ward || ''}
                 onChange={(e) => setCurrAddress({ ...currAddress, ward: e.target.value })}
@@ -183,7 +182,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                         {ward}
                     </MenuItem>
                 ))}
-            </CustomInput>
+            </TextField>
         )
     }
 
@@ -199,7 +198,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                     <Grid container spacing={1}>
                         <Grid container item spacing={1}>
                             <Grid item xs={12} sm={6}>
-                                <CustomInput label='Họ và tên'
+                                <TextField label='Họ và tên'
                                     type="text"
                                     id="fullName"
                                     required
@@ -215,7 +214,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <CustomInput placeholder='Số điện thoại (+84)'
+                                <TextField placeholder='Số điện thoại (+84)'
                                     id="phone"
                                     required
                                     onChange={(e) => setCurrAddress({ ...currAddress, phone: e.target.value })}
@@ -233,7 +232,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                         </Grid>
                         <Grid container item spacing={1}>
                             <Grid item xs={12} sm={6}>
-                                <CustomInput label='Tỉnh/Thành phố'
+                                <TextField label='Tỉnh/Thành phố'
                                     required
                                     value={currAddress?.city || ''}
                                     onChange={(e) => setCurrAddress({ ...currAddress, city: e.target.value, ward: '' })}
@@ -249,14 +248,14 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                                             {city.name}
                                         </MenuItem>
                                     ))}
-                                </CustomInput>
+                                </TextField>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 {selectWards}
                             </Grid>
                         </Grid>
                         <Grid item xs={12}>
-                            <CustomInput placeholder='Địa chỉ nhận hàng'
+                            <TextField placeholder='Địa chỉ nhận hàng'
                                 type="text"
                                 autoComplete="on"
                                 required
@@ -280,7 +279,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                                             disableFocusRipple
                                             disabled={isDefault || isSelected}
                                             checked={selectDefault}
-                                            color="secondary"
+                                            color="primary"
                                             inputProps={{
                                                 'aria-label': 'select',
                                             }}
@@ -321,7 +320,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                 </CustomButton>
                 <CustomButton
                     variant="contained"
-                    color="secondary"
+                    color="primary"
                     size="large"
                     sx={{ marginY: '10px' }}
                     onClick={handleSubmit}

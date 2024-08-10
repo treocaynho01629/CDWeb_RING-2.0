@@ -41,7 +41,7 @@ const StyledDatePicker = styled(DatePicker)(({ theme }) => ({
         borderWidth: 1,
     },
     '& input:valid:focus + fieldset': {
-        borderColor: theme.palette.secondary.main,
+        borderColor: theme.palette.primary.main,
         borderLeftWidth: 4,
         borderRadius: 0,
         padding: '4px !important',

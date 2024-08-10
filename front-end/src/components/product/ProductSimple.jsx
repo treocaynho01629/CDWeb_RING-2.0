@@ -50,7 +50,7 @@ const Title = styled.h5`
 const Price = styled.span`
     font-size: 21px;
     font-weight: bold;
-    color: ${props => props.theme.palette.secondary.main};
+    color: ${props => props.theme.palette.primary.main};
     margin: 10px 0 10px;
     display: flex;
     flex-wrap: wrap;
@@ -116,6 +116,7 @@ const ProductSimple = ({ book }) => {
                     disabled
                     size="small"
                     variant="outlined"
+                    color="secondary"
                     sx={{ marginTop: '10px', marginBottom: '15px', padding: '6px 10px' }}
                     startIcon={<ShoppingCartIcon/>}
                 >

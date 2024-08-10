@@ -15,7 +15,7 @@ const AddressItemContainer = styled.div`
     border: 0.5px solid ${props => props.theme.palette.action.focus};
 
     &.active {
-        border-color: ${props => props.theme.palette.secondary.main};
+        border-color: ${props => props.theme.palette.primary.main};
     }
 
     &.error {
@@ -32,8 +32,8 @@ const AddressTag = styled.div`
     padding: 2px 10px;
     border-right: .5px solid;
     border-bottom: .5px solid;
-    border-color: ${props => props.theme.palette.secondary.main};
-    color: ${props => props.theme.palette.secondary.dark};
+    border-color: ${props => props.theme.palette.primary.main};
+    color: ${props => props.theme.palette.primary.dark};
     pointer-events: none;
 
     &.error {

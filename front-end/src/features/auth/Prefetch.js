@@ -1,25 +1,18 @@
-import { store } from "../../app/store";
-import { postsApiSlice } from "../posts/postsApiSlice";
 import { useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { store } from "../../app/store";
+import { booksApiSlice } from "../books/booksApiSlice";
+import { reviewsApiSlice } from "../reviews/reviewsApiSlice";
+import { ordersApiSlice } from "../orders/ordersApiSlice";
 import { usersApiSlice } from "../users/usersApiSlice";
-import { imagesApiSlice } from "../images/imagesApiSlice";
+import { Outlet } from "react-router-dom";
 
 const defaultSize = 8;
 
 const Prefetch = () => {
 
     useEffect(() => {
-        store.dispatch(postsApiSlice.util.prefetch("getPosts", { 
-            page: 1, 
-            size: defaultSize 
-        }, { force: true }));
         store.dispatch(usersApiSlice.util.prefetch("getUsers", { 
             page: 1, 
-            size: defaultSize
-        }, { force: true }));
-        store.dispatch(imagesApiSlice.util.prefetch("getImages", {
-            page: 1,
             size: defaultSize
         }, { force: true }));
     }, [])

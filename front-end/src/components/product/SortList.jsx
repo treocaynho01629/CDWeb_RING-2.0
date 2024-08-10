@@ -1,10 +1,9 @@
 import styled from "styled-components"
 import { useEffect, useState } from 'react'
 import { styled as muiStyled } from '@mui/system';
-import { Grid, MenuItem, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Grid, MenuItem, ToggleButton, ToggleButtonGroup, TextField } from '@mui/material';
 import { Search, FilterAlt } from '@mui/icons-material';
 import { orderGroup } from "../../ultils/filters";
-import CustomInput from "../custom/CustomInput";
 import CustomButton from "../custom/CustomButton";
 import QuickPagination from "../custom/QuickPagination";
 
@@ -58,10 +57,10 @@ const StyledToggleButton = muiStyled(ToggleButton)(({ theme }) => ({
     transition: 'all .3s ease',
 
     '&:hover': {
-        backgroundColor: theme.palette.secondary.main,
+        backgroundColor: theme.palette.primary.main,
     },
     '&.Mui-selected': {
-        backgroundColor: theme.palette.secondary.main,
+        backgroundColor: theme.palette.primary.main,
         color: 'white',
     },
     '&:focus': {
@@ -138,7 +137,7 @@ const SortList = (props) => {
                         </StyledToggleButtonGroup>
                     </Grid>
                     <Grid item xs={12} md={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-end' } }}>
-                        <CustomInput
+                        <TextField
                             size="small"
                             select
                             value={sortDir}
@@ -146,8 +145,8 @@ const SortList = (props) => {
                         >
                             <MenuItem value={'desc'}>Cao đến thấp</MenuItem>
                             <MenuItem value={'asc'}>Thấp đến cao</MenuItem>
-                        </CustomInput>
-                        <CustomInput
+                        </TextField>
+                        <TextField
                             size="small"
                             select
                             value={pagination?.pageSize}
@@ -158,7 +157,7 @@ const SortList = (props) => {
                             <MenuItem value={16}>Hiển thị 16</MenuItem>
                             <MenuItem value={24}>Hiển thị 24</MenuItem>
                             <MenuItem value={48}>Hiển thị 48</MenuItem>
-                        </CustomInput>
+                        </TextField>
                         {/* <QuickPagination {...{ pagination, onPageChange, onSizeChange }} /> */}
                         <CustomButton
                             size="small"
