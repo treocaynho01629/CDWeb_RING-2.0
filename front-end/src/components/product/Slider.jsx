@@ -168,7 +168,7 @@ function Item({ book }) {
                             <ImgContainer>
                                 <LazyLoadImage
                                     src={book.image}
-                                    srcSet={`${book.images}?size=medium 350w, ${book.image} 600w`}
+                                    srcSet={`${book.image}?size=medium 350w, ${book.image} 600w`}
                                     sizes='400px'
                                     height={400}
                                     width={'100%'}
