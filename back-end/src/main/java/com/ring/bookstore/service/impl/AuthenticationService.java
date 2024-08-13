@@ -51,7 +51,7 @@ public class AuthenticationService {
 	private final JwtService jwtService;
 	private static final long EXPIRE_TOKEN_AFTER_MINUTES = 30;
 	
-	@Value("${ring.fronturl}")
+	@Value("${ring.client-url}")
 	private String frontUrl;
 	
 	//Register

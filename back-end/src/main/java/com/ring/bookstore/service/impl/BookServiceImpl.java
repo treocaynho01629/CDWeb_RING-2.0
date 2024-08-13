@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.service.ImageService;
-import com.ring.bookstore.utils.ImageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ring.bookstore.dtos.BookDTO;
@@ -39,7 +37,6 @@ import com.ring.bookstore.model.Publisher;
 import com.ring.bookstore.repository.BookDetailRepository;
 import com.ring.bookstore.repository.BookRepository;
 import com.ring.bookstore.repository.CategoryRepository;
-import com.ring.bookstore.repository.ImageRepository;
 import com.ring.bookstore.repository.PublisherRepository;
 import com.ring.bookstore.request.BookRequest;
 import com.ring.bookstore.service.BookService;
@@ -55,7 +52,6 @@ public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepo;
 	private final BookDetailRepository detailRepo;
 	private final CategoryRepository cateRepo;
-	private final ImageRepository imageRepo;
 
 	@Autowired
 	private ImageService imageService;
