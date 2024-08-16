@@ -6,7 +6,6 @@ const ScrollToTop = () => {
 
   // Automatically scrolls to top whenever pathname changes
   useLayoutEffect(() => {
-    console.log('dsa')
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [pathname]);
 }

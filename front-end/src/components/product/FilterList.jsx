@@ -1,10 +1,9 @@
 import styled from 'styled-components'
 import { useState, useEffect, useMemo } from "react"
-import { Grid, Box, Divider, Checkbox, FormGroup, FormControlLabel, MenuItem, List, ListItemButton, Collapse, Skeleton, Stack, InputAdornment, TextField } from '@mui/material';
+import { Grid, Box, Button, Divider, Checkbox, FormGroup, FormControlLabel, MenuItem, List, ListItemButton, Collapse, Skeleton, Stack, InputAdornment, TextField } from '@mui/material';
 import { ExpandLess, ExpandMore, PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon, FilterAltOff } from '@mui/icons-material';
 import { marks, bookTypes } from "../../ultils/filters";
 import CustomSlider from "../custom/CustomSlider";
-import CustomButton from "../custom/CustomButton";
 import CustomDivider from '../custom/CustomDivider';
 
 //#region styled
@@ -383,7 +382,7 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
           }}
         />
       </InputContainer>
-      <CustomButton
+      <Button
         variant="contained"
         color="primary"
         size="large"
@@ -392,7 +391,7 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
         onClick={handleApply}
       >
         Áp dụng
-      </CustomButton>
+      </Button>
     </Filter>
   )
 }
@@ -496,7 +495,7 @@ const FilterList = (props) => {
         <PublisherFilter {...{ loadPubs, donePubs, errorPubs, pubs, selectedPub, setSelectedPub, onChangePub }} />
         <OtherFilters {...{ type, seller, setSeller, onChangeType, onChangeSeller }} />
       </Stack>
-      <CustomButton
+      <Button
         variant="contained"
         color="error"
         size="large"
@@ -506,7 +505,7 @@ const FilterList = (props) => {
         startIcon={<FilterAltOff />}
       >
         Xoá bộ lọc
-      </CustomButton>
+      </Button>
     </>
   )
 }

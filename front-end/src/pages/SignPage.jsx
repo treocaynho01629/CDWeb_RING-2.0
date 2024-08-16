@@ -1,10 +1,10 @@
 import styled, { keyframes } from 'styled-components'
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useLocation } from 'react-router-dom';
+import { Button } from '@mui/material';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 import LoginTab from '../components/authorize/LoginTab';
 import RegisterTab from '../components/authorize/RegisterTab';
-import CustomButton from '../components/custom/CustomButton';
 import useAuth from '../hooks/useAuth';
 import useTitle from '../hooks/useTitle';
 
@@ -134,14 +134,14 @@ function SignPage() {
                         </TabContainer>
                         <DividerContainer>
                             <SignDivider onClick={toggleTab}>HOẶC</SignDivider>
-                            <CustomButton
+                            <Button
                                 sx={{ display: { xs: 'block', md: 'none' } }}
                                 variant="outlined"
                                 color="primary"
                                 onClick={toggleTab}
                             >
                                 {isLogin ? 'CHƯA CÓ TÀI KHOẢN?' : 'ĐÃ CÓ TÀI KHOẢN?'}
-                            </CustomButton>
+                            </Button>
                         </DividerContainer>
                     </>
                 }

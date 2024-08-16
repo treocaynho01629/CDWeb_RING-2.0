@@ -18,13 +18,6 @@ const Wrapper = styled.div`
     }
 `
 
-const Instruction = styled.p`
-    font-size: 14px;
-    font-style: italic;
-    color: red;
-    display: ${props => props.display};
-`
-
 const ContentContainer = styled.div`
     position: relative;
     padding: 0px 15px;
@@ -87,7 +80,7 @@ const Profile = () => {
                 <TabPanel value="" sx={{ px: 0 }}>
                     <ContentContainer>
                         <Suspense fallback={tempLoad}>
-                            <ProfileDetail {...{ Title, Instruction, Wrapper, pending, setPending }} />
+                            <ProfileDetail {...{ Title, Wrapper, pending, setPending }} />
                         </Suspense>
                     </ContentContainer>
                 </TabPanel>
@@ -101,7 +94,7 @@ const Profile = () => {
                 <TabPanel value="password" sx={{ px: 0 }}>
                     <ContentContainer>
                         <Suspense fallback={tempLoad}>
-                            <ResetPassComponent {...{ pending, setPending, Title, Wrapper, Instruction }} />
+                            <ResetPassComponent {...{ pending, setPending, Title, Wrapper }} />
                         </Suspense>
                     </ContentContainer>
                 </TabPanel>

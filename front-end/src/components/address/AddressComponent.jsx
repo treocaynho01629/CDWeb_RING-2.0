@@ -1,12 +1,11 @@
 import styled, { useTheme } from "styled-components"
 import { useState } from 'react'
 import { useGetProfileQuery, useUpdateProfileMutation } from '../../features/users/usersApiSlice';
-import { Box, CircularProgress, Dialog, ListItemIcon, ListItemText, Menu, MenuItem, useMediaQuery } from '@mui/material';
+import { Box, Button, CircularProgress, Dialog, ListItemIcon, ListItemText, Menu, MenuItem, useMediaQuery } from '@mui/material';
 import { AddHome, Delete, Home, LocationOn } from '@mui/icons-material';
 import AddressItem from './AddressItem'
 import AddressForm from './AddressForm'
 import useCart from '../../hooks/useCart';
-import CustomButton from '../custom/CustomButton';
 
 //#region styled
 const Title = styled.h3`
@@ -154,14 +153,14 @@ const AddressComponent = ({ pending, setPending }) => {
         <Box display={'flex'} alignItems={'center'}>
           <LocationOn />&nbsp;ĐỊA CHỈ CỦA BẠN
         </Box>
-        <CustomButton
+        <Button
           variant="contained"
           color="primary"
           onClick={() => handleOpen()}
           endIcon={<AddHome />}
         >
           Thêm địa chỉ
-        </CustomButton>
+        </Button>
       </Title>
       {
         (loadProfile && !profile)

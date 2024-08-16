@@ -1,8 +1,7 @@
 import styled from "styled-components"
 import { useEffect, useState } from 'react'
-import { Stack } from '@mui/material';
+import { Stack, Button } from '@mui/material';
 import { AspectRatio, KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
-import CustomButton from "./CustomButton";
 
 //#region styled
 const Container = styled.div`
@@ -45,12 +44,12 @@ const QuickPagination = (props) => {
 
     return (
         <Container>
-            <CustomButton variant="outlined" sx={{aspectRatio: 1/1}}>
+            <Button variant="outlined" sx={{aspectRatio: 1/1}}>
                 <KeyboardArrowLeft/>
-            </CustomButton>
-            <CustomButton>
+            </Button>
+            <Button>
                 <KeyboardArrowRight/>
-            </CustomButton>
+            </Button>
             {/* <Stack spacing={2} sx={{ my: 5 }}>
                 <Pagination count={count ? count : 0} shape="rounded"
                     page={page}

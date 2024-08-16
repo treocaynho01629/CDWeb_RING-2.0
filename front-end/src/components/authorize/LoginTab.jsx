@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useState, useRef, useEffect } from 'react';
-import { Stack, FormControlLabel, Checkbox, DialogContent, DialogActions, Dialog, DialogTitle, TextField } from '@mui/material';
+import { Stack, Button, FormControlLabel, Checkbox, DialogContent, DialogActions, Dialog, DialogTitle, TextField } from '@mui/material';
 import { Check as CheckIcon } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
@@ -9,21 +9,14 @@ import { useDispatch } from 'react-redux';
 import { setAuth, setPersist } from '../../features/auth/authReducer';
 import { useAuthenticateMutation, useForgotMutation } from '../../features/auth/authApiSlice';
 import { EMAIL_REGEX } from '../../ultils/regex';
+import { Instruction } from '../custom/GlobalComponent';
 import CustomPasswordInput from '../custom/CustomPasswordInput';
-import CustomButton from '../custom/CustomButton';
 
 //#region styled
 const Title = styled.h1`
     font-size: 30px;
     font-weight: 400;
     color: inherit;
-`
-
-const Instruction = styled.p`
-    font-size: 14px;
-    margin-top: 0;
-    font-style: italic;
-    color: ${props => props.theme.palette.error.main};
 `
 //#endregion
 
@@ -214,7 +207,7 @@ const LoginTab = ({ pending, setPending }) => {
                         <a style={{ textDecoration: 'underline', cursor: 'pointer', color: '#63e399' }}
                             onClick={handleOpen}>Quên mật khẩu</a>
                     </div>
-                    <CustomButton
+                    <Button
                         disabled={isLoading}
                         variant="contained"
                         color="primary"
@@ -224,7 +217,7 @@ const LoginTab = ({ pending, setPending }) => {
                         sx={{ width: '50%' }}
                     >
                         Đăng nhập
-                    </CustomButton>
+                    </Button>
                 </Stack>
             </form>
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
@@ -250,8 +243,8 @@ const LoginTab = ({ pending, setPending }) => {
                     </form>
                 </DialogContent>
                 <DialogActions sx={{ marginBottom: '10px' }}>
-                    <CustomButton variant="outlined" color="error" size="large" onClick={handleClose}>Huỷ</CustomButton>
-                    <CustomButton
+                    <Button variant="outlined" color="error" size="large" onClick={handleClose}>Huỷ</Button>
+                    <Button
                         disabled={!email || !validEmail || sending}
                         variant="contained"
                         color="primary"
@@ -262,7 +255,7 @@ const LoginTab = ({ pending, setPending }) => {
                         startIcon={<CheckIcon />}
                     >
                         Gửi
-                    </CustomButton>
+                    </Button>
                 </DialogActions>
             </Dialog>
         </>

@@ -1,13 +1,12 @@
 import styled from "styled-components"
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import { useGetOrdersByUserQuery } from '../../features/orders/ordersApiSlice';
 import { Check, DeliveryDining, Receipt, Storefront } from '@mui/icons-material';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { Link } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import CustomProgress from '../custom/CustomProgress';
 import useCart from '../../hooks/useCart';
-import CustomButton from "../custom/CustomButton";
 
 //#region styled
 const ItemTitle = styled.p`
@@ -48,7 +47,6 @@ const StatusTag = styled.p`
     justify-content: flex-end;
     margin: 0;
     font-weight: bold;
-    font-size: 16px;
     padding-left: 5px;
     margin-left: 10px;
     border-left: .5px solid;
@@ -82,6 +80,7 @@ const Price = styled.p`
     font-size: 14px;
     font-weight: bold;
     margin: 0;
+    color: ${props => props.theme.palette.text.secondary};
 
     &.total {
         font-size: 16px;
@@ -100,9 +99,15 @@ const HeadContainer = styled.div`
     justify-content: space-between;
     align-items: center;
     padding: 15px;
+    font-size: 16px;
     border-bottom: .5px solid;
     border-color: ${props => props.theme.palette.action.focus};
     background-color: ${props => props.theme.palette.action.hover};
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        font-size: 14px;
+        svg { font-size: 18px;}
+    }
 `
 
 const BodyContainer = styled.div`
@@ -119,6 +124,23 @@ const BotContainer = styled.div`
     padding: 15px;
     border-top: .5px solid;
     border-color: ${props => props.theme.palette.action.focus};
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        font-size: 14px;
+        align-items: flex-start;
+    }
+`
+
+const StyledLazyImage = styled(LazyLoadImage)`
+    display: inline-block;
+    height: 90px;
+    width: 90px;
+    border: .5px solid ${props => props.theme.palette.action.focus};
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        height: 80px;
+        width: 80px;
+    }
 `
 //#endregion
 
@@ -177,7 +199,7 @@ const OrdersList = ({ Title }) => {
                                 <Link to={`/filters?seller=${detail.sellerName}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
                                     <SellerTag>Đối tác&nbsp;<Check fontSize="small" /></SellerTag>
                                     {detail.sellerName}
-                                    <CustomButton
+                                    <Button
                                         variant="outlined"
                                         sx={{
                                             display: { xs: 'none', md_lg: 'flex' },
@@ -186,10 +208,10 @@ const OrdersList = ({ Title }) => {
                                             paddingRight: '7px',
                                             whiteSpace: 'nowrap'
                                         }}
-                                        startIcon={<Storefront/>}
+                                        startIcon={<Storefront />}
                                     >
                                         Xem Shop
-                                    </CustomButton>
+                                    </Button>
                                 </Link>
                                 <Link to={`/profile/orders/${order.id}--${detail.id}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
                                     <StatusTag><Check />ĐÃ GIAO</StatusTag>
@@ -198,13 +220,9 @@ const OrdersList = ({ Title }) => {
                             <Link to={`/product/${detail.bookId}`} style={{ color: 'inherit' }}>
                                 <BodyContainer>
                                     <Box display={'flex'}>
-                                        <LazyLoadImage src={detail.image}
-                                            height={90}
-                                            width={90}
-                                            style={{
-                                                border: '0.5px solid lightgray',
-                                                objectFit: 'contain'
-                                            }}
+                                        <StyledLazyImage
+                                            src={`${detail.image}?size=small`}
+                                            alt={`${detail.title}`}
                                         />
                                         <div style={{ marginLeft: '20px', marginTop: '10px' }}>
                                             <ItemTitle>{detail.bookTitle}</ItemTitle>
@@ -226,18 +244,18 @@ const OrdersList = ({ Title }) => {
                                         <Price className="total">&nbsp;{(detail.price * detail.amount).toLocaleString()}đ</Price>
                                     </Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                        <CustomButton
+                                        <Button
                                             variant="contained"
                                             color="primary"
                                             onClick={() => handleAddToCart(detail)}
                                         >
                                             Mua lại
-                                        </CustomButton>
+                                        </Button>
                                         <Box display={{ xs: 'none', sm: 'block' }}>
                                             <Link to={`/product/${detail.bookId}?tab=reviews`}>
-                                                <CustomButton variant="outlined" sx={{ marginLeft: '10px' }}>
+                                                <Button variant="outlined" sx={{ marginLeft: '10px' }}>
                                                     Đánh giá sản phẩm
-                                                </CustomButton>
+                                                </Button>
                                             </Link>
                                         </Box>
                                     </Box>

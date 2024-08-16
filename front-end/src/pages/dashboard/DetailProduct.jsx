@@ -10,7 +10,7 @@ import useTitle from '../../hooks/useTitle'
 const EditProductDialog = lazy(() => import('../../components/dashboard/dialog/EditProductDialog'));
 
 //#region styled
-const CustomButton = styled.button`
+const Button = styled.button`
     width: 250px;
     border-radius: 0;
     padding: 15px;
@@ -127,7 +127,7 @@ const DetailProduct = () => {
     //                             </Typography>
     //                         </Grid>
     //                     </Grid>
-    //                     <CustomButton style={{ marginTop: '10px' }} onClick={() => navigate(`/product/${id}`)}>Xem trang sản phẩm</CustomButton>
+    //                     <Button style={{ marginTop: '10px' }} onClick={() => navigate(`/product/${id}`)}>Xem trang sản phẩm</Button>
     //                 </CardContent>
     //                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
     //                     <Divider orientation="vertical" variant="middle" />

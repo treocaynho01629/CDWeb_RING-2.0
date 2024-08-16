@@ -2,11 +2,10 @@ import styled from 'styled-components'
 import { useEffect, useState } from 'react'
 import { styled as muiStyled } from '@mui/system';
 import { AccessTime as AccessTimeIcon, CalendarMonth as CalendarMonthIcon, Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
-import { Avatar, Rating, Box, Grid, TextareaAutosize } from '@mui/material';
+import { Avatar, Rating, Box, Grid, TextareaAutosize, Button } from '@mui/material';
 import { Link } from "react-router-dom";
 import { useCreateReviewMutation, useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
 import AppPagination from '../custom/AppPagination';
-import CustomButton from '../custom/CustomButton';
 import useAuth from "../../hooks/useAuth";
 import CustomProgress from '../custom/CustomProgress';
 
@@ -22,6 +21,16 @@ const RateSelect = styled.div`
     flex-wrap: wrap;
     align-items: center;
     text-align: center;
+`
+
+const SuggestText = styled.b`
+    font-size: 16px;
+    color: ${props => props.theme.palette.text.primary};
+
+    &.error {
+        font-style: italic;
+        color: ${props => props.theme.palette.error.main};
+    }
 `
 
 const StyledRating = muiStyled(Rating)(({ theme }) => ({
@@ -48,6 +57,28 @@ const RatingInfo = styled.p`
     display: flex;
     align-items: center;
     text-transform: uppercase;
+`
+
+const StyledTextarea = styled.textarea`
+  width: 100%;
+  margin: 30px 0px;
+  font-size: 16px;
+  background-color: ${props => props.theme.palette.background.default};
+  color: ${props => props.theme.palette.text.primary};
+  outline: none;
+  resize: none;
+  border-color: ${props => props.theme.palette.text.primary};
+
+  -ms-overflow-style: none;
+  scrollbar-width: none; 
+
+  &::-webkit-scrollbar {
+      display: none;
+  }
+
+  &.error {
+    border-color: ${props => props.theme.palette.error.main};
+  }
 `
 //#endregion
 
@@ -215,55 +246,47 @@ const ReviewTab = (props) => {
                         <Box><strong style={{ fontSize: '16px' }}>{errMsg}</strong></Box>
                         <br />
                         <Link to={'/login'}>
-                            <CustomButton
+                            <Button
                                 variant="contained"
                                 color="primary"
                                 size="small"
                             >
                                 Xem đánh giá
-                            </CustomButton>
+                            </Button>
                         </Link>
                     </Box>
                     : err?.data?.code === 204 ?
                         <Box>
                             <Box><strong style={{ fontSize: '16px' }}>{errMsg}</strong></Box>
                             <br />
-                            <CustomButton
+                            <Button
                                 variant="contained"
                                 color="primary"
                                 size="small"
                                 onClick={() => scrollTo(0, 0)}
                             >
                                 Mua ngay
-                            </CustomButton>
+                            </Button>
                         </Box>
                         :
                         <Box>
-                            <Box><strong style={{ fontSize: '16px', color: errMsg && !content ? 'red' : 'black' }}>
-                                {errMsg ? errMsg : "Để lại đánh giá của bạn"}
-                            </strong></Box>
+                            <Box>
+                                <SuggestText className={`${errMsg && !content ? 'error' : ''}`}>
+                                    {errMsg ? errMsg : "Để lại đánh giá của bạn"}
+                                </SuggestText>
+                            </Box>
                             <form onSubmit={handleSubmitReview}>
-                                <TextareaAutosize
-                                    aria-label="comment"
-                                    minRows={7}
+                                <StyledTextarea
+                                    aria-label="comment-content"
+                                    rows={7}
                                     value={content}
                                     onChange={handleChangeContent}
                                     placeholder="Đánh giá của bạn ..."
-                                    style={{
-                                        width: '100%',
-                                        margin: '30px 0px',
-                                        backgroundColor: 'white',
-                                        outline: 'none',
-                                        borderRadius: '0',
-                                        resize: 'none',
-                                        color: 'black',
-                                        borderColor: err?.data?.errors?.content && !content ? 'red' : 'black',
-                                        fontSize: '16px'
-                                    }}
+                                    className={`${err?.data?.errors?.content && !content ? 'error' : ''}`}
                                 />
                                 <RatingSelect>
                                     <RateSelect>
-                                        <strong>Đánh giá: </strong>
+                                        <SuggestText>Đánh giá: </SuggestText>
                                         <StyledRating
                                             sx={{ marginLeft: '5px' }}
                                             name="product-rating"
@@ -276,28 +299,28 @@ const ReviewTab = (props) => {
                                             emptyIcon={<StarBorderIcon fontSize="10" />}
                                         />
                                     </RateSelect>
-                                    <CustomButton
+                                    <Button
                                         variant="contained"
                                         color="primary"
                                         type="submit"
                                     >
                                         Gửi đánh giá
-                                    </CustomButton>
+                                    </Button>
                                 </RatingSelect>
                             </form>
                         </Box>
                 )
                     :
                     <Box>
-                        <Box><strong style={{ fontSize: '16px' }}>Bạn chưa đăng nhập, hãy Đăng nhập để đánh giá</strong></Box>
+                        <Box><SuggestText>Bạn chưa đăng nhập, hãy Đăng nhập để đánh giá</SuggestText></Box>
                         <br />
                         <Link to={'/login'}>
-                            <CustomButton
+                            <Button
                                 variant="contained"
                                 color="primary"
                             >
                                 Đăng nhập ngay
-                            </CustomButton>
+                            </Button>
                         </Link>
                     </Box>
                 }

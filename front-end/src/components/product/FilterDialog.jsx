@@ -1,9 +1,8 @@
 import styled from 'styled-components'
 import { useState, useEffect, useMemo } from "react"
-import { Box, Divider, MenuItem, Skeleton, Chip, Stack, DialogContent, Dialog, DialogActions, DialogTitle, useMediaQuery, useTheme, InputAdornment, TextField } from '@mui/material';
+import { Box, Divider, Button, MenuItem, Skeleton, Chip, Stack, DialogContent, Dialog, DialogActions, DialogTitle, useMediaQuery, useTheme, InputAdornment, TextField } from '@mui/material';
 import { PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon, Check, FilterAltOff } from '@mui/icons-material';
 import { marks, bookTypes } from "../../ultils/filters";
-import CustomButton from "../custom/CustomButton";
 import CustomSlider from "../custom/CustomSlider";
 
 //#region styled
@@ -482,7 +481,7 @@ const FilterDialog = (props) => {
         </Stack>
       </DialogContent>
       <DialogActions>
-        <CustomButton
+        <Button
           variant="outlined"
           color="error"
           size="large"
@@ -491,8 +490,8 @@ const FilterDialog = (props) => {
           startIcon={<FilterAltOff />}
         >
           Xoá bộ lọc
-        </CustomButton>
-        <CustomButton
+        </Button>
+        <Button
           variant="contained"
           color="primary"
           size="large"
@@ -501,7 +500,7 @@ const FilterDialog = (props) => {
           startIcon={<Check />}
           >
           Áp dụng
-        </CustomButton>
+        </Button>
       </DialogActions>
     </Dialog>
   )

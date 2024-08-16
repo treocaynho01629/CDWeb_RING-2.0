@@ -1,12 +1,12 @@
 import styled from 'styled-components'
 import { useRef, useState, useEffect, lazy, Suspense } from "react";
-import { Stack } from '@mui/material';
+import { Stack, Button } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useResetMutation } from '../features/auth/authApiSlice';
 import { PWD_REGEX } from '../ultils/regex';
+import { Instruction } from '../components/custom/GlobalComponent';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 import CustomPasswordInput from '../components/custom/CustomPasswordInput';
-import CustomButton from '../components/custom/CustomButton';
 
 const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
 
@@ -29,13 +29,6 @@ const Title = styled.h1`
     font-size: 30px;
     font-weight: 400;
     color: inherit;
-`
-
-const Instruction = styled.p`
-    font-size: 14px;
-    font-style: italic;
-    color: red;
-    display: ${props => props.display};;
 `
 //#endregion
 
@@ -170,7 +163,7 @@ function ResetPage() {
                             />
 
                             <br />
-                            <CustomButton
+                            <Button
                                 variant="contained"
                                 color="primary"
                                 size="large"
@@ -179,7 +172,7 @@ function ResetPage() {
                                 disabled={!validPwd || !validMatch ? true : false}
                             >
                                 Khôi phục
-                            </CustomButton>
+                            </Button>
                         </Stack>
                     </form>
                 </Tab>

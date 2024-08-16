@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState } from "react";
 import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search } from '@mui/icons-material';
-import { Checkbox, Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
+import { Checkbox, Button, Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
 import { NavLink, useNavigate } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { booksApiSlice } from '../features/books/booksApiSlice';
@@ -10,7 +10,6 @@ import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import PropTypes from 'prop-types';
 import useCart from '../hooks/useCart';
 import useTitle from '../hooks/useTitle';
-import CustomButton from '../components/custom/CustomButton';
 import CheckoutDialog from '../components/cart/CheckoutDialog';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 
@@ -167,6 +166,18 @@ const Discount = styled.p`
     align-items: center;
     text-align: center;
     text-decoration: line-through;
+`
+
+const StyledLazyImage = styled(LazyLoadImage)`
+    display: inline-block;
+    height: 90px;
+    width: 90px;
+    border: .5px solid ${props => props.theme.palette.action.focus};
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        height: 80px;
+        width: 80px;
+    }
 `
 
 const hoverIcon = {
@@ -326,7 +337,7 @@ const Cart = () => {
                     />
                     <h2>Giỏ hàng của bạn đang trống</h2>
                     <NavLink to={'/'}>
-                        <CustomButton variant="contained" color="primary">Tiếp tục mua sắm</CustomButton>
+                        <Button variant="contained" color="primary">Tiếp tục mua sắm</Button>
                     </NavLink>
                 </EmptyWrapper>
                 :
@@ -334,7 +345,7 @@ const Cart = () => {
                     <Grid item xs={12} lg={8}>
                         <MainTitleContainer>
                             <Title><ShoppingCartIcon />&nbsp;GIỎ HÀNG ({cartProducts?.length})</Title>
-                            <CustomButton
+                            <Button
                                 variant="outlined"
                                 color="error"
                                 sx={{
@@ -346,7 +357,7 @@ const Cart = () => {
                                 endIcon={<DeleteIcon />}
                             >
                                 Xoá
-                            </CustomButton>
+                            </Button>
                         </MainTitleContainer>
                         <TableContainer >
                             <Table aria-label="cart-table">
@@ -382,15 +393,9 @@ const Cart = () => {
                                                         />
                                                         <ItemContainer>
                                                             <NavLink to={`/product/${product.id}`}>
-                                                                <LazyLoadImage
+                                                                <StyledLazyImage
                                                                     src={`${product.image}?size=small`}
                                                                     alt={`${product.title} Cart item`}
-                                                                    height={90}
-                                                                    width={90}
-                                                                    style={{
-                                                                        border: '0.5px solid lightgray',
-                                                                        objectFit: 'contain'
-                                                                    }}
                                                                 />
                                                             </NavLink>
                                                             <ItemSummary>

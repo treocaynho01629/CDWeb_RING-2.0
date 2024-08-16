@@ -79,26 +79,31 @@ const FiltersPage = () => {
 
     //Set pagination after fetch
     useEffect(() => {
-        if (!isLoading && isSuccess && data) {
+        if (data && !isLoading && isSuccess) {
             setPagination({
                 ...pagination,
-                totalPages: data?.info?.totalPages,
-                currPage: data?.info?.currPage,
-                pageSize: data?.info?.pageSize
+                currPage: data.info.currPage,
+                pageSize: data.info.pageSize,
+                totalPages: data.info.totalPages,
             });
         }
     }, [data])
-
-    //Update keyword from navbar
-    useEffect(() => {
-        const keyword = searchParams.get("keyword");
-        if ((keyword != filters.keyword)) handleChangeSearch(keyword);
-    }, [searchParams])
 
     //Set title
     useTitle('RING! - Cửa hàng');
 
     //Handle change: replace filters value & set search params
+    const handleChangePage = (page) => {
+        if (page == 1) {
+            searchParams.delete("pageNo");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("pageNo", page);
+            setSearchParams(searchParams);
+        }
+        setPagination({ ...pagination, currPage: page - 1 });
+    }
+
     const handleChangeCate = (id) => {
         handleChangePage(1);
         if (filters?.cateId == id || id == "") {
@@ -121,17 +126,6 @@ const FiltersPage = () => {
             setSearchParams(searchParams);
         }
         setFilters({ ...filters, value: newValue });
-    }
-
-    const handleChangePage = (page) => {
-        if (page == 1) {
-            searchParams.delete("pageNo");
-            setSearchParams(searchParams);
-        } else {
-            searchParams.set("pageNo", page);
-            setSearchParams(searchParams);
-        }
-        setPagination({ ...pagination, currPage: page - 1 });
     }
 
     const handleChangeOrder = (newValue) => {
@@ -263,7 +257,7 @@ const FiltersPage = () => {
                     </Grid>
                 }
                 <Grid item xs={12} md={9}>
-                    <CustomDivider>DANH MỤC SẢN PHẨM</CustomDivider>
+                    <CustomDivider>{filters?.seller ? `SẢN PHẨM CỦA ${filters.seller}` : 'DANH MỤC SẢN PHẨM'}</CustomDivider>
                     <SortList filters={filters}
                         pagination={pagination}
                         onChangeOrder={handleChangeOrder}

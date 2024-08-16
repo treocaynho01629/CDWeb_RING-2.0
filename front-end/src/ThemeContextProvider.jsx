@@ -53,11 +53,23 @@ export function ThemeContextProvider({ children }) {
                 components: {
                     MuiButton: {
                         styleOverrides: {
-                            root: {
+                            root: ({ theme }) => ({
                                 display: 'flex',
                                 alignItems: 'center',
                                 textTransform: 'none',
-                            },
+
+                                '&.MuiButton-contained': {
+                                    '&:hover': {
+                                        backgroundColor: theme.palette.grey[300],
+                                        color: theme.palette.text.primary
+                                    },
+
+                                    '&:disabled': {
+                                        backgroundColor: theme.palette.grey[500],
+                                        color: theme.palette.text.disabled
+                                    }
+                                },
+                            }),
                         },
                     },
                     MuiTextField: {

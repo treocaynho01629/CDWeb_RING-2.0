@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useEffect, useRef, useState, lazy, Suspense } from 'react'
 import { ShoppingCart as ShoppingCartIcon, LocationOn as LocationOnIcon, CreditCard as CreditCardIcon, KeyboardDoubleArrowDown, Person } from '@mui/icons-material';
-import { TextareaAutosize, Table, TableBody, TableContainer, TableHead, TableRow, Stepper, Step, StepLabel, StepContent, Typography, Box, } from '@mui/material';
+import { TextareaAutosize, Button, Table, TableBody, TableContainer, TableHead, TableRow, Stepper, Step, StepLabel, StepContent, Typography, Box, } from '@mui/material';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import { Navigate, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component'
@@ -10,7 +10,6 @@ import { useGetProfileQuery } from '../features/users/usersApiSlice';
 import { useCheckoutMutation } from '../features/orders/ordersApiSlice';
 import { PHONE_REGEX } from '../ultils/regex';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
-import CustomButton from '../components/custom/CustomButton';
 import FinalCheckoutDialog from '../components/cart/FinalCheckoutDialog';
 import AddressDisplay from '../components/address/AddressDisplay';
 import AddressSelectDialog from '../components/address/AddressSelectDialog';
@@ -243,6 +242,18 @@ const StyledStepContent = muiStyled(StepContent)(({ theme }) => ({
 const StyledStepLabel = muiStyled(StepLabel)(({ theme }) => ({
     margin: '15px 0px',
 }));
+
+const StyledLazyImage = styled(LazyLoadImage)`
+    display: inline-block;
+    height: 90px;
+    width: 90px;
+    border: .5px solid ${props => props.theme.palette.action.focus};
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        height: 80px;
+        width: 80px;
+    }
+`
 //#endregion
 
 const Checkout = () => {
@@ -416,15 +427,9 @@ const Checkout = () => {
                                                         <StyledTableCell>
                                                             <ItemContainer>
                                                                 <NavLink to={`/product/${product.id}`}>
-                                                                    <LazyLoadImage 
+                                                                    <StyledLazyImage 
                                                                         src={`${product.image}?size=small`}
                                                                         alt={`${product.title} Checkout item`}
-                                                                        height={90}
-                                                                        width={90}
-                                                                        style={{
-                                                                            border: '0.5px solid lightgray',
-                                                                            objectFit: 'contain'
-                                                                        }}
                                                                     />
                                                                 </NavLink>
                                                                 <ItemSummary>
@@ -477,7 +482,7 @@ const Checkout = () => {
                                 {
                                     activeStep < 2
                                     &&
-                                    <CustomButton
+                                    <Button
                                         disabled={!validAddressInfo}
                                         variant="contained"
                                         color="primary"
@@ -486,7 +491,7 @@ const Checkout = () => {
                                         endIcon={<KeyboardDoubleArrowDown />}
                                     >
                                         Tiếp tục
-                                    </CustomButton>
+                                    </Button>
                                 }
                             </StyledStepContent>
                         </Step>

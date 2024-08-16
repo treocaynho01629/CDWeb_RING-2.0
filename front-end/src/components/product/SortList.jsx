@@ -1,10 +1,9 @@
 import styled from "styled-components"
 import { useEffect, useState } from 'react'
 import { styled as muiStyled } from '@mui/system';
-import { Grid, MenuItem, ToggleButton, ToggleButtonGroup, TextField } from '@mui/material';
+import { Grid, Button, MenuItem, ToggleButton, ToggleButtonGroup, TextField } from '@mui/material';
 import { Search, FilterAlt } from '@mui/icons-material';
 import { orderGroup } from "../../ultils/filters";
-import CustomButton from "../custom/CustomButton";
 import QuickPagination from "../custom/QuickPagination";
 
 //#region styled
@@ -159,7 +158,7 @@ const SortList = (props) => {
                             <MenuItem value={48}>Hiển thị 48</MenuItem>
                         </TextField>
                         {/* <QuickPagination {...{ pagination, onPageChange, onSizeChange }} /> */}
-                        <CustomButton
+                        <Button
                             size="small"
                             variant="outlined"
                             sx={{ height: '40px', marginLeft: '5px', display: { xs: 'flex', md: 'none' } }}
@@ -167,7 +166,7 @@ const SortList = (props) => {
                             startIcon={<FilterAlt />}
                         >
                             Lọc
-                        </CustomButton>
+                        </Button>
                     </Grid>
                 </Grid>
             </SortContainer>

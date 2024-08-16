@@ -43,6 +43,7 @@ const ImageSlider = styled.div`
 
 const ImageSlide = styled.div`
     position: relative;
+    width: 100%;
     animation: ${fadeIn} .3s ease;
 `
 
@@ -96,6 +97,7 @@ const SmallImageSlide = styled.div`
     cursor: pointer;
     opacity: 0.5;
     transition: all .25s ease;
+    display: flex;
 
     &.active {
         border: 1px solid ${props => props.theme.palette.primary.main};

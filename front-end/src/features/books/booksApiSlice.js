@@ -84,7 +84,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 if (sortBy) params.append('sortBy', sortBy);
                 if (sortDir) params.append('sortDir', sortDir);
                 if (keyword) params.append('keyword', keyword);
-                if (cateId) params.append('pSicateIdze', cateId);
+                if (cateId) params.append('cateId', cateId);
                 if (type) params.append('type', type);
                 if (seller) params.append('seller', seller);
                 if (pubId) params.append('pubId', pubId);

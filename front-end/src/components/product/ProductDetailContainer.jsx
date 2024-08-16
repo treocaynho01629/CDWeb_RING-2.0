@@ -151,7 +151,7 @@ const ProductDetailContainer = ({ loading, book, tab, handleTabChange }) => {
               <ReviewTab id={book?.id} rateAmount={book?.rateAmount} />
             </Suspense>
           </TabPanel>
-          <TabPanel value="related">
+          <TabPanel value="related" sx={{ paddingLeft: 0, paddingRight: 0 }}>
             <div>
               <ProductsSlider {...{ loading: loadRelated, data: relatedBooks, isSuccess: doneRelated, isError: errorRelated, isUninitialized }} />
             </div>

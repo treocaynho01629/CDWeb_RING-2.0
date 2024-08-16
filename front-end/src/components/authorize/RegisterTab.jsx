@@ -1,22 +1,16 @@
 import styled from 'styled-components';
 import { useState, useRef, useEffect } from 'react';
-import { Stack, TextField } from '@mui/material';
+import { Stack, Button, TextField } from '@mui/material';
 import { useRegisterMutation } from '../../features/auth/authApiSlice';
 import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from '../../ultils/regex';
+import { Instruction } from '../custom/GlobalComponent';
 import CustomPasswordInput from '../custom/CustomPasswordInput';
-import CustomButton from '../custom/CustomButton';
 
 //#region styled
 const Title = styled.h1`
     font-size: 30px;
     font-weight: 400;
     color: inherit;
-`
-
-const Instruction = styled.p`
-    font-size: 14px;
-    font-style: italic;
-    color: ${props => props.theme.palette.error.main};
 `
 //#endregion
 
@@ -203,7 +197,7 @@ const RegisterTab = ({ pending, setPending }) => {
                     />
 
                     <br />
-                    <CustomButton
+                    <Button
                         variant="contained"
                         color="primary"
                         size="large"
@@ -213,7 +207,7 @@ const RegisterTab = ({ pending, setPending }) => {
                         disabled={!validRegister || isLoading}
                     >
                         Đăng ký
-                    </CustomButton>
+                    </Button>
                 </Stack>
             </form>
         </>

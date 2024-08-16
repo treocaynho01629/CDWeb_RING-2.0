@@ -5,11 +5,10 @@ import {
     Remove as RemoveIcon, Add as AddIcon, Star as StarIcon, StarBorder as StarBorderIcon,
     ShoppingCart as ShoppingCartIcon, Sell as SellIcon, Storefront as StorefrontIcon, Check as CheckIcon
 } from '@mui/icons-material';
-import { Skeleton, Rating, Box, Divider, Grid, Avatar, Drawer, useTheme, useMediaQuery } from '@mui/material';
+import { Skeleton, Button, Rating, Box, Divider, Grid, Avatar, Drawer, useTheme, useMediaQuery } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ProductImages from './ProductImages';
 import useCart from '../../hooks/useCart';
-import CustomButton from '../custom/CustomButton';
 
 //#region styled
 const StuffContainer = styled.div`
@@ -38,9 +37,10 @@ const SellerContainer = styled.div`
     margin: 10px 0px;
 
     a {
-        text-overflow: ellipsis;
-        overflow: hidden;
+        display: block;
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         
         @supports (-webkit-line-clamp: 1) {
           overflow: hidden;
@@ -50,6 +50,10 @@ const SellerContainer = styled.div`
           -webkit-line-clamp: 1;
           -webkit-box-orient: vertical;
         }
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        max-width: 150px;
     }
 `
 
@@ -523,8 +527,8 @@ const ProductContent = ({ book, handleTabChange }) => {
                                     <Box onClick={(e) => handleChangeTab(e, "reviews")} sx={{ curosr: 'pointer' }}
                                         display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
                                         <PriceContainer>
-                                            <Price>{book?.price?.toLocaleString()} đ</Price>
-                                            <OldPrice>{Math.round(book?.price * 1.1).toLocaleString()} đ</OldPrice>
+                                            <Price>{book?.price?.toLocaleString()}đ</Price>
+                                            <OldPrice>{Math.round(book?.price * 1.1).toLocaleString()}đ</OldPrice>
                                         </PriceContainer>
                                         <Box display={{ xs: 'flex', sm: 'none' }} alignItems={'center'} justifyContent={'space-between'}>
                                             <strong style={{ paddingRight: 10 }}>({calculatedRate}) Đánh giá</strong>
@@ -563,7 +567,7 @@ const ProductContent = ({ book, handleTabChange }) => {
                                             <CartButton><ShoppingCartIcon style={{ fontSize: 24 }} /></CartButton>
                                         </Link>
                                         <BuyButton disabled={!book} onClick={toggleDrawer(true)}>
-                                            THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
+                                            THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()}đ)
                                         </BuyButton>
                                     </AltFilterContainer>
                                     <Drawer
@@ -585,15 +589,15 @@ const ProductContent = ({ book, handleTabChange }) => {
                                                 </AmountButton>
                                             </SubFilterContainer>
                                         </Box>
-                                        <CustomButton
+                                        <Button
                                             variant="outlined"
                                             color="primary"
                                             size="large"
                                             sx={{ margin: '5px' }}
                                             onClick={() => handleAddToCart(book)}
                                         >
-                                            THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
-                                        </CustomButton>
+                                            THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()}đ)
+                                        </Button>
                                     </Drawer>
                                 </>
                                 :
@@ -615,7 +619,7 @@ const ProductContent = ({ book, handleTabChange }) => {
                                     </Filter>
                                     <BuyButton disabled={!book} onClick={() => handleAddToCart(book)}>
                                         <ShoppingCartIcon style={{ fontSize: 18 }} />
-                                        THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()} đ)
+                                        THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()}đ)
                                     </BuyButton>
                                 </FilterContainer>
                             }

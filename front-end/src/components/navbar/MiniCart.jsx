@@ -1,8 +1,7 @@
 import styled from 'styled-components';
-import { RemoveShoppingCart as RemoveShoppingCartIcon } from '@mui/icons-material';
-import { Card, CardContent, CardMedia, Box, Popover } from '@mui/material';
+import { Close, RemoveShoppingCart as RemoveShoppingCartIcon } from '@mui/icons-material';
+import { Card, Button, CardContent, CardMedia, Box, Popover, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
-import CustomButton from '../custom/CustomButton';
 
 //#region styled
 const MiniCartContainer = styled.div`
@@ -11,6 +10,7 @@ const MiniCartContainer = styled.div`
 `
 
 const ProductTitle = styled.h5`
+    width: 100%;
     font-size: 14px;
     margin: 0;
     text-overflow: ellipsis;
@@ -28,6 +28,7 @@ const ProductTitle = styled.h5`
 `
 
 const ProductPrice = styled.span`
+    width: 100%;
     font-size: 16px;
     font-weight: bold;
     color: ${props => props.theme.palette.primary.main};
@@ -35,10 +36,11 @@ const ProductPrice = styled.span`
     flex-wrap: wrap;
     align-items: center;
     text-align: center;
+    justify-content: space-between;
 `
 //#endregion
 
-const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
+const MiniCart = ({ openCart, anchorElCart, handleClose, products, removeProduct }) => {
     return (
         <Popover
             id="mouse-over-popover"
@@ -91,14 +93,21 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
                                 <CardMedia
                                     loading="lazy"
                                     component="img"
-                                    sx={{ width: 50, height: 50 }}
+                                    sx={{ width: 50, height: 50, objectFit: 'contain', marginLeft: '10px' }}
                                     image={`${product?.image}?size=small`}
                                     alt={`${product?.title} Cart item`}
                                 />
-                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                    <CardContent >
+                                <Box sx={{ display: 'flex', flexDirection: 'column', position: 'relative', width: '100%' }}>
+                                    <CardContent sx={{ width: '100%', padding: '10px' }}>
                                         <ProductTitle>{product?.title}</ProductTitle>
-                                        <ProductPrice>{product?.price?.toLocaleString()} đ</ProductPrice>
+                                        <ProductPrice>{product?.price?.toLocaleString()}đ
+                                            <IconButton
+                                                aria-label="Remove item"
+                                                onClick={() => removeProduct(product?.id)}
+                                            >
+                                                <Close />
+                                            </IconButton>
+                                        </ProductPrice>
                                     </CardContent>
                                 </Box>
                             </Card>
@@ -106,13 +115,13 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
                         <Box sx={{ marginTop: '15px', display: 'flex', justifyContent: 'space-between' }}>
                             {products?.length <= 5 ? <p>&nbsp;</p> : <p>Và còn lại {products?.length - 5} trong giỏ</p>}
                             <Link to={'/cart'}>
-                                <CustomButton
+                                <Button
                                     variant="contained"
                                     color="primary"
                                     size="medium"
                                 >
                                     Xem giỏ hàng
-                                </CustomButton>
+                                </Button>
                             </Link>
                         </Box>
                     </>

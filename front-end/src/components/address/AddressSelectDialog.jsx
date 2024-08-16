@@ -1,12 +1,11 @@
 import { useTheme } from "styled-components"
 import { useEffect, useState } from 'react'
 import { useUpdateProfileMutation } from '../../features/users/usersApiSlice';
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle, ListItemIcon, ListItemText, Menu, MenuItem, Radio, styled, useMediaQuery } from '@mui/material';
+import { Box, Dialog, Button, DialogActions, DialogContent, DialogTitle, ListItemIcon, ListItemText, Menu, MenuItem, Radio, styled, useMediaQuery } from '@mui/material';
 import { AddHome, Check, Delete, Home, LocationOn, Close } from '@mui/icons-material';
 import AddressItem from './AddressItem'
 import AddressForm from './AddressForm'
 import useCart from '../../hooks/useCart';
-import CustomButton from '../custom/CustomButton';
 
 const StyledRadio = styled(Radio)(({ theme }) => ({
   borderRadius: 0,
@@ -195,7 +194,7 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
                   </Box>
                 )
               })}
-              <CustomButton
+              <Button
                 variant="outlined"
                 size="large"
                 color="primary"
@@ -203,10 +202,10 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
                 onClick={() => handleOpen()}
               >
                 <AddHome />&nbsp;Thêm địa chỉ
-              </CustomButton>
+              </Button>
             </DialogContent>
             <DialogActions>
-              <CustomButton
+              <Button
                 variant="outlined"
                 color="error"
                 size="large"
@@ -215,8 +214,8 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
                 startIcon={<Close />}
               >
                 Huỷ
-              </CustomButton>
-              <CustomButton
+              </Button>
+              <Button
                 variant="contained"
                 color="primary"
                 size="large"
@@ -225,7 +224,7 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
                 startIcon={<Check />}
               >
                 Chọn
-              </CustomButton>
+              </Button>
             </DialogActions>
             <Menu
               open={openContext}

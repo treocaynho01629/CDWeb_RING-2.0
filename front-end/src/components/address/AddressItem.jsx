@@ -1,8 +1,7 @@
 import styled from 'styled-components'
 import { KeyboardArrowRight, MoreHoriz } from '@mui/icons-material';
-import { Box, IconButton } from '@mui/material'
+import { Box, Button, IconButton } from '@mui/material'
 import { PHONE_REGEX } from '../../ultils/regex';
-import CustomButton from '../custom/CustomButton';
 
 //#region styled
 const AddressItemContainer = styled.div`
@@ -79,7 +78,7 @@ const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue }) =>
                 </Box>
                 <Box>{addressInfo?.address}</Box>
             </Box>
-            <CustomButton
+            <Button
                 sx={{ display: { xs: 'none', sm: 'flex' }, whiteSpace: 'nowrap', marginTop: 2 }}
                 aria-label="toggle address dialog"
                 variant="outlined"
@@ -87,7 +86,7 @@ const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue }) =>
                 onClick={() => handleOpen(addressInfo)}
             >
                 Thay đổi
-            </CustomButton>
+            </Button>
             <IconButton
                 sx={{ display: { xs: 'block', sm: 'none' } }}
                 aria-label="mobile toggle address dialog"

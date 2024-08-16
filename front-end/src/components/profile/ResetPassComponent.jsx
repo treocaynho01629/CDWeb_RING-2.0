@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Box, Stack } from '@mui/material';
+import { Box, Stack, Button } from '@mui/material';
 import { Check, Password } from "@mui/icons-material";
 import { PWD_REGEX } from "../../ultils/regex";
 import { useChangePasswordMutation } from '../../features/users/usersApiSlice';
+import { Instruction } from '../custom/GlobalComponent';
 import CustomPasswordInput from "../custom/CustomPasswordInput";
-import CustomButton from "../custom/CustomButton";
 
-const ResetPassComponent = ({ Instruction, Title, Wrapper, pending, setPending }) => {
+const ResetPassComponent = ({ Title, Wrapper, pending, setPending }) => {
     const [err, setErr] = useState([]);
     const [errMsg, setErrMsg] = useState('');
     const [pass, setPass] = useState('');
@@ -144,7 +144,7 @@ const ResetPassComponent = ({ Instruction, Title, Wrapper, pending, setPending }
                             sx={{ width: { xs: '100%', sm: '80%' } }}
                         />
                         <Box sx={{ width: { xs: '100%', sm: '80%' } }}>
-                            <CustomButton
+                            <Button
                                 variant="contained"
                                 color="primary"
                                 onClick={handleChangePassword}
@@ -152,7 +152,7 @@ const ResetPassComponent = ({ Instruction, Title, Wrapper, pending, setPending }
                                 startIcon={<Check />}
                             >
                                 Xác nhận
-                            </CustomButton>
+                            </Button>
                         </Box>
                     </Stack>
                 </form>

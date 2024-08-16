@@ -1,16 +1,9 @@
-import styled from 'styled-components'
 import { useEffect, useState } from 'react'
 import { LocationOn as LocationOnIcon, Check, Person as PersonIcon, Phone as PhoneIcon, Home as HomeIcon, Close as CloseIcon, Delete } from '@mui/icons-material';
-import { Checkbox, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, MenuItem, Skeleton, TextField } from '@mui/material'
+import { Checkbox, Button, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, MenuItem, TextField } from '@mui/material'
 import { location } from '../../ultils/location'
 import { PHONE_REGEX } from '../../ultils/regex';
-import CustomButton from '../custom/CustomButton';
-
-const Instruction = styled.p`
-    font-size: 14px;
-    font-style: italic;
-    color: ${props => props.theme.palette.error.main};
-`
+import { Instruction } from '../custom/GlobalComponent';
 
 const splitAddress = (addressInfo) => {
     let city = '';
@@ -291,7 +284,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                             {(addressInfo && !isDefault && !isSelected)
                                 &&
                                 <Grid item xs={12} sm={6}>
-                                    <CustomButton
+                                    <Button
                                         disabled={isDefault || isSelected}
                                         variant="contained"
                                         color="error"
@@ -300,7 +293,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                                         onClick={() => handleRemoveAddress(addressInfo?.id)}
                                     >
                                         Xoá địa chỉ&nbsp;<Delete />
-                                    </CustomButton>
+                                    </Button>
                                 </Grid>
                             }
                         </Grid>
@@ -308,7 +301,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                 </form>
             </DialogContent>
             <DialogActions>
-                <CustomButton
+                <Button
                     variant="outlined"
                     color="error"
                     size="large"
@@ -317,8 +310,8 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                     startIcon={<CloseIcon />}
                 >
                     Huỷ
-                </CustomButton>
-                <CustomButton
+                </Button>
+                <Button
                     variant="contained"
                     color="primary"
                     size="large"
@@ -327,7 +320,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                     startIcon={<Check />}
                 >
                     Áp dụng
-                </CustomButton>
+                </Button>
             </DialogActions>
         </>
     )

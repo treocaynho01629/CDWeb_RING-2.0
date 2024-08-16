@@ -134,7 +134,7 @@ const Right = styled.div`
 const SearchInput = styled(TextField)({
     '& .MuiInputBase-root': {
         borderRadius: 0,
-        transition: 'all .3s ease',
+        transition: 'all .25s ease',
     },
     '& label.Mui-focused': {
         color: '#A0AAB4',
@@ -144,13 +144,10 @@ const SearchInput = styled(TextField)({
         background: 'transparent'
     },
     '& .MuiOutlinedInput-root': {
-        '& fieldset': {
-            borderColor: 'transparent',
-        },
         '&:hover fieldset': {
             color: 'inherit',
             borderColor: '#B2BAC2',
-            transition: 'all .3s ease',
+            transition: 'all .25s ease',
         },
         '&.Mui-focused fieldset': {
             color: 'inherit',
@@ -228,24 +225,37 @@ const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
         backgroundColor: 'transparent',
         color: theme.palette.primary.main,
     },
+
+    '&.nav': {
+        display: 'flex',
+        width: '90px',
+        justifyContent: 'flex-start',
+
+        [theme.breakpoints.down('md_lg')]: {
+            justifyContent: 'center',
+            flexDirection: 'column',
+            width: '70px',
+            transform: 'translateY(-5px)',
+        }
+    },
 }));
 
 const IconText = styled.p`
     font-size: 13px;
     margin: 0;
     margin-left: 5px;
-
+    white-space: nowrap;
+    text-overflow: ellipsis;
+	
     ${props => props.theme.breakpoints.down("md_lg")} {
-        display: none;
-
-        &.username { display: block;}
+        height: 0;
     }
 `
 //#endregion
 
 const Navbar = () => {
     //#region construct
-    const { cartProducts } = useCart();
+    const { cartProducts, removeProduct } = useCart();
     const location = useLocation();
     const colorMode = useContext(ColorModeContext);
     const theme = useTheme();
@@ -255,8 +265,7 @@ const Navbar = () => {
     const [openDrawer, setOpen] = useState(false);
 
     //Search field expand
-    const [hover, setHover] = useState(false);
-    const [delayHandler, setDelayHandler] = useState(null);
+    const [toggle, setToggle] = useState(false);
     const [focus, setFocus] = useState(false);
     const [searchField, setSearchField] = useState('');
 
@@ -297,19 +306,6 @@ const Navbar = () => {
         e.preventDefault();
         navigate(`/filters?keyword=${searchField}`);
     }
-
-    //Hover search field
-    const handleMouseEnter = (e) => {
-        setDelayHandler(setTimeout(() => {
-            setHover(true)
-        }, 250))
-    }
-
-    //Leave search field
-    const handlOnMouseLeave = () => {
-        setHover(false);
-        clearTimeout(delayHandler);
-    }
     //#endregion
 
     return (
@@ -347,7 +343,7 @@ const Navbar = () => {
                                     </Box>
                                 }
                                 <Link to={`/`}>
-                                    <Logo className={searchField || hover || focus ? 'active' : ''}>
+                                    <Logo className={searchField || focus || toggle ? 'active' : ''}>
                                         <ImageLogo src="/bell.svg" className="logo" alt="RING! Logo" />RING!&nbsp; <p>- BOOKSTORE</p>
                                     </Logo>
                                 </Link>
@@ -366,28 +362,34 @@ const Navbar = () => {
                                     <Box
                                         sx={{ display: 'flex', alignItems: 'center', marginLeft: '-40' }}
                                     >
+                                        {!(searchField || focus || toggle) &&
+                                            <StyledIconButton aria-label="search toggle" onClick={() => setToggle(true)}>
+                                                <SearchIcon sx={{ fontSize: '26px' }} />
+                                            </StyledIconButton>
+                                        }
                                         <Collapse
                                             orientation="horizontal"
-                                            timeout={300}
+                                            timeout={250}
                                             easing={'ease'}
-                                            in={searchField || hover || focus}
-                                            collapsedSize={40}
+                                            in={searchField || focus || toggle}
+                                            collapsedSize={0}
                                         >
                                             <form onSubmit={handleSubmitSearch}>
                                                 <SearchInput
                                                     className={searchField ? 'active' : ''}
                                                     placeholder='Tìm kiếm... '
-                                                    onMouseEnter={handleMouseEnter}
-                                                    onMouseLeave={handlOnMouseLeave}
                                                     onFocus={() => setFocus(true)}
-                                                    onBlur={() => setFocus(false)}
+                                                    onBlur={() => {
+                                                        setFocus(false);
+                                                        setToggle(false);
+                                                    }}
                                                     onChange={(e) => setSearchField(e.target.value)}
                                                     value={searchField}
                                                     id="search"
                                                     size="small"
                                                     width={50}
                                                     InputProps={{
-                                                        endAdornment: <SearchIcon style={{ color: "gray" }} />
+                                                        endAdornment: <SearchIcon />
                                                     }}
                                                 />
                                             </form>
@@ -401,7 +403,7 @@ const Navbar = () => {
                                 <Right>
                                     <NavItem>
                                         <Stack spacing={1} direction="row" sx={{ color: 'action.active' }} alignItems={'center'}>
-                                            <StyledIconButton aria-label="notification">
+                                            <StyledIconButton className="nav" aria-label="notification">
                                                 <Badge badgeContent={0} anchorOrigin={{
                                                     vertical: 'top',
                                                     horizontal: 'right',
@@ -417,7 +419,7 @@ const Navbar = () => {
                                                 onMouseLeave={handleCartClose}
                                             >
                                                 <Link to={'/cart'} title="Giỏ hàng">
-                                                    <StyledIconButton aria-label="cart">
+                                                    <StyledIconButton className="nav" aria-label="cart">
                                                         <Badge color="primary" badgeContent={cartProducts?.length} anchorOrigin={{
                                                             vertical: 'top',
                                                             horizontal: 'right',
@@ -427,7 +429,7 @@ const Navbar = () => {
                                                         <IconText>Giỏ hàng</IconText>
                                                     </StyledIconButton>
                                                 </Link>
-                                                <MiniCart {...{ openCart, anchorElCart, handleClose: handleCartClose, products: cartProducts }} />
+                                                <MiniCart {...{ removeProduct, openCart, anchorElCart, handleClose: handleCartClose, products: cartProducts }} />
                                             </div>
                                             {username ? (
                                                 <div
@@ -437,17 +439,19 @@ const Navbar = () => {
                                                     onMouseLeave={handleProfileClose}
                                                 >
                                                     <Link to={'/profile/detail'} title="Tài khoản">
-                                                        <StyledIconButton aria-label="profile">
-                                                            <Avatar sx={{ width: 32, height: 32 }}>{username?.charAt(0) ?? 'P'}</Avatar>
+                                                        <StyledIconButton className="nav" aria-label="profile">
+                                                            <Avatar sx={{ width: 24, height: 24, fontSize: '16px' }}>{username?.charAt(0) ?? 'P'}</Avatar>
                                                             <IconText className="username">{username}</IconText>
                                                         </StyledIconButton>
                                                     </Link>
-                                                    <ProfilePopover {...{ open, anchorEl, handleClose: handleProfileClose, 
-                                                        navigate, roles, logout, theme, colorMode }} />
+                                                    <ProfilePopover {...{
+                                                        open, anchorEl, handleClose: handleProfileClose,
+                                                        navigate, roles, logout, theme, colorMode
+                                                    }} />
                                                 </div>
                                             ) : (
                                                 <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">
-                                                    <StyledIconButton aria-label="login">
+                                                    <StyledIconButton className="nav" aria-label="login">
                                                         <LockIcon />
                                                         <IconText className="username">Đăng nhập</IconText>
                                                     </StyledIconButton>

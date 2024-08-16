@@ -76,31 +76,36 @@ const CustomRightArrow = ({ onClick }) => (
   <CustomArrow className="custom-right-arrow" onClick={() => onClick()}><KeyboardArrowRight /></CustomArrow>
 );
 
+const tempItems = [<ProductSimple />, <ProductSimple />, <ProductSimple />, <ProductSimple />, <ProductSimple />];
+
 const ProductsSlider = ({ data, isError, isLoading, isSuccess, isUninitialized = false }) => {
   let productsCarousel;
 
   if (isLoading || isError || isUninitialized) {
-    productsCarousel = (
-      <Carousel
-        responsive={responsive}
-        customLeftArrow={<CustomLeftArrow />}
-        customRightArrow={<CustomRightArrow />}
-        removeArrowOnDeviceType={["tablet", "mobile"]}
-      >
-        {
-          Array.from(new Array(5)).map((index) => (
-            <div key={index} style={{ display: 'flex' }}>
-              <ProductSimple />
-            </div>
-          ))
-        }
-      </Carousel>
-    )
+    productsCarousel = tempItems;
   } else if (isSuccess) {
     const { ids, entities } = data;
 
     productsCarousel = ids?.length
       ?
+        [
+          ids?.map((id, index) => {
+            const book = entities[id];
+  
+            return (
+              <div key={`${id}-${index}`} style={{ display: 'flex' }}>
+                <ProductSimple book={book} />
+              </div>
+            )
+          })
+        ] : tempItems
+  } else {
+    productsCarousel = tempItems;
+  }
+
+  return (
+    <Container>
+      {(isLoading || isError || isUninitialized) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
       <Carousel
         responsive={responsive}
         infinite={true}
@@ -108,58 +113,13 @@ const ProductsSlider = ({ data, isError, isLoading, isSuccess, isUninitialized =
         autoPlaySpeed={10000}
         customLeftArrow={<CustomLeftArrow />}
         customRightArrow={<CustomRightArrow />}
-        removeArrowOnDeviceType={["tablet", "mobile"]}
+        removeArrowOnDeviceType={["mobile"]}
         pauseOnHover
         keyBoardControl
         minimumTouchDrag={80}
       >
-
-        {ids?.map((id, index) => {
-          const book = entities[id];
-
-          return (
-            <div key={`${id}-${index}`} style={{ display: 'flex' }}>
-              <ProductSimple book={book} />
-            </div>
-          )
-        })}
-      </Carousel>
-      :
-      <Carousel
-        responsive={responsive}
-        customLeftArrow={<CustomLeftArrow />}
-        customRightArrow={<CustomRightArrow />}
-        removeArrowOnDeviceType={["tablet", "mobile"]}
-      >
-        {Array.from(new Array(5)).map((index) => (
-          <div key={index} style={{ display: 'flex' }}>
-            <ProductSimple />
-          </div>
-        ))}
-      </Carousel>
-  } else {
-    productsCarousel = (
-      <Carousel
-        responsive={responsive}
-        customLeftArrow={<CustomLeftArrow />}
-        customRightArrow={<CustomRightArrow />}
-        removeArrowOnDeviceType={["tablet", "mobile"]}
-      >
-        {
-          Array.from(new Array(5)).map((index) => (
-            <div key={index} style={{ display: 'flex' }}>
-              <ProductSimple />
-            </div>
-          ))
-        }
-      </Carousel>
-    )
-  }
-
-  return (
-    <Container>
-      {(isLoading || isError || isUninitialized) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
       {productsCarousel}
+      </Carousel>
     </Container>
   )
 }

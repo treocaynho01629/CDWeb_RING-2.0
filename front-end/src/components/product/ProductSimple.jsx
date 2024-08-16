@@ -1,9 +1,8 @@
 import styled from 'styled-components'
 import { Link } from "react-router-dom"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { Skeleton } from '@mui/material';
+import { Skeleton, Button } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import CustomButton from '../custom/CustomButton';
 import useCart from '../../hooks/useCart';
 
 //#region styled
@@ -57,6 +56,13 @@ const Price = styled.span`
     align-items: center;
     text-align: center;
 `
+
+const StyledLazyImage = styled(LazyLoadImage)`
+    aspect-ratio: 1/1;
+    z-index: -3;
+    object-fit: contain;
+    margin: 10px 2px;
+`
 //#endregion
 
 const ProductSimple = ({ book }) => {
@@ -72,59 +78,64 @@ const ProductSimple = ({ book }) => {
         })
     };
 
-    if (book) {
-        return (
-            <Container>
+    return (
+        <Container>
+            {book
+                ?
                 <Link to={`/product/${book?.id}`} style={{ color: 'inherit' }}>
-                    <LazyLoadImage 
+                    <StyledLazyImage
                         src={`${book?.image}?size=small`}
                         alt={`${book?.title} Thumbnail`}
-                        width={'90%'}
-                        height={250}
-                        style={{
-                            aspectRatio: '1/1.2',
-                            zIndex: -3,
-                            marginBottom: '10px 0',
-                            objectFit: 'contain',
-                        }}
+                        width={'100%'}
+                        height={220}
+                        placeholder={
+                            <Skeleton
+                                variant="rectangular"
+                                width={'90%'}
+                                height={210}
+                                animation={false} 
+                                sx={{
+                                    aspectRatio: '1/1',
+                                    margin: '5px 5px 20px 5px'
+                                }}
+                            />
+                        }
                     />
                     <Info>
                         <Price>{book.price.toLocaleString()}&nbsp;đ</Price>
                         <Title>{book.title}</Title>
                     </Info>
                 </Link>
-                <CustomButton
-                    size="small"
-                    variant="outlined"
-                    onClick={() => handleAddToCart(book)}
-                    sx={{ marginTop: '10px', marginBottom: '15px', padding: '6px 10px' }}
-                    startIcon={<ShoppingCartIcon/>}
-                >
-                    THÊM VÀO GIỎ
-                </CustomButton>
-            </Container>
-        )
-    } else {
-        return (
-            <Container>
-                <Skeleton variant="rectangular" width={'90%'} height={250} sx={{ aspectRatio: '1/1.2', margin: '5px 5px 20px 5px' }} />
-                <Info>
-                    <Skeleton variant="text" sx={{ fontSize: '21px' }} width="60%" />
-                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width="100%" />
-                </Info>
-                <CustomButton
-                    disabled
-                    size="small"
-                    variant="outlined"
-                    color="secondary"
-                    sx={{ marginTop: '10px', marginBottom: '15px', padding: '6px 10px' }}
-                    startIcon={<ShoppingCartIcon/>}
-                >
-                    THÊM VÀO GIỎ
-                </CustomButton>
-            </Container>
-        )
-    }
+                :
+                <>
+                    <Skeleton
+                        variant="rectangular"
+                        width={'90%'}
+                        height={210}
+                        sx={{
+                            aspectRatio: '1/1',
+                            margin: '5px 5px 20px 5px'
+                        }}
+                    />
+                    <Info>
+                        <Skeleton variant="text" sx={{ fontSize: '21px' }} width="60%" />
+                        <Skeleton variant="text" sx={{ fontSize: '16px' }} width="100%" />
+                    </Info>
+                </>
+            }
+            <Button
+                disabled={!book}
+                size="small"
+                variant="outlined"
+                color="secondary"
+                onClick={() => handleAddToCart(book)}
+                sx={{ marginTop: '10px', marginBottom: '15px', padding: '6px 10px' }}
+                startIcon={<ShoppingCartIcon />}
+            >
+                THÊM VÀO GIỎ
+            </Button>
+        </Container>
+    )
 }
 
 export default ProductSimple

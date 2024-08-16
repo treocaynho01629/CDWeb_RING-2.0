@@ -29,9 +29,7 @@ const StyledPageItem = muiStyled(PaginationItem)(({ theme }) => ({
 }));
 //#endregion
 
-const AppPagination = (props) => {
-    const { pagination, onPageChange, onSizeChange } = props;
-
+const AppPagination = ({ pagination, onPageChange, onSizeChange }) => {
     //Initial value
     const [page, setPage] = useState(pagination.currPage);
     const [count, setCount] = useState(pagination.totalPages);

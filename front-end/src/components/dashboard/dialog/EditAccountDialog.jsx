@@ -11,7 +11,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 
 //#region styled
-const CustomButton = styled.div`
+const Button = styled.div`
     padding: 10px 15px;
     font-size: 16px;
     font-weight: 400;
@@ -461,7 +461,7 @@ const EditAccountDialog = (props) => {
   //       </Grid>
   //     </DialogContent>
   //     <DialogActions>
-  //       <CustomButton onClick={handleAddBook}><EditIcon sx={{ marginRight: '10px' }} />Chỉnh sửa</CustomButton>
+  //       <Button onClick={handleAddBook}><EditIcon sx={{ marginRight: '10px' }} />Chỉnh sửa</Button>
   //       <ClearButton onClick={handleCloseNew}><CloseIcon sx={{ marginRight: '10px' }} />Huỷ</ClearButton>
   //     </DialogActions>
   //   </CustomDialog>

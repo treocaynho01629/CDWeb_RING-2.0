@@ -1,12 +1,12 @@
 import styled from "styled-components"
 import { useEffect, useState } from "react";
-import { Box, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton, TextField } from "@mui/material";
+import { Box, Button, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton, TextField } from "@mui/material";
 import { Check, Person } from "@mui/icons-material";
 import { PHONE_REGEX } from "../../ultils/regex";
 import { useGetProfileQuery, useUpdateProfileMutation } from "../../features/users/usersApiSlice";
-import dayjs from 'dayjs';
-import CustomButton from "../custom/CustomButton";
+import { Instruction } from '../custom/GlobalComponent';
 import CustomDatePicker from "../custom/CustomDatePicker";
+import dayjs from 'dayjs';
 
 //#region styled
 const InfoText = styled.h4`
@@ -48,7 +48,7 @@ const InfoStackContainer = styled.div`
 `
 //#endregion
 
-const ProfileDetail = ({ Title, Instruction, Wrapper, pending, setPending }) => {
+const ProfileDetail = ({ Title, Wrapper, pending, setPending }) => {
     //Fetch current profile
     const { data: profile, isLoading: loadProfile, isSuccess: profileDone, isError: profileError } = useGetProfileQuery();
 
@@ -276,7 +276,7 @@ const ProfileDetail = ({ Title, Instruction, Wrapper, pending, setPending }) => 
                         </tr>
                     </table>
                     <InfoStackContainer>
-                        <CustomButton
+                        <Button
                             variant="contained"
                             color="primary"
                             size="large"
@@ -286,7 +286,7 @@ const ProfileDetail = ({ Title, Instruction, Wrapper, pending, setPending }) => 
                             startIcon={<Check /> }
                         >
                             Lưu thông tin
-                        </CustomButton>
+                        </Button>
                     </InfoStackContainer>
                 </Box>
             </Wrapper>

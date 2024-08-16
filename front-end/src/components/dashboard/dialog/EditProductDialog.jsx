@@ -16,7 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CustomDropZone from './CustomDropZone';
 
 //#region styled
-const CustomButton = styled.div`
+const Button = styled.div`
     padding: 10px 15px;
     font-size: 16px;
     font-weight: 400;
@@ -541,7 +541,7 @@ const EditProductDialog = (props) => {
   //       </Grid>
   //     </DialogContent>
   //     <DialogActions>
-  //       <CustomButton onClick={handleEditBook}><EditIcon sx={{ marginRight: '10px' }} />Chỉnh sửa</CustomButton>
+  //       <Button onClick={handleEditBook}><EditIcon sx={{ marginRight: '10px' }} />Chỉnh sửa</Button>
   //       <ClearButton onClick={handleCloseNew}><CloseIcon sx={{ marginRight: '10px' }} />Huỷ</ClearButton>
   //     </DialogActions>
   //   </CustomDialog>

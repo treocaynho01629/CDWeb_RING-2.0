@@ -1,7 +1,6 @@
 import styled from 'styled-components'
 import { KeyboardArrowRight } from '@mui/icons-material';
-import { Box, IconButton } from '@mui/material'
-import CustomButton from '../custom/CustomButton';
+import { Box, Button, IconButton } from '@mui/material'
 
 //#region styled
 const AddressDisplayContainer = styled.div`
@@ -42,7 +41,7 @@ const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadProfile }) => {
                     </>
                 }
             </Box>
-            <CustomButton
+            <Button
                 sx={{ display: { xs: 'none', sm: 'flex' }, whiteSpace: 'nowrap' }}
                 aria-label="toggle address dialog"
                 variant="outlined"
@@ -51,7 +50,7 @@ const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadProfile }) => {
                 onClick={handleOpen}
             >
                 Thay đổi
-            </CustomButton>
+            </Button>
             <IconButton
                 sx={{ display: { xs: 'block', sm: 'none' } }}
                 aria-label="mobile toggle address dialog"

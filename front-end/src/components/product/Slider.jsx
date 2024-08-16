@@ -1,11 +1,10 @@
 import styled from "styled-components"
-import { Grid, Skeleton } from '@mui/material';
+import { Grid, Button, Skeleton } from '@mui/material';
 import { Link } from "react-router-dom"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useGetRandomBooksQuery } from "../../features/books/booksApiSlice";
 import Carousel from "react-multi-carousel";
-import CustomButton from "../custom/CustomButton";
 import useCart from "../../hooks/useCart";
 
 //#region styled
@@ -17,16 +16,37 @@ const ImgContainer = styled.div`
     justify-content: center;
 `
 
+const InfoWrapper = styled.div`
+    position: relative;
+    bottom: auto;
+    width: 100%;
+
+    ${props => props.theme.breakpoints.down("md")} {
+        position: absolute;
+        bottom: 0;
+        background-image: linear-gradient(
+            to right, 
+            ${props => props.theme.palette.background.default}, 
+            transparent, 
+            ${props => props.theme.palette.background.default});
+    }
+`
+
 const InfoContainer = styled.div`
     padding: 40px 50px;
     align-items: center;
     justify-content: center;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 40px 20px;
+    }
 `
 
 const Title = styled.h2`
     min-height: 74px;
     font-size: 30px;
-    margin: 0;
+    margin: 25px 0px;
+    min-width: auto;
     line-height: normal;
     text-overflow: ellipsis;
 	overflow: hidden;
@@ -41,9 +61,9 @@ const Title = styled.h2`
       -webkit-box-orient: vertical;
     }
 
-    @media (min-width: 900px) {
-        margin: 25px 0px;
-        min-width: auto;
+    ${props => props.theme.breakpoints.down("md")} {
+        margin: 0;
+        text-shadow: 2px 2px ${props => props.theme.palette.background.default};
     }
 `
 
@@ -64,8 +84,8 @@ const Description = styled.p`
       -webkit-box-orient: vertical;
     }
 
-    @media (min-width: 900px) {
-        min-width: auto;
+    ${props => props.theme.breakpoints.down("md")} {
+        text-shadow: 2px 2px ${props => props.theme.palette.background.default};
     }
 `
 
@@ -82,7 +102,7 @@ const CustomArrow = styled.button`
   justify-content: center;
   position: absolute;
   opacity: .8;
-  transition: all .3s ease;
+  transition: all .25s ease;
 
   &:hover {
     opacity: 1;
@@ -106,6 +126,11 @@ const SlideItemContainer = styled.div`
     position: relative;
     min-height: 450px;
     max-height: 800px;
+`
+
+const StyledLazyImage = styled(LazyLoadImage)`
+    aspect-ratio: 1/1;
+    object-fit: contain;
 `
 //#endregion
 
@@ -166,72 +191,71 @@ function Item({ book }) {
                         ?
                         <Link to={`/product/${book.id}`}>
                             <ImgContainer>
-                                <LazyLoadImage
+                                <StyledLazyImage
                                     src={book.image}
                                     srcSet={`${book.image}?size=medium 350w, ${book.image} 600w`}
+                                    alt={`${book.title} Big product item`}
                                     sizes='400px'
                                     height={400}
                                     width={'100%'}
-                                    alt={`${book.title} Big product item`}
-                                    style={{
-                                        objectFit: 'contain',
-                                        aspectRatio: '1/1'
-                                    }}
+                                    placeholder={
+                                        <Skeleton
+                                            variant="rectangular"
+                                            height={400}
+                                            sx={{ width: { xs: '80%', md: '100%' } }}
+                                            animation={false}
+                                        />
+                                    }
                                 />
                             </ImgContainer>
                         </Link>
                         :
                         <ImgContainer>
-                            <Skeleton 
-                            variant="rectangular" 
-                            height={400} 
-                            sx={{ width: {xs: '80%', md: '100%'} }} 
+                            <Skeleton
+                                variant="rectangular"
+                                height={400}
+                                sx={{ width: { xs: '80%', md: '100%' } }}
                             />
                         </ImgContainer>
                     }
                 </Grid>
-                <Grid item xs={12} md={7}
-                    sx={{
-                        position: { xs: 'absolute', md: 'relative' }
-                        , bottom: { xs: 0, md: 'auto' }
-                        , background: { xs: '#ffffff89', md: 'transparent' }
-                        , width: '100%'
-                    }}
-                >
-                    {book
-                        ?
-                        <InfoContainer>
-                            <Link to={`/product/${book.id}`} style={{ color: 'inherit' }}>
-                                <Title>{book.title}</Title>
-                                <Description>{book.description}</Description>
-                            </Link>
-                            <CustomButton
-                                variant="contained"
-                                color="primary"
-                                size="large"
-                                onClick={() => handleAddToCart(book)}
-                            >
-                                Mua ngay
-                            </CustomButton>
-                        </InfoContainer>
-                        :
-                        <InfoContainer>
-                            <Skeleton variant="text" sx={{ fontSize: '30px' }} />
-                            <br/>
-                            <Skeleton variant="text" sx={{ fontSize: '18px' }} />
-                            <Skeleton variant="text" sx={{ fontSize: '18px' }} />
-                            <Skeleton variant="text" sx={{ fontSize: '18px' }} width={'50%'} />
-                            <br/>
-                            <CustomButton
-                                disabled
-                                variant="contained"
-                                color="primary"
-                                size="large"
-                            >
-                                Mua ngay
-                            </CustomButton>
-                        </InfoContainer>
-                    }
+                <Grid item xs={12} md={7}>
+                    <InfoWrapper>
+                        {book
+                            ?
+                            <InfoContainer>
+                                <Link to={`/product/${book.id}`} style={{ color: 'inherit' }}>
+                                    <Title>{book.title}</Title>
+                                    <Description>{book.description}</Description>
+                                </Link>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    size="large"
+                                    onClick={() => handleAddToCart(book)}
+                                >
+                                    Mua ngay
+                                </Button>
+                            </InfoContainer>
+                            :
+                            <InfoContainer>
+                                <Skeleton variant="text" sx={{ fontSize: '30px' }} />
+                                <br />
+                                <Skeleton variant="text" sx={{ fontSize: '18px' }} />
+                                <Skeleton variant="text" sx={{ fontSize: '18px' }} />
+                                <Skeleton variant="text" sx={{ fontSize: '18px' }} width={'50%'} />
+                                <br />
+                                <Button
+                                    disabled
+                                    variant="contained"
+                                    color="primary"
+                                    size="large"
+                                >
+                                    Mua ngay
+                                </Button>
+                            </InfoContainer>
+                        }
+                    </InfoWrapper>
                 </Grid>
             </Grid>
         </SlideItemContainer>
