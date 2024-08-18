@@ -153,7 +153,7 @@ const Home = () => {
   if (loadCates || errorCates) {
     catesContent = (
       Array.from(new Array(4)).map((index) => (
-        <StyledToggleButton key={index} value='none' disabled={true}>
+        <StyledToggleButton key={index} value='' disabled={true}>
           <Skeleton sx={{ bgcolor: 'grey.400', fontSize: '14px' }} variant="text" animation="wave" width={100} />
         </StyledToggleButton>
       ))
@@ -166,7 +166,7 @@ const Home = () => {
         const cate = entities[id];
 
         return (
-          <StyledToggleButton key={`${id}-${index}`} value={id}>
+          <StyledToggleButton key={`${id}-${index}`} value={id ?? ''}>
             {cate?.categoryName}
           </StyledToggleButton>
         )
@@ -209,7 +209,7 @@ const Home = () => {
               onChange={handleChangeOrder}
             >
               {(!orderGroup?.length ? Array.from(new Array(4)) : orderGroup)?.map((order, index) => (
-                <StyledToggleButton key={`${order?.id}-${index}`} value={order?.value}>
+                <StyledToggleButton key={`${order?.id}-${index}`} value={order?.value ?? ''}>
                   {order
                     ?
                     order?.label
@@ -238,7 +238,7 @@ const Home = () => {
           <br />
           <ToggleGroupContainer>
             <StyledToggleButtonGroup
-              value={currCate}
+              value={currCate ?? ''}
               exclusive
               onChange={handleChangeCate}
             >

@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import { styled as muiStyled } from '@mui/system';
 import { Link } from 'react-router-dom';
 import { Box, Skeleton, Tab } from '@mui/material';
@@ -72,16 +72,23 @@ const StyledTextarea = styled.textarea`
 `
 //#endregion
 
-const ProductDetailContainer = ({ loading, book, tab, handleTabChange }) => {
+const ProductDetailContainer = ({ loading, book, tab, handleTabChange, scrollIntoTab }) => {
+  const textRef = useRef(null);
   //Fetch related books
   const { data: relatedBooks, isLoading: loadRelated, isSuccess: doneRelated, isError: errorRelated, isUninitialized } = useGetBooksByFilterQuery({
     cateId: book?.cateId
   }, { skip: (!book?.cateId || tab !== "related") });
 
+  useEffect(() => { //Resize textarea
+    if (textRef.current?.style) {
+      textRef.current.style.height = "0px";
+      const scrollHeight = textRef.current?.scrollHeight;
+      textRef.current.style.height = scrollHeight + "px";
+    }
+  }, [textRef, book])
+
   //Change tab
-  const handleChangeTab = (e, newTab) => {
-    if (handleTabChange) handleTabChange(newTab)
-  };
+  const handleChangeTab = (e, newTab) => { if (handleTabChange) handleTabChange(newTab) };
 
   let fullInfo;
 
@@ -125,9 +132,10 @@ const ProductDetailContainer = ({ loading, book, tab, handleTabChange }) => {
         <StyledTextarea
           value={book?.description}
           cols={100}
-          rows={80}
-          readOnly
+          rows={1}
+          contentEditable={false}
           disabled
+          ref={textRef}
         />
       </div>
   }
@@ -148,7 +156,7 @@ const ProductDetailContainer = ({ loading, book, tab, handleTabChange }) => {
           </TabPanel>
           <TabPanel value="reviews">
             <Suspense fallback={<CustomProgress color="primary" />}>
-              <ReviewTab id={book?.id} rateAmount={book?.rateAmount} />
+              <ReviewTab {...{ id: book?.id, scrollIntoTab }} />
             </Suspense>
           </TabPanel>
           <TabPanel value="related" sx={{ paddingLeft: 0, paddingRight: 0 }}>

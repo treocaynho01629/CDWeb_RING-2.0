@@ -85,7 +85,7 @@ const ProductDetail = () => {
             </CustomBreadcrumbs>
             {product}
             <div ref={ref}>
-                <ProductDetailContainer {...{ loading: isLoading, book: data, tab, handleTabChange }} />
+                <ProductDetailContainer {...{ loading: isLoading, book: data, tab, handleTabChange, scrollIntoTab }} />
             </div>
             <CustomDivider>CÓ THỂ BẠN SẼ THÍCH</CustomDivider>
             <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />

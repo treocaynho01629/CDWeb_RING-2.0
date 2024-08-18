@@ -5,10 +5,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from "redux-persist/integration/react";
 import { CookiesProvider } from "react-cookie";
-import { SnackbarProvider } from 'notistack';
 import { store, persistor } from './app/store';
 import { ThemeContextProvider } from './ThemeContextProvider';
-import CustomSnackbar from './components/custom/CustomSnackbar';
+import CustomSnackbarProvider from './components/layout/CustomSnackbarProvider';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <CookiesProvider>
@@ -16,21 +15,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <ThemeContextProvider>
-            <SnackbarProvider
-              maxSnack={3}
-              autoHideDuration={1500}
-              Components={{
-                default: CustomSnackbar,
-                success: CustomSnackbar,
-                error: CustomSnackbar,
-                warning : CustomSnackbar,
-                info: CustomSnackbar,
-              }}
-            >
+            <CustomSnackbarProvider>
               <Routes>
                 <Route path="/*" element={<App />} />
               </Routes>
-            </SnackbarProvider>
+            </CustomSnackbarProvider>
           </ThemeContextProvider>
         </PersistGate>
       </Provider>

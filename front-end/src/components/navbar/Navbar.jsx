@@ -20,11 +20,12 @@ import useCart from '../../hooks/useCart';
 const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 5px 20px;
     justify-content: space-between;
     align-items: center;
-
+    padding: 5px 10px;
+    
     ${props => props.theme.breakpoints.up("sm_md")} {
+        padding: 5px 20px;
         width: 750px;
         margin-left: auto;
         margin-right: auto;
@@ -132,38 +133,6 @@ const Right = styled.div`
     }
 `
 
-const SearchInput = styled(TextField)({
-    '& .MuiInputBase-root': {
-        borderRadius: 0,
-        transition: 'all .25s ease',
-    },
-    '& label.Mui-focused': {
-        color: '#A0AAB4',
-    },
-    '& .MuiInput-underline:after': {
-        borderBottomColor: '#B2BAC2',
-        background: 'transparent'
-    },
-    '& .MuiOutlinedInput-root': {
-        '&:hover fieldset': {
-            color: 'inherit',
-            borderColor: '#B2BAC2',
-            transition: 'all .25s ease',
-        },
-        '&.Mui-focused fieldset': {
-            color: 'inherit',
-            borderColor: '#63e399',
-        },
-    },
-    '&.active': {
-        '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-                borderColor: '#B2BAC2',
-            },
-        }
-    }
-});
-
 const Logo = styled.h2`
     position: relative;
     font-family: abel;
@@ -190,10 +159,6 @@ const Logo = styled.h2`
         ${props => props.theme.breakpoints.down("sm")} {
             width: 0px;
         }
-    }
-
-    ${props => props.theme.breakpoints.down("md")} {
-        transform: translateX(20px);
     }
 
     ${props => props.theme.breakpoints.down("md_lg")} {
@@ -265,9 +230,9 @@ const Navbar = () => {
     const [openDrawer, setOpen] = useState(false);
 
     //Search field expand
-    const [toggle, setToggle] = useState(false);
-    const [focus, setFocus] = useState(false);
     const [searchField, setSearchField] = useState('');
+    const [focus, setFocus] = useState(false);
+    const [toggle, setToggle] = useState(searchField !== '');
 
     //Other
     const { username, roles } = useAuth();
@@ -312,6 +277,8 @@ const Navbar = () => {
     }
     //#endregion
 
+    const isToggleSearch = (focus || toggle);
+
     return (
         <>
             <TopHeader>
@@ -338,52 +305,64 @@ const Navbar = () => {
                         <Grid item xs={12} md={6.5} sx={{ display: 'flex', alignItems: 'center' }}>
                             <Left>
                                 {mobileMode &&
-                                    <Box display={{ xs: 'flex', md: 'none' }} alignItems={'center'}>
-                                        <IconButton onClick={toggleDrawer(true)}><MenuIcon sx={{ fontSize: 26 }} /></IconButton>
+                                    <>
+                                        <Box
+                                            display={isToggleSearch ? 'none' : 'flex'}
+                                            flex={1}
+                                            alignItems={'center'}
+                                        >
+                                            <IconButton onClick={toggleDrawer(true)}>
+                                                <MenuIcon sx={{ fontSize: 26 }} />
+                                            </IconButton>
+                                        </Box>
                                         <NavDrawer {...{
                                             openDrawer, setOpen, toggleDrawer, username, roles, location,
                                             products: cartProducts, navigate, logout, ImageLogo, theme, colorMode
                                         }} />
-                                    </Box>
+                                    </>
                                 }
                                 <Link to={`/`}>
-                                    <Logo className={searchField || focus || toggle ? 'active' : ''}>
+                                    <Logo className={isToggleSearch ? 'active' : ''}>
                                         <ImageLogo src="/bell.svg" className="logo" alt="RING! Logo" />RING!&nbsp; <p>- BOOKSTORE</p>
                                     </Logo>
                                 </Link>
-                                <Box display={'flex'} alignItems={'center'} flexDirection={{ xs: 'row-reverse', md: 'row' }}>
+                                <Box
+                                    display={'flex'}
+                                    alignItems={'center'}
+                                    flex={1}
+                                    justifyContent={isToggleSearch ? { xs: 'space-between', md: 'flex-start' } : 'flex-start'}
+                                    flexDirection={{ xs: 'row-reverse', md: 'row' }}
+                                >
                                     <Link to={'/filters'} title="Duyệt cửa hàng">
                                         <StyledIconButton aria-label="explore">
                                             <Storefront sx={{ fontSize: '26px' }} />
                                         </StyledIconButton>
                                     </Link>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }} flexDirection={{ xs: 'row-reverse', md: 'row' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}
+                                        flexDirection={{ xs: 'row-reverse', md: 'row' }}>
                                         <Collapse
                                             orientation="horizontal"
                                             timeout={250}
                                             easing={'ease'}
-                                            in={searchField || focus || toggle}
+                                            in={isToggleSearch}
                                         >
                                             <form onSubmit={handleSubmitSearch}>
-                                                <SearchInput
-                                                    className={searchField ? 'active' : ''}
+                                                <TextField
                                                     placeholder='Tìm kiếm... '
                                                     onFocus={() => setFocus(true)}
-                                                    onBlur={() => {
-                                                        setFocus(false);
-                                                        setToggle(false);
-                                                    }}
+                                                    onBlur={() => setFocus(false)}
                                                     onChange={(e) => setSearchField(e.target.value)}
                                                     value={searchField}
                                                     id="search"
                                                     size="small"
                                                     fullWidth
+                                                    sx={{ width: '100%' }}
                                                     InputProps={{ startAdornment: <SearchIcon sx={{ marginRight: 1 }} /> }}
                                                 />
                                             </form>
                                         </Collapse>
                                         <StyledIconButton aria-label="search toggle" onClick={() => toggleSearch()}>
-                                            { toggle ? <Close sx={{ fontSize: '26px' }} /> : <SearchIcon sx={{ fontSize: '26px' }} />}
+                                            {isToggleSearch ? <Close sx={{ fontSize: '26px' }} /> : <SearchIcon sx={{ fontSize: '26px' }} />}
                                         </StyledIconButton>
                                     </Box>
                                 </Box>

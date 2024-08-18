@@ -37,6 +37,7 @@ const Wrapper = styled.div`
 const FiltersPage = () => {
     //#region construct
     const [searchParams, setSearchParams] = useSearchParams();
+    const initialKeywords = searchParams.get("keyword");
     const navigate = useNavigate();
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
@@ -44,7 +45,7 @@ const FiltersPage = () => {
     //Filter & pagination
     const [filters, setFilters] = useState({
         value: searchParams.get("value") ? searchParams.get("value").split(',') : [1000, 10000000],
-        keyword: searchParams.get("keyword") ?? "",
+        keyword: initialKeywords ?? "",
         type: searchParams.get("type") ?? "",
         seller: searchParams.get("seller") ?? "",
         pubId: searchParams.get("pubId") ?? [],
@@ -89,6 +90,10 @@ const FiltersPage = () => {
         }
     }, [data])
 
+    useEffect(() => {
+        setFilters({ ...filters, keyword: initialKeywords ?? "" });
+    }, [initialKeywords])
+
     //Set title
     useTitle('RING! - Cửa hàng');
 
@@ -102,6 +107,7 @@ const FiltersPage = () => {
             setSearchParams(searchParams);
         }
         setPagination({ ...pagination, currPage: page - 1 });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     const handleChangeCate = (id) => {

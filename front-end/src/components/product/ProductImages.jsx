@@ -275,8 +275,13 @@ const ProductImages = ({ images }) => {
                     </ImageButton>
                 </ImageSlider>
                 <MoreImageContainer>
-                    <SmallImageSlider draggable={true} ref={slideRef}
-                        onDragStart={dragStart} onDragOver={dragOver} onDragEnd={dragEnd}>
+                    <SmallImageSlider
+                        draggable={true}
+                        ref={slideRef}
+                        onDragStart={dragStart}
+                        onDragOver={dragOver}
+                        onDragEnd={dragEnd}
+                    >
                         {multiImages.map((style, index) => (
                             <SmallImageSlide key={index}
                                 className={`${index + 1 === slideIndex && 'active'}`}

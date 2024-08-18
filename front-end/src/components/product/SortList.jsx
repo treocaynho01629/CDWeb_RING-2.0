@@ -2,7 +2,7 @@ import styled from "styled-components"
 import { useEffect, useState } from 'react'
 import { styled as muiStyled } from '@mui/system';
 import { Grid, Button, MenuItem, ToggleButton, ToggleButtonGroup, TextField } from '@mui/material';
-import { Search, FilterAlt } from '@mui/icons-material';
+import { Search, Sort } from '@mui/icons-material';
 import { orderGroup } from "../../ultils/filters";
 import QuickPagination from "../custom/QuickPagination";
 
@@ -163,7 +163,7 @@ const SortList = (props) => {
                             variant="outlined"
                             sx={{ height: '40px', marginLeft: '5px', display: { xs: 'flex', md: 'none' } }}
                             onClick={handleSetOpen}
-                            startIcon={<FilterAlt />}
+                            startIcon={<Sort />}
                         >
                             Lọc
                         </Button>

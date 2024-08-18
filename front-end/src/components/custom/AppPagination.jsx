@@ -31,7 +31,7 @@ const StyledPageItem = muiStyled(PaginationItem)(({ theme }) => ({
 
 const AppPagination = ({ pagination, onPageChange, onSizeChange }) => {
     //Initial value
-    const [page, setPage] = useState(pagination.currPage + 1 ?? 0);
+    const [page, setPage] = useState(pagination.currPage + 1);
     const [count, setCount] = useState(pagination.totalPages ?? 0);
 
     //Update value
@@ -41,12 +41,7 @@ const AppPagination = ({ pagination, onPageChange, onSizeChange }) => {
     }, [pagination])
 
     //Change current page
-    const handlePageChange = (e, page) => {
-        if (onPageChange) {
-            onPageChange(page);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }
+    const handlePageChange = (e, page) => { if (onPageChange) onPageChange(page) }
 
     //Change amount display
     const handleChangeSize = (e) => { if (onSizeChange) onSizeChange(e.target.value) }

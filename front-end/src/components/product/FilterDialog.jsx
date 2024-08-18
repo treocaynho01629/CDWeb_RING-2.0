@@ -458,7 +458,11 @@ const FilterDialog = (props) => {
   }
 
   const handleResetFilter = () => {
-    handleClose();
+    setCateId('');
+    setSelectedPub([]);
+    setType('');
+    setSeller('');
+    setValueInput([1000, 10000000]);
     resetFilter();
   }
   //#endregion

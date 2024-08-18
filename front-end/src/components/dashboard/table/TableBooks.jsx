@@ -3,7 +3,7 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch } from '@mui/material';
 import { AutoStories as AutoStoriesIcon, Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import { visuallyHidden } from '@mui/utils';
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDeleteBookMutation, useDeleteBooksMutation, useGetBooksByFilterQuery } from '../../../features/books/booksApiSlice';
 import { useGetCategoriesQuery } from '../../../features/categories/categoriesApiSlice';
@@ -23,13 +23,13 @@ const ItemTitle = styled.p`
   white-space: nowrap;
 	
 	@supports (-webkit-line-clamp: 1) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: initial;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-    }
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: initial;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
 `
 
 const headCells = [

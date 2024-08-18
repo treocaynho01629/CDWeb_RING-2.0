@@ -2,8 +2,8 @@ import styled from 'styled-components'
 import { useEffect, useState } from 'react'
 import { styled as muiStyled } from '@mui/system';
 import { AccessTime as AccessTimeIcon, CalendarMonth as CalendarMonthIcon, Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
-import { Avatar, Rating, Box, Grid, TextareaAutosize, Button } from '@mui/material';
-import { Link } from "react-router-dom";
+import { Avatar, Rating, Box, Grid, Button, TextField, MenuItem } from '@mui/material';
+import { Link, useLocation } from "react-router-dom";
 import { useCreateReviewMutation, useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
 import AppPagination from '../custom/AppPagination';
 import useAuth from "../../hooks/useAuth";
@@ -47,6 +47,11 @@ const StyledRating = muiStyled(Rating)(({ theme }) => ({
 const Profiler = styled.div`
     display: flex;
     justify-content: space-between;
+    border-bottom: 1px solid transparent;
+
+    &.active {
+        border-color: ${props => props.theme.palette.primary.main};
+    }
 `
 
 const RatingInfo = styled.p`
@@ -57,6 +62,17 @@ const RatingInfo = styled.p`
     display: flex;
     align-items: center;
     text-transform: uppercase;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    
+    ${props => props.theme.breakpoints.down("sm")} {
+        max-width: 95px;
+    }
+
+    &:last-child {
+        margin-right: 0;
+    }
 `
 
 const StyledTextarea = styled.textarea`
@@ -86,31 +102,30 @@ const Review = ({ review, username }) => {
     const date = new Date(review?.date);
 
     return (
-        <div>
-            <Profiler style={{ borderBottom: '1px solid', borderColor: username === review?.userName ? '#63e399' : 'white' }}>
+        <>
+            <Profiler className={username === review?.userName ? 'active' : ''}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <RatingInfo><Avatar sx={{ width: '20px', height: '20px', marginRight: '5px' }}>{review?.userName?.charAt(0) ?? 'A'}</Avatar>{review?.userName}</RatingInfo>
                     <Box display={{ xs: 'none', sm: 'flex' }}>
-                        <RatingInfo><AccessTimeIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />
+                        <RatingInfo><AccessTimeIcon sx={{ fontSize: 18, marginRight: '5px', color: 'primary.main' }} />
                             {`${('0' + date?.getHours()).slice(-2)}:${('0' + date?.getMinutes()).slice(-2)}`}
                         </RatingInfo>
                     </Box>
-                    <RatingInfo><CalendarMonthIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />
+                    <RatingInfo><CalendarMonthIcon sx={{ fontSize: 18, marginRight: '5px', color: 'primary.main' }} />
                         {`${('0' + date.getDate()).slice(-2)}-${('0' + (date.getMonth() + 1)).slice(-2)}-${date.getFullYear()}`}
                     </RatingInfo>
                 </Box>
-                <RatingInfo><StarIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />{review.rating}</RatingInfo>
+                <RatingInfo><StarIcon sx={{ fontSize: 18, marginRight: '5px', color: 'primary.main' }} />{review.rating}</RatingInfo>
             </Profiler>
             <Box sx={{ margin: '20px 0px 50px' }}>{review?.content}</Box>
-        </div>
+        </>
     )
 }
 
-const ReviewTab = (props) => {
+const ReviewTab = ({ id, scrollIntoTab }) => {
     //#region construct
-    const { id } = props;
     const { username } = useAuth();
-
+    const location = useLocation();
 
     //Initial value
     const [content, setContent] = useState('');
@@ -152,6 +167,7 @@ const ReviewTab = (props) => {
     //Change page
     const handlePageChange = (page) => {
         setPagination({ ...pagination, currPage: page - 1 });
+        scrollIntoTab();
     };
 
     const handleChangeContent = (event) => {
@@ -245,7 +261,7 @@ const ReviewTab = (props) => {
                     <Box>
                         <Box><strong style={{ fontSize: '16px' }}>{errMsg}</strong></Box>
                         <br />
-                        <Link to={'/login'}>
+                        <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">
                             <Button
                                 variant="contained"
                                 color="primary"
@@ -288,16 +304,30 @@ const ReviewTab = (props) => {
                                     <RateSelect>
                                         <SuggestText>Đánh giá: </SuggestText>
                                         <StyledRating
-                                            sx={{ marginLeft: '5px' }}
+                                            sx={{ marginLeft: 1, display: { xs: 'none', sm: 'flex' } }}
                                             name="product-rating"
                                             value={rating}
-                                            onChange={(event, newValue) => {
-                                                setRating(newValue);
-                                            }}
+                                            onChange={(e, newValue) => { setRating(newValue) }}
                                             getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
                                             icon={<StarIcon fontSize="10px" />}
                                             emptyIcon={<StarBorderIcon fontSize="10" />}
                                         />
+                                        <TextField
+                                            size="small"
+                                            select
+                                            value={rating}
+                                            onChange={(e) => setRating(e.target.value)}
+                                            sx={{ marginLeft: 1, display: { xs: 'block', sm: 'none' } }}
+                                            InputProps={{
+                                                startAdornment: <StarIcon fontSize="10px" color="primary" sx={{ marginRight: 1 }} />,
+                                            }}
+                                        >
+                                            <MenuItem value={1}>1</MenuItem>
+                                            <MenuItem value={2}>2</MenuItem>
+                                            <MenuItem value={3}>3</MenuItem>
+                                            <MenuItem value={4}>4</MenuItem>
+                                            <MenuItem value={5}>5</MenuItem>
+                                        </TextField>
                                     </RateSelect>
                                     <Button
                                         variant="contained"
@@ -314,7 +344,7 @@ const ReviewTab = (props) => {
                     <Box>
                         <Box><SuggestText>Bạn chưa đăng nhập, hãy Đăng nhập để đánh giá</SuggestText></Box>
                         <br />
-                        <Link to={'/login'}>
+                        <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">
                             <Button
                                 variant="contained"
                                 color="primary"
