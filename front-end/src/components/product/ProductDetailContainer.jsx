@@ -125,7 +125,7 @@ const ProductDetailContainer = ({ loading, book, tab, handleTabChange }) => {
         <StyledTextarea
           value={book?.description}
           cols={100}
-          rows={20}
+          rows={80}
           readOnly
           disabled
         />

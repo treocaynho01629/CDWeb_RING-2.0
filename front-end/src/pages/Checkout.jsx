@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useEffect, useRef, useState, lazy, Suspense } from 'react'
 import { ShoppingCart as ShoppingCartIcon, LocationOn as LocationOnIcon, CreditCard as CreditCardIcon, KeyboardDoubleArrowDown, Person } from '@mui/icons-material';
-import { TextareaAutosize, Button, Table, TableBody, TableContainer, TableHead, TableRow, Stepper, Step, StepLabel, StepContent, Typography, Box, } from '@mui/material';
+import { TextareaAutosize, Button, Table, TableBody, TableContainer, TableHead, TableRow, Stepper, Step, StepLabel, StepContent, Typography, Box, Skeleton, } from '@mui/material';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import { Navigate, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component'
@@ -122,8 +122,6 @@ const MiniTitle = styled.h4`
     text-align: center;
     color: inherit;
 `
-
-
 
 const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -248,6 +246,17 @@ const StyledLazyImage = styled(LazyLoadImage)`
     height: 90px;
     width: 90px;
     border: .5px solid ${props => props.theme.palette.action.focus};
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        height: 80px;
+        width: 80px;
+    }
+`
+
+const StyledSkeleton = styled(Skeleton)`
+    display: inline-block;
+    height: 90px;
+    width: 90px;
 
     ${props => props.theme.breakpoints.down("sm")} {
         height: 80px;
@@ -427,9 +436,10 @@ const Checkout = () => {
                                                         <StyledTableCell>
                                                             <ItemContainer>
                                                                 <NavLink to={`/product/${product.id}`}>
-                                                                    <StyledLazyImage 
+                                                                    <StyledLazyImage
                                                                         src={`${product.image}?size=small`}
                                                                         alt={`${product.title} Checkout item`}
+                                                                        placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
                                                                     />
                                                                 </NavLink>
                                                                 <ItemSummary>

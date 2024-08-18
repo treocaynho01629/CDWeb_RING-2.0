@@ -2,7 +2,7 @@ import styled from "styled-components"
 import { useState } from 'react';
 import { useGetOrdersByUserQuery } from '../../features/orders/ordersApiSlice';
 import { Check, DeliveryDining, Receipt, Storefront } from '@mui/icons-material';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Skeleton } from '@mui/material';
 import { Link } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import CustomProgress from '../custom/CustomProgress';
@@ -142,6 +142,17 @@ const StyledLazyImage = styled(LazyLoadImage)`
         width: 80px;
     }
 `
+
+const StyledSkeleton = styled(Skeleton)`
+    display: inline-block;
+    height: 90px;
+    width: 90px;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        height: 80px;
+        width: 80px;
+    }
+`
 //#endregion
 
 const defaultSize = 5;
@@ -222,7 +233,8 @@ const OrdersList = ({ Title }) => {
                                     <Box display={'flex'}>
                                         <StyledLazyImage
                                             src={`${detail.image}?size=small`}
-                                            alt={`${detail.title}`}
+                                            alt={`${detail.title} Order item`}
+                                            placeholder={<StyledSkeleton variant="rectangular" animation={false}/>}
                                         />
                                         <div style={{ marginLeft: '20px', marginTop: '10px' }}>
                                             <ItemTitle>{detail.bookTitle}</ItemTitle>

@@ -151,7 +151,7 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
     pubsContent = ids?.length
       ? ids?.map((id, index) => {
         const pub = entities[id];
-        const isItemSelected = isSelected(`${id}`);
+        const isItemSelected = isSelected(id);
 
         return (
           <Chip

@@ -50,7 +50,7 @@ const Price = styled.span`
     font-size: 21px;
     font-weight: bold;
     color: ${props => props.theme.palette.primary.main};
-    margin: 10px 0 10px;
+    margin: 2px 0px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -62,6 +62,13 @@ const StyledLazyImage = styled(LazyLoadImage)`
     z-index: -3;
     object-fit: contain;
     margin: 10px 2px;
+`
+
+const StyledTempImage = styled(Skeleton)`
+    aspect-ratio: 1/1;
+    z-index: -3;
+    margin: 10px 2px;
+    margin-bottom: 20px;
 `
 //#endregion
 
@@ -89,15 +96,11 @@ const ProductSimple = ({ book }) => {
                         width={'100%'}
                         height={220}
                         placeholder={
-                            <Skeleton
+                            <StyledTempImage
                                 variant="rectangular"
                                 width={'90%'}
-                                height={210}
+                                height={220}
                                 animation={false} 
-                                sx={{
-                                    aspectRatio: '1/1',
-                                    margin: '5px 5px 20px 5px'
-                                }}
                             />
                         }
                     />
@@ -108,14 +111,10 @@ const ProductSimple = ({ book }) => {
                 </Link>
                 :
                 <>
-                    <Skeleton
+                    <StyledTempImage
                         variant="rectangular"
                         width={'90%'}
-                        height={210}
-                        sx={{
-                            aspectRatio: '1/1',
-                            margin: '5px 5px 20px 5px'
-                        }}
+                        height={220}
                     />
                     <Info>
                         <Skeleton variant="text" sx={{ fontSize: '21px' }} width="60%" />

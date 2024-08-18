@@ -31,8 +31,8 @@ const StyledPageItem = muiStyled(PaginationItem)(({ theme }) => ({
 
 const AppPagination = ({ pagination, onPageChange, onSizeChange }) => {
     //Initial value
-    const [page, setPage] = useState(pagination.currPage);
-    const [count, setCount] = useState(pagination.totalPages);
+    const [page, setPage] = useState(pagination.currPage + 1 ?? 0);
+    const [count, setCount] = useState(pagination.totalPages ?? 0);
 
     //Update value
     useEffect(() => {
@@ -41,7 +41,7 @@ const AppPagination = ({ pagination, onPageChange, onSizeChange }) => {
     }, [pagination])
 
     //Change current page
-    const handlePageChange = (event, page) => {
+    const handlePageChange = (e, page) => {
         if (onPageChange) {
             onPageChange(page);
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -49,13 +49,13 @@ const AppPagination = ({ pagination, onPageChange, onSizeChange }) => {
     }
 
     //Change amount display
-    const handleChangeSize = (event) => { if (onSizeChange) onSizeChange(event.target.value) }
+    const handleChangeSize = (e) => { if (onSizeChange) onSizeChange(e.target.value) }
 
     return (
         <Container>
             <Stack spacing={2} sx={{ my: 5 }}>
-                <Pagination 
-                count={count ? count : 0} 
+                <Pagination
+                    count={count ? count : 0}
                     shape="rounded"
                     page={page}
                     onChange={handlePageChange}

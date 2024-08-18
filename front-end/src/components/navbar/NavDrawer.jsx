@@ -12,21 +12,22 @@ import { Link } from 'react-router-dom';
 const DrawerLogo = styled.h2`
     position: relative;
     font-family: abel;
-    font-size: 27px;
     text-transform: uppercase;
+    font-size: 27px;
     font-weight: 500;
     color: ${props => props.theme.palette.primary.main};
-    cursor: pointer;
     align-items: center;
     display: flex;
-    width: 251px;
-    margin: 5px 5px 5px -5px;
     white-space: nowrap;
-    overflow: hidden;
-    transition: all 1.25s ease;
+    margin: 5px 0px 5px 15px;
 
-    @media (min-width: 450px) {
-        margin: 5px 0px 5px 15px;
+    p {
+        color: ${props => props.theme.palette.text.secondary};
+        margin: 0;
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        margin: 5px 5px 5px -5px;
     }
 `
 //#endregion
@@ -54,7 +55,7 @@ const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, role
                 <Box sx={{ marginY: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Link to={`/`} onClick={toggleDrawer(false)} style={{ paddingLeft: '20px' }}>
                         <DrawerLogo>
-                            <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p style={{ color: '#424242', margin: 0 }}>- BOOKSTORE</p>
+                            <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p>- BOOKSTORE</p>
                         </DrawerLogo>
                     </Link>
                     <IconButton sx={{ marginRight: '15px' }} onClick={toggleDrawer(false)}><KeyboardArrowLeft sx={{ fontSize: 26 }} /></IconButton>
@@ -92,7 +93,7 @@ const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, role
                             <ListItemIcon>
                                 <ShoppingCartIcon />
                             </ListItemIcon>
-                            <ListItemText primary={`Giỏ hàng (${products?.length} sản phẩm)`}/>
+                            <ListItemText primary={`Giỏ hàng (${products?.length} sản phẩm)`} />
                         </ListItemButton>
                     </ListItem>
                 </List>
@@ -142,7 +143,7 @@ const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, role
                                     <ListItemIcon>
                                         {theme.palette.mode === 'dark' ? <Brightness3 fontSize="small" /> : <Brightness7 fontSize="small" />}
                                     </ListItemIcon>
-                                    <ListItemText primary={theme.palette.mode === 'dark' ? 'Chủ đề tối' : 'Chủ đề mặc định' } />
+                                    <ListItemText primary={theme.palette.mode === 'dark' ? 'Chủ đề tối' : 'Chủ đề mặc định'} />
                                 </ListItemButton>
                             </ListItem>
                             <ListItem disablePadding>

@@ -86,6 +86,7 @@ const Title = styled.h5`
     line-height: 2;
     font-size: 14px;
     margin: 0;
+    margin-top: 5px;
     text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
@@ -103,12 +104,12 @@ const Title = styled.h5`
 const Price = styled.span`
     font-size: 16px;
     color: gray;
-    margin: 0;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     text-align: center;
-    margin: 5px 0 5px 0;
+    margin: 0;
+    margin-bottom: 5px;
 `
 
 const Percent = styled.p`
@@ -120,7 +121,7 @@ const Sale = styled.span`
     font-size: 20px;
     font-weight: bold;
     color: ${props => props.theme.palette.primary.main};
-    margin: 10px 0 0;
+    margin: 0;
     display: flex;
     flex-wrap: wrap;
     align-items: center;

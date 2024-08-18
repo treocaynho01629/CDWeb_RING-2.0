@@ -4,6 +4,7 @@ import { styled as muiStyled } from '@mui/system';
 import {
     Search as SearchIcon, ShoppingCart as ShoppingCartIcon, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
     Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, NotificationsActive as NotificationsActiveIcon, Storefront,
+    Close,
 } from '@mui/icons-material';
 import { Stack, Badge, IconButton, Avatar, Box, Grid, TextField, AppBar, Collapse, useTheme, useMediaQuery } from '@mui/material';
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -170,11 +171,10 @@ const Logo = styled.h2`
     text-transform: uppercase;
     font-weight: 500;
     color: ${props => props.theme.palette.primary.main};
-    cursor: pointer;
     align-items: center;
     display: flex;
     width: 251px;
-    margin: 5px 0px 5px 15px;
+    margin: 5px 10px 5px 15px;
     white-space: nowrap;
     overflow: hidden;
     transition: all .25s ease;
@@ -301,6 +301,10 @@ const Navbar = () => {
         setOpen(open)
     };
 
+    const toggleSearch = () => {
+        setToggle(prev => !prev);
+    }
+
     //Confirm search
     const handleSubmitSearch = (e) => {
         e.preventDefault();
@@ -349,30 +353,16 @@ const Navbar = () => {
                                 </Link>
                                 <Box display={'flex'} alignItems={'center'} flexDirection={{ xs: 'row-reverse', md: 'row' }}>
                                     <Link to={'/filters'} title="Duyệt cửa hàng">
-                                        <StyledIconButton aria-label="explore"
-                                            sx={{
-                                                marginLeft: 2,
-                                                marginRight: 0,
-                                                zIndex: 10,
-                                            }}
-                                        >
+                                        <StyledIconButton aria-label="explore">
                                             <Storefront sx={{ fontSize: '26px' }} />
                                         </StyledIconButton>
                                     </Link>
-                                    <Box
-                                        sx={{ display: 'flex', alignItems: 'center', marginLeft: '-40' }}
-                                    >
-                                        {!(searchField || focus || toggle) &&
-                                            <StyledIconButton aria-label="search toggle" onClick={() => setToggle(true)}>
-                                                <SearchIcon sx={{ fontSize: '26px' }} />
-                                            </StyledIconButton>
-                                        }
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }} flexDirection={{ xs: 'row-reverse', md: 'row' }}>
                                         <Collapse
                                             orientation="horizontal"
                                             timeout={250}
                                             easing={'ease'}
                                             in={searchField || focus || toggle}
-                                            collapsedSize={0}
                                         >
                                             <form onSubmit={handleSubmitSearch}>
                                                 <SearchInput
@@ -387,13 +377,14 @@ const Navbar = () => {
                                                     value={searchField}
                                                     id="search"
                                                     size="small"
-                                                    width={50}
-                                                    InputProps={{
-                                                        endAdornment: <SearchIcon />
-                                                    }}
+                                                    fullWidth
+                                                    InputProps={{ startAdornment: <SearchIcon sx={{ marginRight: 1 }} /> }}
                                                 />
                                             </form>
                                         </Collapse>
+                                        <StyledIconButton aria-label="search toggle" onClick={() => toggleSearch()}>
+                                            { toggle ? <Close sx={{ fontSize: '26px' }} /> : <SearchIcon sx={{ fontSize: '26px' }} />}
+                                        </StyledIconButton>
                                     </Box>
                                 </Box>
                             </Left>

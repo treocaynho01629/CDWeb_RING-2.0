@@ -34,7 +34,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         }),
         getUsers: builder.query({
             query: (args) => {
-                const { page, size, sortBy, sortDir } = args || {};
+                const { page, size, sortBy, sortDir, bySeller } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
@@ -44,46 +44,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 if (sortDir) params.append('sortDir', sortDir);
 
                 return {
-                    url: `/api/accounts?${params.toString()}`,
-                    validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
-                    },
-                }
-            },
-            transformResponse: responseData => {
-                const { number, size, totalElements, totalPages, content } = responseData;
-                return usersAdapter.setAll({
-                    ...initialState,
-                    info: {
-                        currPage: number,
-                        pageSize: size,
-                        totalElements,
-                        totalPages
-                    }
-                }, content)
-            },
-            providesTags: (result, error, arg) => {
-                if (result?.ids) {
-                    return [
-                        { type: 'User', id: 'LIST' },
-                        ...result.ids.map(id => ({ type: 'User', id }))
-                    ]
-                } else return [{ type: 'User', id: 'LIST' }]
-            }
-        }),
-        getSellers: builder.query({
-            query: (args) => {
-                const { page, size, sortBy, sortDir } = args || {};
-
-                //Params
-                const params = new URLSearchParams();
-                if (page) params.append('pageNo', page);
-                if (size) params.append('pSize', size);
-                if (sortBy) params.append('sortBy', sortBy);
-                if (sortDir) params.append('sortDir', sortDir);
-
-                return {
-                    url: `/api/accounts/employees?${params.toString()}`,
+                    url: `/api/accounts${bySeller ? '/employees' : ''}?${params.toString()}`,
                     validateStatus: (response, result) => {
                         return response.status === 200 && !result.isError
                     },
@@ -188,7 +149,6 @@ export const {
     useGetProfileQuery,
     useGetUserQuery,
     useGetUsersQuery,
-    useGetSellersQuery,
     useCreateUserMutation,
     useUpdateProfileMutation,
     useUpdateUserMutation,

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useState, useEffect } from "react";
 import { Grid, ToggleButton, Button, ToggleButtonGroup, Skeleton } from '@mui/material';
 import { styled as muiStyled } from '@mui/system';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
 import { useGetBooksByFilterQuery, useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import Categories from '../components/Categories';
@@ -189,7 +189,15 @@ const Home = () => {
           <br />
           <Products {...{ isLoading, data, isSuccess, isError }} />
           <ButtonContainer>
-            <Button color="primary" variant="contained" size="medium" onClick={handleShowMore}>Xem thêm</Button>
+            <Button
+              color="primary"
+              variant="contained"
+              size="medium"
+              sx={{ width: '200px' }}
+              onClick={handleShowMore}
+            >
+              Xem thêm
+            </Button>
           </ButtonContainer>
           <br />
           <CustomDivider>SẢN PHẨM XẾP THEO</CustomDivider>
@@ -214,7 +222,16 @@ const Home = () => {
           </ToggleGroupContainer>
           <ProductsSlider {...{ isLoading: loadByOrder, data: orderBooks, isSuccess: doneByOrder, isError: errorByOrder }} />
           <ButtonContainer>
-            <Button variant="contained" color="primary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</Button>
+            <Link to={`/filters?sortBy=${orderBy}`}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="medium"
+                sx={{ width: '200px' }}
+              >
+                Xem thêm
+              </Button>
+            </Link>
           </ButtonContainer>
           <br />
           <CustomDivider>SẢN PHẨM DANH MỤC</CustomDivider>
@@ -230,14 +247,31 @@ const Home = () => {
           </ToggleGroupContainer>
           <ProductsSlider {...{ isLoading: loadByCate, data: cateBooks, isSuccess: doneByCate, isError: errorByCate, isUninitialized }} />
           <ButtonContainer>
-            <Button variant="contained" color="primary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</Button>
+            <Link to={`/filters?cateId=${currCate}`}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="medium"
+                sx={{ width: '200px' }}
+              >
+                Xem thêm
+              </Button>
+            </Link>
           </ButtonContainer>
           <br />
           <CustomDivider>CÓ THỂ BẠN SẼ THÍCH</CustomDivider>
           <br />
           <ProductsSlider {...{ isLoading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
           <ButtonContainer>
-            <Button variant="contained" color="primary" size="medium" onClick={refetchRandom}>Làm mới</Button>
+            <Button
+              variant="contained"
+              color="primary"
+              size="medium"
+              sx={{ width: '200px' }}
+              onClick={refetchRandom}
+            >
+              Làm mới
+            </Button>
           </ButtonContainer>
         </Grid>
       </Grid>

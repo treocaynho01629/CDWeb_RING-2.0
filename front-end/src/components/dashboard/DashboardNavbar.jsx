@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
-
+import { useState } from 'react';
 import { Toolbar, IconButton, Stack, Badge, Tooltip, Avatar, Menu, MenuItem, Divider, ListItemIcon } from '@mui/material';
-import MuiAppBar from '@mui/material/AppBar';
-
 import { Menu as MenuIcon, Logout, Home as HomeIcon, NotificationsActive as NotificationsActiveIcon } from '@mui/icons-material';
-
 import { useNavigate, Link } from "react-router-dom";
+import MuiAppBar from '@mui/material/AppBar';
 import useLogout from "../../hooks/useLogout";
-import useAuth from "../../hooks/useAuth";
 
 //#region preStyled
 const NavItem = styled.div`
@@ -48,15 +44,19 @@ const StyledBadge = muiStyled(Badge)(({ theme }) => ({
 const Logo = styled.h2`
     position: relative;
     font-family: abel;
-    font-size: 27px;
     text-transform: uppercase;
+    font-size: 27px;
     font-weight: 500;
     color: ${props => props.theme.palette.primary.main};
-    cursor: pointer;
     align-items: center;
     display: flex;
     flex-wrap: wrap;
     margin: 5px 0px 5px 0px;
+
+    p {
+        color: ${props => props.theme.palette.text.secondary};
+        margin: 0;
+    }
 `
 
 const ImageLogo = styled.img`
@@ -92,7 +92,6 @@ export default function DashboardNavbar(props) {
   const { open, setOpen } = props;
   const [anchorEl, setAnchorEl] = useState(null);
   const openProfile = Boolean(anchorEl);
-  const { username } = useAuth();
   const navigate = useNavigate();
   const logout = useLogout();
 
@@ -121,16 +120,14 @@ export default function DashboardNavbar(props) {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <ImageLogo style={{ ...(open && { display: 'none' }) }} src="/bell.svg" className="logo" alt="RING! logo" />
           <IconButton
-            color="inherit"
             aria-label="open drawer"
             onClick={handleDrawerOpen}
-            edge="start"
             sx={{
               marginLeft: '5px',
               ...(open && { display: 'none' }),
             }}
           >
-            <MenuIcon sx={{ color: 'gray' }} />
+            <MenuIcon />
           </IconButton>
           <Link to={'/dashboard'} style={{ marginLeft: '20px' }}>
             <Logo>
@@ -143,11 +140,10 @@ export default function DashboardNavbar(props) {
             <StyledIconButton disableRipple disableFocusRipple aria-label="notification">
               <StyledBadge badgeContent={0} anchorOrigin={{
                 vertical: 'top',
-                horizontal: 'left',
+                horizontal: 'right',
               }}>
                 <NotificationsActiveIcon />
               </StyledBadge>
-              <p style={{ fontSize: '13px', marginLeft: '5px' }}>Thông báo</p>
             </StyledIconButton>
             <Tooltip title="Tài khoản">
               <StyledIconButton
@@ -160,7 +156,6 @@ export default function DashboardNavbar(props) {
                 aria-expanded={openProfile ? 'true' : undefined}
               >
                 <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
-                <p style={{ fontSize: '13px', marginLeft: '5px' }}>{username}</p>
               </StyledIconButton>
             </Tooltip>
           </Stack>

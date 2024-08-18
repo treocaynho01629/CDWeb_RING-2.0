@@ -52,19 +52,23 @@ const CustomArrow = styled.button`
 const responsive = {
   widescreen: {
     breakpoint: { max: 3000, min: 1200 },
-    items: 5
+    items: 5,
+    slidesToSlide: 5
   },
   desktop: {
     breakpoint: { max: 1200, min: 992 },
-    items: 4
+    items: 4,
+    slidesToSlide: 4
   },
   tablet: {
     breakpoint: { max: 992, min: 600 },
-    items: 3
+    items: 3,
+    slidesToSlide: 3
   },
   mobile: {
     breakpoint: { max: 600, min: 0 },
-    items: 2
+    items: 2,
+    slidesToSlide: 2
   }
 };
 
@@ -110,7 +114,7 @@ const ProductsSlider = ({ data, isError, isLoading, isSuccess, isUninitialized =
         responsive={responsive}
         infinite={true}
         autoPlay={true}
-        autoPlaySpeed={10000}
+        autoPlaySpeed={15000}
         customLeftArrow={<CustomLeftArrow />}
         customRightArrow={<CustomRightArrow />}
         removeArrowOnDeviceType={["mobile"]}

@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState } from "react";
 import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search } from '@mui/icons-material';
-import { Checkbox, Button, Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
+import { Checkbox, Button, Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon, Skeleton } from '@mui/material';
 import { NavLink, useNavigate } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { booksApiSlice } from '../features/books/booksApiSlice';
@@ -173,6 +173,17 @@ const StyledLazyImage = styled(LazyLoadImage)`
     height: 90px;
     width: 90px;
     border: .5px solid ${props => props.theme.palette.action.focus};
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        height: 80px;
+        width: 80px;
+    }
+`
+
+const StyledSkeleton = styled(Skeleton)`
+    display: inline-block;
+    height: 90px;
+    width: 90px;
 
     ${props => props.theme.breakpoints.down("sm")} {
         height: 80px;
@@ -396,6 +407,7 @@ const Cart = () => {
                                                                 <StyledLazyImage
                                                                     src={`${product.image}?size=small`}
                                                                     alt={`${product.title} Cart item`}
+                                                                    placeholder={<StyledSkeleton variant="rectangular" animation={false}/>}
                                                                 />
                                                             </NavLink>
                                                             <ItemSummary>

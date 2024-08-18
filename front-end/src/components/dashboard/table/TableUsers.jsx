@@ -1,26 +1,28 @@
 import styled from 'styled-components'
-import { useState, useEffect, lazy, Suspense } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch } from '@mui/material';
-import { AutoStories as AutoStoriesIcon, Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import { visuallyHidden } from '@mui/utils';
-import { Link, useSearchParams } from "react-router-dom";
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { useDeleteBookMutation, useDeleteBooksMutation, useGetBooksByFilterQuery } from '../../../features/books/booksApiSlice';
-import { useGetCategoriesQuery } from '../../../features/categories/categoriesApiSlice';
-import { useGetPublishersQuery } from '../../../features/publishers/publishersApiSlice';
-import CustomProgress from '../../custom/CustomProgress';
 import PropTypes from 'prop-types';
-import useAuth from '../../../hooks/useAuth';
+import { styled as muiStyled } from '@mui/material/styles';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import {
+  Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel
+  , Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch
+} from '@mui/material';
+import { Group as GroupIcon, Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+import { visuallyHidden } from '@mui/utils';
+import { Link } from "react-router-dom";
+import { useDeleteUserMutation, useDeleteUsersMutation, useGetUsersQuery } from '../../../features/users/usersApiSlice';
+import useAuth from "../../../hooks/useAuth";
+import CustomTablePagination from '../custom/CustomTablePagination';
+import CustomProgress from '../../custom/CustomProgress';
 
-const AddProductDialog = lazy(() => import('../dialog/AddProductDialog'));
-const EditProductDialog = lazy(() => import('../dialog/EditProductDialog'));
+const AddAccountDialog = lazy(() => import('../dialog/AddAccountDialog'));
+const EditAccountDialog = lazy(() => import('../dialog/EditAccountDialog'));
 
-//#region preStyled
+//#region styled
 const ItemTitle = styled.p`
-  font-size: 12px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 	
 	@supports (-webkit-line-clamp: 1) {
       overflow: hidden;
@@ -32,6 +34,18 @@ const ItemTitle = styled.p`
     }
 `
 
+const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
+  '&:hover': {
+    transform: 'scale(1.05)',
+    color: theme.palette.primary.main,
+
+    '&.error': {
+      color: theme.palette.error.main,
+    },
+  },
+}));
+//#endregion
+
 const headCells = [
   {
     id: 'id',
@@ -42,43 +56,41 @@ const headCells = [
     label: 'ID',
   },
   {
-    id: 'title',
+    id: 'userName',
     align: 'left',
-    width: '500px',
+    width: '200px',
     disablePadding: false,
     sortable: true,
-    label: 'Tiêu đề',
+    label: 'Tên đăng nhập',
   },
   {
-    id: 'image',
+    id: 'email',
     align: 'left',
-    width: '100px',
+    width: '250px',
+    disablePadding: false,
+    sortable: true,
+    label: 'Email',
+  },
+  {
+    id: 'authorities',
+    align: 'right',
+    width: '150px',
     disablePadding: false,
     sortable: false,
-    label: 'Ảnh',
-  },
-  {
-    id: 'price',
-    align: 'right',
-    width: '120px',
-    disablePadding: false,
-    sortable: true,
-    label: 'Giá(đ)',
+    label: 'Quyền',
   },
   {
     id: 'action',
     align: 'right',
-    width: '150px',
+    width: '250px',
     disablePadding: false,
     sortable: false,
     label: 'Hành động',
   },
 ];
 
-function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, selectedAll }) {
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
-  };
+function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, onRequestSort, selectedAll }) {
+  const createSortHandler = (property) => (e) => { onRequestSort(e, property) };
 
   return (
     <TableHead>
@@ -86,12 +98,10 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
         <TableCell padding="checkbox">
           <Checkbox
             color="primary"
-            indeterminate={numSelected > 0 && selectedAll == false}
-            checked={selectedAll == true}
+            indeterminate={numSelected > 0 && !selectedAll}
+            checked={selectedAll}
             onChange={onSelectAllClick}
-            inputProps={{
-              'aria-label': 'Chọn tất cả',
-            }}
+            inputProps={{ 'aria-label': 'Chọn tất cả' }}
           />
         </TableCell>
         {headCells.map((headCell) => (
@@ -131,68 +141,62 @@ EnhancedTableHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
 };
 
-function EnhancedTableToolbar({ loadCates, cates, loadPubs, pubs, numSelected, selectedAll, handleDeleteMultiples }) {
+function EnhancedTableToolbar({ filter, numSelected, selectedAll, handleDeleteMultiples }) {
   const [openNew, setOpenNew] = useState(false);
-
-  const handleClickOpenNew = () => { setOpenNew(true) }
-  const handleDelete = () => { if (handleDeleteMultiples) handleDeleteMultiples() }
+  const handleClickOpenNew = () => { setOpenNew(true) };
+  const handleDelete = () => { if (handleDeleteMultiples) handleDeleteMultiples(); }
 
   return (
     <Toolbar
       sx={{
-        backgroundColor: '#63e399',
+        backgroundColor: 'primary.main',
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: '#63e3a7',
+        ...((numSelected > 0 || selectedAll) && {
+          bgcolor: 'primary.light',
         }),
       }}
     >
-      {numSelected > 0 ? (
+      {numSelected > 0 || selectedAll ? (
         <Typography
-          sx={{ flex: '1 1 100%', fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center' }}
+          sx={{ flex: '1 1 100%', fontWeight: 'bold', color: 'primary.contrastText', display: 'flex', alignItems: 'center' }}
           variant="h6"
           component="div"
         >
-          <AutoStoriesIcon sx={{ marginRight: '10px' }} />
-          {selectedAll ? "Chọn tất cả" : `Chọn ${numSelected} sản phẩm`}
+          <GroupIcon sx={{ marginRight: '10px' }} />
+          {selectedAll ? "Chọn tất cả" : `Chọn ${numSelected} thành viên`}
         </Typography>
       ) : (
         <Typography
-          sx={{ flex: '1 1 100%', fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center' }}
+          sx={{ flex: '1 1 100%', fontWeight: 'bold', color: 'primary.contrastText', display: 'flex', alignItems: 'center' }}
           variant="h6"
           id="tableTitle"
           component="div"
         >
-          <AutoStoriesIcon sx={{ color: 'white', marginRight: '10px' }} />
-          Danh sách sản phẩm
+          <GroupIcon sx={{ color: 'primary.contrastText', marginRight: '10px' }} />
+          Danh sách {filter ? 'nhân viên' : 'thành viên'}
         </Typography>
       )}
 
-      {numSelected > 0 ? (
-        <Tooltip title="Xoá sản phẩm đã chọn">
-          <IconButton onClick={handleDelete}>
-            <DeleteIcon sx={{ color: 'white', "&:hover": { transform: 'scale(1.05)', color: '#e66161' } }} />
+      {(numSelected > 0 || selectedAll) ?
+        <Tooltip title="Xoá thành viên đã chọn">
+          <StyledIconButton onClick={handleDelete} className="error" sx={{ color: 'primary.contrastText' }}>
+            <DeleteIcon />
+          </StyledIconButton>
+        </Tooltip>
+        :
+        <Tooltip title="Thêm thành viên mới">
+          <IconButton onClick={handleClickOpenNew} sx={{ color: 'primary.contrastText' }}>
+            <AddIcon />
           </IconButton>
         </Tooltip>
-      ) : (
-        <>
-          <Tooltip title="Thêm sản phẩm mới">
-            <IconButton sx={{
-              "&:focus": {
-                outline: 'none',
-              }
-            }}
-              onClick={handleClickOpenNew}>
-              <AddIcon sx={{ color: 'white' }} />
-            </IconButton>
-          </Tooltip>
-        </>
-      )}
+      }
 
       <Suspense fallback={<></>}>
         {openNew ?
-          <AddProductDialog {...{ open: openNew, setOpen: setOpenNew, loadCates, cates, loadPubs, pubs }} />
+          <AddAccountDialog
+            open={openNew}
+            setOpen={setOpenNew} />
           : null
         }
       </Suspense>
@@ -205,17 +209,16 @@ EnhancedTableToolbar.propTypes = {
   selectedAll: PropTypes.bool.isRequired,
 };
 
-//#endregion
-
-export default function TableBooks({ setBookCount, sellerName, mini }) {
+export default function TableUsers({ setAccCount, mini }) {
   //#region construct
-  const { username, roles } = useAuth();
+  const { roles } = useAuth();
+  const isAdmin = useState(roles?.find(role => ['ROLE_ADMIN'].includes(role)));
   const [id, setId] = useState([]);
   const [selected, setSelected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [dense, setDense] = useState(true);
-  const [seller, setSeller] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role))));
   const [openEdit, setOpenEdit] = useState(false);
+  const [filter, setFilter] = useState(false);
   const [pending, setPending] = useState(false);
   const [pagination, setPagination] = useState({
     currPage: 0,
@@ -224,21 +227,17 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
     sortBy: "id",
     sortDir: "asc",
   })
+  const { isLoading, isSuccess, isError, error, data } = useGetUsersQuery({
+    page: pagination.currPage,
+    size: pagination.pageSize,
+    sortBy: pagination.sortBy,
+    sortDir: pagination.sortDir,
+    bySeller: filter
+  })
 
   //Delete hook
-  const [deleteBook, { isLoading: deleting }] = useDeleteBookMutation();
-  const [deleteMultipleBooks, { isLoading: deletingMultiple }] = useDeleteBooksMutation();
-
-  //Fetch books
-  const { data, isLoading, isSuccess, isError } = useGetBooksByFilterQuery({
-    page: pagination?.currPage,
-    size: pagination?.pageSize,
-    sortBy: pagination?.sortBy,
-    sortDir: pagination?.sortDir,
-    seller: `${(!seller ? "" : username)}${(sellerName ?? '')}`,
-  })
-  const { data: cates, isLoading: loadCates } = useGetCategoriesQuery();
-  const { data: pubs, isLoading: loadPubs } = useGetPublishersQuery();
+  const [deleteUser, { isLoading: deleting }] = useDeleteUserMutation();
+  const [deleteMultipleUsers, { isLoading: deletingMultiple }] = useDeleteUsersMutation();
 
   //Set pagination after fetch
   useEffect(() => {
@@ -253,40 +252,39 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
   }, [data])
 
   // useEffect(() => {
-  //   if (!loading && setBookCount) {
-  //     setBookCount(rows?.totalElements);
+  //   if (!loading && setAccCount) {
+  //     setAccCount(data?.totalElements);
   //   }
   // }, [loading]);
 
-  const handleRequestSort = (property) => {
+  const handleRequestSort = (e, property) => {
     const isAsc = (pagination.sortBy === property && pagination.sortDir === 'asc');
-    setPagination({
-      ...pagination,
-      sortBy: property,
-      sortDir: isAsc ? 'desc' : 'asc'
-    })
+    const sortDir = isAsc ? 'desc' : 'asc';
+    setPagination({ ...pagination, sortBy: property, sortDir: sortDir });
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = data?.ids?.length?.content?.map((n) => n.id);
+  const handleSelectAllClick = (e) => {
+    if (e.target.checked) { //Selected all
+      const newSelected = data?.content?.map((n) => n.id);
       setSelected(newSelected);
       setSelectedAll(true);
       return;
     }
+
+    //Unselected all
     setSelected([]);
     setSelectedAll(false);
   };
 
-  const handleClick = (id) => {
-    const selectedIndex = selected.indexOf(id);
+  const handleClick = (e, id) => {
+    const selectedIndex = selected?.indexOf(id);
     let newSelected = [];
 
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
+    } else if (selectedIndex === selected?.length - 1) {
       newSelected = newSelected.concat(selected.slice(0, -1));
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
@@ -303,9 +301,9 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
     setPagination({ ...pagination, currPage: page });
   };
 
-  const handleChangeRowsPerPage = (e) => {
+  const handleChangeRowsPerPage = (size) => {
     handleChangePage(0);
-    const newValue = parseInt(e.target.value, 10);
+    const newValue = parseInt(size, 10);
     setPagination({ ...pagination, pageSize: newValue });
   };
 
@@ -313,9 +311,9 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
     setDense(e.target.checked);
   };
 
-  const handleChangeSeller = (e) => {
-    handleChangePage(1)
-    setSeller(e.target.checked);
+  const handleChangeFilter = (e) => {
+    handleChangePage(0);
+    setFilter(e.target.checked);
   };
 
   const handleClickOpenEdit = (id) => {
@@ -328,10 +326,10 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
     setPending(true);
     const { enqueueSnackbar } = await import('notistack');
 
-    deleteBook({ id }).unwrap()
+    deleteUser({ id }).unwrap()
       .then((data) => {
         //Unselected
-        const selectedIndex = selected.indexOf(id);
+        const selectedIndex = selected?.indexOf(id);
         let newSelected = [];
 
         if (selectedIndex === 0) {
@@ -339,7 +337,7 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
           setSelected(newSelected);
         }
 
-        enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+        enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
         setPending(false);
       })
       .catch((err) => {
@@ -351,7 +349,7 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
         } else if (err?.status === 400) {
           enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
         } else {
-          enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+          enqueueSnackbar('Xoá thành viên thất bại!', { variant: 'error' });
         }
         setPending(false);
       })
@@ -362,12 +360,12 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
     setPending(true);
     const { enqueueSnackbar } = await import('notistack');
 
-    deleteMultipleBooks({ ids: selected }).unwrap()
+    deleteMultipleUsers({ ids: selected }).unwrap()
       .then((data) => {
         //Unselected
         setSelected([]);
         setSelectedAll(false);
-        enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+        enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
         setPending(false);
       })
       .catch((err) => {
@@ -379,20 +377,20 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
         } else if (err?.status === 400) {
           enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
         } else {
-          enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+          enqueueSnackbar('Xoá thành viên thất bại!', { variant: 'error' });
         }
         setPending(false);
       })
   };
 
-  const isSelected = (name) => (selected.indexOf(name) !== -1 || selectedAll);
+  const isSelected = (id) => (selected?.indexOf(id) !== -1 || selectedAll);
   const emptyRows = Math.max(0, (pagination.currPage) * pagination.pageSize - data?.info?.totalElements);
   //#endregion
 
-  let booksRows;
+  let usersRows;
 
   if (isLoading) {
-    booksRows = (
+    usersRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -405,25 +403,24 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    booksRows = ids?.length
+    usersRows = ids?.length
       ? ids?.map((id, index) => {
-        const book = entities[id];
+        const user = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
 
         return (
           <TableRow
             hover
-            role="checkbox"
             aria-checked={isItemSelected}
             tabIndex={-1}
             key={id}
             selected={isItemSelected}
-            sx={{ cursor: 'pointer' }}
           >
             <TableCell padding="checkbox">
-              <Checkbox color="primary"
-                onChange={(event) => handleClick(event, book.id)}
+              <Checkbox
+                color="primary"
+                onChange={(event) => handleClick(event, id)}
                 checked={isItemSelected}
                 inputProps={{
                   'aria-labelledby': labelId,
@@ -431,38 +428,30 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
               />
             </TableCell>
             <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
-              <Link to={`/detail/${id}`}>{id}</Link>
+              {isAdmin ? <Link to={`/user/${id}`}>{id}</Link> : { id }}
             </TableCell>
             <TableCell align="left">
-              <Link to={`/detail/${id}`}>
-                <ItemTitle>{book.title}</ItemTitle>
-              </Link>
+              {isAdmin ? <Link to={`/user/${id}`}><ItemTitle>{user.username}</ItemTitle></Link> : <ItemTitle>{user.username}</ItemTitle>}
             </TableCell>
             <TableCell align="left">
-              <LazyLoadImage
-                src={book.image}
-                height={45}
-                width={45}
-              />
+              {isAdmin ? <Link to={`/user/${id}`}><ItemTitle>{user.email}</ItemTitle></Link> : <ItemTitle>{user.email}</ItemTitle>}
             </TableCell>
-            <TableCell align="right">{book.price.toLocaleString()} đ</TableCell>
+            <TableCell align="right">{user.authorities.length == 3 ? 'ADMIN' : user.authorities.length == 2 ? 'SELLER' : 'MEMBER'}</TableCell>
             <TableCell align="right">
-              <IconButton sx={{ "&:hover": { transform: 'scale(1.05)', color: '#63e399' } }}
-                onClick={(e) => handleClickOpenEdit(id)}>
+              <StyledIconButton onClick={(e) => handleClickOpenEdit(id)}>
                 <EditIcon />
-              </IconButton>
-              <IconButton sx={{ "&:hover": { transform: 'scale(1.05)', color: '#e66161' } }}
-                onClick={(e) => handleDelete(id)}>
+              </StyledIconButton>
+              <StyledIconButton className="error" onClick={(e) => handleDelete(id)}>
                 <DeleteIcon />
-              </IconButton>
+              </StyledIconButton>
             </TableCell>
           </TableRow>
         )
       })
       :
-      <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>Không tìm thấy sản phẩm nào!</Box>
+      <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>Không tìm thấy thành viên nào!</Box>
   } else if (isError) {
-    booksRows = (
+    usersRows = (
       <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>{error?.error}</Box>
     )
   }
@@ -470,21 +459,29 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: '2px' }}>
-        <EnhancedTableToolbar {...{ loadCates, cates, loadPubs, pubs, numSelected: selected.length, selectedAll, handleDeleteMultiples }} />
+        <EnhancedTableToolbar
+          filter={filter}
+          numSelected={selected?.length ?? 0}
+          selectedAll={selectedAll}
+          handleDeleteMultiples={handleDeleteMultiples} />
         <TableContainer sx={{ maxHeight: mini ? 330 : 500 }}>
           <Table
+            stickyHeader 
             sx={{ minWidth: mini ? 500 : 750 }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
             <EnhancedTableHead
-              {...{
-                numSelected: selected.length, selectedAll, pagination, rowCount: data?.ids?.length,
-                onSelectAllClick: handleSelectAllClick, onRequestSort: handleRequestSort
-              }}
+              numSelected={selected?.length ?? 0}
+              order={pagination.sortBy}
+              orderBy={pagination.sortDir}
+              onSelectAllClick={handleSelectAllClick}
+              onRequestSort={handleRequestSort}
+              rowCount={data?.totalElements}
+              selectedAll={selectedAll}
             />
             <TableBody>
-              {booksRows}
+              {usersRows}
               {emptyRows > 0 && (
                 <TableRow style={{ height: (dense ? 63 : 83) * emptyRows }}>
                   <TableCell colSpan={6} />
@@ -493,60 +490,53 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
             </TableBody>
             <Suspense fallback={<></>}>
               {openEdit ?
-                <EditProductDialog {...{ id, open: openEdit, setOpen: setOpenEdit, loadCates, cates, loadPubs, pubs }} />
-                : null}
+                <EditAccountDialog
+                  id={id}
+                  open={openEdit}
+                  setOpen={setOpenEdit}
+                />
+                : null
+              }
             </Suspense>
           </Table>
         </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          component="div"
-          labelRowsPerPage={"Hiển thị"}
-          labelDisplayedRows={function defaultLabelDisplayedRows({ from, to, count }) { return `${from}–${to} trong số ${count !== -1 ? count : `Có hơn ${to}`}`; }}
-          count={data?.info?.totalElements ?? 0}
-          page={pagination.currPage}
-          rowsPerPage={pagination.pageSize}
-          showFirstButton
-          showLastButton
+        <CustomTablePagination
+          pagination={pagination}
           onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          onSizeChange={handleChangeRowsPerPage}
+          count={data?.info?.totalElements ?? 0}
         />
       </Paper>
-      <Box sx={{ height: '10px' }}>
+      <Box sx={{ height: '10px', position: 'relative' }}>
         {isLoading && (<CustomProgress color="primary" />)}
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Box>
           <FormControlLabel
-            control={<Switch sx={{
-              '& .MuiSwitch-switchBase.Mui-checked': {
-                color: '#63e399',
-              },
-              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                backgroundColor: '#63e399',
-              },
-            }}
-              checked={dense} onChange={handleChangeDense} />}
+            control={
+              <Switch
+                color="primary"
+                checked={dense}
+                onChange={handleChangeDense}
+              />
+            }
             label="Thu gọn"
           />
-          {roles?.find(role => ['ROLE_ADMIN'].includes(role)) && !sellerName
-            ? <FormControlLabel
-              control={<Switch sx={{
-                '& .MuiSwitch-switchBase.Mui-checked': {
-                  color: '#63e399',
-                },
-                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                  backgroundColor: '#63e399',
-                },
-              }}
-                checked={seller} onChange={handleChangeSeller} />}
-              label="Theo người bán"
+          {isAdmin
+            && <FormControlLabel
+              control={
+                <Switch
+                  color="primary"
+                  checked={filter}
+                  onChange={handleChangeFilter}
+                />
+              }
+              label="Lọc nhân viên"
             />
-            : null
           }
         </Box>
         {mini ?
-          <Link to={'/manage-books'} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10 }}>Xem tất cả</Link>
+          <Link to={'/manage-users'} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10 }}>Xem tất cả</Link>
           : null
         }
       </Box>
@@ -554,6 +544,6 @@ export default function TableBooks({ setBookCount, sellerName, mini }) {
   );
 }
 
-TableBooks.defaultProps = {
+TableUsers.defaultProps = {
   mini: false,
 };

@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 import { Close, RemoveShoppingCart as RemoveShoppingCartIcon } from '@mui/icons-material';
-import { Card, Button, CardContent, CardMedia, Box, Popover, IconButton } from '@mui/material';
+import { Card, Button, CardContent, Skeleton, Box, Popover, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 //#region styled
 const MiniCartContainer = styled.div`
@@ -89,16 +90,19 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products, removeProduct
                     :
                     <>
                         {products?.slice(0, 5).map((product, index) => (
-                            <Card key={index + ":" + product?.id} mt={0} sx={{ display: 'flex', alignItems: 'center' }}>
-                                <CardMedia
-                                    loading="lazy"
-                                    component="img"
-                                    sx={{ width: 50, height: 50, objectFit: 'contain', marginLeft: '10px' }}
-                                    image={`${product?.image}?size=small`}
+                            <Card key={`${index}-${product?.id}`}
+                                sx={{ display: 'flex', alignItems: 'center', marginBottom: 0.5 }}
+                            >
+                                <LazyLoadImage
+                                    width={50}
+                                    height={50}
+                                    style={{ objectFit: 'contain', marginLeft: '10px' }}
+                                    src={`${product?.image}?size=small`}
                                     alt={`${product?.title} Cart item`}
+                                    placeholder={<Skeleton width={50} height={50} animation={false} variant="rectangular"/>}
                                 />
                                 <Box sx={{ display: 'flex', flexDirection: 'column', position: 'relative', width: '100%' }}>
-                                    <CardContent sx={{ width: '100%', padding: '10px' }}>
+                                    <CardContent sx={{ width: '100%', padding: '10px !important' }}>
                                         <ProductTitle>{product?.title}</ProductTitle>
                                         <ProductPrice>{product?.price?.toLocaleString()}đ
                                             <IconButton

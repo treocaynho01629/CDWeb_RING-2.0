@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { AutoStories as AutoStoriesIcon, Group as GroupIcon, Receipt as ReceiptIcon, Try as TryIcon } from "@mui/icons-material";
 import { Grid, Paper } from '@mui/material';
 import TableBook from '../../components/dashboard/table/TableBooks'
-import TableAccounts from "../../components/dashboard/table/TableAccounts";
+import TableUsers from "../../components/dashboard/table/TableUsers";
 import TableReviews from "../../components/dashboard/table/TableReviews";
 import TableReceipts from "../../components/dashboard/table/TableReceipts";
 import ChartAccounts from "../../components/dashboard/chart/ChartAccounts";
@@ -93,7 +93,7 @@ const Dashboard = () => {
       {admin ?
         <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
           <Grid item sm={12} lg={6}>
-            <TableAccounts mini={true} setAccCount={setAccCount} />
+            <TableUsers mini={true} setAccCount={setAccCount} />
           </Grid>
           <Grid item sm={12} lg={6}>
             <TableReviews mini={true} setReviewCount={setReviewCount} />

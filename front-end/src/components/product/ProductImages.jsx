@@ -45,6 +45,8 @@ const ImageSlide = styled.div`
     position: relative;
     width: 100%;
     animation: ${fadeIn} .3s ease;
+    align-items: center;
+    justify-content: center;
 `
 
 const ImageNumber = styled.p`
@@ -248,7 +250,7 @@ const ProductImages = ({ images }) => {
                 <ImageSlider>
                     {multiImages.map((style, index) => (
                         <ImageSlide key={index}
-                            style={{ display: (index + 1) === slideIndex ? "block" : "none" }}>
+                            style={{ display: (index + 1) === slideIndex ? "flex" : "none" }}>
                             <ImageNumber>{index + 1} / {multiImages.length}</ImageNumber>
                             <StyledLazyImage
                                 src={images}
@@ -256,6 +258,12 @@ const ProductImages = ({ images }) => {
                                 alt={`Big image number ${index}`}
                                 sizes='400px'
                                 imageStyle={style}
+                                placeholder={
+                                    <StyledSkeleton
+                                        variant="rectangular"
+                                        animation={false}
+                                    />
+                                }
                             />
                         </ImageSlide>
                     ))}
@@ -276,6 +284,12 @@ const ProductImages = ({ images }) => {
                                 <StyledSmallLazyImage
                                     src={images}
                                     imageStyle={style}
+                                    placeholder={
+                                        <StyledSmallSkeleton
+                                            variant="rectangular"
+                                            animation={false}
+                                        />
+                                    }
                                 />
                             </SmallImageSlide>
                         ))}

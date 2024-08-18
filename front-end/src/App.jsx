@@ -26,7 +26,7 @@ const Orders = Loadable(lazy(() => import('./pages/Orders')));
 
 const DashboardLayout = lazy(() => import('./components/dashboard/DashboardLayout'));
 const ManageBooks = Loadable(lazy(() => import('./pages/dashboard/ManageBooks')));
-const ManageAccounts = Loadable(lazy(() => import('./pages/dashboard/ManageAccounts')));
+const ManageUsers = Loadable(lazy(() => import('./pages/dashboard/ManageUsers')));
 const ManageReceipts = Loadable(lazy(() => import('./pages/dashboard/ManageReceipts')));
 const ManageReviews = Loadable(lazy(() => import('./pages/dashboard/ManageReviews')));
 const DetailProduct = Loadable(lazy(() => import('./pages/dashboard/DetailProduct.jsx')));
@@ -80,7 +80,7 @@ function App() {
 
                 //ADMIN
               <Route element={<RequireAuth allowedRoles={['ROLE_ADMIN']} />}>
-                <Route path="/manage-accounts" element={<ManageAccounts />} />
+                <Route path="/manage-users" element={<ManageUsers />} />
                 <Route path="/manage-reviews" element={<ManageReviews />} />
                 <Route path="/user/:id" element={<DetailAccount />} />
               </Route>

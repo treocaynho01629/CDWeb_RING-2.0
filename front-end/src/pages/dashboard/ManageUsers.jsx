@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Grid, Paper } from '@mui/material';
 import { useNavigate } from "react-router-dom"
 import ChartAccounts from '../../components/dashboard/chart/ChartAccounts'
-import TableAccounts from "../../components/dashboard/table/TableAccounts";
+import TableUsers from "../../components/dashboard/table/TableUsers";
 import GroupIcon from '@mui/icons-material/Group';
 import useTitle from '../../hooks/useTitle';
 
@@ -29,7 +29,7 @@ const countIconStyle = {
 }
 //#endregion
 
-const ManageAccounts = () => {
+const ManageUsers = () => {
   const [accCount, setAccCount] = useState(0);
   const navigate = useNavigate();
 
@@ -49,9 +49,9 @@ const ManageAccounts = () => {
         </Grid>
       </Grid>
       <ChartAccounts />
-      <TableAccounts setAccCount={setAccCount} />
+      <TableUsers setAccCount={setAccCount} />
     </>
   )
 }
 
-export default ManageAccounts
+export default ManageUsers

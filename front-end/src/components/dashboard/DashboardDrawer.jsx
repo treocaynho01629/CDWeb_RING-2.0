@@ -191,7 +191,7 @@ const DashboardDrawer = (props) => {
             </ListItem>
             <Collapse in={openList[2]} timeout="auto" unmountOnExit sx={{ display: open ? 'block' : 'none' }}>
               <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/manage-accounts')}>
+                <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/manage-users')}>
                   <ListItemIcon>
                     <PersonIcon />
                   </ListItemIcon>
