@@ -24,14 +24,17 @@ public interface AccountRepository extends JpaRepository<Account, Integer>{
 	Optional<Account> findByResetPassToken(String resetPassToken); //Get Account by {resetPassToken}
 	
 	@Query("""
-	select a from Account a where size(a.roles) > 1
+	select a from Account a 
+	where concat (a.email, a.userName) ilike %:keyword%
+	and size(a.roles) <= :maxRoles
+	and size(a.roles) > :minRoles
 	""")
-	Page<Account> findEmployees(Pageable pageable);
+	Page<Account> findAccountsWithFilter(String keyword, Integer maxRoles, Integer minRoles, Pageable pageable);
 	
 	@Query(value ="""
 	select t.user_name as name, coalesce(t.rv, 0) as data, coalesce(t2.od, 0) as otherData
 	from
-	(SELECT a.user_name, r.user_id, count(r.id) as rv
+	(select a.user_name, r.user_id, count(r.id) as rv
 	from review r join account a on a.id = r.user_id
 	group by a.user_name, r.user_id order by rv desc limit 7) t
 	left join

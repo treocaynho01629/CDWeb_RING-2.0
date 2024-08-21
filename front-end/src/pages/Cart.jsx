@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState } from "react";
-import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search } from '@mui/icons-material';
+import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search, ChevronLeft } from '@mui/icons-material';
 import { Checkbox, Button, Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon, Skeleton } from '@mui/material';
 import { NavLink, useNavigate } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
@@ -296,7 +296,7 @@ const Cart = () => {
         const { onSelectAllClick, numSelected, rowCount } = props;
 
         return (
-            <TableHead sx={{ display: { xs: 'none', sm: 'table-header-group' }}}>
+            <TableHead sx={{ display: { xs: 'none', sm: 'table-header-group' } }}>
                 <TableRow sx={{ padding: 0, border: '.5px solid', borderColor: 'action.focus', backgroundColor: 'primary.main' }}>
                     <StyledTableCell>
                         <Checkbox
@@ -343,12 +343,16 @@ const Cart = () => {
 
             {cartProducts?.length == 0 ?
                 <EmptyWrapper>
-                    <LazyLoadImage src="/empty.svg"
-                        height={250}
-                    />
+                    <img src="/empty.svg" height={250} />
                     <h2>Giỏ hàng của bạn đang trống</h2>
                     <NavLink to={'/'}>
-                        <Button variant="contained" color="primary">Tiếp tục mua sắm</Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<ChevronLeft />}
+                        >
+                            Tiếp tục mua sắm
+                        </Button>
                     </NavLink>
                 </EmptyWrapper>
                 :
@@ -396,7 +400,7 @@ const Cart = () => {
                                                         <Checkbox
                                                             disableRipple
                                                             disableFocusRipple
-                                                            color="primary" xx 
+                                                            color="primary" xx
                                                             checked={isItemSelected}
                                                             inputProps={{ 'aria-labelledby': labelId }}
                                                             sx={{ marginRight: { xs: 1, md: 2 }, marginLeft: { xs: -1.5, sm: 0 } }}
@@ -407,7 +411,7 @@ const Cart = () => {
                                                                 <StyledLazyImage
                                                                     src={`${product.image}?size=small`}
                                                                     alt={`${product.title} Cart item`}
-                                                                    placeholder={<StyledSkeleton variant="rectangular" animation={false}/>}
+                                                                    placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
                                                                 />
                                                             </NavLink>
                                                             <ItemSummary>
@@ -466,6 +470,16 @@ const Cart = () => {
                                 </TableBody>
                             </Table>
                         </TableContainer>
+                        <br />
+                        <NavLink to={'/'}>
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                startIcon={<ChevronLeft />}
+                            >
+                                Tiếp tục mua sắm
+                            </Button>
+                        </NavLink>
                     </Grid>
                     <Grid item xs={12} md={8} lg={4}>
                         <CheckoutDialog {...{

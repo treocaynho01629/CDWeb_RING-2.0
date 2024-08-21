@@ -15,8 +15,8 @@ import com.ring.bookstore.response.IChartResponse;
 
 public interface AccountService {
 	
-	Page<Account> getAllAccounts(Integer pageNo, Integer pageSize, String sortBy, String sortDir);
-	Page<Account> getAllEmployees(Integer pageNo, Integer pageSize, String sortBy, String sortDir);
+	Page<Account> getAllAccounts(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
+								 Boolean isEmployee, String keyword, Integer role);
 	AccountDetailDTO getAccountById(Integer id);
 	Account saveAccount(AccountRequest request);
 	Account updateAccount(AccountRequest request, Integer id);

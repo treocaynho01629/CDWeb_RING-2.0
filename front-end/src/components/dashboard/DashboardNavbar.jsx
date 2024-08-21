@@ -115,7 +115,7 @@ export default function DashboardNavbar(props) {
   };
 
   return (
-    <AppBar sx={{ backgroundColor: 'white' }} position="fixed" open={open}>
+    <AppBar sx={{ backgroundColor: 'white' }} position="fixed" open={open} elevation={0}>
       <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <ImageLogo style={{ ...(open && { display: 'none' }) }} src="/bell.svg" className="logo" alt="RING! logo" />

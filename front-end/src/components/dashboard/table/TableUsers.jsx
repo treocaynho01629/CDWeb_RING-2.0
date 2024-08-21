@@ -2,11 +2,8 @@ import styled from 'styled-components'
 import PropTypes from 'prop-types';
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState, useEffect, lazy, Suspense } from 'react';
-import {
-  Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel
-  , Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch
-} from '@mui/material';
-import { Group as GroupIcon, Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch, Avatar, Chip, Popover, Grid, TextField, MenuItem } from '@mui/material';
+import { Group as GroupIcon, Edit as EditIcon, Delete as DeleteIcon, FilterList, Search } from '@mui/icons-material';
 import { visuallyHidden } from '@mui/utils';
 import { Link } from "react-router-dom";
 import { useDeleteUserMutation, useDeleteUsersMutation, useGetUsersQuery } from '../../../features/users/usersApiSlice';
@@ -14,12 +11,12 @@ import useAuth from "../../../hooks/useAuth";
 import CustomTablePagination from '../custom/CustomTablePagination';
 import CustomProgress from '../../custom/CustomProgress';
 
-const AddAccountDialog = lazy(() => import('../dialog/AddAccountDialog'));
 const EditAccountDialog = lazy(() => import('../dialog/EditAccountDialog'));
 
 //#region styled
 const ItemTitle = styled.p`
     font-size: 12px;
+    margin: 5px 0;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -35,6 +32,8 @@ const ItemTitle = styled.p`
 `
 
 const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
+  color: 'inherit',
+
   '&:hover': {
     transform: 'scale(1.05)',
     color: theme.palette.primary.main,
@@ -64,14 +63,6 @@ const headCells = [
     label: 'Tên đăng nhập',
   },
   {
-    id: 'email',
-    align: 'left',
-    width: '250px',
-    disablePadding: false,
-    sortable: true,
-    label: 'Email',
-  },
-  {
     id: 'authorities',
     align: 'right',
     width: '150px',
@@ -89,7 +80,7 @@ const headCells = [
   },
 ];
 
-function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, onRequestSort, selectedAll }) {
+function EnhancedTableHead({ onSelectAllClick, sortDir, sortBy, numSelected, onRequestSort, selectedAll }) {
   const createSortHandler = (property) => (e) => { onRequestSort(e, property) };
 
   return (
@@ -110,18 +101,18 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, onRe
             align={headCell.align}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             style={{ width: headCell.width }}
-            sortDirection={orderBy === headCell.id ? order : false}
+            sortDirection={sortBy === headCell.id ? sortDir : false}
           >
             {headCell.sortable ? (
               <TableSortLabel
-                active={orderBy === headCell.id}
-                direction={orderBy === headCell.id ? order : 'asc'}
+                active={sortBy === headCell.id}
+                direction={sortBy === headCell.id ? sortDir : 'asc'}
                 onClick={createSortHandler(headCell.id)}
               >
                 {headCell.label}
-                {orderBy === headCell.id ? (
+                {sortBy === headCell.id ? (
                   <Box component="span" sx={visuallyHidden}>
-                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                    {sortDir === 'desc' ? 'sorted descending' : 'sorted ascending'}
                   </Box>
                 ) : null}
               </TableSortLabel>
@@ -138,28 +129,32 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, onRe
 }
 
 EnhancedTableHead.propTypes = {
-  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+  sortDir: PropTypes.oneOf(['asc', 'desc']).isRequired,
 };
 
 function EnhancedTableToolbar({ filter, numSelected, selectedAll, handleDeleteMultiples }) {
-  const [openNew, setOpenNew] = useState(false);
-  const handleClickOpenNew = () => { setOpenNew(true) };
-  const handleDelete = () => { if (handleDeleteMultiples) handleDeleteMultiples(); }
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleClick = (e) => { setAnchorEl(e.currentTarget) }
+  const handleClose = () => { setAnchorEl(null) }
+  const handleDelete = () => { if (handleDeleteMultiples) handleDeleteMultiples() }
+
+  const open = Boolean(anchorEl);
 
   return (
     <Toolbar
       sx={{
-        backgroundColor: 'primary.main',
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
         ...((numSelected > 0 || selectedAll) && {
           bgcolor: 'primary.light',
+          color: 'primary.contrastText'
         }),
       }}
     >
       {numSelected > 0 || selectedAll ? (
         <Typography
-          sx={{ flex: '1 1 100%', fontWeight: 'bold', color: 'primary.contrastText', display: 'flex', alignItems: 'center' }}
+          sx={{ flex: '1 1 100%', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}
           variant="h6"
           component="div"
         >
@@ -168,38 +163,72 @@ function EnhancedTableToolbar({ filter, numSelected, selectedAll, handleDeleteMu
         </Typography>
       ) : (
         <Typography
-          sx={{ flex: '1 1 100%', fontWeight: 'bold', color: 'primary.contrastText', display: 'flex', alignItems: 'center' }}
+          sx={{ flex: '1 1 100%', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}
           variant="h6"
           id="tableTitle"
           component="div"
         >
-          <GroupIcon sx={{ color: 'primary.contrastText', marginRight: '10px' }} />
+          <GroupIcon sx={{ color: 'text.primary', marginRight: '10px' }} />
           Danh sách {filter ? 'nhân viên' : 'thành viên'}
         </Typography>
       )}
 
       {(numSelected > 0 || selectedAll) ?
         <Tooltip title="Xoá thành viên đã chọn">
-          <StyledIconButton onClick={handleDelete} className="error" sx={{ color: 'primary.contrastText' }}>
+          <StyledIconButton onClick={handleDelete} className="error">
             <DeleteIcon />
           </StyledIconButton>
         </Tooltip>
         :
-        <Tooltip title="Thêm thành viên mới">
-          <IconButton onClick={handleClickOpenNew} sx={{ color: 'primary.contrastText' }}>
-            <AddIcon />
+        <Tooltip title="Lọc thành viên">
+          <IconButton onClick={handleClick} >
+            <FilterList />
           </IconButton>
         </Tooltip>
       }
-
-      <Suspense fallback={<></>}>
-        {openNew ?
-          <AddAccountDialog
-            open={openNew}
-            setOpen={setOpenNew} />
-          : null
-        }
-      </Suspense>
+      <Popover
+        id="filter-popover"
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <Grid container spacing={1} sx={{ width: '80vw', padding: '10px' }}>
+          <Grid item xs={12} sm={4}>
+            <TextField label='Quyền'
+              // value={currAddress?.city || ''}
+              // onChange={(e) => setCurrAddress({ ...currAddress, city: e.target.value, ward: '' })}
+              select
+              defaultValue=""
+              fullWidth
+              size="small"
+            >
+              <MenuItem disabled value=""><em>--Quyền--</em></MenuItem>
+              {!filter && <MenuItem value={1}>MEMBER</MenuItem>}
+              <MenuItem value={2}>SELLER</MenuItem>
+              <MenuItem value={3}>ADMIN</MenuItem>
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={8}>
+            <TextField
+              placeholder='Tìm kiếm... '
+              // onChange={(e) => setSearchField(e.target.value)}
+              // value={searchField}
+              id="search-user"
+              size="small"
+              fullWidth
+              InputProps={{ startAdornment: <Search sx={{ marginRight: 1 }} /> }}
+            />
+          </Grid>
+        </Grid>
+      </Popover>
     </Toolbar>
   );
 }
@@ -209,7 +238,7 @@ EnhancedTableToolbar.propTypes = {
   selectedAll: PropTypes.bool.isRequired,
 };
 
-export default function TableUsers({ setAccCount, mini }) {
+export default function TableUsers({ setUserCount, mini = false }) {
   //#region construct
   const { roles } = useAuth();
   const isAdmin = useState(roles?.find(role => ['ROLE_ADMIN'].includes(role)));
@@ -218,7 +247,7 @@ export default function TableUsers({ setAccCount, mini }) {
   const [selectedAll, setSelectedAll] = useState(false);
   const [dense, setDense] = useState(true);
   const [openEdit, setOpenEdit] = useState(false);
-  const [filter, setFilter] = useState(false);
+  const [isEmployees, setIsEmployees] = useState(false);
   const [pending, setPending] = useState(false);
   const [pagination, setPagination] = useState({
     currPage: 0,
@@ -232,7 +261,7 @@ export default function TableUsers({ setAccCount, mini }) {
     size: pagination.pageSize,
     sortBy: pagination.sortBy,
     sortDir: pagination.sortDir,
-    bySeller: filter
+    isEmployees: isEmployees
   })
 
   //Delete hook
@@ -248,14 +277,9 @@ export default function TableUsers({ setAccCount, mini }) {
         currPage: data?.info?.currPage,
         pageSize: data?.info?.pageSize
       });
+      setUserCount(data?.info?.totalElements);
     }
   }, [data])
-
-  // useEffect(() => {
-  //   if (!loading && setAccCount) {
-  //     setAccCount(data?.totalElements);
-  //   }
-  // }, [loading]);
 
   const handleRequestSort = (e, property) => {
     const isAsc = (pagination.sortBy === property && pagination.sortDir === 'asc');
@@ -313,7 +337,7 @@ export default function TableUsers({ setAccCount, mini }) {
 
   const handleChangeFilter = (e) => {
     handleChangePage(0);
-    setFilter(e.target.checked);
+    setIsEmployees(e.target.checked);
   };
 
   const handleClickOpenEdit = (id) => {
@@ -384,7 +408,6 @@ export default function TableUsers({ setAccCount, mini }) {
   };
 
   const isSelected = (id) => (selected?.indexOf(id) !== -1 || selectedAll);
-  const emptyRows = Math.max(0, (pagination.currPage) * pagination.pageSize - data?.info?.totalElements);
   //#endregion
 
   let usersRows;
@@ -396,7 +419,10 @@ export default function TableUsers({ setAccCount, mini }) {
           scope="row"
           padding="none"
           align="center"
-          colSpan={6}>
+          colSpan={6}
+          sx={{ position: 'relative', height: '40dvh' }}
+        >
+          <CustomProgress color="primary" />
         </TableCell>
       </TableRow>
     )
@@ -408,6 +434,7 @@ export default function TableUsers({ setAccCount, mini }) {
         const user = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
+        const role = user.authorities.length;
 
         return (
           <TableRow
@@ -431,13 +458,31 @@ export default function TableUsers({ setAccCount, mini }) {
               {isAdmin ? <Link to={`/user/${id}`}>{id}</Link> : { id }}
             </TableCell>
             <TableCell align="left">
-              {isAdmin ? <Link to={`/user/${id}`}><ItemTitle>{user.username}</ItemTitle></Link> : <ItemTitle>{user.username}</ItemTitle>}
+              {isAdmin
+                ?
+                <Link to={`/user/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
+                  <Avatar sx={{ marginRight: 1 }}>{user?.username?.charAt(0) ?? ''}</Avatar>
+                  <Box>
+                    <ItemTitle>{user.username}</ItemTitle>
+                    <ItemTitle>{user.email}</ItemTitle>
+                  </Box>
+                </Link>
+                :
+                <>
+                  <ItemTitle>{user.username}</ItemTitle>
+                  <ItemTitle>{user.email}</ItemTitle>
+                </>
+              }
             </TableCell>
-            <TableCell align="left">
-              {isAdmin ? <Link to={`/user/${id}`}><ItemTitle>{user.email}</ItemTitle></Link> : <ItemTitle>{user.email}</ItemTitle>}
-            </TableCell>
-            <TableCell align="right">{user.authorities.length == 3 ? 'ADMIN' : user.authorities.length == 2 ? 'SELLER' : 'MEMBER'}</TableCell>
             <TableCell align="right">
+              <Chip label={role == 3 ? 'ADMIN' :
+                role == 2 ? 'SELLER' : 'MEMBER'}
+                color={role == 3 ? 'primary' :
+                  role == 2 ? 'info' : 'default'}
+                sx={{ fontWeight: 'bold' }}
+              />
+            </TableCell>
+            <TableCell align="right" sx={{ color: 'text.secondary' }}>
               <StyledIconButton onClick={(e) => handleClickOpenEdit(id)}>
                 <EditIcon />
               </StyledIconButton>
@@ -452,29 +497,39 @@ export default function TableUsers({ setAccCount, mini }) {
       <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>Không tìm thấy thành viên nào!</Box>
   } else if (isError) {
     usersRows = (
-      <Box sx={{ marginTop: 5, marginBottom: '90dvh' }}>{error?.error}</Box>
+      <TableRow>
+        <TableCell
+          scope="row"
+          padding="none"
+          align="center"
+          colSpan={6}
+          sx={{ height: '40dvh' }}
+        >
+          <Box>{error?.error}</Box>
+        </TableCell>
+      </TableRow>
     )
   }
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: '2px' }}>
+      <Paper elevation={3} sx={{ width: '100%', mb: '2px' }} >
         <EnhancedTableToolbar
-          filter={filter}
+          filter={isEmployees}
           numSelected={selected?.length ?? 0}
           selectedAll={selectedAll}
           handleDeleteMultiples={handleDeleteMultiples} />
-        <TableContainer sx={{ maxHeight: mini ? 330 : 500 }}>
+        <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
           <Table
-            stickyHeader 
+            stickyHeader
             sx={{ minWidth: mini ? 500 : 750 }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
             <EnhancedTableHead
               numSelected={selected?.length ?? 0}
-              order={pagination.sortBy}
-              orderBy={pagination.sortDir}
+              sortBy={pagination.sortBy}
+              sortDir={pagination.sortDir}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={data?.totalElements}
@@ -482,11 +537,6 @@ export default function TableUsers({ setAccCount, mini }) {
             />
             <TableBody>
               {usersRows}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: (dense ? 63 : 83) * emptyRows }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
             </TableBody>
             <Suspense fallback={<></>}>
               {openEdit ?
@@ -507,9 +557,6 @@ export default function TableUsers({ setAccCount, mini }) {
           count={data?.info?.totalElements ?? 0}
         />
       </Paper>
-      <Box sx={{ height: '10px', position: 'relative' }}>
-        {isLoading && (<CustomProgress color="primary" />)}
-      </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Box>
           <FormControlLabel
@@ -527,7 +574,7 @@ export default function TableUsers({ setAccCount, mini }) {
               control={
                 <Switch
                   color="primary"
-                  checked={filter}
+                  checked={isEmployees}
                   onChange={handleChangeFilter}
                 />
               }
@@ -543,7 +590,3 @@ export default function TableUsers({ setAccCount, mini }) {
     </Box>
   );
 }
-
-TableUsers.defaultProps = {
-  mini: false,
-};

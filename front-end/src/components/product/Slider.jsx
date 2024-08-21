@@ -166,7 +166,7 @@ const CustomRightArrow = ({ onClick }) => (
     <CustomArrow className="custom-right-arrow" onClick={() => onClick()}><KeyboardArrowRight /></CustomArrow>
 );
 
-function Item({ book }) {
+function Item({ book, index }) {
     const { addProduct } = useCart();
 
     const handleAddToCart = (book) => {
@@ -198,6 +198,7 @@ function Item({ book }) {
                                     sizes='400px'
                                     height={400}
                                     width={'100%'}
+                                    visibleByDefault={index == 0}
                                     placeholder={
                                         <Skeleton
                                             variant="rectangular"
@@ -292,7 +293,7 @@ const Slider = () => {
                         const book = entities[id];
 
                         return (
-                            <Item key={`${id}-${index}`} book={book} />
+                            <Item key={`${id}-${index}`} book={book} index={index} />
                         )
                     })}
                 </Carousel>

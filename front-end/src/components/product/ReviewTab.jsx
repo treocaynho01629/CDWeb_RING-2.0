@@ -105,7 +105,7 @@ const Review = ({ review, username }) => {
         <>
             <Profiler className={username === review?.userName ? 'active' : ''}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <RatingInfo><Avatar sx={{ width: '20px', height: '20px', marginRight: '5px' }}>{review?.userName?.charAt(0) ?? 'A'}</Avatar>{review?.userName}</RatingInfo>
+                    <RatingInfo><Avatar sx={{ width: '20px', height: '20px', marginRight: '5px' }}>{review?.userName?.charAt(0) ?? ''}</Avatar>{review?.userName}</RatingInfo>
                     <Box display={{ xs: 'none', sm: 'flex' }}>
                         <RatingInfo><AccessTimeIcon sx={{ fontSize: 18, marginRight: '5px', color: 'primary.main' }} />
                             {`${('0' + date?.getHours()).slice(-2)}:${('0' + date?.getMinutes()).slice(-2)}`}

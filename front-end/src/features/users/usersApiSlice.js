@@ -34,7 +34,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         }),
         getUsers: builder.query({
             query: (args) => {
-                const { page, size, sortBy, sortDir, bySeller } = args || {};
+                const { page, size, sortBy, sortDir, isEmployees, keyword, role } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
@@ -42,9 +42,12 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 if (size) params.append('pSize', size);
                 if (sortBy) params.append('sortBy', sortBy);
                 if (sortDir) params.append('sortDir', sortDir);
+                if (isEmployees) params.append('isEmployees', isEmployees);
+                if (keyword) params.append('keyword', keyword);
+                if (role) params.append('role', role);
 
                 return {
-                    url: `/api/accounts${bySeller ? '/employees' : ''}?${params.toString()}`,
+                    url: `/api/accounts?${params.toString()}`,
                     validateStatus: (response, result) => {
                         return response.status === 200 && !result.isError
                     },

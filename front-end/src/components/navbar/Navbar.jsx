@@ -6,7 +6,7 @@ import {
     Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, NotificationsActive as NotificationsActiveIcon, Storefront,
     Close,
 } from '@mui/icons-material';
-import { Stack, Badge, IconButton, Avatar, Box, Grid, TextField, AppBar, Collapse, useTheme, useMediaQuery } from '@mui/material';
+import { Stack, Badge, IconButton, Avatar, Box, Grid, TextField, AppBar, useTheme, useMediaQuery } from '@mui/material';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ColorModeContext } from '../../ThemeContextProvider';
 import useLogout from "../../hooks/useLogout";
@@ -156,7 +156,7 @@ const Logo = styled.h2`
     &.active {
         width: 110px;
         
-        ${props => props.theme.breakpoints.down("sm")} {
+        ${props => props.theme.breakpoints.down("md")} {
             width: 0px;
         }
     }
@@ -216,6 +216,33 @@ const IconText = styled.p`
         height: 0;
     }
 `
+
+const StyledSearchForm = styled.form`
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    ${props => props.theme.breakpoints.down("md")} {
+        flex-direction: row-reverse;
+    }
+`
+
+const StyledSearchInput = muiStyled(TextField)(({ theme }) => ({
+    color: 'inherit',
+    [theme.breakpoints.down('sm')]: {
+        width: '100%',
+    },
+    '& .MuiInputBase-input': {
+        transition: theme.transitions.create('width'),
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+            width: '12ch',
+            '&:focus': {
+                width: '20ch',
+            },
+        },
+    },
+}));
 //#endregion
 
 const Navbar = () => {
@@ -338,33 +365,25 @@ const Navbar = () => {
                                             <Storefront sx={{ fontSize: '26px' }} />
                                         </StyledIconButton>
                                     </Link>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}
-                                        flexDirection={{ xs: 'row-reverse', md: 'row' }}>
-                                        <Collapse
-                                            orientation="horizontal"
-                                            timeout={250}
-                                            easing={'ease'}
-                                            in={isToggleSearch}
-                                        >
-                                            <form onSubmit={handleSubmitSearch}>
-                                                <TextField
-                                                    placeholder='Tìm kiếm... '
-                                                    onFocus={() => setFocus(true)}
-                                                    onBlur={() => setFocus(false)}
-                                                    onChange={(e) => setSearchField(e.target.value)}
-                                                    value={searchField}
-                                                    id="search"
-                                                    size="small"
-                                                    fullWidth
-                                                    sx={{ width: '100%' }}
-                                                    InputProps={{ startAdornment: <SearchIcon sx={{ marginRight: 1 }} /> }}
-                                                />
-                                            </form>
-                                        </Collapse>
+                                    <StyledSearchForm onSubmit={handleSubmitSearch}>
+                                        {isToggleSearch &&
+                                            <StyledSearchInput
+                                                placeholder='Tìm kiếm... '
+                                                autoFocus
+                                                autoComplete="search"
+                                                onFocus={() => setFocus(true)}
+                                                onBlur={() => setFocus(false)}
+                                                onChange={(e) => setSearchField(e.target.value)}
+                                                value={searchField}
+                                                id="search"
+                                                size="small"
+                                                InputProps={{ startAdornment: <SearchIcon sx={{ marginRight: 1 }} /> }}
+                                            />
+                                        }
                                         <StyledIconButton aria-label="search toggle" onClick={() => toggleSearch()}>
                                             {isToggleSearch ? <Close sx={{ fontSize: '26px' }} /> : <SearchIcon sx={{ fontSize: '26px' }} />}
                                         </StyledIconButton>
-                                    </Box>
+                                    </StyledSearchForm>
                                 </Box>
                             </Left>
                         </Grid>

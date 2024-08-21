@@ -1,8 +1,7 @@
 import styled, { keyframes } from 'styled-components'
-import { styled as muiStyled } from '@mui/system'
 import { useMemo, useState } from 'react'
-import { KeyboardArrowRight, KeyboardArrowLeft, Star as StarIcon, StarBorder as StarBorderIcon, ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
-import { Divider, Rating, Box, Tooltip, Skeleton } from '@mui/material'
+import { KeyboardArrowRight, KeyboardArrowLeft, Star as StarIcon, ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
+import { Divider, Box, Tooltip, Skeleton } from '@mui/material'
 import { Link, useNavigate } from "react-router-dom"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import useCart from '../../hooks/useCart';
@@ -185,18 +184,6 @@ const TextRating = styled.b`
     font-size: 12px;
 `
 
-const StyledRating = muiStyled(Rating)(({ theme }) => ({
-    fontSize: 14,
-    display: 'flex',
-    alignItems: 'center',
-    '& .MuiRating-iconFilled': {
-        color: theme.palette.primary.main,
-    },
-    '& .MuiRating-iconHover': {
-        color: theme.palette.primary.light,
-    },
-}));
-
 const StyledLazyImage = styled(LazyLoadImage)`
     aspect-ratio: 1/1;
     margin: 10px 2px;
@@ -208,7 +195,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
 //#endregion
 const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY(-1)'];
 
-const Product = ({ book }) => {
+const Product = ({ book, scrollPosition }) => {
     const [slideIndex, setSlideIndex] = useState(0);
     const { addProduct } = useCart();
     const navigate = useNavigate();
@@ -256,12 +243,13 @@ const Product = ({ book }) => {
                         width={'100%'}
                         height={220}
                         imageStyle={multiImages[slideIndex]}
+                        scrollPosition={scrollPosition}
                         placeholder={
                             <Skeleton
                                 variant="rectangular"
                                 width={'90%'}
                                 height={210}
-                                animation={false} 
+                                animation={false}
                                 sx={{
                                     aspectRatio: '1/1',
                                     margin: '5px 0px 20px 0px',
@@ -309,33 +297,19 @@ const Product = ({ book }) => {
                     <AddToCart onClick={() => handleAddToCart(book)} disabled={!book}>
                         <ShoppingCartIcon style={{ fontSize: 14 }} />&nbsp;
                     </AddToCart>
-                    <Box display={{ xs: 'none', lg: 'block' }} sx={{ cursor: 'pointer' }}>
-                        <Tooltip title={calculatedRate === '~' ? 'Chưa có đánh giá nào' : `Trên tổng ${book?.rateAmount ?? 0} đánh giá`}>
-                            <Box>
-                                <StyledRating
-                                    name="product-rating"
-                                    value={calculatedRate}
-                                    getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
-                                    precision={0.5}
-                                    icon={<StarIcon style={{ fontSize: 16 }} />}
-                                    emptyIcon={<StarBorderIcon style={{ fontSize: 16 }} />}
-                                    readOnly
-                                />
-                            </Box>
-                        </Tooltip>
-                    </Box>
-                    <Box display={{ xs: 'block', lg: 'none' }} sx={{ cursor: 'pointer' }}>
-                        <Tooltip title={calculatedRate === '~' ? 'Chưa có đánh giá nào' : `Trên tổng ${book.rateAmount} đánh giá`}>
-                            <Box sx={{ display: 'flex', alignItems: 'flex-start', height: '100%' }}>
-                                <TextRating>{calculatedRate}</TextRating>
-                                <StarIcon sx={{
-                                    fontSize: 16,
-                                    color: 'primary.main',
-                                }}
-                                />
-                            </Box>
-                        </Tooltip>
-                    </Box>
+                    <Tooltip
+                        sx={{ display: 'flex', alignItems: 'center' }}
+                        title={calculatedRate === '~' ? 'Chưa có đánh giá nào' : `Trên tổng ${book.rateAmount} đánh giá`}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                            <TextRating>{calculatedRate}</TextRating>
+                            <StarIcon sx={{
+                                fontSize: 16,
+                                color: 'primary.main',
+                            }}
+                            />
+                        </Box>
+                    </Tooltip>
                 </Extra>
             </Info>
             {book &&

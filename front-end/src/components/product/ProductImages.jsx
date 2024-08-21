@@ -258,6 +258,7 @@ const ProductImages = ({ images }) => {
                                 alt={`Big image number ${index}`}
                                 sizes='400px'
                                 imageStyle={style}
+                                visibleByDefault={index == 0}
                                 placeholder={
                                     <StyledSkeleton
                                         variant="rectangular"

@@ -72,7 +72,7 @@ const StyledTempImage = styled(Skeleton)`
 `
 //#endregion
 
-const ProductSimple = ({ book }) => {
+const ProductSimple = ({ book, scrollPosition }) => {
     const { addProduct } = useCart();
 
     const handleAddToCart = (book) => {
@@ -95,6 +95,7 @@ const ProductSimple = ({ book }) => {
                         alt={`${book?.title} Thumbnail`}
                         width={'100%'}
                         height={220}
+                        scrollPosition={scrollPosition}
                         placeholder={
                             <StyledTempImage
                                 variant="rectangular"

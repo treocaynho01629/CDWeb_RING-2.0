@@ -47,19 +47,12 @@ public class AccountController {
 	public ResponseEntity<?> getAllAccounts(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
 										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
 										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir){
-		Page<Account> accounts = accountService.getAllAccounts(pageNo, pageSize, sortBy, sortDir);
-		return new ResponseEntity< >(accounts, HttpStatus.OK);
-	}
-	
-	//Get all sellers
-	@GetMapping("/employees")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?>  getAllSellers(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
-										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir){
-		Page<Account> accounts = accountService.getAllEmployees(pageNo, pageSize, sortBy, sortDir);
+										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
+										@RequestParam(value = "keyword", defaultValue = "") String keyword,
+										@RequestParam(value = "role", required = false) Integer role,
+										@RequestParam(value = "isEmployees", defaultValue = "false") Boolean isEmployees
+	){
+		Page<Account> accounts = accountService.getAllAccounts(pageNo, pageSize, sortBy, sortDir, isEmployees, keyword, role);
 		return new ResponseEntity< >(accounts, HttpStatus.OK);
 	}
 	

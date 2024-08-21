@@ -90,7 +90,7 @@ public class BookServiceImpl implements BookService {
         String[] pubListString = {""};
         
         if (cateId != 0) cateIdString = String.valueOf(cateId);  
-        if (pubId.size() != 0) {
+        if (!pubId.isEmpty()) {
         	List<Integer> pubList = pubRepo.findAllIds();
             pubList.removeAll(pubId);
         	pubListString = Arrays.toString(pubList.toArray()).split("[\\[\\]]")[1].split(", "); 

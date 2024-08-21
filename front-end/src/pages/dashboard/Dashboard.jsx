@@ -34,7 +34,7 @@ const countIconStyle = {
 //#endregion
 
 const Dashboard = () => {
-  const [accCount, setAccCount] = useState(0);
+  const [userCount, setUserCount] = useState(0);
   const [bookCount, setBookCount] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [receiptCount, setReceiptCount] = useState(0);
@@ -66,7 +66,7 @@ const Dashboard = () => {
             <Grid item sm={6} md={3}>
               <CountContainer elevation={3} >
                 <GroupIcon sx={countIconStyle} />
-                <CountInfo><h2 style={{ margin: 0 }}>{accCount}</h2><span>Thành viên</span></CountInfo>
+                <CountInfo><h2 style={{ margin: 0 }}>{userCount}</h2><span>Thành viên</span></CountInfo>
               </CountContainer>
             </Grid>
             <Grid item sm={6} md={3}>
@@ -93,7 +93,7 @@ const Dashboard = () => {
       {admin ?
         <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
           <Grid item sm={12} lg={6}>
-            <TableUsers mini={true} setAccCount={setAccCount} />
+            <TableUsers mini={true} setUserCount={setUserCount} />
           </Grid>
           <Grid item sm={12} lg={6}>
             <TableReviews mini={true} setReviewCount={setReviewCount} />

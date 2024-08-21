@@ -661,7 +661,7 @@ const ProductContent = ({ book, handleTabChange }) => {
                                         width={'100%'}
                                     >
                                         <SellerContainer>
-                                            <Avatar>{book?.sellerName?.charAt(0) ?? 'H'}</Avatar>
+                                            <Avatar>{book?.sellerName?.charAt(0) ?? ''}</Avatar>
                                             <Link to={`/filters?seller=${book?.sellerName}`}>
                                                 &nbsp;{book?.sellerName}
                                             </Link>

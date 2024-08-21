@@ -3,6 +3,7 @@ import CustomProgress from '../custom/CustomProgress';
 import Carousel from "react-multi-carousel";
 import ProductSimple from "./ProductSimple"
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import { trackWindowScroll } from "react-lazy-load-image-component";
 import "react-multi-carousel/lib/styles.css";
 
 //#region styled
@@ -82,7 +83,7 @@ const CustomRightArrow = ({ onClick }) => (
 
 const tempItems = [<ProductSimple />, <ProductSimple />, <ProductSimple />, <ProductSimple />, <ProductSimple />];
 
-const ProductsSlider = ({ data, isError, isLoading, isSuccess, isUninitialized = false }) => {
+const ProductsSlider = ({ data, isError, isLoading, isSuccess, isUninitialized = false, scrollPosition }) => {
   let productsCarousel;
 
   if (isLoading || isError || isUninitialized) {
@@ -92,17 +93,17 @@ const ProductsSlider = ({ data, isError, isLoading, isSuccess, isUninitialized =
 
     productsCarousel = ids?.length
       ?
-        [
-          ids?.map((id, index) => {
-            const book = entities[id];
-  
-            return (
-              <div key={`${id}-${index}`} style={{ display: 'flex' }}>
-                <ProductSimple book={book} />
-              </div>
-            )
-          })
-        ] : tempItems
+      [
+        ids?.map((id, index) => {
+          const book = entities[id];
+
+          return (
+            <div key={`${id}-${index}`} style={{ display: 'flex' }}>
+              <ProductSimple {...{ book, scrollPosition }} />
+            </div>
+          )
+        })
+      ] : tempItems
   } else {
     productsCarousel = tempItems;
   }
@@ -122,10 +123,10 @@ const ProductsSlider = ({ data, isError, isLoading, isSuccess, isUninitialized =
         keyBoardControl
         minimumTouchDrag={80}
       >
-      {productsCarousel}
+        {productsCarousel}
       </Carousel>
     </Container>
   )
 }
 
-export default ProductsSlider
+export default trackWindowScroll(ProductsSlider)

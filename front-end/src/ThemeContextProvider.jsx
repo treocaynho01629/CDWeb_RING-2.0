@@ -113,6 +113,16 @@ export function ThemeContextProvider({ children }) {
                             },
                         },
                     },
+                    MuiInputBase: {
+                        styleOverrides: {
+                            input: {
+                                "&:-webkit-autofill": {
+                                    transitionDelay: "9999s",
+                                    transitionProperty: "background-color, color",
+                                },
+                            },
+                        },
+                    },
                 },
                 breakpoints: {
                     values: {

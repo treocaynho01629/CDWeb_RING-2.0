@@ -1,8 +1,9 @@
 import { Box, Grid } from "@mui/material";
+import { trackWindowScroll } from "react-lazy-load-image-component";
 import Product from './Product';
 import CustomProgress from '../custom/CustomProgress';
 
-const FilteredProducts = ({ data, isError, error, isLoading, isSuccess, pageSize = 16 }) => {
+const FilteredProducts = ({ data, isError, error, isLoading, isSuccess, pageSize = 16, scrollPosition }) => {
   let productsContent;
 
   if (isLoading) {
@@ -22,7 +23,7 @@ const FilteredProducts = ({ data, isError, error, isLoading, isSuccess, pageSize
 
         return (
           <Grid key={`${id}-${index}`} item xs={6} sm={4} lg={3}>
-            <Product book={book} />
+            <Product {...{ book, scrollPosition }} />
           </Grid>
         )
       })
@@ -36,7 +37,7 @@ const FilteredProducts = ({ data, isError, error, isLoading, isSuccess, pageSize
 
   return (
     <div style={{ padding: 0, width: '100%', position: 'relative' }}>
-      {isLoading && <CustomProgress color="primary"/>}
+      {isLoading && <CustomProgress color="primary" />}
       <Grid container rowSpacing={1} columnSpacing={1} sx={{ width: '100%' }}>
         {productsContent}
       </Grid>
@@ -44,4 +45,4 @@ const FilteredProducts = ({ data, isError, error, isLoading, isSuccess, pageSize
   )
 }
 
-export default FilteredProducts
+export default trackWindowScroll(FilteredProducts)
