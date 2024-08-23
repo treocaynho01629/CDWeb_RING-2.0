@@ -1,37 +1,14 @@
 
-import styled from 'styled-components'
-import { styled as muiStyled } from '@mui/material/styles';
 import { useState } from "react";
-import { Grid, Paper } from '@mui/material';
-import { useNavigate } from "react-router-dom"
+import { Box, Breadcrumbs, Grid, Typography } from '@mui/material';
+import { Link } from "react-router-dom"
+import { Star } from "@mui/icons-material";
 import TableReviews from "../../components/dashboard/table/TableReviews";
-import TryIcon from '@mui/icons-material/Receipt';
 import useTitle from '../../hooks/useTitle';
-
-//#region preStyled
-const CountContainer = muiStyled(Paper)(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '20px 15px'
-}));
-
-const CountInfo = styled.div`
-  text-align: right;
-`
-
-const countIconStyle = {
-  color: '#63e399', 
-  backgroundColor: '#ebebeb', 
-  borderRadius: '50%', 
-  padding: '8px', 
-  fontSize: '60px'
-}
-//#endregion
+import CountCard from "../../components/dashboard/custom/CountCard";
 
 const ManageReviews = () => {
   const [reviewCount, setReviewCount] = useState(0);
-  const navigate = useNavigate();
 
   //Set title
   useTitle('RING! - Đánh giá');
@@ -39,16 +16,23 @@ const ManageReviews = () => {
   return (
     <>
       <h2>Quản lý đánh giá</h2>
-      <h3 style={{color: 'darkgray', cursor: 'pointer'}} onClick={() => navigate('/dashboard')}>Dashboard / Quản lý đánh giá</h3>
-      <Grid container spacing={3} sx={{marginBottom: '20px'}}>
-        <Grid item sm={6} md={3}>
-          <CountContainer elevation={3} >
-            <TryIcon sx={countIconStyle}/>
-            <CountInfo><h2 style={{margin: 0}}>{reviewCount}</h2><span>Đánh giá</span></CountInfo>
-          </CountContainer>
+      <Box display={'flex'} justifyContent={'space-between'}>
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link style={{ color: 'inherit' }} to={'/dashboard'}>Dashboard</Link>
+          <Typography color="text.secondary">Quản lý đánh giá</Typography>
+        </Breadcrumbs>
+      </Box>
+      <br />
+      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
+        <Grid item sm={6} md={4}>
+          <CountCard
+            count={reviewCount}
+            icon={<Star />}
+            title={'Đánh giá'}
+          />
         </Grid>
       </Grid>
-      <TableReviews setReviewCount={setReviewCount}/>
+      <TableReviews setReviewCount={setReviewCount} />
     </>
   )
 }

@@ -76,13 +76,13 @@ function App() {
                 <Route path="/manage-books" element={<ManageBooks />} />
                 <Route path="/manage-receipts" element={<ManageReceipts />} />
                 <Route path="/detail/:id" element={<DetailProduct />} />
+                <Route path="/user/:id" element={<DetailAccount />} />
               </Route>
 
                 //ADMIN
               <Route element={<RequireAuth allowedRoles={['ROLE_ADMIN']} />}>
                 <Route path="/manage-users" element={<ManageUsers />} />
                 <Route path="/manage-reviews" element={<ManageReviews />} />
-                <Route path="/user/:id" element={<DetailAccount />} />
               </Route>
             </Route>
           </Route>

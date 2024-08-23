@@ -15,7 +15,7 @@ import com.ring.bookstore.model.Book;
 public interface BookRepository extends JpaRepository<Book, Integer>{
 	
 	@Query("""
-	select b.id as id, b.title as title, b.description as description, b.images.name as image, b.price as price, 
+	select b.id as id, b.title as title, b.description as description, b.images.name as image, b.price as price, b.amount as amount,
 	count(r.id) as rateAmount, coalesce(sum(r.rating), 0) as rateTotal, size(b.orderDetails) as orderTime
 	from Book b left join Review r on b.id = r.book.id
 	where concat (b.title, b.author) ilike %:keyword%
@@ -39,10 +39,4 @@ public interface BookRepository extends JpaRepository<Book, Integer>{
 	public List<Book> findRandomBooks(int amount); //Get random books
 	
 	public void deleteByUser_Id(Integer id);
-	
-	@Query("""
-	select b from Book b
-	""")
-	List<IBookDisplay> testStuff(); //Test
-
 }

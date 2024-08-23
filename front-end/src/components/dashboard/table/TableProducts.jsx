@@ -1,19 +1,20 @@
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch, Avatar, Chip, Grid, TextField, MenuItem } from '@mui/material';
-import { Group as GroupIcon, Edit as EditIcon, Delete as DeleteIcon, Search } from '@mui/icons-material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch, LinearProgress, Chip } from '@mui/material';
+import { AutoStories as AutoStoriesIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { Link } from "react-router-dom";
-import { useDeleteUserMutation, useDeleteUsersMutation, useGetUsersQuery } from '../../../features/users/usersApiSlice';
-import useAuth from "../../../hooks/useAuth";
-import CustomTablePagination from '../custom/CustomTablePagination';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { useDeleteBookMutation, useDeleteBooksMutation, useGetBooksByFilterQuery } from '../../../features/books/booksApiSlice';
 import CustomProgress from '../../custom/CustomProgress';
+import useAuth from '../../../hooks/useAuth';
 import CustomTableToolbar from '../custom/CustomTableToolbar';
 import CustomTableHead from '../custom/CustomTableHead';
+import CustomTablePagination from '../custom/CustomTablePagination';
 
-const EditAccountDialog = lazy(() => import('../dialog/EditAccountDialog'));
+const EditProductDialog = lazy(() => import('../dialog/EditProductDialog'));
 
-//#region styled
+//#region preStyled
 const ItemTitle = styled.p`
     font-size: 12px;
     margin: 5px 0;
@@ -59,36 +60,52 @@ const headCells = [
     label: 'ID',
   },
   {
-    id: 'userName',
+    id: 'title',
     align: 'left',
-    width: '200px',
+    width: '500px',
     disablePadding: false,
     sortable: true,
-    label: 'Tên đăng nhập',
+    label: 'Tiêu đề',
   },
   {
-    id: 'authorities',
-    align: 'right',
+    id: 'price',
+    align: 'left',
+    width: '120px',
+    disablePadding: false,
+    sortable: true,
+    label: 'Giá(đ)',
+  },
+  {
+    id: 'amount',
+    align: 'left',
     width: '150px',
     disablePadding: false,
-    sortable: false,
-    label: 'Quyền',
+    sortable: true,
+    label: 'Số lượng',
+  },
+  {
+    id: 'amount',
+    align: 'left',
+    width: '150px',
+    disablePadding: false,
+    sortable: true,
+    label: 'Trạng thái',
   },
   {
     id: 'action',
     align: 'right',
-    width: '250px',
+    width: '150px',
     disablePadding: false,
     sortable: false,
     label: 'Hành động',
   },
 ];
 
-function FilterContent({ filter }) {
+function FilterContent({ }) {
   return (
     <Grid container spacing={1} sx={{ width: '80vw', padding: '10px' }}>
       <Grid item xs={12} sm={4}>
-        <TextField label='Quyền'
+        <TextField label='Temp'
           // value={currAddress?.city || ''}
           // onChange={(e) => setCurrAddress({ ...currAddress, city: e.target.value, ward: '' })}
           select
@@ -96,10 +113,12 @@ function FilterContent({ filter }) {
           fullWidth
           size="small"
         >
-          <MenuItem disabled value=""><em>--Quyền--</em></MenuItem>
-          {!filter && <MenuItem value={1}>MEMBER</MenuItem>}
-          <MenuItem value={2}>SELLER</MenuItem>
-          <MenuItem value={3}>ADMIN</MenuItem>
+          <MenuItem disabled value=""><em>--Tất cả--</em></MenuItem>
+          <MenuItem value={5}>5</MenuItem>
+          <MenuItem value={4}>4</MenuItem>
+          <MenuItem value={3}>3</MenuItem>
+          <MenuItem value={2}>2</MenuItem>
+          <MenuItem value={1}>1</MenuItem>
         </TextField>
       </Grid>
       <Grid item xs={12} sm={8}>
@@ -107,7 +126,7 @@ function FilterContent({ filter }) {
           placeholder='Tìm kiếm... '
           // onChange={(e) => setSearchField(e.target.value)}
           // value={searchField}
-          id="search-user"
+          id="search-review"
           size="small"
           fullWidth
           InputProps={{ startAdornment: <Search sx={{ marginRight: 1 }} /> }}
@@ -117,16 +136,16 @@ function FilterContent({ filter }) {
   )
 }
 
-export default function TableUsers({ setUserCount, mini = false }) {
+export default function TableProducts({ setBookCount, sellerName, mini = false }) {
   //#region construct
-  const { roles } = useAuth();
+  const { username, roles } = useAuth();
   const isAdmin = useState(roles?.find(role => ['ROLE_ADMIN'].includes(role)));
   const [id, setId] = useState([]);
   const [selected, setSelected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [dense, setDense] = useState(true);
+  const [isSeller, setIsSeller] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role))));
   const [openEdit, setOpenEdit] = useState(false);
-  const [isEmployees, setIsEmployees] = useState(false);
   const [pending, setPending] = useState(false);
   const [pagination, setPagination] = useState({
     currPage: 0,
@@ -135,17 +154,19 @@ export default function TableUsers({ setUserCount, mini = false }) {
     sortBy: "id",
     sortDir: "asc",
   })
-  const { isLoading, isSuccess, isError, error, data } = useGetUsersQuery({
-    page: pagination.currPage,
-    size: pagination.pageSize,
-    sortBy: pagination.sortBy,
-    sortDir: pagination.sortDir,
-    isEmployees: isEmployees
-  })
 
   //Delete hook
-  const [deleteUser, { isLoading: deleting }] = useDeleteUserMutation();
-  const [deleteMultipleUsers, { isLoading: deletingMultiple }] = useDeleteUsersMutation();
+  const [deleteBook, { isLoading: deleting }] = useDeleteBookMutation();
+  const [deleteMultipleBooks, { isLoading: deletingMultiple }] = useDeleteBooksMutation();
+
+  //Fetch books
+  const { data, isLoading, isSuccess, isError } = useGetBooksByFilterQuery({
+    page: pagination?.currPage,
+    size: pagination?.pageSize,
+    sortBy: pagination?.sortBy,
+    sortDir: pagination?.sortDir,
+    seller: `${(isSeller ? username : sellerName ?? '')}`,
+  })
 
   //Set pagination after fetch
   useEffect(() => {
@@ -156,7 +177,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
         currPage: data?.info?.currPage,
         pageSize: data?.info?.pageSize
       });
-      setUserCount(data?.info?.totalElements);
+      setBookCount(data?.info?.totalElements);
     }
   }, [data])
 
@@ -214,9 +235,9 @@ export default function TableUsers({ setUserCount, mini = false }) {
     setDense(e.target.checked);
   };
 
-  const handleChangeFilter = (e) => {
-    handleChangePage(0);
-    setIsEmployees(e.target.checked);
+  const handleChangeSeller = (e) => {
+    handleChangePage(1)
+    setIsSeller(e.target.checked);
   };
 
   const handleClickOpenEdit = (id) => {
@@ -229,10 +250,10 @@ export default function TableUsers({ setUserCount, mini = false }) {
     setPending(true);
     const { enqueueSnackbar } = await import('notistack');
 
-    deleteUser({ id }).unwrap()
+    deleteBook({ id }).unwrap()
       .then((data) => {
         //Unselected
-        const selectedIndex = selected?.indexOf(id);
+        const selectedIndex = selected.indexOf(id);
         let newSelected = [];
 
         if (selectedIndex === 0) {
@@ -240,7 +261,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
           setSelected(newSelected);
         }
 
-        enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
+        enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
         setPending(false);
       })
       .catch((err) => {
@@ -252,7 +273,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
         } else if (err?.status === 400) {
           enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
         } else {
-          enqueueSnackbar('Xoá thành viên thất bại!', { variant: 'error' });
+          enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
         }
         setPending(false);
       })
@@ -263,12 +284,12 @@ export default function TableUsers({ setUserCount, mini = false }) {
     setPending(true);
     const { enqueueSnackbar } = await import('notistack');
 
-    deleteMultipleUsers({ ids: selected }).unwrap()
+    deleteMultipleBooks({ ids: selected }).unwrap()
       .then((data) => {
         //Unselected
         setSelected([]);
         setSelectedAll(false);
-        enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
+        enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
         setPending(false);
       })
       .catch((err) => {
@@ -280,7 +301,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
         } else if (err?.status === 400) {
           enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
         } else {
-          enqueueSnackbar('Xoá thành viên thất bại!', { variant: 'error' });
+          enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
         }
         setPending(false);
       })
@@ -289,10 +310,10 @@ export default function TableUsers({ setUserCount, mini = false }) {
   const isSelected = (id) => (selected?.indexOf(id) !== -1 || selectedAll);
   //#endregion
 
-  let usersRows;
+  let booksRows;
 
   if (isLoading) {
-    usersRows = (
+    booksRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -308,12 +329,14 @@ export default function TableUsers({ setUserCount, mini = false }) {
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    usersRows = ids?.length
+    booksRows = ids?.length
       ? ids?.map((id, index) => {
-        const user = entities[id];
+        const book = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
-        const role = user.authorities.length;
+        const stockProgress = Math.min((book.amount / 199 * 100), 100);
+        const stockStatus = stockProgress == 0 ? 'error' : stockProgress < 20 ? 'warning' : stockProgress < 80 ? 'primary' : 'info';
+        // const stockStatus = stockProgress == 0 ? 'Ngừng bán' : stockProgress < 20 ? 'Gần hết' : stockProgress < 80 ? 'Bình thường' : 'Mới';
 
         return (
           <TableRow
@@ -324,9 +347,8 @@ export default function TableUsers({ setUserCount, mini = false }) {
             selected={isItemSelected}
           >
             <TableCell padding="checkbox">
-              <Checkbox
-                color="primary"
-                onChange={(e) => handleClick(e, id)}
+              <Checkbox color="primary"
+                onChange={(e) => handleClick(e, book.id)}
                 checked={isItemSelected}
                 inputProps={{
                   'aria-labelledby': labelId,
@@ -334,23 +356,31 @@ export default function TableUsers({ setUserCount, mini = false }) {
               />
             </TableCell>
             <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
-              <Link to={`/user/${id}`}>{id}</Link>
+              <Link to={`/detail/${id}`}>{id}</Link>
             </TableCell>
             <TableCell align="left">
-              <Link to={`/user/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
-                <Avatar sx={{ marginRight: 1 }}>{user?.username?.charAt(0) ?? ''}</Avatar>
-                <Box>
-                  <ItemTitle>{user.username}</ItemTitle>
-                  <ItemTitle className="secondary">{user.email}</ItemTitle>
-                </Box>
+              <Link to={`/detail/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
+                <LazyLoadImage
+                  src={`${book.image}?size=small`}
+                  height={45}
+                  width={45}
+                  style={{ marginRight: '10px' }}
+                />
+                <ItemTitle>{book.title}</ItemTitle>
               </Link>
             </TableCell>
-            <TableCell align="right">
-              <Chip label={role == 3 ? 'ADMIN' :
-                role == 2 ? 'SELLER' : 'MEMBER'}
-                color={role == 3 ? 'primary' :
-                  role == 2 ? 'info' : 'default'}
+            <TableCell align="left">{book.price.toLocaleString()}đ</TableCell>
+            <TableCell align="center">
+              <LinearProgress color={stockStatus} variant="determinate" value={stockProgress} />
+              <ItemTitle className="secondary">{`${book.amount} trong kho`}</ItemTitle>
+            </TableCell>
+            <TableCell align="left">
+              <Chip label={stockStatus == 'error' ? 'Ngừng bán' :
+                stockStatus == 'warning' ? 'Gần hết' :
+                  stockStatus == 'primary' ? 'Bình thường' : 'Mới'}
+                color={stockStatus}
                 sx={{ fontWeight: 'bold' }}
+                variant="outlined"
               />
             </TableCell>
             <TableCell align="right" sx={{ color: 'text.secondary' }}>
@@ -373,11 +403,11 @@ export default function TableUsers({ setUserCount, mini = false }) {
           colSpan={6}
           sx={{ height: '40dvh' }}
         >
-          <Box>Không tìm thấy thành viên nào!</Box>
+          <Box>Không tìm thấy sản phẩm nào!</Box>
         </TableCell>
       </TableRow >
   } else if (isError) {
-    usersRows = (
+    booksRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -396,12 +426,11 @@ export default function TableUsers({ setUserCount, mini = false }) {
     <Box sx={{ width: '100%' }}>
       <Paper elevation={3} sx={{ width: '100%', mb: '2px' }} >
         <CustomTableToolbar
-          filter={isEmployees}
           numSelected={selected?.length ?? 0}
           selectedAll={selectedAll}
-          icon={<GroupIcon />}
-          title={`${isEmployees ? 'nhân viên' : 'thành viên'}`}
-          filterComponent={<FilterContent filter={isEmployees} />}
+          icon={<AutoStoriesIcon />}
+          title={'sản phẩm'}
+          filterComponent={<FilterContent />}
           handleDeleteMultiples={handleDeleteMultiples} />
         <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
           <Table
@@ -421,11 +450,11 @@ export default function TableUsers({ setUserCount, mini = false }) {
               selectedAll={selectedAll}
             />
             <TableBody>
-              {usersRows}
+              {booksRows}
             </TableBody>
             <Suspense fallback={<></>}>
               {openEdit ?
-                <EditAccountDialog
+                <EditProductDialog
                   id={id}
                   open={openEdit}
                   setOpen={setOpenEdit}
@@ -454,16 +483,18 @@ export default function TableUsers({ setUserCount, mini = false }) {
             }
             label="Thu gọn"
           />
-          {isAdmin
-            && <FormControlLabel
-              control={
-                <Switch
-                  color="primary"
-                  checked={isEmployees}
-                  onChange={handleChangeFilter}
-                />
-              }
-              label="Lọc nhân viên"
+          {(isAdmin && !sellerName) &&
+            <FormControlLabel
+              control={<Switch sx={{
+                '& .MuiSwitch-switchBase.Mui-checked': {
+                  color: '#63e399',
+                },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                  backgroundColor: '#63e399',
+                },
+              }}
+                checked={isSeller} onChange={handleChangeSeller} />}
+              label="Theo người bán"
             />
           }
         </Box>

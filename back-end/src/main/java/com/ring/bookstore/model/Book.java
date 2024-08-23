@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 
 import java.util.List;
 
+import jakarta.validation.constraints.Max;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Nationalized;
@@ -60,6 +61,7 @@ public class Book {
     private Double price;
 
     @Column
+    @Max(value = 199, message = "Kho hàng đã đầy (giới hạn 199)")
     private Integer amount;
 
     @Column(length = 200)

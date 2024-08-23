@@ -74,6 +74,24 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 } else return [{ type: 'User', id: 'LIST' }]
             }
         }),
+        getTopUsers: builder.query({
+            query: () => ({
+                url: '/api/accounts/top-accounts',
+                validateStatus: (response, result) => {
+                    return response.status === 200 && !result.isError
+                },
+            }),
+            providesTags: ['Chart'],
+        }),
+        getTopSellers: builder.query({
+            query: () => ({
+                url: '/api/accounts/top-sellers',
+                validateStatus: (response, result) => {
+                    return response.status === 200 && !result.isError
+                },
+            }),
+            providesTags: ['Chart'],
+        }),
         createUser: builder.mutation({
             query: newUser => ({
                 url: '/api/accounts',
@@ -152,6 +170,8 @@ export const {
     useGetProfileQuery,
     useGetUserQuery,
     useGetUsersQuery,
+    useGetTopUsersQuery,
+    useGetTopSellersQuery,
     useCreateUserMutation,
     useUpdateProfileMutation,
     useUpdateUserMutation,

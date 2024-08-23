@@ -2,7 +2,6 @@ package com.ring.bookstore.dtos;
 
 import java.util.Map;
 
-public interface IChartDTO {
-    String getName();
-    Map<String, Long> getData();
+public record ChartDTO(String name,
+                       Map<String, Long> data) {
 }

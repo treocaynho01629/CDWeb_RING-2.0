@@ -5,6 +5,7 @@ public record BookDTO(Integer id,
                       String description,
                       String image,
                       Double price,
+                      Integer amount,
                       int rateTotal,
                       int rateAmount) {
 

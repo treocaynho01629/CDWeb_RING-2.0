@@ -24,6 +24,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 if (size) params.append('pSize', size);
                 if (sortBy) params.append('sortBy', sortBy);
                 if (sortDir) params.append('sortDir', sortDir);
+                // if (isEmployees) params.append('isEmployees', isEmployees);
 
                 return {
                     url: `/api/reviews?${params.toString()}`,
@@ -43,19 +44,6 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                         totalPages
                     }
                 }, content)
-            },
-            serializeQueryArgs: ({ endpointName }) => {
-                return endpointName
-            },
-            merge: (currentCache, newItems) => {
-                currentCache.info = newItems.info;
-                reviewsAdapter.addMany(
-                    currentCache, reviewsSelector.selectAll(newItems)
-                )
-            },
-            forceRefetch: ({ currentArg, previousArg }) => {
-                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
-                return isForceRefetch
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
@@ -105,7 +93,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 } else return [{ type: 'Review', id: 'LIST' }]
             }
         }),
-        getReviewsByBookUserId: builder.query({
+        getReviewsByUserId: builder.query({
             query: (args) => {
                 const { id, page, size, sortBy, sortDir } = args || {};
 
@@ -174,6 +162,19 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                     }
                 }, content)
             },
+            serializeQueryArgs: ({ endpointName }) => {
+                return endpointName
+            },
+            merge: (currentCache, newItems) => {
+                currentCache.info = newItems.info;
+                reviewsAdapter.addMany(
+                    currentCache, reviewsSelector.selectAll(newItems)
+                )
+            },
+            forceRefetch: ({ currentArg, previousArg }) => {
+                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
+                return isForceRefetch
+            },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
                     return [
@@ -227,7 +228,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
 export const {
     useGetReviewsQuery,
     useGetReviewsByBookIdQuery,
-    useGetReviewsByBookUserIdQuery,
+    useGetReviewsByUserIdQuery,
     useGetMyReviewsQuery,
     useCreateReviewMutation,
     useDeleteReviewMutation,

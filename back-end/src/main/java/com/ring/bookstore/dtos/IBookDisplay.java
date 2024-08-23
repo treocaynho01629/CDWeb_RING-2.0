@@ -7,6 +7,7 @@ public interface IBookDisplay {
 	String getDescription();
 	String getImage();
 	Double getPrice();
+	Integer getAmount();
 	Integer getRateAmount();
 	Integer getRateTotal();
 }

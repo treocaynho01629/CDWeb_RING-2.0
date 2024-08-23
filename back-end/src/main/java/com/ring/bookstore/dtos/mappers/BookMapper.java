@@ -30,6 +30,7 @@ public class BookMapper implements Function<Book, BookDTO> {
         		,book.getDescription()
         		,fileDownloadUri
         		,book.getPrice()
+				,book.getAmount()
         		,reviewRepo.findTotalRatingByBookId(book.getId())
         		,book.getBookReviews().size());
     }

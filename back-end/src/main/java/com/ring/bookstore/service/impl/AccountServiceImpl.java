@@ -1,8 +1,10 @@
 package com.ring.bookstore.service.impl;
 
 import com.ring.bookstore.dtos.AccountDetailDTO;
+import com.ring.bookstore.dtos.ChartDTO;
 import com.ring.bookstore.dtos.ProfileDTO;
 import com.ring.bookstore.dtos.mappers.AccountDetailMapper;
+import com.ring.bookstore.dtos.mappers.ChartDataMapper;
 import com.ring.bookstore.dtos.mappers.ProfileMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
@@ -15,7 +17,6 @@ import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.request.AccountRequest;
 import com.ring.bookstore.request.ChangePassRequest;
 import com.ring.bookstore.request.ProfileRequest;
-import com.ring.bookstore.response.IChartResponse;
 import com.ring.bookstore.service.AccountService;
 import com.ring.bookstore.service.EmailService;
 import com.ring.bookstore.service.RoleService;
@@ -30,9 +31,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -48,6 +48,8 @@ public class AccountServiceImpl implements AccountService {
     private ProfileMapper profileMapper;
     @Autowired
     private AccountDetailMapper detailMapper;
+    @Autowired
+    private ChartDataMapper chartMapper;
 
     //Get all accounts
     public Page<Account> getAllAccounts(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
@@ -264,12 +266,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     //Get top users
-    public List<IChartResponse> getTopAccount() {
-        return accountRepo.getTopUser();
+    public List<ChartDTO> getTopAccount() {
+        List<Map<String,Object>> result = accountRepo.getTopUser();
+        return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
     }
 
     //Get top sellers
-    public List<IChartResponse> getTopSeller() {
-        return accountRepo.getTopSeller();
+    public List<ChartDTO> getTopSeller() {
+        List<Map<String,Object>> result = accountRepo.getTopSeller();
+        return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
     }
 }

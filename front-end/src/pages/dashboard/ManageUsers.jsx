@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, Breadcrumbs, Button, Grid, Typography } from '@mui/material';
 import { Link } from "react-router-dom"
 import { Add, Group } from "@mui/icons-material";
-import ChartAccounts from '../../components/dashboard/chart/ChartAccounts'
+import ChartUsers from '../../components/dashboard/chart/ChartUsers'
 import TableUsers from "../../components/dashboard/table/TableUsers";
 import useTitle from '../../hooks/useTitle';
 import CountCard from "../../components/dashboard/custom/CountCard";
@@ -36,7 +36,7 @@ const ManageUsers = () => {
           />
         </Grid>
       </Grid>
-      <ChartAccounts />
+      <ChartUsers />
       <TableUsers setUserCount={setUserCount} />
     </>
   )

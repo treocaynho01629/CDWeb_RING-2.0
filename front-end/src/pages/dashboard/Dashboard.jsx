@@ -3,11 +3,11 @@ import { styled as muiStyled } from '@mui/material/styles';
 import { useState, useEffect } from "react";
 import { AutoStories as AutoStoriesIcon, Group as GroupIcon, Receipt as ReceiptIcon, Try as TryIcon } from "@mui/icons-material";
 import { Grid, Paper } from '@mui/material';
-import TableBook from '../../components/dashboard/table/TableBooks'
+import TableProducts from '../../components/dashboard/table/TableProducts'
 import TableUsers from "../../components/dashboard/table/TableUsers";
 import TableReviews from "../../components/dashboard/table/TableReviews";
 import TableReceipts from "../../components/dashboard/table/TableReceipts";
-import ChartAccounts from "../../components/dashboard/chart/ChartAccounts";
+import ChartUsers from "../../components/dashboard/chart/ChartUsers";
 import ChartSales from "../../components/dashboard/chart/ChartSales";
 import useAuth from "../../hooks/useAuth";
 import useTitle from "../../hooks/useTitle";
@@ -80,7 +80,7 @@ const Dashboard = () => {
       </Grid>
       <ChartSales />
       {admin ?
-        <ChartAccounts />
+        <ChartUsers />
         : null}
       <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
         <Grid item sm={12} lg={6}>

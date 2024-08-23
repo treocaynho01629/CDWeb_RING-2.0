@@ -1,41 +1,29 @@
 package com.ring.bookstore.dtos.mappers;
 
-import java.time.LocalDate;
-import java.util.function.Function;
-
+import com.ring.bookstore.dtos.ChartDTO;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.ProfileDTO;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.AccountProfile;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
-public class ProfileMapper implements Function<Account, ProfileDTO> {
-	
+public class ChartDataMapper implements Function<Map<String, Object>, ChartDTO> {
     @Override
-    public ProfileDTO apply(Account user) {
-    	
-    	AccountProfile profile = user.getProfile();
-    	String name = "";
-    	String phone = "";
-    	String gender = "";
-    	String address = "";
-    	LocalDate dob = LocalDate.of(2000, 1, 1);
-    	if (profile != null) {
-    		name = (name = profile.getName()) != null ? name : "";
-    		phone = (phone = profile.getPhone()) != null ? phone : "";
-    		gender = (gender = profile.getGender()) != null ? gender : "";
-    		address = (address = profile.getAddress()) != null ? address : "";
-    		dob = (dob = profile.getDob()) != null ? dob : LocalDate.of(2000, 1, 1);
-    		
-    	}
-    	
-        return new ProfileDTO(user.getUsername()
-        		,user.getEmail()
-        		,name
-        		,phone
-        		,gender
-        		,dob
-        		,address);
+    public ChartDTO apply(Map<String, Object> rawData) {
+        String name = rawData.get("name").toString();
+        Map<String, Long> dataMap = new HashMap<String, Long>();
+
+        //Map back to Long number
+        for (Map.Entry<String, Object> e : rawData.entrySet()) {
+            if (!e.getKey().equals("name")) {
+                if (dataMap.put(e.getKey(), Double.valueOf(e.getValue().toString()).longValue()) != null) {
+                    throw new IllegalStateException("Duplicate key");
+                }
+            }
+        }
+
+        return new ChartDTO(name, dataMap);
     }
 }
