@@ -4,7 +4,7 @@ import { Box, Button, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton, T
 import { Check, Person } from "@mui/icons-material";
 import { PHONE_REGEX } from "../../ultils/regex";
 import { useGetProfileQuery, useUpdateProfileMutation } from "../../features/users/usersApiSlice";
-import { Instruction } from '../custom/GlobalComponent';
+import { Instruction } from '../custom/GlobalComponents';
 import CustomDatePicker from "../custom/CustomDatePicker";
 import dayjs from 'dayjs';
 

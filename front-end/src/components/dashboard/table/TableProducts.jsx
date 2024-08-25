@@ -1,11 +1,10 @@
-import styled from 'styled-components'
-import { styled as muiStyled } from '@mui/material/styles';
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch, LinearProgress, Chip } from '@mui/material';
-import { AutoStories as AutoStoriesIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch, LinearProgress, Chip, Skeleton, Grid, TextField, MenuItem } from '@mui/material';
+import { AutoStories as AutoStoriesIcon, Delete as DeleteIcon, Search, Star, MoreHoriz } from '@mui/icons-material';
 import { Link } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDeleteBookMutation, useDeleteBooksMutation, useGetBooksByFilterQuery } from '../../../features/books/booksApiSlice';
+import { ItemTitle, FooterContainer, FooterLabel } from '../custom/ShareComponents';
 import CustomProgress from '../../custom/CustomProgress';
 import useAuth from '../../../hooks/useAuth';
 import CustomTableToolbar from '../custom/CustomTableToolbar';
@@ -14,42 +13,6 @@ import CustomTablePagination from '../custom/CustomTablePagination';
 
 const EditProductDialog = lazy(() => import('../dialog/EditProductDialog'));
 
-//#region preStyled
-const ItemTitle = styled.p`
-    font-size: 12px;
-    margin: 5px 0;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-	
-    @supports (-webkit-line-clamp: 1) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: initial;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-    }
-
-    &.secondary {
-      color: ${props => props.theme.palette.text.secondary};
-    }
-`
-
-const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
-  color: 'inherit',
-
-  '&:hover': {
-    transform: 'scale(1.05)',
-    color: theme.palette.primary.main,
-
-    '&.error': {
-      color: theme.palette.error.main,
-    },
-  },
-}));
-//#endregion
-
 const headCells = [
   {
     id: 'id',
@@ -57,6 +20,7 @@ const headCells = [
     width: '70px',
     disablePadding: false,
     sortable: true,
+    hideOnMinimize: true,
     label: 'ID',
   },
   {
@@ -65,7 +29,7 @@ const headCells = [
     width: '500px',
     disablePadding: false,
     sortable: true,
-    label: 'Tiêu đề',
+    label: 'Sản phẩm',
   },
   {
     id: 'price',
@@ -77,7 +41,7 @@ const headCells = [
   },
   {
     id: 'amount',
-    align: 'left',
+    align: 'center',
     width: '150px',
     disablePadding: false,
     sortable: true,
@@ -85,19 +49,19 @@ const headCells = [
   },
   {
     id: 'amount',
-    align: 'left',
-    width: '150px',
+    align: 'center',
+    width: '120px',
     disablePadding: false,
     sortable: true,
+    hideOnMinimize: true,
     label: 'Trạng thái',
   },
   {
     id: 'action',
-    align: 'right',
-    width: '150px',
+    width: '35px',
     disablePadding: false,
     sortable: false,
-    label: 'Hành động',
+    hideOnMinimize: true,
   },
 ];
 
@@ -136,12 +100,13 @@ function FilterContent({ }) {
   )
 }
 
-export default function TableProducts({ setBookCount, sellerName, mini = false }) {
+export default function TableProducts({ setProductCount, sellerName, mini = false }) {
   //#region construct
   const { username, roles } = useAuth();
   const isAdmin = useState(roles?.find(role => ['ROLE_ADMIN'].includes(role)));
   const [id, setId] = useState([]);
   const [selected, setSelected] = useState([]);
+  const [deselected, setDeseletected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [dense, setDense] = useState(true);
   const [isSeller, setIsSeller] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role))));
@@ -160,7 +125,7 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
   const [deleteMultipleBooks, { isLoading: deletingMultiple }] = useDeleteBooksMutation();
 
   //Fetch books
-  const { data, isLoading, isSuccess, isError } = useGetBooksByFilterQuery({
+  const { data, isLoading, isSuccess, isError, error } = useGetBooksByFilterQuery({
     page: pagination?.currPage,
     size: pagination?.pageSize,
     sortBy: pagination?.sortBy,
@@ -177,7 +142,7 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
         currPage: data?.info?.currPage,
         pageSize: data?.info?.pageSize
       });
-      setBookCount(data?.info?.totalElements);
+      if (setProductCount) setProductCount(data?.info?.totalElements);
     }
   }, [data])
 
@@ -189,36 +154,64 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
 
   const handleSelectAllClick = (e) => {
     if (e.target.checked) { //Selected all
-      const newSelected = data?.content?.map((n) => n.id);
-      setSelected(newSelected);
       setSelectedAll(true);
       return;
     }
 
     //Unselected all
     setSelected([]);
+    setDeseletected([]);
     setSelectedAll(false);
   };
 
   const handleClick = (e, id) => {
-    const selectedIndex = selected?.indexOf(id);
-    let newSelected = [];
+    if (selectedAll) {
+      //Set unselected elements for reverse
+      const deselectedIndex = deselected?.indexOf(id);
+      let newDeselected = [];
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected?.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
+      if (deselectedIndex === -1) {
+        newDeselected = newDeselected.concat(deselected, id);
+      } else if (deselectedIndex === 0) {
+        newDeselected = newDeselected.concat(deselected.slice(1));
+      } else if (deselectedIndex === deselected?.length - 1) {
+        newDeselected = newDeselected.concat(deselected.slice(0, -1));
+      } else if (deselectedIndex > 0) {
+        newDeselected = newDeselected.concat(
+          deselected.slice(0, deselectedIndex),
+          deselected.slice(deselectedIndex + 1),
+        );
+      }
+
+      setDeseletected(newDeselected);
+      if (newDeselected.length == data?.info?.totalElements) {
+        setDeseletected([]);
+        setSelectedAll(false);
+      }
+    } else {
+      //Set main selected elements
+      const selectedIndex = selected?.indexOf(id);
+      let newSelected = [];
+
+      if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selected, id);
+      } else if (selectedIndex === 0) {
+        newSelected = newSelected.concat(selected.slice(1));
+      } else if (selectedIndex === selected?.length - 1) {
+        newSelected = newSelected.concat(selected.slice(0, -1));
+      } else if (selectedIndex > 0) {
+        newSelected = newSelected.concat(
+          selected.slice(0, selectedIndex),
+          selected.slice(selectedIndex + 1),
+        );
+      }
+
+      setSelected(newSelected);
+      if (newSelected.length == data?.info?.totalElements) {
+        setSelectedAll(true);
+        setSelected([]);
+      }
     }
-
-    setSelectedAll(false);
-    setSelected(newSelected);
   };
 
   const handleChangePage = (page) => {
@@ -236,7 +229,7 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
   };
 
   const handleChangeSeller = (e) => {
-    handleChangePage(1)
+    handleChangePage(0)
     setIsSeller(e.target.checked);
   };
 
@@ -307,7 +300,9 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
       })
   };
 
-  const isSelected = (id) => (selected?.indexOf(id) !== -1 || selectedAll);
+  const isSelected = (id) => (selected?.indexOf(id) !== -1 || (selectedAll && deselected?.indexOf(id) === -1));
+  const numSelected = () => (selectedAll ? data?.info?.totalElements - deselected?.length : selected?.length);
+  const colSpan = () => (mini ? headCells.filter((h) => !h.hideOnMinimize).length : headCells.length + 1);
   //#endregion
 
   let booksRows;
@@ -319,7 +314,7 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
           scope="row"
           padding="none"
           align="center"
-          colSpan={6}
+          colSpan={colSpan()}
           sx={{ position: 'relative', height: '40dvh' }}
         >
           <CustomProgress color="primary" />
@@ -336,7 +331,12 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
         const labelId = `enhanced-table-checkbox-${index}`;
         const stockProgress = Math.min((book.amount / 199 * 100), 100);
         const stockStatus = stockProgress == 0 ? 'error' : stockProgress < 20 ? 'warning' : stockProgress < 80 ? 'primary' : 'info';
-        // const stockStatus = stockProgress == 0 ? 'Ngừng bán' : stockProgress < 20 ? 'Gần hết' : stockProgress < 80 ? 'Bình thường' : 'Mới';
+        const avgRate = () => {
+          let rate = 0;
+          rate = Math.round((book.rateTotal / book.rateAmount) * 2) / 2
+          rate = rate ? rate : '~';
+          return rate;
+        }
 
         return (
           <TableRow
@@ -346,18 +346,22 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
             key={id}
             selected={isItemSelected}
           >
-            <TableCell padding="checkbox">
-              <Checkbox color="primary"
-                onChange={(e) => handleClick(e, book.id)}
-                checked={isItemSelected}
-                inputProps={{
-                  'aria-labelledby': labelId,
-                }}
-              />
-            </TableCell>
-            <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
-              <Link to={`/detail/${id}`}>{id}</Link>
-            </TableCell>
+            {!mini &&
+              <>
+                <TableCell padding="checkbox">
+                  <Checkbox color="primary"
+                    onChange={(e) => handleClick(e, book.id)}
+                    checked={isItemSelected}
+                    inputProps={{
+                      'aria-labelledby': labelId,
+                    }}
+                  />
+                </TableCell>
+                <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
+                  <Link to={`/detail/${id}`}>#{('00000' + id).slice(-5)}</Link>
+                </TableCell>
+              </>
+            }
             <TableCell align="left">
               <Link to={`/detail/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
                 <LazyLoadImage
@@ -365,8 +369,12 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
                   height={45}
                   width={45}
                   style={{ marginRight: '10px' }}
+                  placeholder={<Skeleton width={45} height={45} animation={false} variant="rectangular" />}
                 />
-                <ItemTitle>{book.title}</ItemTitle>
+                <Box>
+                  <ItemTitle>{book.title}</ItemTitle>
+                  <ItemTitle className="secondary">Đánh giá: {avgRate()} <Star fontSize="15px" color="primary" /></ItemTitle>
+                </Box>
               </Link>
             </TableCell>
             <TableCell align="left">{book.price.toLocaleString()}đ</TableCell>
@@ -374,23 +382,22 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
               <LinearProgress color={stockStatus} variant="determinate" value={stockProgress} />
               <ItemTitle className="secondary">{`${book.amount} trong kho`}</ItemTitle>
             </TableCell>
-            <TableCell align="left">
-              <Chip label={stockStatus == 'error' ? 'Ngừng bán' :
-                stockStatus == 'warning' ? 'Gần hết' :
-                  stockStatus == 'primary' ? 'Bình thường' : 'Mới'}
-                color={stockStatus}
-                sx={{ fontWeight: 'bold' }}
-                variant="outlined"
-              />
-            </TableCell>
-            <TableCell align="right" sx={{ color: 'text.secondary' }}>
-              <StyledIconButton onClick={(e) => handleClickOpenEdit(id)}>
-                <EditIcon />
-              </StyledIconButton>
-              <StyledIconButton className="error" onClick={(e) => handleDelete(id)}>
-                <DeleteIcon />
-              </StyledIconButton>
-            </TableCell>
+            {!mini &&
+              <>
+                <TableCell align="left">
+                  <Chip label={stockStatus == 'error' ? 'Ngừng bán' :
+                    stockStatus == 'warning' ? 'Gần hết' :
+                      stockStatus == 'primary' ? 'Bình thường' : 'Mới'}
+                    color={stockStatus}
+                    sx={{ fontWeight: 'bold' }}
+                    variant="outlined"
+                  />
+                </TableCell>
+                <TableCell align="right">
+                  <IconButton onClick={(e) => handleClickOpenEdit(id)}><MoreHoriz /></IconButton>
+                </TableCell>
+              </>
+            }
           </TableRow>
         )
       })
@@ -400,7 +407,7 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
           scope="row"
           padding="none"
           align="center"
-          colSpan={6}
+          colSpan={colSpan()}
           sx={{ height: '40dvh' }}
         >
           <Box>Không tìm thấy sản phẩm nào!</Box>
@@ -413,7 +420,7 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
           scope="row"
           padding="none"
           align="center"
-          colSpan={6}
+          colSpan={colSpan()}
           sx={{ height: '40dvh' }}
         >
           <Box>{error?.error}</Box>
@@ -426,12 +433,14 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
     <Box sx={{ width: '100%' }}>
       <Paper elevation={3} sx={{ width: '100%', mb: '2px' }} >
         <CustomTableToolbar
-          numSelected={selected?.length ?? 0}
-          selectedAll={selectedAll}
+          numSelected={numSelected()}
           icon={<AutoStoriesIcon />}
           title={'sản phẩm'}
+          submitIcon={<DeleteIcon />}
+          submitTooltip={'Xoá sản phẩm đã chọn'}
+          onSubmitSelected={handleDeleteMultiples}
           filterComponent={<FilterContent />}
-          handleDeleteMultiples={handleDeleteMultiples} />
+        />
         <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
           <Table
             stickyHeader
@@ -441,67 +450,54 @@ export default function TableProducts({ setBookCount, sellerName, mini = false }
           >
             <CustomTableHead
               headCells={headCells}
-              numSelected={selected?.length ?? 0}
+              numSelected={numSelected()}
               sortBy={pagination.sortBy}
               sortDir={pagination.sortDir}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={data?.totalElements}
               selectedAll={selectedAll}
+              mini={mini}
             />
             <TableBody>
               {booksRows}
             </TableBody>
-            <Suspense fallback={<></>}>
-              {openEdit ?
-                <EditProductDialog
-                  id={id}
-                  open={openEdit}
-                  setOpen={setOpenEdit}
-                />
-                : null
-              }
-            </Suspense>
           </Table>
         </TableContainer>
-        <CustomTablePagination
-          pagination={pagination}
-          onPageChange={handleChangePage}
-          onSizeChange={handleChangeRowsPerPage}
-          count={data?.info?.totalElements ?? 0}
-        />
-      </Paper>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Box>
-          <FormControlLabel
-            control={
-              <Switch
-                color="primary"
-                checked={dense}
-                onChange={handleChangeDense}
+        <FooterContainer>
+          {mini ?
+            <Link to={'/manage-products'}>Xem tất cả</Link>
+            :
+            <Box>
+              <FormControlLabel
+                control={<Switch checked={dense} onChange={handleChangeDense} />}
+                label={<FooterLabel>Thu gọn</FooterLabel>}
               />
-            }
-            label="Thu gọn"
-          />
-          {(isAdmin && !sellerName) &&
-            <FormControlLabel
-              control={<Switch sx={{
-                '& .MuiSwitch-switchBase.Mui-checked': {
-                  color: '#63e399',
-                },
-                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                  backgroundColor: '#63e399',
-                },
-              }}
-                checked={isSeller} onChange={handleChangeSeller} />}
-              label="Theo người bán"
-            />
+              {(isAdmin && !sellerName) &&
+                <FormControlLabel
+                  control={<Switch checked={isSeller} onChange={handleChangeSeller} />}
+                  label={<FooterLabel>Theo người bán</FooterLabel>}
+                />
+              }
+            </Box>
           }
-        </Box>
-        {mini &&
-          <Link to={'/manage-users'} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10 }}>Xem tất cả</Link>
+          <CustomTablePagination
+            pagination={pagination}
+            onPageChange={handleChangePage}
+            onSizeChange={handleChangeRowsPerPage}
+            count={data?.info?.totalElements ?? 0}
+          />
+        </FooterContainer>
+      </Paper>
+      <Suspense fallback={<></>}>
+        {openEdit ?
+          <EditProductDialog
+            id={id}
+            open={openEdit}
+            setOpen={setOpenEdit}
+          />
+          : null
         }
-      </Box>
+      </Suspense>
     </Box>
   );
 }

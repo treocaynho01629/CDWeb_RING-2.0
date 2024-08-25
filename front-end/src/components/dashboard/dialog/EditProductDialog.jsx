@@ -13,7 +13,7 @@ import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 
-import CustomDropZone from './CustomDropZone';
+import CustomDropZone from '../custom/CustomDropZone';
 
 //#region styled
 const Button = styled.div`

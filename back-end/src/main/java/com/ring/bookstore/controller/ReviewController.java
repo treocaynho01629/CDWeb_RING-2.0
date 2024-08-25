@@ -94,7 +94,7 @@ public class ReviewController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteReviews(@RequestParam("ids") List<Integer> ids) {
     	reviewService.deleteReviews(ids);
-        return new ResponseEntity<>("Gỡ đánh giá thành công", HttpStatus.OK);
+        return new ResponseEntity<>("Reviews deleted successfully!", HttpStatus.OK);
     }
     
     //Delete all reviews
@@ -102,6 +102,6 @@ public class ReviewController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteAllReviews() {
     	reviewService.deleteAllReviews();
-        return new ResponseEntity<>("Gỡ đánh giá thành công", HttpStatus.OK);
+        return new ResponseEntity<>("All reviews deleted successfully!", HttpStatus.OK);
     }
 }

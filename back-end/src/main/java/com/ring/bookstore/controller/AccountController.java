@@ -91,7 +91,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteAccounts(@RequestParam("ids") List<Integer> ids) {
     	accountService.deleteAccounts(ids);
-        return new ResponseEntity<>("Gỡ người dùng thành công", HttpStatus.OK);
+        return new ResponseEntity<>("Accounts deleted successfully!", HttpStatus.OK);
     }
     
     //Delete all accounts
@@ -99,7 +99,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteAllAccounts() {
     	accountService.deleteAllAccounts();
-        return new ResponseEntity<>("Gỡ người dùng thành công", HttpStatus.OK);
+        return new ResponseEntity<>("All accounts deleted successfully!", HttpStatus.OK);
     }
 	
 	//Get account's profile (AccountProfile)

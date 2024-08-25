@@ -1,14 +1,16 @@
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
-import { useState, useEffect } from "react";
-import { Box, Breadcrumbs, Grid, Paper, Stack, Typography } from '@mui/material';
-import { AutoStories as AutoStoriesIcon, LocalFireDepartment, Star, Style } from '@mui/icons-material';
+import { useState, useEffect, Suspense, lazy } from "react";
+import { Box, Breadcrumbs, Button, Grid, Paper, Stack, Typography } from '@mui/material';
+import { Add, AutoStories as AutoStoriesIcon, LocalFireDepartment, Star, Style } from '@mui/icons-material';
 import { Link, useNavigate } from "react-router-dom"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import TableProducts from '../../components/dashboard/table/TableProducts'
 import useAuth from "../../hooks/useAuth"
 import useTitle from "../../hooks/useTitle"
 import CountCard from '../../components/dashboard/custom/CountCard';
+
+const ProductFormDialog = lazy(() => import("../../components/dashboard/dialog/ProductFormDialog"));
 
 //#region preStyled
 const CountContainer = muiStyled(Paper)(({ theme }) => ({
@@ -62,10 +64,23 @@ const BookPrice = styled.p`
 `
 //#endregion
 
-const ManageBooks = () => {
-  const [bookCount, setBookCount] = useState(0);
+const ManageProducts = () => {
+  const [productCount, setProductCount] = useState(0);
   const { roles } = useAuth();
   const [seller, setSeller] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
+  const [contextProduct, setContextProduct] = useState(null);
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = (product) => {
+    setContextProduct(product);
+    setOpen(true);
+  }
+
+  const handleClose = () => {
+    setContextProduct(null);
+    setOpen(false);
+  }
+
   // const { loading: loadingBest, data: best } = useFetch(BOOKS_URL + "?pSize=5&sortBy=orderTime&sortDir=desc&seller=" + (seller === false ? "" : username));
   // const { loading: loadingFav, data: fav } = useFetch(BOOKS_URL + "?pSize=5&sortBy=rateAmount&sortDir=desc&seller=" + (seller === false ? "" : username));
 
@@ -80,12 +95,15 @@ const ManageBooks = () => {
           <Link style={{ color: 'inherit' }} to={'/dashboard'}>Dashboard</Link>
           <Typography color="text.secondary">Quản lý sản phẩm</Typography>
         </Breadcrumbs>
+        <Button variant="outlined" size="large" startIcon={<Add />} onClick={() => handleOpen()}>
+          Thêm sản phẩm mới
+        </Button>
       </Box>
       <br />
       <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
         <Grid item sm={6} md={4}>
           <CountCard
-            count={bookCount}
+            count={productCount}
             icon={<Style />}
             title={'Sản phẩm'}
           />
@@ -138,9 +156,12 @@ const ManageBooks = () => {
         }
       </Grid> */}
 
-      <TableProducts setBookCount={setBookCount} />
+      <TableProducts setProductCount={setProductCount} />
+      <Suspense fallback={<></>}>
+        {open && <ProductFormDialog open={open} handleClose={handleClose}/>}
+      </Suspense>
     </>
   )
 }
 
-export default ManageBooks
+export default ManageProducts

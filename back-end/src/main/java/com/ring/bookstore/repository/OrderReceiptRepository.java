@@ -1,6 +1,7 @@
 package com.ring.bookstore.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.ring.bookstore.model.OrderReceipt;
-import com.ring.bookstore.response.IChartResponse;
 
 @Repository
 public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Integer>{
@@ -36,17 +36,17 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Inte
 	Page<OrderReceipt> findAllByBookId(Integer id, Pageable pageable); //Get orders with book's {id}
 	
 	@Query("""
-	select month(o.oDate) as name, coalesce(sum(o2.amount) , 0) as data, coalesce(sum(distinct o.total) , 0) as otherData 
+	select month(o.oDate) as name, coalesce(sum(o2.amount) , 0) as books, coalesce(sum(distinct o.total) , 0) as sales 
 	from OrderReceipt o left join OrderDetail o2 on o.id = o2.order.id
 	group by month(o.oDate)
 	""")
-	List<IChartResponse> getMonthlySale(); //Get monthly sale
+	List<Map<String,Object>> getMonthlySale(); //Get monthly sale
 	
 	@Query("""
-	select month(o.oDate) as name, coalesce(sum(o2.amount) , 0) as data, coalesce(sum(distinct o.total) , 0) as otherData 
+	select month(o.oDate) as name, coalesce(sum(o2.amount) , 0) as books, coalesce(sum(distinct o.total) , 0) as sales 
 	from OrderReceipt o left join OrderDetail o2 on o.id = o2.order.id join Book b on b.id = o2.book.id
 	where b.user.id = :id
 	group by month(o.oDate)
 	""")
-	List<IChartResponse> getMonthlySaleBySeller(Integer id); //Get monthly sale by seller's {id}
+	List<Map<String,Object>> getMonthlySaleBySeller(Integer id); //Get monthly sale by seller's {id}
 }

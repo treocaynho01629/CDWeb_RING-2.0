@@ -1,68 +1,14 @@
-import styled from 'styled-components'
-import { styled as muiStyled } from '@mui/material/styles';
 import { useState, useEffect } from 'react';
 import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch, Avatar, Grid, TextField, MenuItem } from '@mui/material';
-import { Delete as DeleteIcon, Filter, Search, Star } from '@mui/icons-material';
+import { Delete as DeleteIcon, Search, Star } from '@mui/icons-material';
 import { Link } from "react-router-dom";
 import { useDeleteReviewMutation, useDeleteReviewsMutation, useGetReviewsByBookIdQuery, useGetReviewsByUserIdQuery, useGetReviewsQuery } from '../../../features/reviews/reviewsApiSlice';
+import { FooterLabel, ItemTitle, FooterContainer } from '../custom/ShareComponents';
 import useAuth from "../../../hooks/useAuth";
 import CustomTablePagination from '../custom/CustomTablePagination';
 import CustomProgress from '../../custom/CustomProgress';
 import CustomTableHead from '../custom/CustomTableHead';
 import CustomTableToolbar from '../custom/CustomTableToolbar';
-
-//#region preStyled
-const ItemTitle = styled.p`
-    font-size: 12px;
-    margin: 5px 0;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-	
-	  @supports (-webkit-line-clamp: 1) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: initial;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-    }
-
-    &.secondary {
-      color: ${props => props.theme.palette.text.secondary};
-    }
-`
-
-const ItemContent = styled.p`
-    font-size: 12px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    max-width: 500px;
-	
-	@supports (-webkit-line-clamp: 1) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: initial;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-    }
-`
-
-const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
-  color: 'inherit',
-
-  '&:hover': {
-    transform: 'scale(1.05)',
-    color: theme.palette.primary.main,
-
-    '&.error': {
-      color: theme.palette.error.main,
-    },
-  },
-}));
-//#endregion
 
 const headCells = [
   {
@@ -71,6 +17,7 @@ const headCells = [
     width: '70px',
     disablePadding: false,
     sortable: true,
+    hideOnMinimize: true,
     label: 'ID',
   },
   {
@@ -99,22 +46,21 @@ const headCells = [
   {
     id: 'book.title',
     align: 'left',
-    width: '250px',
     disablePadding: false,
     sortable: true,
     label: 'Sản phẩm',
   },
   {
     id: 'action',
-    align: 'right',
     width: '35px',
     disablePadding: false,
     sortable: false,
-    label: 'Hành động',
+    hideOnMinimize: true,
+    label: '',
   },
 ];
 
-function FilterContent({  }) {
+function FilterContent({ }) {
   return (
     <Grid container spacing={1} sx={{ width: '80vw', padding: '10px' }}>
       <Grid item xs={12} sm={4}>
@@ -154,6 +100,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
   const { roles } = useAuth();
   const isAdmin = useState(roles?.find(role => ['ROLE_ADMIN'].includes(role)));
   const [selected, setSelected] = useState([]);
+  const [deselected, setDeseletected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [dense, setDense] = useState(true);
   const [isEmployees, setIsEmployees] = useState(false);
@@ -202,7 +149,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
         currPage: data?.info?.currPage,
         pageSize: data?.info?.pageSize
       });
-      setReviewCount(data?.info?.totalElements);
+      if (setReviewCount) setReviewCount(data?.info?.totalElements);
     }
   }, [data])
 
@@ -214,36 +161,64 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
 
   const handleSelectAllClick = (e) => {
     if (e.target.checked) { //Selected all
-      const newSelected = data?.content?.map((n) => n.id);
-      setSelected(newSelected);
       setSelectedAll(true);
       return;
     }
 
     //Unselected all
     setSelected([]);
+    setDeseletected([]);
     setSelectedAll(false);
   };
 
   const handleClick = (e, id) => {
-    const selectedIndex = selected?.indexOf(id);
-    let newSelected = [];
+    if (selectedAll) {
+      //Set unselected elements for reverse
+      const deselectedIndex = deselected?.indexOf(id);
+      let newDeselected = [];
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected?.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
+      if (deselectedIndex === -1) {
+        newDeselected = newDeselected.concat(deselected, id);
+      } else if (deselectedIndex === 0) {
+        newDeselected = newDeselected.concat(deselected.slice(1));
+      } else if (deselectedIndex === deselected?.length - 1) {
+        newDeselected = newDeselected.concat(deselected.slice(0, -1));
+      } else if (deselectedIndex > 0) {
+        newDeselected = newDeselected.concat(
+          deselected.slice(0, deselectedIndex),
+          deselected.slice(deselectedIndex + 1),
+        );
+      }
+
+      setDeseletected(newDeselected);
+      if (newDeselected.length == data?.info?.totalElements) {
+        setDeseletected([]);
+        setSelectedAll(false);
+      }
+    } else {
+      //Set main selected elements
+      const selectedIndex = selected?.indexOf(id);
+      let newSelected = [];
+
+      if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selected, id);
+      } else if (selectedIndex === 0) {
+        newSelected = newSelected.concat(selected.slice(1));
+      } else if (selectedIndex === selected?.length - 1) {
+        newSelected = newSelected.concat(selected.slice(0, -1));
+      } else if (selectedIndex > 0) {
+        newSelected = newSelected.concat(
+          selected.slice(0, selectedIndex),
+          selected.slice(selectedIndex + 1),
+        );
+      }
+
+      setSelected(newSelected);
+      if (newSelected.length == data?.info?.totalElements) {
+        setSelectedAll(true);
+        setSelected([]);
+      }
     }
-
-    setSelectedAll(false);
-    setSelected(newSelected);
   };
 
   const handleChangePage = (page) => {
@@ -327,7 +302,9 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
       })
   };
 
-  const isSelected = (id) => (selected?.indexOf(id) !== -1 || selectedAll);
+  const isSelected = (id) => (selected?.indexOf(id) !== -1 || (selectedAll && deselected?.indexOf(id) === -1));
+  const numSelected = () => (selectedAll ? data?.info?.totalElements - deselected?.length : selected?.length);
+  const colSpan = () => (mini ? headCells.filter((h) => !h.hideOnMinimize).length : headCells.length + 1);
   //#endregion
 
   let reviewsRows;
@@ -339,7 +316,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
           scope="row"
           padding="none"
           align="center"
-          colSpan={6}
+          colSpan={colSpan()}
           sx={{ position: 'relative', height: '40dvh' }}
         >
           <CustomProgress color="primary" />
@@ -364,30 +341,34 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
             key={id}
             selected={isItemSelected}
           >
-            <TableCell padding="checkbox">
-              <Checkbox
-                color="primary"
-                onChange={(event) => handleClick(event, id)}
-                checked={isItemSelected}
-                inputProps={{
-                  'aria-labelledby': labelId,
-                }}
-              />
-            </TableCell>
-            <TableCell component="th" id={labelId} scope="row" padding="none" align="center">{id}</TableCell>
+            {!mini &&
+              <>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    color="primary"
+                    onChange={(event) => handleClick(event, id)}
+                    checked={isItemSelected}
+                    inputProps={{
+                      'aria-labelledby': labelId,
+                    }}
+                  />
+                </TableCell>
+                <TableCell component="th" id={labelId} scope="row" padding="none" align="center">#{('00000' + id).slice(-5)}</TableCell>
+              </>
+            }
             <TableCell align="left">
               <Link to={`/user/${review.userId}`} style={{ display: 'flex', alignItems: 'center' }}>
                 <Avatar sx={{ marginRight: 1 }}>{review?.userName?.charAt(0) ?? ''}</Avatar>
                 <Box>
                   <ItemTitle>{review.userName}</ItemTitle>
-                  <ItemTitle>ID: {review.userId}</ItemTitle>
+                  <ItemTitle className="secondary">ID: #{('00000' + review.userId).slice(-5)}</ItemTitle>
                 </Box>
               </Link>
             </TableCell>
             <TableCell align="left">
               <Box>
-                <ItemTitle>{review.rating} <Star fontSize="15px" color="primary" /></ItemTitle>
-                <ItemContent>{review.content}</ItemContent>
+                <ItemTitle>Đánh giá: {review.rating} <Star fontSize="15px" color="primary" /></ItemTitle>
+                <ItemTitle className="review">{review.content}</ItemTitle>
               </Box>
             </TableCell>
             <TableCell align="left">
@@ -399,13 +380,14 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
             <TableCell align="left">
               <Link to={`/detail/${review.bookId}`} >
                 <ItemTitle>{review.bookTitle}</ItemTitle>
+                <ItemTitle className="secondary">ID: #{('00000' + review.bookId).slice(-5)}</ItemTitle>
               </Link>
             </TableCell>
-            <TableCell align="right" sx={{ color: 'text.secondary' }}>
-              <StyledIconButton className="error" onClick={(e) => handleDelete(id)}>
-                <DeleteIcon />
-              </StyledIconButton>
-            </TableCell>
+            {(!mini && isAdmin) &&
+              <TableCell align="right">
+                <IconButton onClick={(e) => handleDelete(id)}><DeleteIcon /></IconButton>
+              </TableCell>
+            }
           </TableRow>
         )
       })
@@ -415,7 +397,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
           scope="row"
           padding="none"
           align="center"
-          colSpan={6}
+          colSpan={colSpan()}
           sx={{ height: '40dvh' }}
         >
           <Box>Không tìm thấy đánh giá nào!</Box>
@@ -428,7 +410,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
           scope="row"
           padding="none"
           align="center"
-          colSpan={6}
+          colSpan={colSpan()}
           sx={{ height: '40dvh' }}
         >
           <Box>{error?.error}</Box>
@@ -441,13 +423,14 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
     <Box sx={{ width: '100%' }}>
       <Paper elevation={3} sx={{ width: '100%', mb: '2px' }} >
         <CustomTableToolbar
-          filter={isEmployees}
-          numSelected={selected?.length ?? 0}
-          selectedAll={selectedAll}
+          numSelected={numSelected()}
           icon={<Star />}
           title={'đánh giá'}
-          filterComponent={<FilterContent/>}
-          handleDeleteMultiples={handleDeleteMultiples} />
+          submitIcon={<DeleteIcon />}
+          submitTooltip={'Xoá đánh giá đã chọn'}
+          onSubmitSelected={handleDeleteMultiples}
+          filterComponent={<FilterContent />}
+        />
         <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
           <Table
             stickyHeader
@@ -457,55 +440,36 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
           >
             <CustomTableHead
               headCells={headCells}
-              numSelected={selected?.length ?? 0}
+              numSelected={numSelected()}
               sortBy={pagination.sortBy}
               sortDir={pagination.sortDir}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={data?.totalElements}
               selectedAll={selectedAll}
+              mini={mini}
             />
             <TableBody>
               {reviewsRows}
             </TableBody>
           </Table>
         </TableContainer>
-        <CustomTablePagination
-          pagination={pagination}
-          onPageChange={handleChangePage}
-          onSizeChange={handleChangeRowsPerPage}
-          count={data?.info?.totalElements ?? 0}
-        />
-      </Paper>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Box>
-          <FormControlLabel
-            control={
-              <Switch
-                color="primary"
-                checked={dense}
-                onChange={handleChangeDense}
-              />
-            }
-            label="Thu gọn"
-          />
-          {/* {isAdmin
-            && <FormControlLabel
-              control={
-                <Switch
-                  color="primary"
-                  checked={isEmployees}
-                  onChange={handleChangeFilter}
-                />
-              }
-              label="Lọc hiển thị tất cả"
+        <FooterContainer>
+          {mini ?
+            <Link to={'/manage-reviews'}>Xem tất cả</Link>
+            :
+            <FormControlLabel
+              control={<Switch checked={dense} onChange={handleChangeDense} />}
+              label={<FooterLabel>Thu gọn</FooterLabel>}
             />
-          } */}
-        </Box>
-        {mini &&
-          <Link to={'/manage-reviews'} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginRight: 10 }}>Xem tất cả</Link>
-        }
-      </Box>
+          }
+          <CustomTablePagination
+            pagination={pagination}
+            onPageChange={handleChangePage}
+            onSizeChange={handleChangeRowsPerPage}
+            count={data?.info?.totalElements ?? 0}
+          />
+        </FooterContainer>
+      </Paper>
     </Box>
   );
 }

@@ -2,8 +2,12 @@ package com.ring.bookstore.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.ring.bookstore.dtos.ChartDTO;
+import com.ring.bookstore.dtos.mappers.ChartDataMapper;
+import com.ring.bookstore.enums.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -29,7 +33,6 @@ import com.ring.bookstore.repository.BookRepository;
 import com.ring.bookstore.repository.OrderDetailRepository;
 import com.ring.bookstore.repository.OrderReceiptRepository;
 import com.ring.bookstore.request.OrderRequest;
-import com.ring.bookstore.response.IChartResponse;
 import com.ring.bookstore.service.EmailService;
 import com.ring.bookstore.service.OrderService;
 
@@ -47,6 +50,8 @@ public class OrderServiceImpl implements OrderService {
 	
 	@Autowired
 	private OrderMapper orderMapper;
+	@Autowired
+	private ChartDataMapper chartMapper;
 	
 	//Commit order
 	@Transactional
@@ -97,6 +102,7 @@ public class OrderServiceImpl implements OrderService {
 					.price(book.getPrice())
 					.book(book)
 					.order(savedOrder)
+					.status(OrderStatus.PENDING)
 					.build();
 			
 			detailRepo.save(orderDetail); //Save details to database
@@ -172,13 +178,15 @@ public class OrderServiceImpl implements OrderService {
 
 	//Get monthly sales
 	@Override
-	public List<IChartResponse> getMonthlySale(Account user) {
+	public List<ChartDTO> getMonthlySale(Account user) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
+		List<Map<String,Object>> result;
+
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString()))) {
-        	return orderRepo.getMonthlySale(); //Get all if ADMIN
+			result = orderRepo.getMonthlySale(); //Get all if ADMIN
         } else {
-        	return orderRepo.getMonthlySaleBySeller(user.getId()); //If seller only get their
+			result = orderRepo.getMonthlySaleBySeller(user.getId()); //If seller only get their
         }
+		return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
 	}
 }

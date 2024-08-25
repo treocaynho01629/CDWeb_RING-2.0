@@ -12,7 +12,7 @@ import {
 import { Divider, ListItem, ListItemButton, ListItemIcon, ListItemText, List, IconButton, Collapse } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 
 //#region preStyled
@@ -102,24 +102,26 @@ const DashboardDrawer = (props) => {
       <Divider />
       <List>
         <ListItem key={0} disablePadding sx={{ display: 'block' }}>
-          <ListItemButton onClick={() => navigate('/dashboard')}
-            sx={{
-              minHeight: 48,
-              justifyContent: open ? 'initial' : 'center',
-              px: 2.5,
-            }}
-          >
-            <ListItemIcon
+          <Link to={'/dashboard'}>
+            <ListItemButton
               sx={{
-                minWidth: 0,
-                mr: open ? 3 : 'auto',
-                justifyContent: 'center',
+                minHeight: 48,
+                justifyContent: open ? 'initial' : 'center',
+                px: 2.5,
               }}
             >
-              <SpeedIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Dashboard"} sx={{ opacity: open ? 1 : 0 }} />
-          </ListItemButton>
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: open ? 3 : 'auto',
+                  justifyContent: 'center',
+                }}
+              >
+                <SpeedIcon />
+              </ListItemIcon>
+              <ListItemText primary={"Dashboard"} sx={{ opacity: open ? 1 : 0 }} />
+            </ListItemButton>
+          </Link>
         </ListItem>
       </List>
       <Divider />
@@ -148,12 +150,14 @@ const DashboardDrawer = (props) => {
         </ListItem>
         <Collapse in={openList[1]} timeout="auto" unmountOnExit sx={{ display: open ? 'block' : 'none' }}>
           <List component="div" disablePadding>
-            <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/manage-books')}>
-              <ListItemIcon>
-                <AutoStoriesIcon />
-              </ListItemIcon>
-              <ListItemText primary="Sách" />
-            </ListItemButton>
+            <Link to={'/manage-products'}>
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <AutoStoriesIcon />
+                </ListItemIcon>
+                <ListItemText primary="Sách" />
+              </ListItemButton>
+            </Link>
             {admin ?
               <ListItemButton sx={{ pl: 4 }}>
                 <ListItemIcon>
@@ -191,18 +195,22 @@ const DashboardDrawer = (props) => {
             </ListItem>
             <Collapse in={openList[2]} timeout="auto" unmountOnExit sx={{ display: open ? 'block' : 'none' }}>
               <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/manage-users')}>
-                  <ListItemIcon>
-                    <PersonIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Người dùng" />
-                </ListItemButton>
-                <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/manage-reviews')}>
-                  <ListItemIcon>
-                    <TryIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Đánh giá" />
-                </ListItemButton>
+                <Link to={'/manage-users'}>
+                  <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <PersonIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Người dùng" />
+                  </ListItemButton>
+                </Link>
+                <Link to={'/manage-reviews'}>
+                  <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <TryIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Đánh giá" />
+                  </ListItemButton>
+                </Link>
               </List>
             </Collapse>
           </>
@@ -232,7 +240,7 @@ const DashboardDrawer = (props) => {
         </ListItem>
         <Collapse in={openList[3]} timeout="auto" unmountOnExit sx={{ display: open ? 'block' : 'none' }}>
           <List component="div" disablePadding>
-            <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/manage-receipts')}>
+            <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/manage-orders')}>
               <ListItemIcon>
                 <TrendingUpIcon />
               </ListItemIcon>

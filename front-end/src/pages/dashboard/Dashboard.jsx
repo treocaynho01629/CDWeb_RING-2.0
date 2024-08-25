@@ -6,7 +6,7 @@ import { Grid, Paper } from '@mui/material';
 import TableProducts from '../../components/dashboard/table/TableProducts'
 import TableUsers from "../../components/dashboard/table/TableUsers";
 import TableReviews from "../../components/dashboard/table/TableReviews";
-import TableReceipts from "../../components/dashboard/table/TableReceipts";
+import TableOrders from "../../components/dashboard/table/TableOrders";
 import ChartUsers from "../../components/dashboard/chart/ChartUsers";
 import ChartSales from "../../components/dashboard/chart/ChartSales";
 import useAuth from "../../hooks/useAuth";
@@ -35,9 +35,9 @@ const countIconStyle = {
 
 const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
-  const [bookCount, setBookCount] = useState(0);
+  const [productCount, setProductCount] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
-  const [receiptCount, setReceiptCount] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
   const { roles, username } = useAuth();
   const [admin, setAdmin] = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
 
@@ -47,36 +47,25 @@ const Dashboard = () => {
   return (
     <>
       <h2>Chào mừng {username}!</h2>
-      <h3 style={{ color: 'darkgray' }}>Dashboard</h3>
       <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
-        <Grid item sm={6} md={3}>
+        <Grid item sm={6} md={4}>
           <CountContainer elevation={3} >
             <AutoStoriesIcon sx={countIconStyle} />
-            <CountInfo><h2 style={{ margin: 0 }}>{bookCount}</h2><span>Cuốn sách</span></CountInfo>
+            <CountInfo><h2 style={{ margin: 0 }}>{productCount}</h2><span>Cuốn sách</span></CountInfo>
           </CountContainer>
         </Grid>
-        <Grid item sm={6} md={3}>
+        <Grid item sm={6} md={4}>
           <CountContainer elevation={3} >
             <ReceiptIcon sx={countIconStyle} />
-            <CountInfo><h2 style={{ margin: 0 }}>{receiptCount}</h2><span>Đơn hàng</span></CountInfo>
+            <CountInfo><h2 style={{ margin: 0 }}>{orderCount}</h2><span>Đơn hàng</span></CountInfo>
           </CountContainer>
         </Grid>
-        {admin ?
-          <>
-            <Grid item sm={6} md={3}>
-              <CountContainer elevation={3} >
-                <GroupIcon sx={countIconStyle} />
-                <CountInfo><h2 style={{ margin: 0 }}>{userCount}</h2><span>Thành viên</span></CountInfo>
-              </CountContainer>
-            </Grid>
-            <Grid item sm={6} md={3}>
-              <CountContainer elevation={3} >
-                <TryIcon sx={countIconStyle} />
-                <CountInfo><h2 style={{ margin: 0 }}>{reviewCount}</h2><span>Đánh giá</span></CountInfo>
-              </CountContainer>
-            </Grid>
-          </>
-          : null}
+        <Grid item sm={6} md={4}>
+          <CountContainer elevation={3} >
+            <ReceiptIcon sx={countIconStyle} />
+            <CountInfo><h2 style={{ margin: 0 }}>{orderCount}</h2><span>Đơn hàng</span></CountInfo>
+          </CountContainer>
+        </Grid>
       </Grid>
       <ChartSales />
       {admin ?
@@ -84,10 +73,10 @@ const Dashboard = () => {
         : null}
       <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
         <Grid item sm={12} lg={6}>
-          <TableBook mini={true} setBookCount={setBookCount} />
+          <TableProducts mini={true} setProductCount={setProductCount} />
         </Grid>
         <Grid item sm={12} lg={6}>
-          <TableReceipts mini={true} setReceiptCount={setReceiptCount} />
+          <TableOrders mini={true} setOrderCount={setOrderCount} />
         </Grid>
       </Grid>
       {admin ?

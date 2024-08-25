@@ -3,7 +3,7 @@ import { Box, Stack, Button } from '@mui/material';
 import { Check, Password } from "@mui/icons-material";
 import { PWD_REGEX } from "../../ultils/regex";
 import { useChangePasswordMutation } from '../../features/users/usersApiSlice';
-import { Instruction } from '../custom/GlobalComponent';
+import { Instruction } from '../custom/GlobalComponents';
 import CustomPasswordInput from "../custom/CustomPasswordInput";
 
 const ResetPassComponent = ({ Title, Wrapper, pending, setPending }) => {

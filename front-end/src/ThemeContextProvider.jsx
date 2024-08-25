@@ -123,6 +123,27 @@ export function ThemeContextProvider({ children }) {
                             },
                         },
                     },
+                    MuiTableContainer: {
+                        styleOverrides: {
+                            root: ({ theme }) => ({
+                                "&::-webkit-scrollbar": {
+                                    width: 7,
+                                    height: 7,
+                                },
+                                "&::-webkit-scrollbar-track": {
+                                    background: 'inherit',
+                                    boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0)',
+                                },
+                                "&::-webkit-scrollbar-thumb": {
+                                    backgroundColor: theme.palette.action.focus,
+                                    borderRadius: '20px',
+                                },
+                                '&::-webkit-scrollbar-corner': {
+                                    background: 'inherit',
+                                },
+                            }),
+                        },
+                    },
                 },
                 breakpoints: {
                     values: {

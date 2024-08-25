@@ -24,7 +24,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
             providesTags: ['Profile'],
         }),
         getUser: builder.query({
-            query: (id) => ({
+            query: ({ id }) => ({
                 url: `/api/accounts/${id}`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError

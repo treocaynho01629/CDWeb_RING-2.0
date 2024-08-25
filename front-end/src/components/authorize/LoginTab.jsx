@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import { setAuth, setPersist } from '../../features/auth/authReducer';
 import { useAuthenticateMutation, useForgotMutation } from '../../features/auth/authApiSlice';
 import { EMAIL_REGEX } from '../../ultils/regex';
-import { Instruction } from '../custom/GlobalComponent';
+import { Instruction } from '../custom/GlobalComponents';
 import CustomPasswordInput from '../custom/CustomPasswordInput';
 
 //#region styled

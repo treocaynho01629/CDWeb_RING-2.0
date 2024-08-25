@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.ring.bookstore.model.Account;
-import com.ring.bookstore.response.IChartResponse;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer>{

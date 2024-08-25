@@ -4,7 +4,7 @@ import { Stack, Button } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useResetMutation } from '../features/auth/authApiSlice';
 import { PWD_REGEX } from '../ultils/regex';
-import { Instruction } from '../components/custom/GlobalComponent';
+import { Instruction } from '../components/custom/GlobalComponents';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 import CustomPasswordInput from '../components/custom/CustomPasswordInput';
 

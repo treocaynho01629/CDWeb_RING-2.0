@@ -27,6 +27,7 @@ public class OrderDetailMapper implements Function<OrderDetail, OrderDetailDTO> 
 				detail.getAmount(),
         		detail.getPrice(),
         		detail.getBook().getId(),
+				detail.getStatus(),
         		fileDownloadUri,
         		book.getTitle());
     }

@@ -127,7 +127,7 @@ public class BookController {
     public ResponseEntity<?> deleteBooks(@RequestParam("ids") List<Integer> ids,
 										@CurrentAccount Account currUser) {
         bookService.deleteBooks(ids, currUser);
-        return new ResponseEntity<>("Gỡ sách thành công", HttpStatus.OK);
+        return new ResponseEntity<>("Products delete successfully!", HttpStatus.OK);
     }
     
     //Delete all books
@@ -135,7 +135,7 @@ public class BookController {
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> deleteAllBooks(@CurrentAccount Account currUser) {
         bookService.deleteAllBooks(currUser);
-        return new ResponseEntity<>("Gỡ sách thành công", HttpStatus.OK);
+        return new ResponseEntity<>("All products deleted successfully!", HttpStatus.OK);
     }
 	
 	//Test purpose

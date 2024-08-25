@@ -20,7 +20,6 @@ import com.ring.bookstore.dtos.OrderDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.OrderReceipt;
 import com.ring.bookstore.request.OrderRequest;
-import com.ring.bookstore.response.IChartResponse;
 import com.ring.bookstore.service.OrderService;
 
 import jakarta.validation.Valid;
@@ -52,7 +51,7 @@ public class OrderController {
     										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
     										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
         									@CurrentAccount Account currUser){
-        Page<OrderDTO> orders =  orderService.getAllOrders(currUser, pageNo, pageSize, sortBy, sortDir);
+        Page<OrderDTO> orders = orderService.getAllOrders(currUser, pageNo, pageSize, sortBy, sortDir);
         return new ResponseEntity< >(orders, HttpStatus.OK);
     }
 	
@@ -60,7 +59,7 @@ public class OrderController {
 	@GetMapping("{id}")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> getOrderById(@PathVariable("id") Integer id){
-		OrderDTO order =  orderService.getOrderById(id);
+		OrderDTO order = orderService.getOrderById(id);
         return new ResponseEntity< >(order, HttpStatus.OK);
     }
 	
@@ -70,7 +69,7 @@ public class OrderController {
     public ResponseEntity<?> getOrdersByUser(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
     										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
         									@CurrentAccount Account currUser){
-        Page<OrderDTO> orders =  orderService.getOrdersByUser(currUser, pageNo, pageSize);
+        Page<OrderDTO> orders = orderService.getOrdersByUser(currUser, pageNo, pageSize);
         return new ResponseEntity< >(orders, HttpStatus.OK);
     }
 	
@@ -82,7 +81,7 @@ public class OrderController {
     										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
     										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
     										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir){
-        Page<OrderDTO> orders =  orderService.getOrdersByBookId(id, pageNo, pageSize, sortBy, sortDir);
+        Page<OrderDTO> orders = orderService.getOrdersByBookId(id, pageNo, pageSize, sortBy, sortDir);
         return new ResponseEntity< >(orders, HttpStatus.OK);
     }
 
@@ -90,7 +89,6 @@ public class OrderController {
 	@GetMapping("/sale")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> getMonthlySale(@CurrentAccount Account currUser){
-        List<IChartResponse> chart =  orderService.getMonthlySale(currUser);
-        return new ResponseEntity< >(chart, HttpStatus.OK);
+        return new ResponseEntity< >(orderService.getMonthlySale(currUser), HttpStatus.OK);
     }
 }

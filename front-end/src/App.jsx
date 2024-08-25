@@ -2,8 +2,8 @@ import './App.css';
 import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom';
 import { Loader } from './components/layout/Loadable';
-import Loadable from './components/layout/Loadable';
 import useReachable from './hooks/useReachable';
+import Loadable from './components/layout/Loadable';
 import Layout from './components/layout/Layout';
 import PageLayout from './components/layout/PageLayout';
 import RequireAuth from './components/authorize/RequireAuth';
@@ -25,9 +25,9 @@ const Profile = Loadable(lazy(() => import('./pages/Profile')));
 const Orders = Loadable(lazy(() => import('./pages/Orders')));
 
 const DashboardLayout = lazy(() => import('./components/dashboard/DashboardLayout'));
-const ManageBooks = Loadable(lazy(() => import('./pages/dashboard/ManageBooks')));
+const ManageProducts = Loadable(lazy(() => import('./pages/dashboard/ManageProducts')));
 const ManageUsers = Loadable(lazy(() => import('./pages/dashboard/ManageUsers')));
-const ManageReceipts = Loadable(lazy(() => import('./pages/dashboard/ManageReceipts')));
+const ManageOrders = Loadable(lazy(() => import('./pages/dashboard/ManageOrders')));
 const ManageReviews = Loadable(lazy(() => import('./pages/dashboard/ManageReviews')));
 const DetailProduct = Loadable(lazy(() => import('./pages/dashboard/DetailProduct.jsx')));
 const DetailAccount = Loadable(lazy(() => import('./pages/dashboard/DetailAccount.jsx')));
@@ -73,8 +73,8 @@ function App() {
                 //SELLER
               <Route element={<RequireAuth allowedRoles={['ROLE_SELLER']} />}>
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/manage-books" element={<ManageBooks />} />
-                <Route path="/manage-receipts" element={<ManageReceipts />} />
+                <Route path="/manage-products" element={<ManageProducts />} />
+                <Route path="/manage-orders" element={<ManageOrders />} />
                 <Route path="/detail/:id" element={<DetailProduct />} />
                 <Route path="/user/:id" element={<DetailAccount />} />
               </Route>

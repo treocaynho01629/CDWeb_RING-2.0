@@ -3,7 +3,7 @@ import { LocationOn as LocationOnIcon, Check, Person as PersonIcon, Phone as Pho
 import { Checkbox, Button, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, MenuItem, TextField } from '@mui/material'
 import { location } from '../../ultils/location'
 import { PHONE_REGEX } from '../../ultils/regex';
-import { Instruction } from '../custom/GlobalComponent';
+import { Instruction } from '../custom/GlobalComponents';
 
 const splitAddress = (addressInfo) => {
     let city = '';
@@ -39,7 +39,9 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
     useEffect(() => {
         setErrMsg('');
     }, [currAddress])
+
     setPending(false);
+    
     useEffect(() => { //Check phone number
         const result = PHONE_REGEX.test(currAddress.phone);
         setValidPhone(result);

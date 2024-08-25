@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Stack, Button, TextField } from '@mui/material';
 import { useRegisterMutation } from '../../features/auth/authApiSlice';
 import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from '../../ultils/regex';
-import { Instruction } from '../custom/GlobalComponent';
+import { Instruction } from '../custom/GlobalComponents';
 import CustomPasswordInput from '../custom/CustomPasswordInput';
 
 //#region styled
