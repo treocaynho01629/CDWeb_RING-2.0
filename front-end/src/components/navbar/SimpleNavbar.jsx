@@ -7,7 +7,7 @@ import HelpIcon from '@mui/icons-material/Help';
 
 //#region styled
 const Container = styled.div`
-    background-color: white;
+    background-color: ${props => props.theme.palette.background.default};
     border-bottom: 0.5px solid;
     border-color: lightgray;
     align-items: center;
@@ -48,7 +48,7 @@ const Logo = styled.h2`
     font-size: 27px;
     text-transform: uppercase;
     font-weight: 500;
-    color: #63e399;
+    color: ${props => props.theme.palette.primary.main};
     cursor: pointer;
     align-items: center;
     display: flex;
@@ -79,7 +79,7 @@ const ImageLogo = styled.img`
 const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
     '&:hover': {
         backgroundColor: 'transparent',
-        color: theme.palette.secondary.main,
+        color: theme.palette.primary.main,
     },
 }));
 //#endregion

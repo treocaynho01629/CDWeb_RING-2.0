@@ -2,15 +2,15 @@ import { useLocation, Navigate, Outlet } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 
 const RequireAuth = ({ allowedRoles }) => {
-    const { auth } = useAuth();
+    const { token, roles } = useAuth();
     const location = useLocation();
 
     return (
-        auth?.roles?.find(role => allowedRoles?.includes(role.roleName)) 
-            ? <Outlet /> //Người dùng có đúng ROLE
-            : auth?.userName
-                ? <Navigate to="/unauthorized" state={{ from: location }} replace /> //Sai Role và đã Đăng nhập
-                : <Navigate to="/login" state={{ from: location }} replace /> //Chưa đăng nhập
+        roles?.find(role => allowedRoles?.includes(role)) 
+            ? <Outlet /> //Auth with ROLE
+            : token
+                ? <Navigate to="/unauthorized" state={{ from: location }} replace /> //To error page
+                : <Navigate to="/login" state={{ from: location }} replace /> //To login if not logged in
     );
 }
 

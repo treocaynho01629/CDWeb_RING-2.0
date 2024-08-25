@@ -1,54 +1,26 @@
-import React from 'react'
+import './index.css'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import './index.css'
-import { AuthProvider } from './context/AuthProvider';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { persistor, store } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { CookiesProvider } from "react-cookie";
-import { SnackbarProvider, MaterialDesignContent, closeSnackbar } from 'notistack';
-import { styled as muiStyled } from '@mui/material/styles';
-import { Close } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
-
-const StyledMaterialDesignContent = muiStyled(MaterialDesignContent)(() => ({
-  '&.notistack-MuiContent-success': {
-    borderRadius: '0',
-    backgroundColor: '#63e399',
-  },
-  '&.notistack-MuiContent-error': {
-    borderRadius: '0',
-    backgroundColor: '#e66161',
-  },
-}));
+import { store, persistor } from './app/store';
+import { ThemeContextProvider } from './ThemeContextProvider';
+import CustomSnackbarProvider from './components/layout/CustomSnackbarProvider';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <CookiesProvider>
     <BrowserRouter>
       <Provider store={store}>
-        <PersistGate loading={"loading"} persistor={persistor}>
-          <AuthProvider>
-            <SnackbarProvider
-              autoHideDuration={1500}
-              action={(snackbarId) => (
-                <IconButton
-                  aria-label="dismiss snack"
-                  onClick={() => closeSnackbar(snackbarId)}
-                >
-                  <Close />
-                </IconButton>
-              )}
-              Components={{
-                success: StyledMaterialDesignContent,
-                error: StyledMaterialDesignContent,
-              }}>
+        <PersistGate loading={null} persistor={persistor}>
+          <ThemeContextProvider>
+            <CustomSnackbarProvider>
               <Routes>
                 <Route path="/*" element={<App />} />
               </Routes>
-            </SnackbarProvider>
-          </AuthProvider>
+            </CustomSnackbarProvider>
+          </ThemeContextProvider>
         </PersistGate>
       </Provider>
     </BrowserRouter>

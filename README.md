@@ -18,16 +18,17 @@ VITE_PORT_SOCKET_SPRING=<Your spring application url path>
 ```
 - Back-End .env
 ```.env
-spring_profiles_active=prod
-PORT_SOCKET_SPRING=<Your front-end url path>
-PROD_DB_HOST=<Your SQL database path>
-PROD_DB_PORT=<Your SQL database port>
-PROD_DB_NAME=<Your SQL database name>
-PROD_DB_USERNAME=<Your SQL username>
-PROD_DB_PASSWORD=<Your SQL password>
-USERNAME_EMAIL=<Your email address>
-PASSWORD_EMAIL=<Your email app password>
+SPRING_PROFILES_ACTIVE=<Active profiles>
+CLIENT_URL=<Your client path>
+DB_HOST=<Your SQL database path>
+DB_PORT=<Your SQL database port>
+DB_NAME=<Your SQL database name>
+DB_USERNAME=<Your SQL username>
+DB_PASSWORD=<Your SQL password>
+EMAIL_USERNAME=<Your email address>
+EMAIL_PASSWORD=<Your email app password>
 JWT_SECRET_KEY=<Your secret key>
+JWT_SECRET_REFRESH_KEY=<Your refresh secret key>
 ```
 [About email app password](https://support.google.com/mail/answer/185833?hl=en)
 

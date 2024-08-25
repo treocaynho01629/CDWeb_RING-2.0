@@ -1,13 +1,14 @@
 import styled from 'styled-components'
 import { useRef, useState, useEffect, lazy, Suspense } from "react";
-import { Stack } from '@mui/material';
+import { Stack, Button } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useResetMutation } from '../features/auth/authApiSlice';
+import { PWD_REGEX } from '../ultils/regex';
+import { Instruction } from '../components/custom/GlobalComponents';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
-import axios from "../api/axios";
-import CustomInput from '../components/custom/CustomInput';
-import CustomButton from '../components/custom/CustomButton';
+import CustomPasswordInput from '../components/custom/CustomPasswordInput';
 
-const PendingIndicator = lazy(() => import('../components/authorize/PendingIndicator'));
+const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
 
 //#region styled
 const Container = styled.div`
@@ -29,18 +30,7 @@ const Title = styled.h1`
     font-weight: 400;
     color: inherit;
 `
-
-const Instruction = styled.p`
-    font-size: 14px;
-    font-style: italic;
-    color: red;
-    display: ${props => props.display};;
-`
 //#endregion
-
-//Validate input
-const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%:]).{8,24}$/;
-const RESET_URL = '/api/v1/auth/reset-password';
 
 function ResetPage() {
     //Password validation
@@ -59,6 +49,9 @@ function ResetPage() {
     const errRef = useRef();
     const navigate = useNavigate();
 
+    //Reset mutation
+    const [reset, { isLoading }] = useResetMutation();
+
     //Password
     useEffect(() => {
         const result = PWD_REGEX.test(pwd);
@@ -75,9 +68,10 @@ function ResetPage() {
     //Reset passowrd
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // if button enabled with JS hack
-        const v2 = PWD_REGEX.test(pwd);
+        if (pending) return;
 
+        //Validation
+        const v2 = PWD_REGEX.test(pwd);
         if (!v2) {
             setErrMsg("Sai định dạng thông tin!");
             return;
@@ -85,50 +79,50 @@ function ResetPage() {
 
         setPending(true);
 
-        try {
-            const response = await axios.put(RESET_URL,
-                JSON.stringify({ token: token, newPass: pwd, newPassRe: matchPwd }),
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
+        const { enqueueSnackbar } = await import('notistack');
+
+        reset({
+            token: token,
+            newPass: pwd,
+            newPassRe: matchPwd
+        }).unwrap()
+            .then((data) => {
+                //Reset input
+                setPwd('');
+                setMatchPwd('');
+                setErr([]);
+                setErrMsg('');
+
+                //Queue snack
+                enqueueSnackbar('Đổi mật khẩu thành công!', { variant: 'success' });
+                navigate('/login');
+                setPending(false);
+            })
+            .catch((err) => {
+                console.error(err);
+                setErr(err);
+                if (!err?.status) {
+                    setErrMsg('Server không phản hồi');
+                } else if (err?.status === 409) {
+                    setErrMsg(err?.data?.errors?.errorMessage);
+                } else if (err?.status === 400) {
+                    setErrMsg('Sai định dạng thông tin!');
+                } else if (err?.status === 404) {
+                    setErrMsg('Token không tồn tại!');
+                } else {
+                    setErrMsg('Khôi phục thất bại!')
                 }
-            );
-
-            const { enqueueSnackbar } = await import('notistack');
-
-            setPwd('');
-            setMatchPwd('');
-            setErr([]);
-            setErrMsg('');
-            enqueueSnackbar('Đổi mật khẩu thành công!', { variant: 'success' });
-            navigate('/login');
-            setPending(false);
-        } catch (err) {
-
-            console.log(err);
-            setErr(err);
-            if (!err?.response) {
-                setErrMsg('Server không phản hồi');
-            } else if (err.response?.status === 409) {
-                setErrMsg(err.response?.data?.errors?.errorMessage);
-            } else if (err.response?.status === 400) {
-                setErrMsg('Sai định dạng thông tin!');
-            } else if (err.response?.status === 404) {
-                setErrMsg('Token không tồn tại!');
-            } else {
-                setErrMsg('Khôi phục thất bại!')
-            }
-            errRef.current.focus();
-            setPending(false);
-        }
+                errRef.current.focus();
+                setPending(false);
+            })
     }
 
     return (
         <Container>
             <SimpleNavbar />
-            {pending ?
+            {(pending) ?
                 <Suspense fallBack={<></>}>
-                    <PendingIndicator />
+                    <PendingIndicator open={pending} message="Đang gửi yêu cầu..." />
                 </Suspense>
                 : null
             }
@@ -142,8 +136,7 @@ function ResetPage() {
                                 aria-live="assertive">
                                 {errMsg}
                             </Instruction>
-                            <CustomInput
-                                typeToggle={true}
+                            <CustomPasswordInput
                                 label='Mật khẩu mới'
                                 onChange={(e) => setPwd(e.target.value)}
                                 value={pwd}
@@ -151,36 +144,35 @@ function ResetPage() {
                                 aria-describedby="pwdnote"
                                 onFocus={() => setPwdFocus(true)}
                                 onBlur={() => setPwdFocus(false)}
-                                error={(pwd && !validPwd) || err?.response?.data?.errors?.newPass}
+                                error={(pwd && !validPwd) || err?.data?.errors?.newPass}
                                 helperText={pwdFocus && pwd && !validPwd ? "8 đến 24 kí tự. Phải bao gồm chữ in hoa và ký tự đặc biệt."
-                                    : err?.response?.data?.errors?.newPass}
+                                    : err?.data?.errors?.newPass}
                                 size="small"
                                 margin="dense"
                             />
-                            <CustomInput
-                                typeToggle={true}
+                            <CustomPasswordInput
                                 label='Nhập lại mật khẩu mới'
                                 onChange={(e) => setMatchPwd(e.target.value)}
                                 value={matchPwd}
                                 aria-invalid={validMatch ? "false" : "true"}
                                 aria-describedby="confirmnote"
-                                error={(matchPwd && !validMatch) || err?.response?.data?.errors?.newPassRe}
-                                helperText={matchPwd && !validMatch ? "Không trùng mật khẩu." : err?.response?.data?.errors?.newPassRe}
+                                error={(matchPwd && !validMatch) || err?.data?.errors?.newPassRe}
+                                helperText={matchPwd && !validMatch ? "Không trùng mật khẩu." : err?.data?.errors?.newPassRe}
                                 size="small"
                                 margin="dense"
                             />
 
                             <br />
-                            <CustomButton
+                            <Button
                                 variant="contained"
-                                color="secondary"
+                                color="primary"
                                 size="large"
                                 type="submit"
                                 sx={{ width: '50%' }}
                                 disabled={!validPwd || !validMatch ? true : false}
                             >
                                 Khôi phục
-                            </CustomButton>
+                            </Button>
                         </Stack>
                     </form>
                 </Tab>

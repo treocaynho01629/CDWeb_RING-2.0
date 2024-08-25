@@ -5,7 +5,7 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
     fontSize: 18,
     fontWeight: 'bold',
     textTransform: 'uppercase',
-    color: theme.palette.secondary.main,
+    color: theme.palette.primary.main,
     textAlign: 'center',
     justifyContent: 'center',
     margin: '10px 0px',

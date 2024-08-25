@@ -1,26 +1,31 @@
 import styled from 'styled-components';
 import { useState, useEffect } from "react";
-import { Grid, Divider, ToggleButton, ToggleButtonGroup, Skeleton } from '@mui/material';
+import { Grid, ToggleButton, Button, ToggleButtonGroup, Skeleton } from '@mui/material';
 import { styled as muiStyled } from '@mui/system';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
+import { useGetBooksByFilterQuery, useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import Categories from '../components/Categories';
-import Products from '../components/Products';
-import Slider from '../components/Slider';
-import ProductsSlider from '../components/ProductsSlider';
-import CustomButton from '../components/custom/CustomButton';
+import Products from '../components/product/Products';
+import Slider from '../components/product/Slider';
+import ProductsSlider from '../components/product/ProductsSlider';
 import CustomDivider from '../components/custom/CustomDivider';
-import useFetch from '../hooks/useFetch';
+import useTitle from '../hooks/useTitle';
 
 //#region styled
 const Wrapper = styled.div`
+  overflow-x: hidden;
 `
 
 const ToggleGroupContainer = styled.div`
-  background-color: rgb(39, 39, 39);
+  background-color: #272727;
   margin-bottom: 10px;
   overflow-x: scroll;
   scroll-behavior: smooth;
   white-space: nowrap;
+
+  -ms-overflow-style: none;
+  scrollbar-width: none; 
 
   &::-webkit-scrollbar {
       display: none;
@@ -30,12 +35,13 @@ const ToggleGroupContainer = styled.div`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
+  margin-top: 20px;
 `
 
 const StyledToggleButtonGroup = muiStyled(ToggleButtonGroup)(({ theme }) => ({
   '& .MuiToggleButtonGroup-grouped': {
-    backgroundColor: 'rgb(39, 39, 39)',
-    color: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: '#272727',
+    color: '#ffffffb2',
     fontWeight: 400,
     border: 0,
     borderRadius: 0,
@@ -49,11 +55,11 @@ const StyledToggleButton = muiStyled(ToggleButton)(({ theme }) => ({
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   '&:hover': {
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: theme.palette.primary.main,
   },
   '&.Mui-selected': {
     fontWeight: 'bold',
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: theme.palette.primary.main,
     color: 'white',
   },
   '&:focus': {
@@ -78,49 +84,49 @@ const orderGroup = [
   },
 ];
 
-const BOOKS_FETCH_URL = 'api/books/filters?pageNo=0&pSize=15';
-const MORE_BOOKS_URL = 'api/books/filters?pSize=5';
-const BOOKS_RANDOM_URL = 'api/books/random?amount=5';
-const BOOKS_SORT_URL = 'api/books/filters?pageNo=0&pSize=5';
-const CATEGORIES_URL = 'api/categories';
+const defaultSize = 15;
+const defaultMore = 5;
 
 const Home = () => {
   //Initial value
-  const [booksList, setBooksList] = useState([]);
   const [orderBy, setOrderBy] = useState(orderGroup[0].value);
-  const [randomCates, setRandomCates] = useState([]);
-  const [currCate, setCurrCate] = useState('none');
-  const [count, setCount] = useState(3);
+  const [randomCateIds, setRandomCateIds] = useState([]);
+  const [currCate, setCurrCate] = useState(null);
+  const [pagination, setPagination] = useState({
+    currPage: 0,
+    pageSize: defaultSize,
+    isMore: true,
+  })
 
   //Fetch data
-  const { loading: loadingCate, data: cates } = useFetch(CATEGORIES_URL);
-  const { loading, data } = useFetch(BOOKS_FETCH_URL);
-  const { loading: loadingByOrder, data: dataByOrder } = useFetch(BOOKS_SORT_URL + "&sortBy=" + orderBy);
-  const { loading: loadingByCate, data: dataByCate } = useFetch(BOOKS_SORT_URL + "&cateId=" + currCate);
-  const { loading: loadingRandom, data: dataRandom, refetch } = useFetch(BOOKS_RANDOM_URL);
-  const { loading: loadingMore, data: more } = useFetch(MORE_BOOKS_URL + "&pageNo=" + count);
+  const { data, isLoading, isSuccess, isError } = useGetBooksQuery({
+    page: pagination?.currPage,
+    size: pagination?.pageSize,
+    loadMore: pagination?.isMore
+  });
+  const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom, refetch: refetchRandom } = useGetRandomBooksQuery({ amount: 10 });
+  const { data: cateBooks, isLoading: loadByCate, isSuccess: doneByCate, isError: errorByCate, isUninitialized } = useGetBooksByFilterQuery({ cateId: currCate }, { skip: !currCate });
+  const { data: orderBooks, isLoading: loadByOrder, isSuccess: doneByOrder, isError: errorByOrder } = useGetBooksByFilterQuery({ sortBy: orderBy, sortDir: "desc" }, { skip: !orderBy });
+  const { data: cates, isLoading: loadCates, isSuccess: doneCates, isError: errorCates } = useGetCategoriesQuery();
 
   //Other
   const navigate = useNavigate();
 
-  //Update title
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.title = `RING! - Bookstore`;
-  }, []);
+  //Set title
+  useTitle('RING! - Bookstore');
 
   //Load
   useEffect(() => {
-    if (!loading) { setBooksList(data?.content) }
-  }, [loading]);
+    if (!loadCates && doneCates && cates) {
+      const { ids } = cates;
+      let tempIds = [...ids];
 
-  useEffect(() => {
-    if (!loadingCate) {
-      let randoms = (cates?.sort(() => 0.5 - Math.random()).slice(0, 4));
-      setCurrCate(randoms ? randoms[0]?.id : null);
-      setRandomCates(randoms);
+      //Get 4 random cates
+      let randomIds = (tempIds?.sort(() => 0.5 - Math.random()).slice(0, 4));
+      setCurrCate(randomIds ? randomIds[0] : null);
+      setRandomCateIds(randomIds);
     }
-  }, [loadingCate]);
+  }, [cates]);
 
   //Change order tab
   const handleChangeOrder = (e, newValue) => {
@@ -133,26 +139,65 @@ const Home = () => {
   };
 
   //Show more
-  const handleShowMore = async () => {
-    if (count == 6) {
+  const handleShowMore = () => {
+    if (pagination?.currPage >= 5) {
       navigate('/filters');
-    } else if (!loadingMore && more) {
-      setBooksList(current => [...current, ...more?.content]);
-      setCount(prev => prev + 1);
+    } else {
+      let nextPage = (data?.ids?.length / defaultMore);
+      setPagination({ ...pagination, currPage: nextPage, pageSize: defaultMore })
     }
+  }
+
+  let catesContent;
+
+  if (loadCates || errorCates) {
+    catesContent = (
+      Array.from(new Array(4)).map((index) => (
+        <StyledToggleButton key={index} value='' disabled={true}>
+          <Skeleton sx={{ bgcolor: 'grey.400', fontSize: '14px' }} variant="text" animation="wave" width={100} />
+        </StyledToggleButton>
+      ))
+    )
+  } else if (doneCates) {
+    const { entities } = cates;
+
+    catesContent = randomCateIds?.length
+      ? randomCateIds?.map((id, index) => {
+        const cate = entities[id];
+
+        return (
+          <StyledToggleButton key={`${id}-${index}`} value={id ?? ''}>
+            {cate?.categoryName}
+          </StyledToggleButton>
+        )
+      })
+      :
+      Array.from(new Array(4)).map((index) => (
+        <StyledToggleButton key={index}>
+          <Skeleton variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
+        </StyledToggleButton>
+      ))
   }
 
   return (
     <Wrapper>
       <Slider />
-      <Categories loading={loadingCate} data={cates} />
-      <Grid sx={{ my: 3 }} container spacing={5}>
+      <Categories />
+      <Grid sx={{ mb: 3, mt: -1 }} container spacing={5}>
         <Grid item xs={12} md={12}>
           <CustomDivider>SẢN PHẨM MỚI NHẤT</CustomDivider>
           <br />
-          <Products booksList={booksList} loading={loading}/>
+          <Products {...{ isLoading, data, isSuccess, isError }} />
           <ButtonContainer>
-            <CustomButton color="secondary" variant="contained" size="medium" onClick={handleShowMore}>Xem thêm</CustomButton>
+            <Button
+              color="primary"
+              variant="contained"
+              size="medium"
+              sx={{ width: '200px' }}
+              onClick={handleShowMore}
+            >
+              Xem thêm
+            </Button>
           </ButtonContainer>
           <br />
           <CustomDivider>SẢN PHẨM XẾP THEO</CustomDivider>
@@ -164,52 +209,69 @@ const Home = () => {
               onChange={handleChangeOrder}
             >
               {(!orderGroup?.length ? Array.from(new Array(4)) : orderGroup)?.map((order, index) => (
-                <StyledToggleButton key={`${order?.id}-${index}`} value={order?.value}>
+                <StyledToggleButton key={`${order?.id}-${index}`} value={order?.value ?? ''}>
                   {order
                     ?
                     order?.label
                     :
-                    <Skeleton variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
+                    <Skeleton key={index} variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
                   }
                 </StyledToggleButton>
               ))}
             </StyledToggleButtonGroup>
           </ToggleGroupContainer>
-          <ProductsSlider loading={loadingByOrder} booksList={dataByOrder?.content} />
+          <ProductsSlider {...{ isLoading: loadByOrder, data: orderBooks, isSuccess: doneByOrder, isError: errorByOrder }} />
           <ButtonContainer>
-            <CustomButton variant="contained" color="secondary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</CustomButton>
+            <Link to={`/filters?sortBy=${orderBy}`}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="medium"
+                sx={{ width: '200px' }}
+              >
+                Xem thêm
+              </Button>
+            </Link>
           </ButtonContainer>
           <br />
           <CustomDivider>SẢN PHẨM DANH MỤC</CustomDivider>
           <br />
           <ToggleGroupContainer>
             <StyledToggleButtonGroup
-              value={currCate}
+              value={currCate ?? ''}
               exclusive
               onChange={handleChangeCate}
             >
-              {(!randomCates?.length ? Array.from(new Array(4)) : randomCates)?.map((cate, index) => (
-                <StyledToggleButton key={`${cate?.id}-${index}`} value={cate?.id}>
-                  {cate
-                    ?
-                    cate?.categoryName
-                    :
-                    <Skeleton variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
-                  }
-                </StyledToggleButton>
-              ))}
+              {catesContent}
             </StyledToggleButtonGroup>
           </ToggleGroupContainer>
-          <ProductsSlider loading={loadingByCate} booksList={dataByCate?.content} />
+          <ProductsSlider {...{ isLoading: loadByCate, data: cateBooks, isSuccess: doneByCate, isError: errorByCate, isUninitialized }} />
           <ButtonContainer>
-            <CustomButton variant="contained" color="secondary" size="medium" onClick={() => navigate(`/filters?cateId=${currCate}`)}>Xem thêm</CustomButton>
+            <Link to={`/filters?cateId=${currCate}`}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="medium"
+                sx={{ width: '200px' }}
+              >
+                Xem thêm
+              </Button>
+            </Link>
           </ButtonContainer>
           <br />
           <CustomDivider>CÓ THỂ BẠN SẼ THÍCH</CustomDivider>
           <br />
-          <ProductsSlider loading={loadingRandom} booksList={dataRandom?.content} />
+          <ProductsSlider {...{ isLoading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
           <ButtonContainer>
-            <CustomButton variant="contained" color="secondary" size="medium" onClick={refetch}>Làm mới</CustomButton>
+            <Button
+              variant="contained"
+              color="primary"
+              size="medium"
+              sx={{ width: '200px' }}
+              onClick={refetchRandom}
+            >
+              Làm mới
+            </Button>
           </ButtonContainer>
         </Grid>
       </Grid>

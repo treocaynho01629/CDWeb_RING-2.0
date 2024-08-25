@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 import { useState, useRef, useEffect } from 'react';
-import { Stack } from '@mui/material';
-import axios from "../../api/axios";
-import CustomInput from '../custom/CustomInput';
-import CustomButton from '../custom/CustomButton';
+import { Stack, Button, TextField } from '@mui/material';
+import { useRegisterMutation } from '../../features/auth/authApiSlice';
+import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from '../../ultils/regex';
+import { Instruction } from '../custom/GlobalComponents';
+import CustomPasswordInput from '../custom/CustomPasswordInput';
 
 //#region styled
 const Title = styled.h1`
@@ -11,22 +12,9 @@ const Title = styled.h1`
     font-weight: 400;
     color: inherit;
 `
-
-const Instruction = styled.p`
-    font-size: 14px;
-    font-style: italic;
-    color: red;
-    display: ${props => props.display};;
-`
 //#endregion
 
-//Validate input
-const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
-const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%:]).{8,24}$/;
-const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-const REGISTER_URL = '/api/v1/auth/register';
-
-const RegisterTab = ({ setPending }) => {
+const RegisterTab = ({ pending, setPending }) => {
     const userRef = useRef();
     const errRef = useRef();
 
@@ -51,6 +39,9 @@ const RegisterTab = ({ setPending }) => {
     //Error and success message
     const [errMsg, setErrMsg] = useState('');
     const [err, setErr] = useState([]);
+
+    //Register mutation
+    const [register, { isLoading }] = useRegisterMutation();
 
     //Focus username
     useEffect(() => { userRef?.current?.focus() }, [])
@@ -83,6 +74,7 @@ const RegisterTab = ({ setPending }) => {
     //Register
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (pending) return;
 
         //Validation
         const v1 = USER_REGEX.test(username);
@@ -93,44 +85,46 @@ const RegisterTab = ({ setPending }) => {
             setErrMsg("Sai định dạng thông tin!");
             return;
         }
-        const { enqueueSnackbar } = await import('notistack');
         setPending(true);
 
-        try {
-            const response = await axios.post(REGISTER_URL,
-                JSON.stringify({ userName: username, pass: password, email }),
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
+        const { enqueueSnackbar } = await import('notistack');
+
+        register({
+            userName: username,
+            pass: password,
+            email
+        }).unwrap()
+            .then((data) => {
+                //Reset input
+                setUsername('');
+                setPassword('');
+                setMatchPass('');
+                setEmail('');
+                setErr([]);
+                setErrMsg('');
+
+                //Queue snack
+                enqueueSnackbar('Đăng ký thành công!', { variant: 'success' });
+                setPending(false);
+            })
+            .catch((err) => {
+                console.error(err);
+                setErr(err);
+                if (!err?.status) {
+                    setErrMsg('Server không phản hồi');
+                } else if (err?.status === 409) {
+                    setErrMsg(err?.data?.errors?.errorMessage);
+                } else if (err?.status === 400) {
+                    setErrMsg('Sai định dạng thông tin!');
+                } else {
+                    setErrMsg('Đăng ký thất bại!')
                 }
-            );
-
-            setUsername('');
-            setPassword('');
-            setMatchPass('');
-            setEmail('');
-            setErr([]);
-            setErrMsg('');
-            enqueueSnackbar('Đăng ký thành công!', { variant: 'success' });
-            setPending(false);
-        } catch (err) {
-
-            console.log(err);
-            setErr(err);
-            if (!err?.response) {
-                setErrMsg('Server không phản hồi');
-            } else if (err.response?.status === 409) {
-                setErrMsg(err.response?.data?.errors?.errorMessage);
-            } else if (err.response?.status === 400) {
-                setErrMsg('Sai định dạng thông tin!');
-            } else {
-                setErrMsg('Đăng ký thất bại!')
-            }
-            errRef.current.focus();
-            enqueueSnackbar('Đăng ký thất bại!', { variant: 'error' });
-            setPending(false);
-        }
+                errRef.current.focus();
+                setPending(false);
+            })
     }
+
+    const validRegister = [validName, validPass, validMatch, validEmail].every(Boolean);
 
     return (
         <>
@@ -138,11 +132,11 @@ const RegisterTab = ({ setPending }) => {
                 <Title>Đăng ký tài khoản mới</Title>
                 <Stack spacing={1} direction="column">
                     <Instruction ref={errRef}
-                        display={errMsg ? "block" : "none"}
+                        style={{ display: errMsg ? "block" : "none" }}
                         aria-live="assertive">
                         {errMsg}
                     </Instruction>
-                    <CustomInput
+                    <TextField
                         label="Tên đăng nhập"
                         type="text"
                         id="new-username"
@@ -153,12 +147,12 @@ const RegisterTab = ({ setPending }) => {
                         aria-invalid={validName ? "false" : "true"}
                         onFocus={() => setUserFocus(true)}
                         onBlur={() => setUserFocus(false)}
-                        error={(userFocus && username && !validName) || err?.response?.data?.errors?.userName}
-                        helperText={userFocus && username && !validName ? "4 đến 24 kí tự." : err?.response?.data?.errors?.userName}
+                        error={(userFocus && username && !validName) || err?.data?.errors?.userName}
+                        helperText={userFocus && username && !validName ? "4 đến 24 kí tự." : err?.data?.errors?.userName}
                         size="small"
                         margin="dense"
                     />
-                    <CustomInput
+                    <TextField
                         label='Địa chỉ email'
                         type="email"
                         id="email"
@@ -170,13 +164,12 @@ const RegisterTab = ({ setPending }) => {
                         aria-describedby="uidnote"
                         onFocus={() => setEmailFocus(true)}
                         onBlur={() => setEmailFocus(false)}
-                        error={(emailFocus && email && !validEmail) || err?.response?.data?.errors?.email}
-                        helperText={emailFocus && email && !validEmail ? "Sai định dạng email." : err?.response?.data?.errors?.email}
+                        error={(emailFocus && email && !validEmail) || err?.data?.errors?.email}
+                        helperText={emailFocus && email && !validEmail ? "Sai định dạng email." : err?.data?.errors?.email}
                         size="small"
                         margin="dense"
                     />
-                    <CustomInput
-                        typeToggle={true}
+                    <CustomPasswordInput
                         label='Mật khẩu'
                         onChange={(e) => setPassword(e.target.value)}
                         value={password}
@@ -184,37 +177,37 @@ const RegisterTab = ({ setPending }) => {
                         aria-describedby="new password"
                         onFocus={() => setPassFocus(true)}
                         onBlur={() => setPassFocus(false)}
-                        error={(password && !validPass) || err?.response?.data?.errors?.pass}
+                        error={(password && !validPass) || err?.data?.errors?.pass}
                         helperText={passFocus && password && !validPass ? "8 đến 24 kí tự. Phải bao gồm chữ in hoa và ký tự đặc biệt."
-                            : err?.response?.data?.errors?.pass}
+                            : err?.data?.errors?.pass}
                         size="small"
                         margin="dense"
                     />
-                    <CustomInput
-                        typeToggle={true}
+                    <CustomPasswordInput
                         label='Nhập lại mật khẩu'
                         onChange={(e) => setMatchPass(e.target.value)}
                         value={matchPass}
                         aria-invalid={validMatch ? "false" : "true"}
                         aria-describedby="confirm new password"
-                        error={(matchPass && !validMatch) || err?.response?.data?.errors?.pass}
+                        error={(matchPass && !validMatch) || err?.data?.errors?.pass}
                         helperText={matchPass && !validMatch ? "Không trùng mật khẩu."
-                            : err?.response?.data?.errors?.pass}
+                            : err?.data?.errors?.pass}
                         size="small"
                         margin="dense"
                     />
 
                     <br />
-                    <CustomButton
+                    <Button
                         variant="contained"
-                        color="secondary"
+                        color="primary"
                         size="large"
                         type="submit"
+                        aria-label="submit register"
                         sx={{ width: '50%' }}
-                        disabled={!validName || !validPass || !validMatch || !validEmail ? true : false}
+                        disabled={!validRegister || isLoading}
                     >
                         Đăng ký
-                    </CustomButton>
+                    </Button>
                 </Stack>
             </form>
         </>

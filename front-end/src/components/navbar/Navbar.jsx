@@ -1,81 +1,77 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { styled as muiStyled } from '@mui/system';
 import {
     Search as SearchIcon, ShoppingCart as ShoppingCartIcon, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
-    Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, NotificationsActive as NotificationsActiveIcon, Storefront
+    Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, NotificationsActive as NotificationsActiveIcon, Storefront,
+    Close,
 } from '@mui/icons-material';
-import { Stack, Badge, IconButton, Avatar, Tooltip, Box, Grid, TextField, AppBar, useScrollTrigger, Collapse } from '@mui/material';
-import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import PropTypes from 'prop-types';
+import { Stack, Badge, IconButton, Avatar, Box, Grid, TextField, AppBar, useTheme, useMediaQuery } from '@mui/material';
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ColorModeContext } from '../../ThemeContextProvider';
 import useLogout from "../../hooks/useLogout";
 import useAuth from "../../hooks/useAuth";
 import NavDrawer from './NavDrawer';
 import MiniCart from './MiniCart';
 import ProfilePopover from './ProfilePopover';
+import useCart from '../../hooks/useCart';
 
 //#region styled
-const Container = styled.div`
-    background-color: white;
-    border-bottom: 0.5px solid;
-    border-color: lightgray;
-    align-items: center;
-`
-
 const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 5px 20px;
     justify-content: space-between;
     align-items: center;
-    position: sticky;
-
-    @media (min-width: 768px) {
+    padding: 5px 10px;
+    
+    ${props => props.theme.breakpoints.up("sm_md")} {
+        padding: 5px 20px;
         width: 750px;
         margin-left: auto;
         margin-right: auto;
     }
-    @media (min-width: 992px) {
+
+    ${props => props.theme.breakpoints.up("md_lg")} {
         width: 970px;
     }
-    @media (min-width: 1200px) {
+
+    ${props => props.theme.breakpoints.up("lg")} {
         width: 1170px;
     }
 `
 
 const TopHeader = styled.div`
     padding: 0 30px;
-    background-color: #ebebeb;
-    color: #424242;
-    display: none;
+    background-color: ${props => props.theme.palette.divider};
     justify-content: space-between;
-    align-items: center;
     font-size: 15px;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    margin-bottom: -1px;
 
-    @media (min-width: 900px) {
-        display: flex
+    ${props => props.theme.breakpoints.down("md")} {
+        display: none;
     }
 `
 
 const ContactContainer = styled.div`
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: flex-start;
 
-    @media (min-width: 900px) {
-        justify-content: flex-start;
+    ${props => props.theme.breakpoints.down("md")} {
+        justify-content: center;
     }
 `
 
 const SocialContainer = styled.div`
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: flex-end;
 
-    @media (min-width: 900px) {
-        justify-content: flex-end;
+    ${props => props.theme.breakpoints.down("md")} {
+        justify-content: center;
     }
 `
 
@@ -91,12 +87,12 @@ const Contact = styled.p`
     align-items: center;
     text-align: center;
     justify-content: center;
-    color: #424242;
+    color: ${props => props.theme.palette.text.secondary};
 `
 
 const Social = styled.p`
+    color: ${props => props.theme.palette.text.secondary};
     background-color: 'transparent';
-    color: #424242;
     font-size: 14px;
     display: flex;
     flex-wrap: wrap;
@@ -118,59 +114,24 @@ const Left = styled.div`
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
 
-    @media (min-width: 900px) {
-        justify-content: flex-start;
+    ${props => props.theme.breakpoints.down("md")} {
+        justify-content: space-between;
     }
 `
 
 const Right = styled.div`
     flex: 1;
-    display: none;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: flex-end;
+    display: flex;
 
-    @media (min-width: 900px) {
-        justify-content: flex-end;
-        display: flex;
+    ${props => props.theme.breakpoints.down("md")} {
+        justify-content: space-evenly;
+        display: none;
     }
 `
-
-const SearchInput = styled(TextField)({
-    '& .MuiInputBase-root': {
-        borderRadius: 0,
-        transition: 'all .3s ease',
-    },
-    '& label.Mui-focused': {
-        color: '#A0AAB4',
-    },
-    '& .MuiInput-underline:after': {
-        borderBottomColor: '#B2BAC2',
-        background: 'transparent'
-    },
-    '& .MuiOutlinedInput-root': {
-        '& fieldset': {
-            borderColor: 'transparent',
-        },
-        '&:hover fieldset': {
-            color: 'inherit',
-            borderColor: '#B2BAC2',
-            transition: 'all .3s ease',
-        },
-        '&.Mui-focused fieldset': {
-            color: 'inherit',
-            borderColor: '#63e399',
-        },
-    },
-    '&.active': {
-        '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-                borderColor: '#B2BAC2',
-            },
-        }
-    }
-});
 
 const Logo = styled.h2`
     position: relative;
@@ -178,38 +139,33 @@ const Logo = styled.h2`
     font-size: 27px;
     text-transform: uppercase;
     font-weight: 500;
-    color: #63e399;
-    cursor: pointer;
+    color: ${props => props.theme.palette.primary.main};
     align-items: center;
     display: flex;
-    margin: 5px 0px 5px 0px;
-    width: 110px;
+    width: 251px;
+    margin: 5px 10px 5px 15px;
     white-space: nowrap;
     overflow: hidden;
-    transform: translateX(20px);
-    transition: all .3s ease;
+    transition: all .25s ease;
 
-    p { width: 0; }
+    p {
+        color: ${props => props.theme.palette.text.secondary};
+        margin: 0;
+    }
 
     &.active {
-        width: 0px;
-
-        @media (min-width: 600px) {
-            width: 110px;
+        width: 110px;
+        
+        ${props => props.theme.breakpoints.down("md")} {
+            width: 0px;
         }
     }
 
-    @media (min-width: 768px) {
-        width: 251px;
-        margin: 5px 0px 5px 15px;
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        margin: 5px 0px 5px 0px;
+        width: 110px;
 
-        p {
-            width: auto;
-        }
-    }
-
-    @media (min-width: 900px) {
-        transform: none;
+        p { width: 0; }
     }
 `
 
@@ -228,87 +184,85 @@ const NavItem = styled.div`
 `
 
 const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
+    borderRadius: 0,
+
     '&:hover': {
         backgroundColor: 'transparent',
-        color: theme.palette.secondary.main,
+        color: theme.palette.primary.main,
     },
 
-    '&:focus': {
-        outline: 'none',
-    },
+    '&.nav': {
+        display: 'flex',
+        width: '90px',
+        justifyContent: 'flex-start',
 
-    outline: 'none',
-    border: '0',
-    borderRadius: '0',
+        [theme.breakpoints.down('md_lg')]: {
+            justifyContent: 'center',
+            flexDirection: 'column',
+            width: '70px',
+            transform: 'translateY(-5px)',
+        }
+    },
 }));
 
-const Button = styled.button`
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    border-radius: 0;
-    padding: 0;
-    width: 40px;
-    height: 40px;
-    background-color: transparent;
-    color: gray;
-    outline: none;
-    border: none;
-    transition: all 0.25s ease;
-
-    &:hover {
-        transform: scaleY(1.1);
-        color: black,
-    }
-
-    &:focus {
-        outline: none;
-        border: none;
-    }
-
-    @media (min-width: 900px) {
-        display: none
+const IconText = styled.p`
+    font-size: 13px;
+    margin: 0;
+    margin-left: 5px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+	
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        height: 0;
     }
 `
+
+const StyledSearchForm = styled.form`
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    ${props => props.theme.breakpoints.down("md")} {
+        flex-direction: row-reverse;
+    }
+`
+
+const StyledSearchInput = muiStyled(TextField)(({ theme }) => ({
+    color: 'inherit',
+    [theme.breakpoints.down('sm')]: {
+        width: '100%',
+    },
+    '& .MuiInputBase-input': {
+        transition: theme.transitions.create('width'),
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+            width: '12ch',
+            '&:focus': {
+                width: '20ch',
+            },
+        },
+    },
+}));
 //#endregion
 
-//Hide top header bar onscroll
-function HideOnScroll(props) {
-    const { children, window } = props;
-
-    const trigger = useScrollTrigger({
-        target: window ? window() : undefined,
-    });
-
-    return (
-        <Collapse className={"top-header"} in={!trigger} sx={{ display: { xs: 'none', md: 'block' } }}>
-            {children}
-        </Collapse>
-    );
-}
-
-HideOnScroll.propTypes = {
-    children: PropTypes.element.isRequired,
-    window: PropTypes.func,
-};
-
-const Navbar = (props) => {
+const Navbar = () => {
     //#region construct
-    const products = useSelector(state => state.cart.products); //Products from redux carts
+    const { cartProducts, removeProduct } = useCart();
+    const location = useLocation();
+    const colorMode = useContext(ColorModeContext);
+    const theme = useTheme();
+    const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
 
     //Drawer open state
     const [openDrawer, setOpen] = useState(false);
 
     //Search field expand
-    const [hover, setHover] = useState(false);
-    const [delayHandler, setDelayHandler] = useState(null);
-    const [focus, setFocus] = useState(false);
     const [searchField, setSearchField] = useState('');
+    const [focus, setFocus] = useState(false);
+    const [toggle, setToggle] = useState(searchField !== '');
 
     //Other
-    const { auth } = useAuth();
+    const { username, roles } = useAuth();
     const navigate = useNavigate();
     const logout = useLogout();
 
@@ -318,200 +272,189 @@ const Navbar = (props) => {
     const open = Boolean(anchorEl);
     const openCart = Boolean(anchorElCart);
 
-    const handlePopoverOpen = (event) => {
+    const hanldeCartPopover = (event) => {
         setAnchorElCart(event.currentTarget);
     };
 
-    const handlePopoverClose = () => {
+    const handleCartClose = () => {
         setAnchorElCart(null);
     };
 
-    const handleClick = (event) => {
+    const handleProfilePopover = (event) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleClose = () => {
+    const handleProfileClose = () => {
         setAnchorEl(null);
     };
-
-    //Logout
-    const signOut = async () => {
-        await logout();
-        const { enqueueSnackbar } = await import('notistack');
-        navigate('/');
-        enqueueSnackbar('Đã đăng xuất!', { variant: 'error' });
-    }
 
     //Toggle drawer open state
     const toggleDrawer = (open) => (e) => {
         setOpen(open)
     };
 
+    const toggleSearch = () => {
+        setToggle(prev => !prev);
+    }
+
     //Confirm search
     const handleSubmitSearch = (e) => {
         e.preventDefault();
         navigate(`/filters?keyword=${searchField}`);
-        setSearchField('');
-    }
-
-    //Hover search field
-    const handleMouseEnter = (e) => {
-        setDelayHandler(setTimeout(() => {
-            setHover(true)
-        }, 250))
-    }
-
-    //Leave search field
-    const handlOnMouseLeave = () => {
-        setHover(false);
-        clearTimeout(delayHandler);
     }
     //#endregion
 
+    const isToggleSearch = (focus || toggle);
+
     return (
-        <Container>
-            <AppBar sx={{ backgroundColor: 'white' }} position="fixed">
-                <Stack>
-                    <HideOnScroll {...props}>
-                        <TopHeader>
-                            <Grid container>
-                                <Grid item xs={12} md={6}>
-                                    <ContactContainer>
-                                        <Contact><PhoneIcon sx={{ fontSize: 18, marginRight: 1 }} />+8419130248</Contact>
-                                        <Contact><MailIcon sx={{ fontSize: 18, marginRight: 1 }} />haductrong01629@gmail.com</Contact>
-                                    </ContactContainer>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <SocialContainer>
-                                        <Social color="3B5999"><FacebookIcon sx={{ fontSize: 18 }} /></Social>
-                                        <Social color="FF0000"><YouTubeIcon sx={{ fontSize: 18 }} /></Social>
-                                        <Social color="E4405F"><InstagramIcon sx={{ fontSize: 18 }} /></Social>
-                                        <Social color="55ACEE"><TwitterIcon sx={{ fontSize: 18 }} /></Social>
-                                    </SocialContainer>
-                                </Grid>
-                            </Grid>
-                        </TopHeader>
-                    </HideOnScroll>
-                    <Wrapper>
-                        <Grid container>
-                            <Grid item xs={12} md={6.5} sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Left>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Button onClick={toggleDrawer(true)}><MenuIcon sx={{ fontSize: 26 }} /></Button>
-                                        <NavDrawer {...{ openDrawer, toggleDrawer, auth, products, navigate, signOut, ImageLogo, Button }} />
-                                    </Box>
-                                    <Link to={`/`}>
-                                        <Logo className={searchField || hover || focus ? 'active' : ''}>
-                                            <ImageLogo src="/bell.svg" className="logo" alt="RING! Logo" />RING!&nbsp; <p style={{ color: '#424242', margin: 0 }}>- BOOKSTORE</p>
-                                        </Logo>
-                                    </Link>
-                                    <Box sx={{ display: 'flex' }} flexDirection={{ xs: 'row-reverse', md: 'row' }}>
-                                        <Tooltip title="Duyệt cửa hàng">
-                                            <StyledIconButton aria-label="explore"
-                                                onClick={() => navigate('/filters')}
-                                                sx={{
-                                                    marginLeft: 2,
-                                                    marginRight: 0,
-                                                    zIndex: 10,
-                                                }}>
-                                                <Storefront sx={{ fontSize: '26px' }} />
-                                            </StyledIconButton>
-                                        </Tooltip>
+        <>
+            <TopHeader>
+                <Grid container>
+                    <Grid item xs={12} md={6}>
+                        <ContactContainer>
+                            <Contact><PhoneIcon sx={{ fontSize: 18, marginRight: 1 }} />+8419130248</Contact>
+                            <Contact><MailIcon sx={{ fontSize: 18, marginRight: 1 }} />haductrong01629@gmail.com</Contact>
+                        </ContactContainer>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <SocialContainer>
+                            <Social color="3B5999"><FacebookIcon sx={{ fontSize: 18 }} /></Social>
+                            <Social color="FF0000"><YouTubeIcon sx={{ fontSize: 18 }} /></Social>
+                            <Social color="E4405F"><InstagramIcon sx={{ fontSize: 18 }} /></Social>
+                            <Social color="55ACEE"><TwitterIcon sx={{ fontSize: 18 }} /></Social>
+                        </SocialContainer>
+                    </Grid>
+                </Grid>
+            </TopHeader>
+            <AppBar sx={{ backgroundColor: 'background.default', marginBottom: 2 }} position="sticky">
+                <Wrapper>
+                    <Grid container>
+                        <Grid item xs={12} md={6.5} sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Left>
+                                {mobileMode &&
+                                    <>
                                         <Box
-                                            sx={{ display: 'flex', alignItems: 'center', marginLeft: '-40' }}
+                                            display={isToggleSearch ? 'none' : 'flex'}
+                                            flex={1}
+                                            alignItems={'center'}
                                         >
-                                            <Collapse
-                                                orientation="horizontal"
-                                                timeout={300}
-                                                easing={'ease'}
-                                                in={searchField || hover || focus}
-                                                collapsedSize={40}
-                                            >
-                                                <form onSubmit={handleSubmitSearch}>
-                                                    <SearchInput
-                                                        className={searchField ? 'active' : ''}
-                                                        placeholder='Tìm kiếm... '
-                                                        onMouseEnter={handleMouseEnter}
-                                                        onMouseLeave={handlOnMouseLeave}
-                                                        onFocus={() => setFocus(true)}
-                                                        onBlur={() => setFocus(false)}
-                                                        onChange={(e) => setSearchField(e.target.value)}
-                                                        value={searchField}
-                                                        id="search"
-                                                        size="small"
-                                                        width={50}
-                                                        InputProps={{
-                                                            endAdornment: <SearchIcon style={{ color: "gray" }} />
-                                                        }}
-                                                    />
-                                                </form>
-                                            </Collapse>
+                                            <IconButton onClick={toggleDrawer(true)}>
+                                                <MenuIcon sx={{ fontSize: 26 }} />
+                                            </IconButton>
                                         </Box>
-                                    </Box>
-                                </Left>
-                            </Grid>
-                            <Grid item xs={12} md={5.5}>
+                                        <NavDrawer {...{
+                                            openDrawer, setOpen, toggleDrawer, username, roles, location,
+                                            products: cartProducts, navigate, logout, ImageLogo, theme, colorMode
+                                        }} />
+                                    </>
+                                }
+                                <Link to={`/`}>
+                                    <Logo className={isToggleSearch ? 'active' : ''}>
+                                        <ImageLogo src="/bell.svg" className="logo" alt="RING! Logo" />RING!&nbsp; <p>- BOOKSTORE</p>
+                                    </Logo>
+                                </Link>
+                                <Box
+                                    display={'flex'}
+                                    alignItems={'center'}
+                                    flex={1}
+                                    justifyContent={isToggleSearch ? { xs: 'space-between', md: 'flex-start' } : 'flex-start'}
+                                    flexDirection={{ xs: 'row-reverse', md: 'row' }}
+                                >
+                                    <Link to={'/filters'} title="Duyệt cửa hàng">
+                                        <StyledIconButton aria-label="explore">
+                                            <Storefront sx={{ fontSize: '26px' }} />
+                                        </StyledIconButton>
+                                    </Link>
+                                    <StyledSearchForm onSubmit={handleSubmitSearch}>
+                                        {isToggleSearch &&
+                                            <StyledSearchInput
+                                                placeholder='Tìm kiếm... '
+                                                autoFocus
+                                                autoComplete="search"
+                                                onFocus={() => setFocus(true)}
+                                                onBlur={() => setFocus(false)}
+                                                onChange={(e) => setSearchField(e.target.value)}
+                                                value={searchField}
+                                                id="search"
+                                                size="small"
+                                                InputProps={{ startAdornment: <SearchIcon sx={{ marginRight: 1 }} /> }}
+                                            />
+                                        }
+                                        <StyledIconButton aria-label="search toggle" onClick={() => toggleSearch()}>
+                                            {isToggleSearch ? <Close sx={{ fontSize: '26px' }} /> : <SearchIcon sx={{ fontSize: '26px' }} />}
+                                        </StyledIconButton>
+                                    </StyledSearchForm>
+                                </Box>
+                            </Left>
+                        </Grid>
+                        {!mobileMode &&
+                            <Grid item xs={12} md={5.5} sx={{ display: { xs: 'none', md: 'flex' } }}>
                                 <Right>
                                     <NavItem>
-                                        <Stack spacing={1} direction="row" sx={{ color: 'action.active' }}>
-                                            <StyledIconButton aria-label="notification">
+                                        <Stack spacing={1} direction="row" sx={{ color: 'action.active' }} alignItems={'center'}>
+                                            <StyledIconButton className="nav" aria-label="notification">
                                                 <Badge badgeContent={0} anchorOrigin={{
                                                     vertical: 'top',
-                                                    horizontal: 'left',
+                                                    horizontal: 'right',
                                                 }}>
                                                     <NotificationsActiveIcon />
                                                 </Badge>
-                                                <p style={{ fontSize: '13px', marginLeft: '5px' }}>Thông báo</p>
+                                                <IconText>Thông báo</IconText>
                                             </StyledIconButton>
-                                            <Link to={`/cart`}>
-                                                <StyledIconButton
-                                                    aria-label="cart"
-                                                    aria-owns={openCart ? "mouse-over-popover" : undefined}
-                                                    aria-haspopup="true"
-                                                    onMouseEnter={handlePopoverOpen}
-                                                    onMouseLeave={handlePopoverClose}>
-                                                    <Badge color="secondary" badgeContent={products?.length} anchorOrigin={{
-                                                        vertical: 'top',
-                                                        horizontal: 'left',
-                                                    }}>
-                                                        <ShoppingCartIcon />
-                                                    </Badge>
-                                                    <p style={{ fontSize: '13px', marginLeft: '5px' }}>Giỏ hàng</p>
-                                                    <MiniCart {...{ openCart, anchorElCart, handlePopoverClose, products }} />
-                                                </StyledIconButton>
-                                            </Link>
-                                            {auth.userName ? (
-                                                <Tooltip title="Tài khoản">
-                                                    <StyledIconButton
-                                                        onClick={handleClick}
-                                                        size="small"
-                                                        sx={{ ml: 2 }}
-                                                        aria-controls={open ? 'account-menu' : undefined}
-                                                        aria-haspopup="true"
-                                                        aria-expanded={open ? 'true' : undefined}
-                                                    >
-                                                        <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
-                                                        <p style={{ fontSize: '13px', marginLeft: '5px' }}>{auth?.userName}</p>
+                                            <div
+                                                aria-owns={openCart ? "mouse-over-popover" : undefined}
+                                                aria-haspopup="true"
+                                                onMouseEnter={hanldeCartPopover}
+                                                onMouseLeave={handleCartClose}
+                                            >
+                                                <Link to={'/cart'} title="Giỏ hàng">
+                                                    <StyledIconButton className="nav" aria-label="cart">
+                                                        <Badge color="primary" badgeContent={cartProducts?.length} anchorOrigin={{
+                                                            vertical: 'top',
+                                                            horizontal: 'right',
+                                                        }}>
+                                                            <ShoppingCartIcon />
+                                                        </Badge>
+                                                        <IconText>Giỏ hàng</IconText>
                                                     </StyledIconButton>
-                                                </Tooltip>
+                                                </Link>
+                                                <MiniCart {...{ removeProduct, openCart, anchorElCart, handleClose: handleCartClose, products: cartProducts }} />
+                                            </div>
+                                            {username ? (
+                                                <div
+                                                    aria-owns={open ? "mouse-over-popover" : undefined}
+                                                    aria-haspopup="true"
+                                                    onMouseEnter={handleProfilePopover}
+                                                    onMouseLeave={handleProfileClose}
+                                                >
+                                                    <Link to={'/profile/detail'} title="Tài khoản">
+                                                        <StyledIconButton className="nav" aria-label="profile">
+                                                            <Avatar sx={{ width: 24, height: 24, fontSize: '16px' }}>{username?.charAt(0) ?? 'P'}</Avatar>
+                                                            <IconText className="username">{username}</IconText>
+                                                        </StyledIconButton>
+                                                    </Link>
+                                                    <ProfilePopover {...{
+                                                        open, anchorEl, handleClose: handleProfileClose,
+                                                        navigate, roles, logout, theme, colorMode
+                                                    }} />
+                                                </div>
                                             ) : (
-                                                <Link to={`/login`}>
-                                                    <StyledIconButton aria-label="login">
+                                                <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">
+                                                    <StyledIconButton className="nav" aria-label="login">
                                                         <LockIcon />
-                                                        <p style={{ fontSize: '13px', marginLeft: '5px' }}>Đăng nhập</p>
+                                                        <IconText className="username">Đăng nhập</IconText>
                                                     </StyledIconButton>
                                                 </Link>
                                             )}
                                         </Stack>
-                                        <ProfilePopover {...{ open, anchorEl, handleClose, navigate, auth, signOut }} />
                                     </NavItem>
                                 </Right>
                             </Grid>
-                        </Grid>
-                    </Wrapper>
-                </Stack>
+                        }
+                    </Grid>
+                </Wrapper>
             </AppBar>
-        </Container>
+        </>
     )
 }
 

@@ -1,12 +1,14 @@
 import styled, { keyframes } from 'styled-components'
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useLocation } from 'react-router-dom';
+import { Button } from '@mui/material';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 import LoginTab from '../components/authorize/LoginTab';
 import RegisterTab from '../components/authorize/RegisterTab';
-import CustomButton from '../components/custom/CustomButton';
+import useAuth from '../hooks/useAuth';
+import useTitle from '../hooks/useTitle';
 
-const PendingIndicator = lazy(() => import('../components/authorize/PendingIndicator'));
+const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
 
 //#region styled
 const fadeIn = keyframes`
@@ -58,7 +60,7 @@ const Wrapper = styled.div`
 
 const TabContainer = styled.div`
     justify-content: center;
-    flex-grow: 3;
+    flex-grow: 20;
     display: none;
 
     &.active {
@@ -84,8 +86,8 @@ const SignDivider = styled.button`
     text-align: center;
     justify-content: center;
     align-items: center;
-    background-color: #63e399;
-    color: white;
+    background-color: ${props => props.theme.palette.primary.main};
+    color: ${props => props.theme.palette.primary.contrastText};
     border-radius: 0;
     border-radius: 50px;
     width: 60px;
@@ -100,14 +102,12 @@ const SignDivider = styled.button`
 
 function SignPage() {
     const location = useLocation();
+    const { persist } = useAuth(); //Is user logged in
     const [isLogin, setIsLogin] = useState(location.pathname === '/login');
     const [pending, setPending] = useState(false);
 
-    //Update title
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        document.title = `RING! - Chào mừng`;
-    }, [])
+    //Set title
+    useTitle('RING! - Chào mừng');
 
     //Update tab
     useEffect(() => {
@@ -119,29 +119,34 @@ function SignPage() {
     return (
         <Container>
             <SimpleNavbar />
-            {pending ?
+            {(pending) ?
                 <Suspense fallBack={<></>}>
-                    <PendingIndicator open={pending} message="Đang gửi yêu cầu..."/>
+                    <PendingIndicator open={pending} message="Đang gửi yêu cầu..." />
                 </Suspense>
                 : null
             }
             <Wrapper className={`${isLogin ? 'login' : 'signup'}`}>
-                <TabContainer className={`${isLogin ? 'active' : ''}`}>
-                    <LoginTab {...{ setPending }} />
-                </TabContainer>
-                <DividerContainer>
-                    <SignDivider onClick={toggleTab}>HOẶC</SignDivider>
-                    <CustomButton
-                        sx={{ display: { xs: 'block', md: 'none' } }}
-                        variant="outlined"
-                        color="secondary"
-                        onClick={toggleTab}
-                    >
-                        {isLogin ? 'CHƯA CÓ TÀI KHOẢN?' : 'ĐÃ CÓ TÀI KHOẢN?'}
-                    </CustomButton>
-                </DividerContainer>
+                {!persist
+                    &&
+                    <>
+                        <TabContainer className={`${isLogin ? 'active' : ''}`}>
+                            <LoginTab {...{ pending, setPending }} />
+                        </TabContainer>
+                        <DividerContainer>
+                            <SignDivider onClick={toggleTab}>HOẶC</SignDivider>
+                            <Button
+                                sx={{ display: { xs: 'block', md: 'none' } }}
+                                variant="outlined"
+                                color="primary"
+                                onClick={toggleTab}
+                            >
+                                {isLogin ? 'CHƯA CÓ TÀI KHOẢN?' : 'ĐÃ CÓ TÀI KHOẢN?'}
+                            </Button>
+                        </DividerContainer>
+                    </>
+                }
                 <TabContainer className={`${isLogin ? '' : 'active'}`}>
-                    <RegisterTab {...{ setPending }} />
+                    <RegisterTab {...{ pending, setPending }} />
                 </TabContainer>
             </Wrapper>
         </Container>

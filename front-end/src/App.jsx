@@ -1,120 +1,94 @@
-import { lazy, Suspense } from 'react'
 import './App.css';
-
-import Layout from './components/authorize/Layout';
+import { lazy, Suspense } from 'react'
+import { Routes, Route } from 'react-router-dom';
+import { Loader } from './components/layout/Loadable';
+import useReachable from './hooks/useReachable';
+import Loadable from './components/layout/Loadable';
+import Layout from './components/layout/Layout';
+import PageLayout from './components/layout/PageLayout';
 import RequireAuth from './components/authorize/RequireAuth';
 import PersistLogin from './components/authorize/PersistsLogin';
-import Loadable from './components/authorize/Loadable';
-import Loader from './components/authorize/Loadable';
-
-const PageLayout = lazy(() => import('./components/PageLayout'));
-const DashboardLayout = lazy(() => import('./components/dashboard/DashboardLayout'));
-
-const Home = Loadable(lazy(() => import('./pages/Home')));
-const FiltersPage = Loadable(lazy(() => import('./pages/FiltersPage')));
-const ProductDetail = Loadable(lazy(() => import('./pages/ProductDetail')));
-
-const Cart = Loadable(lazy(() => import('./pages/Cart')));
-const SignPage = Loadable(lazy(() => import('./pages/SignPage')));
-const ResetPage = Loadable(lazy(() => import('./pages/ResetPage')));
-const Unauthorized = Loadable(lazy(() => import('./pages/error/Unauthorized')));
+import ScrollToTop from './components/layout/ScrollToTop.jsx';
 
 const Missing = Loadable(lazy(() => import('./pages/error/Missing')));
+const Unauthorized = Loadable(lazy(() => import('./pages/error/Unauthorized')));
+const FiltersPage = Loadable(lazy(() => import('./pages/FiltersPage')));
+const ProductDetail = Loadable(lazy(() => import('./pages/ProductDetail')));
+const Cart = Loadable(lazy(() => import('./pages/Cart')));
+const Home = Loadable(lazy(() => import('./pages/Home')));
+const SignPage = Loadable(lazy(() => import('./pages/SignPage')));
+
+const ProfileLayout = Loadable(lazy(() => import('./components/layout/ProfileLayout')));
+const ResetPage = Loadable(lazy(() => import('./pages/ResetPage')));
 const Checkout = Loadable(lazy(() => import('./pages/Checkout')));
 const Profile = Loadable(lazy(() => import('./pages/Profile')));
+const Orders = Loadable(lazy(() => import('./pages/Orders')));
 
-const ManageBooks = Loadable(lazy(() => import('./pages/dashboard/ManageBooks')));
-const ManageAccounts = Loadable(lazy(() => import('./pages/dashboard/ManageAccounts')));
-const ManageReceipts = Loadable(lazy(() => import('./pages/dashboard/ManageReceipts')));
+const DashboardLayout = lazy(() => import('./components/dashboard/DashboardLayout'));
+const ManageProducts = Loadable(lazy(() => import('./pages/dashboard/ManageProducts')));
+const ManageUsers = Loadable(lazy(() => import('./pages/dashboard/ManageUsers')));
+const ManageOrders = Loadable(lazy(() => import('./pages/dashboard/ManageOrders')));
 const ManageReviews = Loadable(lazy(() => import('./pages/dashboard/ManageReviews')));
 const DetailProduct = Loadable(lazy(() => import('./pages/dashboard/DetailProduct.jsx')));
 const DetailAccount = Loadable(lazy(() => import('./pages/dashboard/DetailAccount.jsx')));
 const Dashboard = Loadable(lazy(() => import('./pages/dashboard/Dashboard')));
 
-import { Routes, Route } from 'react-router-dom';
-import { createTheme, ThemeProvider } from '@mui/material';
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#424242",
-      contrastText: "#ffffffb3",
-    },
-    secondary: {
-      main: "#63e399",
-      contrastText: "#ffffff",
-    },
-    error: {
-      main: "#e66161"
-    }
-  },
-  shape: {
-    borderRadius: 0,
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          display: 'flex',
-          alignItems: 'center',
-          textTransform: 'none',
-        },
-      },
-    }
-  },
-});
-
 function App() {
+  useReachable(); //Test connection to server
+
   return (
-    <ThemeProvider theme={theme}>
-      <Suspense fallback={<Loader />}>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-          //PUBLIC
-            <Route path="/login" element={<SignPage />} />
-            <Route path="/signup" element={<SignPage />} />
-            <Route path="/reset-password" element={<ResetPage />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
+    <Suspense fallback={<Loader />}>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+            //PUBLIC
+          <Route path="/login" element={<SignPage />} />
+          <Route path="/signup" element={<SignPage />} />
+          <Route path="/reset-password" element={<ResetPage />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
 
-          //MISSING
-            <Route path="*" element={<Missing />} />
+            //MISSING
+          <Route path="*" element={<Missing />} />
 
-            <Route element={<PersistLogin />}>
-              <Route element={<PageLayout />}>
-              //ANONYMOUS
-                <Route path="/" element={<Home />} />
-                <Route path="/filters" element={<FiltersPage />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
+          <Route element={<PersistLogin />}>
+            <Route element={<PageLayout />}>
+                //ANONYMOUS
+              <Route path="/" element={<Home />} />
+              <Route path="/filters" element={<FiltersPage />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
 
-              //USER
-                <Route element={<RequireAuth allowedRoles={['ROLE_USER']} />}>
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/profile/:tab" element={<Profile />} />
-                </Route>
-              </Route>
+                //USER
+              <Route element={<RequireAuth allowedRoles={['ROLE_USER']} />}>
+                <Route path="/checkout" element={<Checkout />} />
 
-              <Route element={<DashboardLayout />}>
-              //SELLER
-                <Route element={<RequireAuth allowedRoles={['ROLE_SELLER']} />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/manage-books" element={<ManageBooks />} />
-                  <Route path="/manage-receipts" element={<ManageReceipts />} />
-                  <Route path="/detail/:id" element={<DetailProduct />} />
-                </Route>
-
-              //ADMIN
-                <Route element={<RequireAuth allowedRoles={['ROLE_ADMIN']} />}>
-                  <Route path="/manage-accounts" element={<ManageAccounts />} />
-                  <Route path="/manage-reviews" element={<ManageReviews />} />
-                  <Route path="/user/:id" element={<DetailAccount />} />
+                <Route element={<ProfileLayout />}>
+                  <Route path="/profile/detail/:tab?" element={<Profile />} />
+                  <Route path="/profile/orders/:id?" element={<Orders />} />
                 </Route>
               </Route>
             </Route>
+
+            <Route element={<DashboardLayout />}>
+                //SELLER
+              <Route element={<RequireAuth allowedRoles={['ROLE_SELLER']} />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/manage-products" element={<ManageProducts />} />
+                <Route path="/manage-orders" element={<ManageOrders />} />
+                <Route path="/detail/:id" element={<DetailProduct />} />
+                <Route path="/user/:id" element={<DetailAccount />} />
+              </Route>
+
+                //ADMIN
+              <Route element={<RequireAuth allowedRoles={['ROLE_ADMIN']} />}>
+                <Route path="/manage-users" element={<ManageUsers />} />
+                <Route path="/manage-reviews" element={<ManageReviews />} />
+              </Route>
+            </Route>
           </Route>
-        </Routes>
-      </Suspense>
-    </ThemeProvider>
+        </Route>
+      </Routes>
+    </Suspense>
   )
 }
 
