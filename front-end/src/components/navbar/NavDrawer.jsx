@@ -1,15 +1,13 @@
-import styled from 'styled-components';
+import { styled } from '@mui/system';
 import {
-    ShoppingCart as ShoppingCartIcon, DeliveryDining as DeliveryDiningIcon, Lock as LockIcon,
-    Logout, Speed as SpeedIcon, NotificationsActive as NotificationsActiveIcon, Storefront, KeyboardArrowLeft,
-    Brightness3,
-    Brightness7
+    ShoppingCart, DeliveryDining as DeliveryDiningIcon, Lock as LockIcon, Logout, Speed as SpeedIcon, Notifications,
+    Storefront, KeyboardArrowLeft, Brightness3, Brightness7
 } from '@mui/icons-material';
-import { Avatar, ListItemIcon, Divider, Box, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText, Grid, IconButton } from '@mui/material';
+import { Avatar, ListItemIcon, Divider, Box, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 //#region styled
-const DrawerLogo = styled.h2`
+const DrawerLogo = styled('h2')`
     position: relative;
     font-family: abel;
     text-transform: uppercase;
@@ -30,113 +28,117 @@ const DrawerLogo = styled.h2`
         margin: 5px 5px 5px -5px;
     }
 `
+
+const DrawerContainer = styled(Box)(({ theme }) => `
+    padding-left: ${theme.spacing(1.5)};
+    padding-right: ${theme.spacing(1.5)};
+    width: auto;    
+
+    @media (min-width: 450px) {
+        width: 400px;
+    }
+`)
 //#endregion
 
-const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, roles, products, navigate, logout, ImageLogo, theme, colorMode }) => {
+const NavDrawer = ({ location, openDrawer, setOpen, username, roles, products,
+    logout, ImageLogo, theme, colorMode }) => {
     const role = roles?.length;
+
+    const handleOpen = () => { setOpen(true) }
+    const handleClose = () => { setOpen(false) }
 
     return (
         <SwipeableDrawer
             anchor='left'
             open={openDrawer}
-            onOpen={toggleDrawer(true)}
-            onClose={toggleDrawer(false)}
+            onOpen={handleOpen}
+            onClose={handleClose}
             disableSwipeToOpen={false}
-            ModalProps={{
-                keepMounted: true,
-            }}
+            ModalProps={{ keepMounted: true }}
         >
-            <Box
-                sx={{
-                    width: 'auto',
-                    ["@media (min-width:450px)"]: { width: 400 }
-                }}
-            >
-                <Box sx={{ marginY: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Link to={`/`} onClick={toggleDrawer(false)} style={{ paddingLeft: '20px' }}>
+            <DrawerContainer>
+                <Box sx={{ marginY: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Link to={`/`} onClick={handleClose}>
                         <DrawerLogo>
                             <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p>- BOOKSTORE</p>
                         </DrawerLogo>
                     </Link>
-                    <IconButton sx={{ marginRight: '15px' }} onClick={toggleDrawer(false)}><KeyboardArrowLeft sx={{ fontSize: 26 }} /></IconButton>
+                    <IconButton onClick={handleClose}><KeyboardArrowLeft sx={{ fontSize: 26 }} /></IconButton>
                 </Box>
                 <Divider />
-                <List sx={{ marginLeft: '15px' }}>
-                    <ListItem disablePadding onClick={() => {
-                        navigate('/filters')
-                        setOpen(false)
-                    }}>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <Storefront />
-                            </ListItemIcon>
-                            <ListItemText primary="Cửa hàng" />
-                        </ListItemButton>
-                    </ListItem>
+                <List>
+                    <Link to={'/filters'}>
+                        <ListItem disablePadding onClick={handleClose}>
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <Storefront />
+                                </ListItemIcon>
+                                <ListItemText primary="Cửa hàng" />
+                            </ListItemButton>
+                        </ListItem>
+                    </Link>
                 </List>
                 <Divider />
-                <List sx={{ marginLeft: '15px' }}>
-                    <ListItem disablePadding onClick={toggleDrawer(false)}>
+                <List>
+                    <ListItem disablePadding onClick={handleClose}>
                         <ListItemButton>
                             <ListItemIcon>
-                                <NotificationsActiveIcon />
+                                <Notifications />
                             </ListItemIcon>
                             <ListItemText primary="Thông báo" />
                         </ListItemButton>
                     </ListItem>
-
-                    <ListItem disablePadding onClick={() => {
-                        navigate('/cart')
-                        setOpen(false)
-                    }}>
-                        <ListItemButton >
-                            <ListItemIcon>
-                                <ShoppingCartIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={`Giỏ hàng (${products?.length} sản phẩm)`} />
-                        </ListItemButton>
-                    </ListItem>
+                    <Link to={'/cart'}>
+                        <ListItem disablePadding onClick={handleClose}>
+                            <ListItemButton >
+                                <ListItemIcon>
+                                    <ShoppingCart />
+                                </ListItemIcon>
+                                <ListItemText primary={`Giỏ hàng (${products?.length} sản phẩm)`} />
+                            </ListItemButton>
+                        </ListItem>
+                    </Link>
                 </List>
                 <Divider />
                 {username
                     ?
-                    <Grid>
-                        <List sx={{ marginLeft: '15px' }}>
+                    <Box>
+                        <List>
                             <ListItem disablePadding>
-                                <ListItemButton onClick={() => {
-                                    navigate('/profile/detail')
-                                    setOpen(false)
-                                }}>
-                                    <ListItemIcon>
-                                        <Avatar />
-                                    </ListItemIcon>
-                                    <ListItemText primary={username} />
-                                </ListItemButton>
+                                <Link to={'/profile/detail'}>
+                                    <ListItemButton onClick={handleClose}>
+                                        <ListItemIcon>
+                                            <Avatar />
+                                        </ListItemIcon>
+                                        <ListItemText primary={username} />
+                                    </ListItemButton>
+                                </Link>
                             </ListItem>
 
                             <ListItem disablePadding>
-                                <ListItemButton onClick={() => {
-                                    navigate('/profile/orders')
-                                    setOpen(false)
-                                }}>
-                                    <ListItemIcon>
-                                        <DeliveryDiningIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Đơn giao" />
-                                </ListItemButton>
+                                <Link to={'/profile/orders'}>
+                                    <ListItemButton onClick={handleClose}>
+                                        <ListItemIcon>
+                                            <DeliveryDiningIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Đơn giao" />
+                                    </ListItemButton>
+                                </Link>
                             </ListItem>
                         </List>
                         <Divider />
-                        <List sx={{ marginLeft: '15px' }}>
+                        <List>
                             {role >= 2 && (
-                                <ListItem disablePadding onClick={() => navigate('/dashboard')}>
-                                    <ListItemButton>
-                                        <ListItemIcon>
-                                            <SpeedIcon />
-                                        </ListItemIcon>
-                                        <ListItemText primary="Dashboard" />
-                                    </ListItemButton>
-                                </ListItem>
+                                <Link to={'/dashboard'}>
+                                    <ListItem disablePadding onClick={handleClose}>
+                                        <ListItemButton>
+                                            <ListItemIcon>
+                                                <SpeedIcon />
+                                            </ListItemIcon>
+                                            <ListItemText primary="Dashboard" />
+                                        </ListItemButton>
+                                    </ListItem>
+                                </Link>
                             )}
                             <ListItem disablePadding>
                                 <ListItemButton onClick={colorMode.toggleColorMode}>
@@ -155,20 +157,22 @@ const NavDrawer = ({ location, openDrawer, setOpen, toggleDrawer, username, role
                                 </ListItemButton>
                             </ListItem>
                         </List>
-                    </Grid>
+                    </Box>
                     :
-                    <List sx={{ marginLeft: '15px' }}>
-                        <ListItem disablePadding onClick={() => navigate('/login', { state: { from: location }, replace: true })}>
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    <LockIcon />
-                                </ListItemIcon>
-                                <ListItemText primary="Đăng nhập" />
-                            </ListItemButton>
-                        </ListItem>
+                    <List>
+                        <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">
+                            <ListItem disablePadding onClick={handleClose}>
+                                <ListItemButton>
+                                    <ListItemIcon>
+                                        <LockIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Đăng nhập" />
+                                </ListItemButton>
+                            </ListItem>
+                        </Link>
                     </List>
                 }
-            </Box>
+            </DrawerContainer>
         </SwipeableDrawer >
     )
 }

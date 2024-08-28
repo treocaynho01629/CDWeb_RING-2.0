@@ -28,27 +28,6 @@ const InputContainer = styled.div`
     justify-content: space-between;
     align-items: center;
 `
-
-const PriceInputContainer = styled.div`
-    width: 90px;
-    border: 0.5px solid lightgray;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-`
-
-const PriceInput = styled.input`
-    height: 45px;
-    width: 100%;
-    padding-left: 10px;
-    background: transparent;
-    color: black;
-    resize: none;
-    outline: none;
-    border: none;
-    display: flex;
-    flex: 1;
-`
 //#endregion
 
 const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, setCateId }) => {

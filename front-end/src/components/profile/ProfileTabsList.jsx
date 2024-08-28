@@ -99,7 +99,7 @@ const ProfileTabsList = () => {
                 }} />
                 <Box>
                     <Username>{username}</Username>
-                    <NavLink to={'/profile/detail'} style={{ color: 'inherit' }}>
+                    <NavLink to={'/profile/detail'}>
                         <ChangeText><EditIcon />Sửa hồ sơ</ChangeText>
                     </NavLink>
                 </Box>
@@ -112,7 +112,7 @@ const ProfileTabsList = () => {
                 </StyledListItemButton>
                 <Collapse in={open} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                        <NavLink to={'/profile/detail'} end style={{ color: 'inherit' }}>
+                        <NavLink to={'/profile/detail'} end>
                             {({ isActive }) => (
                                 <StyledListItemButton selected={isActive} className="secondary">
                                     <ItemText>Hồ sơ</ItemText>
@@ -121,7 +121,7 @@ const ProfileTabsList = () => {
                         </NavLink>
                     </List>
                     <List component="div" disablePadding>
-                        <NavLink to={'/profile/detail/address'} end style={{ color: 'inherit' }}>
+                        <NavLink to={'/profile/detail/address'} end>
                             {({ isActive }) => (
                                 <StyledListItemButton selected={isActive}className="secondary" >
                                     <ItemText>Địa chỉ</ItemText>
@@ -130,7 +130,7 @@ const ProfileTabsList = () => {
                         </NavLink>
                     </List>
                     <List component="div" disablePadding>
-                        <NavLink to={'/profile/detail/password'} end style={{ color: 'inherit' }}>
+                        <NavLink to={'/profile/detail/password'} end>
                             {({ isActive }) => (
                                 <StyledListItemButton selected={isActive} className="secondary">
                                     <ItemText>Đổi mật khẩu</ItemText>
@@ -139,14 +139,14 @@ const ProfileTabsList = () => {
                         </NavLink>
                     </List>
                 </Collapse>
-                <NavLink to={'/profile/orders'} end style={{ color: 'inherit' }}>
+                <NavLink to={'/profile/orders'} end>
                     {({ isActive }) => (
                         <StyledListItemButton selected={isActive}>
                             <ItemText><ReceiptIcon />&nbsp;Đơn hàng</ItemText>
                         </StyledListItemButton>
                     )}
                 </NavLink>
-                <NavLink to={'/profile/reviews'} end style={{ color: 'inherit' }}>
+                <NavLink to={'/profile/reviews'} end>
                     {({ isActive }) => (
                         <StyledListItemButton selected={isActive}>
                             <ItemText><TryIcon />&nbsp;Đánh giá</ItemText>

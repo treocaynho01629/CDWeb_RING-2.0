@@ -22,7 +22,7 @@ const Products = ({ data, isError, isLoading, isSuccess, scrollPosition }) => {
         const book = entities[id];
 
         return (
-          <Grid key={`${id}-${index}`} item xs={6} sm={4} md={3} lg={2.4}>
+          <Grid key={`product-${id}-${index}`} item xs={6} sm={4} md={3} lg={2.4}>
             <Product {...{ book, scrollPosition }} />
           </Grid>
         )

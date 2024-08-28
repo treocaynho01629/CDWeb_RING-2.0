@@ -1,38 +1,29 @@
-import React, { useState } from 'react'
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
-import { useTheme } from '@mui/material/styles';
-
-import {
-  ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, ExpandLess, ExpandMore
-  , Category as CategoryIcon, Group as GroupIcon, Person as PersonIcon
-  , Try as TryIcon, Equalizer as EqualizerIcon, TrendingUp as TrendingUpIcon, Receipt as ReceiptIcon
-  , AutoStories as AutoStoriesIcon, Speed as SpeedIcon
-} from '@mui/icons-material';
-import { Divider, ListItem, ListItemButton, ListItemIcon, ListItemText, List, IconButton, Collapse } from '@mui/material';
+import { useState } from 'react'
+import { ExpandLess, ExpandMore, Category, TrendingUp, AutoStories, Speed, Groups, Star } from '@mui/icons-material';
+import { ListItem, ListItemButton, ListItemIcon, ListItemText, List, Collapse, ListSubheader } from '@mui/material';
+import { NavLink } from "react-router-dom";
 import MuiDrawer from '@mui/material/Drawer';
-
-import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 
 //#region preStyled
 const drawerWidth = 250;
 
 const ImageLogo = styled.img`
-    width: 60px;
-    height: 60px;
-    margin-left: 85px;
+    width: 40px;
+    height: 40px;
+    margin: 0 10px 0 0;
     padding: 0;
 `
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
-  transition: theme.transitions.create('width', {
+  transition: theme.transitions.create('all', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
   }),
   overflowX: 'hidden',
-  backgroundColor: '#fefefe',
 });
 
 const closedMixin = (theme) => ({
@@ -42,9 +33,6 @@ const closedMixin = (theme) => ({
   }),
   overflowX: 'hidden',
   width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up('sm')]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
-  },
 });
 
 const DrawerHeader = muiStyled('div')(({ theme }) => ({
@@ -52,7 +40,6 @@ const DrawerHeader = muiStyled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: theme.spacing(0, 1),
-  backgroundColor: '#63e399',
   ...theme.mixins.toolbar,
 }));
 
@@ -62,6 +49,7 @@ const Drawer = muiStyled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'ope
     flexShrink: 0,
     whiteSpace: 'nowrap',
     boxSizing: 'border-box',
+
     ...(open && {
       ...openedMixin(theme),
       '& .MuiDrawer-paper': openedMixin(theme),
@@ -72,19 +60,109 @@ const Drawer = muiStyled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'ope
     }),
   }),
 );
+
+const StyledListItemButton = muiStyled(ListItemButton)(({ theme }) => ({
+  minHeight: 48,
+  justifyContent: 'center',
+  transition: theme.transitions.create('margin', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+
+  '&.Mui-selected': {
+    color: theme.palette.primary.main,
+
+    '.MuiListItemIcon-root': {
+      color: theme.palette.primary.main,
+    }
+  },
+
+  '&.open': {
+    justifyContent: 'initial',
+    marginLeft: theme.spacing(1.5),
+    marginRight: theme.spacing(1.5),
+  }
+}));
+
+const StyledListItemIcon = muiStyled(ListItemIcon)(({ theme }) => ({
+  minWidth: 0,
+  justifyContent: 'center',
+
+  '&.open': { marginRight: theme.spacing(3) }
+}));
 //#endregion
+
+const managementListItems = [
+  {
+    label: 'Sản phẩm',
+    icon: <AutoStories />,
+    url: '/manage-products',
+    subItems: [
+      {
+        label: 'Tổng quan',
+        url: '/manage-products',
+      },
+      {
+        label: 'Thêm mới',
+        url: '/temp',
+      },
+    ]
+  },
+  {
+    isAdmin: true,
+    label: 'Danh mục',
+    icon: <Category />,
+    url: '/temp',
+    subItems: [
+      {
+        label: 'Tổng quan',
+        url: '/temp',
+      },
+      {
+        label: 'Thêm mới',
+        url: '/temp',
+      },
+    ]
+  },
+  {
+    isAdmin: true,
+    label: 'Thành viên',
+    icon: <Groups />,
+    url: '/manage-users',
+    subItems: [
+      {
+        label: 'Tổng quan',
+        url: '/manage-users',
+      },
+      {
+        label: 'Thêm mới',
+        url: '/temp',
+      },
+    ]
+  },
+  {
+    label: 'Đánh giá',
+    icon: <Star />,
+    url: '/manage-reviews',
+  },
+  {
+    label: 'Doanh thu',
+    icon: <TrendingUp />,
+    url: '/manage-orders',
+  },
+];
 
 const DashboardDrawer = (props) => {
   const { open, setOpen } = props;
   const [openList, setOpenList] = useState(true);
-  const theme = useTheme();
-  const navigate = useNavigate();
   const { roles } = useAuth();
-  const [admin, setAdmin] = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
+  const isAdmin = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
 
-  const handleClick = (id) => {
+  const handleClick = (e, id) => {
     setOpenList((prevState) => ({ ...prevState, [id]: !prevState[id] }));
     setOpen(true);
+    e.stopPropagation();
+    e.preventDefault();
   };
 
   const handleDrawerClose = () => {
@@ -95,159 +173,72 @@ const DashboardDrawer = (props) => {
     <Drawer variant="permanent" open={open}>
       <DrawerHeader>
         <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />
-        <IconButton onClick={handleDrawerClose}>
-          {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-        </IconButton>
       </DrawerHeader>
-      <Divider />
-      <List>
+      <List disablePadding>
         <ListItem key={0} disablePadding sx={{ display: 'block' }}>
-          <Link to={'/dashboard'}>
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: open ? 'initial' : 'center',
-                px: 2.5,
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: open ? 3 : 'auto',
-                  justifyContent: 'center',
-                }}
+          <NavLink to={'/dashboard'}>
+            {({ isActive }) => (
+              <StyledListItemButton
+                className={open ? 'open' : ''}
+                selected={isActive}
               >
-                <SpeedIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Dashboard"} sx={{ opacity: open ? 1 : 0 }} />
-            </ListItemButton>
-          </Link>
+                <StyledListItemIcon className={open ? 'open' : ''}>
+                  <Speed />
+                </StyledListItemIcon>
+                <ListItemText primary={"Dashboard"} sx={{ opacity: open ? 1 : 0 }} />
+              </StyledListItemButton>
+            )}
+          </NavLink>
         </ListItem>
       </List>
-      <Divider />
-      <List>
-        <ListItem key={1} disablePadding sx={{ display: 'block' }}>
-          <ListItemButton onClick={() => handleClick(1)}
-            sx={{
-              minHeight: 48,
-              justifyContent: open ? 'initial' : 'center',
-              px: 2.5,
-            }}
-          >
-            <ListItemIcon
-              sx={{
-                minWidth: 0,
-                mr: open ? 3 : 'auto',
-                justifyContent: 'center',
-              }}
-            >
-              <AutoStoriesIcon />
-            </ListItemIcon>
-            <ListItemText primary={'Quản lý sách'} sx={{ opacity: open ? 1 : 0 }} />
-            {openList[1] ? <ExpandLess sx={{ display: open ? 'block' : 'none' }} />
-              : <ExpandMore sx={{ display: open ? 'block' : 'none' }} />}
-          </ListItemButton>
-        </ListItem>
-        <Collapse in={openList[1]} timeout="auto" unmountOnExit sx={{ display: open ? 'block' : 'none' }}>
-          <List component="div" disablePadding>
-            <Link to={'/manage-products'}>
-              <ListItemButton sx={{ pl: 4 }}>
-                <ListItemIcon>
-                  <AutoStoriesIcon />
-                </ListItemIcon>
-                <ListItemText primary="Sách" />
-              </ListItemButton>
-            </Link>
-            {admin ?
-              <ListItemButton sx={{ pl: 4 }}>
-                <ListItemIcon>
-                  <CategoryIcon />
-                </ListItemIcon>
-                <ListItemText primary="Danh mục | NXB" />
-              </ListItemButton>
-              : null}
-          </List>
-        </Collapse>
-
-        {admin ?
-          <>
-            <ListItem key={2} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton onClick={() => handleClick(2)}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <GroupIcon />
-                </ListItemIcon>
-                <ListItemText primary={'Quản lý người dùng'} sx={{ opacity: open ? 1 : 0 }} />
-                {openList[2] ? <ExpandLess sx={{ display: open ? 'block' : 'none' }} />
-                  : <ExpandMore sx={{ display: open ? 'block' : 'none' }} />}
-              </ListItemButton>
-            </ListItem>
-            <Collapse in={openList[2]} timeout="auto" unmountOnExit sx={{ display: open ? 'block' : 'none' }}>
-              <List component="div" disablePadding>
-                <Link to={'/manage-users'}>
-                  <ListItemButton sx={{ pl: 4 }}>
-                    <ListItemIcon>
-                      <PersonIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Người dùng" />
-                  </ListItemButton>
-                </Link>
-                <Link to={'/manage-reviews'}>
-                  <ListItemButton sx={{ pl: 4 }}>
-                    <ListItemIcon>
-                      <TryIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Đánh giá" />
-                  </ListItemButton>
-                </Link>
-              </List>
-            </Collapse>
-          </>
-          : null}
-
-        <ListItem key={3} disablePadding sx={{ display: 'block' }}>
-          <ListItemButton onClick={() => handleClick(3)}
-            sx={{
-              minHeight: 48,
-              justifyContent: open ? 'initial' : 'center',
-              px: 2.5,
-            }}
-          >
-            <ListItemIcon
-              sx={{
-                minWidth: 0,
-                mr: open ? 3 : 'auto',
-                justifyContent: 'center',
-              }}
-            >
-              <EqualizerIcon />
-            </ListItemIcon>
-            <ListItemText primary={'Quản lý doanh thu'} sx={{ opacity: open ? 1 : 0 }} />
-            {openList[3] ? <ExpandLess sx={{ display: open ? 'block' : 'none' }} />
-              : <ExpandMore sx={{ display: open ? 'block' : 'none' }} />}
-          </ListItemButton>
-        </ListItem>
-        <Collapse in={openList[3]} timeout="auto" unmountOnExit sx={{ display: open ? 'block' : 'none' }}>
-          <List component="div" disablePadding>
-            <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/manage-orders')}>
-              <ListItemIcon>
-                <TrendingUpIcon />
-              </ListItemIcon>
-              <ListItemText primary="Doanh thu" />
-            </ListItemButton>
-          </List>
-        </Collapse>
+      <List
+        disablePadding
+        subheader={open ?
+          <ListSubheader component="div" id="management-list-subheader" sx={{ fontSize: 14 }}>
+            QUẢN LÝ
+          </ListSubheader>
+          : null
+        }
+      >
+        {
+          managementListItems.map((item, index) => (
+            (!item.isAdmin || isAdmin) &&
+            <NavLink to={item.url}>
+              {({ isActive }) => (
+                <>
+                  <ListItem key={`item-${index}`} disablePadding sx={{ display: 'block' }}>
+                    <StyledListItemButton
+                      className={open ? 'open' : ''}
+                      selected={isActive}
+                    >
+                      <StyledListItemIcon className={open ? 'open' : ''}>
+                        {item.icon}
+                      </StyledListItemIcon>
+                      <ListItemText primary={item.label} sx={{ opacity: open ? 1 : 0 }} />
+                      {item.subItems &&
+                        (openList[index] ? <ExpandLess sx={{ display: open ? 'block' : 'none' }} onClick={(e) => handleClick(e, index)} />
+                          : <ExpandMore sx={{ display: open ? 'block' : 'none' }} onClick={(e) => handleClick(e, index)} />)
+                      }
+                    </StyledListItemButton>
+                  </ListItem>
+                  {item.subItems &&
+                    <Collapse key={index} in={openList[index]} timeout={250} unmountOnExit sx={{ display: open ? 'block' : 'none' }}>
+                      <List component="div" disablePadding>
+                        {item.subItems?.map((sub, subIndex) => (
+                          <NavLink key={`sub-${index}-${subIndex}`} to={sub.url}>
+                            <ListItemButton sx={{ pl: 4 }}>
+                              <ListItemText primary={sub.label} />
+                            </ListItemButton>
+                          </NavLink>
+                        ))}
+                      </List>
+                    </Collapse>
+                  }
+                </>
+              )}
+            </NavLink>
+          ))
+        }
       </List>
     </Drawer>
   )

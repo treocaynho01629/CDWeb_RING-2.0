@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { useState, useEffect, useMemo } from "react"
-import { Grid, Box, Button, Divider, Checkbox, FormGroup, FormControlLabel, MenuItem, List, ListItemButton, Collapse, Skeleton, Stack, InputAdornment, TextField } from '@mui/material';
+import { Box, Button, Divider, Checkbox, FormGroup, FormControlLabel, MenuItem, List, ListItemButton, Collapse, Skeleton, Stack, InputAdornment, TextField } from '@mui/material';
 import { ExpandLess, ExpandMore, PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon, FilterAltOff } from '@mui/icons-material';
 import { marks, bookTypes } from "../../ultils/filters";
 import CustomSlider from "../custom/CustomSlider";
@@ -55,11 +55,11 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
   if (loadCates || errorCates) {
     catesContent = (
       Array.from(new Array(5)).map((index) => (
-        <Grid key={index}>
+        <Box key={index}>
           <ListItemButton>
             <Skeleton variant="text" sx={{ fontSize: '16px' }} width="70%" />
           </ListItemButton>
-        </Grid>
+        </Box>
       ))
     )
   } else if (doneCates) {
@@ -70,7 +70,7 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
         const cate = entities[id];
 
         return (
-          <Grid key={`${id}-${index}`}>
+          <Box key={`${id}-${index}`}>
             <ListItemButton
               sx={{
                 pl: 0, py: 0,
@@ -83,30 +83,37 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
               onClick={() => handleCateChange(id)}
             >
               <FilterText>{cate?.categoryName}</FilterText>
-              {cate.cateSubs.length == 0
-                ? null
-                :
+              {cate.cateSubs.length ?
                 <>
                   {open[id] ? <ExpandLess onClick={(e) => handleClick(e, id)} />
                     : <ExpandMore onClick={(e) => handleClick(e, id)} />}
                 </>
+                : null
               }
             </ListItemButton>
-            {cate?.cateSubs?.map((sub, subIndex) => (
-              <Grid key={`${sub?.subName}-${subIndex}`}>
-                <Collapse in={open[id]} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
+            {cate?.cateSubs
+              &&
+              <Collapse in={open[id]} timeout="auto" unmountOnExit>
+                {cate.cateSubs?.map((sub, subIndex) => (
+                  <List key={`${sub?.subName}-${subIndex}`} component="div" disablePadding>
                     <ListItemButton sx={{ pl: 2, py: 0, color: 'text.secondary' }}>
                       <FilterText>{sub?.subName}</FilterText>
                     </ListItemButton>
                   </List>
-                </Collapse>
-              </Grid>
-            ))}
-          </Grid>
+                ))}
+              </Collapse>
+            }
+          </Box>
         )
       })
-      : null
+      :
+      Array.from(new Array(5)).map((index) => (
+        <Box key={index}>
+          <ListItemButton>
+            <Skeleton variant="text" sx={{ fontSize: '16px' }} width="70%" />
+          </ListItemButton>
+        </Box>
+      ))
   }
 
   return (
@@ -158,13 +165,13 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
   if (loadPubs || errorPubs) {
     pubsContent = (
       Array.from(new Array(10)).map((index) => (
-        <div key={index} style={{ display: 'flex', justifyContent: 'flex-start' }}>
+        <Box key={index} style={{ display: 'flex', justifyContent: 'flex-start' }}>
           <Checkbox disabled
             disableRipple
             color="primary"
-            sx={{paddingLeft: 0}} />
+            sx={{ paddingLeft: 0 }} />
           <Skeleton variant="text" sx={{ fontSize: '14px' }} width={200} />
-        </div>
+        </Box>
       ))
     )
   } else if (donePubs) {
@@ -184,13 +191,22 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
                 disableRipple
                 name={pub?.pubName}
                 color="primary"
-                sx={{paddingLeft: 0}} />
+                sx={{ paddingLeft: 0 }} />
             }
             label={pub?.pubName}
           />
         )
       })
-      : null
+      :
+      Array.from(new Array(10)).map((index) => (
+        <Box key={index} style={{ display: 'flex', justifyContent: 'flex-start' }}>
+          <Checkbox disabled
+            disableRipple
+            color="primary"
+            sx={{ paddingLeft: 0 }} />
+          <Skeleton variant="text" sx={{ fontSize: '14px' }} width={200} />
+        </Box>
+      ))
   }
 
   return (

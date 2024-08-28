@@ -144,6 +144,27 @@ export function ThemeContextProvider({ children }) {
                             }),
                         },
                     },
+                    MuiPaper: {
+                        styleOverrides: {
+                            root: ({ theme }) => ({
+                                "&::-webkit-scrollbar": {
+                                    width: 5,
+                                    height: 5,
+                                },
+                                "&::-webkit-scrollbar-track": {
+                                    background: 'inherit',
+                                    boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0)',
+                                },
+                                "&::-webkit-scrollbar-thumb": {
+                                    backgroundColor: theme.palette.action.hover,
+                                    borderRadius: '20px',
+                                },
+                                '&::-webkit-scrollbar-corner': {
+                                    background: 'inherit',
+                                },
+                            }),
+                        },
+                    },
                 },
                 breakpoints: {
                     values: {

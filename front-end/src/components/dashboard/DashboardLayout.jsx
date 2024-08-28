@@ -10,10 +10,12 @@ export default function DashboardLayout() {
 
     return (
         <Box sx={{ display: 'flex' }}>
-            <DashboardNavbar open={open} setOpen={setOpen} />
             <DashboardDrawer open={open} setOpen={setOpen} />
-            <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: '80px' }}>
-                <Outlet />
+            <Box component="main" sx={{ flexGrow: 1, position: 'relative' }}>
+                <DashboardNavbar open={open} setOpen={setOpen} />
+                <Box sx={{ p: 3 }}>
+                    <Outlet />
+                </Box>
             </Box>
         </Box>
     )

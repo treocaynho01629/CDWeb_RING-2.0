@@ -302,7 +302,7 @@ const AmountInput = styled.input`
     width: 30px;
     height: 30px;
     background: transparent;
-    color: black;
+    color: ${props => props.theme.palette.text.primary};
 
     &::-webkit-outer-spin-button,
     ::-webkit-inner-spin-button {
@@ -427,7 +427,7 @@ const ProductContent = ({ book, handleTabChange }) => {
             title: book.title,
             price: book.price,
             image: book.image,
-            quantity: 1,
+            quantity: amountIndex,
         })
     };
 

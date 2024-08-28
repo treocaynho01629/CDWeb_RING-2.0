@@ -1,218 +1,144 @@
-import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState } from 'react';
-import { Toolbar, IconButton, Stack, Badge, Tooltip, Avatar, Menu, MenuItem, Divider, ListItemIcon } from '@mui/material';
-import { Menu as MenuIcon, Logout, Home as HomeIcon, NotificationsActive as NotificationsActiveIcon } from '@mui/icons-material';
-import { useNavigate, Link } from "react-router-dom";
+import { Toolbar, IconButton, Stack, Badge, Tooltip, Avatar, Menu, MenuItem, Divider, ListItemIcon, Box, alpha, Chip, Typography } from '@mui/material';
+import { Menu as MenuIcon, Logout, Home as HomeIcon, NotificationsNone, SettingsOutlined } from '@mui/icons-material';
+import { useNavigate } from "react-router-dom";
 import MuiAppBar from '@mui/material/AppBar';
 import useLogout from "../../hooks/useLogout";
+import useAuth from '../../hooks/useAuth';
 
 //#region preStyled
-const NavItem = styled.div`
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-left: 15px;
-`
-
 const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
+  borderRadius: 0,
+  transition: 'all .25s ease',
+
   '&:hover': {
-    backgroundColor: 'transparent',
-    color: '#63e399',
-  },
-
-  '&:focus': {
-    outline: 'none',
-  },
-
-  outline: 'none',
-  border: '0',
-  borderRadius: '0',
-}));
-
-const StyledBadge = muiStyled(Badge)(({ theme }) => ({
-  '& .MuiBadge-badge': {
-    left: -3,
-    top: 4,
-    border: `2px solid`,
-    padding: '0 4px',
-    color: 'white',
-    backgroundColor: '#63e399'
+    color: theme.palette.primary.main,
+    transform: 'scale(1.05)',
   },
 }));
 
-const Logo = styled.h2`
-    position: relative;
-    font-family: abel;
-    text-transform: uppercase;
-    font-size: 27px;
-    font-weight: 500;
-    color: ${props => props.theme.palette.primary.main};
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    margin: 5px 0px 5px 0px;
-
-    p {
-        color: ${props => props.theme.palette.text.secondary};
-        margin: 0;
-    }
-`
-
-const ImageLogo = styled.img`
-    width: 40px;
-    height: 40px;
-    margin-left: 15px;
-    margin-right: 15px;
-    padding: 0;
-`
-
-const drawerWidth = 250;
-
-const AppBar = muiStyled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
+const AppBar = muiStyled(MuiAppBar, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
+  backgroundColor: alpha(theme.palette.background.default, 0.5),
+  backdropFilter: 'blur(10px)',
+
   transition: theme.transitions.create(['width', 'margin'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
 }));
 //#endregion
 
-export default function DashboardNavbar(props) {
-  const { open, setOpen } = props;
+export default function DashboardNavbar({ open, setOpen }) {
+  const { roles, username } = useAuth();
+  const isAdmin = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
   const [anchorEl, setAnchorEl] = useState(null);
   const openProfile = Boolean(anchorEl);
   const navigate = useNavigate();
   const logout = useLogout();
 
-  const signOut = async () => {
-    await logout();
-    const { enqueueSnackbar } = await import('notistack');
-    navigate('/');
-    enqueueSnackbar('Đã đăng xuất!', { variant: 'error' });
-  }
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+  const handleClick = (event) => { setAnchorEl(event.currentTarget) };
+  const handleClose = () => { setAnchorEl(null) };
+  const handleToggleDrawer = () => { setOpen(prev => !prev) };
 
   return (
-    <AppBar sx={{ backgroundColor: 'white' }} position="fixed" open={open} elevation={0}>
-      <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <ImageLogo style={{ ...(open && { display: 'none' }) }} src="/bell.svg" className="logo" alt="RING! logo" />
-          <IconButton
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            sx={{
-              marginLeft: '5px',
-              ...(open && { display: 'none' }),
-            }}
-          >
+    <AppBar position="sticky" open={open} elevation={0}>
+      <Toolbar disableGutters sx={{ justifyContent: 'space-between', padding: '5px 10px' }}>
+        <Box display={'flex'} alignItems={'center'}>
+          <IconButton aria-label="open drawer" onClick={handleToggleDrawer}>
             <MenuIcon />
           </IconButton>
-          <Link to={'/dashboard'} style={{ marginLeft: '20px' }}>
-            <Logo>
-              RING!&nbsp; <p style={{ color: '#424242', margin: 0 }}>- DASHBOARD</p>
-            </Logo>
-          </Link>
-        </div>
-        <NavItem style={{ marginRight: '20px' }}>
-          <Stack spacing={1} direction="row" sx={{ color: 'action.active' }}>
-            <StyledIconButton disableRipple disableFocusRipple aria-label="notification">
-              <StyledBadge badgeContent={0} anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}>
-                <NotificationsActiveIcon />
-              </StyledBadge>
+          <Box display={'flex'} alignItems={'center'} px={1}>
+            <Typography variant="body2" color='text.primary' mr={1}>
+              {username}
+            </Typography>
+            <Chip label={isAdmin ? 'Admin' : 'Nhân viên'}
+              color={isAdmin ? 'primary' : 'info'}
+              size="small"
+              sx={{ fontWeight: 'bold' }}
+            />
+          </Box>
+        </Box>
+        <Stack spacing={1} direction="row" sx={{ color: 'action.active' }}>
+          <StyledIconButton disableRipple disableFocusRipple aria-label="notification">
+            <Badge badgeContent={0} anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}>
+              <NotificationsNone />
+            </Badge>
+          </StyledIconButton>
+          <StyledIconButton disableRipple disableFocusRipple aria-label="notification">
+            <SettingsOutlined />
+          </StyledIconButton>
+          <Tooltip title="Tài khoản">
+            <StyledIconButton
+              disableRipple disableFocusRipple
+              onClick={handleClick}
+              size="small"
+              sx={{ ml: 2 }}
+              aria-controls={openProfile ? 'account-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={openProfile ? 'true' : undefined}
+            >
+              <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
             </StyledIconButton>
-            <Tooltip title="Tài khoản">
-              <StyledIconButton
-                disableRipple disableFocusRipple
-                onClick={handleClick}
-                size="small"
-                sx={{ ml: 2 }}
-                aria-controls={openProfile ? 'account-menu' : undefined}
-                aria-haspopup="true"
-                aria-expanded={openProfile ? 'true' : undefined}
-              >
-                <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
-              </StyledIconButton>
-            </Tooltip>
-          </Stack>
-          <Menu
-            anchorEl={anchorEl}
-            id="account-menu"
-            open={openProfile}
-            onClose={handleClose}
-            onClick={handleClose}
-            PaperProps={{
-              elevation: 0,
-              sx: {
-                overflow: 'visible',
-                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                mt: 1.5,
-                borderRadius: 0,
-                '& .MuiAvatar-root': {
-                  width: 32,
-                  height: 32,
-                  ml: -0.5,
-                  mr: 1,
-                },
-                '&:before': {
-                  content: '""',
-                  display: 'block',
-                  position: 'absolute',
-                  top: 0,
-                  right: 14,
-                  width: 10,
-                  height: 10,
-                  bgcolor: 'background.paper',
-                  transform: 'translateY(-50%) rotate(45deg)',
-                  zIndex: 0,
-                },
+          </Tooltip>
+        </Stack>
+        <Menu
+          anchorEl={anchorEl}
+          id="account-menu"
+          open={openProfile}
+          onClose={handleClose}
+          onClick={handleClose}
+          PaperProps={{
+            elevation: 0,
+            sx: {
+              overflow: 'visible',
+              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+              mt: 1.5,
+              borderRadius: 0,
+              '& .MuiAvatar-root': {
+                width: 32,
+                height: 32,
+                ml: -0.5,
+                mr: 1,
               },
-            }}
-            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-          >
-            <MenuItem>
-              <Avatar /> Thông tin tài khoản
-            </MenuItem>
-            <Divider />
-            <MenuItem onClick={() => navigate('/')}>
-              <ListItemIcon>
-                <HomeIcon fontSize="small" />
-              </ListItemIcon>
-              Trang chủ
-            </MenuItem>
-            <MenuItem onClick={signOut}>
-              <ListItemIcon>
-                <Logout fontSize="small" />
-              </ListItemIcon>
-              Đăng xuất
-            </MenuItem>
-          </Menu>
-        </NavItem>
+              '&:before': {
+                content: '""',
+                display: 'block',
+                position: 'absolute',
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: 'background.paper',
+                transform: 'translateY(-50%) rotate(45deg)',
+                zIndex: 0,
+              },
+            },
+          }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        >
+          <MenuItem>
+            <Avatar /> Thông tin tài khoản
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={() => navigate('/')}>
+            <ListItemIcon>
+              <HomeIcon fontSize="small" />
+            </ListItemIcon>
+            Trang chủ
+          </MenuItem>
+          <MenuItem onClick={logout}>
+            <ListItemIcon>
+              <Logout fontSize="small" />
+            </ListItemIcon>
+            Đăng xuất
+          </MenuItem>
+        </Menu>
       </Toolbar>
     </AppBar>
   );

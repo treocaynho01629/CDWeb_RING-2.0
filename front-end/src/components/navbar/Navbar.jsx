@@ -2,9 +2,8 @@ import styled from 'styled-components';
 import { useContext, useState } from 'react';
 import { styled as muiStyled } from '@mui/system';
 import {
-    Search as SearchIcon, ShoppingCart as ShoppingCartIcon, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
-    Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, NotificationsActive as NotificationsActiveIcon, Storefront,
-    Close,
+    Search as SearchIcon, ShoppingCart, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
+    Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, Storefront, Close, Notifications,
 } from '@mui/icons-material';
 import { Stack, Badge, IconButton, Avatar, Box, Grid, TextField, AppBar, useTheme, useMediaQuery } from '@mui/material';
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -289,8 +288,8 @@ const Navbar = () => {
     };
 
     //Toggle drawer open state
-    const toggleDrawer = (open) => (e) => {
-        setOpen(open)
+    const toggleDrawer = () => {
+        setOpen(prev => !prev)
     };
 
     const toggleSearch = () => {
@@ -338,13 +337,13 @@ const Navbar = () => {
                                             flex={1}
                                             alignItems={'center'}
                                         >
-                                            <IconButton onClick={toggleDrawer(true)}>
+                                            <IconButton onClick={toggleDrawer}>
                                                 <MenuIcon sx={{ fontSize: 26 }} />
                                             </IconButton>
                                         </Box>
                                         <NavDrawer {...{
-                                            openDrawer, setOpen, toggleDrawer, username, roles, location,
-                                            products: cartProducts, navigate, logout, ImageLogo, theme, colorMode
+                                            openDrawer, setOpen, username, roles, location,
+                                            products: cartProducts, logout, ImageLogo, theme, colorMode
                                         }} />
                                     </>
                                 }
@@ -397,7 +396,7 @@ const Navbar = () => {
                                                     vertical: 'top',
                                                     horizontal: 'right',
                                                 }}>
-                                                    <NotificationsActiveIcon />
+                                                    <Notifications />
                                                 </Badge>
                                                 <IconText>Thông báo</IconText>
                                             </StyledIconButton>
@@ -413,7 +412,7 @@ const Navbar = () => {
                                                             vertical: 'top',
                                                             horizontal: 'right',
                                                         }}>
-                                                            <ShoppingCartIcon />
+                                                            <ShoppingCart />
                                                         </Badge>
                                                         <IconText>Giỏ hàng</IconText>
                                                     </StyledIconButton>
@@ -435,7 +434,7 @@ const Navbar = () => {
                                                     </Link>
                                                     <ProfilePopover {...{
                                                         open, anchorEl, handleClose: handleProfileClose,
-                                                        navigate, roles, logout, theme, colorMode
+                                                        roles, logout, theme, colorMode
                                                     }} />
                                                 </div>
                                             ) : (

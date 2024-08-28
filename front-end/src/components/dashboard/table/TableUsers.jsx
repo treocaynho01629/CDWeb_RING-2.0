@@ -394,64 +394,62 @@ export default function TableUsers({ setUserCount, mini = false }) {
   }
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper elevation={3} sx={{ width: '100%', mb: '2px' }} >
-        <CustomTableToolbar
-          numSelected={numSelected()}
-          icon={<GroupIcon />}
-          title={`${isEmployees ? 'nhân viên' : 'thành viên'}`}
-          submitIcon={<DeleteIcon />}
-          submitTooltip={`Xoá ${isEmployees ? 'nhân viên' : 'thành viên'} đã chọn`}
-          onSubmitSelected={handleDeleteMultiples}
-          filterComponent={<FilterContent filter={isEmployees} />}
-        />
-        <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
-          <Table
-            stickyHeader
-            sx={{ minWidth: mini ? 500 : 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <CustomTableHead
-              headCells={headCells}
-              numSelected={numSelected()}
-              sortBy={pagination.sortBy}
-              sortDir={pagination.sortDir}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              selectedAll={selectedAll}
-              mini={mini}
-            />
-            <TableBody>
-              {usersRows}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <FooterContainer>
-          {mini ?
-            <Link to={'/manage-users'}>Xem tất cả</Link>
-            :
-            <Box>
-              <FormControlLabel
-                control={<Switch checked={dense} onChange={handleChangeDense} />}
-                label={<FooterLabel>Thu gọn</FooterLabel>}
-              />
-              {isAdmin &&
-                <FormControlLabel
-                  control={<Switch checked={isEmployees} onChange={handleChangeFilter} />}
-                  label={<FooterLabel>Lọc nhân viên</FooterLabel>}
-                />
-              }
-            </Box>
-          }
-          <CustomTablePagination
-            pagination={pagination}
-            onPageChange={handleChangePage}
-            onSizeChange={handleChangeRowsPerPage}
-            count={data?.info?.totalElements ?? 0}
+    <TableContainer component={Paper}>
+      <CustomTableToolbar
+        numSelected={numSelected()}
+        icon={<GroupIcon />}
+        title={`${isEmployees ? 'nhân viên' : 'thành viên'}`}
+        submitIcon={<DeleteIcon />}
+        submitTooltip={`Xoá ${isEmployees ? 'nhân viên' : 'thành viên'} đã chọn`}
+        onSubmitSelected={handleDeleteMultiples}
+        filterComponent={<FilterContent filter={isEmployees} />}
+      />
+      <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
+        <Table
+          stickyHeader
+          sx={{ minWidth: mini ? 500 : 750 }}
+          aria-labelledby="tableTitle"
+          size={dense ? 'small' : 'medium'}
+        >
+          <CustomTableHead
+            headCells={headCells}
+            numSelected={numSelected()}
+            sortBy={pagination.sortBy}
+            sortDir={pagination.sortDir}
+            onSelectAllClick={handleSelectAllClick}
+            onRequestSort={handleRequestSort}
+            selectedAll={selectedAll}
+            mini={mini}
           />
-        </FooterContainer>
-      </Paper>
+          <TableBody>
+            {usersRows}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <FooterContainer>
+        {mini ?
+          <Link to={'/manage-users'}>Xem tất cả</Link>
+          :
+          <Box>
+            <FormControlLabel
+              control={<Switch checked={dense} onChange={handleChangeDense} />}
+              label={<FooterLabel>Thu gọn</FooterLabel>}
+            />
+            {isAdmin &&
+              <FormControlLabel
+                control={<Switch checked={isEmployees} onChange={handleChangeFilter} />}
+                label={<FooterLabel>Lọc nhân viên</FooterLabel>}
+              />
+            }
+          </Box>
+        }
+        <CustomTablePagination
+          pagination={pagination}
+          onPageChange={handleChangePage}
+          onSizeChange={handleChangeRowsPerPage}
+          count={data?.info?.totalElements ?? 0}
+        />
+      </FooterContainer>
       <Suspense fallback={<></>}>
         {openEdit ?
           <EditAccountDialog
@@ -462,6 +460,6 @@ export default function TableUsers({ setUserCount, mini = false }) {
           : null
         }
       </Suspense>
-    </Box>
+    </TableContainer>
   );
 }

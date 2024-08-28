@@ -82,7 +82,7 @@ const AmountInput = styled.input`
     height: 20px;
     width: 20px;
     background: transparent;
-    color: black;
+    color: ${props => props.theme.palette.text.primary};
     font-weight: bold;
     resize: none;
     outline: none;
@@ -471,15 +471,17 @@ const Cart = () => {
                             </Table>
                         </TableContainer>
                         <br />
-                        <NavLink to={'/'}>
-                            <Button
-                                variant="outlined"
-                                color="secondary"
-                                startIcon={<ChevronLeft />}
-                            >
-                                Tiếp tục mua sắm
-                            </Button>
-                        </NavLink>
+                        <Box display="flex">
+                            <NavLink to={'/'}>
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    startIcon={<ChevronLeft />}
+                                >
+                                    Tiếp tục mua sắm
+                                </Button>
+                            </NavLink>
+                        </Box>
                     </Grid>
                     <Grid item xs={12} md={8} lg={4}>
                         <CheckoutDialog {...{

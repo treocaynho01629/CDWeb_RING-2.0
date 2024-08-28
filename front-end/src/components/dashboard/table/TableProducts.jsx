@@ -430,64 +430,62 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
   }
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper elevation={3} sx={{ width: '100%', mb: '2px' }} >
-        <CustomTableToolbar
-          numSelected={numSelected()}
-          icon={<AutoStoriesIcon />}
-          title={'sản phẩm'}
-          submitIcon={<DeleteIcon />}
-          submitTooltip={'Xoá sản phẩm đã chọn'}
-          onSubmitSelected={handleDeleteMultiples}
-          filterComponent={<FilterContent />}
-        />
-        <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
-          <Table
-            stickyHeader
-            sx={{ minWidth: mini ? 500 : 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <CustomTableHead
-              headCells={headCells}
-              numSelected={numSelected()}
-              sortBy={pagination.sortBy}
-              sortDir={pagination.sortDir}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              selectedAll={selectedAll}
-              mini={mini}
-            />
-            <TableBody>
-              {booksRows}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <FooterContainer>
-          {mini ?
-            <Link to={'/manage-products'}>Xem tất cả</Link>
-            :
-            <Box>
-              <FormControlLabel
-                control={<Switch checked={dense} onChange={handleChangeDense} />}
-                label={<FooterLabel>Thu gọn</FooterLabel>}
-              />
-              {(isAdmin && !sellerName) &&
-                <FormControlLabel
-                  control={<Switch checked={isSeller} onChange={handleChangeSeller} />}
-                  label={<FooterLabel>Theo người bán</FooterLabel>}
-                />
-              }
-            </Box>
-          }
-          <CustomTablePagination
-            pagination={pagination}
-            onPageChange={handleChangePage}
-            onSizeChange={handleChangeRowsPerPage}
-            count={data?.info?.totalElements ?? 0}
+    <TableContainer component={Paper}>
+      <CustomTableToolbar
+        numSelected={numSelected()}
+        icon={<AutoStoriesIcon />}
+        title={'sản phẩm'}
+        submitIcon={<DeleteIcon />}
+        submitTooltip={'Xoá sản phẩm đã chọn'}
+        onSubmitSelected={handleDeleteMultiples}
+        filterComponent={<FilterContent />}
+      />
+      <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
+        <Table
+          stickyHeader
+          sx={{ minWidth: mini ? 500 : 750 }}
+          aria-labelledby="tableTitle"
+          size={dense ? 'small' : 'medium'}
+        >
+          <CustomTableHead
+            headCells={headCells}
+            numSelected={numSelected()}
+            sortBy={pagination.sortBy}
+            sortDir={pagination.sortDir}
+            onSelectAllClick={handleSelectAllClick}
+            onRequestSort={handleRequestSort}
+            selectedAll={selectedAll}
+            mini={mini}
           />
-        </FooterContainer>
-      </Paper>
+          <TableBody>
+            {booksRows}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <FooterContainer>
+        {mini ?
+          <Link to={'/manage-products'}>Xem tất cả</Link>
+          :
+          <Box>
+            <FormControlLabel
+              control={<Switch checked={dense} onChange={handleChangeDense} />}
+              label={<FooterLabel>Thu gọn</FooterLabel>}
+            />
+            {(isAdmin && !sellerName) &&
+              <FormControlLabel
+                control={<Switch checked={isSeller} onChange={handleChangeSeller} />}
+                label={<FooterLabel>Theo người bán</FooterLabel>}
+              />
+            }
+          </Box>
+        }
+        <CustomTablePagination
+          pagination={pagination}
+          onPageChange={handleChangePage}
+          onSizeChange={handleChangeRowsPerPage}
+          count={data?.info?.totalElements ?? 0}
+        />
+      </FooterContainer>
       <Suspense fallback={<></>}>
         {openEdit ?
           <EditProductDialog
@@ -498,6 +496,6 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
           : null
         }
       </Suspense>
-    </Box>
+    </TableContainer>
   );
 }

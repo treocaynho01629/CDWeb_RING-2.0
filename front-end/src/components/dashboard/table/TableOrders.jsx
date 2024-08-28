@@ -570,8 +570,7 @@ export default function TableOrders({ setOrderCount, mini = false }) {
   }
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper elevation={3} sx={{ width: '100%', mb: '2px' }} >
+    <TableContainer component={Paper}>
         <CustomTableToolbar
           numSelected={numSelected()}
           icon={<ReceiptIcon />}
@@ -619,7 +618,6 @@ export default function TableOrders({ setOrderCount, mini = false }) {
             count={data?.info?.totalElements ?? 0}
           />
         </FooterContainer>
-      </Paper>
-    </Box>
+    </TableContainer>
   );
 }

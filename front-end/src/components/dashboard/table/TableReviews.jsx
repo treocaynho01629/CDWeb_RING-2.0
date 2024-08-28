@@ -420,56 +420,54 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
   }
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper elevation={3} sx={{ width: '100%', mb: '2px' }} >
-        <CustomTableToolbar
-          numSelected={numSelected()}
-          icon={<Star />}
-          title={'đánh giá'}
-          submitIcon={<DeleteIcon />}
-          submitTooltip={'Xoá đánh giá đã chọn'}
-          onSubmitSelected={handleDeleteMultiples}
-          filterComponent={<FilterContent />}
-        />
-        <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
-          <Table
-            stickyHeader
-            sx={{ minWidth: mini ? 500 : 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <CustomTableHead
-              headCells={headCells}
-              numSelected={numSelected()}
-              sortBy={pagination.sortBy}
-              sortDir={pagination.sortDir}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              selectedAll={selectedAll}
-              mini={mini}
-            />
-            <TableBody>
-              {reviewsRows}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <FooterContainer>
-          {mini ?
-            <Link to={'/manage-reviews'}>Xem tất cả</Link>
-            :
-            <FormControlLabel
-              control={<Switch checked={dense} onChange={handleChangeDense} />}
-              label={<FooterLabel>Thu gọn</FooterLabel>}
-            />
-          }
-          <CustomTablePagination
-            pagination={pagination}
-            onPageChange={handleChangePage}
-            onSizeChange={handleChangeRowsPerPage}
-            count={data?.info?.totalElements ?? 0}
+    <TableContainer component={Paper}>
+      <CustomTableToolbar
+        numSelected={numSelected()}
+        icon={<Star />}
+        title={'đánh giá'}
+        submitIcon={<DeleteIcon />}
+        submitTooltip={'Xoá đánh giá đã chọn'}
+        onSubmitSelected={handleDeleteMultiples}
+        filterComponent={<FilterContent />}
+      />
+      <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
+        <Table
+          stickyHeader
+          sx={{ minWidth: mini ? 500 : 750 }}
+          aria-labelledby="tableTitle"
+          size={dense ? 'small' : 'medium'}
+        >
+          <CustomTableHead
+            headCells={headCells}
+            numSelected={numSelected()}
+            sortBy={pagination.sortBy}
+            sortDir={pagination.sortDir}
+            onSelectAllClick={handleSelectAllClick}
+            onRequestSort={handleRequestSort}
+            selectedAll={selectedAll}
+            mini={mini}
           />
-        </FooterContainer>
-      </Paper>
-    </Box>
+          <TableBody>
+            {reviewsRows}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <FooterContainer>
+        {mini ?
+          <Link to={'/manage-reviews'}>Xem tất cả</Link>
+          :
+          <FormControlLabel
+            control={<Switch checked={dense} onChange={handleChangeDense} />}
+            label={<FooterLabel>Thu gọn</FooterLabel>}
+          />
+        }
+        <CustomTablePagination
+          pagination={pagination}
+          onPageChange={handleChangePage}
+          onSizeChange={handleChangeRowsPerPage}
+          count={data?.info?.totalElements ?? 0}
+        />
+      </FooterContainer>
+    </TableContainer>
   );
 }
