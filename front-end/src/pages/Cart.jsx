@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState } from "react";
 import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search, ChevronLeft } from '@mui/icons-material';
-import { Checkbox, Button, Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon, Skeleton } from '@mui/material';
+import { Checkbox, Button, Grid2 as Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon, Skeleton } from '@mui/material';
 import { NavLink, useNavigate } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { booksApiSlice } from '../features/books/booksApiSlice';
@@ -303,9 +303,7 @@ const Cart = () => {
                             indeterminate={numSelected > 0 && numSelected < rowCount}
                             checked={rowCount > 0 && numSelected === rowCount}
                             onChange={onSelectAllClick}
-                            inputProps={{
-                                'aria-label': 'select all',
-                            }}
+                            inputProps={{ 'aria-label': 'select all' }}
                             sx={{
                                 marginRight: 1,
                                 color: 'white',
@@ -357,7 +355,7 @@ const Cart = () => {
                 </EmptyWrapper>
                 :
                 <Grid container spacing={3} sx={{ mb: 10, justifyContent: 'flex-end' }}>
-                    <Grid item xs={12} lg={8}>
+                    <Grid size={{ xs: 12, lg: 8 }}>
                         <MainTitleContainer>
                             <Title><ShoppingCartIcon />&nbsp;GIỎ HÀNG ({cartProducts?.length})</Title>
                             <Button
@@ -400,7 +398,7 @@ const Cart = () => {
                                                         <Checkbox
                                                             disableRipple
                                                             disableFocusRipple
-                                                            color="primary" xx
+                                                            color="primary"
                                                             checked={isItemSelected}
                                                             inputProps={{ 'aria-labelledby': labelId }}
                                                             sx={{ marginRight: { xs: 1, md: 2 }, marginLeft: { xs: -1.5, sm: 0 } }}
@@ -483,7 +481,7 @@ const Cart = () => {
                             </NavLink>
                         </Box>
                     </Grid>
-                    <Grid item xs={12} md={8} lg={4}>
+                    <Grid size={{ xs: 12, md: 8, lg: 4 }}>
                         <CheckoutDialog {...{
                             cartProducts, selected, navigate, handleSelectAllClick,
                             numSelected: selected.length, rowCount: cartProducts?.length
@@ -494,9 +492,7 @@ const Cart = () => {
             <Menu
                 open={open}
                 onClose={handleClose}
-                MenuListProps={{
-                    'aria-labelledby': 'basic-button',
-                }}
+                MenuListProps={{ 'aria-labelledby': 'basic-button' }}
                 anchorEl={anchorEl}
             >
                 <MenuItem onClick={handleDeleteContext}>

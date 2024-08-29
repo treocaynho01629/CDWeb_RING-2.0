@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import { useEffect, useState } from 'react'
-import { Grid, useTheme, useMediaQuery } from '@mui/material';
+import { useTheme, useMediaQuery, Grid2 as Grid } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice";
 import { useGetPublishersQuery } from "../features/publishers/publishersApiSlice";
@@ -241,7 +241,7 @@ const FiltersPage = () => {
 
     return (
         <Wrapper>
-            <Grid container spacing={5} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Grid container spacing={4} sx={{ display: 'flex', justifyContent: 'center' }}>
                 {mobileMode ?
                     <FilterDialog
                         {...{ filters, setFilters, resetFilter, open, handleClose, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
@@ -252,7 +252,7 @@ const FiltersPage = () => {
                         onChangeSeller={handleChangeSeller}
                     />
                     :
-                    <Grid item xs={12} md={3} display={{ xs: "none", md: "block" }} sx={{ overflowX: 'visible', zIndex: 1 }}>
+                    <Grid size={{ xs: 12, md: 3 }} display={{ xs: "none", md: "block" }} sx={{ overflowX: 'visible', zIndex: 1 }}>
                         <FilterList
                             {...{ filters, resetFilter, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
                             onChangeCate={handleChangeCate}
@@ -262,7 +262,7 @@ const FiltersPage = () => {
                             onChangeSeller={handleChangeSeller} />
                     </Grid>
                 }
-                <Grid item xs={12} md={9}>
+                <Grid size={{ xs: 12, md: 9 }}>
                     <CustomDivider>{filters?.seller ? `SẢN PHẨM CỦA ${filters.seller}` : 'DANH MỤC SẢN PHẨM'}</CustomDivider>
                     <SortList filters={filters}
                         pagination={pagination}

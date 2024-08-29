@@ -1,7 +1,7 @@
 import styled from "styled-components"
 import { useEffect, useState } from 'react'
 import { styled as muiStyled } from '@mui/system';
-import { Grid, Button, MenuItem, ToggleButton, ToggleButtonGroup, TextField } from '@mui/material';
+import { Grid2 as Grid, Button, MenuItem, ToggleButton, ToggleButtonGroup, TextField } from '@mui/material';
 import { Search, Sort } from '@mui/icons-material';
 import { orderGroup } from "../../ultils/filters";
 import QuickPagination from "../custom/QuickPagination";
@@ -116,8 +116,8 @@ const SortList = (props) => {
                 {filters?.keyword &&
                     <Keyword><Search /> Kết quả từ khoá: '<b>{filters.keyword}</b>'</Keyword>
                 }
-                <Grid container spacing={0} sx={{ width: '100%' }}>
-                    <Grid item xs={12} md={8} sx={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '5px' }}>
+                <Grid container size="grow" spacing={0} sx={{ width: '100%' }}>
+                    <Grid size={{ xs: 12, sm: 8 }} sx={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '5px' }}>
                         <FilterTitle>Xếp theo</FilterTitle>
                         <StyledToggleButtonGroup
                             value={sortBy}
@@ -135,7 +135,7 @@ const SortList = (props) => {
                             ))}
                         </StyledToggleButtonGroup>
                     </Grid>
-                    <Grid item xs={12} md={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-end' } }}>
+                    <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-end' } }}>
                         <TextField
                             size="small"
                             select

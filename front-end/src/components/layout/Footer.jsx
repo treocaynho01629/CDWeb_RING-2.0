@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import { Facebook, YouTube, Instagram, Twitter, QrCode, LocalAtm, SystemSecurityUpdateGood, CreditCard } from '@mui/icons-material';
-import { Box, Grid } from "@mui/material";
+import { Box, Grid2 as Grid } from "@mui/material";
 
 //#region styled
 const Container = styled.div`
@@ -92,11 +92,12 @@ const SocialIcon = styled.div`
 const AddressContainer = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 50px 20px;
+    padding: 30px 0px;
 
     
-    ${props => props.theme.breakpoints.down("md_lg")} {
+    ${props => props.theme.breakpoints.down("lg")} {
         align-items: center;
+        padding: 10px;
     }
 
     ${props => props.theme.breakpoints.down("sm")} {
@@ -198,27 +199,29 @@ const Footer = () => {
     return (
         <Container>
             <Wrapper>
-                <Box display={'flex'} justifyContent={'center'} flexDirection={{ xs: 'column-reverse', md_lg: 'row' }}>
-                    <AddressContainer>
-                        <Logo>RING!&nbsp; <p>- BOOKSTORE</p></Logo>
-                        <Description>Khu phố 6, Phường Linh Trung, TP. Thủ Đức - TP. Hồ Chí Minh</Description>
-                        <Social>
-                            <SocialIcon color="3B5999">
-                                <Facebook />
-                            </SocialIcon>
-                            <SocialIcon color="FF0000">
-                                <YouTube />
-                            </SocialIcon>
-                            <SocialIcon color="E4405F">
-                                <Instagram />
-                            </SocialIcon>
-                            <SocialIcon color="55ACEE">
-                                <Twitter />
-                            </SocialIcon>
-                        </Social>
-                    </AddressContainer>
-                    <Grid container spacing={0.5}>
-                        <Grid item xs={6} sm={3}>
+                <Grid container spacing={1} size="grow">
+                    <Grid size={{ xs: 12, lg: 'auto' }} >
+                        <AddressContainer>
+                            <Logo>RING!&nbsp; <p>- BOOKSTORE</p></Logo>
+                            <Description>Khu phố 6, Phường Linh Trung, TP. Thủ Đức - TP. Hồ Chí Minh</Description>
+                            <Social>
+                                <SocialIcon color="3B5999">
+                                    <Facebook />
+                                </SocialIcon>
+                                <SocialIcon color="FF0000">
+                                    <YouTube />
+                                </SocialIcon>
+                                <SocialIcon color="E4405F">
+                                    <Instagram />
+                                </SocialIcon>
+                                <SocialIcon color="55ACEE">
+                                    <Twitter />
+                                </SocialIcon>
+                            </Social>
+                        </AddressContainer>
+                    </Grid>
+                    <Grid container spacing={.5} offset={{ xs: 0, lg: 'auto' }} size={{ xs: 12, lg: 'auto' }} mb={6}>
+                        <Grid size={{ xs: 6, sm: 3 }}>
                             <Title>HỖ TRỢ</Title>
                             <List>
                                 <ListItem>Chính sách đổi - trả - hoàn tiền</ListItem>
@@ -228,7 +231,7 @@ const Footer = () => {
                                 <ListItem>Hướng dẫn đặt hàng</ListItem>
                             </List>
                         </Grid>
-                        <Grid item xs={6} sm={3}>
+                        <Grid size={{ xs: 6, sm: 3 }}>
                             <Title>THÔNG TIN</Title>
                             <List>
                                 <ListItem>Giới thiệu</ListItem>
@@ -237,14 +240,14 @@ const Footer = () => {
                                 <ListItem>Điều khoản sử dụng</ListItem>
                             </List>
                         </Grid>
-                        <Grid item xs={6} sm={3}>
+                        <Grid size={{ xs: 6, sm: 3 }}>
                             <Title>DỊCH VỤ</Title>
                             <List>
                                 <ListItem>Chính sách bảo mật</ListItem>
                                 <ListItem>Hệ thống hàng</ListItem>
                             </List>
                         </Grid>
-                        <Grid item xs={6} sm={3}>
+                        <Grid size={{ xs: 6, sm: 3 }}>
                             <Title>THANH TOÁN</Title>
                             <List>
                                 <ListItem>Phương thức thanh toán</ListItem>
@@ -257,7 +260,7 @@ const Footer = () => {
                             </List>
                         </Grid>
                     </Grid>
-                </Box>
+                </Grid>
             </Wrapper>
             <BotFooter>
                 <BotText>Giấy chứng nhận Đăng ý kính doanh do NLU - TP.HCM cấp ngày 01/01/2022.</BotText>

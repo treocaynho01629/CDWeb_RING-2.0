@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState } from 'react'
 import { ExpandLess, ExpandMore, Category, TrendingUp, AutoStories, Speed, Groups, Star } from '@mui/icons-material';
-import { ListItem, ListItemButton, ListItemIcon, ListItemText, List, Collapse, ListSubheader } from '@mui/material';
+import { ListItem, ListItemButton, ListItemIcon, ListItemText, List, Collapse, ListSubheader, Drawer } from '@mui/material';
 import { NavLink } from "react-router-dom";
 import MuiDrawer from '@mui/material/Drawer';
 import useAuth from "../../hooks/useAuth";
@@ -13,8 +13,13 @@ const drawerWidth = 250;
 const ImageLogo = styled.img`
     width: 40px;
     height: 40px;
-    margin: 0 10px 0 0;
     padding: 0;
+    transition: all .25s ease;
+    margin: ${props => props.theme.spacing(0, 1)};
+
+    &.open {
+      margin: ${props => props.theme.spacing(0, 3)};
+    }
 `
 
 const openedMixin = (theme) => ({
@@ -39,11 +44,10 @@ const DrawerHeader = muiStyled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: theme.spacing(0, 1),
   ...theme.mixins.toolbar,
 }));
 
-const Drawer = muiStyled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
+const StyledDrawer = muiStyled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
     width: drawerWidth,
     flexShrink: 0,
@@ -59,6 +63,13 @@ const Drawer = muiStyled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'ope
       '& .MuiDrawer-paper': closedMixin(theme),
     }),
   }),
+);
+
+const StyledMobileDrawer = muiStyled(Drawer)(({ theme }) => ({
+  ...openedMixin(theme),
+  '& .MuiDrawer-paper': openedMixin(theme),
+  zIndex: 1201,
+}),
 );
 
 const StyledListItemButton = muiStyled(ListItemButton)(({ theme }) => ({
@@ -79,8 +90,7 @@ const StyledListItemButton = muiStyled(ListItemButton)(({ theme }) => ({
 
   '&.open': {
     justifyContent: 'initial',
-    marginLeft: theme.spacing(1.5),
-    marginRight: theme.spacing(1.5),
+    margin: theme.spacing(0, 1.5),
   }
 }));
 
@@ -152,10 +162,9 @@ const managementListItems = [
   },
 ];
 
-const DashboardDrawer = (props) => {
-  const { open, setOpen } = props;
-  const [openList, setOpenList] = useState(true);
+const DashboardDrawer = ({ open, setOpen }) => {
   const { roles } = useAuth();
+  const [openList, setOpenList] = useState(true);
   const isAdmin = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
 
   const handleClick = (e, id) => {
@@ -165,14 +174,14 @@ const DashboardDrawer = (props) => {
     e.preventDefault();
   };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  const handleDrawerClose = () => { setOpen(false) };
 
-  return (
-    <Drawer variant="permanent" open={open}>
+  const drawerContent = (
+    <>
       <DrawerHeader>
-        <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />
+        <NavLink to={'/dashboard'}>
+          <ImageLogo src="/bell.svg" className={open ? 'open' : ''} alt="RING! logo" />
+        </NavLink>
       </DrawerHeader>
       <List disablePadding>
         <ListItem key={0} disablePadding sx={{ display: 'block' }}>
@@ -240,7 +249,28 @@ const DashboardDrawer = (props) => {
           ))
         }
       </List>
-    </Drawer>
+    </>
+  )
+
+  return (
+    <>
+      <StyledMobileDrawer
+        variant="temporary"
+        open={open}
+        onClose={handleDrawerClose}
+        ModalProps={{ keepMounted: true }}
+        sx={{ display: { xs: 'block', md: 'none' } }}
+      >
+        {drawerContent}
+      </StyledMobileDrawer>
+      <StyledDrawer
+        variant="permanent"
+        sx={{ display: { xs: 'none', md: 'block' } }}
+        open={open}
+      >
+        {drawerContent}
+      </StyledDrawer>
+    </>
   )
 }
 

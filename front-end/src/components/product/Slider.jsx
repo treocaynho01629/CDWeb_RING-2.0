@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Grid, Button, Skeleton } from '@mui/material';
+import { Grid2 as Grid, Button, Skeleton } from '@mui/material';
 import { Link } from "react-router-dom"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
@@ -181,12 +181,8 @@ function Item({ book, index }) {
 
     return (
         <SlideItemContainer>
-            <Grid container sx={{ alignItems: 'center', position: 'relative' }}>
-                <Grid item xs={12} md={5}
-                    sx={{
-                        marginBottom: { xs: '100px', md: 0 }
-                    }}
-                >
+            <Grid container size="grow" sx={{ alignItems: 'center', position: 'relative' }}>
+                <Grid size={{ xs: 12, md: 5 }} mb={{ xs: '100px', md: 0 }}>
                     {book
                         ?
                         <Link to={`/product/${book.id}`}>
@@ -220,7 +216,7 @@ function Item({ book, index }) {
                         </ImgContainer>
                     }
                 </Grid>
-                <Grid item xs={12} md={7}>
+                <Grid size={{ xs: 12, md: 7 }}>
                     <InfoWrapper>
                         {book
                             ?

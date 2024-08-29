@@ -5,7 +5,7 @@ import {
     Search as SearchIcon, ShoppingCart, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
     Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, Storefront, Close, Notifications,
 } from '@mui/icons-material';
-import { Stack, Badge, IconButton, Avatar, Box, Grid, TextField, AppBar, useTheme, useMediaQuery } from '@mui/material';
+import { Stack, Badge, IconButton, Avatar, Box, Grid2 as Grid, TextField, AppBar, useTheme, useMediaQuery } from '@mui/material';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ColorModeContext } from '../../ThemeContextProvider';
 import useLogout from "../../hooks/useLogout";
@@ -17,10 +17,6 @@ import useCart from '../../hooks/useCart';
 
 //#region styled
 const Wrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
     padding: 5px 10px;
     
     ${props => props.theme.breakpoints.up("sm_md")} {
@@ -228,13 +224,13 @@ const StyledSearchForm = styled.form`
 
 const StyledSearchInput = muiStyled(TextField)(({ theme }) => ({
     color: 'inherit',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
         width: '100%',
     },
     '& .MuiInputBase-input': {
         transition: theme.transitions.create('width'),
         width: '100%',
-        [theme.breakpoints.up('sm')]: {
+        [theme.breakpoints.up('md')]: {
             width: '12ch',
             '&:focus': {
                 width: '20ch',
@@ -308,14 +304,14 @@ const Navbar = () => {
     return (
         <>
             <TopHeader>
-                <Grid container>
-                    <Grid item xs={12} md={6}>
+                <Grid container size="grow">
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <ContactContainer>
                             <Contact><PhoneIcon sx={{ fontSize: 18, marginRight: 1 }} />+8419130248</Contact>
                             <Contact><MailIcon sx={{ fontSize: 18, marginRight: 1 }} />haductrong01629@gmail.com</Contact>
                         </ContactContainer>
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <SocialContainer>
                             <Social color="3B5999"><FacebookIcon sx={{ fontSize: 18 }} /></Social>
                             <Social color="FF0000"><YouTubeIcon sx={{ fontSize: 18 }} /></Social>
@@ -327,15 +323,15 @@ const Navbar = () => {
             </TopHeader>
             <AppBar sx={{ backgroundColor: 'background.default', marginBottom: 2 }} position="sticky">
                 <Wrapper>
-                    <Grid container>
-                        <Grid item xs={12} md={6.5} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Grid container size="grow">
+                        <Grid size={{ xs: 12, md: "grow" }} sx={{ display: 'flex', alignItems: 'center' }}>
                             <Left>
                                 {mobileMode &&
                                     <>
                                         <Box
                                             display={isToggleSearch ? 'none' : 'flex'}
                                             flex={1}
-                                            alignItems={'center'}
+                                            alignItems="center"
                                         >
                                             <IconButton onClick={toggleDrawer}>
                                                 <MenuIcon sx={{ fontSize: 26 }} />
@@ -376,7 +372,11 @@ const Navbar = () => {
                                                 value={searchField}
                                                 id="search"
                                                 size="small"
-                                                InputProps={{ startAdornment: <SearchIcon sx={{ marginRight: 1 }} /> }}
+                                                slotProps={{
+                                                    input: {
+                                                        startAdornment: (< SearchIcon sx={{ marginRight: 1 }} />)
+                                                    },
+                                                }}
                                             />
                                         }
                                         <StyledIconButton aria-label="search toggle" onClick={() => toggleSearch()}>
@@ -387,7 +387,7 @@ const Navbar = () => {
                             </Left>
                         </Grid>
                         {!mobileMode &&
-                            <Grid item xs={12} md={5.5} sx={{ display: { xs: 'none', md: 'flex' } }}>
+                            <Grid size={{ xs: 12, md: "auto" }} sx={{ display: { xs: 'none', md: 'flex' } }}>
                                 <Right>
                                     <NavItem>
                                         <Stack spacing={1} direction="row" sx={{ color: 'action.active' }} alignItems={'center'}>

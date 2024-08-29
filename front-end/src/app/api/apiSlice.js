@@ -40,8 +40,8 @@ const baseQueryForRefresh = fetchBaseQuery({
 const baseQueryWithRefresh = async (args, api, extraOptions) => {
     let result = await baseQuery(args, api, extraOptions)
 
-    if (result?.meta?.response?.status === 401 || result?.meta?.response?.status === 403) {
-        const { data } = await baseQueryForRefresh("/api/v1/auth/refresh-token", api, extraOptions)
+    if (result?.meta?.response?.status === 401 || result?.meta?.response?.status === 403) { //Token expired
+        const { data } = await baseQueryForRefresh("/api/v1/auth/refresh-token", api, extraOptions);
         const { token, code, errors } = data;
 
         if (token) {

@@ -28,6 +28,15 @@ const InputContainer = styled.div`
     justify-content: space-between;
     align-items: center;
 `
+
+const StyledNumberInput = styled(TextField)(({ theme }) => ({
+  "input[type=number]::-webkit-outer-spin-button": {
+    "-webkit-appearance": "none",
+  },
+  "input[type=number]::-webkit-inner-spin-button": {
+    "-webkit-appearance": "none",
+  }
+}));
 //#endregion
 
 const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, setCateId }) => {
@@ -41,11 +50,10 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, setCateId
 
   if (loadCates || errorCates) {
     catesContent = (
-      Array.from(new Array(5)).map((index) => (
+      Array.from(new Array(5)).map((item, index) => (
         <Skeleton
           key={index}
           variant="rectangular"
-          animation="wave"
           sx={{ borderRadius: '1em' }}
           height={32}
           width={106}
@@ -113,11 +121,10 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
 
   if (loadPubs || errorPubs) {
     pubsContent = (
-      Array.from(new Array(10)).map((index) => (
+      Array.from(new Array(10)).map((item, index) => (
         <Skeleton
           key={index}
           variant="rectangular"
-          animation="wave"
           sx={{ borderRadius: '1em' }}
           height={32}
           width={106}
@@ -296,37 +303,43 @@ const RangeFilter = ({ valueInput, setValueInput }) => {
         />
       </Box>
       <InputContainer>
-        <TextField
-            onChange={handleInputChange}
-            onBlur={handleBlur}
-            value={valueInput[0]}
-            size="small"
-            inputProps={{
+      <StyledNumberInput
+          onChange={handleInputChange}
+          onBlur={handleBlur}
+          value={valueInput[0]}
+          size="small"
+          slotProps={{
+            htmlInput: {
+              style: {fontSize: 14},
               step: 1000,
               min: 1000,
               max: 10000000,
               type: 'number',
               'aria-labelledby': 'input-slider',
-            }}
-            InputProps={{
+            },
+            input: {
               endAdornment: endAdornment,
-            }}
-          />
+            }
+          }}
+        />
         &nbsp;đến&nbsp;
-        <TextField
+        <StyledNumberInput
           onChange={handleInputChange2}
           onBlur={handleBlur}
           value={valueInput[1]}
           size="small"
-          inputProps={{
-            step: 1000,
-            min: 1000,
-            max: 10000000,
-            type: 'number',
-            'aria-labelledby': 'input-slider',
-          }}
-          InputProps={{
-            endAdornment: endAdornment,
+          slotProps={{
+            htmlInput: {
+              style: {fontSize: 14},
+              step: 1000,
+              min: 1000,
+              max: 10000000,
+              type: 'number',
+              'aria-labelledby': 'input-slider',
+            },
+            input: {
+              endAdornment: endAdornment,
+            }
           }}
         />
       </InputContainer>
@@ -481,7 +494,7 @@ const FilterDialog = (props) => {
           sx={{ marginY: '10px' }}
           onClick={applyFilter}
           startIcon={<Check />}
-          >
+        >
           Áp dụng
         </Button>
       </DialogActions>

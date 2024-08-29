@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 
-import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, FormControl } from '@mui/material';
+import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, FormControl } from '@mui/material';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { BarChart, CartesianGrid, Pie, PieChart, XAxis, YAxis, Tooltip, Legend, Bar, Cell, ResponsiveContainer, LabelList, Label, Sector } from 'recharts'
-import { Avatar, Grid, Paper, useTheme } from '@mui/material'
+import { Avatar, Grid2 as Grid, Paper, useTheme } from '@mui/material'
 import { BarChart as BarChartIcon, PieChart as PieChartIcon } from '@mui/icons-material';
 import { useGetTopSellersQuery, useGetTopUsersQuery } from '../../../features/users/usersApiSlice';
 import { useState } from 'react';
@@ -53,7 +53,7 @@ const renderActiveShape = (props) => {
     );
 };
 
-const renderLabel = function(entry) {
+const renderLabel = function (entry) {
     return entry.name;
 }
 
@@ -98,8 +98,8 @@ const ChartUsers = () => {
     }
 
     return (
-        <Grid container spacing={3} sx={{ mb: 3 }}>
-            <Grid item xs={12} lg={7.5}>
+        <Grid container size="grow" spacing={3} mb={3}>
+            <Grid size="grow">
                 <Paper elevation={3} sx={{ pb: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                     <ChartTitle><BarChartIcon />&nbsp;Xếp hạng khách hàng</ChartTitle>
                     <ResponsiveContainer width="95%" height={350}>
@@ -111,17 +111,17 @@ const ChartUsers = () => {
                             <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
                             <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
                             <Tooltip />
-                            <Legend verticalAlign="top" align="left" height={45}/>
+                            <Legend verticalAlign="top" align="left" height={45} />
                             <Bar dataKey="data.spends" yAxisId="left" fill="#8dcbf5" name="Đơn đặt" />
                             <Bar dataKey="data.reviews" yAxisId="right" fill="#63e399" name="Đánh giá" />
                         </BarChart>
                     </ResponsiveContainer>
                 </Paper>
             </Grid>
-            <Grid item xs={12} lg={4}>
-                <Paper elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'visible'}}>
+            <Grid size="auto">
+                <Paper elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}>
                     <ChartTitle><PieChartIcon />&nbsp;Xếp hạng nhân viên</ChartTitle>
-                    <ResponsiveContainer width="95%" height="95%" style={{overflow: 'visible'}}>
+                    <ResponsiveContainer width={500} height="95%" style={{ overflow: 'visible' }}>
                         <PieChart>
                             {/* <Tooltip content={<CustomPieTooltip />} /> */}
                             <Pie

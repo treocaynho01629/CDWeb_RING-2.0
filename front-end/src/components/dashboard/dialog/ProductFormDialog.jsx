@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 
-import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, FormControl } from '@mui/material';
+import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, FormControl } from '@mui/material';
 import { Check as CheckIcon, Close as CloseIcon, AutoStories as AutoStoriesIcon } from '@mui/icons-material';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';

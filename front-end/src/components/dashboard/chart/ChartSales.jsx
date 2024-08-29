@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { CartesianGrid, LineChart, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Line } from 'recharts'
-import { Box, Grid, Paper, Divider, LinearProgress } from '@mui/material'
+import { Box, Grid2 as Grid, Paper, Divider, LinearProgress } from '@mui/material'
 import { Link } from "react-router-dom";
 import { TrendingUp, TrendingDown, SsidChart, Sell } from '@mui/icons-material';
 import { useGetSaleQuery } from '../../../features/orders/ordersApiSlice';
@@ -60,8 +60,8 @@ const ChartSales = () => {
     let display = chartDisplay();
 
     return (
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} lg={4}>
+      <Grid container spacing={3} size="grow" mb={3}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <Paper elevation={3} sx={{ height: '100%', padding: 3, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Box>
               <h3 style={{ marginTop: 0, display: 'flex', alignItems: 'center' }}><Sell />&nbsp;Doanh thu đỉnh điểm</h3>
@@ -86,7 +86,7 @@ const ChartSales = () => {
             </Box>
           </Paper>
         </Grid>
-        <Grid item xs={12} lg={8}>
+        <Grid size={{ xs: 12, lg: 8 }}>
           <Paper elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <h3 style={{ display: 'flex', alignItems: 'center' }}><SsidChart />&nbsp;Biểu đồ doanh thu theo tháng</h3>
             <ResponsiveContainer width="95%" height={350}>

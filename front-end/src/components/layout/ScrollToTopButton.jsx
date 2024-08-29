@@ -37,12 +37,12 @@ const StyledFab = styled(Fab)(({ theme }) => ({
     backgroundColor: theme.palette.primary.main,
     animation: `${myEffect} 7s infinite`,
     animationDelay: '10s',
-    '-webkit-animation-delay': '5s',
+    WebkitAnimationDelay: '5s',
 
     '&:hover': {
         backgroundColor: theme.palette.grey[300],
         color: theme.palette.text.primary,
-        'animation-play-state': 'pause'
+        WebkitAnimationPlayState: 'pause'
     },
 }));
 

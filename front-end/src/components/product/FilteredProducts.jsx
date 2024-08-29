@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material";
+import { Box, Grid2 as Grid } from "@mui/material";
 import { trackWindowScroll } from "react-lazy-load-image-component";
 import Product from './Product';
 import CustomProgress from '../custom/CustomProgress';
@@ -8,8 +8,8 @@ const FilteredProducts = ({ data, isError, error, isLoading, isSuccess, pageSize
 
   if (isLoading) {
     productsContent = (
-      Array.from(new Array(pageSize)).map((index) => (
-        <Grid key={index} item xs={6} sm={4} lg={3}>
+      Array.from(new Array(pageSize)).map((item, index) => (
+        <Grid key={index} size={{ xs: 6, sm: 4, lg: 3 }}>
           <Product />
         </Grid>
       ))
@@ -22,7 +22,7 @@ const FilteredProducts = ({ data, isError, error, isLoading, isSuccess, pageSize
         const book = entities[id];
 
         return (
-          <Grid key={`${id}-${index}`} item xs={6} sm={4} lg={3}>
+          <Grid key={`${id}-${index}`} size={{ xs: 6, sm: 4, lg: 3 }}>
             <Product {...{ book, scrollPosition }} />
           </Grid>
         )
@@ -38,7 +38,7 @@ const FilteredProducts = ({ data, isError, error, isLoading, isSuccess, pageSize
   return (
     <div style={{ padding: 0, width: '100%', position: 'relative' }}>
       {isLoading && <CustomProgress color="primary" />}
-      <Grid container rowSpacing={1} columnSpacing={1} sx={{ width: '100%' }}>
+      <Grid container spacing={.2} sx={{ width: '100%' }}>
         {productsContent}
       </Grid>
     </div>

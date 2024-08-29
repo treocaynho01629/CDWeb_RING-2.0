@@ -188,7 +188,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
     aspect-ratio: 1/1;
     margin: 10px 2px;
     object-fit: contain;
-    transform: ${props => props.imageStyle};
+    transform: ${props => props.imagestyle};
     animation: ${fadeIn} .25s ease;
     z-index: -1;
 `
@@ -242,7 +242,7 @@ const Product = ({ book, scrollPosition }) => {
                         alt={`${book?.title} Thumbnail`}
                         width={'100%'}
                         height={220}
-                        imageStyle={multiImages[slideIndex]}
+                        imagestyle={multiImages[slideIndex]}
                         scrollPosition={scrollPosition}
                         placeholder={
                             <Skeleton

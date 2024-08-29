@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { useState, lazy, Suspense, useEffect } from 'react';
-import { TextareaAutosize, Box, Card, CardContent, CardMedia, IconButton, Typography, Grid, Divider } from '@mui/material';
+import { TextareaAutosize, Box, Card, CardContent, CardMedia, IconButton, Typography, Grid2 as Grid, Divider } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import TableReviews from "../../components/dashboard/table/TableReviews";
 import TableOrders from "../../components/dashboard/table/TableOrders";

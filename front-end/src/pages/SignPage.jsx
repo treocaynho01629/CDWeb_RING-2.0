@@ -12,26 +12,13 @@ const PendingIndicator = lazy(() => import('../components/layout/PendingIndicato
 
 //#region styled
 const fadeIn = keyframes`
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-`;
+  from {opacity: 0}
+  to {opacity: 1}
+`
 
 const fadeIn2 = keyframes`
-  from {
-    opacity: .1;
-  }
-
-  to {
-    opacity: 1;
-  }
-`;
-
-const Container = styled.div`
+  from { opacity: .1}
+  to { opacity: 1}
 `
 
 const Wrapper = styled.div`
@@ -86,12 +73,14 @@ const SignDivider = styled.button`
     text-align: center;
     justify-content: center;
     align-items: center;
+    border: 0;
     background-color: ${props => props.theme.palette.primary.main};
     color: ${props => props.theme.palette.primary.contrastText};
     border-radius: 0;
     border-radius: 50px;
     width: 60px;
     height: 60px;
+    cursor: pointer;
     display: none;
 
     @media (min-width: 900px) {
@@ -117,7 +106,7 @@ function SignPage() {
     const toggleTab = () => { setIsLogin(prev => !prev) }
 
     return (
-        <Container>
+        <div>
             <SimpleNavbar />
             {(pending) ?
                 <Suspense fallBack={<></>}>
@@ -149,7 +138,7 @@ function SignPage() {
                     <RegisterTab {...{ pending, setPending }} />
                 </TabContainer>
             </Wrapper>
-        </Container>
+        </div>
     )
 }
 

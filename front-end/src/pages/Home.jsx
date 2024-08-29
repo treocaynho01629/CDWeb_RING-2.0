@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useState, useEffect } from "react";
-import { Grid, ToggleButton, Button, ToggleButtonGroup, Skeleton } from '@mui/material';
+import { Grid2 as Grid, ToggleButton, Button, ToggleButtonGroup, Skeleton } from '@mui/material';
 import { styled as muiStyled } from '@mui/system';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
@@ -152,9 +152,9 @@ const Home = () => {
 
   if (loadCates || errorCates) {
     catesContent = (
-      Array.from(new Array(4)).map((index) => (
+      Array.from(new Array(4)).map((item, index) => (
         <StyledToggleButton key={index} value='' disabled={true}>
-          <Skeleton sx={{ bgcolor: 'grey.400', fontSize: '14px' }} variant="text" animation="wave" width={100} />
+          <Skeleton sx={{ bgcolor: 'grey.400', fontSize: '14px' }} variant="text" width={100} />
         </StyledToggleButton>
       ))
     )
@@ -166,15 +166,15 @@ const Home = () => {
         const cate = entities[id];
 
         return (
-          <StyledToggleButton key={`${id}-${index}`} value={id ?? ''}>
+          <StyledToggleButton key={`${id}-${index}`} value={id}>
             {cate?.categoryName}
           </StyledToggleButton>
         )
       })
       :
-      Array.from(new Array(4)).map((index) => (
-        <StyledToggleButton key={index}>
-          <Skeleton variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
+      Array.from(new Array(4)).map((item, index) => (
+        <StyledToggleButton key={index} value='' disabled={true}>
+          <Skeleton sx={{ bgcolor: 'grey.400', fontSize: '14px' }} variant="text" width={100} />
         </StyledToggleButton>
       ))
   }
@@ -183,8 +183,8 @@ const Home = () => {
     <Wrapper>
       <Slider />
       <Categories />
-      <Grid sx={{ mb: 3, mt: -1 }} container spacing={5}>
-        <Grid item xs={12} md={12}>
+      <Grid sx={{ mb: 3, mt: -1 }} container spacing={4}>
+        <Grid size={12}>
           <CustomDivider>SẢN PHẨM MỚI NHẤT</CustomDivider>
           <br />
           <Products {...{ isLoading, data, isSuccess, isError }} />
@@ -210,11 +210,8 @@ const Home = () => {
             >
               {(!orderGroup?.length ? Array.from(new Array(4)) : orderGroup)?.map((order, index) => (
                 <StyledToggleButton key={`${order?.id}-${index}`} value={order?.value ?? ''}>
-                  {order
-                    ?
-                    order?.label
-                    :
-                    <Skeleton key={index} variant="text" animation="wave" sx={{ fontSize: '14px' }} width={100} />
+                  {order ? order?.label
+                    : <Skeleton key={index} variant="text" sx={{ fontSize: '14px' }} width={100} />
                   }
                 </StyledToggleButton>
               ))}

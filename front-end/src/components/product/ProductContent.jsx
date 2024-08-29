@@ -5,7 +5,7 @@ import {
     Remove as RemoveIcon, Add as AddIcon, Star as StarIcon, StarBorder as StarBorderIcon,
     ShoppingCart as ShoppingCartIcon, Sell as SellIcon, Storefront as StorefrontIcon, Check as CheckIcon
 } from '@mui/icons-material';
-import { Skeleton, Button, Rating, Box, Divider, Grid, Avatar, Drawer, useTheme, useMediaQuery } from '@mui/material';
+import { Skeleton, Button, Rating, Box, Divider, Grid2 as Grid, Avatar, Drawer, useTheme, useMediaQuery } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ProductImages from './ProductImages';
 import useCart from '../../hooks/useCart';
@@ -432,178 +432,150 @@ const ProductContent = ({ book, handleTabChange }) => {
     };
 
     return (
-        <Grid container spacing={{ xs: .5, sm: 2 }}>
-            <Grid item xs={12} lg={10}>
-                <Grid
-                    container
-                    spacing={{ xs: .5, sm: 2 }}
-                    justifyContent="flex-start"
-                    alignItems="stretch"
-                >
-                    <Grid item xs={12} md={6}>
+        <Grid container size="grow" spacing={{ xs: .5, sm: 2 }}>
+            <Grid
+                container
+                size={{ xs: 12, lg: 10 }}
+                spacing={{ xs: .5, sm: 2 }}
+                justifyContent="flex-start"
+                alignItems="stretch"
+            >
+                <Grid size={{ xs: 12, md: 6 }}>
+                    {!book
+                        ?
+                        <ProductImages />
+                        :
+                        <ProductImages images={book?.image} />
+                    }
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                    <InfoContainer>
                         {!book
                             ?
-                            <ProductImages />
+                            <div>
+                                <Skeleton variant="text" sx={{ fontSize: '22px', marginTop: '30px' }} />
+                                <Skeleton variant="text" sx={{ fontSize: '22px' }} width="30%" />
+                                <Detail>
+                                    Nhà xuất bản: &nbsp;
+                                    <Skeleton variant="text" sx={{ fontSize: '15px' }} width="50%" />
+                                </Detail>
+                                <TotalRatingContainer>
+                                    <StyledRating
+                                        name="product-rating"
+                                        value={0}
+                                        getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
+                                        precision={0.5}
+                                        icon={<StarIcon fontSize="18" />}
+                                        emptyIcon={<StarBorderIcon fontSize="18" />}
+                                        readOnly
+                                    />
+                                    <strong style={{ paddingLeft: 10 }}>(~) Đánh giá</strong>
+                                </TotalRatingContainer>
+                                <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+                                    <PriceContainer>
+                                        <Skeleton variant="text" sx={{ fontSize: '24px', marginY: '20px' }} width={105} />&nbsp;
+                                        <Skeleton variant="text" sx={{ fontSize: '18px', marginY: '20px' }} width={90} />
+                                    </PriceContainer>
+                                    <Box display={{ xs: 'flex', sm: 'none' }} alignItems={'center'} justifyContent={'space-between'}>
+                                        <strong style={{ paddingRight: 10 }}>(~) Đánh giá</strong>
+                                        <StarIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                                    </Box>
+                                </Box>
+                                <DetailContainer>
+                                    <DetailTitle>Chi tiết:</DetailTitle>
+                                    <Detail>
+                                        Tác giả: &nbsp;
+                                        <Skeleton variant="text" sx={{ fontSize: '15px' }} width="40%" />
+                                    </Detail>
+                                    <Detail>
+                                        Hình thức bìa: &nbsp;
+                                        <Skeleton variant="text" sx={{ fontSize: '15px' }} width="30%" />
+                                    </Detail>
+                                    <br />
+                                    <DetailTitle>Mô tả sản phẩm:</DetailTitle>
+                                    <Description>
+                                        <Skeleton variant="text" sx={{ fontSize: '14px' }} />
+                                        <Skeleton variant="text" sx={{ fontSize: '14px' }} />
+                                        <Skeleton variant="text" sx={{ fontSize: '14px' }} />
+                                    </Description>
+                                    <Detail>
+                                        <Link onClick={(e) => handleChangeTab(e, "detail")}>Xem thêm...</Link>
+                                    </Detail>
+                                </DetailContainer>
+                            </div>
                             :
-                            <ProductImages images={book?.image} />
+                            <>
+                                <BookTitle>{book?.title}</BookTitle>
+                                <Detail>
+                                    Nhà xuất bản: &nbsp;
+                                    <Link to={`/filters?pubId=${book?.publisher?.id}`}>
+                                        {book?.publisher?.pubName}
+                                    </Link>
+                                </Detail>
+                                <TotalRatingContainer onClick={(e) => handleChangeTab(e, "reviews")}>
+                                    <StyledRating
+                                        name="product-rating"
+                                        value={isNaN(calculatedRate) ? 0 : calculatedRate}
+                                        getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
+                                        precision={0.5}
+                                        icon={<StarIcon fontSize="18" />}
+                                        emptyIcon={<StarBorderIcon fontSize="18" />}
+                                        readOnly
+                                    />
+                                    <strong style={{ paddingLeft: 10 }}>({book?.rateAmount}) Đánh giá</strong>
+                                </TotalRatingContainer>
+                                <Box onClick={(e) => handleChangeTab(e, "reviews")} sx={{ curosr: 'pointer' }}
+                                    display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+                                    <PriceContainer>
+                                        <Price>{book?.price?.toLocaleString()}đ</Price>
+                                        <OldPrice>{Math.round(book?.price * 1.1).toLocaleString()}đ</OldPrice>
+                                    </PriceContainer>
+                                    <Box display={{ xs: 'flex', sm: 'none' }} alignItems={'center'} justifyContent={'space-between'}>
+                                        <strong style={{ paddingRight: 10 }}>({calculatedRate}) Đánh giá</strong>
+                                        <StarIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                                    </Box>
+                                </Box>
+                                <DetailContainer>
+                                    <DetailTitle>Chi tiết:</DetailTitle>
+                                    <Detail>
+                                        Tác giả: &nbsp;
+                                        <Link to={`/filters?keyword=${book?.author}`}>
+                                            {book?.author}
+                                        </Link>
+                                    </Detail>
+                                    <Detail>
+                                        Hình thức bìa: &nbsp;
+                                        <Link to={`/filters?type=${book?.type}`}>
+                                            {book?.type}
+                                        </Link>
+                                    </Detail>
+                                    <br />
+                                    <DetailTitle>Mô tả sản phẩm:</DetailTitle>
+                                    <Description>
+                                        {book?.description}
+                                    </Description>
+                                    <Detail>
+                                        <Link onClick={(e) => handleChangeTab(e, "detail")}>Xem thêm...</Link>
+                                    </Detail>
+                                </DetailContainer>
+                            </>
                         }
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <InfoContainer>
-                            {!book
-                                ?
-                                <div>
-                                    <Skeleton variant="text" sx={{ fontSize: '22px', marginTop: '30px' }} />
-                                    <Skeleton variant="text" sx={{ fontSize: '22px' }} width="30%" />
-                                    <Detail>
-                                        Nhà xuất bản: &nbsp;
-                                        <Skeleton variant="text" sx={{ fontSize: '15px' }} width="50%" />
-                                    </Detail>
-                                    <TotalRatingContainer>
-                                        <StyledRating
-                                            name="product-rating"
-                                            value={0}
-                                            getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
-                                            precision={0.5}
-                                            icon={<StarIcon fontSize="18" />}
-                                            emptyIcon={<StarBorderIcon fontSize="18" />}
-                                            readOnly
-                                        />
-                                        <strong style={{ paddingLeft: 10 }}>(~) Đánh giá</strong>
-                                    </TotalRatingContainer>
-                                    <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-                                        <PriceContainer>
-                                            <Skeleton variant="text" sx={{ fontSize: '24px', marginY: '20px' }} width={105} />&nbsp;
-                                            <Skeleton variant="text" sx={{ fontSize: '18px', marginY: '20px' }} width={90} />
-                                        </PriceContainer>
-                                        <Box display={{ xs: 'flex', sm: 'none' }} alignItems={'center'} justifyContent={'space-between'}>
-                                            <strong style={{ paddingRight: 10 }}>(~) Đánh giá</strong>
-                                            <StarIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-                                        </Box>
-                                    </Box>
-                                    <DetailContainer>
-                                        <DetailTitle>Chi tiết:</DetailTitle>
-                                        <Detail>
-                                            Tác giả: &nbsp;
-                                            <Skeleton variant="text" sx={{ fontSize: '15px' }} width="40%" />
-                                        </Detail>
-                                        <Detail>
-                                            Hình thức bìa: &nbsp;
-                                            <Skeleton variant="text" sx={{ fontSize: '15px' }} width="30%" />
-                                        </Detail>
-                                        <br />
-                                        <DetailTitle>Mô tả sản phẩm:</DetailTitle>
-                                        <Description>
-                                            <Skeleton variant="text" sx={{ fontSize: '14px' }} />
-                                            <Skeleton variant="text" sx={{ fontSize: '14px' }} />
-                                            <Skeleton variant="text" sx={{ fontSize: '14px' }} />
-                                        </Description>
-                                        <Detail>
-                                            <Link onClick={(e) => handleChangeTab(e, "detail")}>Xem thêm...</Link>
-                                        </Detail>
-                                    </DetailContainer>
-                                </div>
-                                :
-                                <>
-                                    <BookTitle>{book?.title}</BookTitle>
-                                    <Detail>
-                                        Nhà xuất bản: &nbsp;
-                                        <Link to={`/filters?pubId=${book?.publisher?.id}`}>
-                                            {book?.publisher?.pubName}
-                                        </Link>
-                                    </Detail>
-                                    <TotalRatingContainer onClick={(e) => handleChangeTab(e, "reviews")}>
-                                        <StyledRating
-                                            name="product-rating"
-                                            value={calculatedRate}
-                                            getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
-                                            precision={0.5}
-                                            icon={<StarIcon fontSize="18" />}
-                                            emptyIcon={<StarBorderIcon fontSize="18" />}
-                                            readOnly
-                                        />
-                                        <strong style={{ paddingLeft: 10 }}>({book?.rateAmount}) Đánh giá</strong>
-                                    </TotalRatingContainer>
-                                    <Box onClick={(e) => handleChangeTab(e, "reviews")} sx={{ curosr: 'pointer' }}
-                                        display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-                                        <PriceContainer>
-                                            <Price>{book?.price?.toLocaleString()}đ</Price>
-                                            <OldPrice>{Math.round(book?.price * 1.1).toLocaleString()}đ</OldPrice>
-                                        </PriceContainer>
-                                        <Box display={{ xs: 'flex', sm: 'none' }} alignItems={'center'} justifyContent={'space-between'}>
-                                            <strong style={{ paddingRight: 10 }}>({calculatedRate}) Đánh giá</strong>
-                                            <StarIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-                                        </Box>
-                                    </Box>
-                                    <DetailContainer>
-                                        <DetailTitle>Chi tiết:</DetailTitle>
-                                        <Detail>
-                                            Tác giả: &nbsp;
-                                            <Link to={`/filters?keyword=${book?.author}`}>
-                                                {book?.author}
-                                            </Link>
-                                        </Detail>
-                                        <Detail>
-                                            Hình thức bìa: &nbsp;
-                                            <Link to={`/filters?type=${book?.type}`}>
-                                                {book?.type}
-                                            </Link>
-                                        </Detail>
-                                        <br />
-                                        <DetailTitle>Mô tả sản phẩm:</DetailTitle>
-                                        <Description>
-                                            {book?.description}
-                                        </Description>
-                                        <Detail>
-                                            <Link onClick={(e) => handleChangeTab(e, "detail")}>Xem thêm...</Link>
-                                        </Detail>
-                                    </DetailContainer>
-                                </>
-                            }
-                            {mobileMode ?
-                                <>
-                                    <AltFilterContainer>
-                                        <Link to={`/cart`}>
-                                            <CartButton><ShoppingCartIcon style={{ fontSize: 24 }} /></CartButton>
-                                        </Link>
-                                        <BuyButton disabled={!book} onClick={toggleDrawer(true)}>
-                                            THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()}đ)
-                                        </BuyButton>
-                                    </AltFilterContainer>
-                                    <Drawer
-                                        anchor={'bottom'}
-                                        open={open}
-                                        onClose={toggleDrawer(false)}
-                                    >
-                                        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} padding={'0 10px'}>
-                                            <DetailTitle>Số lượng:</DetailTitle>
-                                            <SubFilterContainer>
-                                                <AmountButton direction="add" onClick={() => changeAmount(-1)}>
-                                                    <RemoveIcon style={{ fontSize: 12 }} />
-                                                </AmountButton>
-                                                <InputContainer>
-                                                    <AmountInput type="number" onChange={(e) => handleChangeAmount(e.target.valueAsNumber)} value={amountIndex} />
-                                                </InputContainer>
-                                                <AmountButton direction="remove" onClick={() => changeAmount(1)}>
-                                                    <AddIcon style={{ fontSize: 12 }} />
-                                                </AmountButton>
-                                            </SubFilterContainer>
-                                        </Box>
-                                        <Button
-                                            variant="outlined"
-                                            color="primary"
-                                            size="large"
-                                            sx={{ margin: '5px' }}
-                                            onClick={() => handleAddToCart(book)}
-                                        >
-                                            THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()}đ)
-                                        </Button>
-                                    </Drawer>
-                                </>
-                                :
-                                <FilterContainer>
-                                    <Divider sx={{ my: 2, display: { xs: 'none', md: 'block' } }} />
-                                    <Filter>
+                        {mobileMode ?
+                            <>
+                                <AltFilterContainer>
+                                    <Link to={`/cart`}>
+                                        <CartButton><ShoppingCartIcon style={{ fontSize: 24 }} /></CartButton>
+                                    </Link>
+                                    <BuyButton disabled={!book} onClick={toggleDrawer(true)}>
+                                        THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()}đ)
+                                    </BuyButton>
+                                </AltFilterContainer>
+                                <Drawer
+                                    anchor={'bottom'}
+                                    open={open}
+                                    onClose={toggleDrawer(false)}
+                                >
+                                    <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} padding={'0 10px'}>
                                         <DetailTitle>Số lượng:</DetailTitle>
                                         <SubFilterContainer>
                                             <AmountButton direction="add" onClick={() => changeAmount(-1)}>
@@ -616,84 +588,109 @@ const ProductContent = ({ book, handleTabChange }) => {
                                                 <AddIcon style={{ fontSize: 12 }} />
                                             </AmountButton>
                                         </SubFilterContainer>
-                                    </Filter>
-                                    <BuyButton disabled={!book} onClick={() => handleAddToCart(book)}>
-                                        <ShoppingCartIcon style={{ fontSize: 18 }} />
+                                    </Box>
+                                    <Button
+                                        variant="outlined"
+                                        color="primary"
+                                        size="large"
+                                        sx={{ margin: '5px' }}
+                                        onClick={() => handleAddToCart(book)}
+                                    >
                                         THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()}đ)
-                                    </BuyButton>
-                                </FilterContainer>
-                            }
+                                    </Button>
+                                </Drawer>
+                            </>
+                            :
+                            <FilterContainer>
+                                <Divider sx={{ my: 2, display: { xs: 'none', md: 'block' } }} />
+                                <Filter>
+                                    <DetailTitle>Số lượng:</DetailTitle>
+                                    <SubFilterContainer>
+                                        <AmountButton direction="add" onClick={() => changeAmount(-1)}>
+                                            <RemoveIcon style={{ fontSize: 12 }} />
+                                        </AmountButton>
+                                        <InputContainer>
+                                            <AmountInput type="number" onChange={(e) => handleChangeAmount(e.target.valueAsNumber)} value={amountIndex} />
+                                        </InputContainer>
+                                        <AmountButton direction="remove" onClick={() => changeAmount(1)}>
+                                            <AddIcon style={{ fontSize: 12 }} />
+                                        </AmountButton>
+                                    </SubFilterContainer>
+                                </Filter>
+                                <BuyButton disabled={!book} onClick={() => handleAddToCart(book)}>
+                                    <ShoppingCartIcon style={{ fontSize: 18 }} />
+                                    THÊM VÀO GIỎ ({(book?.price * amountIndex).toLocaleString()}đ)
+                                </BuyButton>
+                            </FilterContainer>
+                        }
 
-                        </InfoContainer>
-                    </Grid>
+                    </InfoContainer>
                 </Grid>
             </Grid>
-            <Grid item xs={12} lg={2}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} md={3} lg={12}>
-                        <StuffContainer>
-                            <Box display={{ xs: 'flex', md: 'block' }}>
-                                <StuffTitle>
-                                    <StorefrontIcon />&nbsp;NHÀ PHÂN PHỐI:
-                                </StuffTitle>
-                                {!book
-                                    ?
-                                    <Box
-                                        display={'flex'}
-                                        alignItems={'center'}
-                                        justifyContent={'space-between'}
-                                        flexDirection={{ sm: 'row', md: 'column' }}
-                                        width={'100%'}
-                                    >
-                                        <SellerContainer>
-                                            <Avatar>H</Avatar>&nbsp;
-                                            <Skeleton variant="text" sx={{ fontSize: '16px' }} width={100} />
-                                            &nbsp;&nbsp;&nbsp;
-                                        </SellerContainer>
-                                        <VisitButton>ĐỐI TÁC RING!&nbsp;<CheckIcon /></VisitButton>
-                                    </Box>
-                                    :
-                                    <Box
-                                        display={'flex'}
-                                        alignItems={'center'}
-                                        justifyContent={'space-between'}
-                                        flexDirection={{ sm: 'row', md: 'column' }}
-                                        width={'100%'}
-                                    >
-                                        <SellerContainer>
-                                            <Avatar>{book?.sellerName?.charAt(0) ?? ''}</Avatar>
-                                            <Link to={`/filters?seller=${book?.sellerName}`}>
-                                                &nbsp;{book?.sellerName}
-                                            </Link>
-                                            &nbsp;&nbsp;&nbsp;
-                                        </SellerContainer>
-                                        <Link to={`/filters?seller=${book?.sellerName}`}>
-                                            <VisitButton>ĐỐI TÁC RING!&nbsp;<CheckIcon /></VisitButton>
-                                        </Link>
-                                    </Box>
-                                }
-                            </Box>
-                        </StuffContainer>
-                    </Grid>
-                    <Grid item xs={12} md={9} lg={12} display={{ xs: 'none', sm: 'block' }}>
-                        <StuffContainer>
-                            <StuffTitle><SellIcon />&nbsp;KHUYẾN MÃI</StuffTitle>
+            <Grid container spacing={2} size={{ xs: 12, lg: 2 }} direction={{ xs: 'row', lg: 'column'}}>
+                <Grid size={{ xs: 12, md: "auto", lg: 12 }}>
+                    <StuffContainer>
+                        <Box display={{ xs: 'flex', md: 'block' }}>
+                            <StuffTitle>
+                                <StorefrontIcon />&nbsp;NHÀ PHÂN PHỐI:
+                            </StuffTitle>
                             {!book
                                 ?
-                                <>
-                                    <Skeleton variant="rectangular" width={'100%'} height={44} sx={{ marginTop: '10px' }} />
-                                    <Skeleton variant="rectangular" width={'100%'} height={44} sx={{ marginTop: '10px' }} />
-                                    <Skeleton variant="rectangular" width={'100%'} height={44} sx={{ marginTop: '10px' }} />
-                                </>
+                                <Box
+                                    display={'flex'}
+                                    alignItems={'center'}
+                                    justifyContent={'space-between'}
+                                    flexDirection={{ sm: 'row', md: 'column' }}
+                                    width={'100%'}
+                                >
+                                    <SellerContainer>
+                                        <Avatar>H</Avatar>&nbsp;
+                                        <Skeleton variant="text" sx={{ fontSize: '16px' }} width={100} />
+                                        &nbsp;&nbsp;&nbsp;
+                                    </SellerContainer>
+                                    <VisitButton>ĐỐI TÁC RING!&nbsp;<CheckIcon /></VisitButton>
+                                </Box>
                                 :
-                                <>
-                                    <CouponTab><SellIcon />&nbsp; MÃ: ABCDFE39</CouponTab>
-                                    <CouponTab><SellIcon />&nbsp; MÃ: DFCR4546</CouponTab>
-                                    <CouponTab><SellIcon />&nbsp; MÃ: TRBB1234</CouponTab>
-                                </>
+                                <Box
+                                    display={'flex'}
+                                    alignItems={'center'}
+                                    justifyContent={'space-between'}
+                                    flexDirection={{ sm: 'row', md: 'column' }}
+                                    width={'100%'}
+                                >
+                                    <SellerContainer>
+                                        <Avatar>{book?.sellerName?.charAt(0) ?? ''}</Avatar>
+                                        <Link to={`/filters?seller=${book?.sellerName}`}>
+                                            &nbsp;{book?.sellerName}
+                                        </Link>
+                                        &nbsp;&nbsp;&nbsp;
+                                    </SellerContainer>
+                                    <Link to={`/filters?seller=${book?.sellerName}`}>
+                                        <VisitButton>ĐỐI TÁC RING!&nbsp;<CheckIcon /></VisitButton>
+                                    </Link>
+                                </Box>
                             }
-                        </StuffContainer>
-                    </Grid>
+                        </Box>
+                    </StuffContainer>
+                </Grid>
+                <Grid size={{ xs: 12, md: "grow", lg: 12 }} display={{ xs: 'none', md: 'block' }}>
+                    <StuffContainer>
+                        <StuffTitle><SellIcon />&nbsp;KHUYẾN MÃI</StuffTitle>
+                        {!book
+                            ?
+                            <>
+                                <Skeleton variant="rectangular" width={'100%'} height={44} sx={{ marginTop: '10px' }} />
+                                <Skeleton variant="rectangular" width={'100%'} height={44} sx={{ marginTop: '10px' }} />
+                                <Skeleton variant="rectangular" width={'100%'} height={44} sx={{ marginTop: '10px' }} />
+                            </>
+                            :
+                            <>
+                                <CouponTab><SellIcon />&nbsp; MÃ: ABCDFE39</CouponTab>
+                                <CouponTab><SellIcon />&nbsp; MÃ: DFCR4546</CouponTab>
+                                <CouponTab><SellIcon />&nbsp; MÃ: TRBB1234</CouponTab>
+                            </>
+                        }
+                    </StuffContainer>
                 </Grid>
             </Grid>
         </Grid >

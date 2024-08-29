@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { useEffect, useState } from 'react'
 import { styled as muiStyled } from '@mui/system';
 import { AccessTime as AccessTimeIcon, CalendarMonth as CalendarMonthIcon, Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
-import { Avatar, Rating, Box, Grid, Button, TextField, MenuItem } from '@mui/material';
+import { Avatar, Rating, Box, Button, TextField, MenuItem } from '@mui/material';
 import { Link, useLocation } from "react-router-dom";
 import { useCreateReviewMutation, useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
 import AppPagination from '../custom/AppPagination';
@@ -238,9 +238,9 @@ const ReviewTab = ({ id, scrollIntoTab }) => {
                     const review = entities[id];
 
                     return (
-                        <Grid key={`${id}-${index}`}>
+                        <Box key={`${id}-${index}`}>
                             <Review {...{ username, review }} />
-                        </Grid>
+                        </Box>
                     )
                 })
                 }
@@ -320,8 +320,10 @@ const ReviewTab = ({ id, scrollIntoTab }) => {
                                             value={rating}
                                             onChange={(e) => setRating(e.target.value)}
                                             sx={{ marginLeft: 1, display: { xs: 'block', sm: 'none' } }}
-                                            InputProps={{
-                                                startAdornment: <StarIcon fontSize="10px" color="primary" sx={{ marginRight: 1 }} />,
+                                            slotProps={{
+                                                input: {
+                                                    startAdornment: <StarIcon fontSize="10px" color="primary" sx={{ marginRight: 1 }} />,
+                                                }
                                             }}
                                         >
                                             <MenuItem value={1}>1</MenuItem>

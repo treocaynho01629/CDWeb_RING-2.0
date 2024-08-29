@@ -1,5 +1,5 @@
 import { useState, useEffect, Fragment } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, FormControlLabel, Switch, Collapse, TextField, MenuItem, Avatar, Checkbox, Skeleton, Chip, Badge, Grid, TableFooter } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, FormControlLabel, Switch, Collapse, TextField, MenuItem, Avatar, Checkbox, Skeleton, Chip, Badge, Grid2 as Grid, TableFooter } from '@mui/material';
 import { Receipt as ReceiptIcon, KeyboardArrowDown as KeyboardArrowDownIcon, KeyboardArrowUp as KeyboardArrowUpIcon, MoreHoriz } from '@mui/icons-material';
 import { Link } from "react-router-dom";
 import { useGetOrdersQuery } from '../../../features/orders/ordersApiSlice';

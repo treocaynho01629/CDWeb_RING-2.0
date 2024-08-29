@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { LocationOn as LocationOnIcon, Check, Person as PersonIcon, Phone as PhoneIcon, Home as HomeIcon, Close as CloseIcon, Delete } from '@mui/icons-material';
-import { Checkbox, Button, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, MenuItem, TextField } from '@mui/material'
+import { Checkbox, Button, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid2 as Grid, MenuItem, TextField } from '@mui/material'
 import { location } from '../../ultils/location'
 import { PHONE_REGEX } from '../../ultils/regex';
 import { Instruction } from '../custom/GlobalComponents';
@@ -41,7 +41,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
     }, [currAddress])
 
     setPending(false);
-    
+
     useEffect(() => { //Check phone number
         const result = PHONE_REGEX.test(currAddress.phone);
         setValidPhone(result);
@@ -188,11 +188,11 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
         <>
             <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><LocationOnIcon />&nbsp;Địa chỉ người nhận</DialogTitle>
             <DialogContent sx={{ marginX: '10px' }}>
-                <form onSubmit={handleSubmit}>
+                <form style={{ paddingTop: 10 }} onSubmit={handleSubmit}>
                     <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
-                    <Grid container spacing={1}>
-                        <Grid container item spacing={1}>
-                            <Grid item xs={12} sm={6}>
+                    <Grid container size="grow" spacing={1}>
+                        <Grid container size={12} spacing={1}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField label='Họ và tên'
                                     type="text"
                                     id="fullName"
@@ -203,12 +203,14 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                                     helperText={err?.data?.errors?.name}
                                     size="small"
                                     fullWidth
-                                    InputProps={{
-                                        endAdornment: <PersonIcon style={{ color: "gray" }} />
+                                    slotProps={{
+                                        input: {
+                                            endAdornment: <PersonIcon style={{ color: "gray" }} />
+                                        }
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField placeholder='Số điện thoại (+84)'
                                     id="phone"
                                     required
@@ -219,14 +221,16 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                                     helperText={(currAddress.phone && !validPhone) ? "Sai định dạng số điện thoại!" : err?.data?.errors?.phone}
                                     fullWidth
                                     size="small"
-                                    InputProps={{
-                                        endAdornment: <PhoneIcon style={{ color: "gray" }} />
+                                    slotProps={{
+                                        input: {
+                                            endAdornment: <PhoneIcon style={{ color: "gray" }} />
+                                        }
                                     }}
                                 />
                             </Grid>
                         </Grid>
-                        <Grid container item spacing={1}>
-                            <Grid item xs={12} sm={6}>
+                        <Grid container size={12} spacing={1}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField label='Tỉnh/Thành phố'
                                     required
                                     value={currAddress?.city || ''}
@@ -245,11 +249,11 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                                     ))}
                                 </TextField>
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 {selectWards}
                             </Grid>
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <TextField placeholder='Địa chỉ nhận hàng'
                                 type="text"
                                 autoComplete="on"
@@ -260,13 +264,15 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                                 helperText={err?.data?.errors?.address}
                                 fullWidth
                                 size="small"
-                                InputProps={{
-                                    endAdornment: <HomeIcon style={{ color: "gray" }} />
+                                slotProps={{
+                                    input: {
+                                        endAdornment: <HomeIcon style={{ color: "gray" }} />
+                                    }
                                 }}
                             />
                         </Grid>
-                        <Grid container item spacing={1}>
-                            <Grid item xs={12} sm={6}>
+                        <Grid container size={12} spacing={1}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <FormControlLabel
                                     control={
                                         <Checkbox
@@ -275,9 +281,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                                             disabled={isDefault || isSelected}
                                             checked={selectDefault}
                                             color="primary"
-                                            inputProps={{
-                                                'aria-label': 'select',
-                                            }}
+                                            inputProps={{ 'aria-label': 'select' }}
                                             onChange={() => setSelectDefault(prev => !prev)}
                                         />
                                     }
@@ -285,7 +289,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                             </Grid>
                             {(addressInfo && !isDefault && !isSelected)
                                 &&
-                                <Grid item xs={12} sm={6}>
+                                <Grid size={{ xs: 12, sm: 6 }}>
                                     <Button
                                         disabled={isDefault || isSelected}
                                         variant="contained"

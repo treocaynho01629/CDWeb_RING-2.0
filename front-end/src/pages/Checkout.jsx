@@ -395,7 +395,7 @@ const Checkout = () => {
                     <StyledStepper activeStep={activeStep} orientation="vertical" connector={null}>
                         <Step key={0} expanded>
                             <StyledStepLabel ref={errRef}
-                                error={errMsg}
+                                error={errMsg !== ''}
                                 optional={
                                     errMsg && (
                                         <Typography variant="caption" color="error">

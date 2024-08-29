@@ -30,11 +30,7 @@ const ProductDetail = () => {
 
     useEffect(() => {
         const newTab = searchParams.get("tab");
-        if (newTab) {
-            handleTabChange(newTab)
-        } else {
-            handleTabChange("detail", false);
-        }
+        newTab ? handleTabChange(newTab) : handleTabChange("detail", false);
     }, [searchParams]);
 
     //Change detail tab
@@ -68,16 +64,16 @@ const ProductDetail = () => {
                 {data
                     ?
                     [
-                        <NavLink to={`/filters`}>
+                        <NavLink to={`/filters`} key={'bread1'}>
                             Danh mục sản phẩm
                         </NavLink>,
-                        <NavLink to={`/filters?cateId=${data?.cateId}`}>
+                        <NavLink to={`/filters?cateId=${data?.cateId}`} key={'bread2'}>
                             {data?.cateName}
                         </NavLink>,
-                        <NavLink to={`/filters?pubId=${data?.publisher?.id}`}>
+                        <NavLink to={`/filters?pubId=${data?.publisher?.id}`} key={'bread3'}>
                             {data?.publisher?.pubName}
                         </NavLink>,
-                        <strong style={{ textDecoration: 'underline' }}>{data?.title}</strong>
+                        <strong style={{ textDecoration: 'underline' }} key={'bread4'}>{data?.title}</strong>
                     ]
                     :
                     <Skeleton variant="text" sx={{ fontSize: '16px' }} width={300} />

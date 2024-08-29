@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from "react";
-import { Box, Breadcrumbs, Button, Grid, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Button, Grid2 as Grid, Typography } from '@mui/material';
 import { Link } from "react-router-dom"
 import { Add, Group } from "@mui/icons-material";
 import ChartUsers from '../../components/dashboard/chart/ChartUsers'

@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState } from 'react'
-import { TextField, InputAdornment, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, FormControl } from '@mui/material';
+import { TextField, InputAdornment, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, FormControl } from '@mui/material';
 import { Check as CheckIcon, Close as CloseIcon, Person as PersonIcon, VisibilityOff, Visibility } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';

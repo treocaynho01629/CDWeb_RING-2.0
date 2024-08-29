@@ -141,7 +141,7 @@ const ImageButton = styled.button`
 const StyledLazyImage = styled(LazyLoadImage)`
     padding: 15px 10px;
     object-fit: contain;
-    transform: ${props => props.imageStyle};
+    transform: ${props => props.imagestyle};
     width: 95%;
     min-height: 500px;
 
@@ -155,7 +155,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
 const StyledSmallLazyImage = styled(LazyLoadImage)`
     display: inline-block;
     object-fit: contain;
-    transform: ${props => props.imageStyle};
+    transform: ${props => props.imagestyle};
     height: 80px;
     width: 80px;
 
@@ -257,7 +257,7 @@ const ProductImages = ({ images }) => {
                                 srcSet={`${images}?size=medium 350w, ${images} 600w`}
                                 alt={`Big image number ${index}`}
                                 sizes='400px'
-                                imageStyle={style}
+                                imagestyle={style}
                                 visibleByDefault={index == 0}
                                 placeholder={
                                     <StyledSkeleton
@@ -289,7 +289,7 @@ const ProductImages = ({ images }) => {
                                 onClick={() => setSlideIndex(index + 1)}>
                                 <StyledSmallLazyImage
                                     src={images}
-                                    imageStyle={style}
+                                    imagestyle={style}
                                     placeholder={
                                         <StyledSmallSkeleton
                                             variant="rectangular"
@@ -309,16 +309,14 @@ const ProductImages = ({ images }) => {
                 <ImageSlider>
                     <StyledSkeleton
                         variant="rectangular"
-                        animation="wave"
                     />
                 </ImageSlider>
                 <MoreImageContainer>
                     <SmallImageSlider>
-                        {Array.from(new Array(4)).map((index) => (
+                        {Array.from(new Array(4)).map((item, index) => (
                             <StyledSmallSkeleton
                                 key={index}
                                 variant="rectangular"
-                                animation="wave"
                             />
                         ))}
                     </SmallImageSlider>

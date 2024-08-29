@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Box, Breadcrumbs, Grid, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Grid2 as Grid, Typography } from '@mui/material';
 import { Link } from "react-router-dom"
 import { Star } from "@mui/icons-material";
 import TableReviews from "../../components/dashboard/table/TableReviews";

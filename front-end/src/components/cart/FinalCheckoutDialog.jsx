@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { Check, CreditCard, LocalAtm, Payments, QrCode, Sell, SystemSecurityUpdateGood } from '@mui/icons-material';
-import { Grid, Radio, RadioGroup, FormControlLabel, Box, TextField } from '@mui/material';
+import { Grid2 as Grid, Radio, RadioGroup, FormControlLabel, Box, TextField } from '@mui/material';
 
 //#region styled
 const Payout = styled.div`
@@ -92,17 +92,19 @@ const FinalCheckoutDialog = ({ MiniTitle, Title, handleChange, value, products, 
             </SmallContainer>
             <MiniTitle><Sell />&nbsp;Khuyến mãi</MiniTitle>
             <SmallContainer>
-                <Grid container spacing={1}>
-                    <Grid item xs={6}>
+                <Grid container spacing={1} size="grow">
+                    <Grid size="auto">
                         <TextField placeholder='Nhập mã giảm giá ...'
                             size="small"
                             fullWidth
-                            InputProps={{
-                                endAdornment: <Sell style={{ color: "gray" }} />
+                            slotProps={{
+                                input: {
+                                    endAdornment: <Sell style={{ color: "gray" }} />
+                                }
                             }}
                         />
                     </Grid>
-                    <Grid item xs={6} display={'flex'} justifyContent={'flex-end'}>
+                    <Grid size="auto" offset="auto" display="flex" justifyContent="flex-end">
                         <CouponButton>Hoặc chọn mã&nbsp;
                             <Sell />
                         </CouponButton>
@@ -111,7 +113,7 @@ const FinalCheckoutDialog = ({ MiniTitle, Title, handleChange, value, products, 
             </SmallContainer>
             <Title><Check />&nbsp;XÁC THỰC ĐẶT HÀNG</Title>
             <Grid container>
-                <Grid item lg={6} xs={12} sx={{ display: 'flex' }}>
+                <Grid size={{ xs: 12, lg: 6 }} displau="flex">
                     <Payout>
                         <PayoutTitle>THANH TOÁN</PayoutTitle>
                         <PayoutRow>

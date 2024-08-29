@@ -26,8 +26,10 @@ export default function CustomPasswordInput(props) {
         <TextField
             {...props}
             type={showPassword ? 'text' : 'password'}
-            InputProps={{
-                endAdornment: endAdornment
+            slotProps={{
+                input: {
+                    endAdornment: endAdornment
+                }
             }}
         />
     )

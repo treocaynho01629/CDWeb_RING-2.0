@@ -121,7 +121,8 @@ const PayButton = styled.button`
     align-items: center;
     text-align: center;
     justify-content: center;
-    transition: all 0.5s ease;
+    cursor: pointer;
+    transition: all .25s ease;
 
     ${props => props.theme.breakpoints.down("sm")} {
         width: 80%;
@@ -129,7 +130,7 @@ const PayButton = styled.button`
 
     &:hover {
         background-color: ${props => props.theme.palette.action.hover};
-        color: black;
+        color: ${props => props.theme.palette.text.primary};
     }
 
     &:disabled {
@@ -221,9 +222,7 @@ const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick
                                     indeterminate={numSelected > 0 && numSelected < rowCount}
                                     checked={rowCount > 0 && numSelected === rowCount}
                                     color="primary"
-                                    inputProps={{
-                                        'aria-label': 'select all',
-                                    }}
+                                    inputProps={{ 'aria-label': 'select all' }}
                                     onChange={handleSelectAllClick}
                                 />
                             }

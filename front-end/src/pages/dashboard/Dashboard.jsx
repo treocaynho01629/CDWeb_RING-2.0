@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState, useEffect } from "react";
 import { AutoStories as AutoStoriesIcon, Group as GroupIcon, Receipt as ReceiptIcon, Try as TryIcon } from "@mui/icons-material";
-import { Grid, Paper } from '@mui/material';
+import { Grid2 as Grid, Paper } from '@mui/material';
 import TableProducts from '../../components/dashboard/table/TableProducts'
 import TableUsers from "../../components/dashboard/table/TableUsers";
 import TableReviews from "../../components/dashboard/table/TableReviews";
@@ -47,20 +47,20 @@ const Dashboard = () => {
   return (
     <>
       <h2>Chào mừng {username}!</h2>
-      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
-        <Grid item sm={6} md={4}>
+      <Grid container size="grow" spacing={3} mb={2}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <CountContainer elevation={3} >
             <AutoStoriesIcon sx={countIconStyle} />
             <CountInfo><h2 style={{ margin: 0 }}>{productCount}</h2><span>Cuốn sách</span></CountInfo>
           </CountContainer>
         </Grid>
-        <Grid item sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <CountContainer elevation={3} >
             <ReceiptIcon sx={countIconStyle} />
             <CountInfo><h2 style={{ margin: 0 }}>{orderCount}</h2><span>Đơn hàng</span></CountInfo>
           </CountContainer>
         </Grid>
-        <Grid item sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <CountContainer elevation={3} >
             <ReceiptIcon sx={countIconStyle} />
             <CountInfo><h2 style={{ margin: 0 }}>{orderCount}</h2><span>Đơn hàng</span></CountInfo>
@@ -68,27 +68,25 @@ const Dashboard = () => {
         </Grid>
       </Grid>
       <ChartSales />
-      {admin ?
-        <ChartUsers />
-        : null}
-      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
-        <Grid item sm={12} lg={6}>
+      {admin && <ChartUsers />}
+      <Grid container size="grow" spacing={3} mb={2}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <TableProducts mini={true} setProductCount={setProductCount} />
         </Grid>
-        <Grid item sm={12} lg={6}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <TableOrders mini={true} setOrderCount={setOrderCount} />
         </Grid>
+        {admin &&
+          <>
+            <Grid size={{ xs: 12, lg: 6 }}>
+              <TableUsers mini={true} setUserCount={setUserCount} />
+            </Grid>
+            <Grid size={{ xs: 12, lg: 6 }}>
+              <TableReviews mini={true} setReviewCount={setReviewCount} />
+            </Grid>
+          </>
+        }
       </Grid>
-      {admin ?
-        <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
-          <Grid item sm={12} lg={6}>
-            <TableUsers mini={true} setUserCount={setUserCount} />
-          </Grid>
-          <Grid item sm={12} lg={6}>
-            <TableReviews mini={true} setReviewCount={setReviewCount} />
-          </Grid>
-        </Grid>
-        : null}
     </>
   )
 }

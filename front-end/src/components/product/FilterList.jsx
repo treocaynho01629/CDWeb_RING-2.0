@@ -34,6 +34,14 @@ const InputContainer = styled.div`
     justify-content: space-between;
     align-items: center;
 `
+const StyledNumberInput = styled(TextField)(({ theme }) => ({
+  "input[type=number]::-webkit-outer-spin-button": {
+    "-webkit-appearance": "none",
+  },
+  "input[type=number]::-webkit-inner-spin-button": {
+    "-webkit-appearance": "none",
+  }
+}));
 //#endregion
 
 const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeCate }) => {
@@ -54,8 +62,8 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
 
   if (loadCates || errorCates) {
     catesContent = (
-      Array.from(new Array(5)).map((index) => (
-        <Box key={index}>
+      Array.from(new Array(5)).map((item, index) => (
+        <Box key={`cate-${index}`}>
           <ListItemButton>
             <Skeleton variant="text" sx={{ fontSize: '16px' }} width="70%" />
           </ListItemButton>
@@ -107,8 +115,8 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
         )
       })
       :
-      Array.from(new Array(5)).map((index) => (
-        <Box key={index}>
+      Array.from(new Array(5)).map((item, index) => (
+        <Box key={`cate-${index}`}>
           <ListItemButton>
             <Skeleton variant="text" sx={{ fontSize: '16px' }} width="70%" />
           </ListItemButton>
@@ -164,8 +172,8 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
 
   if (loadPubs || errorPubs) {
     pubsContent = (
-      Array.from(new Array(10)).map((index) => (
-        <Box key={index} style={{ display: 'flex', justifyContent: 'flex-start' }}>
+      Array.from(new Array(10)).map((item, index) => (
+        <Box key={`pub-${index}`} style={{ display: 'flex', justifyContent: 'flex-start' }}>
           <Checkbox disabled
             disableRipple
             color="primary"
@@ -198,8 +206,8 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
         )
       })
       :
-      Array.from(new Array(10)).map((index) => (
-        <Box key={index} style={{ display: 'flex', justifyContent: 'flex-start' }}>
+      Array.from(new Array(10)).map((item, index) => (
+        <Box key={`pub-${index}`} style={{ display: 'flex', justifyContent: 'flex-start' }}>
           <Checkbox disabled
             disableRipple
             color="primary"
@@ -348,7 +356,7 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
         <FilterText><PriceChangeIcon />&nbsp;Khoảng giá</FilterText>
       </TitleContainer>
 
-      <Box sx={{ width: 220 }}>
+      <Box sx={{ width: '100%', maxWidth: 250 }}>
         <CustomSlider
           getAriaLabel={() => 'Bộ lọc giá'}
           value={value}
@@ -364,37 +372,43 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
         />
       </Box>
       <InputContainer>
-        <TextField
+        <StyledNumberInput
           onChange={handleInputChange}
           onBlur={handleBlur}
           value={valueInput[0]}
           size="small"
-          inputProps={{
-            step: 1000,
-            min: 1000,
-            max: 10000000,
-            type: 'number',
-            'aria-labelledby': 'input-slider',
-          }}
-          InputProps={{
-            endAdornment: endAdornment,
+          slotProps={{
+            htmlInput: {
+              style: {fontSize: 14},
+              step: 1000,
+              min: 1000,
+              max: 10000000,
+              type: 'number',
+              'aria-labelledby': 'input-slider',
+            },
+            input: {
+              endAdornment: endAdornment,
+            }
           }}
         />
         &nbsp;đến&nbsp;
-        <TextField
+        <StyledNumberInput
           onChange={handleInputChange2}
           onBlur={handleBlur}
           value={valueInput[1]}
           size="small"
-          inputProps={{
-            step: 1000,
-            min: 1000,
-            max: 10000000,
-            type: 'number',
-            'aria-labelledby': 'input-slider',
-          }}
-          InputProps={{
-            endAdornment: endAdornment,
+          slotProps={{
+            htmlInput: {
+              style: {fontSize: 14},
+              step: 1000,
+              min: 1000,
+              max: 10000000,
+              type: 'number',
+              'aria-labelledby': 'input-slider',
+            },
+            input: {
+              endAdornment: endAdornment,
+            }
           }}
         />
       </InputContainer>

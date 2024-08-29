@@ -4,6 +4,7 @@ import { IconButton, Skeleton } from "@mui/material";
 import { KeyboardArrowRight, KeyboardArrowLeft } from '@mui/icons-material';
 import { Link } from "react-router-dom"
 import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice";
+import { Fragment } from "react";
 
 //#region styled
 const ItemContainer = styled.div`
@@ -58,6 +59,10 @@ const CateContainer = styled.div`
     }
 `
 
+const ItemWrapper = styled.div`
+    display: flex;
+`
+
 const Wrapper = styled.div`
     position: relative;
     left: 0;
@@ -71,17 +76,9 @@ const Wrapper = styled.div`
     -ms-overflow-style: none;
     scrollbar-width: none; 
 
-    &::-webkit-scrollbar {
-        display: none;
-    }
-
-    a:first-child {
-        margin-left: 20px;
-    }
-
-    a:last-child {
-        margin-right: 40px;
-    }
+    &::-webkit-scrollbar {display: none;}
+    ${ItemWrapper}:first-child {margin-left: 20px;}
+    ${ItemWrapper}:last-child { margin-right: 40px; }
 `
 
 const ButtonContainer = styled.div`
@@ -116,24 +113,21 @@ const Categories = () => {
     const slideRef = useRef();
 
     //Scroll
-    const scrollSlide = (n) => {
-        slideRef.current.scrollLeft += n;
-    }
+    const scrollSlide = (n) => { slideRef.current.scrollLeft += n }
 
     let catesContent;
 
     if (isLoading || isError) {
         catesContent = (
-            Array.from(new Array(15)).map((index) => (
-                <div key={index}>
+            Array.from(new Array(15)).map((item, index) => (
+                <ItemWrapper key={`cate-${index}`}>
                     <Skeleton
                         variant="rectangular"
-                        animation="wave"
                         height={40}
                         width={100}
                         sx={{ mx: '3px' }}
                     />
-                </div>
+                </ItemWrapper>
             ))
         )
     } else if (isSuccess) {
@@ -144,28 +138,22 @@ const Categories = () => {
                 const cate = entities[cateId];
 
                 return (
-                    <>
-                        <Link
-                            to={`/filters?cateId=${cateId}`}
-                            style={{ color: 'inherit' }}
-                            title={cate?.categoryName}
-                            key={`${cateId}-${index}`}
-                        >
-                            <ItemContainer>{cate?.categoryName}</ItemContainer>
-                        </Link>
+                    <Fragment key={`main-${cateId}-${index}`}>
+                        <ItemWrapper key={`cate-${cateId}-${index}`}>
+                            <Link to={`/filters?cateId=${cateId}`} title={cate?.categoryName}>
+                                <ItemContainer>{cate?.categoryName}</ItemContainer>
+                            </Link>
+                        </ItemWrapper>
                         {
                             cate?.cateSubs?.map((sub, subIndex) => (
-                                <Link
-                                    to={`/filters?cateId=${cateId}`}
-                                    style={{ color: 'inherit' }}
-                                    title={sub?.subName}
-                                    key={`${sub}-${subIndex}`}
-                                >
-                                    <ItemContainer>{sub?.subName}</ItemContainer>
-                                </Link>
+                                <ItemWrapper key={`sub-${sub?.id}-${subIndex}`}>
+                                    <Link to={`/filters?cateId=${cateId}`} title={sub.subName}>
+                                        <ItemContainer>{sub?.subName}</ItemContainer>
+                                    </Link>
+                                </ItemWrapper>
                             ))
                         }
-                    </>
+                    </Fragment>
                 )
             })
             : null

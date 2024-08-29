@@ -81,7 +81,13 @@ const CustomRightArrow = ({ onClick }) => (
   <CustomArrow className="custom-right-arrow" onClick={() => onClick()}><KeyboardArrowRight /></CustomArrow>
 );
 
-const tempItems = [<ProductSimple />, <ProductSimple />, <ProductSimple />, <ProductSimple />, <ProductSimple />];
+const tempItems = [
+  <ProductSimple key={'temp1'} />,
+  <ProductSimple key={'temp2'} />,
+  <ProductSimple key={'temp3'} />,
+  <ProductSimple key={'temp4'} />,
+  <ProductSimple key={'temp5'} />
+];
 
 const ProductsSlider = ({ data, isError, isLoading, isSuccess, isUninitialized = false, scrollPosition }) => {
   let productsCarousel;
