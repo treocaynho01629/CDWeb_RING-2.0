@@ -68,7 +68,6 @@ const StyledDrawer = muiStyled(MuiDrawer, { shouldForwardProp: (prop) => prop !=
 const StyledMobileDrawer = muiStyled(Drawer)(({ theme }) => ({
   ...openedMixin(theme),
   '& .MuiDrawer-paper': openedMixin(theme),
-  zIndex: 1201,
 }),
 );
 
@@ -212,7 +211,7 @@ const DashboardDrawer = ({ open, setOpen }) => {
         {
           managementListItems.map((item, index) => (
             (!item.isAdmin || isAdmin) &&
-            <NavLink to={item.url}>
+            <NavLink key={`link-${index}`} to={item.url}>
               {({ isActive }) => (
                 <>
                   <ListItem key={`item-${index}`} disablePadding sx={{ display: 'block' }}>

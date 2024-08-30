@@ -19,7 +19,6 @@ const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
 }));
 
 const AppBar = muiStyled(MuiAppBar, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
   backgroundColor: alpha(theme.palette.background.default, 0.5),
   backdropFilter: 'blur(10px)',
 
