@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useContext, useState } from 'react';
+import { lazy, Suspense, useContext, useState } from 'react';
 import { styled as muiStyled } from '@mui/system';
 import {
     Search as SearchIcon, ShoppingCart, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
@@ -8,12 +8,14 @@ import {
 import { Stack, Badge, IconButton, Avatar, Box, Grid2 as Grid, TextField, AppBar, useTheme, useMediaQuery } from '@mui/material';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ColorModeContext } from '../../ThemeContextProvider';
+import { LogoImage, LogoSubtitle, LogoTitle } from '../custom/GlobalComponents';
 import useLogout from "../../hooks/useLogout";
 import useAuth from "../../hooks/useAuth";
-import NavDrawer from './NavDrawer';
-import MiniCart from './MiniCart';
-import ProfilePopover from './ProfilePopover';
 import useCart from '../../hooks/useCart';
+
+const NavDrawer = lazy(() => import("./NavDrawer"));
+const MiniCart = lazy(() => import("./MiniCart"));
+const ProfilePopover = lazy(() => import("./ProfilePopover"));
 
 //#region styled
 const Wrapper = styled.div`
@@ -130,29 +132,18 @@ const Right = styled.div`
 
 const Logo = styled.h2`
     position: relative;
-    font-family: abel;
-    font-size: 27px;
-    text-transform: uppercase;
-    font-weight: 500;
-    color: ${props => props.theme.palette.primary.main};
-    align-items: center;
     display: flex;
-    width: 251px;
+    align-items: center;
     margin: 5px 10px 5px 15px;
     white-space: nowrap;
     overflow: hidden;
     transition: all .25s ease;
 
-    p {
-        color: ${props => props.theme.palette.text.secondary};
-        margin: 0;
-    }
-
     &.active {
-        width: 110px;
+        ${LogoSubtitle} {width: 0;}
         
         ${props => props.theme.breakpoints.down("md")} {
-            width: 0px;
+            width: 0;
         }
     }
 
@@ -160,15 +151,8 @@ const Logo = styled.h2`
         margin: 5px 0px 5px 0px;
         width: 110px;
 
-        p { width: 0; }
+        ${LogoSubtitle} {width: 0;}
     }
-`
-
-const ImageLogo = styled.img`
-    width: 40px;
-    height: 40px;
-    margin: 0 10px 0 0;
-    padding: 0;
 `
 
 const NavItem = styled.div`
@@ -267,16 +251,16 @@ const Navbar = () => {
     const open = Boolean(anchorEl);
     const openCart = Boolean(anchorElCart);
 
-    const hanldeCartPopover = (event) => {
-        setAnchorElCart(event.currentTarget);
+    const hanldeCartPopover = (e) => {
+        setAnchorElCart(e.currentTarget);
     };
 
     const handleCartClose = () => {
         setAnchorElCart(null);
     };
 
-    const handleProfilePopover = (event) => {
-        setAnchorEl(event.currentTarget);
+    const handleProfilePopover = (e) => {
+        setAnchorEl(e.currentTarget);
     };
 
     const handleProfileClose = () => {
@@ -337,15 +321,22 @@ const Navbar = () => {
                                                 <MenuIcon sx={{ fontSize: 26 }} />
                                             </IconButton>
                                         </Box>
-                                        <NavDrawer {...{
-                                            openDrawer, setOpen, username, roles, location,
-                                            products: cartProducts, logout, ImageLogo, theme, colorMode
-                                        }} />
+                                        <Suspense fallback={<></>}>
+                                            {openDrawer ?
+                                                <NavDrawer {...{
+                                                    openDrawer, setOpen, username, roles, location,
+                                                    products: cartProducts, logout, theme, colorMode
+                                                }} />
+                                                : null
+                                            }
+                                        </Suspense>
                                     </>
                                 }
                                 <Link to={`/`}>
                                     <Logo className={isToggleSearch ? 'active' : ''}>
-                                        <ImageLogo src="/bell.svg" className="logo" alt="RING! Logo" />RING!&nbsp; <p>- BOOKSTORE</p>
+                                        <LogoImage src="/bell.svg" className="logo" alt="RING! logo" />
+                                        <LogoTitle>RING!&nbsp;</LogoTitle>
+                                        <LogoSubtitle>- BOOKSTORES</LogoSubtitle>
                                     </Logo>
                                 </Link>
                                 <Box
@@ -417,7 +408,9 @@ const Navbar = () => {
                                                         <IconText>Giỏ hàng</IconText>
                                                     </StyledIconButton>
                                                 </Link>
-                                                <MiniCart {...{ removeProduct, openCart, anchorElCart, handleClose: handleCartClose, products: cartProducts }} />
+                                                <Suspense fallback={<></>}>
+                                                    <MiniCart {...{ removeProduct, openCart, anchorElCart, handleClose: handleCartClose, products: cartProducts }} />
+                                                </Suspense>
                                             </div>
                                             {username ? (
                                                 <div
@@ -432,10 +425,12 @@ const Navbar = () => {
                                                             <IconText className="username">{username}</IconText>
                                                         </StyledIconButton>
                                                     </Link>
-                                                    <ProfilePopover {...{
-                                                        open, anchorEl, handleClose: handleProfileClose,
-                                                        roles, logout, theme, colorMode
-                                                    }} />
+                                                    <Suspense fallback={<></>}>
+                                                        <ProfilePopover {...{
+                                                            open, anchorEl, handleClose: handleProfileClose,
+                                                            roles, logout, theme, colorMode
+                                                        }} />
+                                                    </Suspense>
                                                 </div>
                                             ) : (
                                                 <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">

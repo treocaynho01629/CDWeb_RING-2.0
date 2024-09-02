@@ -15,6 +15,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import jakarta.validation.constraints.Max;
@@ -52,38 +53,43 @@ public class Book {
             generator = "primary_sequence"
     )
     private Integer id;
-    
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id", nullable = true)
-    private Image images;
-    
+
+    @OneToOne(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
+    @JoinColumn(name = "image_id", nullable = false)
+    private Image image;
+
     @Column
     private Double price;
+
+    @Column(precision = 5, scale = 4)
+    private BigDecimal onSale;
 
     @Column
     @Max(value = 199, message = "Kho hàng đã đầy (giới hạn 199)")
     private Integer amount;
 
     @Column(length = 200)
-    @Nationalized 
+    @Nationalized
     private String title;
 
     @Column(length = 4000)
-    @Nationalized 
+    @Nationalized
     private String description;
 
     @Column(length = 200)
-    @Nationalized 
+    @Nationalized
     private String type;
 
     @Column(length = 200)
-    @Nationalized 
+    @Nationalized
     private String author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sell_id")
-    @JsonIgnore 
-    private Account user;
+    @JsonIgnore
+    private Account seller;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "publisher_id")
@@ -93,44 +99,44 @@ public class Book {
     @JoinColumn(name = "cate_id")
     private Category cate;
 
-    @OneToOne(cascade = CascadeType.ALL, 
-    		orphanRemoval = true, 
-    		mappedBy = "book")
+    @OneToOne(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "book")
     private BookDetail bookDetail;
 
-    @OneToMany(cascade = CascadeType.ALL, 
-    		orphanRemoval = true, 
-    		mappedBy = "book", 
-    		fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "book",
+            fetch = FetchType.LAZY)
     @LazyCollection(LazyCollectionOption.EXTRA)
-    @JsonIgnore 
+    @JsonIgnore
     private List<Review> bookReviews;
 
-    @OneToMany(cascade = CascadeType.ALL, 
-    		orphanRemoval = true, 
-    		mappedBy = "book", 
-    		fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "book",
+            fetch = FetchType.LAZY)
     @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
     private List<OrderDetail> orderDetails;
-    
+
     public void addReview(Review review) {
-    	bookReviews.add(review);
-    	review.setBook(this);
+        bookReviews.add(review);
+        review.setBook(this);
     }
- 
+
     public void removeReview(Review review) {
-    	bookReviews.remove(review);
+        bookReviews.remove(review);
         review.setBook(null);
     }
-    
+
     public void addOrderDetail(OrderDetail detail) {
-    	orderDetails.add(detail);
-    	detail.setBook(this);
+        orderDetails.add(detail);
+        detail.setBook(this);
     }
- 
+
     public void removeOrderDetail(OrderDetail detail) {
-    	orderDetails.remove(detail);
-    	detail.setBook(null);
+        orderDetails.remove(detail);
+        detail.setBook(null);
     }
 }

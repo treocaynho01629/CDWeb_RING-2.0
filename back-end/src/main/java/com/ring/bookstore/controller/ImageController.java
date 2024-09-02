@@ -34,7 +34,7 @@ public class ImageController {
 	
 	private final ImageService imageService;
 	
-	//Gett all images
+	//Get all images
 	@GetMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllImages() {

@@ -1,7 +1,6 @@
 package com.ring.bookstore.model;
 
 import java.util.List;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -46,13 +45,32 @@ public class Image {
 	@Column(name = "image")
 	@JdbcTypeCode(SqlTypes.BINARY)
 	private byte[] image;
-	
-	@OneToMany(cascade = CascadeType.ALL, 
-			mappedBy = "images", 
-			fetch = FetchType.LAZY)
-	@JsonIgnore
-    private List<Book> books;
 
+	//Image relation
+	@OneToOne(cascade = CascadeType.ALL,
+			orphanRemoval = true,
+			mappedBy = "image")
+	@JsonIgnore
+	private Book book;
+
+	@OneToOne(cascade = CascadeType.ALL,
+			orphanRemoval = true,
+			mappedBy = "image")
+	@JsonIgnore
+	private Account user;
+
+	@OneToOne(cascade = CascadeType.ALL,
+			orphanRemoval = true,
+			mappedBy = "image")
+	@JsonIgnore
+	private Publisher publisher;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "detail_id")
+	@JsonIgnore
+	private BookDetail detail;
+
+	//Sub resized images
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "parent_id")
 	@JsonIgnore

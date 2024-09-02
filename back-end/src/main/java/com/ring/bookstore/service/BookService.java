@@ -15,11 +15,9 @@ import com.ring.bookstore.request.BookRequest;
 
 public interface BookService {
 
-    Page<BookDTO> getAllBooks(Integer pageNo, Integer pageSize);
-
     List<BookDTO> getRandomBooks(Integer amount);
 
-    Page<BookDTO> getBooksByFilter(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword,
+    Page<BookDTO> getBooks(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword,
                                    Integer cateId, List<Integer> pubId, String seller, String type, Double fromRange, Double toRange);
 
     Book getBookById(Integer id);

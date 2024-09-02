@@ -26,6 +26,7 @@ public class BookDisplayMapper implements Function<IBookDisplay, BookDTO> {
         		,book.getPrice()
 				,book.getAmount()
         		,book.getRateTotal()
-        		,book.getRateAmount());
+        		,book.getRateAmount()
+				,book.getOrderTime());
     }
 }

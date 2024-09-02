@@ -10,4 +10,5 @@ public interface IBookDisplay {
 	Integer getAmount();
 	Integer getRateAmount();
 	Integer getRateTotal();
+	Integer getOrderTime();
 }

@@ -3,7 +3,7 @@ import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Chec
 import { AutoStories as AutoStoriesIcon, Delete as DeleteIcon, Search, Star, MoreHoriz } from '@mui/icons-material';
 import { Link } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { useDeleteBookMutation, useDeleteBooksMutation, useGetBooksByFilterQuery } from '../../../features/books/booksApiSlice';
+import { useDeleteBookMutation, useDeleteBooksMutation, useGetBooksQuery } from '../../../features/books/booksApiSlice';
 import { ItemTitle, FooterContainer, FooterLabel } from '../custom/ShareComponents';
 import CustomProgress from '../../custom/CustomProgress';
 import useAuth from '../../../hooks/useAuth';
@@ -125,7 +125,7 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
   const [deleteMultipleBooks, { isLoading: deletingMultiple }] = useDeleteBooksMutation();
 
   //Fetch books
-  const { data, isLoading, isSuccess, isError, error } = useGetBooksByFilterQuery({
+  const { data, isLoading, isSuccess, isError, error } = useGetBooksQuery({
     page: pagination?.currPage,
     size: pagination?.pageSize,
     sortBy: pagination?.sortBy,

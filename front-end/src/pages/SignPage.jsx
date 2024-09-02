@@ -1,11 +1,10 @@
 import styled, { keyframes } from 'styled-components'
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useLocation } from 'react-router-dom';
-import { Button } from '@mui/material';
+import { Button, Grid2 as Grid } from '@mui/material';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 import LoginTab from '../components/authorize/LoginTab';
 import RegisterTab from '../components/authorize/RegisterTab';
-import useAuth from '../hooks/useAuth';
 import useTitle from '../hooks/useTitle';
 
 const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
@@ -24,48 +23,15 @@ const fadeIn2 = keyframes`
 const Wrapper = styled.div`
     display: flex;
     justify-content: center;
-    flex-direction: column;
-
-    &.login {
-        animation: ${fadeIn} .3s linear;
-    }
-
-    &.signup {
-        flex-direction: column-reverse;
-        animation: ${fadeIn2} .3s linear;
-    }
-    
-    @media (min-width: 900px) {
-        flex-direction: row;
-
-        &.signup {
-            flex-direction: row-reverse;
-            animation: ${fadeIn2} .3s linear;
-        }
-    }
-`
-
-const TabContainer = styled.div`
-    justify-content: center;
-    flex-grow: 20;
-    display: none;
-
-    &.active {
-        display: flex;
-    }
-    
-    @media (min-width: 900px) {
-        width: 450px;
-        display: flex;
-    }
-`
-
-const DividerContainer = styled.div`
-    display: flex;   
-    margin: 40px 0px;
     align-items: center;
-    justify-content: center;
-    flex-grow: 1;
+    padding: 40px 50px;
+
+    &.login {animation: ${fadeIn} .3s linear;}
+    &.signup {animation: ${fadeIn2} .3s linear;}
+
+    ${props => props.theme.breakpoints.down("md")} {
+        padding: 40px 10px;
+    }
 `
 
 const SignDivider = styled.button`
@@ -80,18 +46,17 @@ const SignDivider = styled.button`
     border-radius: 50px;
     width: 60px;
     height: 60px;
+    margin: 30px;
     cursor: pointer;
-    display: none;
-
-    @media (min-width: 900px) {
-        display: flex;
+    
+    ${props => props.theme.breakpoints.down("md")} {
+        display: none;
     }
 `
 //#endregion
 
 function SignPage() {
     const location = useLocation();
-    const { persist } = useAuth(); //Is user logged in
     const [isLogin, setIsLogin] = useState(location.pathname === '/login');
     const [pending, setPending] = useState(false);
 
@@ -115,13 +80,33 @@ function SignPage() {
                 : null
             }
             <Wrapper className={`${isLogin ? 'login' : 'signup'}`}>
-                {!persist
-                    &&
-                    <>
-                        <TabContainer className={`${isLogin ? 'active' : ''}`}>
-                            <LoginTab {...{ pending, setPending }} />
-                        </TabContainer>
-                        <DividerContainer>
+                <Grid
+                    container
+                    size="grow"
+                    spacing={5}
+                    display="flex"
+                    justifyContent="center"
+                    offset={{ xs: 0, md: 'auto' }}
+                    alignItems={{ xs: 'center', md: 'flex-start' }}
+                    direction={{ xs: isLogin ? 'column' : 'column-reverse', md: isLogin ? 'row' : 'row-reverse' }}
+                >
+                    <Grid
+                        size="grow"
+                        maxWidth={350}
+                        alignItems="center"
+                        justifyContent="center"
+                        display={{ xs: isLogin ? 'flex' : 'none', md: 'flex' }}
+                    >
+                        <LoginTab {...{ pending, setPending }} />
+                    </Grid>
+                    <Grid
+                        size="auto"
+                        height={{ xs: 'auto', md: 350 }}
+                        alignItems="center"
+                        justifyContent="center"
+                        display="flex"
+                    >
+                        <>
                             <SignDivider onClick={toggleTab}>HOẶC</SignDivider>
                             <Button
                                 sx={{ display: { xs: 'block', md: 'none' } }}
@@ -131,14 +116,20 @@ function SignPage() {
                             >
                                 {isLogin ? 'CHƯA CÓ TÀI KHOẢN?' : 'ĐÃ CÓ TÀI KHOẢN?'}
                             </Button>
-                        </DividerContainer>
-                    </>
-                }
-                <TabContainer className={`${isLogin ? '' : 'active'}`}>
-                    <RegisterTab {...{ pending, setPending }} />
-                </TabContainer>
+                        </>
+                    </Grid>
+                    <Grid
+                        size="grow"
+                        maxWidth={350}
+                        alignItems="center"
+                        justifyContent="center"
+                        display={{ xs: isLogin ? 'none' : 'flex', md: 'flex' }}
+                    >
+                        <RegisterTab {...{ pending, setPending }} />
+                    </Grid>
+                </Grid>
             </Wrapper>
-        </div>
+        </div >
     )
 }
 

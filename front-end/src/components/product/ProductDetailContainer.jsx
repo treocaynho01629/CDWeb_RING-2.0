@@ -3,14 +3,14 @@ import { lazy, Suspense, useEffect, useRef } from 'react'
 import { styled as muiStyled } from '@mui/system';
 import { Link } from 'react-router-dom';
 import { Box, Skeleton, Tab } from '@mui/material';
-import { useGetBooksByFilterQuery } from '../../features/books/booksApiSlice';
+import { useGetBooksQuery } from '../../features/books/booksApiSlice';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import ProductsSlider from './ProductsSlider';
 import CustomProgress from '../custom/CustomProgress';
 
 const ReviewTab = lazy(() => import('./ReviewTab'));
+const ProductsSlider = lazy(() => import("./ProductsSlider"));
 
 //#region styled
 const StyledTabList = muiStyled((props) => (
@@ -75,7 +75,7 @@ const StyledTextarea = styled.textarea`
 const ProductDetailContainer = ({ loading, book, tab, handleTabChange, scrollIntoTab }) => {
   const textRef = useRef(null);
   //Fetch related books
-  const { data: relatedBooks, isLoading: loadRelated, isSuccess: doneRelated, isError: errorRelated, isUninitialized } = useGetBooksByFilterQuery({
+  const { data: relatedBooks, isLoading: loadRelated, isSuccess: doneRelated, isError: errorRelated, isUninitialized } = useGetBooksQuery({
     cateId: book?.cateId
   }, { skip: (!book?.cateId || tab !== "related") });
 
@@ -160,9 +160,11 @@ const ProductDetailContainer = ({ loading, book, tab, handleTabChange, scrollInt
             </Suspense>
           </TabPanel>
           <TabPanel value="related" sx={{ paddingLeft: 0, paddingRight: 0 }}>
-            <div>
-              <ProductsSlider {...{ loading: loadRelated, data: relatedBooks, isSuccess: doneRelated, isError: errorRelated, isUninitialized }} />
-            </div>
+            <Suspense fallback={<CustomProgress color="primary" />}>
+              <div>
+                <ProductsSlider {...{ loading: loadRelated, data: relatedBooks, isSuccess: doneRelated, isError: errorRelated, isUninitialized }} />
+              </div>
+            </Suspense>
           </TabPanel>
         </TabContext>
       </Box>

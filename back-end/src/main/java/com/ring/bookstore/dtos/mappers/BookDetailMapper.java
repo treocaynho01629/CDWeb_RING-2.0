@@ -1,5 +1,7 @@
 package com.ring.bookstore.dtos.mappers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,20 +26,23 @@ public class BookDetailMapper implements Function<Book, BookDetailDTO> {
 		String fileDownloadUri = ServletUriComponentsBuilder
 					  .fromCurrentContextPath()
 					  .path("/api/images/")
-					  .path(book.getImages().getName())
+					  .path(book.getImage().getName())
 					  .toUriString();
 
     	Category cate = book.getCate();
     	BookDetail detail = book.getBookDetail();
+		List<String> images = new ArrayList<>();
+
+		images.add(fileDownloadUri);
 
         return new BookDetailDTO(book.getId(),
-        		fileDownloadUri,
+				images,
         		book.getPrice(),
         		book.getTitle(),
         		book.getDescription(),
         		book.getType(),
         		book.getAuthor(),
-        		book.getUser().getUsername(),
+        		book.getSeller().getUsername(),
         		book.getPublisher(),
         		cate.getId(),
         		cate.getCategoryName(),
@@ -48,6 +53,7 @@ public class BookDetailMapper implements Function<Book, BookDetailDTO> {
         		detail.getBWeight(),
         		book.getAmount(),
         		reviewRepo.findTotalRatingByBookId(book.getId()),
-        		book.getBookReviews().size());
+        		book.getBookReviews().size(),
+				99); //TEMP
     }
 }

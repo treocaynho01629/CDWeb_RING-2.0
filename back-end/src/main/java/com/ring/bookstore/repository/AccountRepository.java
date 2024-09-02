@@ -48,7 +48,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer>{
 	
 	@Query("""
 	select a.userName as name, coalesce(sum(o.amount), 0) as books, coalesce(sum(o.amount * o.price), 0) as sales
-	from Account a join Book b on a.id = b.user.id 
+	from Account a join Book b on a.id = b.seller.id 
 	left join OrderDetail o on b.id = o.book.id
 	group by a.userName
 	order by sales desc

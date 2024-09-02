@@ -4,7 +4,8 @@ import { Grid2 as Grid, ToggleButton, Button, ToggleButtonGroup, Skeleton } from
 import { styled as muiStyled } from '@mui/system';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
-import { useGetBooksByFilterQuery, useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
+import { useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
+import { LazyLoadComponent } from 'react-lazy-load-image-component';
 import Categories from '../components/Categories';
 import Products from '../components/product/Products';
 import Slider from '../components/product/Slider';
@@ -104,9 +105,9 @@ const Home = () => {
     size: pagination?.pageSize,
     loadMore: pagination?.isMore
   });
-  const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom, refetch: refetchRandom } = useGetRandomBooksQuery({ amount: 10 });
-  const { data: cateBooks, isLoading: loadByCate, isSuccess: doneByCate, isError: errorByCate, isUninitialized } = useGetBooksByFilterQuery({ cateId: currCate }, { skip: !currCate });
-  const { data: orderBooks, isLoading: loadByOrder, isSuccess: doneByOrder, isError: errorByOrder } = useGetBooksByFilterQuery({ sortBy: orderBy, sortDir: "desc" }, { skip: !orderBy });
+  const { data: randomBooks, isLoading: loadRandom, isFetching: fetchRandom, isSuccess: doneRandom, isError: errorRandom, refetch: refetchRandom } = useGetRandomBooksQuery({ amount: 10 });
+  const { data: cateBooks, isLoading: loadByCate, isFetching: fetchByCate, isSuccess: doneByCate, isError: errorByCate, isUninitialized } = useGetBooksQuery({ cateId: currCate }, { skip: !currCate });
+  const { data: orderBooks, isLoading: loadByOrder, isFetching: fetchByOrder, isSuccess: doneByOrder, isError: errorByOrder } = useGetBooksQuery({ sortBy: orderBy, sortDir: "desc" }, { skip: !orderBy });
   const { data: cates, isLoading: loadCates, isSuccess: doneCates, isError: errorCates } = useGetCategoriesQuery();
 
   //Other
@@ -185,6 +186,7 @@ const Home = () => {
       <Categories />
       <Grid sx={{ mb: 3, mt: -1 }} container spacing={4}>
         <Grid size={12}>
+          <br />
           <CustomDivider>SẢN PHẨM MỚI NHẤT</CustomDivider>
           <br />
           <Products {...{ isLoading, data, isSuccess, isError }} />
@@ -217,7 +219,9 @@ const Home = () => {
               ))}
             </StyledToggleButtonGroup>
           </ToggleGroupContainer>
-          <ProductsSlider {...{ isLoading: loadByOrder, data: orderBooks, isSuccess: doneByOrder, isError: errorByOrder }} />
+          <LazyLoadComponent>
+            <ProductsSlider {...{ isLoading: loadByOrder, isFetching: fetchByOrder, data: orderBooks, isSuccess: doneByOrder, isError: errorByOrder }} />
+          </LazyLoadComponent>
           <ButtonContainer>
             <Link to={`/filters?sortBy=${orderBy}`}>
               <Button
@@ -242,7 +246,9 @@ const Home = () => {
               {catesContent}
             </StyledToggleButtonGroup>
           </ToggleGroupContainer>
-          <ProductsSlider {...{ isLoading: loadByCate, data: cateBooks, isSuccess: doneByCate, isError: errorByCate, isUninitialized }} />
+          <LazyLoadComponent>
+            <ProductsSlider {...{ isLoading: loadByCate, isFetching: fetchByCate, data: cateBooks, isSuccess: doneByCate, isError: errorByCate, isUninitialized }} />
+          </LazyLoadComponent>
           <ButtonContainer>
             <Link to={`/filters?cateId=${currCate}`}>
               <Button
@@ -258,7 +264,9 @@ const Home = () => {
           <br />
           <CustomDivider>CÓ THỂ BẠN SẼ THÍCH</CustomDivider>
           <br />
-          <ProductsSlider {...{ isLoading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
+          <LazyLoadComponent>
+            <ProductsSlider {...{ isLoading: loadRandom, isFetching: fetchRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
+          </LazyLoadComponent>
           <ButtonContainer>
             <Button
               variant="contained"

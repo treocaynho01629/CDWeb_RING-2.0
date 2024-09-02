@@ -10,13 +10,13 @@ import { useGetProfileQuery } from '../features/users/usersApiSlice';
 import { useCheckoutMutation } from '../features/orders/ordersApiSlice';
 import { PHONE_REGEX } from '../ultils/regex';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
-import FinalCheckoutDialog from '../components/cart/FinalCheckoutDialog';
 import AddressDisplay from '../components/address/AddressDisplay';
 import AddressSelectDialog from '../components/address/AddressSelectDialog';
 import useCart from '../hooks/useCart';
 import useTitle from '../hooks/useTitle';
 
 const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
+const FinalCheckoutDialog = lazy(() => import('../components/cart/FinalCheckoutDialog'));
 
 //#region styled
 const Wrapper = styled.div`
@@ -272,7 +272,6 @@ const Checkout = () => {
     const { clearCart } = useCart();
     const products = checkState?.products;
     const checkRef = useRef(null);
-
     const [addressInfo, setAddressInfo] = useState({
         name: '',
         phone: '',
@@ -311,17 +310,9 @@ const Checkout = () => {
         if (activeStep == 1) checkRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
-    const handleChange = (event) => {
-        setValue(event.target.value);
-    };
-
-    const handleOpenDialog = () => {
-        setOpenDialog(true);
-    }
-
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
-    }
+    const handleChange = (e) => { setValue(e.target.value) }
+    const handleOpenDialog = () => { setOpenDialog(true) }
+    const handleCloseDialog = () => { setOpenDialog(false) }
 
     const validAddressInfo = [addressInfo.name, addressInfo.phone, addressInfo.address, validPhone].every(Boolean);
 
@@ -510,10 +501,14 @@ const Checkout = () => {
                                 <MiniTitle><CreditCardIcon />&nbsp;Thanh toán</MiniTitle>
                             </StyledStepLabel>
                             <StyledStepContent>
-                                <FinalCheckoutDialog {...{
-                                    MiniTitle, Title, value, handleChange,
-                                    products, handleSubmit, validAddressInfo, AltCheckoutContainer, PayButton
-                                }} />
+                                {activeStep == 2 &&
+                                    <Suspense fallBack={<></>}>
+                                        <FinalCheckoutDialog {...{
+                                            MiniTitle, Title, value, handleChange,
+                                            products, handleSubmit, validAddressInfo, AltCheckoutContainer, PayButton
+                                        }} />
+                                    </Suspense>
+                                }
                             </StyledStepContent>
                         </Step>
                     </StyledStepper>

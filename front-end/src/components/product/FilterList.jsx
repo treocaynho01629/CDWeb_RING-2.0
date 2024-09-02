@@ -34,6 +34,7 @@ const InputContainer = styled.div`
     justify-content: space-between;
     align-items: center;
 `
+
 const StyledNumberInput = styled(TextField)(({ theme }) => ({
   "input[type=number]::-webkit-outer-spin-button": {
     "-webkit-appearance": "none",
@@ -379,16 +380,14 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
           size="small"
           slotProps={{
             htmlInput: {
-              style: {fontSize: 14},
+              style: { fontSize: 14 },
               step: 1000,
               min: 1000,
               max: 10000000,
               type: 'number',
               'aria-labelledby': 'input-slider',
             },
-            input: {
-              endAdornment: endAdornment,
-            }
+            input: { endAdornment: endAdornment }
           }}
         />
         &nbsp;đến&nbsp;
@@ -399,16 +398,14 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
           size="small"
           slotProps={{
             htmlInput: {
-              style: {fontSize: 14},
+              style: { fontSize: 14 },
               step: 1000,
               min: 1000,
               max: 10000000,
               type: 'number',
               'aria-labelledby': 'input-slider',
             },
-            input: {
-              endAdornment: endAdornment,
-            }
+            input: { endAdornment: endAdornment }
           }}
         />
       </InputContainer>

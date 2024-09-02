@@ -25,12 +25,23 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         }),
         getBooks: builder.query({
             query: (args) => {
-                const { page, size } = args || {};
+                const { page, size, sortBy, sortDir, keyword, cateId, pubId, type, seller, value } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
                 if (page) params.append('pageNo', page);
                 if (size) params.append('pSize', size);
+                if (sortBy) params.append('sortBy', sortBy);
+                if (sortDir) params.append('sortDir', sortDir);
+                if (keyword) params.append('keyword', keyword);
+                if (cateId) params.append('cateId', cateId);
+                if (type) params.append('type', type);
+                if (seller) params.append('seller', seller);
+                if (pubId) params.append('pubId', pubId);
+                if (value) {
+                    params.append('fromRange', value[0]);
+                    params.append('toRange', value[1]);
+                }
 
                 return {
                     url: `/api/books?${params.toString()}`,
@@ -51,67 +62,19 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                     }
                 }, content)
             },
-            serializeQueryArgs: ({ endpointName }) => {
-                return endpointName
-            },
-            merge: (currentCache, newItems) => {
-                currentCache.info = newItems.info;
-                booksAdapter.addMany(
-                    currentCache, booksSelector.selectAll(newItems)
-                )
-            },
-            forceRefetch: ({ currentArg, previousArg }) => {
-                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
-                return isForceRefetch
-            },
-            providesTags: (result, error, arg) => {
-                if (result?.ids) {
-                    return [
-                        { type: 'Book', id: 'LIST' },
-                        ...result.ids.map(id => ({ type: 'Book', id }))
-                    ]
-                } else return [{ type: 'Book', id: 'LIST' }]
-            },
-        }),
-        getBooksByFilter: builder.query({
-            query: (args) => {
-                const { page, size, sortBy, sortDir, keyword, cateId, pubId, type, seller, value } = args || {};
-
-                //Params
-                const params = new URLSearchParams();
-                if (page) params.append('pageNo', page);
-                if (size) params.append('pSize', size);
-                if (sortBy) params.append('sortBy', sortBy);
-                if (sortDir) params.append('sortDir', sortDir);
-                if (keyword) params.append('keyword', keyword);
-                if (cateId) params.append('cateId', cateId);
-                if (type) params.append('type', type);
-                if (seller) params.append('seller', seller);
-                if (pubId) params.append('pubId', pubId);
-                if (value) {
-                    params.append('fromRange', value[0]);
-                    params.append('toRange', value[1]);
-                }
-
-                return {
-                    url: `/api/books/filters?${params.toString()}`,
-                    validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
-                    },
-                }
-            },
-            transformResponse: responseData => {
-                const { number, size, totalElements, totalPages, content } = responseData;
-                return booksAdapter.setAll({
-                    ...initialState,
-                    info: {
-                        currPage: number,
-                        pageSize: size,
-                        totalElements,
-                        totalPages
-                    }
-                }, content)
-            },
+            // serializeQueryArgs: ({ endpointName }) => {
+            //     return endpointName
+            // },
+            // merge: (currentCache, newItems) => {
+            //     currentCache.info = newItems.info;
+            //     booksAdapter.addMany(
+            //         currentCache, booksSelector.selectAll(newItems)
+            //     )
+            // },
+            // forceRefetch: ({ currentArg, previousArg }) => {
+            //     const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
+            //     return isForceRefetch
+            // },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
                     return [
@@ -201,7 +164,6 @@ export const booksApiSlice = apiSlice.injectEndpoints({
 export const {
     useGetBookQuery,
     useGetBooksQuery,
-    useGetBooksByFilterQuery,
     useGetRandomBooksQuery,
     useCreateBookMutation,
     useUpdateBookMutation,
