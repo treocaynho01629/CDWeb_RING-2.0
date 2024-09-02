@@ -60,10 +60,6 @@ const Container = styled.div`
     &:hover {
         border-color: ${props => props.theme.palette.action.hover};
     }
-
-    @media (min-width: 1000px) {
-        min-width: 220px;
-    }
 `
 
 const Info = styled.div`
@@ -102,7 +98,7 @@ const Title = styled.h5`
 
 const Price = styled.span`
     font-size: 16px;
-    color: gray;
+    color: ${props => props.theme.palette.text.secondary};
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -111,9 +107,13 @@ const Price = styled.span`
     margin-bottom: 5px;
 `
 
-const Percent = styled.p`
-    color: ${props => props.theme.palette.primary.main};
-    margin: 0 0 0 10px;
+const Percentage = styled.span`
+    padding: 1px 5px;
+    margin-left: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: ${props => props.theme.palette.primary.contrastText};
+    background-color: ${props => props.theme.palette.primary.main};
 `
 
 const Sale = styled.span`
@@ -281,7 +281,7 @@ const Product = ({ book, scrollPosition }) => {
                         <Sale>{book.price.toLocaleString()}&nbsp;đ</Sale>
                         <Price>
                             <p style={{ textDecoration: 'line-through', marginTop: 0, marginBottom: 0 }}>{Math.round(book.price * 1.1).toLocaleString()}&nbsp;đ</p>
-                            <Percent>10%</Percent>
+                            <Percentage>-10%</Percentage>
                         </Price>
                     </Link>
                     :
@@ -305,7 +305,7 @@ const Product = ({ book, scrollPosition }) => {
                             <TextRating>{calculatedRate}</TextRating>
                             <StarIcon sx={{
                                 fontSize: 16,
-                                color: 'primary.main',
+                                color: 'warning.light',
                             }}
                             />
                         </Box>

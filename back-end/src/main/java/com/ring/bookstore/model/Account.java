@@ -56,6 +56,12 @@ public class Account implements UserDetails {
 
     @Column(nullable = false, length = 1000)
     private String email;
+
+	@OneToOne(cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY,
+			orphanRemoval = true)
+	@JoinColumn(name = "image_id")
+	private Image image;
     
     @Column(unique = true)
     @JsonIgnore
@@ -64,7 +70,7 @@ public class Account implements UserDetails {
     @Column(nullable = true)
     @JsonIgnore
 	private LocalDateTime tokenCreationDate;
-    
+
     @OneToOne(cascade = CascadeType.ALL, 
     		orphanRemoval = true, 
     		mappedBy = "user")
@@ -77,7 +83,7 @@ public class Account implements UserDetails {
     @JsonIgnore
     private Set<Role> roles;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "seller", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Book> sellBooks;
     
@@ -141,7 +147,7 @@ public class Account implements UserDetails {
     }
 	
 	public void removeAllBooks() {
-		sellBooks.forEach(book -> book.setUser(null));
+		sellBooks.forEach(book -> book.setSeller(null));
         this.sellBooks.clear();
     }
 	

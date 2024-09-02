@@ -8,15 +8,19 @@ import useCart from '../../hooks/useCart';
 //#region styled
 const Container = styled.div`
     min-width: 145px;
-    max-width: 210px;
+    max-width: 290px;
+    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
     text-align: center;
     position: relative;
-    border: 0.5px solid lightgray;
+    border: 0.5px solid ${props => props.theme.palette.action.focus};
     overflow: hidden;
+    margin-left: ${props => props.theme.spacing(.1)};
+    margin-right: ${props => props.theme.spacing(.1)};
 `
 
 const Info = styled.div`
@@ -30,6 +34,7 @@ const Info = styled.div`
 `
 
 const Title = styled.h5`
+    width: 100%;
     font-size: 14px;
     margin: 0;
     text-overflow: ellipsis;

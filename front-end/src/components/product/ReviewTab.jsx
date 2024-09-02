@@ -177,8 +177,7 @@ const ReviewTab = ({ id, scrollIntoTab }) => {
     };
 
     const handleChangeSize = (newValue) => {
-        handlePageChange(1);
-        setPagination({ ...pagination, pageSize: newValue });
+        setPagination({ ...pagination, pageSize: newValue, currPage: 0 });
     };
 
     //Review

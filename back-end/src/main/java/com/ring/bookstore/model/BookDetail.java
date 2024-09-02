@@ -3,7 +3,10 @@ package com.ring.bookstore.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Nationalized;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -59,4 +62,11 @@ public class BookDetail {
     @JsonIgnore
     private Book book;
 
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "detail",
+            fetch = FetchType.LAZY)
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    @JsonIgnore
+    private List<Image> previewImages;
 }

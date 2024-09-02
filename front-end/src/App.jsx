@@ -42,8 +42,6 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
             //PUBLIC
-          <Route path="/login" element={<SignPage />} />
-          <Route path="/signup" element={<SignPage />} />
           <Route path="/reset-password" element={<ResetPage />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
 
@@ -51,6 +49,9 @@ function App() {
           <Route path="*" element={<Missing />} />
 
           <Route element={<PersistLogin />}>
+            <Route path="/login" element={<SignPage />} />
+            <Route path="/signup" element={<SignPage />} />
+
             <Route element={<PageLayout />}>
                 //ANONYMOUS
               <Route path="/" element={<Home />} />

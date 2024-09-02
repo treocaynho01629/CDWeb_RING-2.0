@@ -42,14 +42,7 @@ public class BookController {
 	private final BookService bookService;
 	private final AccountRepository accRepo;
 	
-	//Gett all books
-	@GetMapping()
-    public ResponseEntity<?> getAllBooks(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
-										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo){
-        Page<BookDTO> books =  bookService.getAllBooks(pageNo, pageSize);
-        return new ResponseEntity< >(books, HttpStatus.OK);
-    }
-	
+
 	//Get random books
 	@GetMapping("/random")
     public ResponseEntity<?> getRandomBooks(@RequestParam(value = "amount", defaultValue = "5") Integer amount){
@@ -57,9 +50,9 @@ public class BookController {
         return new ResponseEntity< >(books, HttpStatus.OK);
     }
 	
-	//Get books by filtering
-	@GetMapping("/filters")
-    public ResponseEntity<?> getBooksByFilter(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+	//Get books with filtering
+	@GetMapping()
+    public ResponseEntity<?> getBooks(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
     										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
     										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
     										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
@@ -70,7 +63,7 @@ public class BookController {
     										@RequestParam(value = "type", defaultValue = "") String type,
     										@RequestParam(value = "fromRange", defaultValue = "1000") Double fromRange,
     										@RequestParam(value = "toRange", defaultValue = "100000000") Double toRange){
-        Page<BookDTO> books =  bookService.getBooksByFilter(pageNo, pageSize, sortBy, sortDir, keyword, cateId, pubId, seller, type, fromRange, toRange);
+        Page<BookDTO> books =  bookService.getBooks(pageNo, pageSize, sortBy, sortDir, keyword, cateId, pubId, seller, type, fromRange, toRange);
         return new ResponseEntity< >(books, HttpStatus.OK);
     }
 	

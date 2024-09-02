@@ -5,28 +5,14 @@ import {
 } from '@mui/icons-material';
 import { Avatar, ListItemIcon, Divider, Box, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { LogoImage, LogoSubtitle, LogoTitle } from '../custom/GlobalComponents';
 
 //#region styled
 const DrawerLogo = styled('h2')`
     position: relative;
-    font-family: abel;
-    text-transform: uppercase;
-    font-size: 27px;
-    font-weight: 500;
-    color: ${props => props.theme.palette.primary.main};
-    align-items: center;
     display: flex;
-    white-space: nowrap;
+    align-items: center;
     margin: 5px 0px 5px 15px;
-
-    p {
-        color: ${props => props.theme.palette.text.secondary};
-        margin: 0;
-    }
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        margin: 5px 5px 5px -5px;
-    }
 `
 
 const DrawerContainer = styled(Box)(({ theme }) => `
@@ -40,8 +26,7 @@ const DrawerContainer = styled(Box)(({ theme }) => `
 `)
 //#endregion
 
-const NavDrawer = ({ location, openDrawer, setOpen, username, roles, products,
-    logout, ImageLogo, theme, colorMode }) => {
+const NavDrawer = ({ location, openDrawer, setOpen, username, roles, products, logout, theme, colorMode }) => {
     const role = roles?.length;
 
     const handleOpen = () => { setOpen(true) }
@@ -60,7 +45,9 @@ const NavDrawer = ({ location, openDrawer, setOpen, username, roles, products,
                 <Box sx={{ marginY: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Link to={`/`} onClick={handleClose}>
                         <DrawerLogo>
-                            <ImageLogo src="/bell.svg" className="logo" alt="RING! logo" />RING!&nbsp; <p>- BOOKSTORE</p>
+                            <LogoImage src="/bell.svg" className="logo" alt="RING! logo" />
+                            <LogoTitle>RING!&nbsp;</LogoTitle>
+                            <LogoSubtitle>- BOOKSTORES</LogoSubtitle>
                         </DrawerLogo>
                     </Link>
                     <IconButton onClick={handleClose}><KeyboardArrowLeft sx={{ fontSize: 26 }} /></IconButton>

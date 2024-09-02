@@ -22,7 +22,7 @@ public class BookMapper implements Function<Book, BookDTO> {
 		String fileDownloadUri = ServletUriComponentsBuilder
 					.fromCurrentContextPath()
 					.path("/api/images/")
-					.path(book.getImages().getName())
+					.path(book.getImage().getName())
 					.toUriString();
 
         return new BookDTO(book.getId()
@@ -32,6 +32,7 @@ public class BookMapper implements Function<Book, BookDTO> {
         		,book.getPrice()
 				,book.getAmount()
         		,reviewRepo.findTotalRatingByBookId(book.getId())
-        		,book.getBookReviews().size());
+        		,book.getBookReviews().size()
+				,1);
     }
 }

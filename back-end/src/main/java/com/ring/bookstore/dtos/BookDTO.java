@@ -7,6 +7,7 @@ public record BookDTO(Integer id,
                       Double price,
                       Integer amount,
                       int rateTotal,
-                      int rateAmount) {
+                      int rateAmount,
+                      int orderTime) {
 
 }

@@ -1,16 +1,19 @@
 import styled from 'styled-components';
-import { useState, useRef, useEffect } from 'react';
-import { Stack, Button, FormControlLabel, Checkbox, DialogContent, DialogActions, Dialog, DialogTitle, TextField } from '@mui/material';
-import { Check as CheckIcon } from '@mui/icons-material';
+import { useState, useRef, useEffect, Suspense, lazy } from 'react';
+import { Stack, Button, FormControlLabel, Checkbox, TextField } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { jwtDecode } from 'jwt-decode';
 import { useDispatch } from 'react-redux';
 import { setAuth, setPersist } from '../../features/auth/authReducer';
-import { useAuthenticateMutation, useForgotMutation } from '../../features/auth/authApiSlice';
-import { EMAIL_REGEX } from '../../ultils/regex';
+import { useAuthenticateMutation } from '../../features/auth/authApiSlice';
 import { Instruction } from '../custom/GlobalComponents';
+import { Logout } from '@mui/icons-material';
 import CustomPasswordInput from '../custom/CustomPasswordInput';
+import useAuth from '../../hooks/useAuth';
+import useLogout from '../../hooks/useLogout';
+
+const ForgotDialog = lazy(() => import("./ForgotDialog"));
 
 //#region styled
 const Title = styled.h1`
@@ -22,8 +25,9 @@ const Title = styled.h1`
 
 const LoginTab = ({ pending, setPending }) => {
     const dispatch = useDispatch();
+    const { persist, username: loginedUser } = useAuth(); //Is user logged in
     const [authenticate, { isLoading }] = useAuthenticateMutation();
-    const [sendForgot, { isLoading: sending }] = useForgotMutation();
+    const logout = useLogout();
 
     //Router
     const navigate = useNavigate();
@@ -36,14 +40,10 @@ const LoginTab = ({ pending, setPending }) => {
     //Login value
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [email, setEmail] = useState('');
-    const [validEmail, setValidEmail] = useState(false);
     const [currPersist, setCurrPersist] = useState(false);
 
     //Error
-    const [err, setErr] = useState([]);
     const [errMsgLogin, setErrMsgLogin] = useState(location.state?.errorMsg ?? '');
-    const [errMsgReset, setErrMsgReset] = useState('');
 
     //Other
     const [open, setOpen] = useState(false);
@@ -54,23 +54,8 @@ const LoginTab = ({ pending, setPending }) => {
         setErrMsgLogin('');
     }, [username, password])
 
-    //Validation email
-    useEffect(() => {
-        const result = EMAIL_REGEX.test(email);
-        setValidEmail(result);
-    }, [email])
-
-    //Toggle persist
-    const togglePersist = () => { setCurrPersist(prev => !prev) }
-
-    //Forgot pass dialog open state 
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => {
-        setOpen(false);
-        setEmail('');
-        setErr([]);
-        setErrMsgReset('');
-    }
+    const togglePersist = () => { setCurrPersist(prev => !prev) } //Toggle persist
+    const handleOpen = () => setOpen(true); //Open dialog
 
     //Login
     const handleSubmitLogin = async (e) => {
@@ -116,149 +101,83 @@ const LoginTab = ({ pending, setPending }) => {
             })
     }
 
-    //Forgot pass
-    const handleForgotPassword = async (e) => {
-        e.preventDefault();
-        if (pending) return;
-
-        setPending(true);
-
-        //Validation
-        if (!validEmail) {
-            setErrMsgReset('Sai định dạng email!');
-            return;
-        }
-
-        const { enqueueSnackbar } = await import('notistack');
-
-        //Send mutation
-        sendForgot(email).unwrap()
-            .then((data) => {
-                //Reset input
-                setEmail('');
-                setErr([]);
-                setErrMsgReset('');
-
-                //Queue snack
-                enqueueSnackbar('Đã gửi yêu cầu về email!', { variant: 'success' });
-                setPending(false);
-            })
-            .catch((err) => {
-                console.error(err);
-                setErr(err);
-                if (!err?.status) {
-                    setErrMsgReset('Server không phản hồi');
-                } else if (err?.status === 404) {
-                    setErrMsgReset('Tài khoản với email không tồn tại!');
-                } else if (err?.status === 400) {
-                    setErrMsgReset('Sai định dạng thông tin!');
-                } else {
-                    setErrMsgReset('Gửi yêu cầu thất bại');
-                }
-                setPending(false);
-            })
-    }
-
     return (
-        <>
-            <form onSubmit={handleSubmitLogin}>
-                <Title>Đăng nhập</Title>
-                <Stack spacing={1} direction="column">
-                    <Instruction ref={errRef}
-                        style={{ display: errMsgLogin ? "block" : "none" }}
-                        aria-live="assertive">
-                        {errMsgLogin}
-                    </Instruction>
-                    <TextField
-                        label="Tên đăng nhập"
-                        type="text"
-                        id="username"
-                        autoComplete="username"
-                        ref={userRef}
-                        onChange={(e) => setUsername(e.target.value)}
-                        value={username}
-                        size="small"
-                        margin="dense"
-                    />
-                    <CustomPasswordInput
-                        label="Mật khẩu"
-                        autoComplete="password"
-                        onChange={(e) => setPassword(e.target.value)}
-                        value={password}
-                        size="small"
-                        margin="dense"
-                    />
-                    <div className="persistCheck" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <FormControlLabel control={
-                            <Checkbox id="persist"
-                                checked={currPersist}
-                                onChange={togglePersist}
-                                disableRipple
-                                name="Persist"
-                                sx={{
-                                    fontSize: '12px',
-                                    '&.Mui-checked': {
-                                        color: '#63e399',
-                                    }
-                                }} />
-                        }
-                            label="Lưu đăng nhập"
-                        />
-                        <a style={{ textDecoration: 'underline', cursor: 'pointer', color: '#63e399' }}
-                            onClick={handleOpen}>Quên mật khẩu</a>
-                    </div>
-                    <Button
-                        disabled={isLoading}
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        type="submit"
-                        aria-label="submit login"
-                        sx={{ width: '50%' }}
-                    >
-                        Đăng nhập
-                    </Button>
-                </Stack>
-            </form>
-            <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
-                <DialogTitle sx={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>Nhập email tài khoản</DialogTitle>
-                <DialogContent sx={{ overflow: 'visible' }}>
-                    <form onSubmit={handleForgotPassword}>
-                        <Instruction
-                            style={{ display: errMsgReset ? "block" : "none" }}
+        (persist || loginedUser) ?
+            <div>
+                <Title>Xin chào {loginedUser}</Title>
+                <Button
+                    color="error"
+                    size="large"
+                    onClick={() => logout()}
+                    startIcon={<Logout />}
+                >
+                    Kết thúc phiên đăng nhập?
+
+                </Button>
+            </div>
+            :
+            <>
+                <form onSubmit={handleSubmitLogin}>
+                    <Title>Đăng nhập</Title>
+                    <Stack spacing={1} direction="column">
+                        <Instruction ref={errRef}
+                            style={{ display: errMsgLogin ? "block" : "none" }}
                             aria-live="assertive">
-                            {errMsgReset}
+                            {errMsgLogin}
                         </Instruction>
                         <TextField
-                            placeholder='Nhập email tài khoản cần khôi phục'
-                            id="email"
-                            autoComplete="email"
-                            onChange={(e) => setEmail(e.target.value)}
-                            value={email}
-                            fullWidth
-                            error={(email && !validEmail) || err?.data?.errors?.email}
-                            helperText={email && !validEmail ? "Email không hợp lệ!" : err?.data?.errors?.email}
+                            label="Tên đăng nhập"
+                            type="text"
+                            id="username"
+                            autoComplete="username"
+                            ref={userRef}
+                            onChange={(e) => setUsername(e.target.value)}
+                            value={username}
                             size="small"
+                            margin="dense"
                         />
-                    </form>
-                </DialogContent>
-                <DialogActions sx={{ marginBottom: '10px' }}>
-                    <Button variant="outlined" color="error" size="large" onClick={handleClose}>Huỷ</Button>
-                    <Button
-                        disabled={!email || !validEmail || sending}
-                        variant="contained"
-                        color="primary"
-                        type="submit"
-                        size="large"
-                        aria-label="submit sending recover email"
-                        onClick={handleForgotPassword}
-                        startIcon={<CheckIcon />}
-                    >
-                        Gửi
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </>
+                        <CustomPasswordInput
+                            label="Mật khẩu"
+                            autoComplete="password"
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={password}
+                            size="small"
+                            margin="dense"
+                        />
+                        <div className="persistCheck" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <FormControlLabel control={
+                                <Checkbox
+                                    checked={currPersist}
+                                    onChange={togglePersist}
+                                    disableRipple
+                                    name="persist"
+                                    color="primary"
+                                />
+                            }
+                                label="Lưu đăng nhập"
+                            />
+                            <a style={{ textDecoration: 'underline', cursor: 'pointer', color: '#63e399' }}
+                                onClick={handleOpen}>Quên mật khẩu</a>
+                        </div>
+                        <Button
+                            disabled={isLoading}
+                            variant="contained"
+                            color="primary"
+                            size="large"
+                            type="submit"
+                            aria-label="submit login"
+                            sx={{ width: '50%' }}
+                        >
+                            Đăng nhập
+                        </Button>
+                    </Stack>
+                </form>
+                {open &&
+                    <Suspense fallback={<></>}>
+                        <ForgotDialog {...{ open, setOpen }} />
+                    </Suspense>
+                }
+            </>
     )
 }
 

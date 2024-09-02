@@ -1,24 +1,43 @@
-import styled, { keyframes } from 'styled-components'
-import { useRef, useEffect, useState } from 'react'
+import styled from 'styled-components'
+import { useState } from 'react'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Skeleton } from '@mui/material';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
+import Carousel from 'react-multi-carousel';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 //#region styled
-const fadeIn = keyframes`
-  from { opacity: 0}
-  to { opacity: 1 }
-`
-
 const ImgContainer = styled.div`
-    align-items: center;
-    justify-content: center;
     text-align: center;
-    border: 0.5px solid ${props => props.theme.palette.action.focus};
-
+    border: none;
+    
     ${props => props.theme.breakpoints.up("sm")} {
         width: 100%;
+        position: sticky;
+        top: ${props => props.theme.mixins.toolbar.minHeight + 15}px;
+        border: .5px solid ${props => props.theme.palette.action.focus};
+    }
+`
+
+const ImageNumber = styled.p`
+    font-size: 16px;
+    font-weight: bold;
+    padding: 2px 10px;
+    position: absolute;
+    z-index: 5;
+    color: ${props => props.theme.palette.primary.contrastText};
+    background-color: ${props => props.theme.palette.primary.main};
+    border-radius: 50px;
+    top: 5px;
+    left: 10px;
+    white-space: nowrap;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        bottom: 5px;
+        right: 15px;
+        top: auto;
+        left: auto;
     }
 `
 
@@ -38,36 +57,6 @@ const ImageSlider = styled.div`
 
     ${props => props.theme.breakpoints.down("sm")} {
         padding: 0;
-    }
-`
-
-const ImageSlide = styled.div`
-    position: relative;
-    width: 100%;
-    animation: ${fadeIn} .3s ease;
-    align-items: center;
-    justify-content: center;
-`
-
-const ImageNumber = styled.p`
-    color: inherit;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 2px 10px;
-    position: absolute;
-    z-index: 5;
-    color: ${props => props.theme.palette.primary.contrastText};
-    background-color: ${props => props.theme.palette.primary.main};
-    border-radius: 50px;
-    top: 5px;
-    left: 10px;
-    white-space: nowrap;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        bottom: 5px;
-        right: 15px;
-        top: auto;
-        left: auto;
     }
 `
 
@@ -99,7 +88,10 @@ const SmallImageSlide = styled.div`
     cursor: pointer;
     opacity: 0.5;
     transition: all .25s ease;
-    display: flex;
+
+    ${props => props.theme.breakpoints.down("md")} {
+       width: 15%;
+    }
 
     &.active {
         border: 1px solid ${props => props.theme.palette.primary.main};
@@ -112,7 +104,7 @@ const SmallImageSlide = styled.div`
     }
 `
 
-const ImageButton = styled.button`
+const CustomArrow = styled.button`
     border-radius: 0;
     background-color: transparent;
     color: inherit;
@@ -125,56 +117,70 @@ const ImageButton = styled.button`
     justify-content: center;
     position: absolute;
     opacity: .8;
-    transition: all .3s ease;
-    top: 50%;
-    opacity: .8;
-    left: ${prop => prop.direction === "left" && "2%"};
-    right: ${prop => prop.direction === "right" && "2%"};
+    transition: all .25s ease;
+    cursor: pointer;
 
-    &:hover{
+    &:hover {
         opacity: 1;
         background-color: ${props => props.theme.palette.primary.main};
-        color: ${props => props.theme.palette.primary.contrastText};
+    }
+
+    svg {
+        font-size: 2em;
+    }
+
+    &.custom-left-arrow {
+        left: 1%;
+    }
+
+    &.custom-right-arrow {
+        right: 1%;
+    }
+`
+
+const ImageSlide = styled.div`
+    padding: 15px 10px;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    display: grid;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 5px 0 0 0;
     }
 `
 
 const StyledLazyImage = styled(LazyLoadImage)`
-    padding: 15px 10px;
     object-fit: contain;
     transform: ${props => props.imagestyle};
-    width: 95%;
-    min-height: 500px;
-
-  ${props => props.theme.breakpoints.down("sm")} {
-    padding: 5px 0;
-    min-height: 300px;
-    width: 85%;
-  }
+    width: 100%;
 `
 
 const StyledSmallLazyImage = styled(LazyLoadImage)`
     display: inline-block;
     object-fit: contain;
     transform: ${props => props.imagestyle};
-    height: 80px;
-    width: 80px;
+    width: 70px;
+    aspect-ratio: 1/1;
 
-  ${props => props.theme.breakpoints.down("sm")} {
-    height: 55px;
-    width: 55px;
-  }
+    ${props => props.theme.breakpoints.down("sm")} {
+        width: 55px;
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        width: 45px;
+    }
 `
 
 const StyledSkeleton = styled(Skeleton)`
     margin: 15px 10px;
     width: 95%;
-    min-height: 500px;
+    height: 100%;
 
-  ${props => props.theme.breakpoints.down("sm")} {
-    padding: 5px 0;
-    min-height: 300px;
-    width: 85%;
-  }
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 5px 0 0 0;
+        width: 100%;
+    }
 `
 
 const StyledSmallSkeleton = styled(Skeleton)`
@@ -189,118 +195,116 @@ const StyledSmallSkeleton = styled(Skeleton)`
 `
 //#endregion
 
-const ProductImages = ({ images }) => {
-    const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY(-1)']; //Temp
+const responsive = {
+    default: {
+        breakpoint: {
+            max: 3000,
+            min: 900
+        },
+        items: 1
+    },
+    mobile: {
+        breakpoint: {
+            max: 900,
+            min: 0
+        },
+        items: 1
+    }
+};
 
-    const [width, setWidth] = useState(0);
-    const [start, setStart] = useState(0);
-    const [change, setChange] = useState(9);
+//Custom stuff
+const CustomLeftArrow = ({ carouselState, onClick, setSlideIndex }) => (
+    <CustomArrow
+        className="custom-left-arrow"
+        onClick={() => {
+            onClick();
+            setSlideIndex(carouselState?.currentSlide);
+        }}
+    >
+        <KeyboardArrowLeft />
+    </CustomArrow>
+);
 
+const CustomRightArrow = ({ carouselState, onClick, setSlideIndex }) => (
+    <CustomArrow
+        className="custom-right-arrow"
+        onClick={() => {
+            onClick();
+            setSlideIndex(carouselState?.currentSlide + 2);
+        }}
+    >
+        <KeyboardArrowRight />
+    </CustomArrow>
+);
+
+const CustomButtonGroup = ({ multiImages, images, setSlideIndex, goToSlide, carouselState }) => {
+    const { currentSlide } = carouselState;
+
+    return (
+        <MoreImageContainer>
+            <SmallImageSlider draggable={true}>
+                {multiImages.map((style, index) => (
+                    <SmallImageSlide key={index}
+                        className={`${index === currentSlide && 'active'}`}
+                        onClick={() => {
+                            goToSlide(index);
+                            setSlideIndex(index + 1);
+                        }}>
+                        <StyledSmallLazyImage
+                            src={`${images}?size=small`}
+                            imagestyle={style}
+                            placeholder={
+                                <StyledSmallSkeleton
+                                    variant="rectangular"
+                                    animation={false}
+                                />
+                            }
+                        />
+                    </SmallImageSlide>
+                ))}
+            </SmallImageSlider>
+        </MoreImageContainer>
+    );
+};
+
+const ProductImages = ({ book }) => {
+    const multiImages = ['scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY(-1)', 'scaleX(1)', 'scaleX(-1) scaleY(-1)', 'scaleX(-1)', 'scaleY(-1)']; //Temp
     const [slideIndex, setSlideIndex] = useState(1);
 
-    const slideRef = useRef();
+    if (book) {
+        const images = book?.image;
 
-    useEffect(() => {
-        if (!slideRef.current) return;
-        const scrollWidth = slideRef.current.scrollWidth;
-        const childrenElementCount = slideRef.current.childElementCount;
-        const width = scrollWidth / childrenElementCount;
-        setWidth(width);
-    }, [])
-
-    useEffect(() => {
-        if (!slideRef.current || !width) return;
-        let numOfThumb = Math.round(slideRef.current.offsetWidth / width);
-        slideRef.current.scrollLeft = slideIndex > numOfThumb - 1 ? (slideIndex - 1) * width : 0;
-    }, [width, slideIndex])
-
-    //Slide
-    const changeSlide = (n) => {
-        setSlideIndex(prev => prev + n);
-
-        if ((slideIndex + n) > multiImages.length) {
-            setSlideIndex(1)
-        }
-        if ((slideIndex + n) < 1) {
-            setSlideIndex(multiImages.length)
-        }
-    }
-
-    //Drag
-    const dragStart = (e) => {
-        setStart(e.clientX);
-    }
-
-    const dragOver = (e) => {
-        let touch = e.clientX;
-        setChange(start - touch);
-    }
-
-    const dragEnd = (e) => {
-        if (change > 0) {
-            slideRef.current.scrollLeft += width;
-        } else {
-            slideRef.current.scrollLeft -= width;
-        }
-    }
-
-    if (images) {
         return (
             <ImgContainer>
-                <ImageSlider>
+                <ImageNumber>{slideIndex}/{multiImages.length}</ImageNumber>
+                <Carousel
+                    renderButtonGroupOutside
+                    responsive={responsive}
+                    autoPlay={true}
+                    autoPlaySpeed={60000}
+                    customLeftArrow={<CustomLeftArrow setSlideIndex={setSlideIndex} />}
+                    customRightArrow={<CustomRightArrow setSlideIndex={setSlideIndex} />}
+                    customButtonGroup={<CustomButtonGroup {...{ setSlideIndex, images, multiImages }} />}
+                    removeArrowOnDeviceType={["mobile"]}
+                    pauseOnHover
+                    keyBoardControl
+                    minimumTouchDrag={80}
+                >
                     {multiImages.map((style, index) => (
-                        <ImageSlide key={index}
-                            style={{ display: (index + 1) === slideIndex ? "flex" : "none" }}>
-                            <ImageNumber>{index + 1} / {multiImages.length}</ImageNumber>
+                        <ImageSlide key={index}>
                             <StyledLazyImage
                                 src={images}
                                 srcSet={`${images}?size=medium 350w, ${images} 600w`}
-                                alt={`Big image number ${index}`}
-                                sizes='400px'
+                                alt={`${book?.title} preview image #${index}`}
+                                sizes="400px"
                                 imagestyle={style}
                                 visibleByDefault={index == 0}
-                                placeholder={
-                                    <StyledSkeleton
-                                        variant="rectangular"
-                                        animation={false}
-                                    />
-                                }
+                                placeholderSrc={`${images}?size=small`}
+                                effect="blur"
                             />
                         </ImageSlide>
                     ))}
-                    <ImageButton direction="left" onClick={() => changeSlide(-1)}>
-                        <KeyboardArrowLeft style={{ fontSize: 50 }} />
-                    </ImageButton>
-                    <ImageButton direction="right" onClick={() => changeSlide(1)}>
-                        <KeyboardArrowRight style={{ fontSize: 50 }} />
-                    </ImageButton>
-                </ImageSlider>
-                <MoreImageContainer>
-                    <SmallImageSlider
-                        draggable={true}
-                        ref={slideRef}
-                        onDragStart={dragStart}
-                        onDragOver={dragOver}
-                        onDragEnd={dragEnd}
-                    >
-                        {multiImages.map((style, index) => (
-                            <SmallImageSlide key={index}
-                                className={`${index + 1 === slideIndex && 'active'}`}
-                                onClick={() => setSlideIndex(index + 1)}>
-                                <StyledSmallLazyImage
-                                    src={images}
-                                    imagestyle={style}
-                                    placeholder={
-                                        <StyledSmallSkeleton
-                                            variant="rectangular"
-                                            animation={false}
-                                        />
-                                    }
-                                />
-                            </SmallImageSlide>
-                        ))}
-                    </SmallImageSlider>
-                </MoreImageContainer>
+                </Carousel>
             </ImgContainer>
         )
     } else {

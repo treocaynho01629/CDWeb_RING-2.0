@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react'
 import { Skeleton } from '@mui/material';
 import { useParams, Navigate, NavLink, useSearchParams } from 'react-router-dom';
 import { useGetBookQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
+import { LazyLoadComponent } from 'react-lazy-load-image-component';
 import ProductsSlider from '../components/product/ProductsSlider';
 import ProductDetailContainer from '../components/product/ProductDetailContainer';
 import CustomDivider from '../components/custom/CustomDivider';
@@ -12,6 +13,7 @@ import useTitle from '../hooks/useTitle';
 
 //#region styled
 const Wrapper = styled.div`
+    position: relative;
 `
 //#endregion
 
@@ -23,7 +25,7 @@ const ProductDetail = () => {
 
     //Fetch data
     const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom } = useGetRandomBooksQuery({ amount: 10 });
-    const { data, isLoading, isSuccess, isError, error } = useGetBookQuery({ id }, { skip: !id });
+    const { data, isLoading, isFetching, isSuccess, isError, error } = useGetBookQuery({ id }, { skip: !id });
 
     //Set title
     useTitle(`${data?.title ?? 'RING - Bookstore!'}`);
@@ -52,10 +54,12 @@ const ProductDetail = () => {
 
     let product;
 
-    if (isError && error?.status === 404) {
-        product = <Navigate to={'/missing'} />
-    } else {
+    if (isLoading || isFetching) {
+        product = <ProductContent/>
+    } else if (isSuccess) {
         product = <ProductContent {...{ book: data, handleTabChange }} />
+    } else if (isError && error?.status === 404) {
+        product = <Navigate to={'/missing'} />
     }
 
     return (
@@ -81,10 +85,14 @@ const ProductDetail = () => {
             </CustomBreadcrumbs>
             {product}
             <div ref={ref}>
-                <ProductDetailContainer {...{ loading: isLoading, book: data, tab, handleTabChange, scrollIntoTab }} />
+                <LazyLoadComponent>
+                    <ProductDetailContainer {...{ loading: (isLoading || isFetching), book: data, tab, handleTabChange, scrollIntoTab }} />
+                </LazyLoadComponent>
             </div>
             <CustomDivider>CÓ THỂ BẠN SẼ THÍCH</CustomDivider>
-            <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
+            <LazyLoadComponent>
+                <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
+            </LazyLoadComponent>
             <br /><br />
         </Wrapper>
     )

@@ -22,31 +22,24 @@ const CustomArrow = styled.button`
   background-color: #0000005e;
   border: none;
   outline: none;
-  height: 55px;
+  height: 45px;
   width: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
-  opacity: .8;
-  transition: all .3s ease;
+  opacity: .5;
+  cursor: pointer;
+  transition: all .25s ease;
 
   &:hover {
-    opacity: 1;
+    opacity: .7;
     background-color: ${props => props.theme.palette.primary.main};
   }
 
-  svg {
-    font-size: 2em;
-  }
-
-  &.custom-left-arrow {
-    left: 1%;
-  }
-
-  &.custom-right-arrow {
-    right: 1%;
-  }
+  svg {font-size: 2em;}
+  &.custom-left-arrow {left: 0;}
+  &.custom-right-arrow {right: 0; }
 `
 //#endregion
 
@@ -89,10 +82,11 @@ const tempItems = [
   <ProductSimple key={'temp5'} />
 ];
 
-const ProductsSlider = ({ data, isError, isLoading, isSuccess, isUninitialized = false, scrollPosition }) => {
+const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUninitialized = false, scrollPosition }) => {
   let productsCarousel;
+  const loading = (isLoading || isFetching || isError || isUninitialized);
 
-  if (isLoading || isError || isUninitialized) {
+  if (loading) {
     productsCarousel = tempItems;
   } else if (isSuccess) {
     const { ids, entities } = data;
@@ -116,7 +110,7 @@ const ProductsSlider = ({ data, isError, isLoading, isSuccess, isUninitialized =
 
   return (
     <Container>
-      {(isLoading || isError || isUninitialized) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
+      {(loading) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
       <Carousel
         responsive={responsive}
         infinite={true}

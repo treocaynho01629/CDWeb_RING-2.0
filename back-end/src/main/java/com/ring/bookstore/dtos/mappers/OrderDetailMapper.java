@@ -19,11 +19,11 @@ public class OrderDetailMapper implements Function<OrderDetail, OrderDetailDTO> 
 		String fileDownloadUri = ServletUriComponentsBuilder
 					.fromCurrentContextPath()
 					.path("/api/images/")
-					.path(book.getImages().getName())
+					.path(book.getImage().getName())
 					.toUriString();
 
         return new OrderDetailDTO(detail.getId(),
-				detail.getBook().getUser().getUsername(),
+				detail.getBook().getSeller().getUsername(),
 				detail.getAmount(),
         		detail.getPrice(),
         		detail.getBook().getId(),

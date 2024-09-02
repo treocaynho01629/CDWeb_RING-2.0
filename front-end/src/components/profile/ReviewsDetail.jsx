@@ -17,13 +17,12 @@ const ReviewTable = () => {
         }
     }, [loadingReviews])
 
-    const handleChangeSize = (newValue) => {
-        handlePageChange(1);
-        setPagination({ ...pagination, pageSize: newValue });
-    };
-
     const handlePageChange = (page) => {
         setPagination({ ...pagination, currPage: page - 1 });
+    };
+
+    const handleChangeSize = (newValue) => {
+        setPagination({ ...pagination, pageSize: newValue, currPage: 0 });
     };
 
     if (loadingReviews) {

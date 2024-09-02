@@ -1,17 +1,18 @@
-import styled from "styled-components"
-import { useEffect, useState } from 'react'
+import styled from "styled-components";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useTheme, useMediaQuery, Grid2 as Grid } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice";
 import { useGetPublishersQuery } from "../features/publishers/publishersApiSlice";
-import { useGetBooksByFilterQuery } from "../features/books/booksApiSlice";
-import AppPagination from '../components/custom/AppPagination'
-import FilterList from "../components/product/FilterList"
-import FilteredProducts from "../components/product/FilteredProducts"
-import SortList from "../components/product/SortList"
-import FilterDialog from '../components/product/FilterDialog'
+import { useGetBooksQuery } from "../features/books/booksApiSlice";
+import AppPagination from "../components/custom/AppPagination";
 import CustomDivider from "../components/custom/CustomDivider";
+import FilteredProducts from "../components/product/FilteredProducts";
+import SortList from "../components/product/SortList";
 import useTitle from "../hooks/useTitle";
+
+const FilterList = lazy(() => import("../components/product/FilterList"));
+const FilterDialog = lazy(() => import("../components/product/FilterDialog"));
 
 //#region styled
 const Wrapper = styled.div`
@@ -62,7 +63,7 @@ const FiltersPage = () => {
     //Fetch data
     const { data: cates, isLoading: loadCates, isSuccess: doneCates, isError: errorCates } = useGetCategoriesQuery(); //Categories
     const { data: pubs, isLoading: loadPubs, isSuccess: donePubs, isError: errorPubs } = useGetPublishersQuery(); //Publishers
-    const { data, isError, error, isLoading, isSuccess } = useGetBooksByFilterQuery({ //Books
+    const { data, isError, error, isLoading, isSuccess } = useGetBooksQuery({ //Books
         page: pagination?.currPage,
         size: pagination?.pageSize,
         sortBy: pagination?.sortBy,
@@ -162,7 +163,12 @@ const FiltersPage = () => {
             searchParams.set("pSize", newValue);
             setSearchParams(searchParams);
         }
-        setPagination({ ...pagination, pageSize: newValue });
+
+        //Reset to first page
+        searchParams.set("pageNo", page);
+        setSearchParams(searchParams);
+        setPagination({ ...pagination, pageSize: newValue, currPage: 0 });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     const handleChangeSearch = (newValue) => {
@@ -243,23 +249,31 @@ const FiltersPage = () => {
         <Wrapper>
             <Grid container spacing={4} size="grow" sx={{ display: 'flex', justifyContent: 'center' }}>
                 {mobileMode ?
-                    <FilterDialog
-                        {...{ filters, setFilters, resetFilter, open, handleClose, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
-                        onChangeCate={handleChangeCate}
-                        onChangeRange={handleChangeRange}
-                        onChangePub={handleChangePub}
-                        onChangeType={handleChangeType}
-                        onChangeSeller={handleChangeSeller}
-                    />
+                    <>
+                        {open &&
+                            <Suspense fallback={<></>}>
+                                <FilterDialog
+                                    {...{ filters, setFilters, resetFilter, open, handleClose, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
+                                    onChangeCate={handleChangeCate}
+                                    onChangeRange={handleChangeRange}
+                                    onChangePub={handleChangePub}
+                                    onChangeType={handleChangeType}
+                                    onChangeSeller={handleChangeSeller}
+                                />
+                            </Suspense>
+                        }
+                    </>
                     :
                     <Grid size={{ xs: 12, md: 3 }} display={{ xs: "none", md: "block" }} sx={{ overflowX: 'visible', zIndex: 1 }}>
-                        <FilterList
-                            {...{ filters, resetFilter, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
-                            onChangeCate={handleChangeCate}
-                            onChangeRange={handleChangeRange}
-                            onChangePub={handleChangePub}
-                            onChangeType={handleChangeType}
-                            onChangeSeller={handleChangeSeller} />
+                        <Suspense fallback={<></>}>
+                            <FilterList
+                                {...{ filters, resetFilter, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
+                                onChangeCate={handleChangeCate}
+                                onChangeRange={handleChangeRange}
+                                onChangePub={handleChangePub}
+                                onChangeType={handleChangeType}
+                                onChangeSeller={handleChangeSeller} />
+                        </Suspense>
                     </Grid>
                 }
                 <Grid size={{ xs: 12, md: 9 }}>

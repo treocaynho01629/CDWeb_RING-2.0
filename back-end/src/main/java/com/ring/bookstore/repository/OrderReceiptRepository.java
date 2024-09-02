@@ -25,7 +25,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Inte
 	
 	@Query("""
 	select o from OrderReceipt o join OrderDetail od on o.id = od.order.id 
-	where od.book.user.id = :id
+	where od.book.seller.id = :id
 	""")
 	Page<OrderReceipt> findAllBySeller(Integer id, Pageable pageable); //Get orders by seller's {id}
 	
@@ -45,7 +45,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Inte
 	@Query("""
 	select month(o.oDate) as name, coalesce(sum(o2.amount) , 0) as books, coalesce(sum(distinct o.total) , 0) as sales 
 	from OrderReceipt o left join OrderDetail o2 on o.id = o2.order.id join Book b on b.id = o2.book.id
-	where b.user.id = :id
+	where b.seller.id = :id
 	group by month(o.oDate)
 	""")
 	List<Map<String,Object>> getMonthlySaleBySeller(Integer id); //Get monthly sale by seller's {id}

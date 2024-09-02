@@ -103,6 +103,7 @@ const CustomArrow = styled.button`
   position: absolute;
   opacity: .8;
   transition: all .25s ease;
+  cursor: pointer;
 
   &:hover {
     opacity: 1;
@@ -135,24 +136,17 @@ const StyledLazyImage = styled(LazyLoadImage)`
 //#endregion
 
 const responsive = {
-    desktop: {
+    default: {
         breakpoint: {
             max: 3000,
-            min: 1024
+            min: 900
         },
         items: 1
     },
     mobile: {
         breakpoint: {
-            max: 464,
+            max: 900,
             min: 0
-        },
-        items: 1
-    },
-    tablet: {
-        breakpoint: {
-            max: 1024,
-            min: 464
         },
         items: 1
     }
@@ -279,7 +273,7 @@ const Slider = () => {
                     autoPlaySpeed={15000}
                     customLeftArrow={<CustomLeftArrow />}
                     customRightArrow={<CustomRightArrow />}
-                    removeArrowOnDeviceType={["tablet", "mobile"]}
+                    removeArrowOnDeviceType={["mobile"]}
                     pauseOnHover
                     keyBoardControl
                     minimumTouchDrag={80}
@@ -301,7 +295,7 @@ const Slider = () => {
                     autoPlaySpeed={15000}
                     customLeftArrow={<CustomLeftArrow />}
                     customRightArrow={<CustomRightArrow />}
-                    removeArrowOnDeviceType={["tablet", "mobile"]}
+                    removeArrowOnDeviceType={["mobile"]}
                     pauseOnHover
                     keyBoardControl
                     minimumTouchDrag={80}

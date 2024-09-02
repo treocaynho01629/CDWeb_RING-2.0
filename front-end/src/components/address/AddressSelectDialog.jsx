@@ -1,11 +1,12 @@
 import { useTheme } from "styled-components"
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { useUpdateProfileMutation } from '../../features/users/usersApiSlice';
 import { Box, Dialog, Button, DialogActions, DialogContent, DialogTitle, ListItemIcon, ListItemText, Menu, MenuItem, Radio, styled, useMediaQuery } from '@mui/material';
 import { AddHome, Check, Delete, Home, LocationOn, Close } from '@mui/icons-material';
 import AddressItem from './AddressItem'
-import AddressForm from './AddressForm'
 import useCart from '../../hooks/useCart';
+
+const AddressForm = lazy(() => import('./AddressForm'));
 
 const StyledRadio = styled(Radio)(({ theme }) => ({
   borderRadius: 0,
@@ -160,99 +161,98 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
   const isSelected = (selectedValue != null && selectedValue == contextAddress?.id);
 
   return (
-    <>
-      <Dialog open={openDialog} scroll={'paper'} maxWidth={'sm'} fullWidth onClose={handleCloseDialog} fullScreen={fullScreen}>
-        {openForm
-          ?
+    <Dialog open={openDialog} scroll={'paper'} maxWidth={'sm'} fullWidth onClose={handleCloseDialog} fullScreen={fullScreen}>
+      {openForm
+        ?
+        <Suspense fallBack={<></>}>
           <AddressForm {...{
             open: openForm, handleClose, addressInfo: contextAddress, err, setErr, errMsg, setErrMsg, getFullAddress,
             addNewAddress, pending, setPending, handleRemoveAddress, handleUpdateAddress, defaultAddressToStore, selectedValue
           }} />
-          :
-          <>
-            <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><LocationOn />&nbsp;Địa chỉ của bạn</DialogTitle>
-            <DialogContent sx={{ padding: { xs: 1, sm: '20px 24px' }, paddingTop: 0}}>
-              <Box display={'flex'} mb={'5px'}>
-                <StyledRadio
-                  checked={selectedValue == -1}
-                  onChange={(e) => setSelectedValue(e.target.value)}
-                  value={-1}
-                  name="radio-buttons"
-                />
-                <AddressItem {...{ addressInfo: profile, handleOpen, handleClick, selectedValue }} />
-              </Box>
-              {addresses?.map((address, index) => {
-                return (
-                  <Box display={'flex'} mb={'5px'} key={`${address?.id}-${index}`} >
-                    <StyledRadio
-                      checked={selectedValue == address.id}
-                      onChange={(e) => setSelectedValue(e.target.value)}
-                      value={address.id}
-                      name="radio-buttons"
-                    />
-                    <AddressItem {...{ addressInfo: address, handleOpen, handleClick, selectedValue }} />
-                  </Box>
-                )
-              })}
-              <Button
-                variant="outlined"
-                size="large"
-                color="primary"
-                sx={{ width: '100%', padding: '10px' }}
-                onClick={() => handleOpen()}
-              >
-                <AddHome />&nbsp;Thêm địa chỉ
-              </Button>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                variant="outlined"
-                color="error"
-                size="large"
-                sx={{ marginY: '10px' }}
-                onClick={handleCloseDialog}
-                startIcon={<Close />}
-              >
-                Huỷ
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                sx={{ marginY: '10px' }}
-                onClick={handleSubmit}
-                startIcon={<Check />}
-              >
-                Chọn
-              </Button>
-            </DialogActions>
-            <Menu
-              open={openContext}
-              onClose={handleCloseContext}
-              anchorEl={anchorEl}
-              sx={{ display: { xs: 'none', sm: 'block' } }}
-              MenuListProps={{
-                'aria-labelledby': 'basic-button',
-              }}
+        </Suspense>
+        :
+        <>
+          <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><LocationOn />&nbsp;Địa chỉ của bạn</DialogTitle>
+          <DialogContent sx={{ padding: { xs: 1, sm: '20px 24px' }, paddingTop: 0 }}>
+            <Box display={'flex'} mb={'5px'}>
+              <StyledRadio
+                checked={selectedValue == -1}
+                onChange={(e) => setSelectedValue(e.target.value)}
+                value={-1}
+                name="radio-buttons"
+              />
+              <AddressItem {...{ addressInfo: profile, handleOpen, handleClick, selectedValue }} />
+            </Box>
+            {addresses?.map((address, index) => {
+              return (
+                <Box display={'flex'} mb={'5px'} key={`${address?.id}-${index}`} >
+                  <StyledRadio
+                    checked={selectedValue == address.id}
+                    onChange={(e) => setSelectedValue(e.target.value)}
+                    value={address.id}
+                    name="radio-buttons"
+                  />
+                  <AddressItem {...{ addressInfo: address, handleOpen, handleClick, selectedValue }} />
+                </Box>
+              )
+            })}
+            <Button
+              variant="outlined"
+              size="large"
+              color="primary"
+              sx={{ width: '100%', padding: '10px' }}
+              onClick={() => handleOpen()}
             >
-              <MenuItem disabled={isDefault || isSelected} onClick={() => handleRemoveAddress(contextAddress?.id)}>
-                <ListItemIcon >
-                  <Delete sx={{ color: 'error.main' }} fontSize="small" />
-                </ListItemIcon>
-                <ListItemText sx={{ color: 'error.main' }}>Xoá địa chỉ</ListItemText>
-              </MenuItem>
-              <MenuItem disabled={isDefault || isSelected} onClick={() => handleSetDefault(contextAddress)}>
-                <ListItemIcon>
-                  <Home fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Đặt làm mặc định</ListItemText>
-              </MenuItem>
-            </Menu >
-          </>
-        }
-      </Dialog>
-
-    </>
+              <AddHome />&nbsp;Thêm địa chỉ
+            </Button>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              color="error"
+              size="large"
+              sx={{ marginY: '10px' }}
+              onClick={handleCloseDialog}
+              startIcon={<Close />}
+            >
+              Huỷ
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              sx={{ marginY: '10px' }}
+              onClick={handleSubmit}
+              startIcon={<Check />}
+            >
+              Chọn
+            </Button>
+          </DialogActions>
+          <Menu
+            open={openContext}
+            onClose={handleCloseContext}
+            anchorEl={anchorEl}
+            sx={{ display: { xs: 'none', sm: 'block' } }}
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+          >
+            <MenuItem disabled={isDefault || isSelected} onClick={() => handleRemoveAddress(contextAddress?.id)}>
+              <ListItemIcon >
+                <Delete sx={{ color: 'error.main' }} fontSize="small" />
+              </ListItemIcon>
+              <ListItemText sx={{ color: 'error.main' }}>Xoá địa chỉ</ListItemText>
+            </MenuItem>
+            <MenuItem disabled={isDefault || isSelected} onClick={() => handleSetDefault(contextAddress)}>
+              <ListItemIcon>
+                <Home fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Đặt làm mặc định</ListItemText>
+            </MenuItem>
+          </Menu >
+        </>
+      }
+    </Dialog>
   )
 }
 
