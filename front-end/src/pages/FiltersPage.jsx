@@ -241,7 +241,7 @@ const FiltersPage = () => {
 
     return (
         <Wrapper>
-            <Grid container spacing={4} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Grid container spacing={4} size="grow" sx={{ display: 'flex', justifyContent: 'center' }}>
                 {mobileMode ?
                     <FilterDialog
                         {...{ filters, setFilters, resetFilter, open, handleClose, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}

@@ -38,7 +38,7 @@ const FilteredProducts = ({ data, isError, error, isLoading, isSuccess, pageSize
   return (
     <div style={{ padding: 0, width: '100%', position: 'relative' }}>
       {isLoading && <CustomProgress color="primary" />}
-      <Grid container spacing={.2} sx={{ width: '100%' }}>
+      <Grid container spacing={.2} size="grow" sx={{ width: '100%' }}>
         {productsContent}
       </Grid>
     </div>
