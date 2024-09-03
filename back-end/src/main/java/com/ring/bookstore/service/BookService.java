@@ -18,9 +18,7 @@ public interface BookService {
     List<BookDTO> getRandomBooks(Integer amount);
 
     Page<BookDTO> getBooks(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword,
-                                   Integer cateId, List<Integer> pubId, String seller, String type, Double fromRange, Double toRange);
-
-    Book getBookById(Integer id);
+                           Integer cateId, List<Integer> pubId, String seller, String type, Double fromRange, Double toRange);
 
     BookDetailDTO getBookDetailById(Integer id);
 

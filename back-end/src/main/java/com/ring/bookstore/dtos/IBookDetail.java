@@ -1,32 +1,20 @@
 package com.ring.bookstore.dtos;
 
-import com.ring.bookstore.model.Publisher;
-
 import java.time.LocalDate;
 
 //Display book info
-public interface IBookDetail {
-    Integer getId();
-
-    String getTitle();
-
-    String getDescription();
-
-    String getImage();
-
-    Double getPrice();
-
-    Integer getAmount();
-
-    String getType();
+public interface IBookDetail extends IBookDisplay {
+    Integer getRateTime();
 
     String getAuthor();
 
-    Publisher getPublisher();
+    Integer getPubId();
 
     Integer getCateId();
 
     String getCateName();
+
+    String getType();
 
     String getSize();
 
@@ -37,10 +25,4 @@ public interface IBookDetail {
     String getLanguage();
 
     Double getWeight();
-
-    Integer getRateAmount();
-
-    Integer getRateTotal();
-
-    Integer getOrderTime();
 }

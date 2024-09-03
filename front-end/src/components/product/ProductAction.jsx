@@ -105,12 +105,13 @@ const ProductAction = ({ book }) => {
 
     //Change add amount
     const changeAmount = (n) => {
-        setAmountIndex(prev => (prev + n < 1 ? 1 : prev + n));
+        setAmountIndex(prev => (prev + n < 1 ? 1 : prev + n > (book?.amount ?? 199) ? (book?.amount ?? 199) : prev + n));
     }
 
     const handleChangeAmount = (value) => {
         let newValue = value;
         if (newValue < 1 || !Number.isInteger(newValue)) newValue = 1;
+        if (newValue > (book?.amount ?? 199)) newValue = (book?.amount ?? 199);
         setAmountIndex(newValue);
     }
 
@@ -212,7 +213,9 @@ const ProductAction = ({ book }) => {
                         <CustomAmountInput
                             disabled={!book || book?.amount == 0}
                             size="small"
+                            max={book?.amount}
                             value={amountIndex}
+                            error={1 > amountIndex > (book?.amount ?? 199)}
                             onChange={(e) => handleChangeAmount(e.target.valueAsNumber)}
                             handleDecrease={() => changeAmount(-1)}
                             handleIncrease={() => changeAmount(1)}

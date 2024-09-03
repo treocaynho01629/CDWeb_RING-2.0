@@ -80,7 +80,7 @@ const orderGroup = [
     label: 'Mới nhất',
   },
   {
-    value: 'rateAmount',
+    value: 'rating',
     label: 'Yêu thích',
   },
 ];

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ring.bookstore.dtos.IBookDetail;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,16 +97,9 @@ public class BookServiceImpl implements BookService {
         return new PageImpl<BookDTO>(bookDtos, pageable, booksList.getTotalElements()); //Return paginated books
     }
 
-    //Get book by {id}
-    public Book getBookById(Integer id) {
-        Book book = bookRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Product does not exists!"));
-        return book;
-    }
-
     //Get display book info by {id}
     public BookDetailDTO getBookDetailById(Integer id) {
-        Book book = bookRepo.findById(id).orElseThrow(() ->
+        Book book = bookRepo.findBookDetailById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Product does not exists!"));
         BookDetailDTO bookDetailDTO = bookDetailMapper.apply(book); //Map to DTO
         return bookDetailDTO;

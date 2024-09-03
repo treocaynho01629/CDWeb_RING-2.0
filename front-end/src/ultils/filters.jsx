@@ -50,7 +50,7 @@ export const orderGroup = [
         label: 'Bán chạy',
     },
     {
-        value: 'rateAmount',
+        value: 'rating',
         label: 'Yêu thích',
     },
     {
