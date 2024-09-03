@@ -1,13 +1,15 @@
 package com.ring.bookstore.dtos;
 
+import java.math.BigDecimal;
+
 public record BookDTO(Integer id,
                       String title,
                       String description,
                       String image,
                       Double price,
+                      BigDecimal onSale,
                       Integer amount,
-                      int rateTotal,
-                      int rateAmount,
-                      int orderTime) {
+                      Double rating,
+                      Integer orderTime) {
 
 }

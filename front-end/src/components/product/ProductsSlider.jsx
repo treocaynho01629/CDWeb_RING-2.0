@@ -17,6 +17,11 @@ const Container = styled.div`
     }
 `
 
+const ProductContainer = styled.div`
+  display: flex;
+  height: 100%;
+`
+
 const CustomArrow = styled.button`
   border-radius: 0;
   background-color: #0000005e;
@@ -98,9 +103,9 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
           const book = entities[id];
 
           return (
-            <div key={`${id}-${index}`} style={{ display: 'flex' }}>
+            <ProductContainer key={`${id}-${index}`}>
               <ProductSimple {...{ book, scrollPosition }} />
-            </div>
+            </ProductContainer>
           )
         })
       ] : tempItems

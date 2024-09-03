@@ -18,15 +18,18 @@ public class BookDisplayMapper implements Function<IBookDisplay, BookDTO> {
   	          .path("/api/images/")
   	          .path(book.getImage())
   	          .toUriString();
-    	
+
+		Double rating = book.getRating();
+		Integer orderTime = book.getOrderTime();
+
         return new BookDTO(book.getId()
         		,book.getTitle()
         		,book.getDescription()
         		,fileDownloadUri
         		,book.getPrice()
+				,book.getOnSale()
 				,book.getAmount()
-        		,book.getRateTotal()
-        		,book.getRateAmount()
-				,book.getOrderTime());
+				,rating != null ? rating : 0
+				,orderTime != null ? orderTime : 0);
     }
 }

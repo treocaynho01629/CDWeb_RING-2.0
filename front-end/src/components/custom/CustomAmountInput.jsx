@@ -22,7 +22,7 @@ const StyledButton = styled(IconButton)`
 `
 
 export default function CustomAmountInput(props) {
-    const { handleDecrease, handleIncrease, disabled, ...otherProps } = props;
+    const { handleDecrease, handleIncrease, disabled, min, max, ...otherProps } = props;
 
     const startAdornment =
         <InputAdornment position="start">
@@ -57,6 +57,9 @@ export default function CustomAmountInput(props) {
             type="number"
             slotProps={{
                 htmlInput: {
+                    min: min ?? 1,
+                    max: max ?? 199,
+                    type: "number",
                     style: { fontSize: 13, textAlign: 'center', padding: '5px 0' },
                 },
                 input: {
