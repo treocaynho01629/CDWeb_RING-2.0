@@ -34,7 +34,7 @@ public class Category {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cate", fetch = FetchType.LAZY)
     private Set<Sub> cateSubs;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cate")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cate", fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Book> cateBooks;
 

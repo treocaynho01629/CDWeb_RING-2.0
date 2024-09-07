@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ring.bookstore.dtos.BookDTO;
-import com.ring.bookstore.dtos.IBookDisplay;
+import com.ring.bookstore.dtos.projections.IBookDisplay;
 
 @Service
 public class BookDisplayMapper implements Function<IBookDisplay, BookDTO> {

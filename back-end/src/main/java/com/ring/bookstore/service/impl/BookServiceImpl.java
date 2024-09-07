@@ -5,12 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.ring.bookstore.dtos.IBookDetail;
+import com.ring.bookstore.dtos.projections.IBookDetail;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ring.bookstore.dtos.BookDTO;
 import com.ring.bookstore.dtos.BookDetailDTO;
-import com.ring.bookstore.dtos.IBookDisplay;
+import com.ring.bookstore.dtos.projections.IBookDisplay;
 import com.ring.bookstore.dtos.mappers.BookDetailMapper;
 import com.ring.bookstore.dtos.mappers.BookDisplayMapper;
 import com.ring.bookstore.enums.RoleName;
@@ -93,13 +92,13 @@ public class BookServiceImpl implements BookService {
                 , fromRange
                 , toRange
                 , pageable);
-        List<BookDTO> bookDtos = booksList.stream().map(bookDisplayMapper::apply).collect(Collectors.toList()); //Map to DTO
-        return new PageImpl<BookDTO>(bookDtos, pageable, booksList.getTotalElements()); //Return paginated books
+        Page<BookDTO> bookDtos = booksList.map(bookDisplayMapper::apply);
+        return bookDtos;
     }
 
     //Get display book info by {id}
     public BookDetailDTO getBookDetailById(Integer id) {
-        Book book = bookRepo.findBookDetailById(id).orElseThrow(() ->
+        IBookDetail book = bookRepo.findBookDetailById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Product does not exists!"));
         BookDetailDTO bookDetailDTO = bookDetailMapper.apply(book); //Map to DTO
         return bookDetailDTO;

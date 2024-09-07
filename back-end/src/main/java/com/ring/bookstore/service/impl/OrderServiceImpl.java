@@ -10,7 +10,6 @@ import com.ring.bookstore.dtos.mappers.ChartDataMapper;
 import com.ring.bookstore.enums.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -143,9 +142,9 @@ public class OrderServiceImpl implements OrderService {
         } else {
         	ordersList = orderRepo.findAllBySeller(user.getId(), pageable); //If SELLER, only get their
         }
-		
-        List<OrderDTO> ordersDTO = ordersList.stream().map(orderMapper::apply).collect(Collectors.toList()); //Map to DTO
-        return new PageImpl<OrderDTO>(ordersDTO, pageable, ordersList.getTotalElements()); //Return paginated orders
+
+		Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::apply);
+		return ordersDTO;
 	}
 
 	//Get order with book's {id}
@@ -155,8 +154,8 @@ public class OrderServiceImpl implements OrderService {
 				: Sort.by(sortBy).descending());
 	
 		Page<OrderReceipt> ordersList = orderRepo.findAllByBookId(id, pageable); //Fetch from database
-	    List<OrderDTO> ordersDTO = ordersList.stream().map(orderMapper::apply).collect(Collectors.toList()); //Map to DTO and pagination
-	    return new PageImpl<OrderDTO>(ordersDTO, pageable, ordersList.getTotalElements());
+		Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::apply);
+		return ordersDTO;
 	}
 
 	//Get current user's orders
@@ -164,8 +163,8 @@ public class OrderServiceImpl implements OrderService {
 	public Page<OrderDTO> getOrdersByUser(Account user, Integer pageNo, Integer pageSize) {
 		Pageable pageable = PageRequest.of(pageNo, pageSize); //Pagination
 		Page<OrderReceipt> ordersList = orderRepo.findAllByUser_Id(user.getId(), pageable); //Fetch from database
-	    List<OrderDTO> ordersDTO = ordersList.stream().map(orderMapper::apply).collect(Collectors.toList()); //Map to DTO and pagination
-	    return new PageImpl<OrderDTO>(ordersDTO, pageable, ordersList.getTotalElements());
+		Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::apply);
+		return ordersDTO;
 	}
 
 	//Get order by {id}

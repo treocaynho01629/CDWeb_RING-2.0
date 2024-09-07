@@ -131,7 +131,7 @@ public class ImageController {
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> deleteImage(@PathVariable Integer id) {
-		ImageDTO image = imageService.deleteImage(id);
-		return new ResponseEntity<>(image, HttpStatus.OK);
+		String response = imageService.deleteImage(id);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

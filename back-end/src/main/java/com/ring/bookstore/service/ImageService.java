@@ -1,5 +1,6 @@
 package com.ring.bookstore.service;
 
+import com.ring.bookstore.dtos.ImageInfoDTO;
 import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,11 +17,11 @@ public interface ImageService {
 
     Image get(String name);
 
-    ImageDTO deleteImage(Integer id);
+    String deleteImage(Integer id);
 
     boolean existsImage(String name);
 
-    List<ImageDTO> getAllImages();
+    List<ImageInfoDTO> getAllImages();
 
     Image upload(MultipartFile file) throws ImageResizerException, IOException;
 

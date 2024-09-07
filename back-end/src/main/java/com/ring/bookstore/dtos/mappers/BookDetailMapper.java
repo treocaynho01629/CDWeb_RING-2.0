@@ -1,39 +1,34 @@
 package com.ring.bookstore.dtos.mappers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.ring.bookstore.dtos.IBookDetail;
+import com.ring.bookstore.dtos.projections.IBookDetail;
 import com.ring.bookstore.model.*;
-import jakarta.persistence.criteria.Order;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ring.bookstore.dtos.BookDetailDTO;
-import com.ring.bookstore.repository.ReviewRepository;
 
 @Service
-public class BookDetailMapper implements Function<Book, BookDetailDTO> {
-	
-	@Autowired
-	private ReviewRepository reviewRepo;
-	
+public class BookDetailMapper implements Function<IBookDetail, BookDetailDTO> {
+
     @Override
-    public BookDetailDTO apply(Book book) {
+    public BookDetailDTO apply(IBookDetail bookWithDetail) {
+		Book book = bookWithDetail.getBook();
+		Double rating = bookWithDetail.getRating();
+		Integer rateTime = bookWithDetail.getRateTime();
+		Integer orderTime = bookWithDetail.getOrderTime();
 
 		String fileDownloadUri = ServletUriComponentsBuilder
 					  .fromCurrentContextPath()
 					  .path("/api/images/")
-					  .path(book.getImage().getName())
+					  .path(bookWithDetail.getImage())
 					  .toUriString();
 
 		BookDetail detail = book.getBookDetail();
 		List<Image> previewImages = detail.getPreviewImages();
-		List<Review> reviews = book.getBookReviews();
-		List<OrderDetail> orders = book.getOrderDetails();
 		List<String> images = previewImages
 					.stream()
 					.map(image -> ServletUriComponentsBuilder
@@ -42,15 +37,6 @@ public class BookDetailMapper implements Function<Book, BookDetailDTO> {
 							.path(image.getName())
 							.toUriString())
 					.collect(Collectors.toList());
-		Double rating = reviews
-					.stream()
-					.mapToDouble(r -> r.getRating())
-					.average()
-					.orElse(0.0);
-		Integer orderTime = orders
-				.stream()
-				.mapToInt(s -> s.getAmount())
-				.sum();
 
         return new BookDetailDTO(book.getId(),
 				fileDownloadUri,
@@ -70,8 +56,8 @@ public class BookDetailMapper implements Function<Book, BookDetailDTO> {
 				detail.getBLanguage(),
 				detail.getBWeight(),
         		book.getAmount(),
-				rating,
-        		book.getBookReviews().size(),
-				orderTime);
+				rating != null ? rating : 0.0,
+				rateTime != null ? rateTime : 0,
+				orderTime != null ? orderTime : 0);
     }
 }
