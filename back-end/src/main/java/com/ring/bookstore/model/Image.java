@@ -44,23 +44,27 @@ public class Image {
 	@Lob
 	@Column(name = "image")
 	@JdbcTypeCode(SqlTypes.BINARY)
+	@JsonIgnore
 	private byte[] image;
 
 	//Image relation
 	@OneToOne(cascade = CascadeType.ALL,
 			orphanRemoval = true,
+			fetch = FetchType.LAZY,
 			mappedBy = "image")
 	@JsonIgnore
 	private Book book;
 
 	@OneToOne(cascade = CascadeType.ALL,
 			orphanRemoval = true,
+			fetch = FetchType.LAZY,
 			mappedBy = "image")
 	@JsonIgnore
 	private Account user;
 
 	@OneToOne(cascade = CascadeType.ALL,
 			orphanRemoval = true,
+			fetch = FetchType.LAZY,
 			mappedBy = "image")
 	@JsonIgnore
 	private Publisher publisher;

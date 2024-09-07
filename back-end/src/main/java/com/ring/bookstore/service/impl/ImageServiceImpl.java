@@ -1,5 +1,7 @@
 package com.ring.bookstore.service.impl;
 
+import com.ring.bookstore.dtos.ImageInfoDTO;
+import com.ring.bookstore.dtos.projections.IImageInfo;
 import com.ring.bookstore.enums.ImageSize;
 import com.ring.bookstore.exception.ImageResizerException;
 import jakarta.transaction.Transactional;
@@ -45,13 +47,13 @@ public class ImageServiceImpl implements ImageService {
     //Map to DTO instead
     public ImageDTO uploadAndMap(MultipartFile file) throws ImageResizerException, IOException {
         Image savedImage = upload(file);
-        ImageDTO dto = imageMapper.apply(savedImage); //Map to DTO
+        ImageDTO dto = imageMapper.imageToDTO(savedImage); //Map to DTO
         return dto;
     }
 
     public ImageDTO replaceAndMap(MultipartFile file) throws ImageResizerException, IOException {
         Image savedImage = replace(file);
-        ImageDTO dto = imageMapper.apply(savedImage); //Map to DTO
+        ImageDTO dto = imageMapper.imageToDTO(savedImage); //Map to DTO
         return dto;
     }
 
@@ -88,21 +90,20 @@ public class ImageServiceImpl implements ImageService {
     }
 
     //Get all images
-    public List<ImageDTO> getAllImages() {
-        List<Image> imagesList = imageRepo.findAll();
-        List<ImageDTO> imageDtos = imagesList.stream().map(imageMapper::apply).collect(Collectors.toList()); //Map to DTO
+    public List<ImageInfoDTO> getAllImages() {
+        List<IImageInfo> imagesList = imageRepo.findAllWithoutData();
+        List<ImageInfoDTO> imageDtos = imagesList.stream().map(imageMapper::infoToDTO).collect(Collectors.toList()); //Map to DTO
         return imageDtos;
     }
 
     //Delete image by {id}
     @Transactional
-    public ImageDTO deleteImage(Integer id) {
+    public String deleteImage(Integer id) {
         Image image = imageRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Image does not exists!"));
         imageRepo.deleteById(id);
 
-        ImageDTO dto = imageMapper.apply(image); //Map to DTO
-        return dto;
+        return "Delete image " + image.getImage() + " successfully!";
     }
 
     //Check if image with {name} already exists

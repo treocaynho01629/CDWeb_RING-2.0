@@ -2,11 +2,9 @@ package com.ring.bookstore.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -68,8 +66,8 @@ public class ReviewServiceImpl implements ReviewService {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
 		Page<Review> reviewsList = reviewRepo.findAll(pageable); //Fetch from database
-		List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList()); //Map to DTO
-        return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements()); //Return paginated reviews
+		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::apply);
+		return reviewDtos;
 	}
 
 	//Get reviews from book's {id}
@@ -77,8 +75,8 @@ public class ReviewServiceImpl implements ReviewService {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
 		Page<Review> reviewsList = reviewRepo.findAllByBook_Id(id, pageable); //Fetch from database
-        List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList()); //Map to DTO
-        return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements()); //Return paginated reviews
+		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::apply);
+		return reviewDtos;
 	}
 	
 	//Get reviews by user's {id}
@@ -86,8 +84,8 @@ public class ReviewServiceImpl implements ReviewService {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
 		Page<Review> reviewsList = reviewRepo.findAllByUser_Id(userId, pageable); //Fetch from database
-	    List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList()); //Map to DTO
-	    return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements()); //Return paginated reviews
+		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::apply);
+		return reviewDtos;
 	}
 
 	//Get current user's reviews
@@ -95,8 +93,8 @@ public class ReviewServiceImpl implements ReviewService {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
 		Page<Review> reviewsList = reviewRepo.findAllByUser_Id(user.getId(), pageable); //Fetch from database
-	    List<ReviewDTO> reviewDtos = reviewsList.stream().map(reviewMapper::apply).collect(Collectors.toList()); //Map to DTO
-	    return new PageImpl<ReviewDTO>(reviewDtos, pageable, reviewsList.getTotalElements()); //Return paginated reviews
+		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::apply);
+		return reviewDtos;
 	}
 	
 	//Delete review by {id} (ADMIN)

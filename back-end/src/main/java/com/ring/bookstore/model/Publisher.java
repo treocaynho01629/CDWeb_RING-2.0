@@ -41,7 +41,7 @@ public class Publisher {
     @JoinColumn(name = "image_id")
     private Image image;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "publisher")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "publisher", fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Book> publisherBooks;
 
