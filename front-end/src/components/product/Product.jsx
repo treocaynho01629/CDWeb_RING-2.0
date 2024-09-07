@@ -3,6 +3,7 @@ import { Star as StarIcon, ShoppingCart as ShoppingCartIcon, StarBorder } from '
 import { Divider, Skeleton, Rating } from '@mui/material'
 import { Link } from "react-router-dom"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { numFormatter } from '../../ultils/covert';
 import useCart from '../../hooks/useCart';
 
 //#region styled
@@ -102,7 +103,7 @@ const Price = styled.span`
     }
 `
 
-const OldPrice = styled.span`
+const DiscountContainer = styled.span`
     font-size: 14px;
     color: ${props => props.theme.palette.text.secondary};
     display: flex;
@@ -111,6 +112,12 @@ const OldPrice = styled.span`
     ${props => props.theme.breakpoints.down("sm")} {
         font-size: 13px;
     }
+`
+
+const Discount = styled.p`
+    margin-top: 0;
+    margin-bottom: 0;
+    text-decoration: line-through;
 `
 
 const Percentage = styled.span`
@@ -173,15 +180,7 @@ const StyledRating = styled(Rating)`
 const Product = ({ book, scrollPosition }) => {
     const { addProduct } = useCart();
 
-    const handleAddToCart = (book) => {
-        addProduct({
-            id: book.id,
-            title: book.title,
-            price: book.price,
-            image: book.image,
-            quantity: 1,
-        })
-    };
+    const handleAddToCart = (book) => {addProduct(book, 1)};
 
     return (
         <Container>
@@ -227,17 +226,13 @@ const Product = ({ book, scrollPosition }) => {
                                 <ProductInfo>
                                     <Title>{book.title}</Title>
                                     <PriceContainer>
-                                        <Price>
-                                            {Math.round(book.price * (1 - book.onSale)).toLocaleString()}đ
-                                        </Price>
+                                        <Price>{Math.round(book.price * (1 - book.onSale)).toLocaleString()}đ</Price>
                                         {book.onSale > 0
                                             &&
-                                            <OldPrice>
-                                                <p style={{ textDecoration: 'line-through', marginTop: 0, marginBottom: 0 }}>
-                                                    {book.price.toLocaleString()}đ
-                                                </p>
+                                            <DiscountContainer>
+                                                <Discount>{book.price.toLocaleString()}đ</Discount>
                                                 <Percentage>-{book.onSale * 100}%</Percentage>
-                                            </OldPrice>
+                                            </DiscountContainer>
                                         }
                                     </PriceContainer>
                                 </ProductInfo>
@@ -251,7 +246,7 @@ const Product = ({ book, scrollPosition }) => {
                                         emptyIcon={<StarBorder style={{ fontSize: 14 }} />}
                                         readOnly
                                     />
-                                    <TextMore className="secondary">Đã bán {book?.orderTime}</TextMore>
+                                    <TextMore className="secondary">Đã bán {numFormatter(book?.orderTime)}</TextMore>
                                 </MoreInfo>
                             </MainInfo>
                         </Link>
@@ -266,7 +261,7 @@ const Product = ({ book, scrollPosition }) => {
                                     width: { xs: '90%', sm: '40%' }
                                 }}
                             />
-                            <Skeleton variant="text" sx={{ fontSize: '16px', display: { xs: 'none', sm: 'block' } }}/>
+                            <Skeleton variant="text" sx={{ fontSize: '16px', display: { xs: 'none', sm: 'block' } }} />
                             <Skeleton variant="text" sx={{ fontSize: '14px' }} width="60%" />
                         </>
                     }

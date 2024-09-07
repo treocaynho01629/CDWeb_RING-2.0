@@ -2,6 +2,7 @@ import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
 
 const catesAdapter = createEntityAdapter({});
+const catesSelector = catesAdapter.getSelectors();
 const initialState = catesAdapter.getInitialState();
 
 export const categoriesApiSlice = apiSlice.injectEndpoints({
@@ -15,6 +16,19 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
             }),
             transformResponse: responseData => {
                 return catesAdapter.setAll(initialState, responseData)
+            },
+            serializeQueryArgs: ({ endpointName }) => {
+                return endpointName
+            },
+            merge: (currentCache, newItems) => {
+                currentCache.info = newItems.info;
+                catesAdapter.addMany(
+                    currentCache, catesSelector.selectAll(newItems)
+                )
+            },
+            forceRefetch: ({ currentArg, previousArg }) => {
+                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
+                return isForceRefetch
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {

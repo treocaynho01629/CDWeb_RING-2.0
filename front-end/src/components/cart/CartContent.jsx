@@ -1,12 +1,13 @@
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
 import { useState } from "react";
-import { Remove as RemoveIcon, Add as AddIcon, Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search, ChevronLeft } from '@mui/icons-material';
-import { Checkbox, Button, Grid2 as Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon, Skeleton, TextField } from '@mui/material';
+import { Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search, ChevronLeft } from '@mui/icons-material';
+import { Checkbox, Button, Grid2 as Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon, Skeleton } from '@mui/material';
 import { NavLink, useNavigate } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { booksApiSlice } from '../../features/books/booksApiSlice';
 import CheckoutDialog from './CheckoutDialog';
+import CustomAmountInput from '../custom/CustomAmountInput';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import PropTypes from 'prop-types';
 import useCart from '../../hooks/useCart';
@@ -54,50 +55,6 @@ const Title = styled.h3`
     align-items: center;
     text-align: center;
     justify-content: center;
-`
-
-const InputContainer = styled.div`
-    border: 0.5px solid;
-    border-color: ${props => props.theme.palette.action.focus};
-    align-items: center;
-    justify-content: space-between;
-    align-items: center;
-`
-
-const AmountInput = styled.input.attrs({ type: 'number' })`
-    height: 20px;
-    width: 20px;
-    background: transparent;
-    color: ${props => props.theme.palette.text.primary};
-    font-weight: bold;
-    resize: none;
-    outline: none;
-    border: none;
-    text-align: center;
-
-    &::-webkit-outer-spin-button,
-    &::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-    -moz-appearance: textfield;
-`
-
-const AmountButton = styled.div`
-    width: 25px;
-    height: 25px;
-    background-color: ${props => props.theme.palette.action.focus};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0.75;
-    transition: all 0.5s ease;
-
-    &:hover{
-        background-color: ${props => props.theme.palette.primary.main};
-        color: ${props => props.theme.palette.primary.contrastText};
-    }
 `
 
 const ItemContainer = styled.div`
@@ -211,10 +168,10 @@ function EnhancedTableHead(props) {
                     />
                     Sản phẩm ({numSelected})
                 </StyledTableCell>
-                <StyledTableCell align="left" sx={{ display: { xs: 'none', md: 'table-cell' } }}>Đơn giá</StyledTableCell>
-                <StyledTableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>Số lượng</StyledTableCell>
-                <StyledTableCell align="center" sx={{ display: { xs: 'none', md: 'table-cell' } }}>Tổng</StyledTableCell>
-                <StyledTableCell sx={{ width: 0 }}></StyledTableCell>
+                <StyledTableCell align="left" sx={{ width: '100px', display: { xs: 'none', md: 'table-cell' } }}>Đơn giá</StyledTableCell>
+                <StyledTableCell align="center" sx={{ width: '140px', display: { xs: 'none', sm: 'table-cell' } }}>Số lượng</StyledTableCell>
+                <StyledTableCell align="center" sx={{ width: '130px', display: { xs: 'none', md: 'table-cell' } }}>Tổng</StyledTableCell>
+                <StyledTableCell sx={{ width: 0, padding: 0 }}></StyledTableCell>
             </TableRow>
         </TableHead>
     );
@@ -308,9 +265,7 @@ const CartContent = () => {
     }
 
     const handleDeleteMultiple = () => {
-        selected.map((id) => {
-            removeProduct(id);
-        })
+        selected.map((id) => { removeProduct(id) });
         setSelected([]);
     }
 
@@ -381,19 +336,17 @@ const CartContent = () => {
                                                         </NavLink>
                                                         <ItemAction>
                                                             <Box display={{ xs: 'block', md: 'none' }}>
-                                                                <Discount>{Math.round(product.price * 1.1).toLocaleString()}đ</Discount>
-                                                                <Price>{product.price.toLocaleString()}đ</Price>
+                                                                {product?.onSale > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
+                                                                <Price>{Math.round(product.price * (1 - (product?.onSale || 0))).toLocaleString()}đ</Price>
                                                             </Box>
-                                                            <Box display={{ xs: 'flex', sm: 'none' }} justifyContent={'center'}>
-                                                                <AmountButton direction="remove" onClick={() => handleDecrease(product.quantity, product.id)}>
-                                                                    <RemoveIcon style={{ fontSize: 12 }} />
-                                                                </AmountButton>
-                                                                <InputContainer>
-                                                                    <TextField type="number" onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)} value={product.quantity} />
-                                                                </InputContainer>
-                                                                <AmountButton direction="add" onClick={() => increaseAmount(product.id)}>
-                                                                    <AddIcon style={{ fontSize: 12 }} />
-                                                                </AmountButton>
+                                                            <Box display={{ xs: 'flex', sm: 'none' }}>
+                                                                <CustomAmountInput
+                                                                    size="small"
+                                                                    value={product.quantity}
+                                                                    onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)}
+                                                                    handleDecrease={() => handleDecrease(product.quantity, product.id)}
+                                                                    handleIncrease={() => increaseAmount(product.id)}
+                                                                />
                                                             </Box>
                                                         </ItemAction>
                                                     </ItemSummary>
@@ -401,24 +354,20 @@ const CartContent = () => {
                                             </Box>
                                         </StyledTableCell>
                                         <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                            <Price>{product.price.toLocaleString()}đ</Price>
-                                            <Discount>{Math.round(product.price * 1.1).toLocaleString()}đ</Discount>
+                                            <Price>{Math.round(product.price * (1 - (product?.onSale || 0))).toLocaleString()}đ</Price>
+                                            {product?.onSale > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
                                         </StyledTableCell>
                                         <StyledTableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                                                <AmountButton direction="remove" onClick={() => handleDecrease(product.quantity, product.id)}>
-                                                    <RemoveIcon style={{ fontSize: 12 }} />
-                                                </AmountButton>
-                                                <InputContainer>
-                                                    <AmountInput type="number" onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)} value={product.quantity} />
-                                                </InputContainer>
-                                                <AmountButton direction="add" onClick={() => increaseAmount(product.id)}>
-                                                    <AddIcon style={{ fontSize: 12 }} />
-                                                </AmountButton>
-                                            </Box>
+                                            <CustomAmountInput
+                                                size="small"
+                                                value={product.quantity}
+                                                onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)}
+                                                handleDecrease={() => handleDecrease(product.quantity, product.id)}
+                                                handleIncrease={() => increaseAmount(product.id)}
+                                            />
                                         </StyledTableCell>
                                         <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                            <Price className="total">{(product.price * product.quantity).toLocaleString()}đ</Price>
+                                            <Price className="total">{(Math.round(product.price * (1 - (product?.onSale || 0))) * product.quantity).toLocaleString()}đ</Price>
                                         </StyledTableCell>
                                         <td>
                                             <IconButton sx={hoverIcon} onClick={(e) => handleClick(e, product)}>

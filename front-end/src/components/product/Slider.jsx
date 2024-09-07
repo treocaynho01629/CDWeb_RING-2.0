@@ -163,15 +163,7 @@ const CustomRightArrow = ({ onClick }) => (
 function Item({ book, index }) {
     const { addProduct } = useCart();
 
-    const handleAddToCart = (book) => {
-        addProduct({
-            id: book.id,
-            title: book.title,
-            price: book.price,
-            image: book.image,
-            quantity: 1,
-        })
-    };
+    const handleAddToCart = (book) => {addProduct(book, 1)};
 
     return (
         <SlideItemContainer>

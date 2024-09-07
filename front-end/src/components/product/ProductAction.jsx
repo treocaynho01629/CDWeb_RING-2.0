@@ -38,7 +38,7 @@ const AltFilterContainer = styled.div`
     height: 50px;
     z-index: 99;
     box-shadow: ${props => props.theme.shadows[12]};
-    background-color: ${props => props.theme.palette.primary.main};
+    background-color: ${props => props.theme.palette.background.default};
     align-items: flex-end;
     display: none;
 
@@ -54,13 +54,9 @@ const DetailTitle = styled.span`
 `
 
 const BuyButton = styled(Button)`
-    padding: 10px;
     margin-top: 15px;
-    white-space: nowrap;
-
-    ${props => props.theme.breakpoints.down("md_lg")} {
-        .total { display: none };
-    }
+    height: 100%;
+    line-height: 1.5;
 `
 
 const StyledImage = styled.img`
@@ -87,7 +83,7 @@ const Price = styled.p`
     }
 `
 
-const OldPrice = styled(Price)`
+const Discount = styled(Price)`
     color: ${props => props.theme.palette.text.secondary};
     text-decoration: line-through;
     margin-left: 10px;
@@ -123,13 +119,7 @@ const ProductAction = ({ book }) => {
     //Add to cart
     const handleAddToCart = (book) => {
         setOpen(false); //Close drawer
-        addProduct({
-            id: book?.id,
-            title: book?.title,
-            price: book?.price,
-            image: book?.image,
-            quantity: amountIndex,
-        })
+        addProduct(book, amountIndex);
     };
 
     const handleBuyNow = (book) => {
@@ -145,7 +135,7 @@ const ProductAction = ({ book }) => {
                         variant="contained"
                         color="secondary"
                         fullWidth
-                        sx={{ maxWidth: '35%', height: '100%' }}
+                        sx={{ maxWidth: '35%' }}
                         disabled={!book || book?.amount == 0}
                         onClick={toggleDrawer(true)}
                     >
@@ -158,7 +148,8 @@ const ProductAction = ({ book }) => {
                         disabled={!book || book?.amount == 0}
                         onClick={() => handleBuyNow(book)}
                     >
-                        Mua ngay
+                        {book?.amount == 0 ? 'Hết hàng' 
+                        : `Mua ngay (${(Math.round(book?.price * (1 - book?.onSale)) * amountIndex).toLocaleString()}đ)`}
                     </BuyButton>
                 </AltFilterContainer >
                 <Drawer
@@ -174,8 +165,8 @@ const ProductAction = ({ book }) => {
                         />
                         <Box>
                             <Box display="flex">
-                                <Price>{book?.price?.toLocaleString()}đ</Price>
-                                <OldPrice>{Math.round(book?.price * 1.1).toLocaleString()}đ</OldPrice>
+                                <Price>{Math.round(book?.price * (1 - book?.onSale)).toLocaleString()}đ</Price>
+                                {book?.onSale > 0  && <Discount>{book?.price.toLocaleString()}đ</Discount>}
                             </Box>
                             <AmountCount className={book?.amount > 0 ? '' : 'error'}>
                                 {book?.amount > 0 ? `(${book?.amount}) sản phẩm còn lại` : 'Tạm thời hết hàng'}
@@ -200,12 +191,11 @@ const ProductAction = ({ book }) => {
                         sx={{ margin: '5px' }}
                         onClick={() => handleAddToCart(book)}
                     >
-                        Thêm vào giỏ ({(book?.price * amountIndex).toLocaleString()}đ)
+                        Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.onSale)) * amountIndex).toLocaleString()}đ)
                     </BuyButton>
                 </Drawer>
             </>
-            :
-            <FilterContainer>
+            : <FilterContainer>
                 <Divider sx={{ my: 2, display: { xs: 'none', md: 'block' } }} />
                 <Box display="flex" alignItems="center" flexWrap="wrap">
                     <DetailTitle style={{ marginRight: 20 }}>Số lượng:</DetailTitle>
@@ -228,7 +218,7 @@ const ProductAction = ({ book }) => {
                         }
                     </Box>
                 </Box>
-                <Box display="flex" alignItems="center">
+                <Box display="flex" alignItems="center" height={47}>
                     <BuyButton
                         variant="contained"
                         size="large"
@@ -246,9 +236,9 @@ const ProductAction = ({ book }) => {
                         fullWidth
                         disabled={!book || book?.amount == 0}
                         onClick={() => handleAddToCart(book)}
-                        startIcon={<AddShoppingCart fontSize="small" />}
+                        startIcon={<AddShoppingCart fontSize="small"/>}
                     >
-                        Thêm vào giỏ&nbsp;<span className="total">({(book?.price * amountIndex).toLocaleString()}đ)</span>
+                        Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.onSale)) * amountIndex).toLocaleString()}đ)
                     </BuyButton>
                 </Box>
             </FilterContainer>

@@ -2,7 +2,6 @@ import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
 
 const ordersAdapter = createEntityAdapter({});
-const ordersSelector = ordersAdapter.getSelectors();
 const initialState = ordersAdapter.getInitialState({
     info: {
         currPage: 0,
@@ -89,19 +88,6 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                         totalPages
                     }
                 }, content)
-            },
-            serializeQueryArgs: ({ endpointName }) => {
-                return endpointName
-            },
-            merge: (currentCache, newItems) => {
-                currentCache.info = newItems.info;
-                ordersAdapter.addMany(
-                    currentCache, ordersSelector.selectAll(newItems)
-                )
-            },
-            forceRefetch: ({ currentArg, previousArg }) => {
-                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
-                return isForceRefetch
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {

@@ -173,13 +173,14 @@ const OrdersList = ({ Title }) => {
     });
 
     const handleAddToCart = (detail) => {
-        addProduct({
-            id: detail.bookId,
-            title: detail.bookTitle,
-            price: detail.price,
-            image: detail.image,
-            quantity: 1,
-        })
+        // addProduct({
+        //     id: detail.bookId,
+        //     title: detail.bookTitle,
+        //     price: detail.price,
+        //     image: detail.image,
+        //     quantity: 1,
+        // })
+        console.log('deal with this later');
     };
 
     //Show more

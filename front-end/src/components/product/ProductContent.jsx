@@ -1,8 +1,9 @@
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/system';
 import { Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
-import { Skeleton, Rating, Box, Grid2 as Grid, alpha } from '@mui/material';
+import { Skeleton, Rating, Box, Grid2 as Grid, alpha, Divider } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { numFormatter } from '../../ultils/covert';
 import ProductImages from './ProductImages';
 import ProductAction from './ProductAction';
 
@@ -130,8 +131,8 @@ const BookTitle = styled.h2`
     }
 
     ${props => props.theme.breakpoints.down("sm")} {
-        font-size: 18px;
-        margin-top: 10px;
+        font-size: 16px;
+        margin-top: 0;
     }
 `
 
@@ -140,6 +141,10 @@ const Detail = styled.h3`
     margin: 5px 0px;
     display: flex;
     align-items: center;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        margin: 3px 0;
+    }
 `
 
 const Description = styled.p`
@@ -160,7 +165,7 @@ const Description = styled.p`
     }
 `
 
-const TotalRatingContainer = styled.div`
+const UserInfoContainer = styled.div`
     display: flex;
     align-items: center;
     color: ${props => props.theme.palette.warning.light};
@@ -179,6 +184,23 @@ const StyledRating = muiStyled(Rating)(({ theme }) => ({
     },
 }));
 
+const UserInfoText = styled.strong`
+    color: ${props => props.theme.palette.text.primary};
+
+    &.rate {
+        margin-left: 5px;
+        color: inherit;
+    }
+
+    &.mobile {
+        display: none;
+
+        ${props => props.theme.breakpoints.down("sm")} {
+            display: block;
+        }
+    }
+`
+
 const PriceContainer = styled.div`
     display: flex;
     align-items: center;
@@ -195,17 +217,22 @@ const Price = styled.h2`
     color: ${props => props.theme.palette.primary.main};
 
     ${props => props.theme.breakpoints.down("sm")} {
-       margin: 0;
+        font-size: 21px;
     }
 `
 
-const OldPrice = styled.p`
+const Discount = styled.p`
     margin: 0;
     margin-left: 10px;
     font-size: 18px;
     font-weight: 400;
     color: ${props => props.theme.palette.text.secondary};
     text-decoration: line-through;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        font-size: 16px;
+        margin-left: 5px;
+    }
 `
 
 const Percentage = styled.span`
@@ -215,6 +242,10 @@ const Percentage = styled.span`
     font-weight: bold;
     color: ${props => props.theme.palette.primary.contrastText};
     background-color: ${props => alpha(props.theme.palette.primary.light, 0.8)};
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        font-size: 13px;
+    }
 `
 
 const DetailContainer = styled.div`
@@ -232,15 +263,6 @@ const DetailTitle = styled.span`
 //#endregion
 
 const ProductContent = ({ book, handleTabChange }) => {
-    //Calculate rating
-    const avgRate = () => {
-        let rate = 0;
-        rate = Math.round((book?.rateTotal / book?.rateAmount) * 2) / 2;
-        rate = rate ? rate : '~';
-        return rate;
-    }
-    const calculatedRate = avgRate();
-
     const handleChangeTab = (e, tab) => {
         e.preventDefault();
         if (handleTabChange) handleTabChange(tab);
@@ -257,47 +279,50 @@ const ProductContent = ({ book, handleTabChange }) => {
             >
                 <Grid size={{ xs: 12, md: 5.8, lg: 5 }} position="relative">
                     {!book ? <ProductImages />
-                        : <ProductImages book={book} />
-                    }
+                        : <ProductImages book={book} />}
                 </Grid>
                 <Grid size={{ xs: 12, md: 6.2, lg: 7 }}>
                     <InfoContainer>
                         {book ? <BookTitle>{book?.title}</BookTitle>
-                            :
-                            <>
+                            : <>
                                 <Skeleton variant="text" sx={{ fontSize: '22px', marginTop: '30px' }} />
                                 <Skeleton variant="text" sx={{ fontSize: '22px' }} width="30%" />
-                            </>
-                        }
+                            </>}
                         <Detail>
                             Nhà xuất bản: &nbsp;
-                            {book ?
-                                <Link to={`/filters?pubId=${book?.publisher?.id}`}>
-                                    {book?.publisher?.pubName}
-                                </Link>
-                                :
-                                <Skeleton variant="text" sx={{ fontSize: '15px' }} width="50%" />
-                            }
+                            {book ? <Link to={`/filters?pubId=${book?.publisher?.id}`}>{book?.publisher?.pubName}</Link>
+                                : <Skeleton variant="text" sx={{ fontSize: '15px' }} width="50%" />}
                         </Detail>
-                        <TotalRatingContainer onClick={(e) => handleChangeTab(e, "reviews")}>
+                        <UserInfoContainer onClick={(e) => handleChangeTab(e, "reviews")}>
                             <StyledRating
                                 name="product-rating"
-                                value={isNaN(calculatedRate) ? 0 : calculatedRate}
-                                getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
+                                value={book?.rating ?? 0}
+                                getLabelText={(value) => `${value} star${value !== 1 ? 's' : ''}`}
                                 precision={0.5}
                                 icon={<StarIcon fontSize="18" />}
                                 emptyIcon={<StarBorderIcon fontSize="18" />}
                                 readOnly
                             />
-                            <strong style={{ paddingLeft: 10 }}>({book?.rateAmount ?? '~'}) Đánh giá</strong>
-                        </TotalRatingContainer>
+                            <UserInfoText className="rate">
+                                {book?.rateTime > 0 ?
+                                    `(${numFormatter(book?.rateTime)}) Đánh giá`
+                                    : 'Chưa có đánh giá'}
+                            </UserInfoText>
+                            <Divider orientation="vertical" sx={{ mx: 1 }} />
+                            <UserInfoText>Đã bán: {numFormatter(book?.orderTime)}</UserInfoText>
+                        </UserInfoContainer>
                         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
                             <PriceContainer>
                                 {book ?
                                     <>
-                                        <Price>{book?.price?.toLocaleString()}đ</Price>
-                                        <OldPrice>{Math.round(book?.price * 1.1).toLocaleString()}đ</OldPrice>
-                                        <Percentage>-10%</Percentage>
+                                        <Price>{Math.round(book.price * (1 - book.onSale)).toLocaleString()}đ</Price>
+                                        {book?.onSale > 0
+                                            &&
+                                            <>
+                                                <Discount>{book.price.toLocaleString()}đ</Discount>
+                                                <Percentage>-{book.onSale * 100}%</Percentage>
+                                            </>
+                                        }
                                     </>
                                     :
                                     <>
@@ -307,51 +332,29 @@ const ProductContent = ({ book, handleTabChange }) => {
                                     </>
                                 }
                             </PriceContainer>
-                            <Box
-                                onClick={(e) => handleChangeTab(e, "reviews")} sx={{ cursor: 'pointer' }}
-                                display={{ xs: 'flex', sm: 'none' }}
-                                alignItems={'center'}
-                                justifyContent={'space-between'}
-                            >
-                                <strong style={{ paddingRight: 10 }}>({calculatedRate}) Đánh giá</strong>
-                                <StarIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-                            </Box>
+                            <UserInfoText className="mobile">Đã bán: {numFormatter(book?.orderTime)}</UserInfoText>
                         </Box>
                         <DetailContainer>
                             <DetailTitle>Chi tiết:</DetailTitle>
                             <Detail>
                                 Tác giả: &nbsp;
-                                {book ?
-                                    <Link to={`/filters?keyword=${book?.author}`}>
-                                        {book?.author}
-                                    </Link>
-                                    :
-                                    <Skeleton variant="text" sx={{ fontSize: '15px' }} width="40%" />
-                                }
+                                {book ? <Link to={`/filters?keyword=${book?.author}`}>{book?.author}</Link>
+                                    : <Skeleton variant="text" sx={{ fontSize: '15px' }} width="40%" />}
                             </Detail>
                             <Detail>
                                 Hình thức bìa: &nbsp;
-                                {book ?
-                                    <Link to={`/filters?type=${book?.type}`}>
-                                        {book?.type}
-                                    </Link>
-                                    :
-                                    <Skeleton variant="text" sx={{ fontSize: '15px' }} width="30%" />
-                                }
-
+                                {book ? <Link to={`/filters?type=${book?.type}`}> {book?.type}</Link>
+                                    : <Skeleton variant="text" sx={{ fontSize: '15px' }} width="30%" />}
                             </Detail>
                             <br />
                             <DetailTitle>Mô tả sản phẩm:</DetailTitle>
                             <Description>
-                                {book ?
-                                    book?.description
-                                    :
-                                    <>
+                                {book ? book?.description
+                                    : <>
                                         <Skeleton variant="text" sx={{ fontSize: '14px' }} />
                                         <Skeleton variant="text" sx={{ fontSize: '14px' }} />
                                         <Skeleton variant="text" sx={{ fontSize: '14px' }} />
-                                    </>
-                                }
+                                    </>}
                             </Description>
                             <Detail>
                                 <Link onClick={(e) => handleChangeTab(e, "detail")}>Xem thêm...</Link>
