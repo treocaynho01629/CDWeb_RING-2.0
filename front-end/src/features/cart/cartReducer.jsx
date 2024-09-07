@@ -30,18 +30,22 @@ export const cartSlice = createSlice({
     //Increase quantity
     increaseQuantity: (state, action) => {
       const item = state.products.find((item) => item.id === action.payload);
-      if (item) { item.quantity++ }
+      const newQuantity = item.quantity + 1;
+      if (item) { newQuantity > (item.amount ?? 199) ? item.quantity = (item.amount ?? 199) : item.quantity++};
     },
     //Input quantity
     changeQuantity: (state, action) => {
       const item = state.products.find((item) => item.id === action.payload.id);
+      const quantity = action.payload.quantity;
       if (item) {
-        if (isNaN(action.payload.quantity)) { //Reset to 1 if not valid input
+        if (isNaN(quantity)) { //Reset to 1 if not valid input
           item.quantity = 1;
-        } else if (action.payload.quantity < 1) { //Remove if < 1
+        } else if (quantity < 1) { //Remove if < 1
           state.products = state.products.filter(item => item.id !== action.payload.id)
+        } else if (quantity > (item.amount ?? 199)) { //Cap quantity to max stock amount
+          item.quantity = (item.amount ?? 199);
         } else {
-          item.quantity = action.payload.quantity;
+          item.quantity = quantity;
         }
       }
     },

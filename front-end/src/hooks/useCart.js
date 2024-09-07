@@ -8,10 +8,18 @@ const useCart = () => {
     const addresses = useSelector(selectAddresses);
 
     //Cart
-    const addProduct = async (product) => {
+    const addProduct = async (item, quantity) => {
         const { enqueueSnackbar } = await import('notistack');
         enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });
-        dispatch(addToCart(product));
+        dispatch(addToCart({
+            id: item.id,
+            title: item.title,
+            price: item.price,
+            onSale: item.onSale,
+            image: item.image,
+            amount: item.amount,
+            quantity,
+        }));
     }
     const increaseAmount = (id) => dispatch(increaseQuantity(id));
     const decreaseAmount = (id) => dispatch(decreaseQuantity(id));

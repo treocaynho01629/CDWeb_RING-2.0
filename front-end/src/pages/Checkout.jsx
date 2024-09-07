@@ -185,16 +185,19 @@ const Price = styled.p`
     margin: 0;
  
     &.total {
-        font-size: 18px;
-        color: red;
-        text-align: end;
+        color: ${props => props.theme.palette.error.main};
+        
+        ${props => props.theme.breakpoints.down("md")} {
+            font-size: 18px;
+            text-align: end;
+        }
     }
 `
 
 const Amount = styled.p`
     font-size: 16px;
-    font-weight: bold;
-    margin: 10px 0 0 10px;
+    font-weight: 450;
+    margin: 0;
     text-align: center;
 
     &.alt {
@@ -202,6 +205,7 @@ const Amount = styled.p`
         
         ${props => props.theme.breakpoints.down("sm")} {
             display: block;
+            margin: 10px 0 0 10px;
         }
     }
 `
@@ -414,10 +418,10 @@ const Checkout = () => {
                                             }}
                                         >
                                             <TableRow sx={{ padding: 0, border: '.5px solid', borderColor: 'action.focus', backgroundColor: 'primary.main' }}>
-                                                <StyledTableCell sx={{ height: '42px' }}>Sản phẩm ({products?.length ?? 0})</StyledTableCell>
-                                                <StyledTableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Đơn giá</StyledTableCell>
-                                                <StyledTableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>Số lượng</StyledTableCell>
-                                                <StyledTableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Tổng</StyledTableCell>
+                                                <StyledTableCell sx={{ height: '53px' }}>Sản phẩm ({products?.length ?? 0})</StyledTableCell>
+                                                <StyledTableCell align="left" sx={{ width: '100px', display: { xs: 'none', md: 'table-cell' } }}>Đơn giá</StyledTableCell>
+                                                <StyledTableCell align="center" sx={{ width: '90px', display: { xs: 'none', sm: 'table-cell' } }}>Số lượng</StyledTableCell>
+                                                <StyledTableCell align="center" sx={{ width: '130px', display: { xs: 'none', md: 'table-cell' } }}>Tổng</StyledTableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -440,9 +444,10 @@ const Checkout = () => {
                                                                     <ItemAction>
                                                                         <Box width={'100%'} display={{ xs: 'flex', md: 'none' }} justifyContent={'space-between'}>
                                                                             <Box>
-                                                                                <Price>{product.price.toLocaleString()}đ</Price>
+                                                                                <Price>{Math.round(product.price * (1 - (product?.onSale || 0))).toLocaleString()}đ</Price>
                                                                                 <Box display={'flex'} alignItems={'center'} sx={{ fontWeight: 'bold' }}>
-                                                                                    Tổng: &nbsp;&nbsp;<Price className="total">{(product.price * product.quantity).toLocaleString()}đ</Price>
+                                                                                    Tổng: &nbsp;&nbsp;
+                                                                                    <Price className="total">{(Math.round(product.price * (1 - (product?.onSale || 0))) * product.quantity).toLocaleString()}đ</Price>
                                                                                 </Box>
                                                                             </Box>
                                                                             <Amount className="alt">{`x${product.quantity}`}</Amount>
@@ -452,13 +457,13 @@ const Checkout = () => {
                                                             </ItemContainer>
                                                         </StyledTableCell>
                                                         <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                                            <Price>{product.price.toLocaleString()}đ</Price>
+                                                            <Price>{Math.round(product.price * (1 - (product?.onSale || 0))).toLocaleString()}đ</Price>
                                                         </StyledTableCell>
                                                         <StyledTableCell align="right" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                                                             <Amount>{`x${product.quantity}`}</Amount>
                                                         </StyledTableCell>
                                                         <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                                            <Price>{(product.price * product.quantity).toLocaleString()}đ</Price>
+                                                            <Price className="total">{(Math.round(product.price * (1 - (product?.onSale || 0))) * product.quantity).toLocaleString()}đ</Price>
                                                         </StyledTableCell>
                                                     </StyledTableRow>
                                                 )

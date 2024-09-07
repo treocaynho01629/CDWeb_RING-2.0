@@ -3,7 +3,7 @@ import { IconButton, InputAdornment } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 
-const CustomInput = styled(TextField)`
+const CustomInput = styled(TextField)(({ theme }) => `
     display: flex;
     width: 105px;
 
@@ -13,13 +13,21 @@ const CustomInput = styled(TextField)`
         margin: 0;
     };
     -moz-appearance: textfield;
-`
 
-const StyledButton = styled(IconButton)`
-    padding: 0;
-    padding-left: 5px;
-    padding-right: 5px;
-`
+    ${theme.breakpoints.down("sm")} {
+        width: 90px;
+    }
+`)
+
+const StyledButton = styled(IconButton)(
+    ({ theme }) => ({
+        padding: '0 5px',
+
+        [theme.breakpoints.down("sm")]: {
+            padding: '0 2px',
+        },
+    })
+)
 
 export default function CustomAmountInput(props) {
     const { handleDecrease, handleIncrease, disabled, min, max, ...otherProps } = props;
@@ -33,7 +41,7 @@ export default function CustomAmountInput(props) {
                 disabled={disabled}
                 disableRipple
             >
-                <Remove fontSize="small"/>
+                <Remove fontSize="small" />
             </StyledButton>
         </InputAdornment>
 
@@ -46,7 +54,7 @@ export default function CustomAmountInput(props) {
                 disabled={disabled}
                 disableRipple
             >
-                <Add fontSize="small"/>
+                <Add fontSize="small" />
             </StyledButton>
         </InputAdornment>
 

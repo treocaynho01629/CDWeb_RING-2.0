@@ -91,15 +91,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
 const ProductSimple = ({ book, scrollPosition }) => {
     const { addProduct } = useCart();
 
-    const handleAddToCart = (book) => {
-        addProduct({
-            id: book.id,
-            title: book.title,
-            price: book.price,
-            image: book.image,
-            quantity: 1,
-        })
-    };
+    const handleAddToCart = (book) => {addProduct(book, 1)};
 
     return (
         <Container>
@@ -149,7 +141,7 @@ const ProductSimple = ({ book, scrollPosition }) => {
                 variant="outlined"
                 color="secondary"
                 onClick={() => handleAddToCart(book)}
-                sx={{ marginBottom: '10px', padding: '6px 0', width: '93%' }}
+                sx={{ marginBottom: '10px', marginTop: '10px', padding: '6px 0', width: '93%' }}
                 startIcon={<ShoppingCartIcon />}
             >
                 THÊM VÀO GIỎ

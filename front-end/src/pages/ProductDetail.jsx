@@ -30,22 +30,27 @@ const ProductDetail = () => {
     //Set title
     useTitle(`${data?.title ?? 'RING - Bookstore!'}`);
 
-    useEffect(() => {
-        const newTab = searchParams.get("tab");
-        newTab ? handleTabChange(newTab) : handleTabChange("detail", false);
-    }, [searchParams]);
+    //FIX LATER :v
+    // useEffect(() => {
+    //     const newTab = searchParams.get("tab");
+    //     newTab ? handleTabChange(newTab) : handleTabChange("detail", false);
+    // }, [searchParams]);
 
     //Change detail tab
     const handleTabChange = (tab, scroll = true) => {
         setTab(tab);
-        if (tab == "detail") {
+        if (tab == "reviews") {
             searchParams.delete("tab");
             setSearchParams(searchParams);
         } else {
             searchParams.set("tab", tab);
             setSearchParams(searchParams);
         }
-        if (scroll) scrollIntoTab();
+        if (scroll) {
+            console.log('scroll');
+            
+            scrollIntoTab();
+        }
     }
 
     const scrollIntoTab = () => {

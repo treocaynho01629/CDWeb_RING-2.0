@@ -2,7 +2,6 @@ import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
 
 const reviewsAdapter = createEntityAdapter({});
-const reviewsSelector = reviewsAdapter.getSelectors();
 const initialState = reviewsAdapter.getInitialState({
     info: {
         currPage: 0,
@@ -161,19 +160,6 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                         totalPages
                     }
                 }, content)
-            },
-            serializeQueryArgs: ({ endpointName }) => {
-                return endpointName
-            },
-            merge: (currentCache, newItems) => {
-                currentCache.info = newItems.info;
-                reviewsAdapter.addMany(
-                    currentCache, reviewsSelector.selectAll(newItems)
-                )
-            },
-            forceRefetch: ({ currentArg, previousArg }) => {
-                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
-                return isForceRefetch
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {

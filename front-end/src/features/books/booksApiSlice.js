@@ -62,19 +62,30 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                     }
                 }, content)
             },
-            // serializeQueryArgs: ({ endpointName }) => {
-            //     return endpointName
-            // },
-            // merge: (currentCache, newItems) => {
-            //     currentCache.info = newItems.info;
-            //     booksAdapter.addMany(
-            //         currentCache, booksSelector.selectAll(newItems)
-            //     )
-            // },
-            // forceRefetch: ({ currentArg, previousArg }) => {
-            //     const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
-            //     return isForceRefetch
-            // },
+            serializeQueryArgs: ({ endpointName, queryArgs }) => {
+                if (queryArgs) {
+                    const { page, loadMore, ...rest } = queryArgs;
+
+                    if (loadMore) { //Load more >> serialize without <all pagination part>
+                        const { size, ...left } = rest;
+                        return `${endpointName}Merge(${JSON.stringify(left)})`
+                    }
+
+                    return `${endpointName}(${JSON.stringify(rest)})` //Serialize without <current page pagination>
+                } else {
+                    return endpointName
+                }
+            },
+            merge: (currentCache, newItems) => {
+                currentCache.info = newItems.info;
+                booksAdapter.addMany(
+                    currentCache, booksSelector.selectAll(newItems)
+                )
+            },
+            forceRefetch: ({ currentArg, previousArg }) => {
+                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
+                return isForceRefetch
+            },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
                     return [
