@@ -24,7 +24,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
             providesTags: ['Profile'],
         }),
         getUser: builder.query({
-            query: ({ id }) => ({
+            query: (id) => ({
                 url: `/api/accounts/${id}`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError
@@ -149,7 +149,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 method: 'DELETE',
                 credentials: 'include',
             }),
-            invalidatesTags: (result, error, id) => [
+            invalidatesTags: (result, error) => [
                 { type: 'User', id: "LIST" }
             ]
         }),
@@ -159,7 +159,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 method: 'DELETE',
                 credentials: 'include',
             }),
-            invalidatesTags: (result, error, id) => [
+            invalidatesTags: (result, error) => [
                 { type: 'User', id: "LIST" }
             ]
         }),
