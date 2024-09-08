@@ -43,13 +43,9 @@ public class AccountServiceImpl implements AccountService {
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
     private final EmailService emailService;
-
-    @Autowired
-    private ProfileMapper profileMapper;
-    @Autowired
-    private AccountDetailMapper detailMapper;
-    @Autowired
-    private ChartDataMapper chartMapper;
+    private final ProfileMapper profileMapper;
+    private final AccountDetailMapper detailMapper;
+    private final ChartDataMapper chartMapper;
 
     //Get all accounts
     public Page<Account> getAllAccounts(Integer pageNo, Integer pageSize, String sortBy, String sortDir,

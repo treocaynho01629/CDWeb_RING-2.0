@@ -46,11 +46,8 @@ public class OrderServiceImpl implements OrderService {
 	private final OrderDetailRepository detailRepo;
 	private final BookRepository bookRepo;
 	private final EmailService emailService;
-	
-	@Autowired
-	private OrderMapper orderMapper;
-	@Autowired
-	private ChartDataMapper chartMapper;
+	private final OrderMapper orderMapper;
+	private final ChartDataMapper chartMapper;
 	
 	//Commit order
 	@Transactional

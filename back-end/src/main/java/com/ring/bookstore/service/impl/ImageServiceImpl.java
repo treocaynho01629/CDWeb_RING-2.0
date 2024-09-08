@@ -5,6 +5,7 @@ import com.ring.bookstore.dtos.projections.IImageInfo;
 import com.ring.bookstore.enums.ImageSize;
 import com.ring.bookstore.exception.ImageResizerException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class ImageServiceImpl implements ImageService {
 
@@ -38,11 +40,8 @@ public class ImageServiceImpl implements ImageService {
     @Value("${image.size.medium}")
     private Integer medSize;
 
-    @Autowired
-    private ImageRepository imageRepo;
-
-    @Autowired
-    private ImageMapper imageMapper;
+    private final ImageRepository imageRepo;
+    private final ImageMapper imageMapper;
 
     //Map to DTO instead
     public ImageDTO uploadAndMap(MultipartFile file) throws ImageResizerException, IOException {
