@@ -195,7 +195,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 url: `/api/reviews/delete-multiples?ids=${ids}`,
                 method: 'DELETE'
             }),
-            invalidatesTags: (result, error, id) => [
+            invalidatesTags: (result, error) => [
                 { type: 'Review', id: "LIST" }
             ]
         }),
@@ -204,7 +204,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 url: '/api/reviews/delete-all',
                 method: 'DELETE'
             }),
-            invalidatesTags: (result, error, id) => [
+            invalidatesTags: (result, error) => [
                 { type: 'Review', id: "LIST" }
             ]
         }),
