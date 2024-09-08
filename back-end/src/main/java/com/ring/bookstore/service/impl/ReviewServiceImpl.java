@@ -34,9 +34,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ReviewRepository reviewRepo;
 	private final BookRepository bookRepo;
 	private final OrderReceiptRepository orderRepo;
-	
-	@Autowired
-	private ReviewMapper reviewMapper;
+	private final ReviewMapper reviewMapper;
 	
 	//Review
 	public Review review(Integer id, ReviewRequest request, Account user) {
