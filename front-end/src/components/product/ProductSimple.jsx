@@ -91,7 +91,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
 const ProductSimple = ({ book, scrollPosition }) => {
     const { addProduct } = useCart();
 
-    const handleAddToCart = (book) => {addProduct(book, 1)};
+    const handleAddToCart = (book) => { addProduct(book, 1) };
 
     return (
         <Container>
@@ -115,7 +115,9 @@ const ProductSimple = ({ book, scrollPosition }) => {
                         }
                     />
                     <Info>
-                        <Price>{book.price.toLocaleString()}đ<Percentage>-{book.onSale * 100}%</Percentage></Price>
+                        <Price>{book.price.toLocaleString()}đ
+                            {book.onSale > 0 && <Percentage>-{book.onSale * 100}%</Percentage>}
+                        </Price>
                         <Title>{book.title}</Title>
                     </Info>
                 </Link>

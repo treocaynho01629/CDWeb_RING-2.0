@@ -14,18 +14,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class PublisherServiceImpl implements PublisherService {
-	
-	private final PublisherRepository pubRepo;
 
-	//Get all publishers
-	public List<Publisher> getAllPublishers() {
-		return pubRepo.findAll();
-	}
+    private final PublisherRepository pubRepo;
 
-	//Get publisher by {id}
-	public Publisher getPublisherById(Integer id) {
-		return pubRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Publisher does not exists!"));
-	}
-	
+    //Get all publishers
+    public List<Publisher> getAllPublishers() {
+        return pubRepo.findAll();
+    }
 
+    //Get publisher by {id}
+    public Publisher getPublisherById(Integer id) {
+        return pubRepo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Publisher does not exists!"));
+    }
 }

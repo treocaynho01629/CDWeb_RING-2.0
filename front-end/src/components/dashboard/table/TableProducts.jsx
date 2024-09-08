@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch, LinearProgress, Chip, Skeleton, Grid2 as Grid, TextField, MenuItem } from '@mui/material';
-import { AutoStories as AutoStoriesIcon, Delete as DeleteIcon, Search, Star, MoreHoriz } from '@mui/icons-material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch, LinearProgress, Chip, Skeleton, Grid2 as Grid, TextField, MenuItem, Menu, ListItemIcon, ListItemText } from '@mui/material';
+import { AutoStories as AutoStoriesIcon, Delete as DeleteIcon, Search, MoreHoriz, Edit, Delete, Visibility } from '@mui/icons-material';
 import { Link } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDeleteBookMutation, useDeleteBooksMutation, useGetBooksQuery } from '../../../features/books/booksApiSlice';
@@ -104,7 +104,6 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
   //#region construct
   const { username, roles } = useAuth();
   const isAdmin = useState(roles?.find(role => ['ROLE_ADMIN'].includes(role)));
-  const [id, setId] = useState([]);
   const [selected, setSelected] = useState([]);
   const [deselected, setDeseletected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
@@ -120,6 +119,11 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
     sortDir: "asc",
   })
 
+  //Actions
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [contextId, setContextId] = useState(null); //Current select product's id
+  const openContext = Boolean(anchorEl);
+
   //Delete hook
   const [deleteBook, { isLoading: deleting }] = useDeleteBookMutation();
   const [deleteMultipleBooks, { isLoading: deletingMultiple }] = useDeleteBooksMutation();
@@ -130,7 +134,7 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
     size: pagination?.pageSize,
     sortBy: pagination?.sortBy,
     sortDir: pagination?.sortDir,
-    seller: `${(isSeller ? username : sellerName ?? '')}`,
+    seller: isSeller ? username : sellerName ?? '',
   })
 
   //Set pagination after fetch
@@ -164,6 +168,7 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
     setSelectedAll(false);
   };
 
+  //Select
   const handleClick = (e, id) => {
     if (selectedAll) {
       //Set unselected elements for reverse
@@ -214,6 +219,7 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
     }
   };
 
+  //Pagination
   const handleChangePage = (page) => {
     setPagination({ ...pagination, currPage: page });
   };
@@ -233,10 +239,25 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
     setIsSeller(e.target.checked);
   };
 
-  const handleClickOpenEdit = (id) => {
-    setId(id);
-    setOpenEdit(true);
+  //Actions
+  const handleOpenContext = (e, product) => {
+    setAnchorEl(e.currentTarget);
+    setContextId(product);
   };
+
+  const handleCloseContext = () => {
+    setAnchorEl(null);
+    setContextId(null);
+  }
+
+  const handleOpenEdit = (id) => {
+    setOpenEdit(true);
+    setContextId(id);
+  };
+
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  }
 
   const handleDelete = async (id) => {
     if (pending) return;
@@ -331,12 +352,6 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
         const labelId = `enhanced-table-checkbox-${index}`;
         const stockProgress = Math.min((book.amount / 199 * 100), 100);
         const stockStatus = stockProgress == 0 ? 'error' : stockProgress < 20 ? 'warning' : stockProgress < 80 ? 'primary' : 'info';
-        const avgRate = () => {
-          let rate = 0;
-          rate = Math.round((book.rateTotal / book.rateAmount) * 2) / 2
-          rate = rate ? rate : '~';
-          return rate;
-        }
 
         return (
           <TableRow
@@ -373,11 +388,14 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
                 />
                 <Box>
                   <ItemTitle>{book.title}</ItemTitle>
-                  <ItemTitle className="secondary">Đánh giá: {avgRate()} <Star fontSize="15px" color="primary" /></ItemTitle>
+                  <ItemTitle className="secondary">Đã bán: {book.orderTime}</ItemTitle>
                 </Box>
               </Link>
             </TableCell>
-            <TableCell align="left">{book.price.toLocaleString()}đ</TableCell>
+            <TableCell align="left">
+              <ItemTitle>{Math.round(book.price * (1 - book.onSale)).toLocaleString()}đ</ItemTitle>
+              {book.onSale > 0 && <ItemTitle className="secondary">-{book.onSale * 100}%</ItemTitle>}
+            </TableCell>
             <TableCell align="center">
               <LinearProgress color={stockStatus} variant="determinate" value={stockProgress} />
               <ItemTitle className="secondary">{`${book.amount} trong kho`}</ItemTitle>
@@ -394,7 +412,7 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
                   />
                 </TableCell>
                 <TableCell align="right">
-                  <IconButton onClick={(e) => handleClickOpenEdit(id)}><MoreHoriz /></IconButton>
+                  <IconButton onClick={(e) => handleOpenContext(e, id)}><MoreHoriz /></IconButton>
                 </TableCell>
               </>
             }
@@ -430,72 +448,100 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
   }
 
   return (
-    <TableContainer component={Paper}>
-      <CustomTableToolbar
-        numSelected={numSelected()}
-        icon={<AutoStoriesIcon />}
-        title={'sản phẩm'}
-        submitIcon={<DeleteIcon />}
-        submitTooltip={'Xoá sản phẩm đã chọn'}
-        onSubmitSelected={handleDeleteMultiples}
-        filterComponent={<FilterContent />}
-      />
-      <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
-        <Table
-          stickyHeader
-          sx={{ minWidth: mini ? 500 : 750 }}
-          aria-labelledby="tableTitle"
-          size={dense ? 'small' : 'medium'}
-        >
-          <CustomTableHead
-            headCells={headCells}
-            numSelected={numSelected()}
-            sortBy={pagination.sortBy}
-            sortDir={pagination.sortDir}
-            onSelectAllClick={handleSelectAllClick}
-            onRequestSort={handleRequestSort}
-            selectedAll={selectedAll}
-            mini={mini}
-          />
-          <TableBody>
-            {booksRows}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <FooterContainer>
-        {mini ?
-          <Link to={'/manage-products'}>Xem tất cả</Link>
-          :
-          <Box>
-            <FormControlLabel
-              control={<Switch checked={dense} onChange={handleChangeDense} />}
-              label={<FooterLabel>Thu gọn</FooterLabel>}
-            />
-            {(isAdmin && !sellerName) &&
-              <FormControlLabel
-                control={<Switch checked={isSeller} onChange={handleChangeSeller} />}
-                label={<FooterLabel>Theo người bán</FooterLabel>}
-              />
-            }
-          </Box>
-        }
-        <CustomTablePagination
-          pagination={pagination}
-          onPageChange={handleChangePage}
-          onSizeChange={handleChangeRowsPerPage}
-          count={data?.info?.totalElements ?? 0}
+    <>
+      <TableContainer component={Paper}>
+        <CustomTableToolbar
+          numSelected={numSelected()}
+          icon={<AutoStoriesIcon />}
+          title={'sản phẩm'}
+          submitIcon={<DeleteIcon />}
+          submitTooltip={'Xoá sản phẩm đã chọn'}
+          onSubmitSelected={handleDeleteMultiples}
+          filterComponent={<FilterContent />}
         />
-      </FooterContainer>
-      <Suspense fallback={<></>}>
-        {openEdit ?
-          <EditProductDialog
-            id={id}
-            open={openEdit}
-            setOpen={setOpenEdit}
+        <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
+          <Table
+            stickyHeader
+            sx={{ minWidth: mini ? 500 : 750 }}
+            aria-labelledby="tableTitle"
+            size={dense ? 'small' : 'medium'}
+          >
+            <CustomTableHead
+              headCells={headCells}
+              numSelected={numSelected()}
+              sortBy={pagination.sortBy}
+              sortDir={pagination.sortDir}
+              onSelectAllClick={handleSelectAllClick}
+              onRequestSort={handleRequestSort}
+              selectedAll={selectedAll}
+              mini={mini}
+            />
+            <TableBody>
+              {booksRows}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <FooterContainer>
+          {mini ?
+            <Link to={'/manage-products'}>Xem tất cả</Link>
+            :
+            <Box>
+              <FormControlLabel
+                control={<Switch checked={dense} onChange={handleChangeDense} />}
+                label={<FooterLabel>Thu gọn</FooterLabel>}
+              />
+              {(isAdmin && !sellerName) &&
+                <FormControlLabel
+                  control={<Switch checked={isSeller} onChange={handleChangeSeller} />}
+                  label={<FooterLabel>Theo người bán</FooterLabel>}
+                />
+              }
+            </Box>
+          }
+          <CustomTablePagination
+            pagination={pagination}
+            onPageChange={handleChangePage}
+            onSizeChange={handleChangeRowsPerPage}
+            count={data?.info?.totalElements ?? 0}
           />
-          : null
-        }
-      </Suspense>
-    </TableContainer>
+        </FooterContainer>
+        <Suspense fallback={<></>}>
+          {openEdit &&
+            <EditProductDialog
+              id={contextId}
+              open={openEdit}
+              handleClose={handleCloseEdit}
+            />
+          }
+        </Suspense>
+      </TableContainer>
+      <Menu
+        open={openContext}
+        onClose={handleCloseContext}
+        anchorEl={anchorEl}
+        MenuListProps={{ 'aria-labelledby': 'basic-button' }}
+      >
+        <Link to={`/detail/${contextId}`}>
+          <MenuItem onClick={() => handleOpenEdit(contextId)}>
+            <ListItemIcon>
+              <Visibility fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Xem chi tiết</ListItemText>
+          </MenuItem>
+        </Link>
+        <MenuItem onClick={() => handleOpenEdit(contextId)}>
+          <ListItemIcon>
+            <Edit fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Thay đổi</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => handleDelete(contextId)}>
+          <ListItemIcon >
+            <Delete sx={{ color: 'error.main' }} fontSize="small" />
+          </ListItemIcon>
+          <ListItemText sx={{ color: 'error.main' }}>Xoá</ListItemText>
+        </MenuItem>
+      </Menu >
+    </>
   );
 }

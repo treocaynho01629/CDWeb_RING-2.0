@@ -1,92 +1,114 @@
 import { useEffect } from 'react';
-import styled from 'styled-components'
-
-import Grid from "@mui/material/Grid"
-
-import {useDropzone} from 'react-dropzone';
+import { styled } from '@mui/material/styles';
+import { useDropzone } from 'react-dropzone';
+import { Close, PermMedia } from '@mui/icons-material';
+import { IconButton, Tooltip } from '@mui/material';
 
 //#region styled
-const DropZoneContainer = styled.div`
+const DropZoneContainer = styled('div')`
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #d6e2db;
-    height: 350px;
+    height: 250px;
+    background-color: ${props => props.theme.palette.action.focus};
+    border: 2px dashed ${props => props.theme.palette.primary.main};
     cursor: pointer;
-    border: 5px dashed ${props => props.theme.palette.primary.main};
 `
 
-const ThumbContainer = styled.div`
+const DropZoneContent = styled('div')`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`
+
+const ThumbContainer = styled('aside')`
     display: flex;
-    height: 350px;
-    width: 100%;
+    flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
-    background-color: #d6e2db;
+    margin: 16px 0px;
 `
 
-const Thumb = styled.div`
+const Thumb = styled('div')`
     display: flex;
-    border: 1px solid #eaeaea;
-    height: 350px;
-    width: 100%;
-    padding: 4px;
+    border: .5px solid ${props => props.theme.palette.action.focus};
+    height: 80px;
+    width: 80px;
+    margin-right: 5px;
     box-sizing: border-box;
     justify-content: center;
+    position: relative;
 `
 
-const ThumbInner = styled.div`
+const ThumbInner = styled('div')`
     display: flex;
     min-width: 0;
     overflow: hidden;
     justify-content: center;
 `
 
-const ThumbImage = styled.img`
+const ThumbImage = styled('img')`
     display: block;
+    width: auto;
     height: 100%;
-    width: 100%;
     object-fit: cover;
+`
+
+const StyledIconButton = styled(IconButton)`
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 5px;
+    padding: 2px;
+    color: white;
+    background-color: #0000008b;
+
+    &:hover {
+      background-color: #000000bc;
+    }
+
+    svg { font-size: 15px }
 `
 //#endregion
 
-const CustomDropZone = (props) => {
-    const { image, files, setFiles } = props;
-    const {getRootProps, getInputProps, fileRejections} = useDropzone({
-        maxFiles: 1,
-        maxSize: 2000000,
-        multiple: false,
-        accept: {
-        'image/*': []
-        },
-        onDrop: acceptedFiles => {
-        setFiles(acceptedFiles.map(file => Object.assign(file, {
-            preview: URL.createObjectURL(file)
-        })));
-        }
-    });
+const CustomDropZone = ({ image, files, setFiles }) => {
+  const { getRootProps, getInputProps, fileRejections } = useDropzone({
+    maxFiles: 10,
+    maxSize: 2000000,
+    accept: {
+      'image/*': []
+    },
+    onDrop: acceptedFiles => {
+      setFiles(acceptedFiles.map(file => Object.assign(file, {
+        preview: URL.createObjectURL(file)
+      })));
+    }
+  });
 
-    const fileRejectionItems = fileRejections.map(({ file, errors }) => (
-      <b style={{display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'red'}}>
-        File: {file.path} - {file.size} bytes Quá lớn
-      </b>
-    ));
+  const fileRejectionItems = fileRejections.map(({ file, errors }) => (
+    <b style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'red' }}>
+      File: {file.path} - {file.size} bytes Quá lớn
+    </b>
+  ));
 
   let thumbs
 
   if (files?.length != 0) {
-    thumbs = files.map(file => (
-      <Thumb key={file.name}>
-        <ThumbInner>
-          <ThumbImage
-            src={file.preview}
-            onLoad={() => { URL.revokeObjectURL(file.preview) }}
-          />
-        </ThumbInner>
-      </Thumb>
+    thumbs = files.map((file, index) => (
+      <Tooltip key={`${file.name}-${index}`} title={file.name}>
+        <Thumb>
+            <StyledIconButton><Close /></StyledIconButton>
+            <ThumbInner>
+              <ThumbImage
+                src={file.preview}
+                onLoad={() => { URL.revokeObjectURL(file.preview) }}
+              />
+            </ThumbInner>
+        </Thumb>
+      </Tooltip>
     ));
   } else {
-    thumbs = 
+    thumbs =
       <Thumb>
         <ThumbInner>
           <ThumbImage
@@ -103,23 +125,18 @@ const CustomDropZone = (props) => {
 
   return (
     <section className="container">
-        <Grid container spacing={1}>
-            <Grid item xs={12} sm={6}>
-                <DropZoneContainer {...getRootProps({className: 'dropzone'})}>
-                    <input {...getInputProps()} />
-                    <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                      <p>Thả hoặc click vào để tải ảnh</p>
-                      <b>(Tối đa 2MB)</b>
-                      {fileRejectionItems}
-                    </div>
-                </DropZoneContainer>
-            </Grid>
-            <Grid item xs={12} sm={6} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                <ThumbContainer>
-                    {thumbs}
-                </ThumbContainer>
-            </Grid>
-        </Grid>
+      <DropZoneContainer {...getRootProps({ className: 'dropzone' })}>
+        <input {...getInputProps()} />
+        <DropZoneContent>
+          <PermMedia fontSize="large" />
+          <h3 style={{ margin: 0, marginTop: 10 }}>Kéo thả hoặc chọn file ảnh</h3>
+          <span>(Tối đa 2MB, 10 ảnh)</span>
+          {fileRejectionItems}
+        </DropZoneContent>
+      </DropZoneContainer>
+      <ThumbContainer>
+        {thumbs}
+      </ThumbContainer>
     </section>
   );
 }

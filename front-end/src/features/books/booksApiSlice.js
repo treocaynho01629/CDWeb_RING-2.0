@@ -1,5 +1,6 @@
 import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
+import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
 
 const booksAdapter = createEntityAdapter({});
 const booksSelector = booksAdapter.getSelectors();
@@ -15,7 +16,7 @@ const initialState = booksAdapter.getInitialState({
 export const booksApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getBook: builder.query({
-            query: ({ id }) => ({
+            query: (id) => ({
                 url: `/api/books/${id}`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError
@@ -62,23 +63,34 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                     }
                 }, content)
             },
-            serializeQueryArgs: ({ endpointName, queryArgs }) => {
+            serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
                 if (queryArgs) {
-                    const { page, loadMore, ...rest } = queryArgs;
+                    const { loadMore, ...mainQuery } = queryArgs;
 
-                    if (loadMore) { //Load more >> serialize without <all pagination part>
-                        const { size, ...left } = rest;
-                        return `${endpointName}Merge(${JSON.stringify(left)})`
+                    if (loadMore) { //Load more >> serialize without <pagination>
+                        const { page, size, ...rest } = mainQuery;
+                        if (JSON.stringify(rest) === "{}") return endpointName + 'Merge';
+                        return defaultSerializeQueryArgs({
+                            endpointName: endpointName + 'Merge',
+                            queryArgs: rest,
+                            endpointDefinition
+                        });
                     }
 
-                    return `${endpointName}(${JSON.stringify(rest)})` //Serialize without <current page pagination>
+                    //Serialize like normal
+                    if (JSON.stringify(mainQuery) === "{}") return endpointName;
+                    return defaultSerializeQueryArgs({
+                        endpointName,
+                        queryArgs: mainQuery,
+                        endpointDefinition
+                    })
                 } else {
                     return endpointName
                 }
             },
             merge: (currentCache, newItems) => {
                 currentCache.info = newItems.info;
-                booksAdapter.addMany(
+                booksAdapter.upsertMany(
                     currentCache, booksSelector.selectAll(newItems)
                 )
             },
@@ -124,7 +136,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 method: 'POST',
                 credentials: 'include',
                 body: newBook,
-                formData: true
+                formData: true,
             }),
             invalidatesTags: [
                 { type: 'Book', id: "LIST" }
@@ -136,7 +148,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 method: 'PUT',
                 credentials: 'include',
                 body: updatedBook,
-                formData: true
+                formData: true,
             }),
             invalidatesTags: (result, error, { id }) => [
                 { type: 'Book', id }

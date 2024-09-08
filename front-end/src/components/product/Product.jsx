@@ -180,7 +180,7 @@ const StyledRating = styled(Rating)`
 const Product = ({ book, scrollPosition }) => {
     const { addProduct } = useCart();
 
-    const handleAddToCart = (book) => {addProduct(book, 1)};
+    const handleAddToCart = (book) => { addProduct(book, 1) };
 
     return (
         <Container>
@@ -227,13 +227,15 @@ const Product = ({ book, scrollPosition }) => {
                                     <Title>{book.title}</Title>
                                     <PriceContainer>
                                         <Price>{Math.round(book.price * (1 - book.onSale)).toLocaleString()}đ</Price>
-                                        {book.onSale > 0
-                                            &&
-                                            <DiscountContainer>
-                                                <Discount>{book.price.toLocaleString()}đ</Discount>
-                                                <Percentage>-{book.onSale * 100}%</Percentage>
-                                            </DiscountContainer>
-                                        }
+                                        <DiscountContainer>
+                                            {book.onSale > 0
+                                                ? <>
+                                                    <Discount>{book.price.toLocaleString()}đ</Discount>
+                                                    <Percentage>-{book.onSale * 100}%</Percentage>
+                                                </>
+                                                : <br />
+                                            }
+                                        </DiscountContainer>
                                     </PriceContainer>
                                 </ProductInfo>
                                 <MoreInfo>
