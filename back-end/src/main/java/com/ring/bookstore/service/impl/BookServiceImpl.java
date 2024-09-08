@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ring.bookstore.dtos.BookResponseDTO;
 import com.ring.bookstore.dtos.projections.IBookDetail;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.service.ImageService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,8 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ring.bookstore.dtos.BookDTO;
 import com.ring.bookstore.dtos.BookDetailDTO;
 import com.ring.bookstore.dtos.projections.IBookDisplay;
-import com.ring.bookstore.dtos.mappers.BookDetailMapper;
-import com.ring.bookstore.dtos.mappers.BookDisplayMapper;
+import com.ring.bookstore.dtos.mappers.BookMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
@@ -51,18 +50,13 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepo;
     private final BookDetailRepository detailRepo;
     private final CategoryRepository cateRepo;
-
-    @Autowired
-    private ImageService imageService;
-    @Autowired
-    private BookDisplayMapper bookDisplayMapper;
-    @Autowired
-    private BookDetailMapper bookDetailMapper;
+    private final ImageService imageService;
+    private final BookMapper bookMapper;
 
     //Get random books
     public List<BookDTO> getRandomBooks(Integer amount) {
         List<IBookDisplay> booksList = bookRepo.findRandomBooks(amount);
-        List<BookDTO> bookDtos = booksList.stream().map(bookDisplayMapper::apply).collect(Collectors.toList()); //Return books
+        List<BookDTO> bookDtos = booksList.stream().map(bookMapper::displayToBookDTO).collect(Collectors.toList()); //Return books
         return bookDtos;
     }
 
@@ -92,7 +86,7 @@ public class BookServiceImpl implements BookService {
                 , fromRange
                 , toRange
                 , pageable);
-        Page<BookDTO> bookDtos = booksList.map(bookDisplayMapper::apply);
+        Page<BookDTO> bookDtos = booksList.map(bookMapper::displayToBookDTO);
         return bookDtos;
     }
 
@@ -100,13 +94,13 @@ public class BookServiceImpl implements BookService {
     public BookDetailDTO getBookDetailById(Integer id) {
         IBookDetail book = bookRepo.findBookDetailById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Product does not exists!"));
-        BookDetailDTO bookDetailDTO = bookDetailMapper.apply(book); //Map to DTO
+        BookDetailDTO bookDetailDTO = bookMapper.detailToDetailDTO(book); //Map to DTO
         return bookDetailDTO;
     }
 
     //Add book (SELLER)
     @Transactional
-    public Book addBook(BookRequest request, MultipartFile file, Account seller) throws IOException, ImageResizerException {
+    public BookResponseDTO addBook(BookRequest request, MultipartFile file, Account seller) throws IOException, ImageResizerException {
         //Category & publisher validation
         Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
@@ -142,12 +136,12 @@ public class BookServiceImpl implements BookService {
 
         //Return added book
         addedBook.setBookDetail(addedDetail);
-        return addedBook;
+        return bookMapper.bookToResponseDTO(addedBook);
     }
 
     //Update book (SELLER)
     @Transactional
-    public Book updateBook(BookRequest request, MultipartFile file, Integer id, Account seller) throws IOException, ImageResizerException {
+    public BookResponseDTO updateBook(BookRequest request, MultipartFile file, Integer id, Account seller) throws IOException, ImageResizerException {
         //Check book exists & category, publisher validation
         Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
@@ -156,12 +150,22 @@ public class BookServiceImpl implements BookService {
         //Check if correct seller or admin
         if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
 
+//        if (remove != null) {
+//            if (hasThumbnail && file == null) throw new;
+//            //loop + remove
+//        }
+
         //Image upload/replace
         if (file != null) { //Contain new image >> upload/replace
             imageService.deleteImage(book.getImage().getId()); //Delete old image
             Image savedImage = imageService.upload(file); //Upload new image
             book.setImage(savedImage); //Save to database
         }
+
+//        //Preview images
+//        if (files != null) {
+//            //upload
+//        }
 
         //Set new details info
         BookDetail currDetail = book.getBookDetail();
@@ -182,20 +186,20 @@ public class BookServiceImpl implements BookService {
         book.setAmount(request.getAmount());
         book.setType(request.getType());
 
-        //Return updated book
-        Book savedBook = bookRepo.save(book);
-        return savedBook;
+        //Update
+        Book updatedBook = bookRepo.save(book);
+        return bookMapper.bookToResponseDTO(updatedBook);
     }
 
     //Delete book (SELLER)
     @Transactional
-    public Book deleteBook(Integer id, Account seller) {
+    public BookResponseDTO deleteBook(Integer id, Account seller) {
         Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         //Check if correct seller or admin
         if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
 
         bookRepo.deleteById(id); //Delete from database
-        return book;
+        return bookMapper.bookToResponseDTO(book);
     }
 
     //Delete multiples books (SELLER)

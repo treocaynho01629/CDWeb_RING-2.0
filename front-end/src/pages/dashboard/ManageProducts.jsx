@@ -100,8 +100,8 @@ const ManageProducts = () => {
         </Button>
       </Box>
       <br />
-      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
-        <Grid item sm={6} md={4}>
+      <Grid container spacing={3} mb={'20px'}>
+        <Grid size={{ sm: 6, md: 4 }}>
           <CountCard
             count={productCount}
             icon={<Style />}
@@ -158,7 +158,7 @@ const ManageProducts = () => {
 
       <TableProducts setProductCount={setProductCount} />
       <Suspense fallback={<></>}>
-        {open && <ProductFormDialog open={open} handleClose={handleClose}/>}
+        {open && <ProductFormDialog open={open} handleClose={handleClose} />}
       </Suspense>
     </>
   )

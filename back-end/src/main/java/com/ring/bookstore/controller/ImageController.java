@@ -59,7 +59,7 @@ public class ImageController {
 	}
 
 	//Upload multiples images
-	@PostMapping("/upload_multiples")
+	@PostMapping("/upload-multiples")
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	public ResponseEntity<?> uploadImages( @RequestParam("images") MultipartFile[] files) {
 		List<String> messages = new ArrayList<>();
@@ -94,7 +94,7 @@ public class ImageController {
 	}
 
 	//Upload multiples images
-	@PostMapping("/replace_multiples")
+	@PostMapping("/replace-multiples")
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	public ResponseEntity<?> replaceImages( @RequestParam("images") MultipartFile[] files) {
 		List<String> messages = new ArrayList<>();

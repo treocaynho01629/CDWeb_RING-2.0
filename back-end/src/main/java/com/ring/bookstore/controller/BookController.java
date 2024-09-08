@@ -80,8 +80,7 @@ public class BookController {
 									@RequestPart("image") MultipartFile file,
 		 							@CurrentAccount Account currUser) {
 		try {
-			Book addedBook = bookService.addBook(request, file, currUser);
-			return new ResponseEntity< >(addedBook, HttpStatus.CREATED);
+			return new ResponseEntity< >(bookService.addBook(request, file, currUser), HttpStatus.CREATED);
 		} catch (Exception e) {
 			String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
@@ -97,10 +96,9 @@ public class BookController {
     									@CurrentAccount Account currUser) {
     	
     	try {
-    		Book savedBook = bookService.updateBook(request, file, id, currUser);
-			return new ResponseEntity< >(savedBook, HttpStatus.CREATED);
+			return new ResponseEntity<>(bookService.updateBook(request, file, id, currUser), HttpStatus.CREATED);
 		} catch (Exception e) {
-			String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+			String message = "Failed to update book!";
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
 		}
     }
@@ -108,10 +106,9 @@ public class BookController {
     //Delete book by {id}
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<Book> deleteBook(@PathVariable("id") int id,
+    public ResponseEntity<?> deleteBook(@PathVariable("id") int id,
 										@CurrentAccount Account currUser) {
-        Book deletedBook = bookService.deleteBook(id, currUser);
-        return new ResponseEntity<>(deletedBook, HttpStatus.OK);
+        return new ResponseEntity<>(bookService.deleteBook(id, currUser), HttpStatus.OK);
     }
     
     //Delete multiple books by lists of {ids}

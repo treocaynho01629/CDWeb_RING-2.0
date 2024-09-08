@@ -25,7 +25,7 @@ const ProductDetail = () => {
 
     //Fetch data
     const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom } = useGetRandomBooksQuery({ amount: 10 });
-    const { data, isLoading, isFetching, isSuccess, isError, error } = useGetBookQuery({ id }, { skip: !id });
+    const { data, isLoading, isFetching, isSuccess, isError, error } = useGetBookQuery(id, { skip: !id });
 
     //Set title
     useTitle(`${data?.title ?? 'RING - Bookstore!'}`);
@@ -76,8 +76,8 @@ const ProductDetail = () => {
                         <NavLink to={`/filters`} key={'bread1'}>
                             Danh mục sản phẩm
                         </NavLink>,
-                        <NavLink to={`/filters?cateId=${data?.cateId}`} key={'bread2'}>
-                            {data?.cateName}
+                        <NavLink to={`/filters?cateId=${data?.category?.id}`} key={'bread2'}>
+                            {data?.category?.categoryName}
                         </NavLink>,
                         <NavLink to={`/filters?pubId=${data?.publisher?.id}`} key={'bread3'}>
                             {data?.publisher?.pubName}

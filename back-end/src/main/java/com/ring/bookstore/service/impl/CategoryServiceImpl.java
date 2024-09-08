@@ -14,17 +14,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class CategoryServiceImpl implements CategoryService {
-	
-	private final CategoryRepository cateRepo;
 
-	//Get all categories
-	public List<Category> getAllCategories() {
-		return cateRepo.findAll();
-	}
+    private final CategoryRepository cateRepo;
 
-	//Get category by {id}
-	public Category getCategoryById(Integer id) {
-		return cateRepo.findById(id).orElseThrow(() -> 
-		new ResourceNotFoundException("Category does not exists!"));
-	}
+    //Get all categories
+    public List<Category> getAllCategories() {
+        return cateRepo.findAll();
+    }
+
+    //Get category by {id}
+    public Category getCategoryById(Integer id) {
+        return cateRepo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Category does not exists!"));
+    }
 }

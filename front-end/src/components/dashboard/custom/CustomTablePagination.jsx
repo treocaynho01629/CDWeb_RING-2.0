@@ -2,7 +2,7 @@ import { TablePagination } from "@mui/material";
 import { useEffect, useState } from "react";
 
 const CustomTablePagination = (props) => {
-    const { pagination, count, onPageChange, onSizeChange } = props;
+    const { pagination, onPageChange, onSizeChange, ...otherProps } = props;
     //Initial value
     const [page, setPage] = useState(pagination?.currPage ?? 0);
     const [size, setSize] = useState(pagination?.pageSize ?? 10);
@@ -21,7 +21,7 @@ const CustomTablePagination = (props) => {
 
     return (
         <TablePagination
-            {...props}
+            {...otherProps}
             rowsPerPageOptions={[5, 10, 25, 50, 100]}
             component="div"
             labelRowsPerPage={"Hiển thị"}
