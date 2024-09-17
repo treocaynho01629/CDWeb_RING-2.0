@@ -28,7 +28,6 @@ public class AccountDetailMapper implements Function<Account, AccountDetailDTO> 
     		gender = (gender = profile.getGender()) != null ? gender : "";
     		address = (address = profile.getAddress()) != null ? address : "";
     		dob = (dob = profile.getDob()) != null ? dob : LocalDate.of(2000, 1, 1);
-    		
     	}
     	
         return new AccountDetailDTO(user.getId(),

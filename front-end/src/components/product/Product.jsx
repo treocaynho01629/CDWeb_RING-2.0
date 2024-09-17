@@ -9,6 +9,7 @@ import useCart from '../../hooks/useCart';
 //#region styled
 const StyledLazyImage = styled(LazyLoadImage)`
     aspect-ratio: 1/1;
+    max-height: 180px;
     margin-bottom: 10px;
     object-fit: contain;
     transform: ${props => props.imagestyle};
@@ -47,6 +48,13 @@ const Wrapper = styled.div`
     align-items: center;
     width: 100%;
     height: 100%;
+`
+
+const ItemContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 `
 
 const Info = styled.div`
@@ -175,11 +183,20 @@ const StyledRating = styled(Rating)`
     display: flex;
     align-items: center;
 `
+
+const SkeletonContainer = styled.div`
+    width: 100%;
+    height: 200%;
+    max-height: 180px;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`
 //#endregion
 
 const Product = ({ book, scrollPosition }) => {
     const { addProduct } = useCart();
-
     const handleAddToCart = (book) => { addProduct(book, 1) };
 
     return (
@@ -188,72 +205,71 @@ const Product = ({ book, scrollPosition }) => {
                 {book
                     ?
                     <Link to={`/product/${book.id}`}>
-                        <StyledLazyImage
-                            src={`${book?.image}?size=small`}
-                            alt={`${book?.title} Thumbnail`}
-                            width={'100%'}
-                            height={180}
-                            scrollPosition={scrollPosition}
-                            placeholder={
-                                <Skeleton
-                                    variant="rectangular"
-                                    height={180}
-                                    sx={{
-                                        aspectRatio: '1/1',
-                                        marginBottom: '10px',
-                                    }}
-                                />
-                            }
-                        />
+                        <ItemContainer>
+                            <StyledLazyImage
+                                src={`${book?.image}?size=small`}
+                                alt={`${book?.title} Thumbnail`}
+                                width={'100%'}
+                                scrollPosition={scrollPosition}
+                                placeholder={
+                                    <SkeletonContainer>
+                                        <Skeleton
+                                            variant="rectangular"
+                                            height={'100%'}
+                                            sx={{
+                                                aspectRatio: '1/1',
+                                                marginBottom: '10px',
+                                            }}
+                                        />
+                                    </SkeletonContainer>
+                                }
+                            />
+                            <Info>
+                                <MainInfo>
+                                    <ProductInfo>
+                                        <Title>{book.title}</Title>
+                                        <PriceContainer>
+                                            <Price>{Math.round(book.price * (1 - book.onSale)).toLocaleString()}đ</Price>
+                                            <DiscountContainer>
+                                                {book.onSale > 0
+                                                    ? <>
+                                                        <Discount>{book.price.toLocaleString()}đ</Discount>
+                                                        <Percentage>-{book.onSale * 100}%</Percentage>
+                                                    </>
+                                                    : <br />
+                                                }
+                                            </DiscountContainer>
+                                        </PriceContainer>
+                                    </ProductInfo>
+                                    <MoreInfo>
+                                        <StyledRating
+                                            name="product-rating"
+                                            value={book?.rating ?? 0}
+                                            getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
+                                            precision={0.5}
+                                            icon={<StarIcon style={{ fontSize: 14 }} />}
+                                            emptyIcon={<StarBorder style={{ fontSize: 14 }} />}
+                                            readOnly
+                                        />
+                                        <TextMore className="secondary">Đã bán {numFormatter(book?.orderTime)}</TextMore>
+                                    </MoreInfo>
+                                </MainInfo>
+                            </Info>
+                        </ItemContainer>
                     </Link>
                     :
-                    <div>
-                        <Skeleton
-                            variant="rectangular"
-                            height={180}
-                            sx={{
-                                aspectRatio: '1/1',
-                                marginBottom: '10px',
-                            }}
-                        />
-                    </div>
-                }
-                <Info>
-                    {book
-                        ?
-                        <Link to={`/product/${book.id}`}>
-                            <MainInfo>
-                                <ProductInfo>
-                                    <Title>{book.title}</Title>
-                                    <PriceContainer>
-                                        <Price>{Math.round(book.price * (1 - book.onSale)).toLocaleString()}đ</Price>
-                                        <DiscountContainer>
-                                            {book.onSale > 0
-                                                ? <>
-                                                    <Discount>{book.price.toLocaleString()}đ</Discount>
-                                                    <Percentage>-{book.onSale * 100}%</Percentage>
-                                                </>
-                                                : <br />
-                                            }
-                                        </DiscountContainer>
-                                    </PriceContainer>
-                                </ProductInfo>
-                                <MoreInfo>
-                                    <StyledRating
-                                        name="product-rating"
-                                        value={book?.rating ?? 0}
-                                        getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
-                                        precision={0.5}
-                                        icon={<StarIcon style={{ fontSize: 14 }} />}
-                                        emptyIcon={<StarBorder style={{ fontSize: 14 }} />}
-                                        readOnly
-                                    />
-                                    <TextMore className="secondary">Đã bán {numFormatter(book?.orderTime)}</TextMore>
-                                </MoreInfo>
-                            </MainInfo>
-                        </Link>
-                        :
-                        <>
+                    <>
+                        <SkeletonContainer>
+                            <Skeleton
+                                variant="rectangular"
+                                height={'100%'}
+                                sx={{
+                                    aspectRatio: '1/1',
+                                    marginBottom: '10px',
+                                }}
+                            />
+                        </SkeletonContainer>
+                        <Info>
                             <Skeleton variant="text" sx={{ fontSize: '16px' }} />
                             <Skeleton variant="text" sx={{ fontSize: '16px' }} width="60%" />
                             <Skeleton
@@ -265,9 +281,9 @@ const Product = ({ book, scrollPosition }) => {
                             />
                             <Skeleton variant="text" sx={{ fontSize: '16px', display: { xs: 'none', sm: 'block' } }} />
                             <Skeleton variant="text" sx={{ fontSize: '14px' }} width="60%" />
-                        </>
-                    }
-                </Info>
+                        </Info>
+                    </>
+                }
             </Wrapper>
             <Info className="extra">
                 <Divider />

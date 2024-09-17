@@ -1,6 +1,7 @@
 import styled from "styled-components"
 import { useState, useEffect, lazy, Suspense } from 'react'
 import { Box, Skeleton, CircularProgress } from '@mui/material';
+import { Title } from "../components/custom/GlobalComponents";
 import { useParams } from 'react-router-dom';
 import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
@@ -10,13 +11,6 @@ const PendingIndicator = lazy(() => import('../components/layout/PendingIndicato
 const ProfileDetail = lazy(() => import('../components/profile/ProfileDetail'));
 const AddressComponent = lazy(() => import('../components/address/AddressComponent'));
 const ResetPassComponent = lazy(() => import('../components/profile/ResetPassComponent'));
-
-//#region styled
-const Wrapper = styled.div`
-    ${props => props.theme.breakpoints.down("sm")} {
-        padding: 0 15px;
-    }
-`
 
 const ContentContainer = styled.div`
     position: relative;
@@ -29,28 +23,10 @@ const ContentContainer = styled.div`
     }
 `
 
-const Title = styled.h3`
-    margin: 20px 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
-    border-bottom: 0.5px solid ${props => props.theme.palette.primary.main};
-    padding-bottom: 15px;
-    color: ${props => props.theme.palette.primary.main};
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        font-size: 15px;
-        margin: 20px 15px;
-
-    }
-`
-//#endregion
-
 const tempLoad = (
     <>
-        <Title><Skeleton variant="text" sx={{ fontSize: '19px' }} width="50%" /></Title>
-        <Box display={'flex'} alignItems={'center'} justifyContent={'center'} height={'40dvh'}>
+        <Title className="primary"><Skeleton variant="text" sx={{ fontSize: '19px' }} width="50%" /></Title>
+        <Box display="flex" alignItems="center" justifyContent="center" height={'40dvh'}>
             <CircularProgress
                 color="primary"
                 size={40}
@@ -80,7 +56,7 @@ const Profile = () => {
                 <TabPanel value="" sx={{ px: 0 }}>
                     <ContentContainer>
                         <Suspense fallback={tempLoad}>
-                            <ProfileDetail {...{ Title, Wrapper, pending, setPending }} />
+                            <ProfileDetail {...{ pending, setPending }} />
                         </Suspense>
                     </ContentContainer>
                 </TabPanel>
@@ -94,7 +70,7 @@ const Profile = () => {
                 <TabPanel value="password" sx={{ px: 0 }}>
                     <ContentContainer>
                         <Suspense fallback={tempLoad}>
-                            <ResetPassComponent {...{ pending, setPending, Title, Wrapper }} />
+                            <ResetPassComponent {...{ pending, setPending }} />
                         </Suspense>
                     </ContentContainer>
                 </TabPanel>

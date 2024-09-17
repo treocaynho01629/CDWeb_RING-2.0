@@ -5,18 +5,19 @@ import { Skeleton } from '@mui/material';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import Carousel from 'react-multi-carousel';
-import 'react-lazy-load-image-component/src/effects/blur.css';
+import "react-multi-carousel/lib/styles.css";
 
 //#region styled
 const ImgContainer = styled.div`
     text-align: center;
-    border: none;
+    border: .5px solid ${props => props.theme.palette.divider};
+    border-bottom: none;
     
-    ${props => props.theme.breakpoints.up("sm")} {
+    ${props => props.theme.breakpoints.up("md")} {
         width: 100%;
         position: sticky;
         top: ${props => props.theme.mixins.toolbar.minHeight + 15}px;
-        border: .5px solid ${props => props.theme.palette.action.focus};
+        border-bottom: .5px solid ${props => props.theme.palette.divider};
     }
 `
 
@@ -28,16 +29,16 @@ const ImageNumber = styled.p`
     color: ${props => props.theme.palette.primary.contrastText};
     background-color: ${props => props.theme.palette.primary.main};
     border-radius: 50px;
-    top: 5px;
-    left: 10px;
+    top: 2%;
+    left: 5%;
     opacity: .9;
     z-index: 5;
     pointer-events: none;
     white-space: nowrap;
 
-    ${props => props.theme.breakpoints.down("sm")} {
-        bottom: 60px;
-        right: 15px;
+    ${props => props.theme.breakpoints.down("md")} {
+        bottom: 20%;
+        right: 5%;
         top: auto;
         left: auto;
     }
@@ -45,24 +46,15 @@ const ImageNumber = styled.p`
 
 const MoreImageContainer = styled.div`
     padding: 10px;
-`
 
-const SmallImageSlider = styled.div`
-    display: flex;
-    width: 95%;
-    margin: 0px 10px;
-    user-select: none;
-    white-space: nowrap;
-    padding: 10px;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-       padding: 0;
+    ${props => props.theme.breakpoints.down("md")} {
+        padding: 5px;
     }
 `
 
 const SmallImageSlide = styled.div`
     display: flex;
-    border: .5px solid ${props => props.theme.palette.action.focus};
+    border: .5px solid ${props => props.theme.palette.divider};
     opacity: .5;
     margin-right: 4px;
     cursor: pointer;
@@ -108,10 +100,11 @@ const ImageSlide = styled.div`
     padding: 15px 10px;
     position: relative;
     width: 100%;
+    max-height: 450px;
     aspect-ratio: 1/1;
     display: grid;
 
-    ${props => props.theme.breakpoints.down("sm")} {
+    ${props => props.theme.breakpoints.down("md")} {
         padding: 5px 0 0 0;
     }
 `
@@ -119,6 +112,7 @@ const ImageSlide = styled.div`
 const StyledLazyImage = styled(LazyLoadImage)`
     object-fit: contain;
     width: 100%;
+    max-height: 450px;
 
     &.hidden {display: none;}
 `
@@ -133,6 +127,7 @@ const StyledSmallLazyImage = styled(LazyLoadImage)`
 const StyledSkeleton = styled(Skeleton)`
     width: 100%;
     height: 100%;
+    max-height: 450px;
     aspect-ratio: 1/1;
 `
 
@@ -145,6 +140,23 @@ const StyledSmallSkeleton = styled(Skeleton)`
 //#endregion
 
 const responsive = {
+    default: {
+        breakpoint: {
+            max: 3000,
+            min: 900
+        },
+        items: 1,
+    },
+    mobile: {
+        breakpoint: {
+            max: 900,
+            min: 0
+        },
+        items: 1,
+    }
+};
+
+const responsiveMini = {
     default: {
         breakpoint: {
             max: 3000,
@@ -188,66 +200,83 @@ const CustomRightArrow = ({ carouselState, onClick, setSlideIndex }) => (
     </CustomArrow>
 );
 
+const CustomButtonGroup = ({ book, images, setSlideIndex, goToSlide, carouselState }) => {
+    const { currentSlide } = carouselState;
+
+    return (
+        <MoreImageContainer>
+            <Carousel
+                responsive={responsiveMini}
+                autoPlay={false}
+                customLeftArrow={<CustomLeftArrow setSlideIndex={setSlideIndex} />}
+                customRightArrow={<CustomRightArrow setSlideIndex={setSlideIndex} />}
+                removeArrowOnDeviceType={["mobile"]}
+                minimumTouchDrag={80}
+                partialVisible
+                draggable
+            >
+                {book ? images.map((image, index) => (
+                    <SmallImageSlide key={index}
+                        className={`${index === currentSlide ? 'active' : ''}`}
+                        onClick={() => {
+                            goToSlide(index);
+                            setSlideIndex(index + 1);
+                        }}>
+                        <StyledSmallLazyImage
+                            src={`${image}?size=small`}
+                            placeholder={<StyledSmallSkeleton variant="rectangular" />}
+                        />
+                    </SmallImageSlide>
+                ))
+                    : Array.from(new Array(4)).map((item, index) => (
+                        <SmallImageSlide key={index}>
+                            <StyledSmallSkeleton variant="rectangular" />
+                        </SmallImageSlide>
+                    ))
+                }
+            </Carousel>
+        </MoreImageContainer>
+    );
+};
+
+
 const ProductImages = ({ book }) => {
     const [slideIndex, setSlideIndex] = useState(1);
     const images = [].concat(book?.previewImages, book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
 
     return (
         <ImgContainer>
             <ImageNumber>{slideIndex}/{images.length}</ImageNumber>
-            <ImageSlide >
-                {book ? images.map((image, index) => (
-                    <StyledLazyImage
-                        key={index}
-                        className={(index + 1) === slideIndex ? 'active' : 'hidden'}
-                        src={image}
-                        srcSet={`${image}?size=medium 350w, ${image} 600w`}
-                        alt={`${book?.title} preview image #${index}`}
-                        sizes="400px"
-                        visibleByDefault={index == 0}
-                        placeholder={<StyledSmallSkeleton variant="rectangular" />}
-                    />
-                ))
-                    : <StyledSkeleton variant="rectangular" />
-                }
-            </ImageSlide>
-            <MoreImageContainer>
+            {book ?
                 <Carousel
+                    renderButtonGroupOutside
                     responsive={responsive}
-                    autoPlay={false}
-                    customLeftArrow={<CustomLeftArrow setSlideIndex={setSlideIndex} />}
-                    customRightArrow={<CustomRightArrow setSlideIndex={setSlideIndex} />}
-                    removeArrowOnDeviceType={["mobile"]}
+                    autoPlay={true}
+                    arrows={false}
+                    autoPlaySpeed={10000}
                     keyBoardControl
-                    minimumTouchDrag={80}
-                    partialVisible
                     draggable
+                    customButtonGroup={<CustomButtonGroup {...{ setSlideIndex, images, book }} />}
+                    minimumTouchDrag={80}
                 >
-                    {book ? images.map((image, index) => (
-                        <SmallImageSlide key={index}
-                            className={`${index + 1 === slideIndex ? 'active' : ''}`}
-                            onClick={() => setSlideIndex(index + 1)}>
-                            <StyledSmallLazyImage
-                                src={`${image}?size=small`}
+                    {images.map((image, index) => (
+                        <ImageSlide key={index}>
+                            <StyledLazyImage
+                                src={image}
+                                srcSet={`${image}?size=medium 350w, ${image} 600w`}
+                                alt={`${book?.title} preview image #${index}`}
+                                sizes="400px"
+                                visibleByDefault={index == 0}
                                 placeholder={<StyledSmallSkeleton variant="rectangular" />}
                             />
-                        </SmallImageSlide>
-                    ))
-                        : Array.from(new Array(4)).map((item, index) => (
-                            <SmallImageSlide key={index}>
-                                <StyledSmallSkeleton variant="rectangular" />
-                            </SmallImageSlide>
-                        ))
-                    }
+                        </ImageSlide>
+                    ))}
                 </Carousel>
-            </MoreImageContainer>
-        </ImgContainer>
+                : <ImageSlide>
+                    <StyledSkeleton variant="rectangular" />
+                </ImageSlide>
+            }
+        </ImgContainer >
     )
 }
 

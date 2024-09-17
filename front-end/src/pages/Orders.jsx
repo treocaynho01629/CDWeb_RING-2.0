@@ -64,7 +64,7 @@ const RatingInfo = styled.p`
 const tempLoad = (
     <>
         <Title><Skeleton variant="text" sx={{ fontSize: '19px' }} width="50%" /></Title>
-        <Box display={'flex'} alignItems={'center'} justifyContent={'center'} height={'40dvh'}>
+        <Box display="flex" alignItems="center" justifyContent="center" height={'40dvh'}>
             <CircularProgress
                 color="primary"
                 size={40}

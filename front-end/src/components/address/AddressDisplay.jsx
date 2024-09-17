@@ -27,13 +27,13 @@ const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadProfile }) => {
 
     return (
         <AddressDisplayContainer className={`${loadProfile ? '' : isValid ? '' : !addressInfo ? '' : 'error' }`}>
-            <Box display={'flex'} flexDirection={'column'}>
+            <Box display="flex" flexDirection={'column'}>
                 {(!addressInfo && loadProfile)
                     ?
                     <Box>Đang cập nhật...</Box>
                     :
                     <>
-                        <Box display={'flex'} marginRight={2} whiteSpace={'nowrap'}>
+                        <Box display="flex" marginRight={2} whiteSpace={'nowrap'}>
                             <UserInfo>{addressInfo.name}&nbsp;</UserInfo>
                             {addressInfo?.phone && <UserInfo>{`(+84) ${addressInfo.phone}`}</UserInfo>}
                         </Box>

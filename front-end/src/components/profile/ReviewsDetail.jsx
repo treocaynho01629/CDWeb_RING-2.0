@@ -1,5 +1,3 @@
-import React from 'react'
-
 const ReviewTable = () => {
     const [pagination, setPagination] = useState({
         currPage: 0,

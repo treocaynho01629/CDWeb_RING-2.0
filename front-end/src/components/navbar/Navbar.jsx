@@ -305,7 +305,7 @@ const Navbar = () => {
                     </Grid>
                 </Grid>
             </TopHeader>
-            <AppBar sx={{ backgroundColor: 'background.default', marginBottom: 2 }} position="sticky">
+            <AppBar sx={{ backgroundColor: 'background.default', marginBottom: { xs: 0, md: 2 } }} position="sticky">
                 <Wrapper>
                     <Grid container size="grow">
                         <Grid size={{ xs: 12, md: "grow" }} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -340,8 +340,8 @@ const Navbar = () => {
                                     </Logo>
                                 </Link>
                                 <Box
-                                    display={'flex'}
-                                    alignItems={'center'}
+                                    display="flex"
+                                    alignItems="center"
                                     flex={1}
                                     justifyContent={isToggleSearch ? { xs: 'space-between', md: 'flex-start' } : 'flex-start'}
                                     flexDirection={{ xs: 'row-reverse', md: 'row' }}
@@ -381,7 +381,7 @@ const Navbar = () => {
                             <Grid size={{ xs: 12, md: "auto" }} sx={{ display: { xs: 'none', md: 'flex' } }}>
                                 <Right>
                                     <NavItem>
-                                        <Stack spacing={1} direction="row" sx={{ color: 'action.active' }} alignItems={'center'}>
+                                        <Stack spacing={1} direction="row" sx={{ color: 'action.active' }} alignItems="center">
                                             <StyledIconButton className="nav" aria-label="notification">
                                                 <Badge badgeContent={0} anchorOrigin={{
                                                     vertical: 'top',

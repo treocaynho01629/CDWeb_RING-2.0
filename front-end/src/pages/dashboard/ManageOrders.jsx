@@ -16,7 +16,7 @@ const ManageOrders = () => {
   return (
     <>
       <h2>Quản lý doanh thu</h2>
-      <Box display={'flex'} justifyContent={'space-between'}>
+      <Box display="flex" justifyContent={'space-between'}>
         <Breadcrumbs aria-label="breadcrumb">
           <Link style={{ color: 'inherit' }} to={'/dashboard'}>Dashboard</Link>
           <Typography color="text.secondary">Quản lý đơn hàng</Typography>

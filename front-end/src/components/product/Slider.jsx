@@ -6,6 +6,7 @@ import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useGetRandomBooksQuery } from "../../features/books/booksApiSlice";
 import Carousel from "react-multi-carousel";
 import useCart from "../../hooks/useCart";
+import "react-multi-carousel/lib/styles.css";
 
 //#region styled
 const ImgContainer = styled.div`

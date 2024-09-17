@@ -2,9 +2,9 @@ import styled from 'styled-components'
 import { useState, useEffect, useMemo } from "react"
 import { Box, Button, Divider, Checkbox, FormGroup, FormControlLabel, MenuItem, List, ListItemButton, Collapse, Skeleton, Stack, InputAdornment, TextField } from '@mui/material';
 import { ExpandLess, ExpandMore, PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon, FilterAltOff } from '@mui/icons-material';
-import { marks, bookTypes } from "../../ultils/filters";
-import CustomSlider from "../custom/CustomSlider";
-import CustomDivider from '../custom/CustomDivider';
+import { marks, bookTypes } from "../../../ultils/filters";
+import CustomSlider from "../../custom/CustomSlider";
+import CustomDivider from '../../custom/CustomDivider';
 
 //#region styled
 const TitleContainer = styled.div`
