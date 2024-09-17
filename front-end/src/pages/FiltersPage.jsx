@@ -7,12 +7,12 @@ import { useGetPublishersQuery } from "../features/publishers/publishersApiSlice
 import { useGetBooksQuery } from "../features/books/booksApiSlice";
 import AppPagination from "../components/custom/AppPagination";
 import CustomDivider from "../components/custom/CustomDivider";
-import FilteredProducts from "../components/product/FilteredProducts";
-import SortList from "../components/product/SortList";
+import FilteredProducts from "../components/product/filter/FilteredProducts";
+import SortList from "../components/product/filter/SortList";
 import useTitle from "../hooks/useTitle";
 
-const FilterList = lazy(() => import("../components/product/FilterList"));
-const FilterDialog = lazy(() => import("../components/product/FilterDialog"));
+const FilterList = lazy(() => import("../components/product/filter/FilterList"));
+const FilterDialog = lazy(() => import("../components/product/filter/FilterDialog"));
 
 //#region styled
 const Wrapper = styled.div`
@@ -277,7 +277,7 @@ const FiltersPage = () => {
                     </Grid>
                 }
                 <Grid size={{ xs: 12, md: 9 }}>
-                    <CustomDivider>{filters?.seller ? `SẢN PHẨM CỦA ${filters.seller}` : 'DANH MỤC SẢN PHẨM'}</CustomDivider>
+                    <CustomDivider sx={{ display: { xs: 'none', md: 'flex' } }}>{filters?.seller ? `SẢN PHẨM CỦA ${filters.seller}` : 'DANH MỤC SẢN PHẨM'}</CustomDivider>
                     <SortList filters={filters}
                         pagination={pagination}
                         onChangeOrder={handleChangeOrder}

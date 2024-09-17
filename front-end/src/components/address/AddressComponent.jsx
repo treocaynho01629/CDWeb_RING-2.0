@@ -1,30 +1,12 @@
-import styled, { useTheme } from "styled-components"
+import { useTheme } from "styled-components"
 import { useState } from 'react'
 import { useGetProfileQuery, useUpdateProfileMutation } from '../../features/users/usersApiSlice';
 import { Box, Button, CircularProgress, Dialog, ListItemIcon, ListItemText, Menu, MenuItem, useMediaQuery } from '@mui/material';
 import { AddHome, Delete, Home, LocationOn } from '@mui/icons-material';
+import { Title } from "../custom/GlobalComponents";
 import AddressItem from './AddressItem'
 import AddressForm from './AddressForm'
 import useCart from '../../hooks/useCart';
-
-//#region styled
-const Title = styled.h3`
-    margin: 20px 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    text-align: center;
-    padding-bottom: 15px;
-    border-bottom: 0.5px solid ${props => props.theme.palette.primary.main};
-    color: ${props => props.theme.palette.primary.main};
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        font-size: 15px;
-        margin: 20px 15px;
-    }
-`
-//#endregion
 
 const AddressComponent = ({ pending, setPending }) => {
   const { addresses, addNewAddress, removeAddress } = useCart();
@@ -149,23 +131,25 @@ const AddressComponent = ({ pending, setPending }) => {
 
   return (
     <>
-      <Title>
-        <Box display={'flex'} alignItems={'center'}>
-          <LocationOn />&nbsp;ĐỊA CHỈ CỦA BẠN
-        </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleOpen()}
-          endIcon={<AddHome />}
-        >
-          Thêm địa chỉ
-        </Button>
-      </Title>
+      <Box padding={{ xs: '0 15px', md: 0 }}>
+        <Title className="primary">
+          <Box display="flex" alignItems="center" flexGrow={1}>
+            <LocationOn />&nbsp;ĐỊA CHỈ CỦA BẠN
+          </Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleOpen()}
+            endIcon={<AddHome />}
+          >
+            Thêm địa chỉ
+          </Button>
+        </Title>
+      </Box>
       {
         (loadProfile && !profile)
           ?
-          <Box display={'flex'} alignItems={'center'} justifyContent={'center'} height={'40dvh'}>
+          <Box display="flex" alignItems="center" justifyContent="center" height={'40dvh'}>
             <CircularProgress
               color="primary"
               size={40}

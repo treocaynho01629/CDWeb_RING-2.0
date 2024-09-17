@@ -44,11 +44,11 @@ export default function DashboardNavbar({ open, setOpen }) {
   return (
     <AppBar position="sticky" open={open} elevation={0}>
       <Toolbar disableGutters sx={{ justifyContent: 'space-between', padding: '5px 10px' }}>
-        <Box display={'flex'} alignItems={'center'}>
+        <Box display="flex" alignItems="center">
           <IconButton aria-label="open drawer" onClick={handleToggleDrawer}>
             <MenuIcon />
           </IconButton>
-          <Box display={'flex'} alignItems={'center'} px={1}>
+          <Box display="flex" alignItems="center" px={1}>
             <Typography variant="body2" color='text.primary' mr={1}>
               {username}
             </Typography>

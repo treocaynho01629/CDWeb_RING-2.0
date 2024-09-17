@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 import { styled as muiStyled } from '@mui/system';
 import { Grid2 as Grid, Button, MenuItem, ToggleButton, ToggleButtonGroup, TextField } from '@mui/material';
 import { Search, Sort } from '@mui/icons-material';
-import { orderGroup } from "../../ultils/filters";
-import QuickPagination from "../custom/QuickPagination";
+import { orderGroup } from "../../../ultils/filters";
+import QuickPagination from "../../custom/QuickPagination";
 
 //#region styled
 const Container = styled.div`

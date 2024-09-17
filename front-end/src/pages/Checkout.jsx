@@ -445,7 +445,7 @@ const Checkout = () => {
                                                                         <Box width={'100%'} display={{ xs: 'flex', md: 'none' }} justifyContent={'space-between'}>
                                                                             <Box>
                                                                                 <Price>{Math.round(product.price * (1 - (product?.onSale || 0))).toLocaleString()}đ</Price>
-                                                                                <Box display={'flex'} alignItems={'center'} sx={{ fontWeight: 'bold' }}>
+                                                                                <Box display="flex" alignItems="center" sx={{ fontWeight: 'bold' }}>
                                                                                     Tổng: &nbsp;&nbsp;
                                                                                     <Price className="total">{(Math.round(product.price * (1 - (product?.onSale || 0))) * product.quantity).toLocaleString()}đ</Price>
                                                                                 </Box>

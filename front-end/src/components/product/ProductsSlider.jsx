@@ -18,8 +18,8 @@ const Container = styled.div`
 `
 
 const ProductContainer = styled.div`
-  display: flex;
-  height: 100%;
+    display: flex;
+    height: 100%;
 `
 
 const CustomArrow = styled.button`
@@ -36,6 +36,7 @@ const CustomArrow = styled.button`
   opacity: .5;
   cursor: pointer;
   transition: all .25s ease;
+  z-index: 2;
 
   &:hover {
     opacity: .7;
@@ -119,8 +120,6 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
       <Carousel
         responsive={responsive}
         infinite={true}
-        autoPlay={true}
-        autoPlaySpeed={15000}
         customLeftArrow={<CustomLeftArrow />}
         customRightArrow={<CustomRightArrow />}
         removeArrowOnDeviceType={["mobile"]}

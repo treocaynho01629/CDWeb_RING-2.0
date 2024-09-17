@@ -1,61 +1,17 @@
 import styled from 'styled-components'
 import { useState, useEffect } from 'react'
-import { Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, FormControl, Button, TextField } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, FormControl, Button, TextField, TextareaAutosize } from '@mui/material';
 import { Check, Close } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useCreateBookMutation, useGetBookQuery, useUpdateBookMutation } from '../../../features/books/booksApiSlice';
 import { useGetPublishersQuery } from '../../../features/publishers/publishersApiSlice';
 import { useGetCategoriesQuery } from '../../../features/categories/categoriesApiSlice';
 import dayjs from 'dayjs';
 import CustomDropZone from '../custom/CustomDropZone';
+import CustomDatePicker from '../../custom/CustomDatePicker';
 
 //#region styled
-
-const CustomDatePicker = styled(DatePicker)({
-  '& .MuiInputBase-root': {
-    borderRadius: 0
-  },
-  '& label.Mui-focused': {
-    color: '#A0AAB4'
-  },
-  '& .MuiInput-underline:after': {
-    borderBottomColor: '#B2BAC2',
-  },
-  '& .MuiOutlinedInput-root': {
-    borderRadius: 0,
-    '& fieldset': {
-      borderRadius: 0,
-      borderColor: '#E0E3E7',
-    },
-    '&:hover fieldset': {
-      borderRadius: 0,
-      borderColor: '#B2BAC2',
-    },
-    '&.Mui-focused fieldset': {
-      borderRadius: 0,
-      borderColor: '#6F7E8C',
-    },
-  },
-  '& input:valid + fieldset': {
-    borderColor: 'lightgray',
-    borderRadius: 0,
-    borderWidth: 1,
-  },
-  '& input:invalid + fieldset': {
-    borderColor: '#e66161',
-    borderRadius: 0,
-    borderWidth: 1,
-  },
-  '& input:valid:focus + fieldset': {
-    borderColor: '#63e399',
-    borderLeftWidth: 4,
-    borderRadius: 0,
-    padding: '4px !important',
-  },
-});
-
 const Instruction = styled.p`
     font-size: 14px;
     font-style: italic;
@@ -318,7 +274,16 @@ const EditProductDialog = ({ id, open, handleClose }) => {
               label="Mô tả"
               fullWidth
               multiline
-              rows={6}
+              minRows={6}
+              InputProps={{
+                inputComponent: TextareaAutosize,
+                inputProps: {
+                  minRows: 6,
+                  style: {
+                    resize: "auto"
+                  }
+                }
+              }}
               variant="outlined"
               value={description}
               onChange={(e) => setDescription(e.target.value)}

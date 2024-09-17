@@ -13,13 +13,8 @@ const AddressItemContainer = styled.div`
     padding: 20px;
     border: 0.5px solid ${props => props.theme.palette.action.focus};
 
-    &.active {
-        border-color: ${props => props.theme.palette.primary.main};
-    }
-
-    &.error {
-        border-color: ${props => props.theme.palette.error.main};
-    }
+    &.active { border-color: ${props => props.theme.palette.primary.main};}
+    &.error {border-color: ${props => props.theme.palette.error.main};}
 `
 
 const AddressTag = styled.div`
@@ -42,8 +37,39 @@ const AddressTag = styled.div`
 `
 
 const UserInfo = styled.b`
+    display: flex;
+    white-space: nowrap;
+    margin-right: 16px;
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	
+	@supports (-webkit-line-clamp: 1) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: initial;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+
     ${props => props.theme.breakpoints.down("sm")} {
         font-size: 13px;
+    }
+`
+
+const UserAddress = styled.span`
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	
+	@supports (-webkit-line-clamp: 1) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: initial;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
     }
 `
 //#endregion
@@ -71,12 +97,20 @@ const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue }) =>
     return (
         <AddressItemContainer className={`${isNotValid ? 'error' : isDefault ? 'active' : ''}`}>
             {isDefault && <AddressTag className={`${isNotValid ? 'error' : ''}`}>Mặc định</AddressTag>}
-            <Box display={'flex'} flexDirection={'column'}>
-                <Box display={'flex'} marginRight={2} whiteSpace={'nowrap'}>
-                    <UserInfo>{addressInfo.name}&nbsp;</UserInfo>
-                    {addressInfo?.phone && <UserInfo>{`(+84) ${addressInfo.phone}`}</UserInfo>}
-                </Box>
-                <Box>{addressInfo?.address}</Box>
+            <Box display="flex" flexDirection={'column'}>
+                {!addressInfo ?
+                    <>
+                        <UserInfo>Chưa có địa chỉ mặc định</UserInfo>
+                        <UserAddress>Tạo địa chỉ tạm thời?</UserAddress>
+                    </>
+                    :
+                    <>
+                        <UserInfo>{addressInfo?.name}&nbsp;
+                            {addressInfo?.phone && `(+84) ${addressInfo?.phone}`}
+                        </UserInfo>
+                        <UserAddress>{addressInfo?.address}</UserAddress>
+                    </>
+                }
             </Box>
             <Button
                 sx={{ display: { xs: 'none', sm: 'flex' }, whiteSpace: 'nowrap', marginTop: 2 }}
@@ -91,6 +125,7 @@ const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue }) =>
                 sx={{ display: { xs: 'block', sm: 'none' } }}
                 aria-label="mobile toggle address dialog"
                 onClick={() => handleOpen(addressInfo)}
+                color={isNotValid ? "error" : "primary"}
                 edge="end"
             >
                 <KeyboardArrowRight />

@@ -21,7 +21,7 @@ const AmountCount = styled.span`
 `
 
 const FilterContainer = styled.div`
-    margin: 30px 0px;
+    margin: 0px 0px 30px 0px;
     width: 100%;
     display: block;
     
@@ -174,7 +174,7 @@ const ProductAction = ({ book }) => {
                         </Box>
                     </ProductDetailContainer>
                     <Divider sx={{ my: 2 }} />
-                    <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} padding={'0 10px'}>
+                    <Box display="flex" alignItems="center" justifyContent={'space-between'} padding={'0 10px'}>
                         <DetailTitle>Số lượng:</DetailTitle>
                         <CustomAmountInput
                             size="small"
@@ -196,7 +196,6 @@ const ProductAction = ({ book }) => {
                 </Drawer>
             </>
             : <FilterContainer>
-                <Divider sx={{ my: 2, display: { xs: 'none', md: 'block' } }} />
                 <Box display="flex" alignItems="center" flexWrap="wrap">
                     <DetailTitle style={{ marginRight: 20 }}>Số lượng:</DetailTitle>
                     <Box display="flex" alignItems="center" my={1}>
@@ -218,7 +217,7 @@ const ProductAction = ({ book }) => {
                         }
                     </Box>
                 </Box>
-                <Box display="flex" alignItems="center" height={47}>
+                <Box display="flex" alignItems="center" height={47} position="sticky" bottom={20} bgcolor={'background.default'}>
                     <BuyButton
                         variant="contained"
                         size="large"

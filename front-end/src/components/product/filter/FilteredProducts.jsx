@@ -1,7 +1,7 @@
 import { Box, Grid2 as Grid } from "@mui/material";
 import { trackWindowScroll } from "react-lazy-load-image-component";
-import Product from './Product';
-import CustomProgress from '../custom/CustomProgress';
+import Product from '../Product';
+import CustomProgress from '../../custom/CustomProgress';
 
 const FilteredProducts = ({ data, isError, error, isLoading, isSuccess, pageSize = 16, scrollPosition }) => {
   let productsContent;

@@ -1,13 +1,13 @@
 import styled from 'styled-components'
-import { useEffect, useState, useRef } from 'react'
-import { Skeleton } from '@mui/material';
+import { useState, useRef } from 'react'
+import { Box, Skeleton } from '@mui/material';
 import { useParams, Navigate, NavLink, useSearchParams } from 'react-router-dom';
 import { useGetBookQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import { LazyLoadComponent } from 'react-lazy-load-image-component';
 import ProductsSlider from '../components/product/ProductsSlider';
-import ProductDetailContainer from '../components/product/ProductDetailContainer';
+import ProductDetailContainer from '../components/product/detail/ProductDetailContainer';
 import CustomDivider from '../components/custom/CustomDivider';
-import ProductContent from '../components/product/ProductContent';
+import ProductContent from '../components/product/detail/ProductContent';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 import useTitle from '../hooks/useTitle';
 
@@ -21,6 +21,7 @@ const ProductDetail = () => {
     const { id } = useParams(); //Book ids
     const [searchParams, setSearchParams] = useSearchParams();
     const [tab, setTab] = useState(searchParams.get("tab") ?? "detail"); //Current tab under detail
+    const [pending, setPending] = useState(false); //For reviewing & changing address
     const ref = useRef(null); //Ref for scroll
 
     //Fetch data
@@ -48,7 +49,7 @@ const ProductDetail = () => {
         }
         if (scroll) {
             console.log('scroll');
-            
+
             scrollIntoTab();
         }
     }
@@ -60,9 +61,9 @@ const ProductDetail = () => {
     let product;
 
     if (isLoading || isFetching) {
-        product = <ProductContent/>
+        product = <ProductContent />
     } else if (isSuccess) {
-        product = <ProductContent {...{ book: data, handleTabChange }} />
+        product = <ProductContent {...{ book: data, handleTabChange, pending, setPending }} />
     } else if (isError && error?.status === 404) {
         product = <Navigate to={'/missing'} />
     }
@@ -89,11 +90,11 @@ const ProductDetail = () => {
                 }
             </CustomBreadcrumbs>
             {product}
-            <div ref={ref}>
+            <Box my={1} ref={ref}>
                 <LazyLoadComponent>
                     <ProductDetailContainer {...{ loading: (isLoading || isFetching), book: data, tab, handleTabChange, scrollIntoTab }} />
                 </LazyLoadComponent>
-            </div>
+            </Box>
             <CustomDivider>CÓ THỂ BẠN SẼ THÍCH</CustomDivider>
             <LazyLoadComponent>
                 <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />

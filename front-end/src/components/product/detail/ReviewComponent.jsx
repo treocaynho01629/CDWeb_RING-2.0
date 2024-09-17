@@ -4,12 +4,21 @@ import { styled as muiStyled } from '@mui/system';
 import { AccessTime as AccessTimeIcon, CalendarMonth as CalendarMonthIcon, Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
 import { Avatar, Rating, Box, Button, TextField, MenuItem } from '@mui/material';
 import { Link, useLocation } from "react-router-dom";
-import { useCreateReviewMutation, useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
-import AppPagination from '../custom/AppPagination';
-import useAuth from "../../hooks/useAuth";
-import CustomProgress from '../custom/CustomProgress';
+import { useCreateReviewMutation, useGetReviewsByBookIdQuery } from '../../../features/reviews/reviewsApiSlice';
+import AppPagination from '../../custom/AppPagination';
+import useAuth from "../../../hooks/useAuth";
+import CustomProgress from '../../custom/CustomProgress';
 
 //#region styled
+const ReviewsContainer = styled.div`
+  padding: 10px 20px;
+  border: .5px solid ${props => props.theme.palette.divider};
+
+  ${props => props.theme.breakpoints.down("md")} {
+    padding: 10px 12px;
+  }
+`
+
 const RatingSelect = styled.div`
     display: flex;
     justify-content: space-between;
@@ -124,7 +133,7 @@ const Review = ({ review, username }) => {
     )
 }
 
-const ReviewTab = ({ id, scrollIntoTab }) => {
+const ReviewComponent = ({ id, scrollIntoTab }) => {
     //#region construct
     const { username } = useAuth();
     const location = useLocation();
@@ -248,14 +257,14 @@ const ReviewTab = ({ id, scrollIntoTab }) => {
                     onSizeChange={handleChangeSize} />
             </Box>
             :
-            <Box sx={{ marginBottom: 5 }}>Chưa có ai bình luận, hãy trở thành người đầu tiên!</Box>
+            <Box sx={{ marginBottom: 5 }}>Chưa có ai đánh giá sản phẩm, hãy trở thành người đầu tiên!</Box>
     } else if (isError) {
         reviewsContent = <Box sx={{ marginBottom: 5 }}>{error?.error}</Box>
     }
     //#endregion
 
     return (
-        <>
+        <ReviewsContainer>
             {reviewsContent}
             <Box>
                 {username ? (err?.data?.code === 208 ?
@@ -358,8 +367,8 @@ const ReviewTab = ({ id, scrollIntoTab }) => {
                     </Box>
                 }
             </Box>
-        </>
+        </ReviewsContainer>
     )
 }
 
-export default ReviewTab
+export default ReviewComponent

@@ -231,7 +231,7 @@ const OrdersList = ({ Title }) => {
                             </HeadContainer>
                             <Link to={`/product/${detail.bookId}`} style={{ color: 'inherit' }}>
                                 <BodyContainer>
-                                    <Box display={'flex'}>
+                                    <Box display="flex">
                                         <StyledLazyImage
                                             src={`${detail.image}?size=small`}
                                             alt={`${detail.title} Order item`}
