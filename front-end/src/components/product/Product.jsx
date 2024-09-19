@@ -55,9 +55,12 @@ const ItemContainer = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    height: 100%;
 `
 
 const Info = styled.div`
+    position: relative;
     width: 94%;
     height: 100%;
 
@@ -66,6 +69,7 @@ const Info = styled.div`
 
 const MainInfo = styled.div`
     height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -204,7 +208,7 @@ const Product = ({ book, scrollPosition }) => {
             <Wrapper>
                 {book
                     ?
-                    <Link to={`/product/${book.id}`}>
+                    <Link to={`/product/${book.id}`} style={{ width: '100%', height: '100%' }}>
                         <ItemContainer>
                             <StyledLazyImage
                                 src={`${book?.image}?size=small`}
@@ -245,7 +249,7 @@ const Product = ({ book, scrollPosition }) => {
                                         <StyledRating
                                             name="product-rating"
                                             value={book?.rating ?? 0}
-                                            getLabelText={(value) => `${value} Heart${value !== 1 ? 's' : ''}`}
+                                            getLabelText={(value) => `${value} Star${value !== 1 ? 's' : ''}`}
                                             precision={0.5}
                                             icon={<StarIcon style={{ fontSize: 14 }} />}
                                             emptyIcon={<StarBorder style={{ fontSize: 14 }} />}

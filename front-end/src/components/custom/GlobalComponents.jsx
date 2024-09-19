@@ -55,21 +55,24 @@ export const MobileExtendButton = styled.div`
 `
 
 export const Title = styled.h3`
-    margin: 20px 0;
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     text-align: center;
+    text-transform: uppercase;
+    margin: 0 0 20px;
+    padding: 15px 0;
     border-bottom: .5px solid ${props => props.theme.palette.divider};
-    padding-bottom: 15px;
 
     &.primary {
         color: ${props => props.theme.palette.primary.main};
         border-color: ${props => props.theme.palette.primary.main};
     }
 
-    ${props => props.theme.breakpoints.down("sm")} {
-        font-size: 15px;
-        margin: 15px 0;
+    ${props => props.theme.breakpoints.down("md")} {
+        font-size: 16px;
+        margin: 0 0 15px;
+        text-transform: none;
     }
 `

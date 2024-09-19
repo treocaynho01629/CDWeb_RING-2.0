@@ -58,7 +58,7 @@ public class OrderController {
 	//Get order by {id}
 	@GetMapping("{id}")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> getOrderById(@PathVariable("id") Integer id){
+    public ResponseEntity<?> getOrderById(@PathVariable("id") Long id){
 		OrderDTO order = orderService.getOrderById(id);
         return new ResponseEntity< >(order, HttpStatus.OK);
     }
@@ -76,7 +76,7 @@ public class OrderController {
 	//Get orders for book's {id}
 	@GetMapping("/book/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> getOrdersByBookId(@PathVariable("id") Integer id,
+    public ResponseEntity<?> getOrdersByBookId(@PathVariable("id") Long id,
     										@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
     										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
     										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,

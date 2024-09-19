@@ -45,7 +45,7 @@ public class Account implements UserDetails {
             strategy = GenerationType.SEQUENCE,
             generator = "primary_sequence"
     )
-    private Integer id;
+    private Long id;
 
     @Column(unique = true, nullable = false, length = 30)
     private String userName;
@@ -82,6 +82,13 @@ public class Account implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonIgnore
     private Set<Role> roles;
+
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinTable(	name = "following",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "follower_id"))
+	@JsonIgnore
+	private List<Account> followers;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "seller", fetch = FetchType.LAZY)
     @JsonIgnore

@@ -3,7 +3,7 @@ package com.ring.bookstore.dtos;
 import java.time.LocalDate;
 
 //Account details
-public record AccountDetailDTO(Integer id,
+public record AccountDetailDTO(Long id,
 		String userName,
 		String email,
 		Integer roles,

@@ -19,7 +19,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     //Get all categories
     public List<Category> getAllCategories() {
-        return cateRepo.findAll();
+        return cateRepo.findAllByParentIsNull();
     }
 
     //Get category by {id}

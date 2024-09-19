@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import com.ring.bookstore.model.Account;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, Integer>{
+public interface AccountRepository extends JpaRepository<Account, Long>{
 	
 	boolean existsByUserName(String userName); //Check exists Account by {userName}
 	

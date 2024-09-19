@@ -102,7 +102,7 @@ const ResetPassComponent = ({ pending, setPending }) => {
 
     return (
         <Wrapper>
-            <Title className="primary"><Password />&nbsp;THAY ĐỔI MẬT KHẨU</Title>
+            <Title className="primary"><Password />&nbsp;Thay đổi mật khẩu</Title>
             <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
             <form style={{ marginTop: '30px' }} onSubmit={handleChangePassword}>
                 <Stack spacing={2} direction="column" alignItems={{ xs: 'center', md: 'start' }}>

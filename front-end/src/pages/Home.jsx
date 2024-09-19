@@ -187,7 +187,7 @@ const Home = () => {
       <Grid sx={{ mb: 3, mt: -1 }} container spacing={4}>
         <Grid size={12}>
           <br />
-          <CustomDivider>SẢN PHẨM MỚI NHẤT</CustomDivider>
+          <CustomDivider>Sản phẩm mới nhất</CustomDivider>
           <br />
           <Products {...{ isLoading, data, isSuccess, isError }} />
           <ButtonContainer>
@@ -202,7 +202,7 @@ const Home = () => {
             </Button>
           </ButtonContainer>
           <br />
-          <CustomDivider>SẢN PHẨM XẾP THEO</CustomDivider>
+          <CustomDivider>Sản phẩm xếp theo</CustomDivider>
           <br />
           <ToggleGroupContainer>
             <StyledToggleButtonGroup
@@ -235,7 +235,7 @@ const Home = () => {
             </Link>
           </ButtonContainer>
           <br />
-          <CustomDivider>SẢN PHẨM DANH MỤC</CustomDivider>
+          <CustomDivider>Sản phẩm theo danh mục</CustomDivider>
           <br />
           <ToggleGroupContainer>
             <StyledToggleButtonGroup
@@ -262,7 +262,7 @@ const Home = () => {
             </Link>
           </ButtonContainer>
           <br />
-          <CustomDivider>CÓ THỂ BẠN SẼ THÍCH</CustomDivider>
+          <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
           <br />
           <LazyLoadComponent>
             <ProductsSlider {...{ isLoading: loadRandom, isFetching: fetchRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />

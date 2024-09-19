@@ -1,10 +1,12 @@
 import styled from 'styled-components'
 import { AddShoppingCart } from '@mui/icons-material';
-import { Button, Box, Divider, Drawer, useTheme, useMediaQuery, Skeleton } from '@mui/material';
-import { useState } from 'react';
+import { Button, Box, Divider, useTheme, useMediaQuery, Skeleton } from '@mui/material';
+import { lazy, Suspense, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CustomAmountInput from '../custom/CustomAmountInput';
 import useCart from '../../hooks/useCart';
+
+const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
 
 //#region styled
 const AmountCount = styled.span`
@@ -148,52 +150,57 @@ const ProductAction = ({ book }) => {
                         disabled={!book || book?.amount == 0}
                         onClick={() => handleBuyNow(book)}
                     >
-                        {book?.amount == 0 ? 'Hết hàng' 
-                        : `Mua ngay (${(Math.round(book?.price * (1 - book?.onSale)) * amountIndex).toLocaleString()}đ)`}
+                        {book?.amount == 0 ? 'Hết hàng'
+                            : `Mua ngay (${(Math.round(book?.price * (1 - book?.onSale)) * amountIndex).toLocaleString()}đ)`}
                     </BuyButton>
-                </AltFilterContainer >
-                <Drawer
-                    anchor={'bottom'}
-                    open={open}
-                    onClose={toggleDrawer(false)}
-                >
-                    <ProductDetailContainer>
-                        <StyledImage
-                            src={book?.image}
-                            alt={'Product image'}
-                            sizes='300px'
-                        />
-                        <Box>
-                            <Box display="flex">
-                                <Price>{Math.round(book?.price * (1 - book?.onSale)).toLocaleString()}đ</Price>
-                                {book?.onSale > 0  && <Discount>{book?.price.toLocaleString()}đ</Discount>}
+                </AltFilterContainer>
+                <Suspense fallback={<></>}>
+                    {open &&
+                        <SwipeableDrawer
+                            anchor="bottom"
+                            open={open}
+                            onOpen={toggleDrawer(true)}
+                            onClose={toggleDrawer(false)}
+                        >
+                            <ProductDetailContainer>
+                                <StyledImage
+                                    src={book?.image}
+                                    alt={'Product image'}
+                                    sizes='300px'
+                                />
+                                <Box>
+                                    <Box display="flex">
+                                        <Price>{Math.round(book?.price * (1 - book?.onSale)).toLocaleString()}đ</Price>
+                                        {book?.onSale > 0 && <Discount>{book?.price.toLocaleString()}đ</Discount>}
+                                    </Box>
+                                    <AmountCount className={book?.amount > 0 ? '' : 'error'}>
+                                        {book?.amount > 0 ? `(${book?.amount}) sản phẩm còn lại` : 'Tạm thời hết hàng'}
+                                    </AmountCount>
+                                </Box>
+                            </ProductDetailContainer>
+                            <Divider sx={{ my: 2 }} />
+                            <Box display="flex" alignItems="center" justifyContent={'space-between'} padding={'0 10px'}>
+                                <DetailTitle>Số lượng:</DetailTitle>
+                                <CustomAmountInput
+                                    size="small"
+                                    value={amountIndex}
+                                    onChange={(e) => handleChangeAmount(e.target.valueAsNumber)}
+                                    handleDecrease={() => changeAmount(-1)}
+                                    handleIncrease={() => changeAmount(1)}
+                                />
                             </Box>
-                            <AmountCount className={book?.amount > 0 ? '' : 'error'}>
-                                {book?.amount > 0 ? `(${book?.amount}) sản phẩm còn lại` : 'Tạm thời hết hàng'}
-                            </AmountCount>
-                        </Box>
-                    </ProductDetailContainer>
-                    <Divider sx={{ my: 2 }} />
-                    <Box display="flex" alignItems="center" justifyContent={'space-between'} padding={'0 10px'}>
-                        <DetailTitle>Số lượng:</DetailTitle>
-                        <CustomAmountInput
-                            size="small"
-                            value={amountIndex}
-                            onChange={(e) => handleChangeAmount(e.target.valueAsNumber)}
-                            handleDecrease={() => changeAmount(-1)}
-                            handleIncrease={() => changeAmount(1)}
-                        />
-                    </Box>
-                    <BuyButton
-                        variant="outlined"
-                        color="primary"
-                        size="large"
-                        sx={{ margin: '5px' }}
-                        onClick={() => handleAddToCart(book)}
-                    >
-                        Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.onSale)) * amountIndex).toLocaleString()}đ)
-                    </BuyButton>
-                </Drawer>
+                            <BuyButton
+                                variant="outlined"
+                                color="primary"
+                                size="large"
+                                sx={{ margin: '5px' }}
+                                onClick={() => handleAddToCart(book)}
+                            >
+                                Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.onSale)) * amountIndex).toLocaleString()}đ)
+                            </BuyButton>
+                        </SwipeableDrawer>
+                    }
+                </Suspense>
             </>
             : <FilterContainer>
                 <Box display="flex" alignItems="center" flexWrap="wrap">
@@ -235,7 +242,7 @@ const ProductAction = ({ book }) => {
                         fullWidth
                         disabled={!book || book?.amount == 0}
                         onClick={() => handleAddToCart(book)}
-                        startIcon={<AddShoppingCart fontSize="small"/>}
+                        startIcon={<AddShoppingCart fontSize="small" />}
                     >
                         Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.onSale)) * amountIndex).toLocaleString()}đ)
                     </BuyButton>

@@ -39,7 +39,7 @@ public class BookDetail {
             generator = "primary_sequence"
     )
     @JsonIgnore
-    private Integer id;
+    private Long id;
 
     @Column
     private Double bWeight;

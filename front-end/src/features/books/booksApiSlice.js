@@ -38,7 +38,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 if (cateId) params.append('cateId', cateId);
                 if (type) params.append('type', type);
                 if (seller) params.append('seller', seller);
-                if (pubId) params.append('pubId', pubId);
+                if (pubId?.length) params.append('pubId', pubId);
                 if (value) {
                     params.append('fromRange', value[0]);
                     params.append('toRange', value[1]);

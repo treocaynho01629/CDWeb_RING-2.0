@@ -1,5 +1,6 @@
 package com.ring.bookstore.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +19,6 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.List;
 
-import jakarta.validation.constraints.Max;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Nationalized;
@@ -52,7 +52,7 @@ public class Book {
             strategy = GenerationType.SEQUENCE,
             generator = "primary_sequence"
     )
-    private Integer id;
+    private Long id;
 
     @OneToOne(cascade = CascadeType.ALL,
             fetch = FetchType.LAZY,
@@ -67,8 +67,7 @@ public class Book {
     private BigDecimal onSale;
 
     @Column
-    @Max(value = 199, message = "Kho hàng đã đầy (giới hạn 199)")
-    private Integer amount;
+    private Short amount;
 
     @Column(length = 200)
     @Nationalized
@@ -93,10 +92,12 @@ public class Book {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "publisher_id")
+    @JsonManagedReference
     private Publisher publisher;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cate_id")
+    @JsonManagedReference
     private Category cate;
 
     @OneToOne(cascade = CascadeType.ALL,

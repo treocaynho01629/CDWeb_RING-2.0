@@ -17,18 +17,18 @@ public interface BookService {
 
     List<BookDTO> getRandomBooks(Integer amount);
 
-    Page<BookDTO> getBooks(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword,
+    Page<BookDTO> getBooks(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword, Integer amount, Integer rating,
                            Integer cateId, List<Integer> pubId, String seller, String type, Double fromRange, Double toRange);
 
-    BookDetailDTO getBookDetailById(Integer id);
+    BookDetailDTO getBookDetailById(Long id);
 
     BookResponseDTO addBook(BookRequest request, MultipartFile file, Account seller) throws IOException, ImageResizerException;
 
-    BookResponseDTO updateBook(BookRequest request, MultipartFile file, Integer id, Account seller) throws IOException, ImageResizerException;
+    BookResponseDTO updateBook(BookRequest request, MultipartFile file, Long id, Account seller) throws IOException, ImageResizerException;
 
-    BookResponseDTO deleteBook(Integer id, Account seller);
+    BookResponseDTO deleteBook(Long id, Account seller);
 
-    void deleteBooks(List<Integer> ids, Account seller);
+    void deleteBooks(List<Long> ids, Account seller);
 
     void deleteAllBooks(Account seller);
 }

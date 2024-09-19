@@ -7,18 +7,24 @@ import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.dtos.ReviewDTO;
 import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Review;
 import com.ring.bookstore.request.ReviewRequest;
 
 @Service
 public interface ReviewService {
-	
-	Page<ReviewDTO> getAllReviews(Integer pageNo, Integer pageSize, String sortBy, String sortDir);
-	Page<ReviewDTO> getReviewsByUser(Integer userId, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
-	Page<ReviewDTO> getReviewsByUser(Account user, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
-	Page<ReviewDTO> getReviewsByBookId(Integer id, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
-	Review review(Integer id, ReviewRequest request, Account user);
-	Review deleteReview(Integer id);
-	void deleteReviews(List<Integer> ids);
-	void deleteAllReviews();
+
+    Page<ReviewDTO> getReviews(Long bookId, Long userId, Integer rating, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
+
+    Page<ReviewDTO> getUserReviews(Account user, Integer rating, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
+
+    Page<ReviewDTO> getReviewsByBookId(Long bookId, Integer rating, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
+
+	ReviewDTO review(Long id, ReviewRequest request, Account user);
+
+	ReviewDTO updateReview(Long id, ReviewRequest request, Account user);
+
+	ReviewDTO deleteReview(Long id, Account user);
+
+	void deleteReviews(List<Long> ids, boolean isInverse);
+
+    void deleteAllReviews();
 }

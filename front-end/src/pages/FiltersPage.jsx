@@ -114,13 +114,14 @@ const FiltersPage = () => {
     const handleChangeCate = (id) => {
         handleChangePage(1);
         if (filters?.cateId == id || id == "") {
+            setFilters({ ...filters, cateId: '' });
             searchParams.delete("cateId");
             setSearchParams(searchParams);
         } else {
             searchParams.set("cateId", id);
             setSearchParams(searchParams);
+            setFilters({ ...filters, cateId: id });
         }
-        setFilters({ ...filters, cateId: id ?? '' });
     }
 
     const handleChangeRange = (newValue) => {

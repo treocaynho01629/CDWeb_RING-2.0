@@ -3,11 +3,11 @@ package com.ring.bookstore.dtos;
 import com.ring.bookstore.enums.OrderStatus;
 
 //Order details
-public record OrderDetailDTO(Integer id,
+public record OrderDetailDTO(Long id,
                              String sellerName,
                              Integer amount,
                              Double price,
-                             Integer bookId,
+                             Long bookId,
                              OrderStatus status,
                              String image,
                              String bookTitle) {

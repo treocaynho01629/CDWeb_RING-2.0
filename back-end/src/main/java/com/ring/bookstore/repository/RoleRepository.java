@@ -8,7 +8,7 @@ import com.ring.bookstore.model.Role;
 import java.util.Optional;
 
 
-public interface RoleRepository extends JpaRepository<Role, Integer> {
+public interface RoleRepository extends JpaRepository<Role, Byte> {
 
     Optional<Role> findByRoleName(RoleName roleName); //Find role by {roleName}
 }

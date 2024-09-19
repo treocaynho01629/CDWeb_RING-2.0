@@ -94,7 +94,13 @@ const ShopDisplay = () => {
                         </Box>
                     </ShopInfo>
                 </Grid>
-                <Grid size={{ xs: 12, md: 'grow' }} display="flex" alignItems="center" pl={{ xs: 0, md: 1 }}>
+                <Grid
+                    size={{ xs: 12, md: 'grow' }}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    pl={{ xs: 0, md: 1 }}
+                >
                     <Stack
                         spacing={2}
                         direction="row"

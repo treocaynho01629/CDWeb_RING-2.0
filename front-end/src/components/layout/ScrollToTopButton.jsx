@@ -44,6 +44,12 @@ const StyledFab = styled(Fab)(({ theme }) => ({
         color: theme.palette.text.primary,
         WebkitAnimationPlayState: 'pause'
     },
+
+    [theme.breakpoints.down('sm')]: {
+        width: 35,
+        height: 35,
+        opacity: .8,
+    },
 }));
 
 const ScrollToTopButton = () => {

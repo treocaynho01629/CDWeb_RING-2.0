@@ -1,12 +1,11 @@
 package com.ring.bookstore.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.Set;
 
 import org.hibernate.annotations.Nationalized;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -42,7 +41,7 @@ public class Publisher {
     private Image image;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "publisher", fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonBackReference
     private Set<Book> publisherBooks;
 
 }

@@ -46,7 +46,7 @@ public class OrderReceipt {
             strategy = GenerationType.SEQUENCE,
             generator = "primary_sequence"
     )
-    private Integer id;
+    private Long id;
 
     @Column(length = 200)
     @Nationalized 
@@ -76,6 +76,11 @@ public class OrderReceipt {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private Account user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id")
+    @JsonIgnore
+    private Coupon coupon;
 
     @OneToMany(cascade = CascadeType.ALL, 
     		orphanRemoval = true,  

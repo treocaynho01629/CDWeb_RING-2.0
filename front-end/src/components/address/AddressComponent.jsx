@@ -131,10 +131,10 @@ const AddressComponent = ({ pending, setPending }) => {
 
   return (
     <>
-      <Box padding={{ xs: '0 15px', md: 0 }}>
+      <Box padding={{ xs: '0 15px', sm: 0 }}>
         <Title className="primary">
           <Box display="flex" alignItems="center" flexGrow={1}>
-            <LocationOn />&nbsp;ĐỊA CHỈ CỦA BẠN
+            <LocationOn />&nbsp;Địa chỉ của bạn
           </Box>
           <Button
             variant="contained"

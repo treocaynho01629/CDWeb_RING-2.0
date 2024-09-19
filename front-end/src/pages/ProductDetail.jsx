@@ -1,6 +1,6 @@
-import styled from 'styled-components'
+import styled, { useTheme } from 'styled-components'
 import { useState, useRef } from 'react'
-import { Box, Skeleton } from '@mui/material';
+import { Box, Skeleton, useMediaQuery } from '@mui/material';
 import { useParams, Navigate, NavLink, useSearchParams } from 'react-router-dom';
 import { useGetBookQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import { LazyLoadComponent } from 'react-lazy-load-image-component';
@@ -23,6 +23,8 @@ const ProductDetail = () => {
     const [tab, setTab] = useState(searchParams.get("tab") ?? "detail"); //Current tab under detail
     const [pending, setPending] = useState(false); //For reviewing & changing address
     const ref = useRef(null); //Ref for scroll
+    const theme = useTheme();
+    const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
 
     //Fetch data
     const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom } = useGetRandomBooksQuery({ amount: 10 });
@@ -92,10 +94,10 @@ const ProductDetail = () => {
             {product}
             <Box my={1} ref={ref}>
                 <LazyLoadComponent>
-                    <ProductDetailContainer {...{ loading: (isLoading || isFetching), book: data, tab, handleTabChange, scrollIntoTab }} />
+                    <ProductDetailContainer {...{ loading: (isLoading || isFetching), book: data, scrollIntoTab, mobileMode }} />
                 </LazyLoadComponent>
             </Box>
-            <CustomDivider>CÓ THỂ BẠN SẼ THÍCH</CustomDivider>
+            <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
             <LazyLoadComponent>
                 <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
             </LazyLoadComponent>

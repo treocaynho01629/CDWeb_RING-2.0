@@ -17,7 +17,7 @@ public interface ImageService {
 
     Image get(String name);
 
-    String deleteImage(Integer id);
+    String deleteImage(Long id);
 
     boolean existsImage(String name);
 
