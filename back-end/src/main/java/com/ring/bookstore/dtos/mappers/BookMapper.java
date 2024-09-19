@@ -5,6 +5,7 @@ import com.ring.bookstore.dtos.BookResponseDTO;
 import com.ring.bookstore.dtos.projections.IBookDetail;
 import com.ring.bookstore.model.Book;
 import com.ring.bookstore.model.BookDetail;
+import com.ring.bookstore.model.Category;
 import com.ring.bookstore.model.Image;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.ring.bookstore.dtos.BookDTO;
 import com.ring.bookstore.dtos.projections.IBookDisplay;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +64,9 @@ public class BookMapper {
 						.path(image.getName())
 						.toUriString())
 				.collect(Collectors.toList());
+//		List<Category> categories = new ArrayList<Category>();
+//		categories.add()
+//		if (book.getCate().getParent())
 
 		return new BookDetailDTO(book.getId(),
 				fileDownloadUri,

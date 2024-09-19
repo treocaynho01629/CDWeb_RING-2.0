@@ -3,7 +3,7 @@ package com.ring.bookstore.dtos;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record OrderDTO(Integer id,
+public record OrderDTO(Long id,
                        String fullName,
                        String email,
                        String phone,

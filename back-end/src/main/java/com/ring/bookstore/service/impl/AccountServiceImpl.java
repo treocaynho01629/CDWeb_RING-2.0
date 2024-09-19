@@ -60,7 +60,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     //Get account by {id}
-    public AccountDetailDTO getAccountById(Integer id) {
+    public AccountDetailDTO getAccountById(Long id) {
         Account account = accountRepo.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("User does not exists!"));
         return detailMapper.apply(account);
@@ -109,7 +109,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     //Update account (ADMIN)
-    public Account updateAccount(AccountRequest request, Integer id) {
+    public Account updateAccount(AccountRequest request, Long id) {
         //Check Account exists?
         Account currUser = accountRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
@@ -159,7 +159,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     //Delete account (ADMIN)
-    public void deleteAccount(Integer id) {
+    public void deleteAccount(Long id) {
         //Check if account exists?
         Account account = accountRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
 
@@ -175,9 +175,9 @@ public class AccountServiceImpl implements AccountService {
 
     //Delete multiples accounts (ADMIN)
     @Transactional
-    public void deleteAccounts(List<Integer> ids) {
+    public void deleteAccounts(List<Long> ids) {
         //Loop through and delete from lists
-        for (Integer id : ids) {
+        for (Long id : ids) {
             Account account = accountRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
 
             //Remove relationship

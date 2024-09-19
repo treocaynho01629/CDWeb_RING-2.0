@@ -1,9 +1,7 @@
 package com.ring.bookstore.enums;
 
-public enum OrderStatus {
-    REFUNDED,
-    CANCELED,
-    PENDING,
+public enum CouponType {
     SHIPPING,
-    COMPLETED,
+    MIN_VALUE,
+    MIN_AMOUNT,
 }

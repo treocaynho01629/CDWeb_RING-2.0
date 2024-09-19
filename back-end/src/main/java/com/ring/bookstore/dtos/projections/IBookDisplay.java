@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 //Display book info
 public interface IBookDisplay {
-    Integer getId();
+    Long getId();
 
     String getTitle();
 
@@ -16,7 +16,7 @@ public interface IBookDisplay {
 
     BigDecimal getOnSale();
 
-    Integer getAmount();
+    Short getAmount();
 
     Double getRating();
 

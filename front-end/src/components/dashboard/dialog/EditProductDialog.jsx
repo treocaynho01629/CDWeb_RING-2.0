@@ -64,16 +64,16 @@ const EditProductDialog = ({ id, open, handleClose }) => {
   const [date, setDate] = useState(dayjs('2001-01-01'));
   const [files, setFiles] = useState([]);
   const [image, setImage] = useState([]);
-  const [title, setTitle] = useState('')
-  const [price, setPrice] = useState('')
-  const [amount, setAmount] = useState('')
-  const [description, setDescription] = useState([''])
-  const [author, setAuthor] = useState('')
-  const [pubId, setPubId] = useState('')
-  const [cateId, setCateId] = useState('')
-  const [weight, setWeight] = useState('')
-  const [size, setSize] = useState('')
-  const [pages, setPages] = useState('')
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [amount, setAmount] = useState('');
+  const [author, setAuthor] = useState('');
+  const [pubId, setPubId] = useState('');
+  const [cateId, setCateId] = useState('');
+  const [weight, setWeight] = useState('');
+  const [size, setSize] = useState('');
+  const [pages, setPages] = useState('');
   const [language, setLanguage] = useState(bookLanguages[0].value);
   const [type, setType] = useState(bookTypes[0].value);
   const [err, setErr] = useState([]);
@@ -94,10 +94,8 @@ const EditProductDialog = ({ id, open, handleClose }) => {
       setDate(dayjs(data?.date));
       setFiles([]);
       setImage(data?.image);
-      setTitle(data?.title);
       setPrice(data?.price);
       setAmount(data?.amount);
-      setDescription(data?.description);
       setAuthor(data?.author);
       setWeight(data?.weight);
       setSize(data?.size);
@@ -106,6 +104,8 @@ const EditProductDialog = ({ id, open, handleClose }) => {
       setCateId(data?.category?.id);
       setType(data?.type);
       setLanguage(data?.language);
+      setTitle(data?.title);
+      setDescription(data?.description);
     }
   }, [data]);
 
@@ -263,7 +263,7 @@ const EditProductDialog = ({ id, open, handleClose }) => {
               fullWidth
               variant="outlined"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onBlur={(e) => setTitle(e.target.value)}
               error={err?.response?.data?.errors?.title}
               helperText={err?.response?.data?.errors?.title}
             />
@@ -275,7 +275,7 @@ const EditProductDialog = ({ id, open, handleClose }) => {
               fullWidth
               multiline
               minRows={6}
-              InputProps={{
+              slotProps={{
                 inputComponent: TextareaAutosize,
                 inputProps: {
                   minRows: 6,
@@ -286,7 +286,7 @@ const EditProductDialog = ({ id, open, handleClose }) => {
               }}
               variant="outlined"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onBlur={(e) => setDescription(e.target.value)}
               error={err?.response?.data?.errors?.description}
               helperText={err?.response?.data?.errors?.description}
             />

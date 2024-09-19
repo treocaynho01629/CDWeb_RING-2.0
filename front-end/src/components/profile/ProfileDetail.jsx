@@ -127,7 +127,7 @@ const ProfileDetail = ({ pending, setPending }) => {
 
     return (
         <Wrapper>
-            <Title className="primary"><Person />&nbsp;HỒ SƠ CỦA BẠN</Title>
+            <Title className="primary"><Person />&nbsp;Hồ sơ của bạn</Title>
             <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
             <Box sx={{ paddingBottom: '100px' }}>
                 <table style={{ width: '100%' }}>

@@ -97,7 +97,7 @@ public class ImageServiceImpl implements ImageService {
 
     //Delete image by {id}
     @Transactional
-    public String deleteImage(Integer id) {
+    public String deleteImage(Long id) {
         Image image = imageRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Image does not exists!"));
         imageRepo.deleteById(id);

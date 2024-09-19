@@ -1,7 +1,12 @@
 package com.ring.bookstore.model;
 
+import com.ring.bookstore.enums.CouponType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 
 @Entity
@@ -10,7 +15,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CouponConditions {
+public class CouponDetail {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -24,11 +29,24 @@ public class CouponConditions {
             strategy = GenerationType.SEQUENCE,
             generator = "primary_sequence"
     )
-    private Integer id;
+    private Long id;
 
-    @Column(length = 50, nullable = false, unique = true)
-    private String code;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private CouponType type;
 
-    @Column(name = "active", nullable = false)
-    private boolean active
+    @Column
+    private Double attribute; //Min money/quantity
+
+    @Column(nullable = false)
+    private Double maxDiscount;
+
+    @Column(nullable = false)
+    private BigDecimal discountPercent;
+
+    @Column
+    private Short usage;
+
+    @Column
+    private LocalDate expDate;
 }

@@ -1,5 +1,7 @@
 package com.ring.bookstore.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -32,15 +34,16 @@ public class Category {
     private String categoryName;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cate", fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Sub> cateSubs;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cate", fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonBackReference
     private Set<Book> cateBooks;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "parent_id")
-    @JsonIgnore
+    @JsonBackReference
     private Category parent;
 
     @OneToMany(cascade = CascadeType.ALL,
@@ -48,7 +51,7 @@ public class Category {
             mappedBy = "parent",
             fetch = FetchType.LAZY)
     @LazyCollection(LazyCollectionOption.EXTRA)
-    @JsonIgnore
+    @JsonManagedReference
     private List<Category> subCates;
 
     public void addSubCate(Category subCate) {

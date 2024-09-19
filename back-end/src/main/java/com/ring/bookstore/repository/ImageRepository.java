@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.ring.bookstore.model.Image;
 
 @Repository
-public interface ImageRepository extends JpaRepository<Image, Integer>{
+public interface ImageRepository extends JpaRepository<Image, Long>{
 
 	@Query("""
     	select i.name as name, i.type as type from Image i

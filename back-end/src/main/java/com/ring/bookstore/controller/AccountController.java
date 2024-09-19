@@ -59,14 +59,14 @@ public class AccountController {
 	//Get account by {id}
 	@GetMapping("{id}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<AccountDetailDTO> getAccountById(@PathVariable("id") Integer accountId){
+	public ResponseEntity<AccountDetailDTO> getAccountById(@PathVariable("id") Long accountId){
 		return new ResponseEntity<AccountDetailDTO>(accountService.getAccountById(accountId), HttpStatus.OK);
 	}
 	
 	//Edit account by {id}
 	@PutMapping("{id}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<Account> updateAccount(@PathVariable("id") Integer accountId,
+	public ResponseEntity<Account> updateAccount(@PathVariable("id") Long accountId,
 			@Valid @RequestBody AccountRequest requestt){
 		return new ResponseEntity<Account>(accountService.updateAccount(requestt, accountId), HttpStatus.OK);
 	}
@@ -81,7 +81,7 @@ public class AccountController {
 	//Delete account by {id}
 	@DeleteMapping("{id}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<String> deleteAccount(@PathVariable("id") Integer accountId){
+	public ResponseEntity<String> deleteAccount(@PathVariable("id") Long accountId){
 		accountService.deleteAccount(accountId);
 		return new ResponseEntity<String>("Account deleted successfully!", HttpStatus.OK);
 	}
@@ -89,7 +89,7 @@ public class AccountController {
 	//Delete multiple accounts from a lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteAccounts(@RequestParam("ids") List<Integer> ids) {
+    public ResponseEntity<?> deleteAccounts(@RequestParam("ids") List<Long> ids) {
     	accountService.deleteAccounts(ids);
         return new ResponseEntity<>("Accounts deleted successfully!", HttpStatus.OK);
     }

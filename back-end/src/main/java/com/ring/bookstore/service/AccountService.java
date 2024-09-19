@@ -17,11 +17,11 @@ public interface AccountService {
 	
 	Page<Account> getAllAccounts(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
 								 Boolean isEmployee, String keyword, Integer role);
-	AccountDetailDTO getAccountById(Integer id);
+	AccountDetailDTO getAccountById(Long id);
 	Account saveAccount(AccountRequest request);
-	Account updateAccount(AccountRequest request, Integer id);
-	void deleteAccount(Integer id);
-	void deleteAccounts(List<Integer> ids);
+	Account updateAccount(AccountRequest request, Long id);
+	void deleteAccount(Long id);
+	void deleteAccounts(List<Long> ids);
 	void deleteAllAccounts();
 	ProfileDTO getProfile(Account user);
 	AccountProfile updateProfile(ProfileRequest request, Account user);

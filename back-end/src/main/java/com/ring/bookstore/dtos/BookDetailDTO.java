@@ -8,7 +8,7 @@ import com.ring.bookstore.model.Category;
 import com.ring.bookstore.model.Publisher;
 
 //Book details
-public record BookDetailDTO(Integer id,
+public record BookDetailDTO(Long id,
                             String image,
                             List<String> previewImages,
                             Double price,
@@ -25,7 +25,7 @@ public record BookDetailDTO(Integer id,
                             LocalDate date,
                             String language,
                             Double weight,
-                            Integer amount,
+                            Short amount,
                             Double rating,
                             Integer rateTime,
                             Integer orderTime) {

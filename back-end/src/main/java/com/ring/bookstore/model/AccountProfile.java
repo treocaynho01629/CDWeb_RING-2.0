@@ -33,7 +33,7 @@ public class AccountProfile {
             generator = "primary_sequence"
     )
     @JsonIgnore
-    private Integer id;
+    private Long id;
 	
 	@Column(length = 250)
 	@Nationalized 

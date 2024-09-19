@@ -27,7 +27,8 @@ public class BookRequest { //Request body for book
 	
 	@NotNull(message = "Số lượng không được bỏ trống!")
 	@Min(value = 1, message = "Số lượng phải trên 1")
-	private Integer amount;
+	@Max(value = 199, message = "Kho hàng đã đầy (giới hạn 199)")
+	private Short amount;
 	
 	@NotBlank(message = "Tiêu đề không được bỏ trống!")
 	private String title;

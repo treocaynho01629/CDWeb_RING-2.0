@@ -38,88 +38,91 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Validated
 public class BookController {
-	
-	private final BookService bookService;
-	private final AccountRepository accRepo;
-	
 
-	//Get random books
-	@GetMapping("/random")
-    public ResponseEntity<?> getRandomBooks(@RequestParam(value = "amount", defaultValue = "5") Integer amount){
-        List<BookDTO> books =  bookService.getRandomBooks(amount);
-        return new ResponseEntity< >(books, HttpStatus.OK);
+    private final BookService bookService;
+    private final AccountRepository accRepo;
+
+
+    //Get random books
+    @GetMapping("/random")
+    public ResponseEntity<?> getRandomBooks(@RequestParam(value = "amount", defaultValue = "5") Integer amount) {
+        List<BookDTO> books = bookService.getRandomBooks(amount);
+        return new ResponseEntity<>(books, HttpStatus.OK);
     }
-	
-	//Get books with filtering
-	@GetMapping()
+
+    //Get books with filtering
+    @GetMapping()
     public ResponseEntity<?> getBooks(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
-    										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-    										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-    										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
-    										@RequestParam(value = "keyword", defaultValue = "") String keyword,
-    										@RequestParam(value = "cateId", defaultValue = "0") Integer cateId,
-    										@RequestParam(value = "pubId", defaultValue = "") List<Integer> pubId,
-    										@RequestParam(value = "seller", defaultValue = "") String seller,
-    										@RequestParam(value = "type", defaultValue = "") String type,
-    										@RequestParam(value = "fromRange", defaultValue = "1000") Double fromRange,
-    										@RequestParam(value = "toRange", defaultValue = "100000000") Double toRange){
-        Page<BookDTO> books =  bookService.getBooks(pageNo, pageSize, sortBy, sortDir, keyword, cateId, pubId, seller, type, fromRange, toRange);
-        return new ResponseEntity< >(books, HttpStatus.OK);
+                                      @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                                      @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+                                      @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
+                                      @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                      @RequestParam(value = "cateId", required = false) Integer cateId,
+                                      @RequestParam(value = "pubId", required = false) List<Integer> pubId,
+                                      @RequestParam(value = "seller", defaultValue = "") String seller,
+                                      @RequestParam(value = "type", defaultValue = "") String type,
+                                      @RequestParam(value = "fromRange", defaultValue = "1000") Double fromRange,
+                                      @RequestParam(value = "toRange", defaultValue = "100000000") Double toRange,
+                                      @RequestParam(value = "rating", defaultValue = "0") Integer rating,
+                                      @RequestParam(value = "amount", defaultValue = "1") Integer amount) {
+        Page<BookDTO> books = bookService.getBooks(pageNo, pageSize, sortBy, sortDir, keyword,
+                rating, amount, cateId, pubId, seller, type, fromRange, toRange);
+        return new ResponseEntity<>(books, HttpStatus.OK);
     }
-	
-	//Get book details by {id}
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getBookDetailById(@PathVariable("id") Integer bookId) {
-		return new ResponseEntity< >(bookService.getBookDetailById(bookId), HttpStatus.OK);
-	}
-	
-	//Add new book
-	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+
+    //Get book details by {id}
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getBookDetailById(@PathVariable("id") Long bookId) {
+        return new ResponseEntity<>(bookService.getBookDetailById(bookId), HttpStatus.OK);
+    }
+
+    //Add new book
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> addBook(@Valid @RequestPart("request") BookRequest request,
-									@RequestPart("image") MultipartFile file,
-		 							@CurrentAccount Account currUser) {
-		try {
-			return new ResponseEntity< >(bookService.addBook(request, file, currUser), HttpStatus.CREATED);
-		} catch (Exception e) {
-			String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-		}
+                                     @RequestPart("image") MultipartFile file,
+                                     @CurrentAccount Account currUser) {
+        try {
+            return new ResponseEntity<>(bookService.addBook(request, file, currUser), HttpStatus.CREATED);
+        } catch (Exception e) {
+            String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+        }
     }
-	
-	//Update book by id
+
+    //Update book by id
     @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> updateBook(@Valid @RequestPart("request") BookRequest request, 
-    									@RequestPart(name="image", required=false) MultipartFile file,
-    									@PathVariable("id") Integer id,
-    									@CurrentAccount Account currUser) {
-    	
-    	try {
-			return new ResponseEntity<>(bookService.updateBook(request, file, id, currUser), HttpStatus.CREATED);
-		} catch (Exception e) {
-			String message = "Failed to update book!";
-			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-		}
+    public ResponseEntity<?> updateBook(@Valid @RequestPart("request") BookRequest request,
+                                        @RequestPart(name = "image", required = false) MultipartFile file,
+                                        @PathVariable("id") Long id,
+                                        @CurrentAccount Account currUser) {
+
+        try {
+            return new ResponseEntity<>(bookService.updateBook(request, file, id, currUser), HttpStatus.CREATED);
+        } catch (Exception e) {
+            String message = "Failed to update book!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+        }
     }
-    
+
     //Delete book by {id}
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> deleteBook(@PathVariable("id") int id,
-										@CurrentAccount Account currUser) {
+    public ResponseEntity<?> deleteBook(@PathVariable("id") Long id,
+                                        @CurrentAccount Account currUser) {
         return new ResponseEntity<>(bookService.deleteBook(id, currUser), HttpStatus.OK);
     }
-    
+
     //Delete multiple books by lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> deleteBooks(@RequestParam("ids") List<Integer> ids,
-										@CurrentAccount Account currUser) {
+    public ResponseEntity<?> deleteBooks(@RequestParam("ids") List<Long> ids,
+                                         @CurrentAccount Account currUser) {
         bookService.deleteBooks(ids, currUser);
         return new ResponseEntity<>("Products delete successfully!", HttpStatus.OK);
     }
-    
+
     //Delete all books
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
@@ -127,12 +130,12 @@ public class BookController {
         bookService.deleteAllBooks(currUser);
         return new ResponseEntity<>("All products deleted successfully!", HttpStatus.OK);
     }
-	
-	//Test purpose
-	@GetMapping("/test/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getTest(@PathVariable("id") long bookId){
-        Account test =  accRepo.findByUserName("chuotcon1").orElse(null);
-        return new ResponseEntity< >(test, HttpStatus.OK);
+
+    //Test purpose
+    @GetMapping("/test/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getTest(@PathVariable("id") long bookId) {
+        Account test = accRepo.findByUserName("chuotcon1").orElse(null);
+        return new ResponseEntity<>(test, HttpStatus.OK);
     }
 }

@@ -61,37 +61,28 @@ public class BookServiceImpl implements BookService {
     }
 
     //Get books with filter
-    public Page<BookDTO> getBooks(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                                  String keyword, Integer cateId, List<Integer> pubId, String seller, String type, Double fromRange, Double toRange) {
+    public Page<BookDTO> getBooks(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword, Integer rating, Integer amount,
+                                  Integer cateId, List<Integer> pubId, String seller, String type, Double fromRange, Double toRange) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
-        //Convert these to string
-        String cateIdString = "";
-        String[] pubListString = {""};
-
-        if (cateId != 0) cateIdString = String.valueOf(cateId);
-        if (!pubId.isEmpty()) {
-            List<Integer> pubList = pubRepo.findAllIds();
-            pubList.removeAll(pubId);
-            pubListString = Arrays.toString(pubList.toArray()).split("[\\[\\]]")[1].split(", ");
-        }
-
         //Fetch from database
         Page<IBookDisplay> booksList = bookRepo.findBooksWithFilter(keyword
-                , cateIdString
-                , pubListString
+                , cateId
+                , pubId
                 , seller
                 , type
                 , fromRange
                 , toRange
+                , rating
+                , amount
                 , pageable);
         Page<BookDTO> bookDtos = booksList.map(bookMapper::displayToBookDTO);
         return bookDtos;
     }
 
     //Get display book info by {id}
-    public BookDetailDTO getBookDetailById(Integer id) {
+    public BookDetailDTO getBookDetailById(Long id) {
         IBookDetail book = bookRepo.findBookDetailById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Product does not exists!"));
         BookDetailDTO bookDetailDTO = bookMapper.detailToDetailDTO(book); //Map to DTO
@@ -141,7 +132,7 @@ public class BookServiceImpl implements BookService {
 
     //Update book (SELLER)
     @Transactional
-    public BookResponseDTO updateBook(BookRequest request, MultipartFile file, Integer id, Account seller) throws IOException, ImageResizerException {
+    public BookResponseDTO updateBook(BookRequest request, MultipartFile file, Long id, Account seller) throws IOException, ImageResizerException {
         //Check book exists & category, publisher validation
         Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
@@ -193,7 +184,7 @@ public class BookServiceImpl implements BookService {
 
     //Delete book (SELLER)
     @Transactional
-    public BookResponseDTO deleteBook(Integer id, Account seller) {
+    public BookResponseDTO deleteBook(Long id, Account seller) {
         Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         //Check if correct seller or admin
         if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
@@ -204,9 +195,9 @@ public class BookServiceImpl implements BookService {
 
     //Delete multiples books (SELLER)
     @Transactional
-    public void deleteBooks(List<Integer> ids, Account seller) {
+    public void deleteBooks(List<Long> ids, Account seller) {
         //Loop and delete
-        for (Integer id : ids) {
+        for (Long id : ids) {
             Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
             //Check if correct seller or admin
             if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
@@ -236,5 +227,4 @@ public class BookServiceImpl implements BookService {
         }
         return result;
     }
-
 }

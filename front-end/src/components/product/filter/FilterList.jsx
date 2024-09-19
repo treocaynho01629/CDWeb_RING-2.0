@@ -21,18 +21,32 @@ const Filter = styled.div`
 `
 
 const FilterText = styled.h3`
-    font-size: 16px;
+    font-size: 14px;
     text-transform: uppercase;
     margin: 5px 0px;
     color: inherit;
     display: flex;
     align-items: center;
+
+    &.secondary {
+      font-size: 13px;
+      color: ${props => props.theme.palette.text.secondary};
+    }
+`
+
+const LabelText = styled.span`
+  font-size: 14px;
 `
 
 const InputContainer = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-size: 14px;
+
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        flex-direction: column;
+    }
 `
 
 const StyledNumberInput = styled(TextField)(({ theme }) => ({
@@ -66,7 +80,7 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
       Array.from(new Array(5)).map((item, index) => (
         <Box key={`cate-${index}`}>
           <ListItemButton>
-            <Skeleton variant="text" sx={{ fontSize: '16px' }} width="70%" />
+            <Skeleton variant="text" sx={{ fontSize: '14px' }} width="70%" />
           </ListItemButton>
         </Box>
       ))
@@ -92,7 +106,7 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
               onClick={() => handleCateChange(id)}
             >
               <FilterText>{cate?.categoryName}</FilterText>
-              {cate.cateSubs.length ?
+              {cate.subCates.length ?
                 <>
                   {open[id] ? <ExpandLess onClick={(e) => handleClick(e, id)} />
                     : <ExpandMore onClick={(e) => handleClick(e, id)} />}
@@ -100,13 +114,13 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
                 : null
               }
             </ListItemButton>
-            {cate?.cateSubs
+            {cate?.subCates
               &&
               <Collapse in={open[id]} timeout="auto" unmountOnExit>
-                {cate.cateSubs?.map((sub, subIndex) => (
-                  <List key={`${sub?.subName}-${subIndex}`} component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 2, py: 0, color: 'text.secondary' }}>
-                      <FilterText>{sub?.subName}</FilterText>
+                {cate.subCates?.map((sub, subIndex) => (
+                  <List key={`${sub?.id}-${subIndex}`} component="div" disablePadding>
+                    <ListItemButton sx={{ pl: 2, py: 0 }}>
+                      <FilterText className="secondary">{sub?.categoryName}</FilterText>
                     </ListItemButton>
                   </List>
                 ))}
@@ -200,9 +214,11 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
                 disableRipple
                 name={pub?.pubName}
                 color="primary"
+                size="small"
                 sx={{ paddingLeft: 0 }} />
             }
-            label={pub?.pubName}
+            sx={{ fontSize: '14px' }}
+            label={<LabelText>{pub?.pubName}</LabelText>}
           />
         )
       })
@@ -414,7 +430,7 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
         color="primary"
         size="large"
         fullWidth
-        sx={{ marginTop: 2 }}
+        sx={{ marginTop: 1 }}
         onClick={handleApply}
       >
         Áp dụng

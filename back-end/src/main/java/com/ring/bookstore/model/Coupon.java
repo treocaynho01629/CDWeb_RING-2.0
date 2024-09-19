@@ -1,26 +1,18 @@
 package com.ring.bookstore.model;
 
-import org.hibernate.annotations.Nationalized;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.SequenceGenerator;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.Nationalized;
 
 
 @Entity
 @Getter
 @Setter
-public class Sub {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class Coupon {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -34,14 +26,11 @@ public class Sub {
             strategy = GenerationType.SEQUENCE,
             generator = "primary_sequence"
     )
-    private Integer id;
+    private Long id;
 
-    @Column(length = 200)
-    @Nationalized 
-    private String subName;
+    @Column(length = 50, nullable = false, unique = true)
+    private String code;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cate_id")
-    @JsonIgnore
-    private Category cate;
+    @Column(name = "active", nullable = false)
+    private boolean active;
 }

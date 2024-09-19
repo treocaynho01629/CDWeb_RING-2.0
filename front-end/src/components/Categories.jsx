@@ -145,7 +145,7 @@ const Categories = () => {
                             </Link>
                         </ItemWrapper>
                         {
-                            cate?.cateSubs?.map((sub, subIndex) => (
+                            cate?.subCates?.map((sub, subIndex) => (
                                 <ItemWrapper key={`sub-${sub?.id}-${subIndex}`}>
                                     <Link to={`/filters?cateId=${cateId}`} title={sub.subName}>
                                         <ItemContainer>{sub?.subName}</ItemContainer>

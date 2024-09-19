@@ -30,7 +30,7 @@ public class OrderDetail {
             strategy = GenerationType.SEQUENCE,
             generator = "primary_sequence"
     )
-    private Integer id;
+    private Long id;
 
     @Column
     private Integer amount;
@@ -51,5 +51,9 @@ public class OrderDetail {
     @JoinColumn(name = "book_id")
     @JsonIgnore
     private Book book;
-   
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id")
+    @JsonIgnore
+    private Coupon coupon;
 }

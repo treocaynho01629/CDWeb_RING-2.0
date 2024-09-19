@@ -6,7 +6,7 @@ import com.ring.bookstore.model.Publisher;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record BookResponseDTO(Integer id,
+public record BookResponseDTO(Long id,
                               Double price,
                               BigDecimal onSale,
                               String title,
@@ -18,6 +18,6 @@ public record BookResponseDTO(Integer id,
                               LocalDate date,
                               String language,
                               Double weight,
-                              Integer amount) {
+                              Short amount) {
 
 }

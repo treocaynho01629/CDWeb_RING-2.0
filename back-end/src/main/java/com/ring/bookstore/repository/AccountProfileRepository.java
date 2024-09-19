@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.ring.bookstore.model.AccountProfile;
 
 @Repository
-public interface AccountProfileRepository extends JpaRepository<AccountProfile, Integer>{
+public interface AccountProfileRepository extends JpaRepository<AccountProfile, Long>{
 	
 }

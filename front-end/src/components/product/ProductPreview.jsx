@@ -16,7 +16,7 @@ const Container = styled.div`
     align-items: center;
     position: relative;
     overflow: hidden;
-    border: .5px solid ${props => props.theme.palette.action.hover};
+    border: .5px solid ${props => props.theme.palette.background.default};
     margin: ${props => props.theme.spacing(.1)} 0;
 
     &:hover {

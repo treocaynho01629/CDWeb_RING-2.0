@@ -146,7 +146,7 @@ public class OrderServiceImpl implements OrderService {
 
 	//Get order with book's {id}
 	@Override
-	public Page<OrderDTO> getOrdersByBookId(Integer id, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+	public Page<OrderDTO> getOrdersByBookId(Long id, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
 	
@@ -166,7 +166,7 @@ public class OrderServiceImpl implements OrderService {
 
 	//Get order by {id}
 	@Override
-	public OrderDTO getOrderById(Integer id) {
+	public OrderDTO getOrderById(Long id) {
 		OrderReceipt order = orderRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order does not exists!"));
 		OrderDTO orderDTO = orderMapper.apply(order); //Map to DTO
 		return orderDTO;
