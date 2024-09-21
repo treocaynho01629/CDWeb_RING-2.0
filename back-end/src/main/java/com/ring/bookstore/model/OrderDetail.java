@@ -33,7 +33,7 @@ public class OrderDetail {
     private Long id;
 
     @Column
-    private Integer amount;
+    private Short amount;
 
     @Column
     private Double price;

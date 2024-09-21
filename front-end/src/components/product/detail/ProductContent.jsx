@@ -248,32 +248,32 @@ const ProductContent = ({ book, handleTabChange, pending, setPending }) => {
                                 {book ?
                                     <>
                                         <UserInfoContainer
-                                            className={book?.rating > 0 ? 'active' : ''}
+                                            className={book?.reviewsInfo?.rating > 0 ? 'active' : ''}
                                             onClick={(e) => handleChangeTab(e, "reviews")}
                                         >
-                                            {book?.rating ?? 0}&nbsp;
+                                            {book?.reviewsInfo?.rating ?? 0}&nbsp;
                                             <StyledRating
                                                 name="product-rating"
-                                                value={book?.rating ?? 0}
+                                                value={book?.reviewsInfo?.rating ?? 0}
                                                 getLabelText={(value) => `${value} star${value !== 1 ? 's' : ''}`}
                                                 precision={0.5}
                                                 icon={<StarIcon fontSize="18" />}
                                                 emptyIcon={<StarBorderIcon fontSize="18" />}
                                                 readOnly
                                             />
-                                            {book?.rating > 0
+                                            {book?.reviewsInfo?.rating > 0
                                                 ? <StarIcon fontSize="18" sx={{ display: { xs: 'block', md_lg: 'none' } }} />
                                                 : <StarBorderIcon fontSize="18" sx={{ display: { xs: 'block', md_lg: 'none' } }} />
                                             }
                                             <Divider orientation="vertical" sx={{ mx: { xs: 0.7, md: 1 } }} flexItem />
                                             <UserInfoText className="rate">
-                                                {book?.rateTime > 0 ?
-                                                    `(${numFormatter(book?.rateTime)}) Đánh giá`
+                                                {book?.reviewsInfo?.totalRates > 0 ?
+                                                    `(${numFormatter(book?.reviewsInfo?.totalRates)}) Đánh giá`
                                                     : 'Chưa có đánh giá'}
                                             </UserInfoText>
                                         </UserInfoContainer>
                                         <Divider orientation="vertical" sx={{ mx: 1, display: { xs: 'none', md: 'block' } }} flexItem />
-                                        <UserInfoText className="hide-on-mobile">Đã bán: {numFormatter(book?.orderTime)}</UserInfoText>
+                                        <UserInfoText className="hide-on-mobile">Đã bán: {numFormatter(book?.totalOrders)}</UserInfoText>
                                         <UserInfoText className="end">Tố cáo</UserInfoText>
                                     </>
                                     :
@@ -298,15 +298,15 @@ const ProductContent = ({ book, handleTabChange, pending, setPending }) => {
                             <PriceContainer>
                                 {book ?
                                     <>
-                                        <Price>{Math.round(book.price * (1 - book.onSale)).toLocaleString()}đ</Price>
-                                        {book?.onSale > 0
+                                        <Price>{Math.round(book.price * (1 - book.discount)).toLocaleString()}đ</Price>
+                                        {book?.discount > 0
                                             &&
                                             <>
                                                 <Discount>{book.price.toLocaleString()}đ</Discount>
-                                                <Percentage>-{book.onSale * 100}%</Percentage>
+                                                <Percentage>-{book.discount * 100}%</Percentage>
                                             </>
                                         }
-                                        <UserInfoText className="end mobile">Đã bán: {numFormatter(book?.orderTime)}</UserInfoText>
+                                        <UserInfoText className="end mobile">Đã bán: {numFormatter(book?.totalOrders)}</UserInfoText>
                                     </>
                                     :
                                     <Skeleton variant="text" sx={{ fontSize: '24px' }} width={200} />

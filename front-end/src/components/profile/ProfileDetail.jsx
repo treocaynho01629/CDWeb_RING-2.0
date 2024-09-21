@@ -139,7 +139,7 @@ const ProfileDetail = ({ pending, setPending }) => {
                                     ?
                                     <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
                                     :
-                                    <InfoText>{profile?.userName}</InfoText>
+                                    <InfoText>{profile?.username}</InfoText>
                                 }
                             </InfoStackContainer></InfoStack>
                         </tr>

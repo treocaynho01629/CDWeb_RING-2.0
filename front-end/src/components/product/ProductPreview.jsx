@@ -109,7 +109,7 @@ const ProductPreview = ({ book, scrollPosition }) => {
         <Container>
             {book
                 ?
-                <Link to={`/product/${book?.id}`} style={{ width: '100%' }}>
+                <Link to={`/product/${book?.slug}`} style={{ width: '100%' }}>
                     <StyledLazyImage
                         src={`${book?.image}?size=small`}
                         alt={`${book?.title} Thumbnail`}
@@ -128,7 +128,7 @@ const ProductPreview = ({ book, scrollPosition }) => {
                     <Info>
                         <Title>{book.title}</Title>
                         <Price>{book.price.toLocaleString()}đ
-                            {book.onSale > 0 && <Percentage>-{book.onSale * 100}%</Percentage>}
+                            {book.discount > 0 && <Percentage>-{book.discount * 100}%</Percentage>}
                         </Price>
                     </Info>
                 </Link>

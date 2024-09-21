@@ -16,13 +16,13 @@ const initialState = booksAdapter.getInitialState({
 export const booksApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getBook: builder.query({
-            query: (id) => ({
-                url: `/api/books/${id}`,
+            query: ({ id, slug }) => ({
+                url: `/api/books/${slug ? 'slug/' + slug : id ? id : ''}`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError
                 },
             }),
-            providesTags: (result, error, id) => [{ type: 'Book', id }]
+            providesTags: (result, error) => [{ type: 'Book', id: result.id }]
         }),
         getBooks: builder.query({
             query: (args) => {

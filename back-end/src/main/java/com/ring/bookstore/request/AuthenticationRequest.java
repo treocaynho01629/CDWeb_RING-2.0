@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class AuthenticationRequest { //Request body for auth
 
 	@NotNull(message = "Tên đăng nhập không được để trống!")	
-	private String userName;
+	private String username;
 	
 	@NotNull(message = "Mật khẩu không được để trống!")
 	private String pass;

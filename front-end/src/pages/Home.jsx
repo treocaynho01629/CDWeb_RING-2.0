@@ -72,7 +72,7 @@ const StyledToggleButton = muiStyled(ToggleButton)(({ theme }) => ({
 
 const orderGroup = [
   {
-    value: 'orderTime',
+    value: 'totalOrders',
     label: 'Bán chạy',
   },
   {

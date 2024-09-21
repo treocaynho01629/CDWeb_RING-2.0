@@ -151,7 +151,7 @@ const ProductAction = ({ book }) => {
                         onClick={() => handleBuyNow(book)}
                     >
                         {book?.amount == 0 ? 'Hết hàng'
-                            : `Mua ngay (${(Math.round(book?.price * (1 - book?.onSale)) * amountIndex).toLocaleString()}đ)`}
+                            : `Mua ngay (${(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)`}
                     </BuyButton>
                 </AltFilterContainer>
                 <Suspense fallback={<></>}>
@@ -170,8 +170,8 @@ const ProductAction = ({ book }) => {
                                 />
                                 <Box>
                                     <Box display="flex">
-                                        <Price>{Math.round(book?.price * (1 - book?.onSale)).toLocaleString()}đ</Price>
-                                        {book?.onSale > 0 && <Discount>{book?.price.toLocaleString()}đ</Discount>}
+                                        <Price>{Math.round(book?.price * (1 - book?.discount)).toLocaleString()}đ</Price>
+                                        {book?.discount > 0 && <Discount>{book?.price.toLocaleString()}đ</Discount>}
                                     </Box>
                                     <AmountCount className={book?.amount > 0 ? '' : 'error'}>
                                         {book?.amount > 0 ? `(${book?.amount}) sản phẩm còn lại` : 'Tạm thời hết hàng'}
@@ -196,7 +196,7 @@ const ProductAction = ({ book }) => {
                                 sx={{ margin: '5px' }}
                                 onClick={() => handleAddToCart(book)}
                             >
-                                Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.onSale)) * amountIndex).toLocaleString()}đ)
+                                Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)
                             </BuyButton>
                         </SwipeableDrawer>
                     }
@@ -244,7 +244,7 @@ const ProductAction = ({ book }) => {
                         onClick={() => handleAddToCart(book)}
                         startIcon={<AddShoppingCart fontSize="small" />}
                     >
-                        Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.onSale)) * amountIndex).toLocaleString()}đ)
+                        Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)
                     </BuyButton>
                 </Box>
             </FilterContainer>

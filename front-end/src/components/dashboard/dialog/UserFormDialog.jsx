@@ -189,7 +189,7 @@ const rolesList = [
 
 const UserFormDialog = ({ open, handleClose, userId }) => {
   //#region construct
-  const [userName, setUserName] = useState('')
+  const [username, setUserName] = useState('')
   const [pass, setPass] = useState('')
   const [email, setEmail] = useState('')
   const [roles, setRoles] = useState(rolesList[0].value)
@@ -227,7 +227,7 @@ const UserFormDialog = ({ open, handleClose, userId }) => {
     // try {
     //   const response = await axiosPrivate.post(ACCOUNT_URL,
     //     JSON.stringify({
-    //       userName: userName, pass: pass, email: email, roles: roles,
+    //       username: username, pass: pass, email: email, roles: roles,
     //       name: name, phone: phone, dob: dob.format('YYYY-MM-DD'), gender: gender, address: address
     //     }),
     //     {
@@ -278,14 +278,14 @@ const UserFormDialog = ({ open, handleClose, userId }) => {
               <CustomInput
                 required
                 margin="dense"
-                id="userName"
+                id="username"
                 label="Tên đăng nhập"
                 fullWidth
                 variant="outlined"
-                value={userName}
+                value={username}
                 onChange={(e) => setUserName(e.target.value)}
-                error={err?.response?.data?.errors?.userName}
-                helperText={err?.response?.data?.errors?.userName}
+                error={err?.response?.data?.errors?.username}
+                helperText={err?.response?.data?.errors?.username}
               />
             </Grid>
             <Grid item xs={12} sm={6}>

@@ -229,7 +229,7 @@ const OrdersList = ({ Title }) => {
                                     <StatusTag><Check />ĐÃ GIAO</StatusTag>
                                 </Link>
                             </HeadContainer>
-                            <Link to={`/product/${detail.bookId}`} style={{ color: 'inherit' }}>
+                            <Link to={`/product/${detail.slug}`} style={{ color: 'inherit' }}>
                                 <BodyContainer>
                                     <Box display="flex">
                                         <StyledLazyImage
@@ -265,7 +265,7 @@ const OrdersList = ({ Title }) => {
                                             Mua lại
                                         </Button>
                                         <Box display={{ xs: 'none', sm: 'block' }}>
-                                            <Link to={`/product/${detail.bookId}?tab=reviews`}>
+                                            <Link to={`/product/${detail.slug}?tab=reviews`}>
                                                 <Button variant="outlined" sx={{ marginLeft: '10px' }}>
                                                     Đánh giá sản phẩm
                                                 </Button>

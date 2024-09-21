@@ -56,7 +56,8 @@ function App() {
                 //ANONYMOUS
               <Route path="/" element={<Home />} />
               <Route path="/filters" element={<FiltersPage />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/product/:slug" element={<ProductDetail />} />
+              <Route path="/product-id/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />
 
                 //USER

@@ -90,7 +90,7 @@ const RegisterTab = ({ pending, setPending }) => {
         const { enqueueSnackbar } = await import('notistack');
 
         register({
-            userName: username,
+            username,
             pass: password,
             email
         }).unwrap()
@@ -147,8 +147,8 @@ const RegisterTab = ({ pending, setPending }) => {
                         aria-invalid={validName ? "false" : "true"}
                         onFocus={() => setUserFocus(true)}
                         onBlur={() => setUserFocus(false)}
-                        error={(userFocus && username && !validName) || err?.data?.errors?.userName}
-                        helperText={userFocus && username && !validName ? "4 đến 24 kí tự." : err?.data?.errors?.userName}
+                        error={(userFocus && username && !validName) || err?.data?.errors?.username}
+                        helperText={userFocus && username && !validName ? "4 đến 24 kí tự." : err?.data?.errors?.username}
                         size="small"
                         margin="dense"
                     />

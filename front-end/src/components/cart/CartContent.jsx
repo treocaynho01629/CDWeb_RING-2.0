@@ -323,7 +323,7 @@ const CartContent = () => {
                                                     onClick={() => handleSelect(product.id)}
                                                 />
                                                 <ItemContainer>
-                                                    <NavLink to={`/product/${product.id}`}>
+                                                    <NavLink to={`/product/${product.slug}`}>
                                                         <StyledLazyImage
                                                             src={`${product.image}?size=small`}
                                                             alt={`${product.title} Cart item`}
@@ -331,13 +331,13 @@ const CartContent = () => {
                                                         />
                                                     </NavLink>
                                                     <ItemSummary>
-                                                        <NavLink to={`/product/${product.id}`}>
+                                                        <NavLink to={`/product/${product.slug}`}>
                                                             <ItemTitle>{product.title}</ItemTitle>
                                                         </NavLink>
                                                         <ItemAction>
                                                             <Box display={{ xs: 'block', md: 'none' }}>
-                                                                {product?.onSale > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
-                                                                <Price>{Math.round(product.price * (1 - (product?.onSale || 0))).toLocaleString()}đ</Price>
+                                                                {product?.discount > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
+                                                                <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
                                                             </Box>
                                                             <Box display={{ xs: 'flex', sm: 'none' }}>
                                                                 <CustomAmountInput
@@ -354,8 +354,8 @@ const CartContent = () => {
                                             </Box>
                                         </StyledTableCell>
                                         <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                            <Price>{Math.round(product.price * (1 - (product?.onSale || 0))).toLocaleString()}đ</Price>
-                                            {product?.onSale > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
+                                            <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
+                                            {product?.discount > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
                                         </StyledTableCell>
                                         <StyledTableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                                             <CustomAmountInput
@@ -367,7 +367,7 @@ const CartContent = () => {
                                             />
                                         </StyledTableCell>
                                         <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                            <Price className="total">{(Math.round(product.price * (1 - (product?.onSale || 0))) * product.quantity).toLocaleString()}đ</Price>
+                                            <Price className="total">{(Math.round(product.price * (1 - (product?.discount || 0))) * product.quantity).toLocaleString()}đ</Price>
                                         </StyledTableCell>
                                         <td>
                                             <IconButton sx={hoverIcon} onClick={(e) => handleClick(e, product)}>

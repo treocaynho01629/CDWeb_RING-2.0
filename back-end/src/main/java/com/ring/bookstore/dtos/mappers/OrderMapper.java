@@ -1,44 +1,60 @@
 package com.ring.bookstore.dtos.mappers;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ring.bookstore.model.*;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.dtos.OrderDTO;
 import com.ring.bookstore.dtos.OrderDetailDTO;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.OrderDetail;
-import com.ring.bookstore.model.OrderReceipt;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Service
-public class OrderMapper implements Function<OrderReceipt, OrderDTO> {
-	
-	@Autowired
-	private OrderDetailMapper detailMapper;
-	
-    @Override
-    public OrderDTO apply(OrderReceipt order) {
+public class OrderMapper {
+
+    public OrderDTO orderToOrderDTO(OrderReceipt order) {
     	
-    	List<OrderDetail> orderDetails = order.getOrderOrderDetails();
-    	List<OrderDetailDTO> detailsDTO = orderDetails.stream().map(detailMapper::apply).collect(Collectors.toList());
+    	List<OrderDetail> orderDetails = order.getDetails();
+    	List<OrderDetailDTO> detailsDTO = orderDetails.stream().map(this::detailToDetailDTO).collect(Collectors.toList());
     	
     	Account user = order.getUser();
-    	String userName = "Người dùng RING!";
-    	if (user != null) userName = user.getUsername();
+    	String username = "Người dùng RING!";
+    	if (user != null) username = user.getUsername();
         
     	return new OrderDTO(order.getId(),
 				order.getFullName(),
         		order.getEmail(), 
         		order.getPhone(),
-        		order.getOAddress(),
-        		order.getOMessage(),
-        		order.getODate(),
+        		order.getOrderAddress(),
+        		order.getOrderMessage(),
+        		order.getOrderDate(),
         		order.getTotal(),
-        		userName,
+        		username,
         		detailsDTO
 		);
     }
+
+	public OrderDetailDTO detailToDetailDTO(OrderDetail detail) {
+
+		Book book = detail.getBook();
+		Shop shop = book.getShop();
+
+		String fileDownloadUri = ServletUriComponentsBuilder
+				.fromCurrentContextPath()
+				.path("/api/images/")
+				.path(book.getImage().getName())
+				.toUriString();
+
+		return new OrderDetailDTO(detail.getId(),
+				shop.getId(),
+				shop.getName(),
+				detail.getAmount(),
+				detail.getPrice(),
+				book.getId(),
+				book.getSlug(),
+				detail.getStatus(),
+				fileDownloadUri,
+				book.getTitle());
+	}
 }

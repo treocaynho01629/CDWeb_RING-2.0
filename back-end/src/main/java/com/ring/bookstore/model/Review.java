@@ -29,8 +29,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
-public class Review {
+@EqualsAndHashCode(callSuper = true)
+public class Review extends Auditable {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -52,9 +52,6 @@ public class Review {
 
     @Column
     private Integer rating;
-
-    @Column
-    private LocalDateTime rDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")

@@ -194,7 +194,7 @@ const EditAccountDialog = (props) => {
 
   // //#region construct
   // const { id, open, setOpen, refetch } = props;
-  // const [userName, setUserName] = useState('')
+  // const [username, setUserName] = useState('')
   // const [pass, setPass] = useState('')
   // const [email, setEmail] = useState('')
   // const [roles, setRoles] = useState(rolesList[0].value)
@@ -212,7 +212,7 @@ const EditAccountDialog = (props) => {
 
   // useEffect(() => {
   //   if (id.length !== 0 && open && data && !loading) {
-  //     setUserName(data?.userName);
+  //     setUserName(data?.username);
   //     setEmail(data?.email);
   //     setRoles(data?.roles);
   //     setName(data?.name);
@@ -266,13 +266,13 @@ const EditAccountDialog = (props) => {
   //   const { enqueueSnackbar } = await import('notistack');
 
   //   let json = JSON.stringify({
-  //     userName: userName, pass: pass, email: email, roles: roles, keepOldPass: keep,
+  //     username: username, pass: pass, email: email, roles: roles, keepOldPass: keep,
   //     name: name, phone: phone, dob: dob.format('YYYY-MM-DD'), gender: gender, address: address
   //   })
 
   //   if (keep) {
   //     json = JSON.stringify({
-  //       userName: userName, pass: '................', email: email, roles: roles, keepOldPass: keep,
+  //       username: username, pass: '................', email: email, roles: roles, keepOldPass: keep,
   //       name: name, phone: phone, dob: dob.format('YYYY-MM-DD'), gender: gender, address: address
   //     })
   //   }
@@ -318,14 +318,14 @@ const EditAccountDialog = (props) => {
   //             <CustomInput
   //               required
   //               margin="dense"
-  //               id="userName"
+  //               id="username"
   //               label="Tên đăng nhập"
   //               fullWidth
   //               variant="outlined"
-  //               value={userName}
+  //               value={username}
   //               onChange={(e) => setUserName(e.target.value)}
-  //               error={err?.response?.data?.errors?.userName}
-  //               helperText={err?.response?.data?.errors?.userName}
+  //               error={err?.response?.data?.errors?.username}
+  //               helperText={err?.response?.data?.errors?.username}
   //             />
   //           </Grid>
   //           <Grid item xs={12} sm={6}>

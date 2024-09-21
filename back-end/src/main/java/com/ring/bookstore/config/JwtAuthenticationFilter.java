@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //JWT authen
         //Get bearer authentication from HttpRequest
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        final String userName;
+        final String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) { //Null || not Bearer >> cancel
             filterChain.doFilter(request, response);
@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //JWT authen
 
         jwt = authHeader.substring(7); //After "Bearer "
         try {
-            userName = jwtService.extractUsername(jwt); //Extract username from JWT
+            username = jwtService.extractUsername(jwt); //Extract username from JWT
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); //Not exists >> throw error
             response.getWriter().write(e.getMessage());
@@ -61,8 +61,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //JWT authen
             return;
         }
 
-        if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) { //Check user exists or not & their roles
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) { //Check user exists or not & their roles
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
             if (jwtService.isTokenValid(jwt, userDetails)) { //Check valid JWT
                 //Create auth token

@@ -22,7 +22,7 @@ const headCells = [
     label: 'ID',
   },
   {
-    id: 'userName',
+    id: 'username',
     align: 'left',
     disablePadding: false,
     sortable: true,

@@ -31,7 +31,7 @@ const DetailAccount = () => {
     };
 
     //Set title
-    useTitle(`Người dùng: ${data?.userName ?? 'RING - Người dùng'}`);
+    useTitle(`Người dùng: ${data?.username ?? 'RING - Người dùng'}`);
 
     return (
         <>
@@ -44,7 +44,7 @@ const DetailAccount = () => {
                             {data?.roles == 3 ? 'ADMIN' : data?.roles == 2 ? 'SELLER' : 'MEMBER'}
                         </Typography>
                         <Typography component="div" variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                            {data?.userName}
+                            {data?.username}
                         </Typography>
                         <Typography component="div" variant="subtitle1" color="text.secondary" sx={{ fontWeight: '500' }}>
                             Giới tính: {data?.gender == '' ? 'Không' : data?.gender}
@@ -110,7 +110,7 @@ const DetailAccount = () => {
                 <Grid container spacing={3}>
                     {data?.roles >= 2 ?
                         <Grid item lg={12}>
-                            <TableProducts mini={true} sellerName={data?.userName} />
+                            <TableProducts mini={true} sellerName={data?.username} />
                         </Grid>
                         : null
                     }

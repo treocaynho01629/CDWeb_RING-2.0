@@ -3,11 +3,15 @@ package com.ring.bookstore.service.impl;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.github.slugify.Slugify;
 import com.ring.bookstore.dtos.BookResponseDTO;
 import com.ring.bookstore.dtos.projections.IBookDetail;
 import com.ring.bookstore.exception.ImageResizerException;
+import com.ring.bookstore.model.*;
+import com.ring.bookstore.repository.*;
 import com.ring.bookstore.service.ImageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,16 +30,6 @@ import com.ring.bookstore.dtos.mappers.BookMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Book;
-import com.ring.bookstore.model.BookDetail;
-import com.ring.bookstore.model.Category;
-import com.ring.bookstore.model.Image;
-import com.ring.bookstore.model.Publisher;
-import com.ring.bookstore.repository.BookDetailRepository;
-import com.ring.bookstore.repository.BookRepository;
-import com.ring.bookstore.repository.CategoryRepository;
-import com.ring.bookstore.repository.PublisherRepository;
 import com.ring.bookstore.request.BookRequest;
 import com.ring.bookstore.service.BookService;
 
@@ -46,12 +40,14 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class BookServiceImpl implements BookService {
 
-    private final PublisherRepository pubRepo;
     private final BookRepository bookRepo;
     private final BookDetailRepository detailRepo;
+    private final PublisherRepository pubRepo;
     private final CategoryRepository cateRepo;
+    private final ShopRepository shopRepo;
     private final ImageService imageService;
     private final BookMapper bookMapper;
+    private final Slugify slg = Slugify.builder().lowerCase(false).build();
 
     //Get random books
     public List<BookDTO> getRandomBooks(Integer amount) {
@@ -62,21 +58,13 @@ public class BookServiceImpl implements BookService {
 
     //Get books with filter
     public Page<BookDTO> getBooks(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword, Integer rating, Integer amount,
-                                  Integer cateId, List<Integer> pubId, String seller, String type, Double fromRange, Double toRange) {
+                                  Integer cateId, List<Integer> pubId, Long shopId, Long sellerId, String type, Double fromRange, Double toRange) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<IBookDisplay> booksList = bookRepo.findBooksWithFilter(keyword
-                , cateId
-                , pubId
-                , seller
-                , type
-                , fromRange
-                , toRange
-                , rating
-                , amount
-                , pageable);
+        Page<IBookDisplay> booksList = bookRepo.findBooksWithFilter(keyword, cateId, pubId, shopId
+                , sellerId, type, fromRange, toRange, rating, amount, pageable);
         Page<BookDTO> bookDtos = booksList.map(bookMapper::displayToBookDTO);
         return bookDtos;
     }
@@ -89,15 +77,28 @@ public class BookServiceImpl implements BookService {
         return bookDetailDTO;
     }
 
+    //Get display book info by {slug}
+    public BookDetailDTO getBookDetailBySlug(String slug) {
+        IBookDetail book = bookRepo.findBookDetailBySlug(slug).orElseThrow(() ->
+                new ResourceNotFoundException("Product does not exists!"));
+        BookDetailDTO bookDetailDTO = bookMapper.detailToDetailDTO(book); //Map to DTO
+        return bookDetailDTO;
+    }
+
     //Add book (SELLER)
     @Transactional
     public BookResponseDTO addBook(BookRequest request, MultipartFile file, Account seller) throws IOException, ImageResizerException {
-        //Category & publisher validation
+        //Validation
         Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
+        Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
+        if (!Objects.equals(shop.getOwner().getId(), seller.getId())) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid owner!");
 
         //Image upload
         Image savedImage = imageService.upload(file);
+
+        //Slugify
+        String slug = slg.slugify(request.getTitle());
 
         //Create new book
         var book = Book.builder()
@@ -107,10 +108,11 @@ public class BookServiceImpl implements BookService {
                 .price(request.getPrice())
                 .publisher(pub)
                 .cate(cate)
-                .seller(seller)
+                .shop(shop)
                 .author(request.getAuthor())
                 .amount(request.getAmount())
                 .type(request.getType())
+                .slug(slug)
                 .build();
         Book addedBook = bookRepo.save(book); //Save to database
 
@@ -168,6 +170,9 @@ public class BookServiceImpl implements BookService {
         detailRepo.save(currDetail); //Save new details to database
 
         //Set new info
+        String slug = slg.slugify(request.getTitle());
+
+        book.setSlug(slug);
         book.setTitle(request.getTitle());
         book.setDescription(request.getDescription());
         book.setPrice(request.getPrice());
@@ -219,9 +224,9 @@ public class BookServiceImpl implements BookService {
     //Check valid role function
     protected boolean isSellerValid(Book book, Account seller) {
         boolean result = false;
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current user
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
         //Check if is admin or valid seller id
-        if (book.getSeller().getId().equals(seller.getId())
+        if (book.getShop().getOwner().getId().equals(seller.getId())
                 || (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())))) {
             result = true;
         }

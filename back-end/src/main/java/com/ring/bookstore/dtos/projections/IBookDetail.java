@@ -5,11 +5,23 @@ import com.ring.bookstore.model.Book;
 public interface IBookDetail {
     Book getBook();
 
+    Long getShopId();
+
     String getImage();
+
+    Integer getTotalOrders();
 
     Double getRating();
 
-    Integer getRateTime();
+    Integer getTotalRates();
 
-    Integer getOrderTime();
+    Integer getFive();
+
+    Integer getFour();
+
+    Integer getThree();
+
+    Integer getTwo();
+
+    Integer getOne();
 }

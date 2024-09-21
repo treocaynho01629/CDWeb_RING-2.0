@@ -388,13 +388,13 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
                 />
                 <Box>
                   <ItemTitle>{book.title}</ItemTitle>
-                  <ItemTitle className="secondary">Đã bán: {book.orderTime}</ItemTitle>
+                  <ItemTitle className="secondary">Đã bán: {book.totalOrders}</ItemTitle>
                 </Box>
               </Link>
             </TableCell>
             <TableCell align="left">
-              <ItemTitle>{Math.round(book.price * (1 - book.onSale)).toLocaleString()}đ</ItemTitle>
-              {book.onSale > 0 && <ItemTitle className="secondary">-{book.onSale * 100}%</ItemTitle>}
+              <ItemTitle>{Math.round(book.price * (1 - book.discount)).toLocaleString()}đ</ItemTitle>
+              {book.discount > 0 && <ItemTitle className="secondary">-{book.discount * 100}%</ItemTitle>}
             </TableCell>
             <TableCell align="center">
               <LinearProgress color={stockStatus} variant="determinate" value={stockProgress} />

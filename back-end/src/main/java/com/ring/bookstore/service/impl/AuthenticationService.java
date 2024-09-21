@@ -58,7 +58,7 @@ public class AuthenticationService {
 	public AuthenticationResponse register(RegisterRequest request) {
 
 		//Check if user with this username already exists
-		if (accountRepo.existsByUserName(request.getUserName())) {
+		if (accountRepo.existsByUsername(request.getUsername())) {
 			throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Người dùng với tên đăng nhập này đã tồn tại!");
 		} else {
 			
@@ -68,7 +68,7 @@ public class AuthenticationService {
 					.orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "No roles has been set")));
 			
 			//Create and set new Account info
-			var acc = Account.builder().userName(request.getUserName()).pass(passwordEncoder.encode(request.getPass()))
+			var acc = Account.builder().username(request.getUsername()).pass(passwordEncoder.encode(request.getPass()))
 					.email(request.getEmail()).roles(roles).build();
 			
 			accountRepo.save(acc); //Save to database
@@ -82,7 +82,7 @@ public class AuthenticationService {
 					+ "Tài khoản của bạn đã được đăng ký thành công!\r\n"
 					+ "</h2>\n"
 					+ "<h3>Tài khoản RING!:</h3>\n"
-					+ "<p><b>- Tên đăng nhập: </b>" + request.getUserName() + " đã đăng ký thành công</p>\n"
+					+ "<p><b>- Tên đăng nhập: </b>" + request.getUsername() + " đã đăng ký thành công</p>\n"
 					+ "<p>- Chúc bạn có trả nghiệm vui vẻ khi mua sách tại RING! - BOOKSTORE</p>\n"
 					+ "<br><p>Liên hệ hỗ trợ khi cần thiết: <b>ringbookstore@ring.email</b></p>\n"
 					+ "<br><br><h3>Cảm ơn đã tham gia!</h3>\n";
@@ -99,13 +99,13 @@ public class AuthenticationService {
 	//Authenticate
 	public AuthenticationResponse authenticate(AuthenticationRequest request) throws ResourceNotFoundException {
 		//Check if user with this username exists
-		var user = accountRepo.findByUserName(request.getUserName())
+		var user = accountRepo.findByUsername(request.getUsername())
 				.orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
 
 		//Validate token
 		try {
 			Authentication authentication = authenticationManager
-					.authenticate(new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPass()));
+					.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPass()));
 
 			SecurityContextHolder.getContext().setAuthentication(authentication); //All good >> security context
 		} catch (Exception e) {
@@ -130,15 +130,15 @@ public class AuthenticationService {
 		//Get request JWT from Header
 		final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 		final String refreshToken;
-		final String userName;
+		final String username;
 
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) { return; } //Not valid Bearer header
 
 		refreshToken = authHeader.substring(7); //After "Bearer "
-		userName = jwtService.extractRefreshUsername(refreshToken); //Get username from token
+		username = jwtService.extractRefreshUsername(refreshToken); //Get username from token
 
-		if (userName != null) { //Check if this username exists
-			var user = this.accountRepo.findByUserName(userName)
+		if (username != null) { //Check if this username exists
+			var user = this.accountRepo.findByUsername(username)
 					.orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
 
 			if (jwtService.isRefreshTokenValid(refreshToken, user)) { //Validate token

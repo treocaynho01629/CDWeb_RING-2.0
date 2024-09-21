@@ -15,9 +15,9 @@ import com.ring.bookstore.model.Account;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long>{
 	
-	boolean existsByUserName(String userName); //Check exists Account by {userName}
+	boolean existsByUsername(String username); //Check exists Account by {username}
 	
-	Optional<Account> findByUserName(String userName); //Get Account by {userName}
+	Optional<Account> findByUsername(String username); //Get Account by {username}
 	
 	List<Account> findByEmail(String email); //Get Account by {email}
 	
@@ -25,7 +25,7 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	
 	@Query("""
 	select a from Account a 
-	where concat (a.email, a.userName) ilike %:keyword%
+	where concat (a.email, a.username) ilike %:keyword%
 	and size(a.roles) <= :maxRoles
 	and size(a.roles) > :minRoles
 	""")
@@ -47,10 +47,10 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	List<Map<String,Object>> getTopUser(); //Top 7 users base on receipts and reviews
 	
 	@Query("""
-	select a.userName as name, coalesce(sum(o.amount), 0) as books, coalesce(sum(o.amount * o.price), 0) as sales
-	from Account a join Book b on a.id = b.seller.id 
+	select a.username as name, coalesce(sum(o.amount), 0) as books, coalesce(sum(o.amount * o.price), 0) as sales
+	from Account a join Book b on a.id = b.shop.owner.id 
 	left join OrderDetail o on b.id = o.book.id
-	group by a.userName
+	group by a.username
 	order by sales desc
 	""")
 	List<Map<String,Object>> getTopSeller(); //Top sellers base on sale (username, total amount sold, total sales)

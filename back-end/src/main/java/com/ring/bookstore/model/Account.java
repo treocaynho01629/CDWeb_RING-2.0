@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,8 +27,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-public class Account implements UserDetails {
+@EqualsAndHashCode(callSuper = true)
+public class Account extends Auditable implements UserDetails {
 
     /**
 	 * 
@@ -48,7 +50,7 @@ public class Account implements UserDetails {
     private Long id;
 
     @Column(unique = true, nullable = false, length = 30)
-    private String userName;
+    private String username;
 
     @Column(nullable = false, length = 500)
     @JsonIgnore
@@ -67,7 +69,7 @@ public class Account implements UserDetails {
     @JsonIgnore
     private String resetPassToken;
     
-    @Column(nullable = true)
+    @Column
     @JsonIgnore
 	private LocalDateTime tokenCreationDate;
 
@@ -83,16 +85,9 @@ public class Account implements UserDetails {
     @JsonIgnore
     private Set<Role> roles;
 
-	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinTable(	name = "following",
-			joinColumns = @JoinColumn(name = "user_id"),
-			inverseJoinColumns = @JoinColumn(name = "follower_id"))
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<Account> followers;
-    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "seller", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Book> sellBooks;
+	private List<Shop> shops;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -116,7 +111,7 @@ public class Account implements UserDetails {
 
 	@Override
 	public String getUsername() {
-		return this.userName;
+		return this.username;
 	}
 	
 	@Override
@@ -152,12 +147,7 @@ public class Account implements UserDetails {
         userReviews.forEach(review -> review.setUser(null));
         this.userReviews.clear();
     }
-	
-	public void removeAllBooks() {
-		sellBooks.forEach(book -> book.setSeller(null));
-        this.sellBooks.clear();
-    }
-	
+
 	public void removeAllRoles() {
         this.roles.clear();
     }

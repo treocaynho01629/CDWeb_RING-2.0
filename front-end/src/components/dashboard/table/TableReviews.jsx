@@ -21,7 +21,7 @@ const headCells = [
     label: 'ID',
   },
   {
-    id: 'user.userName',
+    id: 'user.username',
     align: 'left',
     width: '200px',
     disablePadding: false,
@@ -358,9 +358,9 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
             }
             <TableCell align="left">
               <Link to={`/user/${review.userId}`} style={{ display: 'flex', alignItems: 'center' }}>
-                <Avatar sx={{ marginRight: 1 }}>{review?.userName?.charAt(0) ?? ''}</Avatar>
+                <Avatar sx={{ marginRight: 1 }}>{review?.username?.charAt(0) ?? ''}</Avatar>
                 <Box>
-                  <ItemTitle>{review.userName}</ItemTitle>
+                  <ItemTitle>{review.username}</ItemTitle>
                   <ItemTitle className="secondary">ID: #{('00000' + review.userId).slice(-5)}</ItemTitle>
                 </Box>
               </Link>

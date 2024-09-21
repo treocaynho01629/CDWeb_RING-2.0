@@ -88,13 +88,13 @@ public class JwtService {
 	
 	//JWT validation
 	public boolean isTokenValid(String token, UserDetails userDetails) {
-		final String userName = extractUsername(token); //Extract name
-		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token, getSignInKey()); //Check expiration and valid username
+		final String username = extractUsername(token); //Extract name
+		return (username.equals(userDetails.getUsername())) && !isTokenExpired(token, getSignInKey()); //Check expiration and valid username
 	}
 
 	public boolean isRefreshTokenValid(String token, UserDetails userDetails) {
-		final String userName = extractRefreshUsername(token); //Extract refresh username
-		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token, getRefreshSignInKey()); //Check expiration and valid username
+		final String username = extractRefreshUsername(token); //Extract refresh username
+		return (username.equals(userDetails.getUsername())) && !isTokenExpired(token, getRefreshSignInKey()); //Check expiration and valid username
 	}
 	
 	//Check JWT expired or not

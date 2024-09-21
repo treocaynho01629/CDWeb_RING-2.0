@@ -58,7 +58,7 @@ const Review = ({ review }) => {
             <Profiler>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Box display={{ xs: 'none', md: 'flex' }}>
-                        <RatingInfo><Avatar sx={{ width: '20px', height: '20px', marginRight: '5px' }}>A</Avatar>{review.userName}</RatingInfo>
+                        <RatingInfo><Avatar sx={{ width: '20px', height: '20px', marginRight: '5px' }}>A</Avatar>{review.username}</RatingInfo>
                         <RatingInfo><AccessTimeIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />{date.getHours() + ":" + date.getMinutes()}</RatingInfo>
                     </Box>
                     <RatingInfo><CalendarMonthIcon sx={{ fontSize: 18, marginRight: '5px', color: '#63e399' }} />{date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear()}</RatingInfo>
