@@ -13,9 +13,10 @@ const useCart = () => {
         enqueueSnackbar('Đã thêm sản phẩm vào giỏ hàng!', { variant: 'success' });
         dispatch(addToCart({
             id: item.id,
+            slug: item.slug,
             title: item.title,
             price: item.price,
-            onSale: item.onSale,
+            discount: item.discount,
             image: item.image,
             amount: item.amount,
             quantity,

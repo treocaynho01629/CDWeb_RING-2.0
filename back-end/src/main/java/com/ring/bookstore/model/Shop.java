@@ -1,25 +1,19 @@
 package com.ring.bookstore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import java.time.LocalDate;
-
+import lombok.*;
 import org.hibernate.annotations.Nationalized;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-public class AccountProfile {
+@EqualsAndHashCode(callSuper = true)
+public class Shop extends Auditable {
 	@Id
     @Column(nullable = false, updatable = false)
     @SequenceGenerator(
@@ -39,22 +33,33 @@ public class AccountProfile {
 	@Nationalized 
     private String name;
 
-	@Column(length = 15)
-    private String phone;
+	@Column(length = 500)
+    private String description;
 
-    @Column(length = 10)
-    @Nationalized 
-    private String gender;
-
-    @Column
-    private LocalDate dob;
-
-    @Column(length = 500)
-    @Nationalized 
-    private String address;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
     @JsonIgnore
-    private Account user;
+    private Account owner;
+
+    @OneToOne(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
+    @JoinColumn(name = "image_id")
+    private Image image;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shop", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Book> books;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(	name = "following",
+            joinColumns = @JoinColumn(name = "shop_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id"))
+    @JsonIgnore
+    private List<Account> followers;
+
+    public void removeAllBooks() {
+        books.forEach(book -> book.setShop(null));
+        this.books.clear();
+    }
 }

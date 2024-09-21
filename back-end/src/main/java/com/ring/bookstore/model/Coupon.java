@@ -12,7 +12,7 @@ import org.hibernate.annotations.Nationalized;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Coupon {
+public class Coupon extends Auditable {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -30,7 +30,4 @@ public class Coupon {
 
     @Column(length = 50, nullable = false, unique = true)
     private String code;
-
-    @Column(name = "active", nullable = false)
-    private boolean active;
 }

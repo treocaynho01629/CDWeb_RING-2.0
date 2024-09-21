@@ -21,7 +21,7 @@ const headCells = [
     label: 'ID',
   },
   {
-    id: 'user.userName',
+    id: 'user.username',
     align: 'left',
     width: '200px',
     disablePadding: false,
@@ -173,7 +173,7 @@ function OrderRow({ isSelected, isOrderSelected, index, id, order, dense, handle
         }
         <TableCell align="left">
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Avatar sx={{ marginRight: 1 }}>{order?.userName?.charAt(0) ?? ''}</Avatar>
+            <Avatar sx={{ marginRight: 1 }}>{order?.username?.charAt(0) ?? ''}</Avatar>
             <Box>
               <ItemTitle>{order.fullName}</ItemTitle>
               <ItemTitle className="secondary">{order.email}</ItemTitle>

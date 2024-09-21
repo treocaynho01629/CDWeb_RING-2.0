@@ -1,41 +1,37 @@
 package com.ring.bookstore.dtos.mappers;
 
+import com.ring.bookstore.dtos.ProfileDTO;
+import com.ring.bookstore.dtos.ShopDTO;
+import com.ring.bookstore.dtos.projections.IShopDetail;
+import com.ring.bookstore.model.Account;
+import com.ring.bookstore.model.AccountProfile;
+import com.ring.bookstore.model.Shop;
+import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import java.time.LocalDate;
 import java.util.function.Function;
 
-import org.springframework.stereotype.Service;
-
-import com.ring.bookstore.dtos.ProfileDTO;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.AccountProfile;
-
 @Service
-public class ProfileMapper implements Function<Account, ProfileDTO> {
+public class ShopMapper implements Function<IShopDetail, ShopDTO> {
 	
     @Override
-    public ProfileDTO apply(Account user) {
-    	
-    	AccountProfile profile = user.getProfile();
-    	String name = "";
-    	String phone = "";
-    	String gender = "";
-    	String address = "";
-    	LocalDate dob = LocalDate.of(2000, 1, 1);
+    public ShopDTO apply(IShopDetail shop) {
 
-    	if (profile != null) {
-    		name = (name = profile.getName()) != null ? name : "";
-    		phone = (phone = profile.getPhone()) != null ? phone : "";
-    		gender = (gender = profile.getGender()) != null ? gender : "";
-    		address = (address = profile.getAddress()) != null ? address : "";
-    		dob = (dob = profile.getDob()) != null ? dob : LocalDate.of(2000, 1, 1);
-    	}
-    	
-        return new ProfileDTO(user.getUsername()
-        		,user.getEmail()
-        		,name
-        		,phone
-        		,gender
-        		,dob
-        		,address);
+        String fileDownloadUri = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/images/")
+                .path(shop.getImage())
+                .toUriString();
+
+        return new ShopDTO(shop.getOwnerUsername()
+				, shop.getOwnerId()
+        		, shop.getName()
+        		, shop.getDescription()
+        		, fileDownloadUri
+        		, shop.getJoinedDate()
+        		, shop.getTotalReviews()
+                , shop.getTotalProducts()
+        		, shop.getTotalFollowers());
     }
 }

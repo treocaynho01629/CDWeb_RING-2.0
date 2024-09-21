@@ -21,13 +21,13 @@ public class ProfileMapper implements Function<Account, ProfileDTO> {
     	String gender = "";
     	String address = "";
     	LocalDate dob = LocalDate.of(2000, 1, 1);
+
     	if (profile != null) {
     		name = (name = profile.getName()) != null ? name : "";
     		phone = (phone = profile.getPhone()) != null ? phone : "";
     		gender = (gender = profile.getGender()) != null ? gender : "";
     		address = (address = profile.getAddress()) != null ? address : "";
     		dob = (dob = profile.getDob()) != null ? dob : LocalDate.of(2000, 1, 1);
-    		
     	}
     	
         return new ProfileDTO(user.getUsername()

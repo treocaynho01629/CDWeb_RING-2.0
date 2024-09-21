@@ -172,7 +172,7 @@ function Item({ book, index }) {
                 <Grid size={{ xs: 12, md: 5 }} mb={{ xs: '100px', md: 0 }}>
                     {book
                         ?
-                        <Link to={`/product/${book.id}`}>
+                        <Link to={`/product/${book.slug}`}>
                             <ImgContainer>
                                 <StyledLazyImage
                                     src={book.image}
@@ -208,7 +208,7 @@ function Item({ book, index }) {
                         {book
                             ?
                             <InfoContainer>
-                                <Link to={`/product/${book.id}`} style={{ color: 'inherit' }}>
+                                <Link to={`/product/${book.slug}`} style={{ color: 'inherit' }}>
                                     <Title>{book.title}</Title>
                                     <Description>{book.description}</Description>
                                 </Link>

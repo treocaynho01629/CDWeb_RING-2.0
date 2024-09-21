@@ -2,11 +2,13 @@ package com.ring.bookstore.dtos.mappers;
 
 import com.ring.bookstore.dtos.BookDetailDTO;
 import com.ring.bookstore.dtos.BookResponseDTO;
+import com.ring.bookstore.dtos.ReviewsInfoDTO;
 import com.ring.bookstore.dtos.projections.IBookDetail;
 import com.ring.bookstore.model.Book;
 import com.ring.bookstore.model.BookDetail;
 import com.ring.bookstore.model.Category;
 import com.ring.bookstore.model.Image;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -20,93 +22,113 @@ import java.util.stream.Collectors;
 @Service
 public class BookMapper {
 
-    public BookDTO displayToBookDTO(IBookDisplay book) {
-    	
-    	String fileDownloadUri = ServletUriComponentsBuilder
-  	          .fromCurrentContextPath()
-  	          .path("/api/images/")
-  	          .path(book.getImage())
-  	          .toUriString();
+//	@Autowired
+//	private ShopMapper
 
-		Double rating = book.getRating();
-		Integer orderTime = book.getOrderTime();
+    public BookDTO displayToBookDTO(IBookDisplay book) {
+
+        String fileDownloadUri = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/images/")
+                .path(book.getImage())
+                .toUriString();
+
+        Double rating = book.getRating();
+        Integer totalOrders = book.getTotalOrders();
 
         return new BookDTO(book.getId(),
-				book.getTitle(),
-        		book.getDescription(),
-        		fileDownloadUri,
-        		book.getPrice(),
-				book.getOnSale(),
-				book.getAmount(),
-				rating != null ? rating : 0,
-				orderTime != null ? orderTime : 0);
+                book.getSlug(),
+                book.getTitle(),
+                book.getDescription(),
+                fileDownloadUri,
+                book.getPrice(),
+                book.getDiscount(),
+                book.getAmount(),
+                rating != null ? rating : 0,
+                totalOrders != null ? totalOrders : 0);
     }
 
-	public BookDetailDTO detailToDetailDTO(IBookDetail bookWithDetail) {
-		Book book = bookWithDetail.getBook();
-		Double rating = bookWithDetail.getRating();
-		Integer rateTime = bookWithDetail.getRateTime();
-		Integer orderTime = bookWithDetail.getOrderTime();
+    public BookDetailDTO detailToDetailDTO(IBookDetail bookWithDetail) {
+        Book book = bookWithDetail.getBook();
+        Long shopId = bookWithDetail.getShopId();
+        Integer totalOrders = bookWithDetail.getTotalOrders();
+        Double rating = bookWithDetail.getRating();
+        Integer totalRates = bookWithDetail.getTotalRates();
+        Integer five = bookWithDetail.getFive();
+        Integer four = bookWithDetail.getFour();
+        Integer three = bookWithDetail.getThree();
+        Integer two = bookWithDetail.getTwo();
+        Integer one = bookWithDetail.getOne();
 
-		String fileDownloadUri = ServletUriComponentsBuilder
-				.fromCurrentContextPath()
-				.path("/api/images/")
-				.path(bookWithDetail.getImage())
-				.toUriString();
+        String fileDownloadUri = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/images/")
+                .path(bookWithDetail.getImage())
+                .toUriString();
 
-		BookDetail detail = book.getBookDetail();
-		List<Image> previewImages = detail.getPreviewImages();
-		List<String> images = previewImages
-				.stream()
-				.map(image -> ServletUriComponentsBuilder
-						.fromCurrentContextPath()
-						.path("/api/images/")
-						.path(image.getName())
-						.toUriString())
-				.collect(Collectors.toList());
+        BookDetail detail = book.getBookDetail();
+        List<Image> previewImages = detail.getPreviewImages();
+        List<String> images = previewImages
+                .stream()
+                .map(image -> ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/api/images/")
+                        .path(image.getName())
+                        .toUriString())
+                .collect(Collectors.toList());
 //		List<Category> categories = new ArrayList<Category>();
 //		categories.add()
 //		if (book.getCate().getParent())
 
-		return new BookDetailDTO(book.getId(),
-				fileDownloadUri,
-				images,
-				book.getPrice(),
-				book.getOnSale(),
-				book.getTitle(),
-				book.getDescription(),
-				book.getType(),
-				book.getAuthor(),
-				book.getSeller().getUsername(),
-				book.getPublisher(),
-				book.getCate(),
-				detail.getSize(),
-				detail.getPages(),
-				detail.getBDate(),
-				detail.getBLanguage(),
-				detail.getBWeight(),
-				book.getAmount(),
-				rating != null ? rating : 0.0,
-				rateTime != null ? rateTime : 0,
-				orderTime != null ? orderTime : 0);
-	}
+        return new BookDetailDTO(book.getId(),
+                book.getSlug(),
+                fileDownloadUri,
+                images,
+                book.getPrice(),
+                book.getDiscount(),
+                book.getTitle(),
+                book.getDescription(),
+                book.getType(),
+                book.getAuthor(),
+                shopId,
+                book.getPublisher(),
+                book.getCate(),
+                detail.getSize(),
+                detail.getPages(),
+                detail.getBDate(),
+                detail.getBLanguage(),
+                detail.getBWeight(),
+                book.getAmount(),
+                totalOrders != null ? totalOrders : 0,
+                new ReviewsInfoDTO(
+                        rating != null ? rating : 0.0,
+                        totalRates != null ? totalRates : 0,
+                        five != null ? five : 0,
+                        four != null ? four : 0,
+                        three != null ? three : 0,
+                        two != null ? two : 0,
+                        one != null ? one : 0
+                )
+        );
+    }
 
-	public BookResponseDTO bookToResponseDTO(Book book) {
+    public BookResponseDTO bookToResponseDTO(Book book) {
 
-		BookDetail detail = book.getBookDetail();
+        BookDetail detail = book.getBookDetail();
 
-		return new BookResponseDTO(book.getId(),
-				book.getPrice(),
-				book.getOnSale(),
-				book.getTitle(),
-				book.getDescription(),
-				book.getType(),
-				book.getAuthor(),
-				detail.getSize(),
-				detail.getPages(),
-				detail.getBDate(),
-				detail.getBLanguage(),
-				detail.getBWeight(),
-				book.getAmount());
-	}
+        return new BookResponseDTO(book.getId(),
+                book.getSlug(),
+                book.getPrice(),
+                book.getDiscount(),
+                book.getTitle(),
+                book.getDescription(),
+                book.getType(),
+                book.getAuthor(),
+                detail.getSize(),
+                detail.getPages(),
+                detail.getBDate(),
+                detail.getBLanguage(),
+                detail.getBWeight(),
+                book.getAmount());
+    }
 }

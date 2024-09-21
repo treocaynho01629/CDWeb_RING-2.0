@@ -159,7 +159,7 @@ const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick
 
     const totalPrice = () => {
         let total = 0;
-        selectedProducts?.forEach((item) => (total += item.quantity * Math.round(item.price * (1 - item.onSale))));
+        selectedProducts?.forEach((item) => (total += item.quantity * Math.round(item.price * (1 - item.discount))));
         return total;
     }
 

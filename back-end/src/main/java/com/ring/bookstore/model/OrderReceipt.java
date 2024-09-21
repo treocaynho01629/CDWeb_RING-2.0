@@ -25,6 +25,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Builder
@@ -60,14 +61,15 @@ public class OrderReceipt {
 
     @Column(length = 1000)
     @Nationalized 
-    private String oAddress;
+    private String orderAddress;
 
     @Column(length = 1000)
     @Nationalized 
-    private String oMessage;
+    private String orderMessage;
 
-    @Column
-    private LocalDateTime oDate;
+    @Column(name="order_date", nullable = false, updatable = false)
+    @CreatedDate
+    private LocalDateTime orderDate;
 
     @Column
     private Double total;
@@ -88,15 +90,15 @@ public class OrderReceipt {
     		fetch = FetchType.LAZY)
     @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
-    private List<OrderDetail> orderOrderDetails;
+    private List<OrderDetail> details;
 
     public void addOrderDetail(OrderDetail detail) {
-    	orderOrderDetails.add(detail);
+        details.add(detail);
     	detail.setOrder(this);
     }
  
     public void removeOrderDetail(OrderDetail detail) {
-    	orderOrderDetails.remove(detail);
+        details.remove(detail);
     	detail.setOrder(null);
     }
 }

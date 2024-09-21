@@ -208,7 +208,7 @@ const Product = ({ book, scrollPosition }) => {
             <Wrapper>
                 {book
                     ?
-                    <Link to={`/product/${book.id}`} style={{ width: '100%', height: '100%' }}>
+                    <Link to={`/product/${book.slug}`} style={{ width: '100%', height: '100%' }}>
                         <ItemContainer>
                             <StyledLazyImage
                                 src={`${book?.image}?size=small`}
@@ -233,12 +233,12 @@ const Product = ({ book, scrollPosition }) => {
                                     <ProductInfo>
                                         <Title>{book.title}</Title>
                                         <PriceContainer>
-                                            <Price>{Math.round(book.price * (1 - book.onSale)).toLocaleString()}đ</Price>
+                                            <Price>{Math.round(book.price * (1 - book.discount)).toLocaleString()}đ</Price>
                                             <DiscountContainer>
-                                                {book.onSale > 0
+                                                {book.discount > 0
                                                     ? <>
                                                         <Discount>{book.price.toLocaleString()}đ</Discount>
-                                                        <Percentage>-{book.onSale * 100}%</Percentage>
+                                                        <Percentage>-{book.discount * 100}%</Percentage>
                                                     </>
                                                     : <br />
                                                 }
@@ -255,7 +255,7 @@ const Product = ({ book, scrollPosition }) => {
                                             emptyIcon={<StarBorder style={{ fontSize: 14 }} />}
                                             readOnly
                                         />
-                                        <TextMore className="secondary">Đã bán {numFormatter(book?.orderTime)}</TextMore>
+                                        <TextMore className="secondary">Đã bán {numFormatter(book?.totalOrders)}</TextMore>
                                     </MoreInfo>
                                 </MainInfo>
                             </Info>

@@ -46,7 +46,7 @@ export const orderGroup = [
         label: 'Mới nhất',
     },
     {
-        value: 'orderTime',
+        value: 'totalOrders',
         label: 'Bán chạy',
     },
     {

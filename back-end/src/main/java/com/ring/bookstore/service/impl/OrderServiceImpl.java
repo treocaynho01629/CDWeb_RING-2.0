@@ -1,5 +1,6 @@
 package com.ring.bookstore.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -58,28 +59,31 @@ public class OrderServiceImpl implements OrderService {
 		double total = 0.0; //Total price
 		
 		//Get cart from request
-		if (request.getCart() != null && request.getCart().size() == 0) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Empty cart!"); 
+		if (request.getCart() != null && request.getCart().isEmpty()) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Cart cannot be empty!");
 		
 		//Create new receipt
 		var orderReceipt = OrderReceipt.builder()
 				.fullName(request.getName())
 				.email(user.getEmail())
 				.phone(request.getPhone())
-				.oAddress(request.getAddress())
-				.oMessage(request.getMessage())
-				.oDate(LocalDateTime.now())
+				.orderAddress(request.getAddress())
+				.orderMessage(request.getMessage())
 				.user(user)
 				.build();
 		
 		OrderReceipt savedOrder = orderRepo.save(orderReceipt); //Save receipt to database
 		
 		//Create order details
-		for (CartItem i : request.getCart()) {
+		for (CartItem item : request.getCart()) {
 			//Book validation
-			Book book = bookRepo.findById(i.getId()) 
+			Book book = bookRepo.findById(item.getId())
 			            .orElseThrow(()-> new ResourceNotFoundException("Product does not exists!"));
-			
-			double totalPrice = (i.getQuantity() * book.getPrice()); //Price
+			if (book.getAmount() < item.getQuantity()) throw new ResourceNotFoundException("Product is out of stock!");
+
+			//Calculate
+			double shippingFee = 10000.0;
+			double productPrice = book.getPrice() * (BigDecimal.valueOf(1).subtract(book.getDiscount())).doubleValue();
+			double totalPrice = (item.getQuantity() * productPrice) + shippingFee;
 			total += totalPrice; //Add to total price
 			
 			//Add to email content
@@ -87,24 +91,28 @@ public class OrderServiceImpl implements OrderService {
 			  "<div style=\"display: flex; padding: 5px 15px; border: 0.5px solid lightgray;\">\r\n"
 			+ "	   <div style=\"margin-left: 15px;\">\r\n"
 			+ "      <h3>" + book.getTitle() + "</h3>\r\n"
-			+ "      <p style=\"font-size: 14px;\">x" + i.getQuantity() + "</p>\r\n"
+			+ "      <p style=\"font-size: 14px;\">x" + item.getQuantity() + "</p>\r\n"
 			+ "      <p style=\"font-size: 16px; color: green;\"><b style=\"color: black;\">Thành tiền: </b>" + totalPrice + "đ</p>\r\n"
 			+ "    </div>\r\n"
 			+ "</div><br><br>";
 			
 			//Create details
 			var orderDetail = OrderDetail.builder()
-					.amount(i.getQuantity())
-					.price(book.getPrice())
+					.amount(item.getQuantity())
+					.price(productPrice)
 					.book(book)
 					.order(savedOrder)
 					.status(OrderStatus.PENDING)
 					.build();
-			
+
+			//Decrease product amount
+			book.setAmount((short) (book.getAmount() - item.getQuantity()));
+
+			bookRepo.save(book); //Save after decrement
 			detailRepo.save(orderDetail); //Save details to database
 		}
 		
-		savedOrder.setTotal(total * 1.1 + 10000); //+ fixed taxed total
+		savedOrder.setTotal(total);
 		
 		//Create and send email
         String subject = "RING! - BOOKSTORE: Đặt hàng thành công! "; 
@@ -119,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
                 + "<br><p>Lời nhắn cho shipper: <b>" + request.getMessage() + "</b></p>\n"
                 + "<br><br><h3>Chi tiết sản phẩm:</h3>\n"
                 + cartContent
-                + "<br><br><h3>Tổng đơn giá: <b style=\"color: red\">" + total * 1.1 + 10000 + "đ</b></h3>";
+                + "<br><br><h3>Tổng đơn giá: <b style=\"color: red\">" + total + "đ</b></h3>";
         emailService.sendHtmlMessage(user.getEmail(), subject, content); //Send
 		
 		return orderRepo.save(savedOrder); //Save to database
@@ -137,10 +145,10 @@ public class OrderServiceImpl implements OrderService {
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString()))) {
         	ordersList = orderRepo.findAll(pageable); //Get all if ADMIN
         } else {
-        	ordersList = orderRepo.findAllBySeller(user.getId(), pageable); //If SELLER, only get their
+        	ordersList = orderRepo.findAllBySellerId(user.getId(), pageable); //If SELLER, only get their
         }
 
-		Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::apply);
+		Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::orderToOrderDTO);
 		return ordersDTO;
 	}
 
@@ -151,7 +159,7 @@ public class OrderServiceImpl implements OrderService {
 				: Sort.by(sortBy).descending());
 	
 		Page<OrderReceipt> ordersList = orderRepo.findAllByBookId(id, pageable); //Fetch from database
-		Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::apply);
+		Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::orderToOrderDTO);
 		return ordersDTO;
 	}
 
@@ -159,8 +167,8 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public Page<OrderDTO> getOrdersByUser(Account user, Integer pageNo, Integer pageSize) {
 		Pageable pageable = PageRequest.of(pageNo, pageSize); //Pagination
-		Page<OrderReceipt> ordersList = orderRepo.findAllByUser_Id(user.getId(), pageable); //Fetch from database
-		Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::apply);
+		Page<OrderReceipt> ordersList = orderRepo.findAllByUserId(user.getId(), pageable); //Fetch from database
+		Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::orderToOrderDTO);
 		return ordersDTO;
 	}
 
@@ -168,7 +176,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public OrderDTO getOrderById(Long id) {
 		OrderReceipt order = orderRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order does not exists!"));
-		OrderDTO orderDTO = orderMapper.apply(order); //Map to DTO
+		OrderDTO orderDTO = orderMapper.orderToOrderDTO(order); //Map to DTO
 		return orderDTO;
 	}
 

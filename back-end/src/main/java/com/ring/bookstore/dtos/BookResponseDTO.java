@@ -7,8 +7,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record BookResponseDTO(Long id,
+                              String slug,
+
                               Double price,
-                              BigDecimal onSale,
+                              BigDecimal discount,
                               String title,
                               String description,
                               String type,

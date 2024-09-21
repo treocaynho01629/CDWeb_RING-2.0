@@ -26,7 +26,7 @@ public class BookRequest { //Request body for book
 	private Double price;
 	
 	@NotNull(message = "Số lượng không được bỏ trống!")
-	@Min(value = 1, message = "Số lượng phải trên 1")
+	@Min(value = 0, message = "Số lượng phải trên 0")
 	@Max(value = 199, message = "Kho hàng đã đầy (giới hạn 199)")
 	private Short amount;
 	
@@ -43,10 +43,10 @@ public class BookRequest { //Request body for book
 	private String author;
 	
 	@NotNull(message = "NXB không được bỏ trống!")
-	private int pubId;
+	private Integer pubId;
 	
 	@NotNull(message = "Danh mục không được bỏ trống!")
-	private int cateId;
+	private Integer cateId;
 	
 	@NotNull(message = "Trọng lượng không được bỏ trống!")
 	@Min(value = 1, message = "Trọng lượng phải trên 1g")
@@ -65,4 +65,7 @@ public class BookRequest { //Request body for book
 	
 	@NotBlank(message = "Ngôn ngữ không được bỏ trống!")
 	private String language;
+
+	@NotNull(message = "Shop không được bỏ trống!")
+	private Long shopId;
 }

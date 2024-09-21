@@ -209,7 +209,7 @@ function LinearProgressWithLabel(props) {
                 <ProgressLabel>{label}</ProgressLabel>
             </Box>
             <Box sx={{ width: '100%', mr: 1, color: 'warning.light' }}>
-                <LinearProgress color="inherit" variant="determinate" {...otherProps} />
+                <LinearProgress color="inherit" variant="determinate" value={Math.round(value)} {...otherProps} />
             </Box>
             <Box sx={{ minWidth: 35 }}>
                 <ProgressLabel>{`${Math.round(value)}%`}</ProgressLabel>
@@ -228,11 +228,11 @@ const Review = ({ review, username }) => {
 
     return (
         <>
-            <Profile className={username === review?.userName ? 'active' : ''}>
+            <Profile className={username === review?.username ? 'active' : ''}>
                 <Box sx={{ display: 'flex' }}>
                     <Avatar sx={{ width: { xs: 30, md: 40 }, height: { xs: 30, md: 40 }, marginRight: 1 }} />
                     <Box>
-                        <RatingInfo>{review?.userName}</RatingInfo>
+                        <RatingInfo>{review?.username}</RatingInfo>
                         <StyledRating
                             name="product-rating"
                             value={review?.rating ?? 0}
@@ -259,7 +259,7 @@ const Review = ({ review, username }) => {
     )
 }
 
-const ReviewComponent = ({ id, scrollIntoTab }) => {
+const ReviewComponent = ({ book, id, scrollIntoTab }) => {
     //#region construct
     const { username } = useAuth();
     const location = useLocation();
@@ -394,19 +394,19 @@ const ReviewComponent = ({ id, scrollIntoTab }) => {
                             <Score>5<b>/5</b></Score>
                             <StyledRating
                                 name="product-rating"
-                                value={5}
+                                value={book?.reviewsInfo?.rating}
                                 readOnly
                                 icon={<StarIcon fontSize="medium" />}
                                 emptyIcon={<StarBorderIcon fontSize="medium" />}
                             />
-                            <TotalLabel>(5 đánh giá)</TotalLabel>
+                            <TotalLabel>({book?.reviewsInfo?.totalRates} đánh giá)</TotalLabel>
                         </ScoreContainer>
                         <ProgressContainer>
-                            <LinearProgressWithLabel label="5 sao" value={100} />
-                            <LinearProgressWithLabel label="4 sao" value={100} />
-                            <LinearProgressWithLabel label="3 sao" value={100} />
-                            <LinearProgressWithLabel label="2 sao" value={100} />
-                            <LinearProgressWithLabel label="1 sao" value={100} />
+                            <LinearProgressWithLabel label="5 sao" value={book?.reviewsInfo?.five / book?.reviewsInfo?.totalRates * 100} />
+                            <LinearProgressWithLabel label="4 sao" value={book?.reviewsInfo?.four / book?.reviewsInfo?.totalRates * 100} />
+                            <LinearProgressWithLabel label="3 sao" value={book?.reviewsInfo?.three / book?.reviewsInfo?.totalRates * 100} />
+                            <LinearProgressWithLabel label="2 sao" value={book?.reviewsInfo?.two / book?.reviewsInfo?.totalRates * 100} />
+                            <LinearProgressWithLabel label="1 sao" value={book?.reviewsInfo?.one / book?.reviewsInfo?.totalRates * 100} />
                         </ProgressContainer>
                     </ReviewsSummary>
                 </Box>

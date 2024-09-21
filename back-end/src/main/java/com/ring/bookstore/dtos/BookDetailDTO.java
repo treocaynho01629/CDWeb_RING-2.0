@@ -9,15 +9,17 @@ import com.ring.bookstore.model.Publisher;
 
 //Book details
 public record BookDetailDTO(Long id,
+                            String slug,
+
                             String image,
                             List<String> previewImages,
                             Double price,
-                            BigDecimal onSale,
+                            BigDecimal discount,
                             String title,
                             String description,
                             String type,
                             String author,
-                            String sellerName,
+                            Long shopId,
                             Publisher publisher,
                             Category category,
                             String size,
@@ -26,8 +28,7 @@ public record BookDetailDTO(Long id,
                             String language,
                             Double weight,
                             Short amount,
-                            Double rating,
-                            Integer rateTime,
-                            Integer orderTime) {
+                            Integer totalOrders,
+                            ReviewsInfoDTO reviewsInfo) {
 
 }

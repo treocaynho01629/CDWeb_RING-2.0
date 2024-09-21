@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 public interface IBookDisplay {
     Long getId();
 
+    String getSlug();
+
     String getTitle();
 
     String getDescription();
@@ -14,11 +16,11 @@ public interface IBookDisplay {
 
     Double getPrice();
 
-    BigDecimal getOnSale();
+    BigDecimal getDiscount();
 
     Short getAmount();
 
     Double getRating();
 
-    Integer getOrderTime();
+    Integer getTotalOrders();
 }

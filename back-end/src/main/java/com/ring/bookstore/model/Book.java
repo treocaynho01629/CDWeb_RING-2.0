@@ -36,9 +36,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @Table(indexes = @Index(columnList = "title"))
-public class Book {
+public class Book extends Auditable {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -64,12 +64,12 @@ public class Book {
     private Double price;
 
     @Column(precision = 5, scale = 4)
-    private BigDecimal onSale;
+    private BigDecimal discount;
 
     @Column
     private Short amount;
 
-    @Column(length = 200)
+    @Column(length = 200, unique = true)
     @Nationalized
     private String title;
 
@@ -85,10 +85,13 @@ public class Book {
     @Nationalized
     private String author;
 
+    @Column(unique = true)
+    private String slug;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sell_id")
+    @JoinColumn(name = "shop_id")
     @JsonIgnore
-    private Account seller;
+    private Shop shop;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "publisher_id")

@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 //#endregion
 
 const ProductDetail = () => {
-    const { id } = useParams(); //Book ids
+    const { slug, id } = useParams(); //Book ids
     const [searchParams, setSearchParams] = useSearchParams();
     const [tab, setTab] = useState(searchParams.get("tab") ?? "detail"); //Current tab under detail
     const [pending, setPending] = useState(false); //For reviewing & changing address
@@ -28,7 +28,7 @@ const ProductDetail = () => {
 
     //Fetch data
     const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom } = useGetRandomBooksQuery({ amount: 10 });
-    const { data, isLoading, isFetching, isSuccess, isError, error } = useGetBookQuery(id, { skip: !id });
+    const { data, isLoading, isFetching, isSuccess, isError, error } = useGetBookQuery(slug ? { slug } : id ? { id } : null, { skip: (!slug && !id) });
 
     //Set title
     useTitle(`${data?.title ?? 'RING - Bookstore!'}`);

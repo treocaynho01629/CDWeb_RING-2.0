@@ -51,7 +51,6 @@ public class ReviewServiceImpl implements ReviewService {
                 .book(book)
                 .rating(request.getRating())
                 .rContent(request.getContent())
-                .rDate(LocalDateTime.now())
                 .user(user)
                 .build();
         

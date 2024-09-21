@@ -282,7 +282,7 @@ const ProductDetailContainer = ({ loading, book, scrollIntoTab, mobileMode }) =>
           </Grid>
         </Grid>
       </Stack>
-      <ReviewComponent {...{ id: book?.id, scrollIntoTab }} />
+      <ReviewComponent {...{ book, id: book?.id, scrollIntoTab }} />
     </Stack>
   )
 }

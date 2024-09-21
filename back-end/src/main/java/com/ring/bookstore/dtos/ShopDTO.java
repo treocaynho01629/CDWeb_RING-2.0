@@ -1,15 +1,16 @@
 package com.ring.bookstore.dtos;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-//Shop/Seller
-public record SellerDTO(String username,
-                        String name,
-                        String image,
-                        String gender,
-                        Integer totalReviews,
-                        Integer totalProducts,
-                        Integer totalFollowers,
-                        LocalDate joinedDate) {
+//Shop
+public record ShopDTO(String ownerUsername,
+                      Long ownerId,
+                      String name,
+                      String description,
+                      String image,
+                      LocalDateTime joinedDate,
+                      Integer totalReviews,
+                      Integer totalProducts,
+                      Integer totalFollowers) {
 
 }

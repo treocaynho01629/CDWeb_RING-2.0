@@ -1,27 +1,23 @@
 package com.ring.bookstore.dtos.projections;
 
-import com.ring.bookstore.model.Book;
+import java.time.LocalDateTime;
 
-public interface IBookDetail {
-    Book getBook();
+public interface IShopDetail {
+    String getOwnerUsername();
 
-    Long getShopId();
+    Long getOwnerId();
+
+    String getName();
+
+    String getDescription();
 
     String getImage();
 
-    Integer getOrderTime();
+    Integer getTotalReviews();
 
-    Double getRating();
+    Integer getTotalProducts();
 
-    Integer getRateTime();
+    Integer getTotalFollowers();
 
-    Integer getFive();
-
-    Integer getFour();
-
-    Integer getThree();
-
-    Integer getTwo();
-
-    Integer getOne();
+    LocalDateTime getJoinedDate();
 }

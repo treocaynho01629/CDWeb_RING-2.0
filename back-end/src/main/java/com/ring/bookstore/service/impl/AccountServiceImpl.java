@@ -22,7 +22,6 @@ import com.ring.bookstore.service.EmailService;
 import com.ring.bookstore.service.RoleService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -70,7 +69,7 @@ public class AccountServiceImpl implements AccountService {
     public Account saveAccount(AccountRequest request) {
 
         //Check if Account with these username and email has exists >> throw exception
-        if (!accountRepo.findByUserName(request.getUserName()).isEmpty()) {
+        if (!accountRepo.findByUsername(request.getUsername()).isEmpty()) {
             throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Người dùng với tên đăng nhập này đã tồn tại!");
         }
 
@@ -86,7 +85,7 @@ public class AccountServiceImpl implements AccountService {
 
         //Create account
         var acc = Account.builder()
-                .userName(request.getUserName())
+                .username(request.getUsername())
                 .pass(passwordEncoder.encode(request.getPass()))
                 .email(request.getEmail())
                 .roles(roles)
@@ -115,7 +114,7 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
 
         //Check if Account with these username and email has exists >> throw exception
-        if (!request.getUserName().equals(currUser.getUsername()) && !accountRepo.findByUserName(request.getUserName()).isEmpty()) {
+        if (!request.getUsername().equals(currUser.getUsername()) && !accountRepo.findByUsername(request.getUsername()).isEmpty()) {
             throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Người dùng với tên đăng nhập này đã tồn tại!");
         }
 
@@ -131,7 +130,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         //Set new info
-        currUser.setUserName(request.getUserName());
+        currUser.setUsername(request.getUsername());
         currUser.setEmail(request.getEmail());
         currUser.setRoles(roles);
         if (!request.isKeepOldPass()) currUser.setPass(passwordEncoder.encode(request.getPass()));
@@ -165,7 +164,6 @@ public class AccountServiceImpl implements AccountService {
 
         //Remove relationship with related Table
         account.removeAllOrders();
-        account.removeAllBooks();
         account.removeAllReviews();
         account.removeAllRoles();
 
@@ -182,7 +180,6 @@ public class AccountServiceImpl implements AccountService {
 
             //Remove relationship
             account.removeAllOrders();
-            account.removeAllBooks();
             account.removeAllReviews();
             account.removeAllRoles();
 
@@ -193,15 +190,7 @@ public class AccountServiceImpl implements AccountService {
     //Delete all accounts (ADMIN)
     @Transactional
     public void deleteAllAccounts() {
-        for (Account account : accountRepo.findAll()) {
-            //Remove relationship
-            account.removeAllOrders();
-            account.removeAllBooks();
-            account.removeAllReviews();
-            account.removeAllRoles();
-        }
-
-        accountRepo.deleteAll(); //Delete all
+        accountRepo.deleteAll();
     }
 
     //Get account's profile

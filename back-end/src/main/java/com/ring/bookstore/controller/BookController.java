@@ -1,6 +1,5 @@
 package com.ring.bookstore.controller;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -24,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ring.bookstore.config.CurrentAccount;
 import com.ring.bookstore.dtos.BookDTO;
 import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Book;
 import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.request.BookRequest;
 import com.ring.bookstore.service.BookService;
@@ -59,14 +57,15 @@ public class BookController {
                                       @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                       @RequestParam(value = "cateId", required = false) Integer cateId,
                                       @RequestParam(value = "pubId", required = false) List<Integer> pubId,
-                                      @RequestParam(value = "seller", defaultValue = "") String seller,
+                                      @RequestParam(value = "shopId", required = false) Long shopId,
+                                      @RequestParam(value = "sellerId", required = false) Long sellerId,
                                       @RequestParam(value = "type", defaultValue = "") String type,
                                       @RequestParam(value = "fromRange", defaultValue = "1000") Double fromRange,
                                       @RequestParam(value = "toRange", defaultValue = "100000000") Double toRange,
                                       @RequestParam(value = "rating", defaultValue = "0") Integer rating,
                                       @RequestParam(value = "amount", defaultValue = "1") Integer amount) {
         Page<BookDTO> books = bookService.getBooks(pageNo, pageSize, sortBy, sortDir, keyword,
-                rating, amount, cateId, pubId, seller, type, fromRange, toRange);
+                rating, amount, cateId, pubId, shopId, sellerId, type, fromRange, toRange);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
@@ -74,6 +73,12 @@ public class BookController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getBookDetailById(@PathVariable("id") Long bookId) {
         return new ResponseEntity<>(bookService.getBookDetailById(bookId), HttpStatus.OK);
+    }
+
+    //Get book details by {id}
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<?> getBookDetailBySlug(@PathVariable("slug") String slug) {
+        return new ResponseEntity<>(bookService.getBookDetailBySlug(slug), HttpStatus.OK);
     }
 
     //Add new book
@@ -135,7 +140,7 @@ public class BookController {
     @GetMapping("/test/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getTest(@PathVariable("id") long bookId) {
-        Account test = accRepo.findByUserName("chuotcon1").orElse(null);
+        Account test = accRepo.findByUsername("chuotcon1").orElse(null);
         return new ResponseEntity<>(test, HttpStatus.OK);
     }
 }

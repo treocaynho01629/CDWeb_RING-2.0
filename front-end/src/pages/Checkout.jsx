@@ -430,7 +430,7 @@ const Checkout = () => {
                                                     <StyledTableRow hover key={product.id}>
                                                         <StyledTableCell>
                                                             <ItemContainer>
-                                                                <NavLink to={`/product/${product.id}`}>
+                                                                <NavLink to={`/product/${product.slug}`}>
                                                                     <StyledLazyImage
                                                                         src={`${product.image}?size=small`}
                                                                         alt={`${product.title} Checkout item`}
@@ -438,16 +438,16 @@ const Checkout = () => {
                                                                     />
                                                                 </NavLink>
                                                                 <ItemSummary>
-                                                                    <NavLink to={`/product/${product.id}`}>
+                                                                    <NavLink to={`/product/${product.slug}`}>
                                                                         <ItemTitle>{product.title}</ItemTitle>
                                                                     </NavLink>
                                                                     <ItemAction>
                                                                         <Box width={'100%'} display={{ xs: 'flex', md: 'none' }} justifyContent={'space-between'}>
                                                                             <Box>
-                                                                                <Price>{Math.round(product.price * (1 - (product?.onSale || 0))).toLocaleString()}đ</Price>
+                                                                                <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
                                                                                 <Box display="flex" alignItems="center" sx={{ fontWeight: 'bold' }}>
                                                                                     Tổng: &nbsp;&nbsp;
-                                                                                    <Price className="total">{(Math.round(product.price * (1 - (product?.onSale || 0))) * product.quantity).toLocaleString()}đ</Price>
+                                                                                    <Price className="total">{(Math.round(product.price * (1 - (product?.discount || 0))) * product.quantity).toLocaleString()}đ</Price>
                                                                                 </Box>
                                                                             </Box>
                                                                             <Amount className="alt">{`x${product.quantity}`}</Amount>
@@ -457,13 +457,13 @@ const Checkout = () => {
                                                             </ItemContainer>
                                                         </StyledTableCell>
                                                         <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                                            <Price>{Math.round(product.price * (1 - (product?.onSale || 0))).toLocaleString()}đ</Price>
+                                                            <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
                                                         </StyledTableCell>
                                                         <StyledTableCell align="right" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                                                             <Amount>{`x${product.quantity}`}</Amount>
                                                         </StyledTableCell>
                                                         <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                                            <Price className="total">{(Math.round(product.price * (1 - (product?.onSale || 0))) * product.quantity).toLocaleString()}đ</Price>
+                                                            <Price className="total">{(Math.round(product.price * (1 - (product?.discount || 0))) * product.quantity).toLocaleString()}đ</Price>
                                                         </StyledTableCell>
                                                     </StyledTableRow>
                                                 )

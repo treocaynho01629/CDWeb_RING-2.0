@@ -65,7 +65,7 @@ const LoginTab = ({ pending, setPending }) => {
         setPending(true);
         const { enqueueSnackbar } = await import('notistack');
 
-        authenticate({ userName: username, pass: password }).unwrap()
+        authenticate({ username, pass: password }).unwrap()
             .then((data) => {
                 const { token, refreshToken } = data;
 
