@@ -6,24 +6,18 @@ import com.ring.bookstore.dtos.ReviewsInfoDTO;
 import com.ring.bookstore.dtos.projections.IBookDetail;
 import com.ring.bookstore.model.Book;
 import com.ring.bookstore.model.BookDetail;
-import com.ring.bookstore.model.Category;
 import com.ring.bookstore.model.Image;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ring.bookstore.dtos.BookDTO;
 import com.ring.bookstore.dtos.projections.IBookDisplay;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class BookMapper {
-
-//	@Autowired
-//	private ShopMapper
 
     public BookDTO displayToBookDTO(IBookDisplay book) {
 

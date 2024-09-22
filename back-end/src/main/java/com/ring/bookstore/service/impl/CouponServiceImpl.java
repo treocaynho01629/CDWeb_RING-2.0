@@ -1,17 +1,15 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.ShopDTO;
-import com.ring.bookstore.dtos.mappers.ShopMapper;
-import com.ring.bookstore.dtos.projections.IShopDetail;
+import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
-import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.*;
+import com.ring.bookstore.repository.CouponDetailRepository;
+import com.ring.bookstore.repository.CouponRepository;
 import com.ring.bookstore.repository.ShopRepository;
-import com.ring.bookstore.request.ShopRequest;
-import com.ring.bookstore.service.ImageService;
-import com.ring.bookstore.service.ShopService;
+import com.ring.bookstore.request.CouponRequest;
+import com.ring.bookstore.service.CouponService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,114 +20,146 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class ShopServiceImpl implements ShopService {
+public class CouponServiceImpl implements CouponService {
 
+    private final CouponRepository couponRepo;
+    private final CouponDetailRepository couponDetailRepo;
     private final ShopRepository shopRepo;
-    private final ShopMapper shopMapper;
-    private final ImageService imageService;
 
     @Override
-    public Page<ShopDTO> getShops(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword, Long ownerId) {
+    public Page<Coupon> getCoupons(CouponType type, String keyword, Long shopId,
+                                   Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<IShopDetail> shopsList = shopRepo.findShopByFilter(keyword, ownerId, pageable);
-        Page<ShopDTO> shopDtos = shopsList.map(shopMapper::apply);
-        return shopDtos;
+        Page<Coupon> couponsList = couponRepo.findCouponByFilter(type, keyword, shopId, pageable);
+        return couponsList;
     }
 
     @Override
-    public ShopDTO getShopById(Long id) {
-        IShopDetail shop = shopRepo.findShopById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Shop does not exists!"));
-
-        ShopDTO shopDTO = shopMapper.apply(shop); //Map to DTO
-        return shopDTO;
+    public Coupon getCouponByCode(String code) {
+        Coupon coupon = couponRepo.findByCode(code).orElseThrow(() ->
+                new ResourceNotFoundException("Coupon not found!"));
+        return coupon;
     }
 
-    //Add shop (SELLER)
+    //Add coupon (SELLER)
     @Transactional
-    public Shop addShop(ShopRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException {
-        Image image = null;
-
-        //Image upload
-        if (file != null) image = imageService.upload(file);
-
-        //Create new shop
-        var shop = Shop.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .image(image)
-                .owner(user)
+    public Coupon addCoupon(CouponRequest request, Account user) {
+        //Create new coupon
+        var coupon = Coupon.builder()
+                .code(request.getCode())
                 .build();
-        Shop addedShop = shopRepo.save(shop); //Save to database
-        return addedShop;
-    }
 
-    @Transactional
-    public Shop updateShop(Long id, ShopRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException {
-        //Get original shop
-        Shop shop = shopRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
-
-        //Check if correct seller or admin
-        if (!isOwenerValid(shop, user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
-
-        //Image upload/replace
-        if (file != null) { //Contain new image >> upload/replace
-            imageService.deleteImage(shop.getImage().getId()); //Delete old image
-            Image savedImage = imageService.upload(file); //Upload new image
-            shop.setImage(savedImage); //Set new image
+        //Shop validation
+        if (request.getShopId() != null) {
+            Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found!"));
+            if (isOwnerValid(shop, user)) {
+                coupon.setShop(shop);
+            } else {
+                throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+            }
+        } else {
+            if (!isAuthAdmin()) { throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");}
         }
 
-        shop.setName(request.getName());
-        shop.setDescription(request.getDescription());
+        //Create coupon details
+        var couponDetail = CouponDetail.builder()
+                .type(request.getType())
+                .usage(request.getUsage())
+                .expDate(request.getExpireDate())
+                .attribute(request.getAttribute())
+                .discount(request.getDiscount())
+                .maxDiscount(request.getMaxDiscount())
+                .build();
+
+        Coupon addedCoupon = couponRepo.save(coupon); //Save to database
+        CouponDetail addedDetail = couponDetailRepo.save(couponDetail); //Save details to database
+
+        addedCoupon.setDetail(addedDetail);
+        return addedCoupon;
+    }
+
+    @Transactional
+    public Coupon updateCoupon(Long id, CouponRequest request, Account user) {
+        //Get original coupon
+        Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
+
+        //Check if correct seller or admin
+        if (!isOwnerValid(coupon.getShop(), user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+
+        //Shop validation + set
+        if (request.getShopId() != null) {
+            Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found!"));
+            if (isOwnerValid(shop, user)) {
+                coupon.setShop(shop);
+            } else {
+                throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+            }
+        } else {
+            if (!isAuthAdmin()) { throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");}
+        }
+
+        //Set new details info
+        CouponDetail currDetail = coupon.getDetail();
+        currDetail.setType(request.getType());
+        currDetail.setUsage(request.getUsage());
+        currDetail.setExpDate(request.getExpireDate());
+        currDetail.setAttribute(request.getAttribute());
+        currDetail.setDiscount(request.getDiscount());
+        currDetail.setMaxDiscount(request.getMaxDiscount());
+        couponDetailRepo.save(currDetail); //Save new details to database
+
+        coupon.setCode(request.getCode());
 
         //Update
-        Shop updatedShop = shopRepo.save(shop);
-        return updatedShop;
+        Coupon updatedCoupon = couponRepo.save(coupon);
+        return updatedCoupon;
     }
 
     @Override
-    public Shop deleteShop(Long id, Account user) {
-        Shop shop = shopRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
+    public Coupon deleteCoupon(Long id, Account user) {
+        Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
         //Check if correct seller or admin
-        if (!isOwenerValid(shop, user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+        if (!isOwnerValid(coupon.getShop(), user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
 
-        shopRepo.deleteById(id); //Delete from database
-        return shop;
+        couponRepo.deleteById(id); //Delete from database
+        return coupon;
     }
 
     @Override
-    public void deleteShops(List<Long> ids, boolean isInverse) {
-        if (isInverse) {
-            shopRepo.deleteByIdIsNotIn(ids);
-        } else {
-            shopRepo.deleteByIdIsIn(ids);
-        }
+    public void deleteCoupons(List<Long> ids, boolean isInverse) {
+//        if (isInverse) {
+//            couponRepo.deleteByIdIsNotIn(ids);
+//        } else {
+//            couponRepo.deleteByIdIsIn(ids);
+//        }
     }
 
+
     @Override
-    public void deleteAllShops() {
-        shopRepo.deleteAll();
+    public void deleteAllCoupons() {
+        couponRepo.deleteAll();
     }
 
     //Check valid role function
-    protected boolean isOwenerValid(Shop shop, Account user) {
-        boolean result = false;
+    protected boolean isAuthAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
+        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+    }
+
+    protected boolean isOwnerValid(Shop shop, Account user) {
         //Check if is admin or valid owner id
-        if (shop.getOwner().getId().equals(user.getId())
-                || (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())))) {
-            result = true;
-        }
-        return result;
+        boolean isAdmin = isAuthAdmin();
+
+        if (shop != null) {
+            return shop.getOwner().getId().equals(user.getId()) || isAdmin;
+        } else return isAdmin;
     }
 }

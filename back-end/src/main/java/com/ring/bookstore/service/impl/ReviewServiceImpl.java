@@ -71,7 +71,7 @@ public class ReviewServiceImpl implements ReviewService {
 	public Page<ReviewDTO> getReviewsByBookId(Long id, Integer rating, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
-		Page<Review> reviewsList = reviewRepo.findAllByBook_IdAndRatingIsGreaterThan(id, rating, pageable); //Fetch from database
+		Page<Review> reviewsList = reviewRepo.findReviewsByBookId(id, rating, pageable); //Fetch from database
 		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::apply);
 		return reviewDtos;
 	}
@@ -80,21 +80,9 @@ public class ReviewServiceImpl implements ReviewService {
 	public Page<ReviewDTO> getUserReviews(Account user, Integer rating, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
-		Page<Review> reviewsList = reviewRepo.findAllByUser_IdAndRatingIsGreaterThan(user.getId(), rating, pageable); //Fetch from database
+		Page<Review> reviewsList = reviewRepo.findUserReviews(user.getId(), rating, pageable); //Fetch from database
 		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::apply);
 		return reviewDtos;
-	}
-	
-	//Delete review by {id}
-	public ReviewDTO deleteReview(Long id, Account user) {
-		//Check review exists
-		Review review = reviewRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Review not found"));
-
-		//Check if correct user or admin
-		if (!isUserValid(review, user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
-
-		reviewRepo.deleteById(id); //Delete from database
-		return reviewMapper.apply(review);
 	}
 
 	//Update review
@@ -112,13 +100,20 @@ public class ReviewServiceImpl implements ReviewService {
 		return reviewMapper.apply(updatedReview); //Return added review
 	}
 
+	//Delete review by {id} (ADMIN)
+	public void deleteReview(Long id) {
+		reviewRepo.deleteById(id);
+	}
+
 	//Delete multiples reviews (ADMIN)
 	@Transactional
-	public void deleteReviews(List<Long> ids, boolean isInverse) {
-		if (isInverse) {
-			reviewRepo.deleteInverseByIds(ids);
-		} else {
-			reviewRepo.deleteByIds(ids);
+	public void deleteReviews(Long bookId, Long userId, Integer rating, List<Long> ids, boolean isInverse) {
+		List<Long> listDelete = ids;
+		if (isInverse) listDelete = reviewRepo.findInverseIds(bookId, userId, rating, ids);
+
+		//Loop and delete
+		for (Long id : listDelete) {
+			reviewRepo.deleteById(id); //Delete from database
 		}
 	}
 	
@@ -129,14 +124,13 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	//Check valid role function
+	protected boolean isAuthAdmin() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
+		return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+	}
+
 	protected boolean isUserValid(Review review, Account user) {
-		boolean result = false;
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current user
 		//Check if is admin or valid seller id
-		if (review.getUser().getId().equals(user.getId())
-				|| (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())))) {
-			result = true;
-		}
-		return result;
+		return review.getUser().getId().equals(user.getId()) || isAuthAdmin();
 	}
 }

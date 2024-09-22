@@ -391,10 +391,10 @@ const ReviewComponent = ({ book, id, scrollIntoTab }) => {
                     Đánh giá sản phẩm
                     <ReviewsSummary>
                         <ScoreContainer>
-                            <Score>5<b>/5</b></Score>
+                            <Score>{book?.reviewsInfo?.rating ?? 0}<b>/5</b></Score>
                             <StyledRating
                                 name="product-rating"
-                                value={book?.reviewsInfo?.rating}
+                                value={book?.reviewsInfo?.rating ?? 0}
                                 readOnly
                                 icon={<StarIcon fontSize="medium" />}
                                 emptyIcon={<StarBorderIcon fontSize="medium" />}
@@ -402,11 +402,11 @@ const ReviewComponent = ({ book, id, scrollIntoTab }) => {
                             <TotalLabel>({book?.reviewsInfo?.totalRates} đánh giá)</TotalLabel>
                         </ScoreContainer>
                         <ProgressContainer>
-                            <LinearProgressWithLabel label="5 sao" value={book?.reviewsInfo?.five / book?.reviewsInfo?.totalRates * 100} />
-                            <LinearProgressWithLabel label="4 sao" value={book?.reviewsInfo?.four / book?.reviewsInfo?.totalRates * 100} />
-                            <LinearProgressWithLabel label="3 sao" value={book?.reviewsInfo?.three / book?.reviewsInfo?.totalRates * 100} />
-                            <LinearProgressWithLabel label="2 sao" value={book?.reviewsInfo?.two / book?.reviewsInfo?.totalRates * 100} />
-                            <LinearProgressWithLabel label="1 sao" value={book?.reviewsInfo?.one / book?.reviewsInfo?.totalRates * 100} />
+                            <LinearProgressWithLabel label="5 sao" value={book?.reviewsInfo?.five ?? 0 / book?.reviewsInfo?.totalRates ?? 0 * 100} />
+                            <LinearProgressWithLabel label="4 sao" value={book?.reviewsInfo?.four ?? 0 / book?.reviewsInfo?.totalRates ?? 0 * 100} />
+                            <LinearProgressWithLabel label="3 sao" value={book?.reviewsInfo?.three ?? 0 / book?.reviewsInfo?.totalRates ?? 0 * 100} />
+                            <LinearProgressWithLabel label="2 sao" value={book?.reviewsInfo?.two ?? 0 / book?.reviewsInfo?.totalRates ?? 0 * 100} />
+                            <LinearProgressWithLabel label="1 sao" value={book?.reviewsInfo?.one ?? 0 / book?.reviewsInfo?.totalRates ?? 0 * 100} />
                         </ProgressContainer>
                     </ReviewsSummary>
                 </Box>

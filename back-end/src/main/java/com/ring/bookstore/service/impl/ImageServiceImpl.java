@@ -99,7 +99,7 @@ public class ImageServiceImpl implements ImageService {
     @Transactional
     public String deleteImage(Long id) {
         Image image = imageRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Image does not exists!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
         imageRepo.deleteById(id);
 
         return "Delete image " + image.getImage() + " successfully!";
@@ -113,7 +113,7 @@ public class ImageServiceImpl implements ImageService {
     //Get image by {name}
     public Image get(String name) {
         Image image = imageRepo.findByName(name)
-                .orElseThrow(() -> new ResourceNotFoundException("Image does not exists!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
         return image;
     }
 
@@ -136,7 +136,7 @@ public class ImageServiceImpl implements ImageService {
             imageRepo.save(image); //Save to database
             return image;
         } catch (IOException e) {
-            throw new ImageResizerException(HttpStatus.INTERNAL_SERVER_ERROR, "Resized image could not be saved.");
+            throw new ImageResizerException(HttpStatus.EXPECTATION_FAILED, "Resized image could not be saved.");
         }
     }
     //Get image with {reference (name)} and {type (size)}
@@ -193,7 +193,7 @@ public class ImageServiceImpl implements ImageService {
                     Scalr.Mode.AUTOMATIC,
                     size); // Size base on type
         } catch (Exception e) {
-            throw new ImageResizerException(HttpStatus.INTERNAL_SERVER_ERROR, "Image could not be resized to type: " + e.getMessage());
+            throw new ImageResizerException(HttpStatus.EXPECTATION_FAILED, "Image could not be resized to type: " + e.getMessage());
         }
     }
 
@@ -206,7 +206,7 @@ public class ImageServiceImpl implements ImageService {
             BufferedImage resizedImage = resize(bufferedImage, type);
             return resizedImage;
         } catch (IOException e) {
-            throw new ImageResizerException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not read the original image.");
+            throw new ImageResizerException(HttpStatus.BAD_REQUEST, "Could not read the original image!");
         }
     }
 

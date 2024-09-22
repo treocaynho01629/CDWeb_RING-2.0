@@ -24,7 +24,7 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	Optional<Account> findByResetPassToken(String resetPassToken); //Get Account by {resetPassToken}
 	
 	@Query("""
-	select a from Account a 
+	select a from Account a left join fetch AccountProfile p on a.id = p.user.id
 	where concat (a.email, a.username) ilike %:keyword%
 	and size(a.roles) <= :maxRoles
 	and size(a.roles) > :minRoles
@@ -32,11 +32,11 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	Page<Account> findAccountsWithFilter(String keyword, Integer maxRoles, Integer minRoles, Pageable pageable);
 	
 	@Query(value ="""
-	select t.user_name as name, coalesce(t.rv, 0) as reviews, coalesce(t2.od, 0) as orders, coalesce(t2.sp, 0) as spends
+	select t.username as name, coalesce(t.rv, 0) as reviews, coalesce(t2.od, 0) as orders, coalesce(t2.sp, 0) as spends
 	from
-	(select a.user_name, r.user_id, count(r.id) as rv
+	(select a.username, r.user_id, count(r.id) as rv
 	from review r join account a on a.id = r.user_id
-	group by a.user_name, r.user_id order by rv desc) t
+	group by a.username, r.user_id order by rv desc) t
 	left join
 	(select o2.user_id, sum(o.amount) as od, sum(o.amount * o.price) as sp\s
 	from order_receipt o2 join order_detail o on o2.id = o.order_id

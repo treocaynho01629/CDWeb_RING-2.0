@@ -19,9 +19,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.Nationalized;
+import org.hibernate.annotations.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -36,6 +34,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@SQLDelete(sql = "UPDATE Book SET active = false WHERE id=?")
+@Where(clause = "active=true")
 @EqualsAndHashCode(callSuper = true)
 @Table(indexes = @Index(columnList = "title"))
 public class Book extends Auditable {

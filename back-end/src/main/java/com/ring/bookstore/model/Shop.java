@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Nationalized;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.List;
 
@@ -12,6 +14,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE Shop SET active = false WHERE id=?")
+@Where(clause = "active=true")
 @EqualsAndHashCode(callSuper = true)
 public class Shop extends Auditable {
 	@Id
@@ -34,6 +38,7 @@ public class Shop extends Auditable {
     private String name;
 
 	@Column(length = 500)
+    @Nationalized
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -50,6 +55,10 @@ public class Shop extends Auditable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "shop", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Book> books;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shop", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Coupon> coupons;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(	name = "following",

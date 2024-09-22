@@ -1,9 +1,9 @@
 package com.ring.bookstore.service;
 
-import com.ring.bookstore.dtos.ReviewDTO;
+import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Review;
-import com.ring.bookstore.request.ReviewRequest;
+import com.ring.bookstore.model.Coupon;
+import com.ring.bookstore.request.CouponRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -11,13 +11,19 @@ import java.util.List;
 
 @Service
 public interface CouponService {
-	
-	Page<ReviewDTO> getAllCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir);
-	Page<ReviewDTO> getCouponsBySeller(Long userId, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
-	Page<ReviewDTO> getReviewsByUser(Account user, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
-	Page<ReviewDTO> getReviewsByBookId(Long id, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
-	Review review(Long id, ReviewRequest request, Account user);
-	Review deleteReview(Long id);
-	void deleteReviews(List<Long> ids);
-	void deleteAllReviews();
+
+    Page<Coupon> getCoupons(CouponType type, String keyword, Long shopId,
+                            Integer pageNo, Integer pageSize, String sortBy, String sortDir);
+
+    Coupon getCouponByCode(String code);
+
+    Coupon addCoupon(CouponRequest request, Account user);
+
+    Coupon updateCoupon(Long id, CouponRequest request, Account user);
+
+    Coupon deleteCoupon(Long id, Account user);
+
+    void deleteCoupons(List<Long> ids, boolean isInverse);
+
+    void deleteAllCoupons();
 }

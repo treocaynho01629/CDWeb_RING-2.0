@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +29,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE Product SET active = false WHERE id=?")
+@Where(clause = "active=true")
 @EqualsAndHashCode(callSuper = true)
 public class Account extends Auditable implements UserDetails {
 
@@ -59,12 +63,6 @@ public class Account extends Auditable implements UserDetails {
     @Column(nullable = false, length = 1000)
     private String email;
 
-	@OneToOne(cascade = CascadeType.ALL,
-			fetch = FetchType.LAZY,
-			orphanRemoval = true)
-	@JoinColumn(name = "image_id")
-	private Image image;
-    
     @Column(unique = true)
     @JsonIgnore
     private String resetPassToken;

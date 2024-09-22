@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,9 +22,18 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	left join Review r on b.id = r.book.id
 	where concat (s.name, s.owner.username) ilike %:keyword%
 	and (coalesce(:ownerId) is null or s.owner.id = :ownerId)
+	group by s.id, s.owner.username, s.owner.id, s.image.name
+	""")
+    Page<IShopDetail> findShopByFilter(String keyword, Long ownerId, Pageable pageable);
+
+	@Query("""
+	select s.id from Shop s
+	where concat (s.name, s.owner.username) ilike %:keyword%
+	and (coalesce(:ownerId) is null or s.owner.id = :ownerId)
+	and s.id not in :ids
 	group by s.id
 	""")
-    public Page<IShopDetail> findShopByFilter(String keyword, Long ownerId, Pageable pageable);
+	List<Long> findInverseIds(String keyword, Long ownerId, List<Long> ids);
 
 	@Query("""
 	select s.owner.username as ownerUsername, s.owner.id as ownerId, s.name as name, s.description as description,
@@ -34,5 +44,5 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	where s.id = :id
 	group by s.id
 	""")
-    public Optional<IShopDetail> findShopById(Long id);
+    Optional<IShopDetail> findShopById(Long id);
 }

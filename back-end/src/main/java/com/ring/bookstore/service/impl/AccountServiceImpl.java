@@ -55,13 +55,12 @@ public class AccountServiceImpl implements AccountService {
         //Filter by role/employees
         int maxRoles = role != null ? role : RoleName.values().length + 1; //+ 1 to prevent role = 3 (ADMIN)
         int minRoles = (maxRoles < RoleName.values().length + 1) ? maxRoles - 1 : (isEmployees ? 1 : 0);
-        return accountRepo.findAccountsWithFilter(keyword, maxRoles, minRoles, pageable); //Pagination
+        return accountRepo.findAccountsWithFilter(keyword, maxRoles, minRoles, pageable);
     }
 
     //Get account by {id}
     public AccountDetailDTO getAccountById(Long id) {
-        Account account = accountRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("User does not exists!"));
+        Account account = accountRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
         return detailMapper.apply(account);
     }
 
@@ -111,7 +110,7 @@ public class AccountServiceImpl implements AccountService {
     public Account updateAccount(AccountRequest request, Long id) {
         //Check Account exists?
         Account currUser = accountRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         //Check if Account with these username and email has exists >> throw exception
         if (!request.getUsername().equals(currUser.getUsername()) && !accountRepo.findByUsername(request.getUsername()).isEmpty()) {
@@ -160,7 +159,7 @@ public class AccountServiceImpl implements AccountService {
     //Delete account (ADMIN)
     public void deleteAccount(Long id) {
         //Check if account exists?
-        Account account = accountRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
+        Account account = accountRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         //Remove relationship with related Table
         account.removeAllOrders();
@@ -176,7 +175,7 @@ public class AccountServiceImpl implements AccountService {
     public void deleteAccounts(List<Long> ids) {
         //Loop through and delete from lists
         for (Long id : ids) {
-            Account account = accountRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
+            Account account = accountRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
             //Remove relationship
             account.removeAllOrders();

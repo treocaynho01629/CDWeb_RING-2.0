@@ -1,14 +1,11 @@
 package com.ring.bookstore.request;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +21,11 @@ public class BookRequest { //Request body for book
 	@Min(value = 1000, message = "Giá từ 1000đ")
 	@Max(value = 10000000, message = "Giá dưới 10000000đ")
 	private Double price;
-	
+
+	@DecimalMin(value = "0.0", inclusive = false)
+	@Digits(integer=5, fraction=4)
+	private BigDecimal discount;
+
 	@NotNull(message = "Số lượng không được bỏ trống!")
 	@Min(value = 0, message = "Số lượng phải trên 0")
 	@Max(value = 199, message = "Kho hàng đã đầy (giới hạn 199)")

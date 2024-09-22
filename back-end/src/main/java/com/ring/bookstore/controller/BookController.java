@@ -1,7 +1,9 @@
 package com.ring.bookstore.controller;
 
+import java.io.IOException;
 import java.util.List;
 
+import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -86,29 +88,19 @@ public class BookController {
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> addBook(@Valid @RequestPart("request") BookRequest request,
                                      @RequestPart("image") MultipartFile file,
-                                     @CurrentAccount Account currUser) {
-        try {
-            return new ResponseEntity<>(bookService.addBook(request, file, currUser), HttpStatus.CREATED);
-        } catch (Exception e) {
-            String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-        }
+                                     @CurrentAccount Account currUser) throws ImageResizerException, IOException {
+        return new ResponseEntity<>(bookService.addBook(request, file, currUser), HttpStatus.CREATED);
     }
 
     //Update book by id
     @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> updateBook(@Valid @RequestPart("request") BookRequest request,
+    public ResponseEntity<?> updateBook(@PathVariable("id") Long id,
+                                        @Valid @RequestPart("request") BookRequest request,
                                         @RequestPart(name = "image", required = false) MultipartFile file,
-                                        @PathVariable("id") Long id,
-                                        @CurrentAccount Account currUser) {
+                                        @CurrentAccount Account currUser) throws ImageResizerException, IOException {
 
-        try {
-            return new ResponseEntity<>(bookService.updateBook(request, file, id, currUser), HttpStatus.CREATED);
-        } catch (Exception e) {
-            String message = "Failed to update book!";
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-        }
+        return new ResponseEntity<>(bookService.updateBook(id, request, file, currUser), HttpStatus.CREATED);
     }
 
     //Delete book by {id}

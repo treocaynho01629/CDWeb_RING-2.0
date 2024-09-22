@@ -25,6 +25,6 @@ public class CategoryServiceImpl implements CategoryService {
     //Get category by {id}
     public Category getCategoryById(Integer id) {
         return cateRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Category does not exists!"));
+                new ResourceNotFoundException("Category not found!"));
     }
 }

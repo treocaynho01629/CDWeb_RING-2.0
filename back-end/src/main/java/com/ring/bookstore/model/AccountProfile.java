@@ -53,6 +53,12 @@ public class AccountProfile {
     @Nationalized 
     private String address;
 
+    @OneToOne(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
+    @JoinColumn(name = "image_id")
+    private Image image;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore

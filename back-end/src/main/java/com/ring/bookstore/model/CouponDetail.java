@@ -1,5 +1,7 @@
 package com.ring.bookstore.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ring.bookstore.enums.CouponType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -31,18 +33,23 @@ public class CouponDetail {
     )
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id", nullable = false)
+    @JsonBackReference
+    private Coupon coupon;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private CouponType type;
 
-    @Column
+    @Column(nullable = false)
     private Double attribute; //Min money/quantity
 
-    @Column(nullable = false)
+    @Column
     private Double maxDiscount;
 
-    @Column(nullable = false)
-    private BigDecimal discountPercent;
+    @Column(precision = 5, scale = 4, nullable = false)
+    private BigDecimal discount;
 
     @Column
     private Short usage;

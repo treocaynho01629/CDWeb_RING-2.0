@@ -15,8 +15,6 @@ import com.ring.bookstore.model.Book;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>{
-	//	and cast(b.publisher.id as string) not in :pubIds
-//	and cast(b.cate.id as string) like %:cateId%
 	@Query("""
 	select b.id as id, b.slug as slug, b.title as title, b.description as description, b.image.name as image,
 	b.price as price, b.discount as discount, b.amount as amount, rv.rating as rating, od.totalOrders as totalOrders
@@ -33,7 +31,7 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 	and b.amount >= :amount
 	group by b, b.image.name, rv.rating, od.totalOrders
 	""")
-	public Page<IBookDisplay> findBooksWithFilter(String keyword, //Get books by filtering
+	Page<IBookDisplay> findBooksWithFilter(String keyword, //Get books by filtering
 			Integer cateId,
 			List<Integer> pubIds,
 			Long shopId,
@@ -63,7 +61,7 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 	where b.id = :id
 	group by b, b.image.name, bd, od.totalOrders, rv.rating, rv.totalRates, rv.five, rv.four, rv.three, rv.two, rv.one
 	""")
-	public Optional<IBookDetail> findBookDetailById(Long id);
+	Optional<IBookDetail> findBookDetailById(Long id);
 
 	@Query("""
 	select distinct b as book, b.shop.id as shopId, b.image.name as image, od.totalOrders as totalOrders, rv.rating as rating, 
@@ -83,7 +81,7 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 	where b.slug = :slug
 	group by b, b.image.name, bd, od.totalOrders, rv.rating, rv.totalRates, rv.five, rv.four, rv.three, rv.two, rv.one
 	""")
-	public Optional<IBookDetail> findBookDetailBySlug(String slug);
+	Optional<IBookDetail> findBookDetailBySlug(String slug);
 
 	@Query("""
  	select b.id as id, b.slug as slug, b.title as title, b.description as description, b.image.name as image,
@@ -94,10 +92,10 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 	order by random()
 	limit :amount
 	""")
-	public List<IBookDisplay> findRandomBooks(Integer amount); //Get random books
+	List<IBookDisplay> findRandomBooks(Integer amount); //Get random books
 
 	@Query("""
  	delete from Book b where b.shop.owner.id = :id
 	""")
-	public void deleteBySellerId(Long id);
+	void deleteBySellerId(Long id);
 }

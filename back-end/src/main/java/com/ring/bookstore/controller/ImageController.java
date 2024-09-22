@@ -31,107 +31,102 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
 public class ImageController {
-	
-	private final ImageService imageService;
-	
-	//Get all images
-	@GetMapping
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> getAllImages() {
-		return new ResponseEntity<>(imageService.getAllImages(), HttpStatus.OK);
-	}
 
-	//Upload image
-	@PostMapping("/upload")
-	@PreAuthorize("hasAnyRole('ADMIN')")
-	public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) {
-		if (file.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File does not exist!");
-		}
+    private final ImageService imageService;
 
-		try {
-			ImageDTO image = imageService.uploadAndMap(file);
-			return new ResponseEntity<>(image, HttpStatus.OK);
-		} catch (Exception e) {
-			String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-		}
-	}
+    //Get all images
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllImages() {
+        return new ResponseEntity<>(imageService.getAllImages(), HttpStatus.OK);
+    }
 
-	//Upload multiples images
-	@PostMapping("/upload-multiples")
-	@PreAuthorize("hasAnyRole('ADMIN')")
-	public ResponseEntity<?> uploadImages( @RequestParam("images") MultipartFile[] files) {
-		List<String> messages = new ArrayList<>();
+    //Upload image
+    @PostMapping("/upload")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File not found!");
+        }
 
-		Arrays.asList(files).forEach(file -> {
-			try {
-				imageService.upload(file);
-				messages.add(file.getOriginalFilename() + " [Successful]");
-			} catch (Exception e) {
-				messages.add(file.getOriginalFilename() + " <Failed> - " + e.getMessage());
-			}
-		});
+        try {
+            ImageDTO image = imageService.uploadAndMap(file);
+            return new ResponseEntity<>(image, HttpStatus.OK);
+        } catch (Exception e) {
+            String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+        }
+    }
 
-		return new ResponseEntity<>(messages, HttpStatus.OK);
-	}
+    //Upload multiples images
+    @PostMapping("/upload-multiples")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<?> uploadImages(@RequestParam("images") MultipartFile[] files) {
+        List<String> messages = new ArrayList<>();
 
-	//Upload image
-	@PostMapping("/replace")
-	@PreAuthorize("hasAnyRole('ADMIN')")
-	public ResponseEntity<?> replaceImage(@RequestParam("image") MultipartFile file) {
-		if (file.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File does not exist!");
-		}
+        Arrays.asList(files).forEach(file -> {
+            try {
+                imageService.upload(file);
+                messages.add(file.getOriginalFilename() + " [Successful]");
+            } catch (Exception e) {
+                messages.add(file.getOriginalFilename() + " <Failed> - " + e.getMessage());
+            }
+        });
 
-		try {
-			ImageDTO image = imageService.replaceAndMap(file);
-			return new ResponseEntity<>(image, HttpStatus.OK);
-		} catch (Exception e) {
-			String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-		}
-	}
+        return new ResponseEntity<>(messages, HttpStatus.OK);
+    }
 
-	//Upload multiples images
-	@PostMapping("/replace-multiples")
-	@PreAuthorize("hasAnyRole('ADMIN')")
-	public ResponseEntity<?> replaceImages( @RequestParam("images") MultipartFile[] files) {
-		List<String> messages = new ArrayList<>();
+    //Upload image
+    @PostMapping("/replace")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<?> replaceImage(@RequestParam("image") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File not found!");
+        }
 
-		Arrays.asList(files).forEach(file -> {
-			try {
-				imageService.replace(file);
-				messages.add(file.getOriginalFilename() + " [Successful]");
-			} catch (Exception e) {
-				messages.add(file.getOriginalFilename() + " <Failed> - " + e.getMessage());
-			}
-		});
+        try {
+            ImageDTO image = imageService.replaceAndMap(file);
+            return new ResponseEntity<>(image, HttpStatus.OK);
+        } catch (Exception e) {
+            String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+        }
+    }
 
-		return new ResponseEntity<>(messages, HttpStatus.OK);
-	}
-	
-	//Get image by {name}
-	@GetMapping("/{name}")
-	public ResponseEntity<?> getImage(@PathVariable String name,
-									   @RequestParam(value = "size", defaultValue = "original") String predefinedTypeName) {
-		final HttpHeaders headers = new HttpHeaders();
-		try {
-			Image image = imageService.resolve(predefinedTypeName, name);
-			return ResponseEntity.status(HttpStatus.OK)
-					.contentType(MediaType.valueOf(image.getType()))
-					.body(image.getImage()); //Return image
-		} catch (ImageResizerException e) {
-			headers.setContentType(MediaType.TEXT_HTML);
-			return new ResponseEntity<>(e.getMessage(), headers, e.getStatus());
-		}
-	}
-	
-	//Delete image by {id}
-	@DeleteMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> deleteImage(@PathVariable Long id) {
-		String response = imageService.deleteImage(id);
-		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
+    //Upload multiples images
+    @PostMapping("/replace-multiples")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<?> replaceImages(@RequestParam("images") MultipartFile[] files) {
+        List<String> messages = new ArrayList<>();
+
+        Arrays.asList(files).forEach(file -> {
+            try {
+                imageService.replace(file);
+                messages.add(file.getOriginalFilename() + " [Successful]");
+            } catch (Exception e) {
+                messages.add(file.getOriginalFilename() + " <Failed> - " + e.getMessage());
+            }
+        });
+
+        return new ResponseEntity<>(messages, HttpStatus.OK);
+    }
+
+    //Get image by {name}
+    @GetMapping("/{name}")
+    public ResponseEntity<?> getImage(@PathVariable String name,
+                                      @RequestParam(value = "size", defaultValue = "original") String predefinedTypeName) throws ImageResizerException {
+        Image image = imageService.resolve(predefinedTypeName, name);
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.valueOf(image.getType()))
+                .body(image.getImage()); //Return image
+
+    }
+
+    //Delete image by {id}
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteImage(@PathVariable Long id) {
+        String response = imageService.deleteImage(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
