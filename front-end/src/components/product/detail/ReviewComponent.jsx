@@ -117,9 +117,6 @@ const RatingInfo = styled.p`
     font-weight: 400;
     display: flex;
     align-items: center;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
     
     ${props => props.theme.breakpoints.down("sm")} {
         max-width: 95px;
@@ -245,10 +242,17 @@ const Review = ({ review, username }) => {
                 </Box>
                 <Box sx={{ display: 'flex', flexGrow: 1, justifyContent: 'flex-end' }}>
                     <RatingInfo className="time"><AccessTimeIcon sx={{ fontSize: 18, marginRight: '5px', color: 'primary.main' }} />
-                        {`${('0' + date?.getHours()).slice(-2)}:${('0' + date?.getMinutes()).slice(-2)}`}
+                        {date.toLocaleTimeString("en-GB", {
+                            hour: "2-digit",
+                            minute:"2-digit"
+                        })}
                     </RatingInfo>
                     <RatingInfo><CalendarMonthIcon sx={{ fontSize: 18, marginRight: '5px', color: 'primary.main' }} />
-                        {`${('0' + date.getDate()).slice(-2)}-${('0' + (date.getMonth() + 1)).slice(-2)}-${date.getFullYear()}`}
+                        {date.toLocaleDateString("en-GB", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                        })}
                     </RatingInfo>
                     <ReportButton className="mobile"><ReportGmailerrorred sx={{ fontSize: 20, color: 'text.secondary' }} /></ReportButton>
                 </Box>
@@ -315,6 +319,10 @@ const ReviewComponent = ({ book, id, scrollIntoTab }) => {
     const handleChangeSize = (newValue) => {
         setPagination({ ...pagination, pageSize: newValue, currPage: 0 });
     };
+
+    const reviewPercent = (value) => {
+        return (value / (book?.reviewsInfo?.totalRates ?? 0)) * 100;
+    }
 
     //Review
     const handleSubmitReview = async (e) => {
@@ -402,11 +410,11 @@ const ReviewComponent = ({ book, id, scrollIntoTab }) => {
                             <TotalLabel>({book?.reviewsInfo?.totalRates} đánh giá)</TotalLabel>
                         </ScoreContainer>
                         <ProgressContainer>
-                            <LinearProgressWithLabel label="5 sao" value={book?.reviewsInfo?.five ?? 0 / book?.reviewsInfo?.totalRates ?? 0 * 100} />
-                            <LinearProgressWithLabel label="4 sao" value={book?.reviewsInfo?.four ?? 0 / book?.reviewsInfo?.totalRates ?? 0 * 100} />
-                            <LinearProgressWithLabel label="3 sao" value={book?.reviewsInfo?.three ?? 0 / book?.reviewsInfo?.totalRates ?? 0 * 100} />
-                            <LinearProgressWithLabel label="2 sao" value={book?.reviewsInfo?.two ?? 0 / book?.reviewsInfo?.totalRates ?? 0 * 100} />
-                            <LinearProgressWithLabel label="1 sao" value={book?.reviewsInfo?.one ?? 0 / book?.reviewsInfo?.totalRates ?? 0 * 100} />
+                            <LinearProgressWithLabel label="5 sao" value={reviewPercent(book?.reviewsInfo?.five ?? 0)} />
+                            <LinearProgressWithLabel label="4 sao" value={reviewPercent(book?.reviewsInfo?.four ?? 0)} />
+                            <LinearProgressWithLabel label="3 sao" value={reviewPercent(book?.reviewsInfo?.three ?? 0)} />
+                            <LinearProgressWithLabel label="2 sao" value={reviewPercent(book?.reviewsInfo?.two ?? 0)} />
+                            <LinearProgressWithLabel label="1 sao" value={reviewPercent(book?.reviewsInfo?.one ?? 0)} />
                         </ProgressContainer>
                     </ReviewsSummary>
                 </Box>

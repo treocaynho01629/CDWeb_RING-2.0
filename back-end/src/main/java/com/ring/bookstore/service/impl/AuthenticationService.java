@@ -245,7 +245,8 @@ public class AuthenticationService {
 		String fileDownloadUri = image != null ? image.getFileDownloadUri() : null;
 
 		Map<String, Object> extraClaims = new HashMap<>();
-		extraClaims.put("image", fileDownloadUri);
+        extraClaims.put("id", user.getId());
+        extraClaims.put("image", fileDownloadUri);
 
         return jwtService.generateToken(extraClaims, user);
 	}

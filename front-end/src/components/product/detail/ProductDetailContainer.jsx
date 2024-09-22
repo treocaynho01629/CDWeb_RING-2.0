@@ -229,7 +229,7 @@ const ProductDetailContainer = ({ loading, book, scrollIntoTab, mobileMode }) =>
   return (
     <Stack spacing={1} direction={{ xs: 'column-reverse', md: 'column' }}>
       <Stack spacing={1}>
-        <ShopDisplay />
+        <ShopDisplay id={book?.shopId}/>
         <Grid container size={12} spacing={1} display="flex" flexDirection={{ xs: 'column-reverse', md: 'row' }}>
           <Grid size={{ xs: 12, md: 'grow' }}>
             <DetailContainer>

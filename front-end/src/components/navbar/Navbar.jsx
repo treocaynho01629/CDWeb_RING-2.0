@@ -241,7 +241,7 @@ const Navbar = () => {
     const [toggle, setToggle] = useState(searchField !== '');
 
     //Other
-    const { username, roles } = useAuth();
+    const { username, image, roles } = useAuth();
     const navigate = useNavigate();
     const logout = useLogout();
 
@@ -421,7 +421,7 @@ const Navbar = () => {
                                                 >
                                                     <Link to={'/profile/detail'} title="Tài khoản">
                                                         <StyledIconButton className="nav" aria-label="profile">
-                                                            <Avatar sx={{ width: 24, height: 24, fontSize: '16px' }}>{username?.charAt(0) ?? 'P'}</Avatar>
+                                                            <Avatar sx={{ width: 24, height: 24, fontSize: '16px' }} src={image ? image + '?size=small' : null}/>
                                                             <IconText className="username">{username}</IconText>
                                                         </StyledIconButton>
                                                     </Link>

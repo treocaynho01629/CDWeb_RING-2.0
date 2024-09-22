@@ -66,18 +66,16 @@ public class JwtService {
     ) {
         //Add roles with token
         List<String> roles = new ArrayList<>();
-        Map<String, Object> rolesClaim = new HashMap<>();
         userDetails.getAuthorities().forEach(a -> roles.add(a.getAuthority()));
-        rolesClaim.put("roles", roles);
+        extraClaims.put("roles", roles);
 
         return Jwts //Create JWT
                 .builder()
-                .setClaims(extraClaims) //Extra claims
+                .setClaims(extraClaims) //Claims
                 .setSubject(userDetails.getUsername()) //Name
                 .setIssuedAt(new Date(System.currentTimeMillis())) //Create date
                 .setExpiration(new Date(System.currentTimeMillis() + expiration)) //Expiration date
                 .signWith(key, SignatureAlgorithm.HS256) //Encrypt
-                .addClaims(rolesClaim) //Roles
                 .compact();
     }
 

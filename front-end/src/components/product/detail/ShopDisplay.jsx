@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { Avatar, Box, Button, Grid2 as Grid, Stack } from "@mui/material";
-import { Storefront, Verified as VerifiedIcon } from "@mui/icons-material";
+import { AutoStories, LocalActivity, PersonAddAlt1, Storefront, Today, Verified as VerifiedIcon } from "@mui/icons-material";
+import { useGetShopQuery } from "../../../features/shops/shopsApiSlice";
 
 //#region styled
 const ShopContainer = styled.div`
@@ -44,6 +45,15 @@ const Verified = styled.p`
 const ShopDetail = styled.span`
     flex-grow: 1;
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    /* min-width: 250px; */
+    width: 40%;
+
+    svg {
+        font-size: 15px;
+        margin-right: 3px;
+    }
 
     b { 
         margin-left: 10px;
@@ -52,6 +62,7 @@ const ShopDetail = styled.span`
 
     ${props => props.theme.breakpoints.down("md")} {
         font-size: 12px;
+        width: auto;
 
         b { margin-left: 5px; }
         &.hide-on-mobile {display: none}
@@ -59,11 +70,15 @@ const ShopDetail = styled.span`
 `
 //#endregion
 
-const ShopDisplay = () => {
+const ShopDisplay = ({ id }) => {
+
+    //Fetch reviews
+    const { data, isLoading, isSuccess, isError, error } = useGetShopQuery(id, { skip: !id })
+
     return (
         <ShopContainer>
             <Grid container size={12} spacing={1}>
-                <Grid size={{ xs: 12, md: 'auto' }}>
+                <Grid size={{ xs: 12, md: 4.5 }}>
                     <ShopInfo>
                         <Avatar
                             alt="Shop name"
@@ -80,7 +95,7 @@ const ShopDisplay = () => {
                             flexGrow={1}
                         >
                             <Box mb={{ xs: 0, md: 1 }}>
-                                <ShopName>Tên shop</ShopName>
+                                <ShopName>{data?.name}</ShopName>
                                 <Verified><VerifiedIcon sx={{ fontSize: '16px', marginRight: 1 }} color="primary" />Đối tác RING!</Verified>
                             </Box>
                             <Button
@@ -99,18 +114,26 @@ const ShopDisplay = () => {
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    pl={{ xs: 0, md: 1 }}
+                    padding={{ xs: 0, md: '0 25px' }}
                 >
                     <Stack
                         spacing={2}
                         direction="row"
                         useFlexGap
-                        sx={{ flexWrap: 'wrap' }}
+                        sx={{ flexWrap: 'wrap', width: '100%' }}
                     >
-                        <ShopDetail>Đánh giá<b>9999</b></ShopDetail>
-                        <ShopDetail>Sản phẩm<b>9999</b></ShopDetail>
-                        <ShopDetail>Người theo dõi<b>9999</b></ShopDetail>
-                        <ShopDetail className="hide-on-mobile">Tham gia<b>9999</b></ShopDetail>
+                        <ShopDetail><LocalActivity color="warning" />Đánh giá:<b>{data?.totalReviews}</b></ShopDetail>
+                        <ShopDetail><AutoStories color="warning" />Sản phẩm:<b>{data?.totalProducts}</b></ShopDetail>
+                        <ShopDetail><PersonAddAlt1 color="warning" />Người theo dõi:<b>{data?.totalFollowers}</b></ShopDetail>
+                        <ShopDetail className="hide-on-mobile">
+                            <Today color="warning" />Tham gia:<b>
+                                {new Date(data?.joinedDate).toLocaleDateString("en-GB", {
+                                    year: "numeric",
+                                    month: "2-digit",
+                                    day: "2-digit",
+                                })}
+                            </b>
+                        </ShopDetail>
                     </Stack>
                 </Grid>
             </Grid>

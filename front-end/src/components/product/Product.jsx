@@ -23,6 +23,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
 
 const Container = styled.div`
     min-width: 172px;
+    min-height: 350px;
     max-width: 290px;
     width: 100%;
     height: 100%;
@@ -39,6 +40,10 @@ const Container = styled.div`
         border-color: ${props => props.theme.palette.action.focus};
         box-shadow: ${props => props.theme.shadows[1]};
         ${StyledLazyImage} { filter: saturate(120%)}
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        min-height: 317px;
     }
 `
 
