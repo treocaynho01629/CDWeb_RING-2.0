@@ -16,13 +16,14 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
     @Query("""
 	select s.owner.username as ownerUsername, s.owner.id as ownerId, s.name as name, s.description as description,
-	 s.image.name as image, s.createdDate as joinedDate, count(r.id) as totalReviews, 
+	 i.name as image, s.createdDate as joinedDate, count(r.id) as totalReviews, 
 	 count(b.id) as totalProducts, size(s.followers) as totalFollowers 
-	from Shop s left join Book b on s.id = b.shop.id
+	from Shop s left join Image i on i.id = s.image.id
+	left join Book b on s.id = b.shop.id
 	left join Review r on b.id = r.book.id
 	where concat (s.name, s.owner.username) ilike %:keyword%
 	and (coalesce(:ownerId) is null or s.owner.id = :ownerId)
-	group by s.id, s.owner.username, s.owner.id, s.image.name
+	group by s.id, s.owner.username, s.owner.id, i.id
 	""")
     Page<IShopDetail> findShopByFilter(String keyword, Long ownerId, Pageable pageable);
 
@@ -37,12 +38,13 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
 	@Query("""
 	select s.owner.username as ownerUsername, s.owner.id as ownerId, s.name as name, s.description as description,
-	 s.image.name as image, s.createdDate as joinedDate, count(r.id) as totalReviews, 
+	 i.name as image, s.createdDate as joinedDate, count(r.id) as totalReviews, 
 	 count(b.id) as totalProducts, size(s.followers) as totalFollowers 
-	from Shop s left join Book b on s.id = b.shop.id
+	from Shop s left join Image i on i.id = s.image.id
+	left join Book b on s.id = b.shop.id
 	left join Review r on b.id = r.book.id
 	where s.id = :id
-	group by s.id
+	group by s.id, s.owner.username, s.owner.id, i.id
 	""")
     Optional<IShopDetail> findShopById(Long id);
 }

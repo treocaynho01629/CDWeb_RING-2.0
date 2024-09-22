@@ -1,5 +1,6 @@
 package com.ring.bookstore.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -74,6 +75,7 @@ public class Account extends Auditable implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL, 
     		orphanRemoval = true, 
     		mappedBy = "user")
+	@JsonManagedReference
     private AccountProfile profile;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
