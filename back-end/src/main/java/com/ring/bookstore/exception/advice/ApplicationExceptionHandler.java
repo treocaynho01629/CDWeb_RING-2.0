@@ -1,7 +1,9 @@
 package com.ring.bookstore.exception.advice;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -12,6 +14,8 @@ import com.ring.bookstore.exception.ExceptionMessage;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.exception.HttpResponseException;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +29,7 @@ public class ApplicationExceptionHandler{
         e.getBindingResult().getFieldErrors().forEach(error -> {
             errorMap.put(error.getField(), error.getDefaultMessage());
         });
-        return new ExceptionMessage(400, "Invalid argument", errorMap);
+        return new ExceptionMessage(HttpStatus.BAD_REQUEST.value(), "Invalid argument", errorMap);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -33,10 +37,9 @@ public class ApplicationExceptionHandler{
     public ExceptionMessage processRuntimeException(RuntimeException e) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("errorMessage", e.getMessage());
-        return new ExceptionMessage(500, "An internal server error occurred.", errorMap);
+        return new ExceptionMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An internal server error occurred.", errorMap);
     }
 
-    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(HttpResponseException.class)
     public ExceptionMessage processSocialException(HttpResponseException e) {
         Map<String, String> errorMap = new HashMap<>();
@@ -54,7 +57,7 @@ public class ApplicationExceptionHandler{
     public ExceptionMessage processSocialException(ImageResizerException e) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("errorMessage", e.getMessage());
-        return new ExceptionMessage(e.getStatus().value(), e.getMessage(), errorMap);
+        return new ExceptionMessage(e.getStatus().value(), "Failed to resize image!", errorMap);
     }
     
     @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
@@ -62,6 +65,31 @@ public class ApplicationExceptionHandler{
     public ExceptionMessage handleMaxSizeException(MaxUploadSizeExceededException e) {
     	Map<String, String> errorMap = new HashMap<>();
         errorMap.put("errorMessage", e.getMessage());
-        return new ExceptionMessage(417 , "File must be under 2mb!", errorMap);
+        return new ExceptionMessage(HttpStatus.EXPECTATION_FAILED.value() , "File size exceed maximum limit!", errorMap);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ExceptionMessage handleValidationException(HttpMessageNotReadableException e) {
+        String errorMessage = "";
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("errorMessage", e.getMessage());
+
+        if (e.getCause() instanceof InvalidFormatException) {
+            InvalidFormatException ifx = (InvalidFormatException) e.getCause();
+            if (ifx.getTargetType() != null && ifx.getTargetType().isEnum()) {
+                errorMessage = String.format("Invalid enum value: '%s' for the field: '%s'. The value must be one of: %s.",
+                        ifx.getValue(), ifx.getPath().get(ifx.getPath().size()-1).getFieldName(), Arrays.toString(ifx.getTargetType().getEnumConstants()));
+            }
+        }
+        return new ExceptionMessage(HttpStatus.BAD_REQUEST.value(), errorMessage, errorMap);
+    }
+
+    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+    @ExceptionHandler(IOException.class)
+    public ExceptionMessage handleUploadImageException(IOException e) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("errorMessage", e.getMessage());
+        return new ExceptionMessage(HttpStatus.EXPECTATION_FAILED.value() , "Failed to upload image!", errorMap);
     }
 }

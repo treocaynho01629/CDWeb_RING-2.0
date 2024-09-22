@@ -29,7 +29,7 @@ public class ReviewController {
     public ResponseEntity<?> getReviews(
             @RequestParam(value = "bookId", required = false) Long bookId,
             @RequestParam(value = "userId", required = false) Long userId,
-            @RequestParam(value = "rating", defaultValue = "0") Integer rating,
+            @RequestParam(value = "rating", required = false) Integer rating,
             @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
@@ -40,7 +40,7 @@ public class ReviewController {
     //Get reviews for book's {id}
     @GetMapping("/{id}")
     public ResponseEntity<?> getReviewsByBookId(@PathVariable("id") Long bookId,
-                                                @RequestParam(value = "rating", defaultValue = "0") Integer rating,
+                                                @RequestParam(value = "rating", required = false) Integer rating,
                                                 @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
                                                 @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                                 @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
@@ -51,7 +51,7 @@ public class ReviewController {
     //Get current user's reviews
     @GetMapping("/user")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> getUserReviews(@RequestParam(value = "rating", defaultValue = "0") Integer rating,
+    public ResponseEntity<?> getUserReviews(@RequestParam(value = "rating", required = false) Integer rating,
                                             @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
                                             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
@@ -66,31 +66,35 @@ public class ReviewController {
     public ResponseEntity<?> reviewBook(@PathVariable("id") Long bookId,
                                         @RequestBody @Valid ReviewRequest request,
                                         @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(reviewService.review(bookId, request, currUser), HttpStatus.OK);
+        return new ResponseEntity<>(reviewService.review(bookId, request, currUser), HttpStatus.CREATED);
     }
 
     //Update review by id
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> updateBook(@PathVariable("id") Long bookId,
-                                        @Valid @RequestBody ReviewRequest request,
-                                        @CurrentAccount Account currUser) {
+    public ResponseEntity<?> updateReview(@PathVariable("id") Long bookId,
+                                          @Valid @RequestBody ReviewRequest request,
+                                          @CurrentAccount Account currUser) {
         return new ResponseEntity<>(reviewService.updateReview(bookId, request, currUser), HttpStatus.OK);
     }
 
     //Delete review
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteReview(@PathVariable("id") Long bookId, @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(reviewService.deleteReview(bookId, currUser), HttpStatus.OK);
+    public ResponseEntity<?> deleteReview(@PathVariable("id") Long id) {
+        reviewService.deleteReview(id);
+        return new ResponseEntity<>("Review deleted successfully!", HttpStatus.OK);
     }
 
     //Delete multiples reviews in a lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteReviews(@RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse,
+    public ResponseEntity<?> deleteReviews(@RequestParam(value = "bookId", required = false) Long bookId,
+                                           @RequestParam(value = "userId", required = false) Long userId,
+                                           @RequestParam(value = "rating", required = false) Integer rating,
+                                           @RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse,
                                            @RequestParam("ids") List<Long> ids) {
-        reviewService.deleteReviews(ids, isInverse);
+        reviewService.deleteReviews(bookId, userId, rating, ids, isInverse);
         return new ResponseEntity<>("Reviews deleted successfully!", HttpStatus.OK);
     }
 

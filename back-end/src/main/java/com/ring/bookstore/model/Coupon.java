@@ -1,9 +1,11 @@
 package com.ring.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Nationalized;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 
 @Entity
@@ -12,6 +14,9 @@ import org.hibernate.annotations.Nationalized;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE Coupon SET active = false WHERE id=?")
+@Where(clause = "active=true")
+@EqualsAndHashCode(callSuper = true)
 public class Coupon extends Auditable {
 
     @Id
@@ -30,4 +35,15 @@ public class Coupon extends Auditable {
 
     @Column(length = 50, nullable = false, unique = true)
     private String code;
+
+    @OneToOne(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "coupon")
+    @JsonManagedReference
+    private CouponDetail detail;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id")
+    @JsonIgnore
+    private Shop shop;
 }

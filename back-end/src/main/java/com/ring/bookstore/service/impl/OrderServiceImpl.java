@@ -77,7 +77,7 @@ public class OrderServiceImpl implements OrderService {
 		for (CartItem item : request.getCart()) {
 			//Book validation
 			Book book = bookRepo.findById(item.getId())
-			            .orElseThrow(()-> new ResourceNotFoundException("Product does not exists!"));
+			            .orElseThrow(()-> new ResourceNotFoundException("Product not found!"));
 			if (book.getAmount() < item.getQuantity()) throw new ResourceNotFoundException("Product is out of stock!");
 
 			//Calculate
@@ -175,7 +175,7 @@ public class OrderServiceImpl implements OrderService {
 	//Get order by {id}
 	@Override
 	public OrderDTO getOrderById(Long id) {
-		OrderReceipt order = orderRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order does not exists!"));
+		OrderReceipt order = orderRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found!"));
 		OrderDTO orderDTO = orderMapper.orderToOrderDTO(order); //Map to DTO
 		return orderDTO;
 	}

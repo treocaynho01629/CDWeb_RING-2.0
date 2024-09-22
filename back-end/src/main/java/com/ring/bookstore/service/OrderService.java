@@ -16,6 +16,6 @@ public interface OrderService {
 	Page<OrderDTO> getOrdersByBookId(Long id, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
 	Page<OrderDTO> getOrdersByUser(Account user, Integer pageNo, Integer pageSize);
 	OrderDTO getOrderById(Long id);
-	public OrderReceipt checkout(OrderRequest request, Account user);
+	OrderReceipt checkout(OrderRequest request, Account user);
 	List<ChartDTO> getMonthlySale(Account user);
 }

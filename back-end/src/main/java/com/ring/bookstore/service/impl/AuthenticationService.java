@@ -1,6 +1,8 @@
 package com.ring.bookstore.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ring.bookstore.model.AccountProfile;
+import com.ring.bookstore.model.Image;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -30,14 +32,12 @@ import com.ring.bookstore.service.RoleService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -100,7 +100,7 @@ public class AuthenticationService {
 	public AuthenticationResponse authenticate(AuthenticationRequest request) throws ResourceNotFoundException {
 		//Check if user with this username exists
 		var user = accountRepo.findByUsername(request.getUsername())
-				.orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
+				.orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
 		//Validate token
 		try {
@@ -113,7 +113,7 @@ public class AuthenticationService {
 		}
 
 		//Generate new JWT & refresh token
-		var jwtToken = jwtService.generateToken(user);
+		var jwtToken = generateToken(user);
 		var refreshToken = jwtService.generateRefreshToken(user);
 
 		//Return authentication response
@@ -139,10 +139,10 @@ public class AuthenticationService {
 
 		if (username != null) { //Check if this username exists
 			var user = this.accountRepo.findByUsername(username)
-					.orElseThrow(() -> new ResourceNotFoundException("User does not exist!"));
+					.orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
 			if (jwtService.isRefreshTokenValid(refreshToken, user)) { //Validate token
-				var jwtToken = jwtService.generateToken(user);
+				var jwtToken = generateToken(user);
 
 				//Generate and return new authentication response
 				var authResponse = AuthenticationResponse.builder()
@@ -160,7 +160,7 @@ public class AuthenticationService {
 		//Get all accounts with this email
 		List<Account> accounts = accountRepo.findByEmail(email);
 
-		if (accounts.size() == 0) throw new ResourceNotFoundException("User with this email does not exist!");
+		if (accounts.isEmpty()) throw new ResourceNotFoundException("User with this email not found!");
 		String resetContent = ""; //Email content
 
 		//Loop through all and send email
@@ -210,7 +210,7 @@ public class AuthenticationService {
 	public Account resetPassword(ResetPassRequest request) {
 		//Check if user with username exists
 		var user = accountRepo.findByResetPassToken(request.getToken())
-				.orElseThrow(() -> new ResourceNotFoundException("User with this token does not exist!"));
+				.orElseThrow(() -> new ResourceNotFoundException("User with this token not found!"));
 		//Check token expiration
 		if (isTokenExpired(user.getTokenCreationDate())) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Token hết hạn!");
         //Validate new password
@@ -238,7 +238,19 @@ public class AuthenticationService {
         return savedAccount; //Return updated account
 	}
 
-	//Check if reset token expired or not
+	//Generate token with avatar
+	protected String generateToken(Account user) {
+		AccountProfile profile = (profile = user.getProfile()) != null ? profile : null;
+		Image image = (image = profile.getImage()) != null ? image : null;
+		String fileDownloadUri = image != null ? image.getFileDownloadUri() : null;
+
+		Map<String, Object> extraClaims = new HashMap<>();
+		extraClaims.put("image", fileDownloadUri);
+
+        return jwtService.generateToken(extraClaims, user);
+	}
+
+	//Check has reset token expired
 	private boolean isTokenExpired(final LocalDateTime tokenCreationDate) {
 
 		LocalDateTime now = LocalDateTime.now();

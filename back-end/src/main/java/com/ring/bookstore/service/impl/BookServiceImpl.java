@@ -1,7 +1,6 @@
 package com.ring.bookstore.service.impl;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -72,7 +71,7 @@ public class BookServiceImpl implements BookService {
     //Get display book info by {id}
     public BookDetailDTO getBookDetailById(Long id) {
         IBookDetail book = bookRepo.findBookDetailById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Product does not exists!"));
+                new ResourceNotFoundException("Product not found!"));
         BookDetailDTO bookDetailDTO = bookMapper.detailToDetailDTO(book); //Map to DTO
         return bookDetailDTO;
     }
@@ -80,7 +79,7 @@ public class BookServiceImpl implements BookService {
     //Get display book info by {slug}
     public BookDetailDTO getBookDetailBySlug(String slug) {
         IBookDetail book = bookRepo.findBookDetailBySlug(slug).orElseThrow(() ->
-                new ResourceNotFoundException("Product does not exists!"));
+                new ResourceNotFoundException("Product not found!"));
         BookDetailDTO bookDetailDTO = bookMapper.detailToDetailDTO(book); //Map to DTO
         return bookDetailDTO;
     }
@@ -106,6 +105,7 @@ public class BookServiceImpl implements BookService {
                 .description(request.getDescription())
                 .image(savedImage)
                 .price(request.getPrice())
+                .discount(request.getDiscount())
                 .publisher(pub)
                 .cate(cate)
                 .shop(shop)
@@ -125,7 +125,7 @@ public class BookServiceImpl implements BookService {
                 .bLanguage(request.getLanguage())
                 .bDate(request.getDate())
                 .build();
-        BookDetail addedDetail = detailRepo.save(bookDetail); //Save details to databasae
+        BookDetail addedDetail = detailRepo.save(bookDetail); //Save details to database
 
         //Return added book
         addedBook.setBookDetail(addedDetail);
@@ -134,7 +134,7 @@ public class BookServiceImpl implements BookService {
 
     //Update book (SELLER)
     @Transactional
-    public BookResponseDTO updateBook(BookRequest request, MultipartFile file, Long id, Account seller) throws IOException, ImageResizerException {
+    public BookResponseDTO updateBook(Long id, BookRequest request, MultipartFile file, Account seller) throws IOException, ImageResizerException {
         //Check book exists & category, publisher validation
         Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
@@ -152,7 +152,7 @@ public class BookServiceImpl implements BookService {
         if (file != null) { //Contain new image >> upload/replace
             imageService.deleteImage(book.getImage().getId()); //Delete old image
             Image savedImage = imageService.upload(file); //Upload new image
-            book.setImage(savedImage); //Save to database
+            book.setImage(savedImage); //Set new image
         }
 
 //        //Preview images
@@ -176,6 +176,7 @@ public class BookServiceImpl implements BookService {
         book.setTitle(request.getTitle());
         book.setDescription(request.getDescription());
         book.setPrice(request.getPrice());
+        book.setDiscount(request.getDiscount());
         book.setPublisher(pub);
         book.setCate(cate);
         book.setAuthor(request.getAuthor());
@@ -213,8 +214,7 @@ public class BookServiceImpl implements BookService {
     //Delete all books (SELLER)
     @Transactional
     public void deleteAllBooks(Account seller) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString()))) {
+        if (isAuthAdmin()) {
             bookRepo.deleteAll();
         } else {
             bookRepo.deleteBySellerId(seller.getId());
@@ -222,14 +222,13 @@ public class BookServiceImpl implements BookService {
     }
 
     //Check valid role function
-    protected boolean isSellerValid(Book book, Account seller) {
-        boolean result = false;
+    protected boolean isAuthAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
+        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+    }
+
+    protected boolean isSellerValid(Book book, Account seller) {
         //Check if is admin or valid seller id
-        if (book.getShop().getOwner().getId().equals(seller.getId())
-                || (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())))) {
-            result = true;
-        }
-        return result;
+        return book.getShop().getOwner().getId().equals(seller.getId()) || isAuthAdmin();
     }
 }

@@ -51,6 +51,7 @@ public class SecurityConfiguration { //Security config
 					"/api/categories/**",
 					"/api/publishers/**",
 					"/api/reviews/**",
+					"/api/shops/**",
 					"/api/images/**",
 					"/v2/api-docs",
 					"v3/api-docs",

@@ -9,12 +9,10 @@ import java.util.HashMap;
 public class ResourceNotFoundException extends RuntimeException{
 	
     private ExceptionMessage exceptionMessage;
-    private String message;
-    
+
     public ResourceNotFoundException(String message) {
         super(message);
-        this.message = message;
-        this.exceptionMessage = new ExceptionMessage(HttpStatus.NOT_FOUND.value(), message,new HashMap<>());
+        this.exceptionMessage = new ExceptionMessage(HttpStatus.NOT_FOUND.value(), message, new HashMap<>());
     }
 
     public ExceptionMessage getExceptionMessage() {

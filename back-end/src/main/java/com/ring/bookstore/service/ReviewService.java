@@ -22,9 +22,9 @@ public interface ReviewService {
 
 	ReviewDTO updateReview(Long id, ReviewRequest request, Account user);
 
-	ReviewDTO deleteReview(Long id, Account user);
+	void deleteReview(Long id);
 
-	void deleteReviews(List<Long> ids, boolean isInverse);
+	void deleteReviews(Long bookId, Long userId, Integer rating, List<Long> ids, boolean isInverse);
 
     void deleteAllReviews();
 }

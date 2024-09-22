@@ -1,104 +1,92 @@
 package com.ring.bookstore.controller;
 
-import java.util.List;
-
+import com.ring.bookstore.config.CurrentAccount;
+import com.ring.bookstore.exception.ImageResizerException;
+import com.ring.bookstore.model.Account;
+import com.ring.bookstore.request.ShopRequest;
+import com.ring.bookstore.service.ShopService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.ring.bookstore.config.CurrentAccount;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.request.ReviewRequest;
-import com.ring.bookstore.service.ReviewService;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @CrossOrigin("http://localhost:5173")
-@RequestMapping("/api/reviews")
+@RequestMapping("/api/shops")
 @RequiredArgsConstructor
-public class ReviewController {
+public class ShopController {
 
-    private final ReviewService reviewService;
+    private final ShopService shopService;
 
-    //Get reviews
+    //Get shops
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getReviews(
-            @RequestParam(value = "bookId", required = false) Long bookId,
-            @RequestParam(value = "userId", required = false) Long userId,
-            @RequestParam(value = "rating", defaultValue = "0") Integer rating,
+    public ResponseEntity<?> getShops(
+            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+            @RequestParam(value = "ownerId", required = false) Long ownerId,
             @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
             @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir) {
-        return new ResponseEntity<>(reviewService.getReviews(bookId, userId, rating, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
+        return new ResponseEntity<>(shopService.getShops(pageNo, pageSize, sortBy, sortDir, keyword, ownerId), HttpStatus.OK);
     }
 
-    //Get reviews for book's {id}
+    //Get shop by {id}
     @GetMapping("/{id}")
-    public ResponseEntity<?> getReviewsByBookId(@PathVariable("id") Long bookId,
-                                                @RequestParam(value = "rating", defaultValue = "0") Integer rating,
-                                                @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
-                                                @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                                @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-                                                @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir) {
-        return new ResponseEntity<>(reviewService.getReviewsByBookId(bookId, rating, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
+    public ResponseEntity<?> getShopById(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(shopService.getShopById(id), HttpStatus.OK);
     }
 
-    //Get current user's reviews
-    @GetMapping("/user")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> getUserReviews(@RequestParam(value = "rating", defaultValue = "0") Integer rating,
-                                            @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
-                                            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                            @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-                                            @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
-                                            @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(reviewService.getUserReviews(currUser, rating, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
+    //Add shop
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> createShop(@Valid @RequestPart("request") ShopRequest request,
+                                        @RequestPart("image") MultipartFile file,
+                                        @CurrentAccount Account currUser) throws ImageResizerException, IOException {
+        return new ResponseEntity<>(shopService.addShop(request, file, currUser), HttpStatus.CREATED);
     }
 
-    //Review
-    @PostMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> reviewBook(@PathVariable("id") Long bookId,
-                                        @RequestBody @Valid ReviewRequest request,
-                                        @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(reviewService.review(bookId, request, currUser), HttpStatus.OK);
+    //Update shop by id
+    @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> updateShop(@PathVariable("id") Long id,
+                                        @Valid @RequestPart("request") ShopRequest request,
+                                        @RequestPart(name = "image", required = false) MultipartFile file,
+                                        @CurrentAccount Account currUser) throws ImageResizerException, IOException {
+        return new ResponseEntity<>(shopService.updateShop(id, request, file, currUser), HttpStatus.CREATED);
     }
 
-    //Update review by id
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> updateBook(@PathVariable("id") Long bookId,
-                                        @Valid @RequestBody ReviewRequest request,
-                                        @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(reviewService.updateReview(bookId, request, currUser), HttpStatus.OK);
-    }
-
-    //Delete review
+    //Delete shop
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteReview(@PathVariable("id") Long bookId, @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(reviewService.deleteReview(bookId, currUser), HttpStatus.OK);
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> deleteShop(@PathVariable("id") Long id, @CurrentAccount Account currUser) {
+        return new ResponseEntity<>(shopService.deleteShop(id, currUser), HttpStatus.OK);
     }
 
-    //Delete multiples reviews in a lists of {ids}
+    //Delete multiples shops in a lists of {ids}
     @DeleteMapping("/delete-multiples")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteReviews(@RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse,
-                                           @RequestParam("ids") List<Long> ids) {
-        reviewService.deleteReviews(ids, isInverse);
-        return new ResponseEntity<>("Reviews deleted successfully!", HttpStatus.OK);
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> deleteShops(@RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                         @RequestParam(value = "ownerId", required = false) Long ownerId,
+                                         @RequestParam("ids") List<Long> ids,
+                                         @RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse,
+                                         @CurrentAccount Account currUser
+    ) {
+        shopService.deleteShops(keyword, ownerId, ids, isInverse, currUser);
+        return new ResponseEntity<>("Shops deleted successfully!", HttpStatus.OK);
     }
 
-    //Delete all reviews
+    //Delete all shops
     @DeleteMapping("/delete-all")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteAllReviews() {
-        reviewService.deleteAllReviews();
-        return new ResponseEntity<>("All reviews deleted successfully!", HttpStatus.OK);
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> deleteAllShops() {
+        shopService.deleteAllShops();
+        return new ResponseEntity<>("All shops deleted successfully!", HttpStatus.OK);
     }
 }

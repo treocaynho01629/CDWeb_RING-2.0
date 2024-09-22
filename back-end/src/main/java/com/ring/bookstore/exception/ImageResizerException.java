@@ -14,5 +14,4 @@ public class ImageResizerException extends Exception {
     public HttpStatus getStatus() {
         return statusCode;
     }
-
 }

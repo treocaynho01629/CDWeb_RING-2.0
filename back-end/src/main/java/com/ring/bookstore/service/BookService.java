@@ -26,7 +26,7 @@ public interface BookService {
 
     BookResponseDTO addBook(BookRequest request, MultipartFile file, Account seller) throws IOException, ImageResizerException;
 
-    BookResponseDTO updateBook(BookRequest request, MultipartFile file, Long id, Account seller) throws IOException, ImageResizerException;
+    BookResponseDTO updateBook(Long id, BookRequest request, MultipartFile file, Account seller) throws IOException, ImageResizerException;
 
     BookResponseDTO deleteBook(Long id, Account seller);
 
