@@ -38,6 +38,8 @@ public class BookMapper {
                 book.getPrice(),
                 book.getDiscount(),
                 book.getAmount(),
+                book.getShopId(),
+                book.getShopName(),
                 rating != null ? rating : 0,
                 totalOrders != null ? totalOrders : 0);
     }
@@ -54,12 +56,14 @@ public class BookMapper {
         Integer two = bookWithDetail.getTwo();
         Integer one = bookWithDetail.getOne();
 
+        //Main thumbnail
         String fileDownloadUri = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
                 .path("/api/images/")
                 .path(bookWithDetail.getImage())
                 .toUriString();
 
+        //Other preview images
         BookDetail detail = book.getBookDetail();
         List<Image> previewImages = detail.getPreviewImages();
         List<String> images = previewImages
@@ -84,7 +88,8 @@ public class BookMapper {
                 book.getDescription(),
                 book.getType(),
                 book.getAuthor(),
-                shopId,
+                bookWithDetail.getShopId(),
+                bookWithDetail.getShopName(),
                 book.getPublisher(),
                 book.getCate(),
                 detail.getSize(),

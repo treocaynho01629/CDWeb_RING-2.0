@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 //Shop
 public record ShopDTO(String ownerUsername,
                       Long ownerId,
+                      Long id,
                       String name,
                       String description,
                       String image,

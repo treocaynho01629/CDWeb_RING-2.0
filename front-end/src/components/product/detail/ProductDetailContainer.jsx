@@ -5,6 +5,7 @@ import { Grid2 as Grid, Skeleton, Box, Stack } from '@mui/material';
 import { useGetBooksQuery } from '../../../features/books/booksApiSlice';
 import { MobileExtendButton, Title } from '../../custom/GlobalComponents';
 import { KeyboardArrowDown, KeyboardArrowRight, KeyboardArrowUp } from '@mui/icons-material';
+import { idFormatter } from '../../../ultils/covert';
 import ShopDisplay from './ShopDisplay';
 import ProductsScroll from '../ProductsScroll';
 
@@ -67,7 +68,7 @@ const Showmore = styled.div`
 
 const Description = styled.p`
   margin-top: 10px;
-  margin-bottom: 0px;
+  margin-bottom: 20px;
   font-size: 14px;
   height: auto;
   transition: all 1s ease;
@@ -158,11 +159,11 @@ const ProductDetailContainer = ({ loading, book, scrollIntoTab, mobileMode }) =>
 
   if (!loading && book) {
     details =
-      <table style={{ width: '100%' }}>
+      <table style={{ width: '100%', marginTop: '25px' }}>
         <tbody>
           <tr>
             <InfoTitle><InfoText className="secondary">Mã hàng: </InfoText></InfoTitle>
-            <InfoStack><InfoText>{('00000' + book?.id).slice(-5)}</InfoText></InfoStack>
+            <InfoStack><InfoText>{idFormatter(book?.id)}</InfoText></InfoStack>
           </tr>
           <tr>
             <InfoTitle><InfoText className="secondary">Tác giả: </InfoText></InfoTitle>
@@ -229,14 +230,14 @@ const ProductDetailContainer = ({ loading, book, scrollIntoTab, mobileMode }) =>
   return (
     <Stack spacing={1} direction={{ xs: 'column-reverse', md: 'column' }}>
       <Stack spacing={1}>
-        <ShopDisplay id={book?.shopId}/>
+        <ShopDisplay id={book?.shopId} name={book?.shopName} />
         <Grid container size={12} spacing={1} display="flex" flexDirection={{ xs: 'column-reverse', md: 'row' }}>
           <Grid size={{ xs: 12, md: 'grow' }}>
             <DetailContainer>
               <Box position="relative" mb={-2}>
                 <Title>Thông tin chi tiết</Title>
                 <MobileExtendButton disabled={loading || !book} onClick={() => setOpenDetail(true)}>
-                  <KeyboardArrowRight fontSize="small" />
+                  Tác giả, Nhà xuất bản,... <KeyboardArrowRight fontSize="small" />
                 </MobileExtendButton>
               </Box>
               {mobileMode
@@ -249,7 +250,12 @@ const ProductDetailContainer = ({ loading, book, scrollIntoTab, mobileMode }) =>
                       onOpen={() => setOpenDetail(true)}
                       onClose={() => setOpenDetail(false)}
                     >
-                      {details}
+                      <Box sx={{ padding: '0 12px' }}>
+                        <Title>Thông tin chi tiết</Title>
+                        <Box mt={-2} mb={2}>
+                          {details}
+                        </Box>
+                      </Box>
                     </SwipeableDrawer>
                   }
                 </Suspense>

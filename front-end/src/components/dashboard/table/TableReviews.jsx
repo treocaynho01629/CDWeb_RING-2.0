@@ -4,6 +4,7 @@ import { Delete as DeleteIcon, Search, Star } from '@mui/icons-material';
 import { Link } from "react-router-dom";
 import { useDeleteReviewMutation, useDeleteReviewsMutation, useGetReviewsByBookIdQuery, useGetReviewsByUserIdQuery, useGetReviewsQuery } from '../../../features/reviews/reviewsApiSlice';
 import { FooterLabel, ItemTitle, FooterContainer } from '../custom/ShareComponents';
+import { idFormatter } from '../../../ultils/covert';
 import useAuth from "../../../hooks/useAuth";
 import CustomTablePagination from '../custom/CustomTablePagination';
 import CustomProgress from '../../custom/CustomProgress';
@@ -353,7 +354,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
                     }}
                   />
                 </TableCell>
-                <TableCell component="th" id={labelId} scope="row" padding="none" align="center">#{('00000' + id).slice(-5)}</TableCell>
+                <TableCell component="th" id={labelId} scope="row" padding="none" align="center">{idFormatter(id)}</TableCell>
               </>
             }
             <TableCell align="left">
@@ -361,7 +362,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
                 <Avatar sx={{ marginRight: 1 }}>{review?.username?.charAt(0) ?? ''}</Avatar>
                 <Box>
                   <ItemTitle>{review.username}</ItemTitle>
-                  <ItemTitle className="secondary">ID: #{('00000' + review.userId).slice(-5)}</ItemTitle>
+                  <ItemTitle className="secondary">ID: {idFormatter(review.userId)}</ItemTitle>
                 </Box>
               </Link>
             </TableCell>
@@ -380,7 +381,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
             <TableCell align="left">
               <Link to={`/detail/${review.bookId}`} >
                 <ItemTitle>{review.bookTitle}</ItemTitle>
-                <ItemTitle className="secondary">ID: #{('00000' + review.bookId).slice(-5)}</ItemTitle>
+                <ItemTitle className="secondary">ID: {idFormatter(review.bookId)}</ItemTitle>
               </Link>
             </TableCell>
             {(!mini && isAdmin) &&

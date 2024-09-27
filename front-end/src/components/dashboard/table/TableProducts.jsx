@@ -5,8 +5,9 @@ import { Link } from "react-router-dom";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDeleteBookMutation, useDeleteBooksMutation, useGetBooksQuery } from '../../../features/books/booksApiSlice';
 import { ItemTitle, FooterContainer, FooterLabel } from '../custom/ShareComponents';
-import CustomProgress from '../../custom/CustomProgress';
+import { idFormatter } from '../../../ultils/covert';
 import useAuth from '../../../hooks/useAuth';
+import CustomProgress from '../../custom/CustomProgress';
 import CustomTableToolbar from '../custom/CustomTableToolbar';
 import CustomTableHead from '../custom/CustomTableHead';
 import CustomTablePagination from '../custom/CustomTablePagination';
@@ -373,7 +374,7 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
                   />
                 </TableCell>
                 <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
-                  <Link to={`/detail/${id}`}>#{('00000' + id).slice(-5)}</Link>
+                  <Link to={`/detail/${id}`}>{idFormatter(id)}</Link>
                 </TableCell>
               </>
             }

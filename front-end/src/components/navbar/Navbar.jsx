@@ -251,30 +251,14 @@ const Navbar = () => {
     const open = Boolean(anchorEl);
     const openCart = Boolean(anchorElCart);
 
-    const hanldeCartPopover = (e) => {
-        setAnchorElCart(e.currentTarget);
-    };
-
-    const handleCartClose = () => {
-        setAnchorElCart(null);
-    };
-
-    const handleProfilePopover = (e) => {
-        setAnchorEl(e.currentTarget);
-    };
-
-    const handleProfileClose = () => {
-        setAnchorEl(null);
-    };
+    const hanldeCartPopover = (e) => { setAnchorElCart(e.currentTarget) };
+    const handleCartClose = () => { setAnchorElCart(null) };
+    const handleProfilePopover = (e) => { setAnchorEl(e.currentTarget) };
+    const handleProfileClose = () => { setAnchorEl(null) };
 
     //Toggle drawer open state
-    const toggleDrawer = () => {
-        setOpen(prev => !prev)
-    };
-
-    const toggleSearch = () => {
-        setToggle(prev => !prev);
-    }
+    const toggleDrawer = () => { setOpen(prev => !prev) };
+    const toggleSearch = () => { setToggle(prev => !prev) };
 
     //Confirm search
     const handleSubmitSearch = (e) => {
@@ -421,14 +405,14 @@ const Navbar = () => {
                                                 >
                                                     <Link to={'/profile/detail'} title="Tài khoản">
                                                         <StyledIconButton className="nav" aria-label="profile">
-                                                            <Avatar sx={{ width: 24, height: 24, fontSize: '16px' }} src={image ? image + '?size=small' : null}/>
+                                                            <Avatar sx={{ width: 24, height: 24, fontSize: '16px' }} src={image ? image + '?size=small' : null} />
                                                             <IconText className="username">{username}</IconText>
                                                         </StyledIconButton>
                                                     </Link>
                                                     <Suspense fallback={<></>}>
                                                         <ProfilePopover {...{
                                                             open, anchorEl, handleClose: handleProfileClose,
-                                                            roles, logout, theme, colorMode
+                                                            roles, logout, theme, colorMode, image
                                                         }} />
                                                     </Suspense>
                                                 </div>

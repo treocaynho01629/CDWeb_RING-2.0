@@ -32,13 +32,13 @@ public class CouponServiceImpl implements CouponService {
     private final ShopRepository shopRepo;
 
     @Override
-    public Page<Coupon> getCoupons(CouponType type, String keyword, Long shopId,
-                                   Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+    public Page<Coupon> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
+                                   CouponType type, String keyword, Long shopId, Boolean byShop) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<Coupon> couponsList = couponRepo.findCouponByFilter(type, keyword, shopId, pageable);
+        Page<Coupon> couponsList = couponRepo.findCouponByFilter(type, keyword, shopId, byShop, pageable);
         return couponsList;
     }
 
@@ -66,7 +66,9 @@ public class CouponServiceImpl implements CouponService {
                 throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
             }
         } else {
-            if (!isAuthAdmin()) { throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");}
+            if (!isAuthAdmin()) {
+                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");
+            }
         }
 
         //Create coupon details
@@ -92,7 +94,8 @@ public class CouponServiceImpl implements CouponService {
         Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
 
         //Check if correct seller or admin
-        if (!isOwnerValid(coupon.getShop(), user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+        if (!isOwnerValid(coupon.getShop(), user))
+            throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
 
         //Shop validation + set
         if (request.getShopId() != null) {
@@ -103,7 +106,9 @@ public class CouponServiceImpl implements CouponService {
                 throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
             }
         } else {
-            if (!isAuthAdmin()) { throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");}
+            if (!isAuthAdmin()) {
+                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");
+            }
         }
 
         //Set new details info
@@ -127,21 +132,28 @@ public class CouponServiceImpl implements CouponService {
     public Coupon deleteCoupon(Long id, Account user) {
         Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
         //Check if correct seller or admin
-        if (!isOwnerValid(coupon.getShop(), user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+        if (!isOwnerValid(coupon.getShop(), user))
+            throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
 
         couponRepo.deleteById(id); //Delete from database
         return coupon;
     }
 
     @Override
-    public void deleteCoupons(List<Long> ids, boolean isInverse) {
-//        if (isInverse) {
-//            couponRepo.deleteByIdIsNotIn(ids);
-//        } else {
-//            couponRepo.deleteByIdIsIn(ids);
-//        }
-    }
+    public void deleteCoupons(CouponType type, String keyword, Long shopId, Boolean byShop,
+                              List<Long> ids, boolean isInverse, Account user) {
+        List<Long> listDelete = ids;
+        if (isInverse) listDelete = couponRepo.findInverseIds(type, keyword, shopId, byShop, ids);
 
+        //Loop and delete
+        for (Long id : listDelete) {
+            Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
+            //Check if correct seller or admin
+            if (!isOwnerValid(coupon.getShop(), user))
+                throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+            couponRepo.deleteById(id); //Delete from database
+        }
+    }
 
     @Override
     public void deleteAllCoupons() {

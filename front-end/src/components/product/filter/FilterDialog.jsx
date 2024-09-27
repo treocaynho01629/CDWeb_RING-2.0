@@ -347,7 +347,7 @@ const RangeFilter = ({ valueInput, setValueInput }) => {
   )
 }
 
-const OtherFilters = ({ type, setType, seller, setSeller }) => {
+const OtherFilters = ({ type, setType, shop, setShop }) => {
   //Change type
   const handleChangeType = (event) => {
     setType(event.target.value)
@@ -376,12 +376,12 @@ const OtherFilters = ({ type, setType, seller, setSeller }) => {
       </TextField>
       <TextField
         margin="dense"
-        id="seller"
+        id="shop"
         label="Tên người bán"
         fullWidth
         variant="outlined"
-        value={seller}
-        onChange={(e) => setSeller(e.target.value)}
+        value={shop}
+        onChange={(e) => setShop(e.target.value)}
       />
     </Filter>
   )
@@ -390,7 +390,7 @@ const OtherFilters = ({ type, setType, seller, setSeller }) => {
 const FilterDialog = (props) => {
   //#region construct
   const { filters, setFilters, onChangeCate, onChangeRange, onChangePub, onChangeType
-    , onChangeSeller, open, handleClose, resetFilter
+    , onChangeShop, open, handleClose, resetFilter
     , loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs
   } = props;
 
@@ -398,7 +398,7 @@ const FilterDialog = (props) => {
   const [cateId, setCateId] = useState(filters?.cateId);
   const [valueInput, setValueInput] = useState(filters?.value);
   const [type, setType] = useState(filters?.type);
-  const [seller, setSeller] = useState(filters?.seller);
+  const [shop, setShop] = useState(filters?.shop);
   const [selectedPub, setSelectedPub] = useState(filters?.pubId);
 
   //Fullscreen detection
@@ -415,8 +415,8 @@ const FilterDialog = (props) => {
   }, [filters?.type]);
 
   useEffect(() => {
-    setSeller(filters?.seller);
-  }, [filters?.seller]);
+    setShop(filters?.shop);
+  }, [filters?.shop]);
 
   useEffect(() => {
     setValueInput(filters?.value);
@@ -436,7 +436,7 @@ const FilterDialog = (props) => {
     if (onChangeRange) onChangeRange(valueInput);
     if (onChangeCate) onChangeCate(cateId);
     if (onChangeType) onChangeType(type);
-    if (onChangeSeller) onChangeSeller(seller);
+    if (onChangeShop) onChangeShop(shop);
 
     //Change filters
     setFilters({
@@ -445,7 +445,7 @@ const FilterDialog = (props) => {
       pubId: selectedPub,
       value: valueInput,
       type: type,
-      seller: seller
+      shop: shop
     })
   }
 
@@ -453,7 +453,7 @@ const FilterDialog = (props) => {
     setCateId('');
     setSelectedPub([]);
     setType('');
-    setSeller('');
+    setShop('');
     setValueInput([1000, 10000000]);
     resetFilter();
   }
@@ -473,7 +473,7 @@ const FilterDialog = (props) => {
           <CateFilter {...{ loadCates, doneCates, errorCates, cates, cateId, setCateId }} />
           <PublisherFilter {...{ loadPubs, donePubs, errorPubs, pubs, selectedPub, setSelectedPub }} />
           <RangeFilter {...{ valueInput, setValueInput }} />
-          <OtherFilters {...{ type, setType, seller, setSeller }} />
+          <OtherFilters {...{ type, setType, shop, setShop }} />
         </Stack>
       </DialogContent>
       <DialogActions>

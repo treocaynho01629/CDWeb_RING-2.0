@@ -4,6 +4,7 @@ import { Group as GroupIcon, Edit as EditIcon, Delete as DeleteIcon, Search, Mor
 import { Link } from "react-router-dom";
 import { useDeleteUserMutation, useDeleteUsersMutation, useGetUsersQuery } from '../../../features/users/usersApiSlice';
 import { FooterLabel, ItemTitle, FooterContainer } from '../custom/ShareComponents';
+import { idFormatter } from '../../../ultils/covert';
 import useAuth from "../../../hooks/useAuth";
 import CustomTablePagination from '../custom/CustomTablePagination';
 import CustomProgress from '../../custom/CustomProgress';
@@ -338,7 +339,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
               </TableCell>
             }
             <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
-              <Link to={`/user/${id}`}>#{('00000' + id).slice(-5)}</Link>
+              <Link to={`/user/${id}`}>{idFormatter(id)}</Link>
             </TableCell>
             <TableCell align="left">
               <Link to={`/user/${id}`} style={{ display: 'flex', alignItems: 'center' }}>

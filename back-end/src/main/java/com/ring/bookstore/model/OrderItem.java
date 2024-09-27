@@ -1,14 +1,8 @@
 package com.ring.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import com.ring.bookstore.enums.OrderStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Data
@@ -16,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class OrderDetail {
+public class OrderItem {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -38,22 +32,13 @@ public class OrderDetail {
     @Column
     private Double price;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
-    private OrderStatus status;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "detail_id")
     @JsonIgnore
-    private OrderReceipt order;
+    private OrderDetail detail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     @JsonIgnore
     private Book book;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id")
-    @JsonIgnore
-    private Coupon coupon;
 }

@@ -165,7 +165,7 @@ const ProgressContainer = styled.div`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    padding: 0 20px;
+    padding-left: 20px;
     margin-left: 10px;
 
     ${props => props.theme.breakpoints.down("sm")} {
@@ -321,7 +321,9 @@ const ReviewComponent = ({ book, id, scrollIntoTab }) => {
     };
 
     const reviewPercent = (value) => {
-        return (value / (book?.reviewsInfo?.totalRates ?? 0)) * 100;
+        const total = book?.reviewsInfo?.totalRates ?? 0;
+        const result = (value == 0 || total == 0) ? 0 : (value / total) * 100;
+        return result;
     }
 
     //Review

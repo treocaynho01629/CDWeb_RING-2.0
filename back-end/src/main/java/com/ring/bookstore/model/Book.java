@@ -122,7 +122,7 @@ public class Book extends Auditable {
             fetch = FetchType.LAZY)
     @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
-    private List<OrderDetail> orderDetails;
+    private List<OrderItem> orderItems;
 
     public void addReview(Review review) {
         bookReviews.add(review);
@@ -132,15 +132,5 @@ public class Book extends Auditable {
     public void removeReview(Review review) {
         bookReviews.remove(review);
         review.setBook(null);
-    }
-
-    public void addOrderDetail(OrderDetail detail) {
-        orderDetails.add(detail);
-        detail.setBook(this);
-    }
-
-    public void removeOrderDetail(OrderDetail detail) {
-        orderDetails.remove(detail);
-        detail.setBook(null);
     }
 }

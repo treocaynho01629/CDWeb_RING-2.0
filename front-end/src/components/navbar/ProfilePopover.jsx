@@ -2,7 +2,7 @@ import { Brightness3, Brightness7, DeliveryDining as DeliveryDiningIcon, Logout,
 import { Avatar, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-const ProfilePopover = ({ open, anchorEl, handleClose, roles, logout, theme, colorMode }) => {
+const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, theme, colorMode }) => {
     const role = roles?.length;
 
     return (
@@ -52,7 +52,7 @@ const ProfilePopover = ({ open, anchorEl, handleClose, roles, logout, theme, col
         >
             <Link to={'/profile/detail'} style={{ color: 'inherit' }}>
                 <MenuItem>
-                    <Avatar /> Thông tin tài khoản
+                    <Avatar src={image ? image + '?size=small' : null}/> Thông tin tài khoản
                 </MenuItem>
             </Link>
             <Link to={'/profile/orders'} style={{ color: 'inherit' }}>

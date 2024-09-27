@@ -48,9 +48,11 @@ const FiltersPage = () => {
         value: searchParams.get("value") ? searchParams.get("value").split(',') : [1000, 10000000],
         keyword: initialKeywords ?? "",
         type: searchParams.get("type") ?? "",
-        seller: searchParams.get("seller") ?? "",
+        shopId: searchParams.get("shopId") ?? "",
         pubId: searchParams.get("pubId") ?? [],
         cateId: searchParams.get("cateId") ?? "",
+        rating: searchParams.get("rating") ?? 0,
+        amount: searchParams.get("amount") ?? 1
     })
     const [pagination, setPagination] = useState({
         currPage: searchParams.get("pageNo") ? searchParams.get("pageNo") - 1 : 0,
@@ -70,8 +72,10 @@ const FiltersPage = () => {
         sortDir: pagination?.sortDir,
         keyword: filters?.keyword,
         cateId: filters?.cateId,
+        rating: filters?.rating,
+        amount: filters?.amount,
         type: filters?.type,
-        seller: filters?.seller,
+        shopId: filters?.shopId,
         pubId: filters?.pubId,
         value: filters?.value
     });
@@ -208,16 +212,16 @@ const FiltersPage = () => {
         setFilters({ ...filters, type: newValue });
     }
 
-    const handleChangeSeller = (newValue) => {
+    const handleChangeShop = (newValue) => {
         handleChangePage(1);
         if (newValue == "") {
-            searchParams.delete("seller");
+            searchParams.delete("shopId");
             setSearchParams(searchParams);
         } else {
-            searchParams.set("seller", newValue);
+            searchParams.set("shopId", newValue);
             setSearchParams(searchParams);
         }
-        setFilters({ ...filters, seller: newValue });
+        setFilters({ ...filters, shopId: newValue });
     }
 
     //Reset filters
@@ -226,7 +230,9 @@ const FiltersPage = () => {
             value: [1000, 10000000],
             keyword: "",
             type: "",
-            seller: "",
+            rating: 0,
+            amount: 1,
+            shopId: "",
             pubId: [],
             cateId: "",
         })
@@ -259,7 +265,7 @@ const FiltersPage = () => {
                                     onChangeRange={handleChangeRange}
                                     onChangePub={handleChangePub}
                                     onChangeType={handleChangeType}
-                                    onChangeSeller={handleChangeSeller}
+                                    onChangeShop={handleChangeShop}
                                 />
                             </Suspense>
                         }
@@ -273,12 +279,12 @@ const FiltersPage = () => {
                                 onChangeRange={handleChangeRange}
                                 onChangePub={handleChangePub}
                                 onChangeType={handleChangeType}
-                                onChangeSeller={handleChangeSeller} />
+                                onChangeShop={handleChangeShop} />
                         </Suspense>
                     </Grid>
                 }
                 <Grid size={{ xs: 12, md: 9 }}>
-                    <CustomDivider sx={{ display: { xs: 'none', md: 'flex' } }}>{filters?.seller ? `SẢN PHẨM CỦA ${filters.seller}` : 'DANH MỤC SẢN PHẨM'}</CustomDivider>
+                    <CustomDivider sx={{ display: { xs: 'none', md: 'flex' } }}>{filters?.shop ? `SẢN PHẨM CỦA ${filters.shop}` : 'DANH MỤC SẢN PHẨM'}</CustomDivider>
                     <SortList filters={filters}
                         pagination={pagination}
                         onChangeOrder={handleChangeOrder}

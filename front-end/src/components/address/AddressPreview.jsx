@@ -32,14 +32,10 @@ const DetailTitle = styled.h4`
 
 const Address = styled.span`
     text-decoration: underline;
-    white-space: wrap;
     font-weight: 450;
-
-    ${props => props.theme.breakpoints.down("md")} {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 `
 
 const AddressInfo = styled.span`

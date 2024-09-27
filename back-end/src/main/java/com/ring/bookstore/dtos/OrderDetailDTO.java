@@ -2,16 +2,14 @@ package com.ring.bookstore.dtos;
 
 import com.ring.bookstore.enums.OrderStatus;
 
-//Order details
+import java.util.List;
+
+//Order detail
 public record OrderDetailDTO(Long id,
                              Long shopId,
                              String shopName,
-                             Short amount,
-                             Double price,
-                             Long bookId,
-                             String bookSlug,
+                             Double totalPrice,
                              OrderStatus status,
-                             String image,
-                             String bookTitle) {
+                             List<OrderItemDTO> items) {
 
 }

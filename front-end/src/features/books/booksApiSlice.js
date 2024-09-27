@@ -26,7 +26,8 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         }),
         getBooks: builder.query({
             query: (args) => {
-                const { page, size, sortBy, sortDir, keyword, cateId, pubId, type, seller, value } = args || {};
+                const { page, size, sortBy, sortDir, keyword, cateId, rating, 
+                    amount, pubId, type, shopId, sellerId, value } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
@@ -36,8 +37,11 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 if (sortDir) params.append('sortDir', sortDir);
                 if (keyword) params.append('keyword', keyword);
                 if (cateId) params.append('cateId', cateId);
+                if (rating) params.append('rating', rating);
+                if (amount) params.append('amount', amount);
                 if (type) params.append('type', type);
-                if (seller) params.append('seller', seller);
+                if (shopId) params.append('shopId', shopId);
+                if (sellerId) params.append('sellerId', sellerId);
                 if (pubId?.length) params.append('pubId', pubId);
                 if (value) {
                     params.append('fromRange', value[0]);

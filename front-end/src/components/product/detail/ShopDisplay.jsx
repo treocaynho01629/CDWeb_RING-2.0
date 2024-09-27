@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import { Avatar, Box, Button, Grid2 as Grid, Stack } from "@mui/material";
-import { AutoStories, LocalActivity, PersonAddAlt1, Storefront, Today, Verified as VerifiedIcon } from "@mui/icons-material";
+import { AutoStories, LocalActivity, PersonAddAlt1, Store, Storefront, Today, Verified as VerifiedIcon } from "@mui/icons-material";
 import { useGetShopQuery } from "../../../features/shops/shopsApiSlice";
+import { Link } from "react-router-dom";
 
 //#region styled
 const ShopContainer = styled.div`
@@ -70,7 +71,7 @@ const ShopDetail = styled.span`
 `
 //#endregion
 
-const ShopDisplay = ({ id }) => {
+const ShopDisplay = ({ id, name }) => {
 
     //Fetch reviews
     const { data, isLoading, isSuccess, isError, error } = useGetShopQuery(id, { skip: !id })
@@ -81,13 +82,16 @@ const ShopDisplay = ({ id }) => {
                 <Grid size={{ xs: 12, md: 4.5 }}>
                     <ShopInfo>
                         <Avatar
-                            alt="Shop name"
+                            alt={`${name || data?.name} shop avatar`}
                             sx={{
                                 width: { xs: 50, md: 75 },
                                 height: { xs: 50, md: 75 },
                                 marginRight: { xs: .5, md: 2 }
                             }}
-                        />
+                            src={data?.image ?? null}
+                        >
+                            <Store fontSize="large"/>
+                        </Avatar>
                         <Box
                             display={{ xs: 'flex', md: 'block' }}
                             justifyContent="space-between"
@@ -98,14 +102,16 @@ const ShopDisplay = ({ id }) => {
                                 <ShopName>{data?.name}</ShopName>
                                 <Verified><VerifiedIcon sx={{ fontSize: '16px', marginRight: 1 }} color="primary" />Đối tác RING!</Verified>
                             </Box>
-                            <Button
-                                variant="outlined"
-                                size="small"
-                                sx={{ height: 35 }}
-                                startIcon={<Storefront />}
-                            >
-                                Xem cửa hàng
-                            </Button>
+                            <Link to={`/filters?shopId=${id}`}>
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    sx={{ height: 35 }}
+                                    startIcon={<Storefront />}
+                                >
+                                    Xem cửa hàng
+                                </Button>
+                            </Link>
                         </Box>
                     </ShopInfo>
                 </Grid>

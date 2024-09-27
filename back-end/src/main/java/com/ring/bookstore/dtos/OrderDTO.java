@@ -12,6 +12,6 @@ public record OrderDTO(Long id,
                        LocalDateTime date,
                        Double total,
                        String username,
-                       List<OrderDetailDTO> orderDetails) {
+                       List<OrderDetailDTO> details) {
 
 }

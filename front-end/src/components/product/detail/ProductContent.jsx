@@ -7,8 +7,8 @@ import { numFormatter } from '../../../ultils/covert';
 import { useGetProfileQuery } from '../../../features/users/usersApiSlice';
 import { useState } from 'react';
 import ProductImages from './ProductImages';
-import ProductAction from '../ProductAction';
-import ProductCoupon from './ProductCoupon';
+import ProductAction from './ProductAction';
+import CouponPreview from '../../coupon/CouponPreview';
 import AddressSelectDialog from '../../address/AddressSelectDialog';
 import AddressPreview from '../../address/AddressPreview';
 import ProductPolicies from './ProductPolicies';
@@ -59,7 +59,9 @@ const Detail = styled.span`
     display: flex;
     align-items: center;
     white-space: nowrap;
-    padding-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
     flex-grow: 1;
 
     ${props => props.theme.breakpoints.down("md")} {
@@ -93,6 +95,7 @@ const StyledRating = muiStyled(Rating)(({ theme }) => ({
 
 const UserInfoText = styled.strong`
     color: ${props => props.theme.palette.text.primary};
+    font-size: 15px;
 
     &.rate { color: inherit}
 
@@ -157,20 +160,6 @@ const Percentage = styled.span`
     ${props => props.theme.breakpoints.down("md")} {
         font-size: 13px;
     }
-`
-
-const DetailContainer = styled.div`
-    display: block;
-
-    ${props => props.theme.breakpoints.down("md")} {
-        display: none;
-    }
-`
-
-const DetailTitle = styled.h4`
-    margin: 10px 0;
-    font-size: 16px;
-    font-weight: 600;
 `
 //#endregion
 
@@ -313,7 +302,7 @@ const ProductContent = ({ book, handleTabChange, pending, setPending }) => {
                                 }
                             </PriceContainer>
                             <Divider sx={{ my: 1, display: { xs: 'none', md: 'block' } }} />
-                            <ProductCoupon />
+                            <CouponPreview shopId={book?.shopId}/>
                         </Box>
                     </Box>
                     <Box className="product-address">

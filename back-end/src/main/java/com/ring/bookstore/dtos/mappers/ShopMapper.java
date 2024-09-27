@@ -26,6 +26,7 @@ public class ShopMapper implements Function<IShopDetail, ShopDTO> {
 
         return new ShopDTO(shop.getOwnerUsername()
 				, shop.getOwnerId()
+				, shop.getId()
         		, shop.getName()
         		, shop.getDescription()
         		, fileDownloadUri
