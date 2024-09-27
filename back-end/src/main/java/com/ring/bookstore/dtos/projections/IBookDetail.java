@@ -7,6 +7,8 @@ public interface IBookDetail {
 
     Long getShopId();
 
+    String getShopName();
+
     String getImage();
 
     Integer getTotalOrders();

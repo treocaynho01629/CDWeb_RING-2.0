@@ -47,7 +47,7 @@ public class ShopController {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> createShop(@Valid @RequestPart("request") ShopRequest request,
-                                        @RequestPart("image") MultipartFile file,
+                                        @RequestPart(name = "image", required = false) MultipartFile file,
                                         @CurrentAccount Account currUser) throws ImageResizerException, IOException {
         return new ResponseEntity<>(shopService.addShop(request, file, currUser), HttpStatus.CREATED);
     }

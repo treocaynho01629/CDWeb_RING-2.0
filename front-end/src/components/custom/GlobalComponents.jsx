@@ -37,8 +37,12 @@ export const MobileExtendButton = styled.div`
     position: absolute;
     left: 0;
     top: -2%;
+    bottom: 0;
+    margin: auto;
     width: 101%;
     height: 104%;
+    max-height: 30px;
+    font-size: 14px;
     background-image: linear-gradient(
         to left, 
         ${props => props.theme.palette.background.default}, 

@@ -20,6 +20,10 @@ public interface IBookDisplay {
 
     Short getAmount();
 
+    Long getShopId();
+
+    String getShopName();
+
     Double getRating();
 
     Integer getTotalOrders();

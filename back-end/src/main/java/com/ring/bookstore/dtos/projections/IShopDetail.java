@@ -7,6 +7,8 @@ public interface IShopDetail {
 
     Long getOwnerId();
 
+    Long getId();
+
     String getName();
 
     String getDescription();

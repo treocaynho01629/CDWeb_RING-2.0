@@ -9,6 +9,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -33,10 +37,16 @@ public class OrderDetail {
     private Long id;
 
     @Column
-    private Short amount;
+    private Double totalPrice;
 
     @Column
-    private Double price;
+    private Double shippingFee;
+
+    @Column
+    private Double shippingDiscount;
+
+    @Column
+    private Double discount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
@@ -48,12 +58,20 @@ public class OrderDetail {
     private OrderReceipt order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "shop_id")
     @JsonIgnore
-    private Book book;
+    private Shop shop;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id")
     @JsonIgnore
     private Coupon coupon;
+
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "detail",
+            fetch = FetchType.LAZY)
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    @JsonIgnore
+    private List<OrderItem> items;
 }

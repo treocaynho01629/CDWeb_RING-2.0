@@ -96,20 +96,20 @@ public class OrderServiceImpl implements OrderService {
 			+ "    </div>\r\n"
 			+ "</div><br><br>";
 			
-			//Create details
-			var orderDetail = OrderDetail.builder()
-					.amount(item.getQuantity())
-					.price(productPrice)
-					.book(book)
-					.order(savedOrder)
-					.status(OrderStatus.PENDING)
-					.build();
+//			//Create details
+//			var orderDetail = OrderDetail.builder()
+//					.amount(item.getQuantity())
+//					.price(productPrice)
+//					.book(book)
+//					.order(savedOrder)
+//					.status(OrderStatus.PENDING)
+//					.build();
 
 			//Decrease product amount
 			book.setAmount((short) (book.getAmount() - item.getQuantity()));
 
 			bookRepo.save(book); //Save after decrement
-			detailRepo.save(orderDetail); //Save details to database
+//			detailRepo.save(orderDetail); //Save details to database
 		}
 		
 		savedOrder.setTotal(total);

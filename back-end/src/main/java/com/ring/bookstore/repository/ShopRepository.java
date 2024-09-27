@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface ShopRepository extends JpaRepository<Shop, Long> {
 
     @Query("""
-	select s.owner.username as ownerUsername, s.owner.id as ownerId, s.name as name, s.description as description,
+	select s.owner.username as ownerUsername, s.owner.id as ownerId, s.id as id, s.name as name, s.description as description,
 	 i.name as image, s.createdDate as joinedDate, count(r.id) as totalReviews, 
 	 count(b.id) as totalProducts, size(s.followers) as totalFollowers 
 	from Shop s left join Image i on i.id = s.image.id
@@ -37,7 +37,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	List<Long> findInverseIds(String keyword, Long ownerId, List<Long> ids);
 
 	@Query("""
-	select s.owner.username as ownerUsername, s.owner.id as ownerId, s.name as name, s.description as description,
+	select s.owner.username as ownerUsername, s.owner.id as ownerId, s.id as id, s.name as name, s.description as description,
 	 i.name as image, s.createdDate as joinedDate, count(r.id) as totalReviews, 
 	 count(b.id) as totalProducts, size(s.followers) as totalFollowers 
 	from Shop s left join Image i on i.id = s.image.id

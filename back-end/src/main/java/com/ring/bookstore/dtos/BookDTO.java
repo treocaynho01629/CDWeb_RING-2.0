@@ -10,6 +10,8 @@ public record BookDTO(Long id,
                       Double price,
                       BigDecimal discount,
                       Short amount,
+                      Long shopId,
+                      String shopName,
                       Double rating,
                       Integer totalOrders) {
 

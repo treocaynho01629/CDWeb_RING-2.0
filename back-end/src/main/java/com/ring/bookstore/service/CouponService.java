@@ -12,8 +12,8 @@ import java.util.List;
 @Service
 public interface CouponService {
 
-    Page<Coupon> getCoupons(CouponType type, String keyword, Long shopId,
-                            Integer pageNo, Integer pageSize, String sortBy, String sortDir);
+    Page<Coupon> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
+                            CouponType type, String keyword, Long shopId, Boolean byShop);
 
     Coupon getCouponByCode(String code);
 
@@ -23,7 +23,8 @@ public interface CouponService {
 
     Coupon deleteCoupon(Long id, Account user);
 
-    void deleteCoupons(List<Long> ids, boolean isInverse);
+    void deleteCoupons(CouponType type, String keyword, Long shopId, Boolean byShop,
+                       List<Long> ids, boolean isInverse, Account user);
 
     void deleteAllCoupons();
 }

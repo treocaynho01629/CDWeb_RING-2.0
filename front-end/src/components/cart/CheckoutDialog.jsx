@@ -20,8 +20,8 @@ const AltCheckoutContainer = styled.div`
     width: 100%;
     height: 50px;
     z-index: 99;
-    background-color: white;
-    box-shadow: 3px 3px 10px 3px #b7b7b7;
+    box-shadow: ${props => props.theme.shadows[12]};
+    background-color: ${props => props.theme.palette.background.default};
     align-items: flex-end;
     justify-content: space-between;
     display: none;

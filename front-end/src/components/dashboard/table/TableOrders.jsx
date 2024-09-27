@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useGetOrdersQuery } from '../../../features/orders/ordersApiSlice';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { FooterContainer, FooterLabel, ItemTitle } from '../custom/ShareComponents';
+import { idFormatter } from '../../../ultils/covert';
 import CustomProgress from '../../custom/CustomProgress';
 import CustomTableToolbar from '../custom/CustomTableToolbar';
 import CustomTableHead from '../custom/CustomTableHead';
@@ -168,7 +169,7 @@ function OrderRow({ isSelected, isOrderSelected, index, id, order, dense, handle
                 </Badge>
               </IconButton>
             </TableCell>
-            <TableCell component="th" id={labelId} scope="row" padding="none" align="center">#{('00000' + id).slice(-5)}</TableCell>
+            <TableCell component="th" id={labelId} scope="row" padding="none" align="center">{idFormatter(id)}</TableCell>
           </>
         }
         <TableCell align="left">
@@ -262,7 +263,7 @@ function OrderRow({ isSelected, isOrderSelected, index, id, order, dense, handle
                             />
                             <Box>
                               <ItemTitle>{detail.bookTitle}</ItemTitle>
-                              <ItemTitle className="secondary">ID: #{('00000' + detail.bookId).slice(-5)}</ItemTitle>
+                              <ItemTitle className="secondary">ID: {idFormatter(detail.bookId)}</ItemTitle>
                             </Box>
                           </Link>
                         </TableCell>

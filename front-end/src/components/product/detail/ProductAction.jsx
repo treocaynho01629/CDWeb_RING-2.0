@@ -3,8 +3,8 @@ import { AddShoppingCart } from '@mui/icons-material';
 import { Button, Box, Divider, useTheme, useMediaQuery, Skeleton } from '@mui/material';
 import { lazy, Suspense, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CustomAmountInput from '../custom/CustomAmountInput';
-import useCart from '../../hooks/useCart';
+import CustomAmountInput from '../../custom/CustomAmountInput';
+import useCart from '../../../hooks/useCart';
 
 const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
 
@@ -224,28 +224,30 @@ const ProductAction = ({ book }) => {
                         }
                     </Box>
                 </Box>
-                <Box display="flex" alignItems="center" height={47} position="sticky" bottom={20} bgcolor={'background.default'}>
-                    <BuyButton
-                        variant="contained"
-                        size="large"
-                        fullWidth
-                        sx={{ maxWidth: '40%', marginRight: 1 }}
-                        disabled={!book || book?.amount == 0}
-                        onClick={() => handleBuyNow(book)}
-                    >
-                        Mua ngay
-                    </BuyButton>
-                    <BuyButton
-                        variant="outlined"
-                        color="secondary"
-                        size="large"
-                        fullWidth
-                        disabled={!book || book?.amount == 0}
-                        onClick={() => handleAddToCart(book)}
-                        startIcon={<AddShoppingCart fontSize="small" />}
-                    >
-                        Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)
-                    </BuyButton>
+                <Box position="sticky" height={55} bottom={20} bgcolor={'background.default'}>
+                    <Box display="flex" alignItems="center" height={47} >
+                        <BuyButton
+                            variant="contained"
+                            size="large"
+                            fullWidth
+                            sx={{ maxWidth: '40%', marginRight: 1 }}
+                            disabled={!book || book?.amount == 0}
+                            onClick={() => handleBuyNow(book)}
+                        >
+                            Mua ngay
+                        </BuyButton>
+                        <BuyButton
+                            variant="outlined"
+                            color="secondary"
+                            size="large"
+                            fullWidth
+                            disabled={!book || book?.amount == 0}
+                            onClick={() => handleAddToCart(book)}
+                            startIcon={<AddShoppingCart fontSize="small" />}
+                        >
+                            Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)
+                        </BuyButton>
+                    </Box>
                 </Box>
             </FilterContainer>
     )

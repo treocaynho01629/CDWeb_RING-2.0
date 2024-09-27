@@ -439,17 +439,17 @@ const RangeFilter = ({ valueInput, setValueInput, onChangeRange }) => {
   )
 }
 
-const OtherFilters = ({ type, seller, setSeller, onChangeType, onChangeSeller }) => {
+const OtherFilters = ({ type, shop, setShop, onChangeType, onChangeShop }) => {
 
   //Change type
   const handleChangeType = (event) => {
     if (onChangeType) onChangeType(event.target.value)
   }
 
-  //change seller
-  const handleChangeSeller = (event) => {
+  //change shop
+  const handleChangeShop = (event) => {
     event.preventDefault();
-    if (onChangeSeller) onChangeSeller(seller);
+    if (onChangeShop) onChangeShop(shop);
   };
 
   return (
@@ -476,14 +476,14 @@ const OtherFilters = ({ type, seller, setSeller, onChangeType, onChangeSeller })
       </TextField>
       <TextField
         margin="dense"
-        id="seller"
+        id="shop"
         label="Tên người bán"
         size="small"
         fullWidth
         variant="outlined"
-        value={seller}
-        onBlur={handleChangeSeller}
-        onChange={(e) => setSeller(e.target.value)}
+        value={shop}
+        onBlur={handleChangeShop}
+        onChange={(e) => setShop(e.target.value)}
       />
     </Filter>
   )
@@ -491,7 +491,7 @@ const OtherFilters = ({ type, seller, setSeller, onChangeType, onChangeSeller })
 
 const FilterList = (props) => {
   //#region construct
-  const { filters, onChangeCate, onChangeRange, onChangePub, onChangeType, onChangeSeller,
+  const { filters, onChangeCate, onChangeRange, onChangePub, onChangeType, onChangeShop,
     loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs, resetFilter
   } = props;
 
@@ -499,7 +499,7 @@ const FilterList = (props) => {
   const [cateId, setCateId] = useState(filters?.cateId);
   const [valueInput, setValueInput] = useState(filters?.value);
   const [type, setType] = useState(filters?.type);
-  const [seller, setSeller] = useState(filters?.seller);
+  const [shop, setShop] = useState(filters?.shop);
   const [selectedPub, setSelectedPub] = useState(filters?.pubId);
 
   //Update value
@@ -512,8 +512,8 @@ const FilterList = (props) => {
   }, [filters?.type]);
 
   useEffect(() => {
-    setSeller(filters?.seller);
-  }, [filters?.seller]);
+    setShop(filters?.shop);
+  }, [filters?.shop]);
 
   useEffect(() => {
     setValueInput(filters?.value);
@@ -536,7 +536,7 @@ const FilterList = (props) => {
         <RangeFilter {...{ valueInput, setValueInput, onChangeRange }} />
         <CateFilter {...{ loadCates, doneCates, errorCates, cates, cateId, onChangeCate }} />
         <PublisherFilter {...{ loadPubs, donePubs, errorPubs, pubs, selectedPub, setSelectedPub, onChangePub }} />
-        <OtherFilters {...{ type, seller, setSeller, onChangeType, onChangeSeller }} />
+        <OtherFilters {...{ type, shop, setShop, onChangeType, onChangeShop }} />
       </Stack>
       <Button
         variant="contained"
