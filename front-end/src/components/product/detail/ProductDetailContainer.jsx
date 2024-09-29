@@ -6,11 +6,11 @@ import { useGetBooksQuery } from '../../../features/books/booksApiSlice';
 import { MobileExtendButton, Title } from '../../custom/GlobalComponents';
 import { KeyboardArrowDown, KeyboardArrowRight, KeyboardArrowUp } from '@mui/icons-material';
 import { idFormatter } from '../../../ultils/covert';
-import ShopDisplay from './ShopDisplay';
-import ProductsScroll from '../ProductsScroll';
 
-const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
+const ShopDisplay = lazy(() => import('./ShopDisplay'));
+const ProductsScroll = lazy(() => import('../ProductsScroll'));
 const ReviewComponent = lazy(() => import('./ReviewComponent'));
+const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
 
 //#region styled
 const DetailContainer = styled.div`
@@ -123,7 +123,7 @@ const DescTitle = styled.h4`
 `
 //#endregion
 
-const ProductDetailContainer = ({ loading, book, scrollIntoTab, mobileMode }) => {
+const ProductDetailContainer = ({ loading, book, reviewRef, scrollIntoTab, mobileMode }) => {
   const descRef = useRef(null);
   const [overflowed, setOverflowed] = useState(false);
   const [minimize, setMinimize] = useState(true);
@@ -288,7 +288,9 @@ const ProductDetailContainer = ({ loading, book, scrollIntoTab, mobileMode }) =>
           </Grid>
         </Grid>
       </Stack>
-      <ReviewComponent {...{ book, id: book?.id, scrollIntoTab }} />
+      <Box ref={reviewRef} sx={{ scrollMargin: '80px' }}>
+        <ReviewComponent {...{ book, id: book?.id, reviewRef, scrollIntoTab }} />
+      </Box>
     </Stack>
   )
 }

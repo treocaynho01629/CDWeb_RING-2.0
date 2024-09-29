@@ -1,5 +1,4 @@
 import { AssignmentReturn, KeyboardArrowRight, LocalShipping, VerifiedUser } from '@mui/icons-material'
-import { Skeleton } from '@mui/material'
 import { MobileExtendButton } from '../../custom/GlobalComponents'
 import styled from 'styled-components'
 
@@ -44,24 +43,14 @@ const PolicyTitle = styled.span`
 `
 //#endregion
 
-const ProductPolicies = ({ book }) => {
+const ProductPolicies = () => {
     return (
         <PoliciesWrapper>
             <DetailTitle>Chính sách ưu đãi:</DetailTitle>
             <PoliciesContainer>
-                {book ?
-                    <>
-                        <PolicyTitle><LocalShipping fontSize="16px" color="error" />&nbsp;Miễn phí giao hàng</PolicyTitle>
-                        <PolicyTitle><AssignmentReturn fontSize="16px" color="error" />&nbsp;Đổi trả miễn phí</PolicyTitle>
-                        <PolicyTitle><VerifiedUser fontSize="16px" color="error" />&nbsp;Hàng chính hãng 100%</PolicyTitle>
-                    </>
-                    :
-                    <>
-                        <Skeleton variant="text" sx={{ fontSize: '14px' }} />
-                        <Skeleton variant="text" sx={{ fontSize: '14px' }} />
-                        <Skeleton variant="text" sx={{ fontSize: '14px' }} />
-                    </>
-                }
+                <PolicyTitle><LocalShipping fontSize="16px" color="error" />&nbsp;Miễn phí giao hàng</PolicyTitle>
+                <PolicyTitle><AssignmentReturn fontSize="16px" color="error" />&nbsp;Đổi trả miễn phí</PolicyTitle>
+                <PolicyTitle><VerifiedUser fontSize="16px" color="error" />&nbsp;Hàng chính hãng 100%</PolicyTitle>
             </PoliciesContainer>
             <MobileExtendButton>
                 <KeyboardArrowRight fontSize="small" />

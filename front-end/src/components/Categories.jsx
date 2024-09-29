@@ -77,8 +77,11 @@ const Wrapper = styled.div`
     scrollbar-width: none; 
 
     &::-webkit-scrollbar {display: none;}
-    ${ItemWrapper}:first-child {margin-left: 20px;}
-    ${ItemWrapper}:last-child { margin-right: 40px; }
+
+    ${props => props.theme.breakpoints.up("md")} {
+        ${ItemWrapper}:first-child {margin-left: 20px;}
+        ${ItemWrapper}:last-child { margin-right: 40px; }
+    }
 `
 
 const ButtonContainer = styled.div`
