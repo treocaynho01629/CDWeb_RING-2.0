@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { lazy, Suspense, useState } from 'react'
-import { KeyboardArrowRight, LocalShipping, Sell, ShoppingBasket } from '@mui/icons-material'
+import { KeyboardArrowRight, LabelOff, LocalShipping, Sell, ShoppingBasket } from '@mui/icons-material'
 import { MobileExtendButton } from '../custom/GlobalComponents'
 import { useGetCouponsQuery } from '../../features/coupons/couponsApiSlice'
 import { Skeleton } from '@mui/material'
@@ -37,6 +37,7 @@ const Wrapper = styled.div`
     padding: 5px 0;
     overflow-x: scroll;
     scroll-behavior: smooth;
+    width: 100%;
 
     -ms-overflow-style: none;
     scrollbar-width: none; 
@@ -51,6 +52,7 @@ const Wrapper = styled.div`
 const ItemsContainer = styled.div`
     display: flex;
     align-items: center;
+    width: 100%;
 `
 
 const Coupon = styled.div`
@@ -174,6 +176,16 @@ const MoreButton = styled.span`
     pointer-events: ${props => props.disabled ? 'none' : 'all'};
     cursor: pointer;
 `
+
+const CouponMessage = styled.span`
+    display: flex;
+    align-items: center;
+    color: ${props => props.theme.palette.text.secondary};
+
+    ${props => props.theme.breakpoints.down("md")} {
+       font-size: 14px;
+    }
+`
 //#endregion
 
 const getCouponSumary = (type) => {
@@ -213,21 +225,23 @@ const CouponPreview = ({ shopId }) => {
 
     if (isLoading || isError) {
         coupons = (
-            Array.from(new Array(2)).map((item, index) => (
-                <Coupon key={`cate-${index}`}>
-                    <Skeleton
-                        variant="rectangular"
-                        height={40}
-                        width={100}
-                        sx={{ mx: '3px' }}
-                    />
-                </Coupon>
+            Array.from(new Array(3)).map((item, index) => (
+                <Skeleton
+                    key={`cate-${index}`}
+                    variant="rectangular"
+                    sx={{
+                        mx: '3px',
+                        borderRadius: '5px',
+                        height: { xs: 22, md: 40 },
+                        width: '30%'
+                    }}
+                />
             ))
         )
     } else if (isSuccess) {
         const { ids, entities } = data;
 
-        coupons = ids?.length
+        coupons = false
             ? ids?.map((id, index) => {
                 const coupon = entities[id];
                 const couponSumary = getCouponSumary(coupon.detail.type);
@@ -246,7 +260,7 @@ const CouponPreview = ({ shopId }) => {
                     </Coupon>
                 )
             })
-            : null
+            : <CouponMessage><LabelOff fontSize="small"/>&nbsp;Hiện Shop không có khuyến mãi</CouponMessage>
     }
 
     return (

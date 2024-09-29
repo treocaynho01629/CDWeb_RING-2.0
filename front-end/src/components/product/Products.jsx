@@ -1,5 +1,5 @@
-import Grid from "@mui/material/Grid2"
 import { trackWindowScroll } from "react-lazy-load-image-component";
+import Grid from "@mui/material/Grid2"
 import Product from './Product'
 import CustomProgress from "../custom/CustomProgress";
 

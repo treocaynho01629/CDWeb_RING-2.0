@@ -8,12 +8,13 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
     color: theme.palette.primary.main,
     textAlign: 'center',
     justifyContent: 'center',
-    margin: '10px 0px',
+    margin: '10px 0',
 
     [theme.breakpoints.down('sm')]: {
         fontSize: 16,
         fontWeight: 500,
         padding: '0 10px',
+        margin: '5px 0',
         textTransform: 'none'
     },
 }));

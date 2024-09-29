@@ -263,7 +263,7 @@ const Review = ({ review, username }) => {
     )
 }
 
-const ReviewComponent = ({ book, id, scrollIntoTab }) => {
+const ReviewComponent = ({ book, scrollIntoTab }) => {
     //#region construct
     const { username } = useAuth();
     const location = useLocation();
@@ -286,10 +286,10 @@ const ReviewComponent = ({ book, id, scrollIntoTab }) => {
 
     //Fetch reviews
     const { data, isLoading, isSuccess, isError, error } = useGetReviewsByBookIdQuery({
-        id,
+        id: book?.id,
         page: pagination?.currPage,
         size: pagination?.pageSize
-    }, { skip: !id })
+    }, { skip: !book })
 
     //Review hook
     const [review, { isLoading: reviewing }] = useCreateReviewMutation();
@@ -334,7 +334,7 @@ const ReviewComponent = ({ book, id, scrollIntoTab }) => {
         const { enqueueSnackbar } = await import('notistack');
 
         review({
-            id,
+            id: book?.id,
             newReview: {
                 content: content,
                 rating: rating

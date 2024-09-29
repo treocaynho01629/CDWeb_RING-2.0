@@ -1,17 +1,20 @@
 import styled from 'styled-components';
-import { useState, useEffect } from "react";
-import { Grid2 as Grid, ToggleButton, Button, ToggleButtonGroup, Skeleton } from '@mui/material';
-import { styled as muiStyled } from '@mui/system';
+import { useState, useEffect, lazy, Suspense } from "react";
+import { Grid2 as Grid, Button, Tabs } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
 import { useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import { LazyLoadComponent } from 'react-lazy-load-image-component';
+import { ExpandMore, Replay } from '@mui/icons-material';
+import useTitle from '../hooks/useTitle';
 import Categories from '../components/Categories';
 import Products from '../components/product/Products';
 import Slider from '../components/product/Slider';
-import ProductsSlider from '../components/product/ProductsSlider';
 import CustomDivider from '../components/custom/CustomDivider';
-import useTitle from '../hooks/useTitle';
+import CustomTab from '../components/custom/CustomTab';
+import ProductsSliderPlaceholder from '../components/product/ProductsSliderPlaceholder';
+
+const ProductsSlider = lazy(() => import('../components/product/ProductsSlider'));
 
 //#region styled
 const Wrapper = styled.div`
@@ -19,17 +22,14 @@ const Wrapper = styled.div`
 `
 
 const ToggleGroupContainer = styled.div`
-  background-color: #272727;
-  margin-bottom: 10px;
-  overflow-x: scroll;
-  scroll-behavior: smooth;
+  background-color: ${props => props.theme.palette.grey[900]};
+  margin: 15px 0 0;
   white-space: nowrap;
-
-  -ms-overflow-style: none;
-  scrollbar-width: none; 
-
-  &::-webkit-scrollbar {
-      display: none;
+  
+  ${props => props.theme.breakpoints.down("sm")} {
+    margin: 10px 0;
+    background-color: ${props => props.theme.palette.action.hover};
+    border-bottom: 1px solid ${props => props.theme.palette.divider};
   }
 `
 
@@ -38,36 +38,6 @@ const ButtonContainer = styled.div`
   justify-content: center;
   margin-top: 20px;
 `
-
-const StyledToggleButtonGroup = muiStyled(ToggleButtonGroup)(({ theme }) => ({
-  '& .MuiToggleButtonGroup-grouped': {
-    backgroundColor: '#272727',
-    color: '#ffffffb2',
-    fontWeight: 400,
-    border: 0,
-    borderRadius: 0,
-  },
-}));
-
-const StyledToggleButton = muiStyled(ToggleButton)(({ theme }) => ({
-  paddingLeft: '20px',
-  paddingRight: '20px',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  '&:hover': {
-    backgroundColor: theme.palette.primary.main,
-  },
-  '&.Mui-selected': {
-    fontWeight: 'bold',
-    backgroundColor: theme.palette.primary.main,
-    color: 'white',
-  },
-  '&:focus': {
-    outline: 'none',
-    border: 'none',
-  },
-}));
 //#endregion
 
 const orderGroup = [
@@ -88,33 +58,80 @@ const orderGroup = [
 const defaultSize = 15;
 const defaultMore = 5;
 
-const Home = () => {
-  //Initial value
+const OrderList = () => {
   const [orderBy, setOrderBy] = useState(orderGroup[0].value);
+  const { data, isLoading, isFetching, isSuccess, isError, refetch } = useGetBooksQuery({
+    sortBy: orderBy,
+    sortDir: "desc"
+  }, { skip: !orderBy });
+
+  //Change order tab
+  const handleChangeOrder = (e, newValue) => {
+    if (newValue !== null) { setOrderBy(newValue) }
+  };
+
+  return (
+    <>
+      <br />
+      <CustomDivider>Sản phẩm xếp theo</CustomDivider>
+      <LazyLoadComponent>
+        <Suspense fallback={
+          <>
+            <ToggleGroupContainer><Tabs /></ToggleGroupContainer>
+            <ProductsSliderPlaceholder/>
+          </>
+        }>
+          <ToggleGroupContainer>
+            <Tabs
+              variant="scrollable"
+              value={orderBy}
+              onChange={handleChangeOrder}
+            >
+              {(!orderGroup?.length ? Array.from(new Array(4)) : orderGroup)?.map((order, index) => (
+                <CustomTab key={`${order?.id}-${index}`} label={order?.label ?? 'Đang cập nhật'} value={order?.value ?? ''} />
+              ))}
+            </Tabs>
+          </ToggleGroupContainer>
+          <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
+        </Suspense>
+      </LazyLoadComponent>
+      <ButtonContainer>
+        {isError ?
+          <Button
+            variant="outlined"
+            color="error"
+            size="medium"
+            sx={{ width: '200px' }}
+            endIcon={<Replay sx={{ marginRight: '-10px' }} />}
+            onClick={refetch}
+          >
+            Tải lại
+          </Button>
+          :
+          <Link to={`/filters?sortBy=${orderBy}`}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="medium"
+              sx={{ width: '200px' }}
+              endIcon={<ExpandMore sx={{ marginRight: '-10px' }} />}
+            >
+              Xem thêm
+            </Button>
+          </Link>
+        }
+      </ButtonContainer>
+    </>
+  )
+}
+
+const CateList = () => {
   const [randomCateIds, setRandomCateIds] = useState([]);
   const [currCate, setCurrCate] = useState(null);
-  const [pagination, setPagination] = useState({
-    currPage: 0,
-    pageSize: defaultSize,
-    isMore: true,
-  })
 
-  //Fetch data
-  const { data, isLoading, isSuccess, isError } = useGetBooksQuery({
-    page: pagination?.currPage,
-    size: pagination?.pageSize,
-    loadMore: pagination?.isMore
-  });
-  const { data: randomBooks, isLoading: loadRandom, isFetching: fetchRandom, isSuccess: doneRandom, isError: errorRandom, refetch: refetchRandom } = useGetRandomBooksQuery({ amount: 10 });
-  const { data: cateBooks, isLoading: loadByCate, isFetching: fetchByCate, isSuccess: doneByCate, isError: errorByCate, isUninitialized } = useGetBooksQuery({ cateId: currCate }, { skip: !currCate });
-  const { data: orderBooks, isLoading: loadByOrder, isFetching: fetchByOrder, isSuccess: doneByOrder, isError: errorByOrder } = useGetBooksQuery({ sortBy: orderBy, sortDir: "desc" }, { skip: !orderBy });
-  const { data: cates, isLoading: loadCates, isSuccess: doneCates, isError: errorCates } = useGetCategoriesQuery();
-
-  //Other
-  const navigate = useNavigate();
-
-  //Set title
-  useTitle('RING! - Bookstore');
+  //Fetch categories & books
+  const { data: cates, isLoading: loadCates, isSuccess: doneCates } = useGetCategoriesQuery();
+  const { data, isLoading, isFetching, isSuccess, isError, refetch } = useGetBooksQuery({ cateId: currCate }, { skip: !currCate });
 
   //Load
   useEffect(() => {
@@ -129,15 +146,98 @@ const Home = () => {
     }
   }, [cates]);
 
-  //Change order tab
-  const handleChangeOrder = (e, newValue) => {
-    if (newValue !== null) { setOrderBy(newValue) }
-  };
-
   //Change cate tab
   const handleChangeCate = (e, newValue) => {
     if (newValue !== null) { setCurrCate(newValue) }
   };
+
+  let cateTabs;
+
+  if (doneCates) {
+    const { entities } = cates;
+
+    cateTabs = (!randomCateIds?.length ? Array.from(new Array(4)) : randomCateIds)?.map((id, index) => {
+      let cate;
+      if (id) cate = entities[id];
+
+      return (
+        <CustomTab key={`catetab-${id}-${index}`} label={cate?.categoryName ?? 'Đang cập nhật'} value={id ?? ''} />
+      )
+    })
+  }
+
+  return (
+    <>
+      <br />
+      <CustomDivider>Sản phẩm theo danh mục</CustomDivider>
+      <LazyLoadComponent>
+        <Suspense fallback={
+          <>
+            <ToggleGroupContainer><Tabs /></ToggleGroupContainer>
+            <ProductsSliderPlaceholder/>
+          </>
+        }>
+          <ToggleGroupContainer>
+            <Tabs
+              variant="scrollable"
+              value={currCate ?? ''}
+              onChange={handleChangeCate}
+            >
+              {cateTabs}
+            </Tabs>
+          </ToggleGroupContainer>
+          <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
+        </Suspense>
+      </LazyLoadComponent>
+      <ButtonContainer>
+        {isError ?
+          <Button
+            variant="outlined"
+            color="error"
+            size="medium"
+            sx={{ width: '200px' }}
+            endIcon={<Replay sx={{ marginRight: '-10px' }} />}
+            onClick={refetch}
+          >
+            Tải lại
+          </Button>
+          :
+          <Link to={`/filters?cateId=${currCate}`}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="medium"
+              sx={{ width: '200px' }}
+              endIcon={<ExpandMore sx={{ marginRight: '-10px' }} />}
+            >
+              Xem thêm
+            </Button>
+          </Link>
+        }
+      </ButtonContainer>
+    </>
+  )
+}
+
+const Home = () => {
+  //Initial value
+  const navigate = useNavigate();
+  const [pagination, setPagination] = useState({
+    currPage: 0,
+    pageSize: defaultSize,
+    isMore: true,
+  })
+
+  //Fetch books
+  const { data, isLoading, isSuccess, isError } = useGetBooksQuery({
+    page: pagination?.currPage,
+    size: pagination?.pageSize,
+    loadMore: pagination?.isMore
+  });
+  const { data: randomBooks, isLoading: loadRandom, isFetching: fetchRandom, isSuccess: doneRandom, isError: errorRandom, refetch: refetchRandom } = useGetRandomBooksQuery({ amount: 10 });
+
+  //Set title
+  useTitle('RING! - Bookstore');
 
   //Show more
   const handleShowMore = () => {
@@ -149,37 +249,6 @@ const Home = () => {
     }
   }
 
-  let catesContent;
-
-  if (loadCates || errorCates) {
-    catesContent = (
-      Array.from(new Array(4)).map((item, index) => (
-        <StyledToggleButton key={index} value='' disabled={true}>
-          <Skeleton sx={{ bgcolor: 'grey.400', fontSize: '14px' }} variant="text" width={100} />
-        </StyledToggleButton>
-      ))
-    )
-  } else if (doneCates) {
-    const { entities } = cates;
-
-    catesContent = randomCateIds?.length
-      ? randomCateIds?.map((id, index) => {
-        const cate = entities[id];
-
-        return (
-          <StyledToggleButton key={`${id}-${index}`} value={id}>
-            {cate?.categoryName}
-          </StyledToggleButton>
-        )
-      })
-      :
-      Array.from(new Array(4)).map((item, index) => (
-        <StyledToggleButton key={index} value='' disabled={true}>
-          <Skeleton sx={{ bgcolor: 'grey.400', fontSize: '14px' }} variant="text" width={100} />
-        </StyledToggleButton>
-      ))
-  }
-
   return (
     <Wrapper>
       <Slider />
@@ -188,95 +257,65 @@ const Home = () => {
         <Grid size={12}>
           <br />
           <CustomDivider>Sản phẩm mới nhất</CustomDivider>
-          <br />
           <Products {...{ isLoading, data, isSuccess, isError }} />
           <ButtonContainer>
-            <Button
-              color="primary"
-              variant="contained"
-              size="medium"
-              sx={{ width: '200px' }}
-              onClick={handleShowMore}
-            >
-              Xem thêm
-            </Button>
-          </ButtonContainer>
-          <br />
-          <CustomDivider>Sản phẩm xếp theo</CustomDivider>
-          <br />
-          <ToggleGroupContainer>
-            <StyledToggleButtonGroup
-              value={orderBy}
-              exclusive
-              onChange={handleChangeOrder}
-            >
-              {(!orderGroup?.length ? Array.from(new Array(4)) : orderGroup)?.map((order, index) => (
-                <StyledToggleButton key={`${order?.id}-${index}`} value={order?.value ?? ''}>
-                  {order ? order?.label
-                    : <Skeleton key={index} variant="text" sx={{ fontSize: '14px' }} width={100} />
-                  }
-                </StyledToggleButton>
-              ))}
-            </StyledToggleButtonGroup>
-          </ToggleGroupContainer>
-          <LazyLoadComponent>
-            <ProductsSlider {...{ isLoading: loadByOrder, isFetching: fetchByOrder, data: orderBooks, isSuccess: doneByOrder, isError: errorByOrder }} />
-          </LazyLoadComponent>
-          <ButtonContainer>
-            <Link to={`/filters?sortBy=${orderBy}`}>
+            {isError ?
+              <Button
+                variant="outlined"
+                color="error"
+                size="medium"
+                sx={{ width: '200px' }}
+                endIcon={<Replay sx={{ marginRight: '-10px' }} />}
+                onClick={refetch}
+              >
+                Tải lại
+              </Button>
+              :
               <Button
                 variant="contained"
                 color="primary"
                 size="medium"
                 sx={{ width: '200px' }}
+                onClick={handleShowMore}
+                endIcon={<ExpandMore sx={{ marginRight: '-10px' }} />}
               >
                 Xem thêm
               </Button>
-            </Link>
+            }
           </ButtonContainer>
-          <br />
-          <CustomDivider>Sản phẩm theo danh mục</CustomDivider>
-          <br />
-          <ToggleGroupContainer>
-            <StyledToggleButtonGroup
-              value={currCate ?? ''}
-              exclusive
-              onChange={handleChangeCate}
-            >
-              {catesContent}
-            </StyledToggleButtonGroup>
-          </ToggleGroupContainer>
-          <LazyLoadComponent>
-            <ProductsSlider {...{ isLoading: loadByCate, isFetching: fetchByCate, data: cateBooks, isSuccess: doneByCate, isError: errorByCate, isUninitialized }} />
-          </LazyLoadComponent>
-          <ButtonContainer>
-            <Link to={`/filters?cateId=${currCate}`}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="medium"
-                sx={{ width: '200px' }}
-              >
-                Xem thêm
-              </Button>
-            </Link>
-          </ButtonContainer>
+          <OrderList />
+          <CateList />
           <br />
           <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
-          <br />
           <LazyLoadComponent>
-            <ProductsSlider {...{ isLoading: loadRandom, isFetching: fetchRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
+            <Suspense fallback={<ProductsSliderPlaceholder/>}>
+              <ProductsSlider {...{ isLoading: loadRandom, isFetching: fetchRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
+            </Suspense>
           </LazyLoadComponent>
           <ButtonContainer>
-            <Button
-              variant="contained"
-              color="primary"
-              size="medium"
-              sx={{ width: '200px' }}
-              onClick={refetchRandom}
-            >
-              Làm mới
-            </Button>
+            {isError ?
+              <Button
+                variant="outlined"
+                color="error"
+                size="medium"
+                sx={{ width: '200px' }}
+                endIcon={<Replay sx={{ marginRight: '-10px' }} />}
+                onClick={refetchRandom}
+              >
+                Tải lại
+              </Button>
+              :
+              <Button
+                variant="contained"
+                color="primary"
+                size="medium"
+                sx={{ width: '200px' }}
+                endIcon={<Replay sx={{ marginRight: '-10px' }} />}
+                onClick={refetchRandom}
+              >
+                Làm mới
+              </Button>
+            }
           </ButtonContainer>
         </Grid>
       </Grid>

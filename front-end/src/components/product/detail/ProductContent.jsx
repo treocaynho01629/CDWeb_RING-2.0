@@ -5,13 +5,14 @@ import { Skeleton, Rating, Box, Grid2 as Grid, alpha, Divider, Stack } from '@mu
 import { Link } from 'react-router-dom';
 import { numFormatter } from '../../../ultils/covert';
 import { useGetProfileQuery } from '../../../features/users/usersApiSlice';
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import ProductImages from './ProductImages';
 import ProductAction from './ProductAction';
-import CouponPreview from '../../coupon/CouponPreview';
-import AddressSelectDialog from '../../address/AddressSelectDialog';
-import AddressPreview from '../../address/AddressPreview';
-import ProductPolicies from './ProductPolicies';
+
+const CouponPreview = lazy(() => import('../../coupon/CouponPreview'));
+const AddressPreview = lazy(() => import('../../address/AddressPreview'));
+const AddressSelectDialog = lazy(() => import('../../address/AddressSelectDialog'));
+const ProductPolicies = lazy(() => import('./ProductPolicies'));
 
 //#region styled
 const InfoContainer = styled.div`
@@ -71,6 +72,7 @@ const Detail = styled.span`
 
 const UserInfoContainer = styled.div`
     display: flex;
+    position: relative;
     height: 100%;
     align-items: center;
     color: ${props => props.theme.palette.text.secondary};
@@ -161,9 +163,61 @@ const Percentage = styled.span`
         font-size: 13px;
     }
 `
+
+const couponPlaceholder = (
+    <>
+        <Skeleton variant="text" sx={{ fontSize: '20px', margin: '10px 0', display: { xs: 'none', md: 'block' } }} width={150} />
+        <Box display="flex">
+            <Skeleton
+                variant="rectangular"
+                sx={{
+                    mr: '3px',
+                    borderRadius: '5px',
+                    height: { xs: 22, md: 40 },
+                    width: '30%'
+                }}
+            />
+            <Skeleton
+                variant="rectangular"
+                sx={{
+                    mx: '3px',
+                    borderRadius: '5px',
+                    height: { xs: 22, md: 40 },
+                    width: '30%'
+                }}
+            />
+            <Skeleton
+                variant="rectangular"
+                sx={{
+                    mx: '3px',
+                    borderRadius: '5px',
+                    height: { xs: 22, md: 40 },
+                    width: '30%'
+                }}
+            />
+        </Box>
+    </>
+)
+
+const addressPlaceholder = (
+    <Box my={{ xs: -0.5, md: 2 }}>
+        <Skeleton variant="text" sx={{ fontSize: '20px', margin: { xs: 0, md: '10px 0' }, width: { xs: "100%", md: 150 } }} />
+        <Skeleton variant="text" sx={{ fontSize: '16px', display: { xs: 'none', md: 'block' } }} width="80%" />
+        <Skeleton variant="text" sx={{ fontSize: '16px', display: { xs: 'none', md: 'block' } }} width="45%" />
+    </Box>
+)
+
+const policiesPlaceholder = (
+    <Box display="flex" flexDirection={{ xs: 'row', md: 'column' }}>
+        <Skeleton variant="text" sx={{ fontSize: '20px', margin: '10px 0', display: { xs: 'none', md: 'block' } }} width={150} />
+        <Skeleton variant="text" sx={{ fontSize: '14px', marginRight: '10px' }} width="40%" />
+        <Skeleton variant="text" sx={{ fontSize: '14px', marginRight: '10px' }} width="40%" />
+        <Skeleton variant="text" sx={{ fontSize: '14px', marginRight: '10px' }} width="40%" />
+    </Box>
+)
 //#endregion
 
-const ProductContent = ({ book, handleTabChange, pending, setPending }) => {
+const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
     const [addressInfo, setAddressInfo] = useState({
         name: '',
         phone: '',
@@ -174,11 +228,7 @@ const ProductContent = ({ book, handleTabChange, pending, setPending }) => {
     //Fetch address
     const { data: profile, isLoading: loadProfile, isSuccess: profileDone } = useGetProfileQuery();
 
-    const handleChangeTab = (e, tab) => {
-        e.preventDefault();
-        if (handleTabChange) handleTabChange(tab);
-    };
-
+    const handleViewReview = (value) => { if (handleToggleReview) handleToggleReview(value) };
     const handleOpenDialog = () => { setOpenDialog(true) }
     const handleCloseDialog = () => { setOpenDialog(false) }
 
@@ -202,34 +252,33 @@ const ProductContent = ({ book, handleTabChange, pending, setPending }) => {
                     >
                         <Box className="product-title">
                             {book ? <BookTitle>{book?.title}</BookTitle>
-                                : <>
-                                    <Skeleton variant="text" sx={{ fontSize: '22px', marginTop: '30px' }} />
-                                    <Skeleton variant="text" sx={{ fontSize: '22px' }} width="30%" />
-                                </>}
-                            <Stack
+                                :
+                                <Box sx={{ margin: { xs: '10px 0', md: '0 0 20px' } }}>
+                                    <Skeleton variant="text" sx={{ fontSize: { xs: '16px', md: '22px' } }} />
+                                    <Skeleton variant="text" sx={{ fontSize: { xs: '16px', md: '22px' } }} width="30%" />
+                                </Box>}
+                            <Stack className="info"
                                 direction="row"
                                 useFlexGap
                                 sx={{ flexWrap: 'wrap', mb: 1, display: { xs: 'none', md: 'flex' } }}
                             >
                                 <Box display="flex" justifyContent="space-between" width="100%">
                                     <Detail>
-                                        Nhà xuất bản: &nbsp;
-                                        {book ? <Link to={`/filters?pubId=${book?.publisher?.id}`}>{book?.publisher?.pubName}</Link>
-                                            : <Skeleton variant="text" sx={{ fontSize: '15px' }} width="50%" />}
+                                        {book ? <>Nhà xuất bản:&nbsp;<Link to={`/filters?pubId=${book?.publisher?.id}`}>{book?.publisher?.pubName}</Link></>
+                                            : <Skeleton variant="text" sx={{ fontSize: '14px' }} width="90%" />}
                                     </Detail>
                                     <Detail>
-                                        Tác giả: &nbsp;
-                                        {book ? <Link to={`/filters?keyword=${book?.author}`}>{book?.author}</Link>
-                                            : <Skeleton variant="text" sx={{ fontSize: '15px' }} width="40%" />}
+
+                                        {book ? <>Tác giả: &nbsp;<Link to={`/filters?keyword=${book?.author}`}>{book?.author}</Link></>
+                                            : <Skeleton variant="text" sx={{ fontSize: '14px' }} width="90%" />}
                                     </Detail>
                                 </Box>
                                 <Detail>
-                                    Hình thức bìa: &nbsp;
-                                    {book ? <Link to={`/filters?type=${book?.type}`}> {book?.type}</Link>
-                                        : <Skeleton variant="text" sx={{ fontSize: '15px' }} width="30%" />}
+                                    {book ? <>Hình thức bìa: &nbsp;<Link to={`/filters?type=${book?.type}`}> {book?.type}</Link></>
+                                        : <Skeleton variant="text" sx={{ fontSize: '14px' }} width="90%" />}
                                 </Detail>
                             </Stack>
-                            <Stack
+                            <Stack className="user-info"
                                 direction="row"
                                 useFlexGap
                                 sx={{ flexWrap: 'wrap' }}
@@ -238,7 +287,7 @@ const ProductContent = ({ book, handleTabChange, pending, setPending }) => {
                                     <>
                                         <UserInfoContainer
                                             className={book?.reviewsInfo?.rating > 0 ? 'active' : ''}
-                                            onClick={(e) => handleChangeTab(e, "reviews")}
+                                            onClick={() => handleViewReview(true)}
                                         >
                                             {book?.reviewsInfo?.rating ?? 0}&nbsp;
                                             <StyledRating
@@ -266,21 +315,10 @@ const ProductContent = ({ book, handleTabChange, pending, setPending }) => {
                                         <UserInfoText className="end">Tố cáo</UserInfoText>
                                     </>
                                     :
-                                    <>
-                                        <UserInfoContainer>
-                                            <StyledRating
-                                                name="product-rating"
-                                                value={0}
-                                                getLabelText={(value) => `${value} star${value !== 1 ? 's' : ''}`}
-                                                precision={0.5}
-                                                icon={<StarIcon fontSize="18" />}
-                                                emptyIcon={<StarBorderIcon fontSize="18" />}
-                                                readOnly
-                                            />
-                                            <Skeleton variant="text" sx={{ fontSize: '16px', marginLeft: '5px' }} width={190} />
-                                        </UserInfoContainer>
-                                        <UserInfoText className="report">Tố cáo</UserInfoText>
-                                    </>}
+                                    <Box display="flex" justifyContent="space-between" width="100%">
+                                        <Skeleton variant="text" sx={{ fontSize: '16px', width: { xs: '40%', md: '70%' } }} />
+                                        <Skeleton variant="text" sx={{ fontSize: '16px' }} width="20%" />
+                                    </Box>}
                             </Stack>
                         </Box>
                         <Box className="product-price">
@@ -298,22 +336,44 @@ const ProductContent = ({ book, handleTabChange, pending, setPending }) => {
                                         <UserInfoText className="end mobile">Đã bán: {numFormatter(book?.totalOrders)}</UserInfoText>
                                     </>
                                     :
-                                    <Skeleton variant="text" sx={{ fontSize: '24px' }} width={200} />
+                                    <Box display="flex" width="100%" justifyContent="space-between" sx={{ marginBottom: { xs: '5px', md: 0 } }}>
+                                        <Skeleton variant="text" sx={{ fontSize: '21px' }} width={200} />
+                                        <Skeleton variant="text" sx={{ fontSize: '14px', display: { xs: 'block', md: 'none' } }} width={60} />
+                                    </Box>
                                 }
                             </PriceContainer>
                             <Divider sx={{ my: 1, display: { xs: 'none', md: 'block' } }} />
-                            <CouponPreview shopId={book?.shopId}/>
+                            {book ?
+                                <Suspense fallback={couponPlaceholder}>
+                                    {book && <CouponPreview shopId={book?.shopId} />}
+                                </Suspense>
+                                : couponPlaceholder
+                            }
                         </Box>
                     </Box>
                     <Box className="product-address">
                         <Divider sx={{ my: 1, display: { xs: 'block', md: 'none' } }} />
-                        <AddressPreview {...{ addressInfo, handleOpen: handleOpenDialog, loadProfile }} />
-                        <AddressSelectDialog {...{ profile, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }} />
+                        {book ?
+                            <Suspense fallback={addressPlaceholder}>
+                                {book &&
+                                    <>
+                                        <AddressPreview {...{ addressInfo, handleOpen: handleOpenDialog, loadProfile }} />
+                                        <AddressSelectDialog {...{ profile, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }} />
+                                    </>
+                                }
+                            </Suspense>
+                            : addressPlaceholder
+                        }
                     </Box>
                     <Box className="product-action" display="flex" flexDirection="column">
                         <ProductAction book={book} />
                         <Divider sx={{ my: 1 }} />
-                        <ProductPolicies book={book} />
+                        {book ?
+                            <Suspense fallback={policiesPlaceholder}>
+                                {book && <ProductPolicies />}
+                            </Suspense>
+                            : policiesPlaceholder
+                        }
                     </Box>
                 </InfoContainer>
             </Grid>

@@ -246,36 +246,37 @@ const ProductImages = ({ book }) => {
 
     return (
         <ImgContainer>
-            <ImageNumber>{slideIndex}/{images.length}</ImageNumber>
-            {book ?
-                <Carousel
-                    renderButtonGroupOutside
-                    responsive={responsive}
-                    autoPlay={true}
-                    arrows={false}
-                    autoPlaySpeed={10000}
-                    keyBoardControl
-                    draggable
-                    customButtonGroup={<CustomButtonGroup {...{ setSlideIndex, images, book }} />}
-                    minimumTouchDrag={80}
-                >
-                    {images.map((image, index) => (
-                        <ImageSlide key={index}>
-                            <StyledLazyImage
-                                src={image}
-                                srcSet={`${image}?size=medium 350w, ${image} 600w`}
-                                alt={`${book?.title} preview image #${index}`}
-                                sizes="400px"
-                                visibleByDefault={index == 0}
-                                placeholder={<StyledSmallSkeleton variant="rectangular" />}
-                            />
-                        </ImageSlide>
-                    ))}
-                </Carousel>
-                : <ImageSlide>
-                    <StyledSkeleton variant="rectangular" />
-                </ImageSlide>
-            }
+            {book ? <ImageNumber>{slideIndex}/{images.length}</ImageNumber>
+                : <ImageNumber>Đang tải</ImageNumber>}
+            <Carousel
+                renderButtonGroupOutside
+                responsive={responsive}
+                autoPlay={true}
+                arrows={false}
+                autoPlaySpeed={10000}
+                keyBoardControl
+                draggable
+                customButtonGroup={<CustomButtonGroup {...{ setSlideIndex, images, book }} />}
+                minimumTouchDrag={80}
+            >
+                {book ? images.map((image, index) => (
+                    <ImageSlide key={index}>
+                        <StyledLazyImage
+                            src={image}
+                            srcSet={`${image}?size=medium 350w, ${image} 600w`}
+                            alt={`${book?.title} preview image #${index}`}
+                            sizes="400px"
+                            visibleByDefault={index == 0}
+                            placeholder={<StyledSmallSkeleton variant="rectangular" />}
+                        />
+                    </ImageSlide>
+                ))
+                    :
+                    <ImageSlide>
+                        <StyledSkeleton variant="rectangular" />
+                    </ImageSlide>
+                }
+            </Carousel>
         </ImgContainer >
     )
 }
