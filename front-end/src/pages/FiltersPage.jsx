@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice";
 import { useGetPublishersQuery } from "../features/publishers/publishersApiSlice";
 import { useGetBooksQuery } from "../features/books/booksApiSlice";
+import { orderGroup } from "../ultils/filters";
 import AppPagination from "../components/custom/AppPagination";
 import CustomDivider from "../components/custom/CustomDivider";
 import FilteredProducts from "../components/product/filter/FilteredProducts";
@@ -58,7 +59,7 @@ const FiltersPage = () => {
         currPage: searchParams.get("pageNo") ? searchParams.get("pageNo") - 1 : 0,
         pageSize: searchParams.get("pSize") ?? 16,
         totalPages: 0,
-        sortBy: searchParams.get("sortBy") ?? "id",
+        sortBy: searchParams.get("sortBy") ?? orderGroup[0].value,
         sortDir: searchParams.get("sortDir") ?? "desc",
     })
 
@@ -240,7 +241,7 @@ const FiltersPage = () => {
             ...pagination,
             currPage: 0,
             pageSize: 16,
-            sortBy: "id",
+            sortBy: orderGroup[0].value,
             sortDir: "desc",
         })
         navigate('/filters')

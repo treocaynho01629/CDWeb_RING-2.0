@@ -80,3 +80,44 @@ export const Title = styled.h3`
         text-transform: none;
     }
 `
+
+export const Showmore = styled.div`
+    font-size: 14px;
+    font-weight: 500;
+    flex-grow: 1;
+    padding: 15px 0;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: ${props => props.theme.palette.info.main};
+    cursor: pointer;
+
+    &::after {
+        content: "";
+        z-index: 0;
+        position: absolute;
+        top: -55px;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        pointer-events: none;
+        border-bottom: .5px solid ${props => props.theme.palette.divider};
+        background-image: linear-gradient(180deg, 
+        transparent, 
+        transparent 60%,
+        ${props => props.theme.palette.background.default} 100%);
+    }
+
+    &.expand {
+        margin-top: 10px;
+
+        &::after {
+            background-image: none;
+        }
+    }
+
+    ${props => props.theme.breakpoints.down("md")} {
+        margin-top: 0;
+    }
+`

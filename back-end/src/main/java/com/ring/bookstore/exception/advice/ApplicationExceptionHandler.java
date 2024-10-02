@@ -40,6 +40,7 @@ public class ApplicationExceptionHandler{
         return new ExceptionMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An internal server error occurred.", errorMap);
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(HttpResponseException.class)
     public ExceptionMessage processSocialException(HttpResponseException e) {
         Map<String, String> errorMap = new HashMap<>();
@@ -53,6 +54,7 @@ public class ApplicationExceptionHandler{
         return e.getExceptionMessage();
     }
 
+    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
     @ExceptionHandler(ImageResizerException.class)
     public ExceptionMessage processSocialException(ImageResizerException e) {
         Map<String, String> errorMap = new HashMap<>();
@@ -60,12 +62,12 @@ public class ApplicationExceptionHandler{
         return new ExceptionMessage(e.getStatus().value(), "Failed to resize image!", errorMap);
     }
     
-    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ExceptionMessage handleMaxSizeException(MaxUploadSizeExceededException e) {
     	Map<String, String> errorMap = new HashMap<>();
         errorMap.put("errorMessage", e.getMessage());
-        return new ExceptionMessage(HttpStatus.EXPECTATION_FAILED.value() , "File size exceed maximum limit!", errorMap);
+        return new ExceptionMessage(HttpStatus.PAYLOAD_TOO_LARGE.value() , "File size exceed maximum limit!", errorMap);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -289,7 +289,7 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                                             className={book?.reviewsInfo?.rating > 0 ? 'active' : ''}
                                             onClick={() => handleViewReview(true)}
                                         >
-                                            {book?.reviewsInfo?.rating ?? 0}&nbsp;
+                                            {(book?.reviewsInfo?.rating ?? 0).toFixed(1)}&nbsp;
                                             <StyledRating
                                                 name="product-rating"
                                                 value={book?.reviewsInfo?.rating ?? 0}
@@ -305,8 +305,8 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                                             }
                                             <Divider orientation="vertical" sx={{ mx: { xs: 0.7, md: 1 } }} flexItem />
                                             <UserInfoText className="rate">
-                                                {book?.reviewsInfo?.totalRates > 0 ?
-                                                    `(${numFormatter(book?.reviewsInfo?.totalRates)}) Đánh giá`
+                                                {book?.reviewsInfo?.count[0] > 0 ?
+                                                    `(${numFormatter(book?.reviewsInfo?.count[0])}) Đánh giá`
                                                     : 'Chưa có đánh giá'}
                                             </UserInfoText>
                                         </UserInfoContainer>

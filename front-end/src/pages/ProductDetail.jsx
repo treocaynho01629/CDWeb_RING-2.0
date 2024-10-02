@@ -86,7 +86,8 @@ const ProductDetail = () => {
                 </CustomBreadcrumbs>
                 {product}
                 <Box my={1}>
-                    <ProductDetailContainer {...{ loading: (isLoading || isFetching), book: data, reviewRef, scrollIntoTab, mobileMode }} />
+                    <ProductDetailContainer {...{ loading: (isLoading || isFetching), book: data, 
+                        reviewRef, scrollIntoTab, mobileMode, pending, setPending }} />
                 </Box>
                 <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
                 <LazyLoadComponent>

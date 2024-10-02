@@ -7,7 +7,7 @@ export const Loader = () => {
       <div style={{ position: 'fixed', width: '100%', top: 0, left: 0, zIndex: 1200 }}>
         <CustomProgress color="primary" />
       </div>
-      <div style={{ height: '70dvh' }} />
+      <div style={{ height: '90dvh' }} />
     </>
   );
 };

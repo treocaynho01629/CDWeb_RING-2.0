@@ -1,4 +1,4 @@
-import { Button, DialogContent, DialogActions, Dialog, DialogTitle, TextField } from '@mui/material';
+import { Button, DialogContent, DialogActions, Dialog, TextField, DialogTitle } from '@mui/material';
 import { Check as CheckIcon } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { useForgotMutation } from '../../features/auth/authApiSlice';

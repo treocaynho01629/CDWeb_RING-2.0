@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch, Avatar, Grid2 as Grid, TextField, MenuItem } from '@mui/material';
 import { Delete as DeleteIcon, Search, Star } from '@mui/icons-material';
 import { Link } from "react-router-dom";
-import { useDeleteReviewMutation, useDeleteReviewsMutation, useGetReviewsByBookIdQuery, useGetReviewsByUserIdQuery, useGetReviewsQuery } from '../../../features/reviews/reviewsApiSlice';
+import { useDeleteReviewMutation, useDeleteReviewsMutation, useGetReviewsQuery } from '../../../features/reviews/reviewsApiSlice';
 import { FooterLabel, ItemTitle, FooterContainer } from '../custom/ShareComponents';
 import { idFormatter } from '../../../ultils/covert';
 import useAuth from "../../../hooks/useAuth";
@@ -112,29 +112,14 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
     sortBy: "id",
     sortDir: "asc",
   })
-  const { data, isLoading, isSuccess, isError, error } =
-    bookId ? useGetReviewsByBookIdQuery({
-      page: pagination.currPage,
-      size: pagination.pageSize,
-      sortBy: pagination.sortBy,
-      sortDir: pagination.sortDir,
-      id: bookId
-    }) : userId ?
-      useGetReviewsByUserIdQuery({
-        page: pagination.currPage,
-        size: pagination.pageSize,
-        sortBy: pagination.sortBy,
-        sortDir: pagination.sortDir,
-        id: userId
-      })
-      :
-      useGetReviewsQuery({
-        page: pagination.currPage,
-        size: pagination.pageSize,
-        sortBy: pagination.sortBy,
-        sortDir: pagination.sortDir,
-        isEmployees: isEmployees
-      })
+  const { data, isLoading, isSuccess, isError, error } = useGetReviewsQuery({
+    page: pagination.currPage,
+    size: pagination.pageSize,
+    sortBy: pagination.sortBy,
+    sortDir: pagination.sortDir,
+    bookId: bookId,
+    userId: userId
+  })
 
   //Delete hook
   const [deleteReview, { isLoading: deleting }] = useDeleteReviewMutation();

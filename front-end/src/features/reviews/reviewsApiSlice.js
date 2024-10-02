@@ -15,7 +15,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getReviews: builder.query({
             query: (args) => {
-                const { page, size, sortBy, sortDir } = args || {};
+                const { page, size, sortBy, sortDir, rating, bookId, userId } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
@@ -23,7 +23,9 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 if (size) params.append('pSize', size);
                 if (sortBy) params.append('sortBy', sortBy);
                 if (sortDir) params.append('sortDir', sortDir);
-                // if (isEmployees) params.append('isEmployees', isEmployees);
+                if (rating) params.append('rating', rating);
+                if (bookId) params.append('bookId', bookId);
+                if (userId) params.append('userId', userId);
 
                 return {
                     url: `/api/reviews?${params.toString()}`,
@@ -55,7 +57,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
         }),
         getReviewsByBookId: builder.query({
             query: (args) => {
-                const { id, page, size, sortBy, sortDir } = args || {};
+                const { id, page, size, sortBy, sortDir, rating } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
@@ -63,6 +65,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 if (size) params.append('pSize', size);
                 if (sortBy) params.append('sortBy', sortBy);
                 if (sortDir) params.append('sortDir', sortDir);
+                if (rating) params.append('rating', rating);
 
                 return {
                     url: `/api/reviews/${id}?${params.toString()}`,
@@ -92,48 +95,9 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 } else return [{ type: 'Review', id: 'LIST' }]
             }
         }),
-        getReviewsByUserId: builder.query({
-            query: (args) => {
-                const { id, page, size, sortBy, sortDir } = args || {};
-
-                //Params
-                const params = new URLSearchParams();
-                if (page) params.append('pageNo', page);
-                if (size) params.append('pSize', size);
-                if (sortBy) params.append('sortBy', sortBy);
-                if (sortDir) params.append('sortDir', sortDir);
-
-                return {
-                    url: `/api/reviews/user/${id}?${params.toString()}`,
-                    validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
-                    },
-                }
-            },
-            transformResponse: responseData => {
-                const { number, size, totalElements, totalPages, content } = responseData;
-                return reviewsAdapter.setAll({
-                    ...initialState,
-                    info: {
-                        currPage: number,
-                        pageSize: size,
-                        totalElements,
-                        totalPages
-                    }
-                }, content)
-            },
-            providesTags: (result, error, arg) => {
-                if (result?.ids) {
-                    return [
-                        { type: 'Review', id: 'LIST' },
-                        ...result.ids.map(id => ({ type: 'Review', id }))
-                    ]
-                } else return [{ type: 'Review', id: 'LIST' }]
-            }
-        }),
         getMyReviews: builder.query({
             query: (args) => {
-                const { page, size, sortBy, sortDir } = args || {};
+                const { page, size, sortBy, sortDir, rating } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
@@ -141,6 +105,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 if (size) params.append('pSize', size);
                 if (sortBy) params.append('sortBy', sortBy);
                 if (sortDir) params.append('sortDir', sortDir);
+                if (rating) params.append('rating', rating);
 
                 return {
                     url: `/api/reviews/user?${params.toString()}`,
@@ -214,7 +179,6 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
 export const {
     useGetReviewsQuery,
     useGetReviewsByBookIdQuery,
-    useGetReviewsByUserIdQuery,
     useGetMyReviewsQuery,
     useCreateReviewMutation,
     useDeleteReviewMutation,

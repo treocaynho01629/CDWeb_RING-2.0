@@ -241,7 +241,7 @@ const CouponPreview = ({ shopId }) => {
     } else if (isSuccess) {
         const { ids, entities } = data;
 
-        coupons = false
+        coupons = ids?.length
             ? ids?.map((id, index) => {
                 const coupon = entities[id];
                 const couponSumary = getCouponSumary(coupon.detail.type);

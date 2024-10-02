@@ -8,6 +8,10 @@ const Container = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        justify-content: center;
+    }
 `
 
 const StyledPageItem = muiStyled(PaginationItem)(({ theme }) => ({
