@@ -3,13 +3,14 @@ import { lazy, Suspense, useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { Grid2 as Grid, Skeleton, Box, Stack } from '@mui/material';
 import { useGetBooksQuery } from '../../../features/books/booksApiSlice';
-import { MobileExtendButton, Title } from '../../custom/GlobalComponents';
+import { MobileExtendButton, Showmore, Title } from '../../custom/GlobalComponents';
 import { KeyboardArrowDown, KeyboardArrowRight, KeyboardArrowUp } from '@mui/icons-material';
 import { idFormatter } from '../../../ultils/covert';
+import { LazyLoadComponent } from 'react-lazy-load-image-component';
 
 const ShopDisplay = lazy(() => import('./ShopDisplay'));
 const ProductsScroll = lazy(() => import('../ProductsScroll'));
-const ReviewComponent = lazy(() => import('./ReviewComponent'));
+const ReviewComponent = lazy(() => import('../../review/ReviewComponent'));
 const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
 
 //#region styled
@@ -25,45 +26,6 @@ const DetailContainer = styled.div`
 
 const DescriptionContainer = styled.div`
   position: relative;
-`
-
-const Showmore = styled.div`
-  font-size: 14px;
-  flex-grow: 1;
-  padding: 15px 0;
-  margin-top: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${props => props.theme.palette.info.main};
-  cursor: pointer;
-  
-  &::after {
-    content: "";
-    z-index: 0;
-    position: absolute;
-    top: -55px;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    border-bottom: .5px solid ${props => props.theme.palette.divider};
-    background-image: linear-gradient(180deg, 
-        transparent, 
-        transparent 60%,
-        ${props => props.theme.palette.background.default} 100%);
-  }
-
-  &.expand {
-    margin-top: 10px;
-
-    &::after {
-      background-image: none;
-    }
-  }
-
-  ${props => props.theme.breakpoints.down("md")} {
-    margin-top: 0;
-  }
 `
 
 const Description = styled.p`
@@ -123,7 +85,7 @@ const DescTitle = styled.h4`
 `
 //#endregion
 
-const ProductDetailContainer = ({ loading, book, reviewRef, scrollIntoTab, mobileMode }) => {
+const ProductDetailContainer = ({ loading, book, reviewRef, scrollIntoTab, mobileMode, pending, setPending }) => {
   const descRef = useRef(null);
   const [overflowed, setOverflowed] = useState(false);
   const [minimize, setMinimize] = useState(true);
@@ -230,7 +192,11 @@ const ProductDetailContainer = ({ loading, book, reviewRef, scrollIntoTab, mobil
   return (
     <Stack spacing={1} direction={{ xs: 'column-reverse', md: 'column' }}>
       <Stack spacing={1}>
-        <ShopDisplay id={book?.shopId} name={book?.shopName} />
+        <LazyLoadComponent>
+          <Suspense fallback={<p>LOADING</p>}>
+            <ShopDisplay id={book?.shopId} name={book?.shopName} />
+          </Suspense>
+        </LazyLoadComponent>
         <Grid container size={12} spacing={1} display="flex" flexDirection={{ xs: 'column-reverse', md: 'row' }}>
           <Grid size={{ xs: 12, md: 'grow' }}>
             <DetailContainer>
@@ -284,12 +250,20 @@ const ProductDetailContainer = ({ loading, book, reviewRef, scrollIntoTab, mobil
             </DetailContainer>
           </Grid>
           <Grid size={{ xs: 12, md: 'auto' }}>
-            <ProductsScroll {...{ loading: loadRelated, data: relatedBooks, isSuccess: doneRelated, isError: errorRelated, isUninitialized }} />
+            <LazyLoadComponent>
+              <Suspense fallback={<p>LOADING</p>}>
+                <ProductsScroll {...{ loading: loadRelated, data: relatedBooks, isSuccess: doneRelated, isError: errorRelated, isUninitialized }} />
+              </Suspense>
+            </LazyLoadComponent>
           </Grid>
         </Grid>
       </Stack>
       <Box ref={reviewRef} sx={{ scrollMargin: '80px' }}>
-        <ReviewComponent {...{ book, id: book?.id, reviewRef, scrollIntoTab }} />
+        <LazyLoadComponent>
+          <Suspense fallback={<p>LOADING</p>}>
+            <ReviewComponent {...{ book, id: book?.id, reviewRef, scrollIntoTab, mobileMode, pending, setPending }} />
+          </Suspense>
+        </LazyLoadComponent>
       </Box>
     </Stack>
   )

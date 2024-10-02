@@ -306,12 +306,11 @@ const Navbar = () => {
                                             </IconButton>
                                         </Box>
                                         <Suspense fallback={<></>}>
-                                            {openDrawer ?
+                                            {openDrawer &&
                                                 <NavDrawer {...{
                                                     openDrawer, setOpen, username, roles, location,
                                                     products: cartProducts, logout, theme, colorMode
                                                 }} />
-                                                : null
                                             }
                                         </Suspense>
                                     </>
@@ -393,7 +392,9 @@ const Navbar = () => {
                                                     </StyledIconButton>
                                                 </Link>
                                                 <Suspense fallback={<></>}>
-                                                    <MiniCart {...{ removeProduct, openCart, anchorElCart, handleClose: handleCartClose, products: cartProducts }} />
+                                                    {openCart &&
+                                                        <MiniCart {...{ removeProduct, openCart, anchorElCart, handleClose: handleCartClose, products: cartProducts }} />
+                                                    }
                                                 </Suspense>
                                             </div>
                                             {username ? (
@@ -410,10 +411,12 @@ const Navbar = () => {
                                                         </StyledIconButton>
                                                     </Link>
                                                     <Suspense fallback={<></>}>
-                                                        <ProfilePopover {...{
-                                                            open, anchorEl, handleClose: handleProfileClose,
-                                                            roles, logout, theme, colorMode, image
-                                                        }} />
+                                                        {open &&
+                                                            <ProfilePopover {...{
+                                                                open, anchorEl, handleClose: handleProfileClose,
+                                                                roles, logout, theme, colorMode, image
+                                                            }} />
+                                                        }
                                                     </Suspense>
                                                 </div>
                                             ) : (

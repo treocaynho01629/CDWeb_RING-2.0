@@ -1,11 +1,8 @@
 package com.ring.bookstore.dtos;
 
+import java.util.List;
+
 public record ReviewsInfoDTO(Double rating,
-                             Integer totalRates,
-                             Integer five,
-                             Integer four,
-                             Integer three,
-                             Integer two,
-                             Integer one) {
+                             List<Integer> count ) {
 
 }

@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import { Facebook, YouTube, Instagram, Twitter, QrCode, LocalAtm, SystemSecurityUpdateGood, CreditCard } from '@mui/icons-material';
-import { Box, Grid2 as Grid } from "@mui/material";
+import { Grid2 as Grid } from "@mui/material";
 
 //#region styled
 const Container = styled.div`

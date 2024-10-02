@@ -42,7 +42,7 @@ export const bookTypes = [
 
 export const orderGroup = [
     {
-        value: 'id',
+        value: 'createdDate',
         label: 'Mới nhất',
     },
     {
@@ -58,3 +58,11 @@ export const orderGroup = [
         label: 'Giá bán',
     },
 ];
+
+export const rateLabels = {
+    1: 'Cực tệ',
+    2: 'Tệ',
+    3: 'Ổn',
+    4: 'Hài lòng',
+    5: 'Cực hài lòng',
+};

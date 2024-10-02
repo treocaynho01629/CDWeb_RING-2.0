@@ -1,7 +1,7 @@
 import { useTheme } from "styled-components"
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { useUpdateProfileMutation } from '../../features/users/usersApiSlice';
-import { Box, Dialog, Button, DialogActions, DialogContent, DialogTitle, ListItemIcon, ListItemText, Menu, MenuItem, Radio, styled, useMediaQuery } from '@mui/material';
+import { Box, Dialog, Button, DialogActions, DialogContent, ListItemIcon, ListItemText, Menu, MenuItem, Radio, styled, useMediaQuery, DialogTitle } from '@mui/material';
 import { AddHome, Check, Delete, Home, LocationOn, Close } from '@mui/icons-material';
 import { useLocation, useNavigate } from "react-router-dom";
 import AddressItem from './AddressItem'
@@ -187,7 +187,7 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
         :
         <>
           <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><LocationOn />&nbsp;Địa chỉ của bạn</DialogTitle>
-          <DialogContent sx={{ padding: { xs: 1, sm: '20px 24px' }, paddingTop: 0 }}>
+          <DialogContent sx={{ padding: { xs: 1, sm: '20px 24px' } }}>
             <Box display="flex" mb={'5px'}>
               <StyledRadio
                 checked={selectedValue == -1}

@@ -98,6 +98,18 @@ export function ThemeContextProvider({ children }) {
                             }),
                         },
                     },
+                    MuiDialogTitle: {
+                        styleOverrides: {
+                            root: ({ theme }) => ({
+                                [theme.breakpoints.down('sm')]: {
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: 10,
+                                    height: theme.mixins.toolbar.minHeight,
+                                }
+                            }),
+                        },
+                    },
                     MuiOutlinedInput: {
                         styleOverrides: {
                             notchedOutline: {

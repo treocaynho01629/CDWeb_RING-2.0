@@ -13,6 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.ring.bookstore.dtos.BookDTO;
 import com.ring.bookstore.dtos.projections.IBookDisplay;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,12 +50,13 @@ public class BookMapper {
         Long shopId = bookWithDetail.getShopId();
         Integer totalOrders = bookWithDetail.getTotalOrders();
         Double rating = bookWithDetail.getRating();
-        Integer totalRates = bookWithDetail.getTotalRates();
-        Integer five = bookWithDetail.getFive();
-        Integer four = bookWithDetail.getFour();
-        Integer three = bookWithDetail.getThree();
-        Integer two = bookWithDetail.getTwo();
-        Integer one = bookWithDetail.getOne();
+        List<Integer> count = new ArrayList<>();
+        count.add(0, bookWithDetail.getTotalRates());
+        count.add(1, bookWithDetail.getOne());
+        count.add(2, bookWithDetail.getTwo());
+        count.add(3, bookWithDetail.getThree());
+        count.add(4, bookWithDetail.getFour());
+        count.add(5, bookWithDetail.getFive());
 
         //Main thumbnail
         String fileDownloadUri = ServletUriComponentsBuilder
@@ -99,15 +101,7 @@ public class BookMapper {
                 detail.getBWeight(),
                 book.getAmount(),
                 totalOrders != null ? totalOrders : 0,
-                new ReviewsInfoDTO(
-                        rating != null ? rating : 0.0,
-                        totalRates != null ? totalRates : 0,
-                        five != null ? five : 0,
-                        four != null ? four : 0,
-                        three != null ? three : 0,
-                        two != null ? two : 0,
-                        one != null ? one : 0
-                )
+                new ReviewsInfoDTO(rating != null ? rating : 0.0, count)
         );
     }
 
