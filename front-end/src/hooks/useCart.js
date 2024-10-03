@@ -19,6 +19,8 @@ const useCart = () => {
             discount: item.discount,
             image: item.image,
             amount: item.amount,
+            shopId: item.shopId,
+            shopName: item.shopName,
             quantity,
         }));
     }

@@ -2,12 +2,13 @@ import styled from 'styled-components'
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
 import { MobileExtendButton, Showmore, Title } from '../custom/GlobalComponents';
-import { Button, DialogActions, DialogTitle, IconButton, Rating } from '@mui/material';
+import { Button, DialogActions, DialogTitle, IconButton, Rating, Box, Skeleton } from '@mui/material';
 import { KeyboardArrowRight, KeyboardArrowLeft, Star, StarBorder, EditOutlined } from '@mui/icons-material';
 import { numFormatter } from '../../ultils/covert';
 import useAuth from "../../hooks/useAuth";
 import CustomProgress from '../custom/CustomProgress';
 import ReviewItem from './ReviewItem';
+import CustomPlaceholder from '../custom/CustomPlaceholder';
 
 const ReviewSort = lazy(() => import('./ReviewSort'));
 const ReviewForm = lazy(() => import('./ReviewForm'));
@@ -79,10 +80,9 @@ const EmptyImage = styled.img`
 `
 //#endregion
 
-const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending }) => {
+const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending, isReview, handleToggleReview }) => {
     //#region construct
     const { username } = useAuth();
-    const [openReview, setOpenReview] = useState(false);
     const [openForm, setOpenForm] = useState(false);
 
     //Pagination & filter
@@ -136,7 +136,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending 
     let reviewsContent;
     let mainContent;
 
-    if (isLoading) {
+    if (isLoading && !isUninitialized) {
         reviewsContent = <>
             {(loading) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
             {[...Array(pagination?.page)].map((item, index) =>
@@ -177,7 +177,11 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending 
     mainContent = (
         <>
             {book?.reviewsInfo?.count[0] > 0 &&
-                <Suspense fallback={<p>LOADING</p>}>
+                <Suspense fallback={<Box display="flex">
+                    <Skeleton variant="text" sx={{ mr: 2, fontSize: '16px', display: { xs: 'none', md: 'block' } }} width={64} />
+                    <Skeleton variant="rectangular" sx={{ mr: 1, height: 40, width: 178 }} />
+                    <Skeleton variant="rectangular" sx={{ height: 40, width: 115 }} />
+                </Box>}>
                     <ReviewSort {...{
                         sortBy: pagination?.sortBy, handleChangeOrder,
                         filterBy, handleChangeFilter, count: book?.reviewsInfo?.count
@@ -186,7 +190,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending 
             }
             {reviewsContent}
             {book?.reviewsInfo?.count[0] > pagination.pageSize &&
-                <Suspense fallback={<p>LOADING</p>}>
+                <Suspense fallback={null}>
                     <AppPagination pagination={pagination}
                         onPageChange={handlePageChange}
                         onSizeChange={handleChangeSize} />
@@ -200,29 +204,38 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending 
         <ReviewsWrapper>
             <Title>
                 <TitleContainer>
-                    Đánh giá sản phẩm
+                    {book ? 'Đánh giá sản phẩm'
+                        : <Skeleton variant="text" sx={{ fontSize: 'inherit' }} width="40%" />
+                    }
                     {mobileMode ?
                         <ReviewSummary>
-                            <Rating
-                                name="product-rating"
-                                value={book?.reviewsInfo?.rating ?? 0}
-                                readOnly
-                                sx={{ fontSize: 16 }}
-                                icon={<Star sx={{ fontSize: 16 }} />}
-                                emptyIcon={<StarBorder sx={{ fontSize: 16 }} />}
-                            />
-                            <Label>{(book?.reviewsInfo?.rating ?? 0).toFixed(1)}/5</Label>
-                            <Label className="secondary">({numFormatter(book?.reviewsInfo?.count[0] ?? 0)} đánh giá)</Label>
+                            {book ? <>
+                                <Rating
+                                    name="product-rating"
+                                    value={book?.reviewsInfo?.rating ?? 0}
+                                    readOnly
+                                    sx={{ fontSize: 16 }}
+                                    icon={<Star sx={{ fontSize: 16 }} />}
+                                    emptyIcon={<StarBorder sx={{ fontSize: 16 }} />}
+                                />
+                                <Label>{(book?.reviewsInfo?.rating ?? 0).toFixed(1)}/5</Label>
+                                <Label className="secondary">({numFormatter(book?.reviewsInfo?.count[0] ?? 0)} đánh giá)</Label>
+                            </>
+                                : <Skeleton variant="text" sx={{ fontSize: '16px' }} width={200} />
+                            }
+
                         </ReviewSummary>
                         :
-                        <Suspense fallback={<p>LOADING</p>}>
-                            <ReviewInfo handleClick={handleOpenForm} rating={book?.reviewsInfo?.rating} count={book?.reviewsInfo?.count} />
+                        <Suspense fallback={<CustomPlaceholder sx={{ height: { xs: 131, md: 140 } }} />}>
+                            <ReviewInfo handleClick={handleOpenForm} book={book} />
                         </Suspense>
                     }
                 </TitleContainer>
                 {mobileMode &&
-                    <MobileExtendButton disabled={!book} onClick={() => setOpenReview(true)}>
-                        <Label>Xem tất cả <KeyboardArrowRight fontSize="small" /></Label>
+                    <MobileExtendButton disabled={!book} onClick={() => handleToggleReview(true)}>
+                        {book ? <Label>Xem tất cả <KeyboardArrowRight fontSize="small" /></Label>
+                            : <Label><Skeleton variant="text" sx={{ fontSize: 'inherit' }} width={80} /></Label>
+                        }
                     </MobileExtendButton>
                 }
             </Title>
@@ -230,27 +243,27 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending 
                 {mobileMode ? reviewsContent : mainContent}
             </ReviewsContainer>
             {(mobileMode && book?.reviewsInfo?.count[0] > 0) &&
-                <Showmore onClick={() => setOpenReview(true)}>
+                <Showmore onClick={() => handleToggleReview(true)}>
                     <Label>Xem tất cả ({numFormatter(book?.reviewsInfo?.count[0] ?? 0)} đánh giá) <KeyboardArrowRight fontSize="small" /></Label>
                 </Showmore>
             }
-            {openReview &&
-                <Suspense fallback={<p>LOADING</p>}>
+            {(isReview && mobileMode) &&
+                <Suspense fallback={null}>
                     <Dialog
                         fullScreen
                         scroll="paper"
-                        open={openReview}
-                        onClose={() => setOpenReview(false)}
+                        open={isReview}
+                        onClose={() => handleToggleReview(false)}
                     >
                         <DialogTitle>
-                            <IconButton onClick={() => setOpenReview(false)}><KeyboardArrowLeft /></IconButton> Đánh giá
+                            <IconButton onClick={() => handleToggleReview(false)}><KeyboardArrowLeft /></IconButton> Đánh giá
                         </DialogTitle>
-                        <Suspense fallback={<p>LOADING</p>}>
+                        <Suspense fallback={<CustomPlaceholder />}>
                             <DialogContent
                                 dividers={true}
                                 sx={{ padding: 1, paddingTop: 0 }}
                             >
-                                <ReviewInfo rating={book?.reviewsInfo?.rating} count={book?.reviewsInfo?.count} />
+                                <ReviewInfo book={book} />
                                 {mainContent}
                             </DialogContent>
                         </Suspense>
@@ -260,6 +273,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending 
                                 size="large"
                                 fullWidth
                                 sx={{ marginY: '10px' }}
+                                disabled={!book}
                                 onClick={() => setOpenForm(true)}
                                 startIcon={<EditOutlined />}
                             >
@@ -271,8 +285,10 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending 
             }
             {openForm &&
                 <Suspense fallback={null}>
-                    <ReviewForm {...{ username, bookId: book?.id, open: openForm, handleClose: handleCloseForm, 
-                        mobileMode, pending, setPending, handlePageChange }} />
+                    <ReviewForm {...{
+                        username, bookId: book?.id, open: openForm, handleClose: handleCloseForm,
+                        mobileMode, pending, setPending, handlePageChange
+                    }} />
                 </Suspense>
             }
         </ReviewsWrapper>

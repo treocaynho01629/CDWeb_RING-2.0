@@ -76,7 +76,7 @@ const AddressPreview = ({ addressInfo, handleOpen, loadProfile }) => {
                                 >
                                     &nbsp;Vận chuyển tới:&emsp;
                                     <Address>
-                                        {addressInfo?.address ? addressInfo?.address : 'Không xác định'}
+                                        {addressInfo?.address || 'Không xác định'}
                                     </Address>
                                     <KeyboardArrowDown sx={{ display: { xs: 'none', md: 'block' } }} />
                                 </AddressInfo>

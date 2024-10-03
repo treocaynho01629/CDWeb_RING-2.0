@@ -5,10 +5,9 @@ import { Skeleton } from '@mui/material';
 
 //#region styled
 const Container = styled.div`
-    min-width: 110px;
-    max-width: 220px;
-    height: 100%;
+    max-width: 200px;
     width: 100%;
+    height: 100%;
     padding: 10px;
     display: inline-flex;
     flex-direction: column;
@@ -25,6 +24,8 @@ const Container = styled.div`
     }
 
     ${props => props.theme.breakpoints.down("sm")} {
+        min-width: 110px;
+        max-width: 120px;
         padding: 0;
         margin: 0 ${props => props.theme.spacing(.1)};
     }

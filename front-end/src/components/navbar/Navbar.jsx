@@ -246,8 +246,8 @@ const Navbar = () => {
     const logout = useLogout();
 
     //Anchor for popoever & open state
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [anchorElCart, setAnchorElCart] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(undefined);
+    const [anchorElCart, setAnchorElCart] = useState(undefined);
     const open = Boolean(anchorEl);
     const openCart = Boolean(anchorElCart);
 
@@ -374,7 +374,7 @@ const Navbar = () => {
                                                 </Badge>
                                                 <IconText>Thông báo</IconText>
                                             </StyledIconButton>
-                                            <div
+                                            <Box
                                                 aria-owns={openCart ? "mouse-over-popover" : undefined}
                                                 aria-haspopup="true"
                                                 onMouseEnter={hanldeCartPopover}
@@ -392,13 +392,13 @@ const Navbar = () => {
                                                     </StyledIconButton>
                                                 </Link>
                                                 <Suspense fallback={<></>}>
-                                                    {openCart &&
+                                                    {anchorElCart !== undefined &&
                                                         <MiniCart {...{ removeProduct, openCart, anchorElCart, handleClose: handleCartClose, products: cartProducts }} />
                                                     }
                                                 </Suspense>
-                                            </div>
+                                            </Box>
                                             {username ? (
-                                                <div
+                                                <Box
                                                     aria-owns={open ? "mouse-over-popover" : undefined}
                                                     aria-haspopup="true"
                                                     onMouseEnter={handleProfilePopover}
@@ -411,14 +411,14 @@ const Navbar = () => {
                                                         </StyledIconButton>
                                                     </Link>
                                                     <Suspense fallback={<></>}>
-                                                        {open &&
+                                                        {anchorEl !== undefined &&
                                                             <ProfilePopover {...{
                                                                 open, anchorEl, handleClose: handleProfileClose,
                                                                 roles, logout, theme, colorMode, image
                                                             }} />
                                                         }
                                                     </Suspense>
-                                                </div>
+                                                </Box>
                                             ) : (
                                                 <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">
                                                     <StyledIconButton className="nav" aria-label="login">
@@ -434,7 +434,7 @@ const Navbar = () => {
                         }
                     </Grid>
                 </Wrapper>
-            </AppBar>
+            </AppBar >
         </>
     )
 }
