@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
-import { Button, LinearProgress, Rating } from '@mui/material';
+import { Button, LinearProgress, Rating, Skeleton } from '@mui/material';
 import { EditOutlined, Star, StarBorder } from '@mui/icons-material';
 import { numFormatter } from '../../ultils/covert';
 
@@ -113,9 +113,9 @@ LinearProgressWithLabel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-const ReviewInfo = ({ handleClick, rating, count = [] }) => {
+const ReviewInfo = ({ handleClick, book }) => {
     const reviewPercent = (value) => {
-        const total = count[0] ?? 0;
+        const total = book?.reviewsInfo?.count[0] ?? 0;
         const result = (value == 0 || total == 0) ? 0 : (value / total) * 100;
         return result;
     }
@@ -123,34 +123,47 @@ const ReviewInfo = ({ handleClick, rating, count = [] }) => {
     return (
         <ReviewsInfoContainer>
             <ScoreContainer>
-                <Score>{(rating ?? 0).toFixed(1)}<b>/5</b></Score>
-                <Rating
-                    name="product-rating"
-                    value={rating ?? 0}
-                    readOnly
-                    sx={{ fontSize: { xs: 18, sm: 24 } }}
-                    icon={<Star fontSize="inherit" />}
-                    emptyIcon={<StarBorder fontSize="inherit" />}
-                />
-                <TotalLabel>({numFormatter(count[0])} đánh giá)</TotalLabel>
+                {book ? <>
+                    <Score>{(book?.reviewsInfo?.rating ?? 0).toFixed(1)}<b>/5</b></Score>
+                    <Rating
+                        name="product-rating"
+                        value={book?.reviewsInfo?.rating ?? 0}
+                        readOnly
+                        sx={{ fontSize: { xs: 18, md: 24 } }}
+                        icon={<Star fontSize="inherit" />}
+                        emptyIcon={<StarBorder fontSize="inherit" />}
+                    />
+                    <TotalLabel>({numFormatter(book?.reviewsInfo?.count[0])} đánh giá)</TotalLabel>
+                </>
+                    : <>
+                        <Score><Skeleton variant="text" sx={{ fontSize: 'inherit', width: { xs: 60, md: 100 } }} /></Score>
+                        <Skeleton variant="text" sx={{ fontSize: { xs: 18, md: 24 }, width: { xs: 90, md: 120 } }} />
+                        <TotalLabel><Skeleton variant="text" sx={{ fontSize: 'inherit', width: { xs: 80, md: 100 } }} /></TotalLabel>
+                    </>
+                }
             </ScoreContainer>
             <ProgressContainer>
-                {[...Array(5)].map((item, index) =>
-                    <LinearProgressWithLabel
-                        key={`progress-${index + 1}`}
-                        label={`${index + 1} sao`}
-                        value={reviewPercent(count[index + 1] ?? 0)} />
-                )}
+                {[...Array(5)].map((item, index) => (
+                    book ?
+                        <LinearProgressWithLabel
+                            key={`progress-${index + 1}`}
+                            label={`${index + 1} sao`}
+                            value={reviewPercent(book?.reviewsInfo?.count[index + 1] ?? 0)} />
+                        : <Skeleton variant="rectangular" sx={{ height: 10, width: '90%', ml: '5%', my: { xs: '8px', md: '10px' } }} />
+                ))}
             </ProgressContainer>
             <ButtonContainer>
-                <Button
-                    variant="outlined"
-                    size="large"
-                    onClick={handleClick}
-                    startIcon={<EditOutlined />}
-                >
-                    Viết đánh giá
-                </Button>
+                {book ?
+                    <Button
+                        variant="outlined"
+                        size="large"
+                        onClick={handleClick}
+                        startIcon={<EditOutlined />}
+                    >
+                        Viết đánh giá
+                    </Button>
+                    : <Skeleton variant="rectangular" sx={{ height: 42, width: 160 }} />
+                }
             </ButtonContainer>
         </ReviewsInfoContainer>
     )

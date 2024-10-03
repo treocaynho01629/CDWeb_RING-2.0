@@ -1,16 +1,13 @@
 import styled from 'styled-components'
 import { lazy, Suspense, useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
-import { Grid2 as Grid, Skeleton, Box, Stack } from '@mui/material';
+import { Grid2 as Grid, Skeleton, Box } from '@mui/material';
 import { useGetBooksQuery } from '../../../features/books/booksApiSlice';
 import { MobileExtendButton, Showmore, Title } from '../../custom/GlobalComponents';
 import { KeyboardArrowDown, KeyboardArrowRight, KeyboardArrowUp } from '@mui/icons-material';
 import { idFormatter } from '../../../ultils/covert';
-import { LazyLoadComponent } from 'react-lazy-load-image-component';
+import ProductsScroll from '../ProductsScroll';
 
-const ShopDisplay = lazy(() => import('./ShopDisplay'));
-const ProductsScroll = lazy(() => import('../ProductsScroll'));
-const ReviewComponent = lazy(() => import('../../review/ReviewComponent'));
 const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
 
 //#region styled
@@ -22,6 +19,10 @@ const DetailContainer = styled.div`
   ${props => props.theme.breakpoints.down("md")} {
     padding: 0 12px;
   }
+`
+
+const ProductsContainer = styled.div`
+  border: .5px solid ${props => props.theme.palette.divider};
 `
 
 const DescriptionContainer = styled.div`
@@ -83,9 +84,10 @@ const InfoText = styled.p`
 const DescTitle = styled.h4`
   margin: 15px 0;
 `
+
 //#endregion
 
-const ProductDetailContainer = ({ loading, book, reviewRef, scrollIntoTab, mobileMode, pending, setPending }) => {
+const ProductDetailContainer = ({ loading, book, mobileMode }) => {
   const descRef = useRef(null);
   const [overflowed, setOverflowed] = useState(false);
   const [minimize, setMinimize] = useState(true);
@@ -190,82 +192,91 @@ const ProductDetailContainer = ({ loading, book, reviewRef, scrollIntoTab, mobil
   }
 
   return (
-    <Stack spacing={1} direction={{ xs: 'column-reverse', md: 'column' }}>
-      <Stack spacing={1}>
-        <LazyLoadComponent>
-          <Suspense fallback={<p>LOADING</p>}>
-            <ShopDisplay id={book?.shopId} name={book?.shopName} />
-          </Suspense>
-        </LazyLoadComponent>
-        <Grid container size={12} spacing={1} display="flex" flexDirection={{ xs: 'column-reverse', md: 'row' }}>
-          <Grid size={{ xs: 12, md: 'grow' }}>
-            <DetailContainer>
-              <Box position="relative" mb={-2}>
-                <Title>Thông tin chi tiết</Title>
-                <MobileExtendButton disabled={loading || !book} onClick={() => setOpenDetail(true)}>
-                  Tác giả, Nhà xuất bản,... <KeyboardArrowRight fontSize="small" />
-                </MobileExtendButton>
-              </Box>
-              {mobileMode
-                ?
-                <Suspense fallback={<></>}>
-                  {openDetail &&
-                    <SwipeableDrawer
-                      anchor="bottom"
-                      open={openDetail}
-                      onOpen={() => setOpenDetail(true)}
-                      onClose={() => setOpenDetail(false)}
-                    >
-                      <Box sx={{ padding: '0 12px' }}>
-                        <Title>Thông tin chi tiết</Title>
-                        <Box mt={-2} mb={2}>
-                          {details}
-                        </Box>
-                      </Box>
-                    </SwipeableDrawer>
-                  }
-                </Suspense>
-                : details
+    <Grid container size={12} spacing={1} display="flex" flexDirection={{ xs: 'column-reverse', md: 'row' }}>
+      <Grid size={{ xs: 12, md: 'grow' }}>
+        <DetailContainer>
+          <Box position="relative" mb={-2}>
+            <Title>
+              {book ? 'Thông tin chi tiết'
+                : <Skeleton variant="text" sx={{ fontSize: 'inherit' }} width="40%" />
               }
-              <Title>Mô tả sản phẩm</Title>
-              <DescTitle>{book?.title}</DescTitle>
-              <DescriptionContainer>
-                <Description
-                  ref={descRef}
-                  className={minimize ? 'minimize' : ''}
+            </Title>
+            <MobileExtendButton disabled={loading || !book} onClick={() => setOpenDetail(true)}>
+              {book ? <>Tác giả, Nhà xuất bản,... <KeyboardArrowRight fontSize="small" /></>
+                : <Skeleton variant="text" sx={{ fontSize: 'inherit' }} width="35%" />
+              }
+
+            </MobileExtendButton>
+          </Box>
+          {mobileMode
+            ?
+            <Suspense fallback={<></>}>
+              {openDetail &&
+                <SwipeableDrawer
+                  anchor="bottom"
+                  open={openDetail}
+                  onOpen={() => setOpenDetail(true)}
+                  onClose={() => setOpenDetail(false)}
                 >
-                  {book?.description}
-                </Description>
-                {overflowed && <Showmore
-                  className={minimize ? '' : 'expand'}
-                  onClick={toggleMinimize}
-                >
-                  {minimize ?
-                    <>Xem thêm <KeyboardArrowDown /> </>
-                    :
-                    <>Ẩn bớt <KeyboardArrowUp /> </>
-                  }
-                </Showmore>}
-              </DescriptionContainer>
-            </DetailContainer>
-          </Grid>
-          <Grid size={{ xs: 12, md: 'auto' }}>
-            <LazyLoadComponent>
-              <Suspense fallback={<p>LOADING</p>}>
-                <ProductsScroll {...{ loading: loadRelated, data: relatedBooks, isSuccess: doneRelated, isError: errorRelated, isUninitialized }} />
-              </Suspense>
-            </LazyLoadComponent>
-          </Grid>
-        </Grid>
-      </Stack>
-      <Box ref={reviewRef} sx={{ scrollMargin: '80px' }}>
-        <LazyLoadComponent>
-          <Suspense fallback={<p>LOADING</p>}>
-            <ReviewComponent {...{ book, id: book?.id, reviewRef, scrollIntoTab, mobileMode, pending, setPending }} />
-          </Suspense>
-        </LazyLoadComponent>
-      </Box>
-    </Stack>
+                  <Box sx={{ padding: '0 12px' }}>
+                    <Title>Thông tin chi tiết</Title>
+                    <Box mt={-2} mb={2}>
+                      {details}
+                    </Box>
+                  </Box>
+                </SwipeableDrawer>
+              }
+            </Suspense>
+            : details
+          }
+          <Title>
+            {book ? 'Mô tả sản phẩm'
+              : <Skeleton variant="text" sx={{ fontSize: 'inherit' }} width="40%" />
+            }
+          </Title>
+          <DescTitle>{book?.title}</DescTitle>
+          <DescriptionContainer>
+            <Description
+              ref={descRef}
+              className={minimize ? 'minimize' : ''}
+            >
+              {book ?
+                book?.description
+                : <>
+                  <Skeleton variant="text" sx={{ fontSize: '16px', mb: '15px' }} width="60%" />
+                  <Skeleton variant="text" sx={{ fontSize: 'inherit' }} width="100%" />
+                  <Skeleton variant="text" sx={{ fontSize: 'inherit' }} width="100%" />
+                  <Skeleton variant="text" sx={{ fontSize: 'inherit' }} width="100%" />
+                  <Skeleton variant="text" sx={{ fontSize: 'inherit' }} width="40%" />
+                </>
+              }
+            </Description>
+            {overflowed && <Showmore
+              className={minimize ? '' : 'expand'}
+              onClick={toggleMinimize}
+            >
+              {minimize ?
+                <>Xem thêm <KeyboardArrowDown /> </>
+                :
+                <>Ẩn bớt <KeyboardArrowUp /> </>
+              }
+            </Showmore>}
+          </DescriptionContainer>
+        </DetailContainer>
+      </Grid>
+      <Grid size={{ xs: 12, md: 'auto' }}>
+        <ProductsContainer>
+          <Box padding={{ xs: '0 12px', md: '10px 20px 0' }}>
+            <Title>
+              {book ? 'Sản phẩm khác'
+                : <Skeleton variant="text" sx={{ fontSize: 'inherit' }} width={150} />
+              }
+            </Title>
+          </Box>
+          <ProductsScroll {...{ loading: loadRelated, data: relatedBooks, isSuccess: doneRelated, isError: errorRelated, isUninitialized }} />
+        </ProductsContainer>
+      </Grid>
+    </Grid>
   )
 }
 

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { styled as muiStyled } from '@mui/material/styles';
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search, ChevronLeft } from '@mui/icons-material';
 import { Checkbox, Button, Grid2 as Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon, Skeleton } from '@mui/material';
 import { NavLink, useNavigate } from "react-router-dom";
@@ -191,6 +191,21 @@ const CartContent = () => {
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
 
+    //Test
+    const reduceCart = () => {
+        return cartProducts.reduce((result, item) => {
+            if (!result[item.shopId]) { //Check if not exists shop >> Add new one
+                result[item.shopId] = { shopName: item.shopName, products: [] };
+            }
+
+            //Else push
+            result[item.shopId].products.push(item);
+            return result;
+        }, {});
+    }
+
+    const reducedCart = useMemo(() => reduceCart(), cartProducts);
+
     //Get similar
     const [getBook] = booksApiSlice.useLazyGetBookQuery();
 
@@ -298,7 +313,95 @@ const CartContent = () => {
                             rowCount={cartProducts?.length}
                         />
                         <TableBody>
-                            {cartProducts?.map((product, index) => {
+                            {Object.keys(reducedCart).map(shopId => {
+                                const shop = reducedCart[shopId];
+                                
+                                return (
+                                    <>
+                                        <p>{shop.shopName}</p>
+                                        {shop.products?.map((product, index) => {
+                                            const isItemSelected = isSelected(product.id);
+                                            const labelId = `enhanced-table-checkbox-${index}`;
+
+                                            return (
+                                                <StyledTableRow
+                                                    hover
+                                                    role="checkbox"
+                                                    aria-checked={isItemSelected}
+                                                    tabIndex={-1}
+                                                    key={product.id}
+                                                    selected={isItemSelected}
+                                                >
+                                                    <StyledTableCell component="th" scope="product">
+                                                        <Box sx={{ display: 'flex' }}>
+                                                            <Checkbox
+                                                                disableRipple
+                                                                disableFocusRipple
+                                                                color="primary"
+                                                                checked={isItemSelected}
+                                                                inputProps={{ 'aria-labelledby': labelId }}
+                                                                sx={{ marginRight: { xs: 1, md: 2 }, marginLeft: { xs: -1.5, sm: 0 } }}
+                                                                onClick={() => handleSelect(product.id)}
+                                                            />
+                                                            <ItemContainer>
+                                                                <NavLink to={`/product/${product.slug}`}>
+                                                                    <StyledLazyImage
+                                                                        src={`${product.image}?size=small`}
+                                                                        alt={`${product.title} Cart item`}
+                                                                        placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
+                                                                    />
+                                                                </NavLink>
+                                                                <ItemSummary>
+                                                                    <NavLink to={`/product/${product.slug}`}>
+                                                                        <ItemTitle>{product.title}</ItemTitle>
+                                                                    </NavLink>
+                                                                    <ItemAction>
+                                                                        <Box display={{ xs: 'block', md: 'none' }}>
+                                                                            {product?.discount > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
+                                                                            <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
+                                                                        </Box>
+                                                                        <Box display={{ xs: 'flex', sm: 'none' }}>
+                                                                            <CustomAmountInput
+                                                                                size="small"
+                                                                                value={product.quantity}
+                                                                                onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)}
+                                                                                handleDecrease={() => handleDecrease(product.quantity, product.id)}
+                                                                                handleIncrease={() => increaseAmount(product.id)}
+                                                                            />
+                                                                        </Box>
+                                                                    </ItemAction>
+                                                                </ItemSummary>
+                                                            </ItemContainer>
+                                                        </Box>
+                                                    </StyledTableCell>
+                                                    <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                                                        <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
+                                                        {product?.discount > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
+                                                    </StyledTableCell>
+                                                    <StyledTableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                                                        <CustomAmountInput
+                                                            size="small"
+                                                            value={product.quantity}
+                                                            onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)}
+                                                            handleDecrease={() => handleDecrease(product.quantity, product.id)}
+                                                            handleIncrease={() => increaseAmount(product.id)}
+                                                        />
+                                                    </StyledTableCell>
+                                                    <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                                                        <Price className="total">{(Math.round(product.price * (1 - (product?.discount || 0))) * product.quantity).toLocaleString()}đ</Price>
+                                                    </StyledTableCell>
+                                                    <td>
+                                                        <IconButton sx={hoverIcon} onClick={(e) => handleClick(e, product)}>
+                                                            <MoreHoriz />
+                                                        </IconButton>
+                                                    </td>
+                                                </StyledTableRow>
+                                            )
+                                        })}
+                                    </>
+                                )
+                            })}
+                            {/* {cartProducts?.map((product, index) => {
                                 const isItemSelected = isSelected(product.id);
                                 const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -376,7 +479,7 @@ const CartContent = () => {
                                         </td>
                                     </StyledTableRow>
                                 )
-                            })}
+                            })} */}
                         </TableBody>
                     </Table>
                 </TableContainer>

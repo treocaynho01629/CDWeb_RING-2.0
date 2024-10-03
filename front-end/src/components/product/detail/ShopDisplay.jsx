@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { Avatar, Box, Button, Grid2 as Grid, Stack } from "@mui/material";
-import { AutoStories, LocalActivity, PersonAddAlt1, Store, Storefront, Today, Verified as VerifiedIcon } from "@mui/icons-material";
+import { Avatar, Box, Button, Grid2 as Grid, Skeleton, Stack } from "@mui/material";
+import { Add, AutoStories, LocalActivity, PersonAddAlt1, Store, Today, Verified as VerifiedIcon } from "@mui/icons-material";
 import { useGetShopQuery } from "../../../features/shops/shopsApiSlice";
 import { Link } from "react-router-dom";
 
@@ -30,6 +30,7 @@ const ShopInfo = styled.div`
 
 const ShopName = styled.h3`
     margin: 0;
+    white-space: nowrap;
 
     ${props => props.theme.breakpoints.down("md")} {
         font-size: 15px;
@@ -48,7 +49,6 @@ const ShopDetail = styled.span`
     font-size: 14px;
     display: flex;
     align-items: center;
-    /* min-width: 250px; */
     width: 40%;
 
     svg {
@@ -74,46 +74,73 @@ const ShopDetail = styled.span`
 const ShopDisplay = ({ id, name }) => {
 
     //Fetch reviews
-    const { data, isLoading, isSuccess, isError, error } = useGetShopQuery(id, { skip: !id })
+    const { data, isLoading, isSuccess } = useGetShopQuery(id, { skip: !id })
+    let loading = ((!id && !data && !isSuccess) || isLoading);
 
     return (
         <ShopContainer>
             <Grid container size={12} spacing={1}>
                 <Grid size={{ xs: 12, md: 4.5 }}>
-                    <ShopInfo>
-                        <Avatar
-                            alt={`${name || data?.name} shop avatar`}
-                            sx={{
-                                width: { xs: 50, md: 75 },
-                                height: { xs: 50, md: 75 },
-                                marginRight: { xs: .5, md: 2 }
-                            }}
-                            src={data?.image ?? null}
-                        >
-                            <Store fontSize="large"/>
-                        </Avatar>
-                        <Box
-                            display={{ xs: 'flex', md: 'block' }}
-                            justifyContent="space-between"
-                            alignItems="center"
-                            flexGrow={1}
-                        >
-                            <Box mb={{ xs: 0, md: 1 }}>
-                                <ShopName>{data?.name}</ShopName>
-                                <Verified><VerifiedIcon sx={{ fontSize: '16px', marginRight: 1 }} color="primary" />Đối tác RING!</Verified>
+                    {loading ?
+                        <ShopInfo>
+                            <Skeleton variant="circular"
+                                sx={{
+                                    width: { xs: 50, md: 75 },
+                                    height: { xs: 50, md: 75 },
+                                    marginRight: { xs: .5, md: 2 }
+                                }}
+                            />
+                            <Box
+                                display={{ xs: 'flex', md: 'block' }}
+                                justifyContent="space-between"
+                                alignItems="center"
+                                flexGrow={1}
+                            >
+                                <Box mb={{ xs: 0, md: 1 }}>
+                                    <Skeleton variant="text" sx={{ fontSize: { xs: '15px', md: '18px' }, width: { xs: 110, md: 200 } }} />
+                                    <Skeleton variant="text" sx={{ fontSize: '13px' }} width={100} />
+                                </Box>
+                                <Skeleton variant="rectangular" sx={{ height: 35, width: { xs: 100, md: '100%' } }} />
                             </Box>
+                        </ShopInfo>
+                        :
+                        <ShopInfo>
                             <Link to={`/filters?shopId=${id}`}>
+                                <Avatar
+                                    alt={`${name || data?.name} shop avatar`}
+                                    sx={{
+                                        width: { xs: 50, md: 75 },
+                                        height: { xs: 50, md: 75 },
+                                        marginRight: { xs: .5, md: 2 }
+                                    }}
+                                    src={data?.image ?? null}
+                                >
+                                    <Store fontSize="large" />
+                                </Avatar>
+                            </Link>
+                            <Box
+                                display={{ xs: 'flex', md: 'block' }}
+                                justifyContent="space-between"
+                                alignItems="center"
+                                flexGrow={1}
+                            >
+                                <Link to={`/filters?shopId=${id}`}>
+                                    <Box mb={{ xs: 0, md: 1 }}>
+                                        <ShopName>{data?.name}</ShopName>
+                                        <Verified><VerifiedIcon sx={{ fontSize: '16px', marginRight: 1 }} color="primary" />Đối tác RING!</Verified>
+                                    </Box>
+                                </Link>
                                 <Button
                                     variant="outlined"
                                     size="small"
-                                    sx={{ height: 35 }}
-                                    startIcon={<Storefront />}
+                                    sx={{ height: 35, width: { xs: 'auto', md: '100%' } }}
+                                    startIcon={<Add />}
                                 >
-                                    Xem cửa hàng
+                                    Theo dõi
                                 </Button>
-                            </Link>
-                        </Box>
-                    </ShopInfo>
+                            </Box>
+                        </ShopInfo>
+                    }
                 </Grid>
                 <Grid
                     size={{ xs: 12, md: 'grow' }}
@@ -128,22 +155,33 @@ const ShopDisplay = ({ id, name }) => {
                         useFlexGap
                         sx={{ flexWrap: 'wrap', width: '100%' }}
                     >
-                        <ShopDetail><LocalActivity color="warning" />Đánh giá:<b>{data?.totalReviews}</b></ShopDetail>
-                        <ShopDetail><AutoStories color="warning" />Sản phẩm:<b>{data?.totalProducts}</b></ShopDetail>
-                        <ShopDetail><PersonAddAlt1 color="warning" />Người theo dõi:<b>{data?.totalFollowers}</b></ShopDetail>
-                        <ShopDetail className="hide-on-mobile">
-                            <Today color="warning" />Tham gia:<b>
-                                {new Date(data?.joinedDate).toLocaleDateString("en-GB", {
-                                    year: "numeric",
-                                    month: "2-digit",
-                                    day: "2-digit",
-                                })}
-                            </b>
-                        </ShopDetail>
+                        {loading ?
+                            <>
+                                <ShopDetail><Skeleton variant="text" sx={{ fontSize: { xs: '12px', md: '14px' }, width: { xs: 95, md: 100 } }} /></ShopDetail>
+                                <ShopDetail><Skeleton variant="text" sx={{ fontSize: { xs: '12px', md: '14px' }, width: { xs: 95, md: 110 } }} /></ShopDetail>
+                                <ShopDetail><Skeleton variant="text" sx={{ fontSize: { xs: '12px', md: '14px' }, width: { xs: 95, md: 150 } }} /></ShopDetail>
+                                <ShopDetail className="hide-on-mobile"><Skeleton variant="text" sx={{ fontSize: { xs: '12px', md: '14px' } }} width={170} /></ShopDetail>
+                            </>
+                            :
+                            <>
+                                <ShopDetail><LocalActivity color="warning" />Đánh giá:<b>{data?.totalReviews}</b></ShopDetail>
+                                <ShopDetail><AutoStories color="warning" />Sản phẩm:<b>{data?.totalProducts}</b></ShopDetail>
+                                <ShopDetail><PersonAddAlt1 color="warning" />Người theo dõi:<b>{data?.totalFollowers}</b></ShopDetail>
+                                <ShopDetail className="hide-on-mobile">
+                                    <Today color="warning" />Tham gia:<b>
+                                        {new Date(data?.joinedDate).toLocaleDateString("en-GB", {
+                                            year: "numeric",
+                                            month: "2-digit",
+                                            day: "2-digit",
+                                        })}
+                                    </b>
+                                </ShopDetail>
+                            </>
+                        }
                     </Stack>
                 </Grid>
             </Grid>
-        </ShopContainer>
+        </ShopContainer >
     )
 }
 

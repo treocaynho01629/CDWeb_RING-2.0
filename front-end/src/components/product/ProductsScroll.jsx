@@ -6,7 +6,12 @@ import ProductPreview from "./ProductPreview";
 const Container = styled.div`
     position: relative;
     max-height: 100%;
-    border: .5px solid ${props => props.theme.palette.divider};
+    width: 200px;
+    /* border: .5px solid ${props => props.theme.palette.divider}; */
+
+    ${props => props.theme.breakpoints.down("md")} {
+        width: auto;
+    }
 `
 
 const MainTitle = styled.p`
@@ -29,12 +34,14 @@ const ProductContainer = styled.div`
 const SliderContainer = styled.div`
     -ms-overflow-style: none;
     scrollbar-width: none; 
+    display: flex;
+    flex-direction: ${props => props.$direction || 'column'};
 
     &::-webkit-scrollbar {display: none;}
     
     ${props => props.theme.breakpoints.down("md")} {
-        display: flex;
         width: 100%;
+        flex-direction: row;
         overflow-y: hidden;
     }
 `
@@ -47,7 +54,7 @@ const tempItems = [
     <ProductPreview key={'temp4'} />
 ];
 
-const ProductsScroll = ({ data, isError, isLoading, isFetching, isSuccess, isUninitialized = false, scrollPosition }) => {
+const ProductsScroll = ({ data, isError, isLoading, isFetching, isSuccess, isUninitialized = false, direction, scrollPosition }) => {
     let productsScroll;
     const loading = (isLoading || isFetching || isError || isUninitialized);
 
@@ -75,9 +82,9 @@ const ProductsScroll = ({ data, isError, isLoading, isFetching, isSuccess, isUni
 
     return (
         <Container>
-            <MainTitle>Sản phẩm liên quan</MainTitle>
+            {/* <MainTitle>Sản phẩm liên quan</MainTitle> */}
             {(loading) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
-            <SliderContainer>
+            <SliderContainer $direction={direction}>
                 {productsScroll}
             </SliderContainer>
         </Container>

@@ -12,7 +12,8 @@ import Products from '../components/product/Products';
 import Slider from '../components/product/Slider';
 import CustomDivider from '../components/custom/CustomDivider';
 import CustomTab from '../components/custom/CustomTab';
-import ProductsSliderPlaceholder from '../components/product/ProductsSliderPlaceholder';
+import ProductSimple from '../components/product/ProductSimple';
+import CustomPlaceholder from '../components/custom/CustomPlaceholder';
 
 const ProductsSlider = lazy(() => import('../components/product/ProductsSlider'));
 
@@ -58,6 +59,17 @@ const orderGroup = [
 const defaultSize = 15;
 const defaultMore = 5;
 
+let sliderPlaceholder = (
+  <CustomPlaceholder sx={{
+    height: 'auto',
+    border: '.5px solid',
+    borderColor: 'action.hover',
+  }}
+  >
+    <ProductSimple />
+  </CustomPlaceholder>
+)
+
 const OrderList = () => {
   const [orderBy, setOrderBy] = useState(orderGroup[0].value);
   const { data, isLoading, isFetching, isSuccess, isError, refetch } = useGetBooksQuery({
@@ -78,7 +90,7 @@ const OrderList = () => {
         <Suspense fallback={
           <>
             <ToggleGroupContainer><Tabs /></ToggleGroupContainer>
-            <ProductsSliderPlaceholder/>
+            {sliderPlaceholder}
           </>
         }>
           <ToggleGroupContainer>
@@ -174,7 +186,7 @@ const CateList = () => {
         <Suspense fallback={
           <>
             <ToggleGroupContainer><Tabs /></ToggleGroupContainer>
-            <ProductsSliderPlaceholder/>
+            {sliderPlaceholder}
           </>
         }>
           <ToggleGroupContainer>
@@ -288,7 +300,7 @@ const Home = () => {
           <br />
           <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
           <LazyLoadComponent>
-            <Suspense fallback={<ProductsSliderPlaceholder/>}>
+            <Suspense fallback={sliderPlaceholder}>
               <ProductsSlider {...{ isLoading: loadRandom, isFetching: fetchRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
             </Suspense>
           </LazyLoadComponent>

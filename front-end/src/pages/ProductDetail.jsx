@@ -1,5 +1,5 @@
 import { useState, useRef, lazy, Suspense } from 'react'
-import { Box, Skeleton, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Skeleton, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { useParams, Navigate, NavLink, useSearchParams } from 'react-router-dom';
 import { useGetBookQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import { LazyLoadComponent } from 'react-lazy-load-image-component';
@@ -7,11 +7,14 @@ import useTitle from '../hooks/useTitle';
 import CustomDivider from '../components/custom/CustomDivider';
 import ProductContent from '../components/product/detail/ProductContent';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
-import ProductsSliderPlaceholder from '../components/product/ProductsSliderPlaceholder';
-import ProductDetailContainer from '../components/product/detail/ProductDetailContainer';
+import CustomPlaceholder from '../components/custom/CustomPlaceholder';
+import ProductSimple from '../components/product/ProductSimple';
 
 const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
 const ProductsSlider = lazy(() => import('../components/product/ProductsSlider'));
+const ShopDisplay = lazy(() => import('../components/product/detail/ShopDisplay'));
+const ProductDetailContainer = lazy(() => import('../components/product/detail/ProductDetailContainer'));
+const ReviewComponent = lazy(() => import('../components/review/ReviewComponent'));
 
 const ProductDetail = () => {
     const { slug, id } = useParams(); //Book ids
@@ -54,15 +57,16 @@ const ProductDetail = () => {
         product = <ProductContent {...{ book: data, handleToggleReview, pending, setPending }} />
     } else if (isError && error?.status === 404) {
         product = <Navigate to={'/missing'} />
+    } else {
+        product = <ProductContent />
     }
 
     return (
         <>
-            {(pending) ?
+            {(pending) &&
                 <Suspense fallBack={<></>}>
                     <PendingIndicator open={pending} message="Đang gửi yêu cầu..." />
                 </Suspense>
-                : null
             }
             <div style={{ display: 'relative' }}>
                 <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
@@ -85,13 +89,61 @@ const ProductDetail = () => {
                     }
                 </CustomBreadcrumbs>
                 {product}
-                <Box my={1}>
-                    <ProductDetailContainer {...{ loading: (isLoading || isFetching), book: data, 
-                        reviewRef, scrollIntoTab, mobileMode, pending, setPending }} />
-                </Box>
+                <Stack my={1} spacing={1} direction={{ xs: 'column-reverse', md: 'column' }}>
+                    <Stack spacing={1}>
+                        <LazyLoadComponent>
+                            <Suspense fallback={<CustomPlaceholder sx={{
+                                width: '100%',
+                                border: '.5px solid',
+                                borderColor: 'divider',
+                                height: { xs: 98, md: 133 }
+                            }}
+                            />}>
+                                <ShopDisplay id={data?.shopId} name={data?.shopName} />
+                            </Suspense>
+                        </LazyLoadComponent>
+                        <LazyLoadComponent>
+                            <Suspense fallback={<CustomPlaceholder sx={{
+                                width: '100%',
+                                border: '.5px solid',
+                                borderColor: 'divider',
+                                height: { xs: 610, md: 980 }
+                            }}
+                            />}>
+                                <ProductDetailContainer {...{
+                                    loading: (isLoading || isFetching), book: data,
+                                    reviewRef, scrollIntoTab, mobileMode, pending, setPending
+                                }} />
+                            </Suspense>
+                        </LazyLoadComponent>
+                    </Stack>
+                    <Box ref={reviewRef} sx={{ scrollMargin: '80px' }}>
+                        <LazyLoadComponent>
+                            <Suspense fallback={<CustomPlaceholder sx={{
+                                width: '100%',
+                                border: '.5px solid',
+                                borderColor: 'divider',
+                                height: { xs: 310, md: 410 }
+                            }}
+                            />}>
+                                <ReviewComponent {...{
+                                    book: data, scrollIntoTab, mobileMode,
+                                    pending, setPending, isReview, handleToggleReview
+                                }} />
+                            </Suspense>
+                        </LazyLoadComponent>
+                    </Box>
+                </Stack>
                 <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
                 <LazyLoadComponent>
-                    <Suspense fallback={<ProductsSliderPlaceholder />}>
+                    <Suspense fallback={<CustomPlaceholder sx={{
+                        height: 'auto',
+                        border: '.5px solid',
+                        borderColor: 'action.hover',
+                    }}
+                    >
+                        <ProductSimple />
+                    </CustomPlaceholder>}>
                         <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
                     </Suspense>
                 </LazyLoadComponent>
