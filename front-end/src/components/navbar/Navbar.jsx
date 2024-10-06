@@ -162,6 +162,13 @@ const NavItem = styled.div`
     margin-left: 15px;
 `
 
+const StyledAppBar = muiStyled(AppBar)(({ theme }) => ({
+    backgroundColor: theme.palette.background.default,
+    borderBottom: '.5px solid',
+    borderColor: theme.palette.divider,
+    top: 0,
+}));
+
 const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
     borderRadius: 0,
 
@@ -233,7 +240,7 @@ const Navbar = () => {
     const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
 
     //Drawer open state
-    const [openDrawer, setOpen] = useState(false);
+    const [openDrawer, setOpenDrawer] = useState(undefined);
 
     //Search field expand
     const [searchField, setSearchField] = useState('');
@@ -257,7 +264,7 @@ const Navbar = () => {
     const handleProfileClose = () => { setAnchorEl(null) };
 
     //Toggle drawer open state
-    const toggleDrawer = () => { setOpen(prev => !prev) };
+    const handleToggleDrawer = (value) => { setOpenDrawer(value) };
     const toggleSearch = () => { setToggle(prev => !prev) };
 
     //Confirm search
@@ -289,7 +296,7 @@ const Navbar = () => {
                     </Grid>
                 </Grid>
             </TopHeader>
-            <AppBar sx={{ backgroundColor: 'background.default', marginBottom: { xs: 0, md: 2 } }} position="sticky">
+            <StyledAppBar sx={{ marginBottom: { xs: 0, md: 2 } }} position="sticky" elevation={0}>
                 <Wrapper>
                     <Grid container size="grow">
                         <Grid size={{ xs: 12, md: "grow" }} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -301,15 +308,17 @@ const Navbar = () => {
                                             flex={1}
                                             alignItems="center"
                                         >
-                                            <IconButton onClick={toggleDrawer}>
+                                            <IconButton onClick={() => handleToggleDrawer(true)}>
                                                 <MenuIcon sx={{ fontSize: 26 }} />
                                             </IconButton>
                                         </Box>
                                         <Suspense fallback={<></>}>
-                                            {openDrawer &&
+                                            {openDrawer !== undefined &&
                                                 <NavDrawer {...{
-                                                    openDrawer, setOpen, username, roles, location,
-                                                    products: cartProducts, logout, theme, colorMode
+                                                    openDrawer, username, roles, location,
+                                                    products: cartProducts, logout, theme, colorMode,
+                                                    handleOpen: () => handleToggleDrawer(true),
+                                                    handleClose: () => handleToggleDrawer(false)
                                                 }} />
                                             }
                                         </Suspense>
@@ -434,7 +443,7 @@ const Navbar = () => {
                         }
                     </Grid>
                 </Wrapper>
-            </AppBar >
+            </StyledAppBar >
         </>
     )
 }

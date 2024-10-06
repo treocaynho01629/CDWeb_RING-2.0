@@ -201,10 +201,10 @@ const getCouponSumary = (type) => {
 
 const CouponPreview = ({ shopId }) => {
     const { data, isLoading, isSuccess, isError } = useGetCouponsQuery({ shop: shopId, size: 4 }, { skip: !shopId });
-    const [anchorEl, setAnchorEl] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(undefined);
     const [contextCoupon, setContextCoupon] = useState(null);
     const [contextSumary, setContextSumary] = useState(null);
-    const [openDialog, setOpenDialog] = useState(false);
+    const [openDialog, setOpenDialog] = useState(undefined);
 
     const handlePopover = (e, coupon, sumary) => {
         setAnchorEl(e.currentTarget);
@@ -274,7 +274,7 @@ const CouponPreview = ({ shopId }) => {
                     <ItemsContainer>
                         {coupons}
                         <Suspense fallback={<></>}>
-                            {open &&
+                            {anchorEl !== undefined &&
                                 <Popover
                                     id={id}
                                     open={open}
@@ -310,7 +310,7 @@ const CouponPreview = ({ shopId }) => {
                 </MobileExtendButton>
             </CouponContainer>
             <Suspense fallback={<></>}>
-                {openDialog && <CouponDialog {...{ openDialog, handleCloseDialog, shopId }} />}
+                {openDialog !== undefined && <CouponDialog {...{ openDialog, handleCloseDialog, shopId }} />}
             </Suspense>
         </CouponWrapper >
     )

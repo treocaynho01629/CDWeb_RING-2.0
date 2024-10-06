@@ -130,7 +130,7 @@ const ShopDisplay = ({ id, name }) => {
                                         <Verified><VerifiedIcon sx={{ fontSize: '16px', marginRight: 1 }} color="primary" />Đối tác RING!</Verified>
                                     </Box>
                                 </Link>
-                                <Button
+                                <Button //FIX
                                     variant="outlined"
                                     size="small"
                                     sx={{ height: 35, width: { xs: 'auto', md: '100%' } }}

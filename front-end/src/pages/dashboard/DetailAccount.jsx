@@ -23,12 +23,10 @@ const Title = styled.h2`
 
 const DetailAccount = () => {
     const { id } = useParams();
-    const [openEdit, setOpenEdit] = useState(false);
+    const [openEdit, setOpenEdit] = useState(undefined);
     const { data, isLoading, isSuccess, isError, error } = useGetUserQuery({ id: id }, { skip: !id })
 
-    const handleClickOpenEdit = () => {
-        setOpenEdit(true);
-    };
+    const handleClickOpenEdit = () => { setOpenEdit(true) };
 
     //Set title
     useTitle(`Người dùng: ${data?.username ?? 'RING - Người dùng'}`);
@@ -99,14 +97,11 @@ const DetailAccount = () => {
                 </Box>
             </Card>
             <Suspense fallback={<></>}>
-                {openEdit ?
-                    <EditAccountDialog
-                        id={id}
-                        open={openEdit}
-                        setOpen={setOpenEdit}
-                        refetch={refetch} />
-                    : null}
-
+                {openEdit !== undefined && <EditAccountDialog
+                    id={id}
+                    open={openEdit}
+                    setOpen={setOpenEdit}
+                    refetch={refetch} />}
                 <Grid container spacing={3}>
                     {data?.roles >= 2 ?
                         <Grid item lg={12}>

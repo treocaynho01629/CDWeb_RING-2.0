@@ -9,7 +9,6 @@ public record OrderDetailDTO(Long id,
                              Long shopId,
                              String shopName,
                              Double totalPrice,
-                             OrderStatus status,
                              List<OrderItemDTO> items) {
 
 }

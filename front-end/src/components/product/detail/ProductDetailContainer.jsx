@@ -91,7 +91,7 @@ const ProductDetailContainer = ({ loading, book, mobileMode }) => {
   const descRef = useRef(null);
   const [overflowed, setOverflowed] = useState(false);
   const [minimize, setMinimize] = useState(true);
-  const [openDetail, setOpenDetail] = useState(false);
+  const [openDetail, setOpenDetail] = useState(undefined);
 
   //Fetch related books
   const { data: relatedBooks, isLoading: loadRelated, isSuccess: doneRelated, isError: errorRelated, isUninitialized } = useGetBooksQuery({
@@ -211,7 +211,7 @@ const ProductDetailContainer = ({ loading, book, mobileMode }) => {
           {mobileMode
             ?
             <Suspense fallback={<></>}>
-              {openDetail &&
+              {openDetail !== undefined &&
                 <SwipeableDrawer
                   anchor="bottom"
                   open={openDetail}

@@ -97,8 +97,8 @@ const ProductAction = ({ book }) => {
     const navigate = useNavigate();
     const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
     const [amountIndex, setAmountIndex] = useState(1); //Amount add to cart
-    const [open, setOpen] = useState(false);
-    const [openNow, setOpenNow] = useState(false);
+    const [open, setOpen] = useState(undefined);
+    const [openNow, setOpenNow] = useState(false); //FIX
     const { addProduct } = useCart();
 
     //Change add amount
@@ -155,7 +155,7 @@ const ProductAction = ({ book }) => {
                     </BuyButton>
                 </AltFilterContainer>
                 <Suspense fallback={<></>}>
-                    {open &&
+                    {open !== undefined &&
                         <SwipeableDrawer
                             anchor="bottom"
                             open={open}
