@@ -1,4 +1,4 @@
-package com.ring.bookstore.model;
+package com.ring.bookstore.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
