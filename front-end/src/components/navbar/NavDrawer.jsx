@@ -26,11 +26,8 @@ const DrawerContainer = styled(Box)(({ theme }) => `
 `)
 //#endregion
 
-const NavDrawer = ({ location, openDrawer, setOpen, username, roles, products, logout, theme, colorMode }) => {
+const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, roles, products, logout, theme, colorMode }) => {
     const role = roles?.length;
-
-    const handleOpen = () => { setOpen(true) }
-    const handleClose = () => { setOpen(false) }
 
     return (
         <SwipeableDrawer

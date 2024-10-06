@@ -2,8 +2,6 @@ package com.ring.bookstore.request;
 
 import java.util.List;
 
-import com.ring.bookstore.model.CartItem;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -19,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class OrderRequest { //Request body when order
 	
 	@NotNull(message = "Giỏ hàng không được trống!")
-	private List<CartItem> cart;
+	private List<CartItemRequest> cart;
 	
 	@NotBlank(message = "Tên không được bỏ trống!")
 	@Size(min = 5, max = 150, message = "Tên phải dài từ 5-150 kí tự")

@@ -46,7 +46,7 @@ const LoginTab = ({ pending, setPending }) => {
     const [errMsgLogin, setErrMsgLogin] = useState(location.state?.errorMsg ?? '');
 
     //Other
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(undefined);
     const [cookies, setCookie] = useCookies(['refreshToken']);
 
     //Error message reset when reinput stuff
@@ -156,7 +156,7 @@ const LoginTab = ({ pending, setPending }) => {
                             }
                                 label="Lưu đăng nhập"
                             />
-                            <a style={{ textDecoration: 'underline', cursor: 'pointer', color: '#63e399' }}
+                            <a style={{ textDecoration: 'underline', cursor: 'pointer', color: '#63e399' }} //FIX
                                 onClick={handleOpen}>Quên mật khẩu</a>
                         </div>
                         <Button
@@ -172,7 +172,7 @@ const LoginTab = ({ pending, setPending }) => {
                         </Button>
                     </Stack>
                 </form>
-                {open &&
+                {open !== undefined &&
                     <Suspense fallback={<></>}>
                         <ForgotDialog {...{ open, setOpen }} />
                     </Suspense>

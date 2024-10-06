@@ -146,6 +146,14 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             }),
             providesTags: ['Chart'],
         }),
+        calculate: builder.mutation({
+            query: (currCart) => ({
+                url: '/api/orders/calculate',
+                method: 'POST',
+                credentials: 'include',
+                body: { ...currCart }
+            }),
+        }),
         checkout: builder.mutation({
             query: (newOrder) => ({
                 url: '/api/orders',
@@ -166,6 +174,7 @@ export const {
     useGetOrdersByUserQuery,
     useGetOrdersByBookIdQuery,
     useGetSaleQuery,
+    useCalculateMutation,
     useCheckoutMutation,
 } = ordersApiSlice
 

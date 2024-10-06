@@ -16,7 +16,7 @@ export default function CustomTableHead({ headCells, onSelectAllClick, sortDir, 
                             indeterminate={numSelected > 0 && !selectedAll}
                             checked={selectedAll}
                             onChange={onSelectAllClick}
-                            inputProps={{ 'aria-label': 'Chọn tất cả' }}
+                            inputProps={{ 'aria-label': 'Select all' }}
                         />
                     </TableCell>
                 }

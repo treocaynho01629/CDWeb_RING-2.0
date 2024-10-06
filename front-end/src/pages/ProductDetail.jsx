@@ -19,7 +19,7 @@ const ReviewComponent = lazy(() => import('../components/review/ReviewComponent'
 const ProductDetail = () => {
     const { slug, id } = useParams(); //Book ids
     const [searchParams, setSearchParams] = useSearchParams();
-    const [isReview, setIsReview] = useState(searchParams.get("review") ?? false); //Is open review tab
+    const [isReview, setIsReview] = useState(searchParams.get("review") ?? undefined); //Is open review tab
     const [pending, setPending] = useState(false); //For reviewing & changing address
     const reviewRef = useRef(null); //Ref for scroll
     const theme = useTheme();

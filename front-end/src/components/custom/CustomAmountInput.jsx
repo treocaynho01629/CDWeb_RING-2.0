@@ -1,80 +1,85 @@
 import { Add, Remove } from '@mui/icons-material';
-import { IconButton, InputAdornment } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import TextField from '@mui/material/TextField';
+import InputBase from '@mui/material/InputBase';
+import styled from 'styled-components'
 
-const CustomInput = styled(TextField)(({ theme }) => `
+const InputContainer = styled.div`
     display: flex;
-    width: 105px;
+    align-items: center;
+    justify-content: space-between;
+    border: .5px solid ${props => props.theme.palette.divider};
+    height: 30px;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        height: 25px;
+    }
+`
+
+const CustomInput = styled(InputBase)`
+    width: 28px;
+    font-size: 13px;
 
     input[type=number]::-webkit-outer-spin-button,
     input[type=number]::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
+        opacity: 1;
     };
-    -moz-appearance: textfield;
+`
 
-    ${theme.breakpoints.down("sm")} {
-        width: 90px;
+const StyledButton = styled.span`
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    color: ${props => props.theme.palette.text.secondary};
+
+    &:hover {
+        color: ${props => props.theme.palette.text.primary};
     }
-`)
 
-const StyledButton = styled(IconButton)(
-    ({ theme }) => ({
-        padding: '0 5px',
-
-        [theme.breakpoints.down("sm")]: {
-            padding: '0 2px',
-        },
-    })
-)
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 0 2px;
+    }
+`
 
 export default function CustomAmountInput(props) {
     const { handleDecrease, handleIncrease, disabled, min, max, ...otherProps } = props;
 
-    const startAdornment =
-        <InputAdornment position="start">
+    return (
+        <InputContainer>
             <StyledButton
                 aria-label="decrease amount"
                 onClick={handleDecrease}
-                edge="start"
-                disabled={disabled}
-                disableRipple
             >
                 <Remove fontSize="small" />
             </StyledButton>
-        </InputAdornment>
-
-    const endAdornment =
-        <InputAdornment position="end">
+            <CustomInput
+                {...otherProps}
+                disabled={disabled}
+                type="number"
+                sx={{ textAlign: 'center' }}
+                slotProps={{
+                    input: {
+                        min: min ?? 1,
+                        max: max ?? 199,
+                        type: "number",
+                        style: { fontSize: 13, textAlign: 'center', padding: 0 },
+                    },
+                    htmlInput: {
+                        min: min ?? 1,
+                        max: max ?? 199,
+                        type: "number",
+                    },
+                }}
+                inputProps={{ 'aria-label': 'amount input' }}
+            />
             <StyledButton
                 aria-label="increase amount"
                 onClick={handleIncrease}
-                edge="end"
-                disabled={disabled}
-                disableRipple
             >
                 <Add fontSize="small" />
             </StyledButton>
-        </InputAdornment>
-
-    return (
-        <CustomInput
-            {...otherProps}
-            disabled={disabled}
-            type="number"
-            slotProps={{
-                htmlInput: {
-                    min: min ?? 1,
-                    max: max ?? 199,
-                    type: "number",
-                    style: { fontSize: 13, textAlign: 'center', padding: '5px 0' },
-                },
-                input: {
-                    startAdornment: startAdornment,
-                    endAdornment: endAdornment
-                }
-            }}
-        />
+        </InputContainer>
     )
 }

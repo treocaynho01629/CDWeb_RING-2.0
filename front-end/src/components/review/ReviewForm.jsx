@@ -99,7 +99,7 @@ const ReviewForm = ({ username, bookId, open, handleClose, mobileMode, handlePag
 
     return (
         <Dialog open={open} scroll={'paper'} maxWidth={'md'} fullWidth onClose={handleClose} fullScreen={mobileMode}>
-            <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><Edit />&nbsp;Đánh giá sản phẩm</DialogTitle>
+            <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><Edit />&nbsp;Đánh giá sản phẩm</DialogTitle> //FIX
             <DialogContent>
                 {username ?
                     <div>

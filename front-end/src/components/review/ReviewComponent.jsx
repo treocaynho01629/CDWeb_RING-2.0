@@ -83,7 +83,7 @@ const EmptyImage = styled.img`
 const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending, isReview, handleToggleReview }) => {
     //#region construct
     const { username } = useAuth();
-    const [openForm, setOpenForm] = useState(false);
+    const [openForm, setOpenForm] = useState(undefined);
 
     //Pagination & filter
     const [filterBy, setFilterBy] = useState('all');
@@ -247,7 +247,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                     <Label>Xem tất cả ({numFormatter(book?.reviewsInfo?.count[0] ?? 0)} đánh giá) <KeyboardArrowRight fontSize="small" /></Label>
                 </Showmore>
             }
-            {(isReview && mobileMode) &&
+            {(isReview !== undefined && mobileMode) &&
                 <Suspense fallback={null}>
                     <Dialog
                         fullScreen
@@ -283,7 +283,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                     </Dialog>
                 </Suspense>
             }
-            {openForm &&
+            {openForm !== undefined &&
                 <Suspense fallback={null}>
                     <ReviewForm {...{
                         username, bookId: book?.id, open: openForm, handleClose: handleCloseForm,

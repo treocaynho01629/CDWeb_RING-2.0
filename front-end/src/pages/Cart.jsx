@@ -19,6 +19,7 @@ const EmptyWrapper = styled.div`
 `
 
 const Wrapper = styled.div`
+    position: relative;
     min-height: 90dvh;
 `
 //#endregion
@@ -32,9 +33,7 @@ const Cart = () => {
             <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
                 <strong style={{ textDecoration: 'underline' }}>Giỏ hàng</strong>
             </CustomBreadcrumbs>
-
-            {cartProducts?.length == 0 ?
-                <EmptyWrapper>
+            {cartProducts?.length == 0 ? <EmptyWrapper>
                     <img src="/empty.svg" height={250} />
                     <h2>Giỏ hàng của bạn đang trống</h2>
                     <NavLink to={'/'}>
@@ -47,8 +46,7 @@ const Cart = () => {
                         </Button>
                     </NavLink>
                 </EmptyWrapper>
-                :
-                <Suspense fallback={<></>}>
+                : <Suspense fallback={<></>}>
                     <CartContent />
                 </Suspense>
             }

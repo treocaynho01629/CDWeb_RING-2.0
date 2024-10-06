@@ -44,7 +44,6 @@ public class OrderMapper {
                 shop.getId(),
                 shop.getName(),
                 detail.getTotalPrice(),
-                detail.getStatus(),
                 itemDTOS);
     }
 
@@ -55,9 +54,27 @@ public class OrderMapper {
         return new OrderItemDTO(item.getId(),
                 item.getPrice(),
                 item.getAmount(),
+                item.getStatus(),
                 book.getId(),
                 book.getSlug(),
                 fileDownloadUri,
                 book.getTitle());
+    }
+
+    public OrderDTO orderToCalculate(OrderReceipt order) {
+        List<OrderDetail> orderDetails = order.getDetails();
+        List<OrderDetailDTO> detailDTOS = orderDetails.stream().map(this::detailToDetailDTO).collect(Collectors.toList());
+        Account user = order.getUser();
+
+        return new OrderDTO(null, null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                order.getTotal(),
+                null,
+                detailDTOS
+        );
     }
 }

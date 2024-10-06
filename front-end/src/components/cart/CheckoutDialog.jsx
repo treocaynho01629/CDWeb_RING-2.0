@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Sell as SellIcon, Payments as PaymentsIcon } from '@mui/icons-material';
 import { Checkbox, Divider, Drawer, FormControlLabel, useMediaQuery, useTheme } from '@mui/material';
 import useAuth from "../../hooks/useAuth";
@@ -7,6 +7,8 @@ import useAuth from "../../hooks/useAuth";
 //#region styled
 const CheckoutContainer = styled.div`
     display: block;
+    position: relative;
+    height: 100%;
 
     ${props => props.theme.breakpoints.down("sm")} {
         display: none;
@@ -51,6 +53,11 @@ const Payout = styled.div`
     border: .5px solid ${props => props.theme.palette.action.focus};
     padding: 20px;
     margin-bottom: 20px;
+
+    &.sticky {
+        position: sticky;
+        top: ${props => props.theme.mixins.toolbar.minHeight + 15}px;
+    }
 `
 
 const AltPayout = styled.div`
@@ -145,27 +152,37 @@ const PayButton = styled.button`
 `
 //#endregion
 
-const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick, numSelected, rowCount }) => {
+const CheckoutDialog = ({ testCart, selected, navigate, handleSelectAllClick, numSelected, rowCount }) => {
     const { token } = useAuth();
     const theme = useTheme();
     const desktopMode = useMediaQuery(theme.breakpoints.up('sm'));
-    const [selectedProducts, setSelectedProducts] = useState([]);
     const [open, setOpen] = useState(false);
+    // const [checkoutCart, setCheckoutCart] = useState([]);
 
-    useEffect(() => {
-        let newProducts = cartProducts?.filter(product => selected.includes(product?.id));
-        setSelectedProducts(newProducts);
-    }, [selected, cartProducts])
+    // useEffect(() => {
+    //     let newProducts = cartProducts?.filter(product => selected.includes(product?.id));
+    //     setCheckoutCart(newProducts);
+    // }, [selected, cartProducts])
 
+    //Test estimate
     const totalPrice = () => {
+        // let total = 0;
+        // checkoutCart?.forEach((item) => (totalPrice() += item.quantity * Math.round(item.price * (1 - item.discount))));
+        // return total;
+
         let total = 0;
-        selectedProducts?.forEach((item) => (total += item.quantity * Math.round(item.price * (1 - item.discount))));
+        testCart?.cart?.forEach((detail) => (
+            detail?.items?.forEach((item) => (
+                total += item.quantity * Math.round(item.price * (1 - item.discount)
+            ))
+        )));
         return total;
     }
 
-    const toggleDrawer = (newOpen) => () => {
-        setOpen(newOpen);
-    };
+    // const total = useMemo(() => totalPrice(), testCart);
+    // const total = totalPrice();
+
+    const toggleDrawer = (newOpen) => { setOpen(newOpen) };
 
     return (
         <>
@@ -184,30 +201,30 @@ const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick
                             </CouponButton>
                         </PayoutRow>
                     </Payout>
-                    <Payout>
+                    <Payout className="sticky">
                         <PayoutTitle>THANH TOÁN</PayoutTitle>
                         <PayoutRow>
                             <PayoutText>Thành tiền:</PayoutText>
                             <PayoutText>{totalPrice().toLocaleString()} đ</PayoutText>
                         </PayoutRow>
-                        <PayoutRow>
+                        {/* <PayoutRow>
                             <PayoutText>VAT:</PayoutText>
-                            <PayoutText>{selectedProducts?.length ? 10 : 0}%</PayoutText>
-                        </PayoutRow>
+                            <PayoutText>{testCart?.cart?.length ? 10 : 0}%</PayoutText>
+                        </PayoutRow> */}
                         <PayoutRow>
                             <PayoutText>Phí vận chuyển:</PayoutText>
-                            <PayoutText>{selectedProducts?.length ? '10,000' : 0}&nbsp;đ</PayoutText>
+                            <PayoutText>{testCart?.cart?.length ? (10000 * testCart?.cart?.length) : 0}&nbsp;đ</PayoutText>
                         </PayoutRow>
                         <PayoutRow>
                             <PayoutText>Tổng:</PayoutText>
-                            <PayoutPrice>{selectedProducts?.length ? Math.round(totalPrice() * 1.1 + 10000).toLocaleString() : 0}&nbsp;đ</PayoutPrice>
+                            <PayoutPrice>{testCart?.cart?.length ? Math.round(totalPrice() + (10000 * testCart?.cart?.length)).toLocaleString() : 0}&nbsp;đ</PayoutPrice>
                         </PayoutRow>
                         <PayButton
-                            disabled={selectedProducts?.length == 0}
-                            onClick={() => navigate('/checkout', { state: { products: selectedProducts } })}
+                            disabled={rowCount == 0}
+                            onClick={() => navigate('/checkout', { state: { products: checkoutCart } })}
                         >
                             <PaymentsIcon style={{ fontSize: 18 }} />&nbsp;
-                            {token ? `THANH TOÁN (${selectedProducts.length} SẢN PHẨM)` : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
+                            {token ? `THANH TOÁN (${rowCount} SẢN PHẨM)` : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
                         </PayButton>
                     </Payout>
                 </CheckoutContainer >
@@ -230,14 +247,14 @@ const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick
                             label="Tất cả" />
                         <Divider orientation="vertical" flexItem />
                         <PayoutPrice onClick={toggleDrawer(true)} style={{ cursor: 'pointer' }}>
-                            {selectedProducts?.length ? Math.round(totalPrice() * 1.1 + 10000).toLocaleString() : 0}&nbsp;đ
+                            {testCart?.cart?.length ? Math.round(totalPrice() + (10000 * testCart?.cart?.length)).toLocaleString() : 0}&nbsp;đ
                         </PayoutPrice>
                     </AltPayout>
                     <PayButton
-                        disabled={selectedProducts?.length == 0}
-                        onClick={() => navigate('/checkout', { state: { products: selectedProducts } })}
+                        disabled={testCart?.cart?.length == 0}
+                        onClick={() => navigate('/checkout', { state: { products: testCart } })}
                     >
-                        {token ? `THANH TOÁN (${selectedProducts.length})` : 'ĐĂNG NHẬP'}
+                        {token ? `THANH TOÁN (${rowCount})` : 'ĐĂNG NHẬP'}
                     </PayButton>
                     <Drawer
                         anchor={'bottom'}
@@ -250,17 +267,17 @@ const CheckoutDialog = ({ cartProducts, selected, navigate, handleSelectAllClick
                                 <PayoutText>Thành tiền:</PayoutText>
                                 <PayoutText>{totalPrice().toLocaleString()} đ</PayoutText>
                             </PayoutRow>
-                            <PayoutRow>
+                            {/* <PayoutRow>
                                 <PayoutText>VAT:</PayoutText>
-                                <PayoutText>{selectedProducts?.length ? 10 : 0}%</PayoutText>
-                            </PayoutRow>
+                                <PayoutText>{testCart?.cart?.length ? 10 : 0}%</PayoutText>
+                            </PayoutRow> */}
                             <PayoutRow>
                                 <PayoutText>Phí vận chuyển:</PayoutText>
-                                <PayoutText>{selectedProducts?.length ? '10,000' : 0}&nbsp;đ</PayoutText>
+                                <PayoutText>{testCart?.cart?.length ? (10000 * testCart?.cart?.length).toLocaleString() : 0}&nbsp;đ</PayoutText>
                             </PayoutRow>
                             <PayoutRow>
                                 <PayoutText>Tổng:</PayoutText>
-                                <PayoutPrice>{selectedProducts?.length ? Math.round(totalPrice() * 1.1 + 10000).toLocaleString() : 0}&nbsp;đ</PayoutPrice>
+                                <PayoutPrice>{testCart?.cart?.length ? Math.round(totalPrice() + (10000 * testCart?.cart?.length)).toLocaleString() : 0}&nbsp;đ</PayoutPrice>
                             </PayoutRow>
                         </Payout>
                     </Drawer>

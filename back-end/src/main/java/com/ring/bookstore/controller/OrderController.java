@@ -2,6 +2,7 @@ package com.ring.bookstore.controller;
 
 import java.util.List;
 
+import com.ring.bookstore.request.CalculateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,14 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 	
 	private final OrderService orderService;
+
+	//Calculate price
+	@PostMapping("/calculate")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<OrderDTO> calculate(@RequestBody @Valid CalculateRequest request) {
+		OrderDTO orderDTO = orderService.calculate(request);
+		return new ResponseEntity< >(orderDTO, HttpStatus.CREATED);
+	}
 	
 	//Commit order
 	@PostMapping

@@ -1,41 +1,97 @@
 import styled from 'styled-components'
-import { styled as muiStyled } from '@mui/material/styles';
-import { useMemo, useState } from "react";
-import { Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, MoreHoriz, Search, ChevronLeft } from '@mui/icons-material';
-import { Checkbox, Button, Grid2 as Grid, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon, Skeleton } from '@mui/material';
-import { NavLink, useNavigate } from "react-router-dom";
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { useEffect, useMemo, useState } from "react";
+import { Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, Search, ChevronLeft } from '@mui/icons-material';
+import { Checkbox, Button, Grid2 as Grid, Table, TableBody, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
+import { Link, useNavigate } from "react-router-dom";
 import { booksApiSlice } from '../../features/books/booksApiSlice';
 import CheckoutDialog from './CheckoutDialog';
-import CustomAmountInput from '../custom/CustomAmountInput';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import PropTypes from 'prop-types';
 import useCart from '../../hooks/useCart';
+import CartDetailRow from './CartDetailRow';
+import { useCalculateMutation } from '../../features/orders/ordersApiSlice';
 
 //#region styled
-const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.common.white,
-        fontSize: 14,
-        fontWeight: 'bold',
-        paddingTop: 5,
-        paddingBottom: 5
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-    },
-}));
+const StyledTableCell = styled(TableCell)`
+    &.${tableCellClasses.root} {
+        border: none;
+    }
 
-const StyledTableRow = muiStyled(TableRow)(({ theme }) => ({
-    border: '.5px solid',
-    borderColor: theme.palette.action.focus,
-    position: 'relative',
+    &.${tableCellClasses.head} {
+        font-weight: bold;
+    }
 
-    '&:nth-of-type(odd)': {
-        backgroundColor: theme.palette.action.hover,
-    },
-}));
+    ${props => props.theme.breakpoints.down("sm")} {
+        &.${tableCellClasses.body} {
+            padding: 8px 8px 8px 4px;
+        }
+
+        &.${tableCellClasses.head} {
+            padding: 4px;
+        }
+
+        &.${tableCellClasses.paddingCheckbox} {
+            padding: 0;
+        }
+    }
+`
+
+const ActionTableCell = styled(TableCell)`
+    &.${tableCellClasses.root} {
+        border: none;
+        padding: 0;
+        width: 8px;
+    }
+`
+
+const StyledTableHead = styled(TableHead)`
+    position: sticky; 
+    top: ${props => props.theme.mixins.toolbar.minHeight + 16.5}px;
+    background-color: ${props => props.theme.palette.background.default};
+    z-index: 2;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        top: ${props => props.theme.mixins.toolbar.minHeight + 4.5}px;
+
+        &:before{
+            display: none;            
+        }
+    }
+
+    &:before{
+        content: "";
+        position: absolute;
+        left: -10px;
+        top: -16px;
+        width: calc(100% + 20px);
+        height: calc(100% + 16px);
+        background-color: ${props => props.theme.palette.background.default};
+        z-index: -1;
+    }
+
+    &:after{
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        border: .5px solid ${props => props.theme.palette.action.focus};
+
+        ${props => props.theme.breakpoints.down("sm")} {
+            border-left: none;
+            border-right: none;
+        }
+    }
+`
+
+const StyledCheckbox = styled(Checkbox)`
+    margin-left: 8px;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        margin-left: 0
+    }
+`
 
 const MainTitleContainer = styled.div`
     display: flex;
@@ -56,124 +112,37 @@ const Title = styled.h3`
     text-align: center;
     justify-content: center;
 `
-
-const ItemContainer = styled.div`
-    display: flex;
-    width: 100%;
-`
-
-const ItemSummary = styled.div`
-    margin-left: 10px;
-    width: 100%;
-`
-
-const ItemTitle = styled.p`
-    font-size: 14px;
-    text-overflow: ellipsis;
-	overflow: hidden;
-	white-space: nowrap;
-    margin: 5px 0px;
-	
-	@supports (-webkit-line-clamp: 1) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: initial;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-    }
-`
-
-const ItemAction = styled.div`
-    justify-content: space-between;
-    align-items: flex-end;
-    display: flex;
-`
-
-const Price = styled.p`
-    font-size: 16px;
-    font-weight: bold;
-    text-align: left;
-    color: ${props => props.theme.palette.primary.main};
-    margin: 0;
-
-    &.total {
-        color: ${props => props.theme.palette.warning.light};
-    }
-`
-
-const Discount = styled.p`
-    font-size: 12px;
-    color: gray;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
-    text-decoration: line-through;
-`
-
-const StyledLazyImage = styled(LazyLoadImage)`
-    display: inline-block;
-    height: 90px;
-    width: 90px;
-    border: .5px solid ${props => props.theme.palette.action.focus};
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        height: 80px;
-        width: 80px;
-    }
-`
-
-const StyledSkeleton = styled(Skeleton)`
-    display: inline-block;
-    height: 90px;
-    width: 90px;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        height: 80px;
-        width: 80px;
-    }
-`
-
-const hoverIcon = {
-    position: 'absolute',
-    right: 1,
-    top: 2,
-};
 //#endregion
 
 function EnhancedTableHead(props) {
     const { onSelectAllClick, numSelected, rowCount } = props;
+    let isIndeterminate = numSelected > 0 && numSelected < rowCount;
+    let isSelectedAll = rowCount > 0 && numSelected === rowCount;
 
     return (
-        <TableHead sx={{ display: { xs: 'none', sm: 'table-header-group' } }}>
-            <TableRow sx={{ padding: 0, border: '.5px solid', borderColor: 'action.focus', backgroundColor: 'primary.main' }}>
-                <StyledTableCell>
-                    <Checkbox
-                        indeterminate={numSelected > 0 && numSelected < rowCount}
-                        checked={rowCount > 0 && numSelected === rowCount}
+        <StyledTableHead>
+            <TableRow
+                className="header"
+                role="select-all-checkbox"
+                aria-checked={isIndeterminate || isSelectedAll}
+                selected={isIndeterminate || isSelectedAll}
+                sx={{ backgroundColor: { xs: 'background.default', sm: 'action.hover' } }}
+            >
+                <StyledTableCell padding="checkbox" sx={{ width: '40px' }}>
+                    <StyledCheckbox
+                        indeterminate={isIndeterminate}
+                        checked={isSelectedAll}
                         onChange={onSelectAllClick}
-                        inputProps={{ 'aria-label': 'select all' }}
-                        sx={{
-                            marginRight: 1,
-                            color: 'white',
-                            '&.Mui-checked': {
-                                color: 'white',
-                            },
-                            '&.MuiCheckbox-indeterminate': {
-                                color: 'white',
-                            }
-                        }}
+                        inputProps={{ 'aria-label': 'Select all' }}
                     />
-                    Sản phẩm ({numSelected})
                 </StyledTableCell>
+                <StyledTableCell align="left">Sản phẩm ({rowCount})</StyledTableCell>
                 <StyledTableCell align="left" sx={{ width: '100px', display: { xs: 'none', md: 'table-cell' } }}>Đơn giá</StyledTableCell>
                 <StyledTableCell align="center" sx={{ width: '140px', display: { xs: 'none', sm: 'table-cell' } }}>Số lượng</StyledTableCell>
                 <StyledTableCell align="center" sx={{ width: '130px', display: { xs: 'none', md: 'table-cell' } }}>Tổng</StyledTableCell>
-                <StyledTableCell sx={{ width: 0, padding: 0 }}></StyledTableCell>
+                <ActionTableCell></ActionTableCell>
             </TableRow>
-        </TableHead>
+        </StyledTableHead>
     );
 }
 
@@ -186,12 +155,62 @@ EnhancedTableHead.propTypes = {
 const CartContent = () => {
     const { cartProducts, removeProduct, decreaseAmount, increaseAmount, changeAmount } = useCart();
     const [selected, setSelected] = useState([]);
+    const [coupon, setCoupon] = useState('');
     const [contextProduct, setContextProduct] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
 
-    //Test
+    //TEST
+    const [testCart, setTestCart] = useState([]);
+    const [calculate, { isLoading }] = useCalculateMutation();
+
+    //Test calculate
+    const handleCalculate = async () => {
+        if (isLoading) return;
+
+        //Create cart
+        let newProducts = cartProducts.filter(product => selected.includes(product?.id));
+        let test = newProducts.reduce((result, item) => {
+            if (!result[item.shopId]) { //Check if not exists shop >> Add new one
+                result[item.shopId] = { coupon: coupon[item.shopId], items: [] };
+            }
+
+            //Else push
+            result[item.shopId].items.push(item);
+            return result;
+        }, {});
+        let finalCart = { coupon: 'GIAMTOANBO', cart: Object.entries(test).map(([id, value]) => ({
+            shopId: id,
+            coupon: value.coupon,
+            items: value.items
+        }))};
+        setTestCart(finalCart);
+
+        calculate(finalCart).unwrap()
+            .then((data) => {
+                console.log(data);
+            })
+            .catch((err) => {
+                console.error(err);
+                if (!err?.status) {
+                    console.error('Server không phản hồi!');
+                } else if (err?.status === 409) {
+                    console.error(err?.data?.errors?.errorMessage);
+                } else if (err?.status === 400) {
+                    console.error('Sai định dạng thông tin!');
+                } else {
+                    console.error('Đặt hàng thất bại!')
+                }
+            })
+    }
+
+    //#region construct
+    useEffect(() => {
+        if (selected.length) handleCalculate();
+    }, [selected, coupon])
+
+    //Separate by shop
     const reduceCart = () => {
         return cartProducts.reduce((result, item) => {
             if (!result[item.shopId]) { //Check if not exists shop >> Add new one
@@ -210,8 +229,8 @@ const CartContent = () => {
     const [getBook] = booksApiSlice.useLazyGetBookQuery();
 
     //Open context menu
-    const handleClick = (event, product) => {
-        setAnchorEl(event.currentTarget);
+    const handleClick = (e, product) => {
+        setAnchorEl(e.currentTarget);
         setContextProduct(product);
     };
 
@@ -220,9 +239,13 @@ const CartContent = () => {
         setContextProduct(null);
     };
 
+    //Selected?
+    const isShopSelected = (shop) => shop?.products.some(product => selected.includes(product.id));
+    const isSelected = (id) => selected.indexOf(id) !== -1;
+
     //Select all checkboxes
-    const handleSelectAllClick = (event) => {
-        if (event.target.checked) {
+    const handleSelectAllClick = (e) => {
+        if (e.target.checked) {
             const newSelected = cartProducts?.map((n) => n.id);
             setSelected(newSelected);
             return;
@@ -230,6 +253,7 @@ const CartContent = () => {
         setSelected([]);
     };
 
+    //Select item
     const handleSelect = (id) => {
         const selectedIndex = selected.indexOf(id);
         let newSelected = [];
@@ -250,16 +274,27 @@ const CartContent = () => {
         setSelected(newSelected);
     };
 
+    //Select shop
+    const handleSelectShop = (shop) => {
+        let newSelected = [];
+        const notSelected = shop?.products
+            .filter(product => !selected.includes(product.id))
+            .map(product => product.id);
+
+        if (!notSelected.length) {
+            const alreadySelected = shop?.products
+                .filter(product => selected.includes(product.id))
+                .map(product => product.id);
+            newSelected = selected.filter(id => !alreadySelected.includes(id));
+        } else {
+            newSelected = newSelected.concat(selected, notSelected);
+        }
+        setSelected(newSelected);
+    };
+
+    //Delete
     const handleDeleteContext = () => {
         handleDelete(contextProduct?.id);
-        handleClose();
-    }
-
-    const handleFindSimilar = async () => {
-        getBook({ id: contextProduct?.id })
-            .unwrap()
-            .then((book) => navigate(`/filters?cateId=${book?.cateId}&pubId=${book?.publisher?.id}&type=${book?.type}`))
-            .catch((rejected) => console.error(rejected));
         handleClose();
     }
 
@@ -284,17 +319,30 @@ const CartContent = () => {
         setSelected([]);
     }
 
-    const isSelected = (id) => selected.indexOf(id) !== -1;
+    const handleFindSimilar = async () => {
+        getBook({ id: contextProduct?.id })
+            .unwrap()
+            .then((book) => navigate(`/filters?cateId=${book?.cateId}&pubId=${book?.publisher?.id}&type=${book?.type}`))
+            .catch((rejected) => console.error(rejected));
+        handleClose();
+    }
+
+    const handleChangeCoupon = (e, id) => {
+        setCoupon((prev) => ({ ...prev, [id]: 'GIAMGIAbfd538' }));
+    };
+    //#endregion
 
     return (
-        <Grid container spacing={3} sx={{ mb: 10, justifyContent: 'flex-end' }}>
-            <Grid size={{ xs: 12, lg: 8 }}>
+        <Grid container spacing={3} sx={{ position: 'relative', mb: 10, justifyContent: 'flex-end' }}>
+            <Grid size={{ xs: 12, lg: 8 }} position="relative">
                 <MainTitleContainer>
                     <Title><ShoppingCartIcon />&nbsp;GIỎ HÀNG ({cartProducts?.length})</Title>
                     <Button
                         variant="outlined"
                         color="error"
                         sx={{
+                            position: 'absolute',
+                            right: 0,
                             opacity: selected.length > 0 ? 1 : 0,
                             visibility: selected.length > 0 ? 'visible' : 'hidden',
                             transition: 'all .25s ease',
@@ -305,187 +353,27 @@ const CartContent = () => {
                         Xoá
                     </Button>
                 </MainTitleContainer>
-                <TableContainer >
-                    <Table aria-label="cart-table">
-                        <EnhancedTableHead
-                            numSelected={selected.length}
-                            onSelectAllClick={handleSelectAllClick}
-                            rowCount={cartProducts?.length}
-                        />
-                        <TableBody>
-                            {Object.keys(reducedCart).map(shopId => {
-                                const shop = reducedCart[shopId];
-                                
-                                return (
-                                    <>
-                                        <p>{shop.shopName}</p>
-                                        {shop.products?.map((product, index) => {
-                                            const isItemSelected = isSelected(product.id);
-                                            const labelId = `enhanced-table-checkbox-${index}`;
+                <Table aria-label="cart-table">
+                    <EnhancedTableHead
+                        numSelected={selected.length}
+                        onSelectAllClick={handleSelectAllClick}
+                        rowCount={cartProducts?.length}
+                    />
+                    <TableBody>
+                        {Object.keys(reducedCart).map((shopId, index) => {
+                            const shop = reducedCart[shopId];
 
-                                            return (
-                                                <StyledTableRow
-                                                    hover
-                                                    role="checkbox"
-                                                    aria-checked={isItemSelected}
-                                                    tabIndex={-1}
-                                                    key={product.id}
-                                                    selected={isItemSelected}
-                                                >
-                                                    <StyledTableCell component="th" scope="product">
-                                                        <Box sx={{ display: 'flex' }}>
-                                                            <Checkbox
-                                                                disableRipple
-                                                                disableFocusRipple
-                                                                color="primary"
-                                                                checked={isItemSelected}
-                                                                inputProps={{ 'aria-labelledby': labelId }}
-                                                                sx={{ marginRight: { xs: 1, md: 2 }, marginLeft: { xs: -1.5, sm: 0 } }}
-                                                                onClick={() => handleSelect(product.id)}
-                                                            />
-                                                            <ItemContainer>
-                                                                <NavLink to={`/product/${product.slug}`}>
-                                                                    <StyledLazyImage
-                                                                        src={`${product.image}?size=small`}
-                                                                        alt={`${product.title} Cart item`}
-                                                                        placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
-                                                                    />
-                                                                </NavLink>
-                                                                <ItemSummary>
-                                                                    <NavLink to={`/product/${product.slug}`}>
-                                                                        <ItemTitle>{product.title}</ItemTitle>
-                                                                    </NavLink>
-                                                                    <ItemAction>
-                                                                        <Box display={{ xs: 'block', md: 'none' }}>
-                                                                            {product?.discount > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
-                                                                            <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                                                                        </Box>
-                                                                        <Box display={{ xs: 'flex', sm: 'none' }}>
-                                                                            <CustomAmountInput
-                                                                                size="small"
-                                                                                value={product.quantity}
-                                                                                onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)}
-                                                                                handleDecrease={() => handleDecrease(product.quantity, product.id)}
-                                                                                handleIncrease={() => increaseAmount(product.id)}
-                                                                            />
-                                                                        </Box>
-                                                                    </ItemAction>
-                                                                </ItemSummary>
-                                                            </ItemContainer>
-                                                        </Box>
-                                                    </StyledTableCell>
-                                                    <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                                        <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                                                        {product?.discount > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
-                                                    </StyledTableCell>
-                                                    <StyledTableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                                                        <CustomAmountInput
-                                                            size="small"
-                                                            value={product.quantity}
-                                                            onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)}
-                                                            handleDecrease={() => handleDecrease(product.quantity, product.id)}
-                                                            handleIncrease={() => increaseAmount(product.id)}
-                                                        />
-                                                    </StyledTableCell>
-                                                    <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                                        <Price className="total">{(Math.round(product.price * (1 - (product?.discount || 0))) * product.quantity).toLocaleString()}đ</Price>
-                                                    </StyledTableCell>
-                                                    <td>
-                                                        <IconButton sx={hoverIcon} onClick={(e) => handleClick(e, product)}>
-                                                            <MoreHoriz />
-                                                        </IconButton>
-                                                    </td>
-                                                </StyledTableRow>
-                                            )
-                                        })}
-                                    </>
-                                )
-                            })}
-                            {/* {cartProducts?.map((product, index) => {
-                                const isItemSelected = isSelected(product.id);
-                                const labelId = `enhanced-table-checkbox-${index}`;
-
-                                return (
-                                    <StyledTableRow
-                                        hover
-                                        role="checkbox"
-                                        aria-checked={isItemSelected}
-                                        tabIndex={-1}
-                                        key={product.id}
-                                        selected={isItemSelected}
-                                    >
-                                        <StyledTableCell component="th" scope="product">
-                                            <Box sx={{ display: 'flex' }}>
-                                                <Checkbox
-                                                    disableRipple
-                                                    disableFocusRipple
-                                                    color="primary"
-                                                    checked={isItemSelected}
-                                                    inputProps={{ 'aria-labelledby': labelId }}
-                                                    sx={{ marginRight: { xs: 1, md: 2 }, marginLeft: { xs: -1.5, sm: 0 } }}
-                                                    onClick={() => handleSelect(product.id)}
-                                                />
-                                                <ItemContainer>
-                                                    <NavLink to={`/product/${product.slug}`}>
-                                                        <StyledLazyImage
-                                                            src={`${product.image}?size=small`}
-                                                            alt={`${product.title} Cart item`}
-                                                            placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
-                                                        />
-                                                    </NavLink>
-                                                    <ItemSummary>
-                                                        <NavLink to={`/product/${product.slug}`}>
-                                                            <ItemTitle>{product.title}</ItemTitle>
-                                                        </NavLink>
-                                                        <ItemAction>
-                                                            <Box display={{ xs: 'block', md: 'none' }}>
-                                                                {product?.discount > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
-                                                                <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                                                            </Box>
-                                                            <Box display={{ xs: 'flex', sm: 'none' }}>
-                                                                <CustomAmountInput
-                                                                    size="small"
-                                                                    value={product.quantity}
-                                                                    onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)}
-                                                                    handleDecrease={() => handleDecrease(product.quantity, product.id)}
-                                                                    handleIncrease={() => increaseAmount(product.id)}
-                                                                />
-                                                            </Box>
-                                                        </ItemAction>
-                                                    </ItemSummary>
-                                                </ItemContainer>
-                                            </Box>
-                                        </StyledTableCell>
-                                        <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                            <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                                            {product?.discount > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
-                                        </StyledTableCell>
-                                        <StyledTableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                                            <CustomAmountInput
-                                                size="small"
-                                                value={product.quantity}
-                                                onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)}
-                                                handleDecrease={() => handleDecrease(product.quantity, product.id)}
-                                                handleIncrease={() => increaseAmount(product.id)}
-                                            />
-                                        </StyledTableCell>
-                                        <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                            <Price className="total">{(Math.round(product.price * (1 - (product?.discount || 0))) * product.quantity).toLocaleString()}đ</Price>
-                                        </StyledTableCell>
-                                        <td>
-                                            <IconButton sx={hoverIcon} onClick={(e) => handleClick(e, product)}>
-                                                <MoreHoriz />
-                                            </IconButton>
-                                        </td>
-                                    </StyledTableRow>
-                                )
-                            })} */}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                            return (<CartDetailRow {...{
+                                id: shopId, index, shop, coupon, isSelected, isShopSelected, handleSelect, handleSelectShop,
+                                handleDecrease, handleChangeQuantity, handleChangeCoupon, handleClick,
+                                StyledCheckbox, StyledTableCell, ActionTableCell
+                            }} />)
+                        })}
+                    </TableBody>
+                </Table>
                 <br />
                 <Box display="flex">
-                    <NavLink to={'/'}>
+                    <Link to={'/'}>
                         <Button
                             variant="outlined"
                             color="secondary"
@@ -493,12 +381,12 @@ const CartContent = () => {
                         >
                             Tiếp tục mua sắm
                         </Button>
-                    </NavLink>
+                    </Link>
                 </Box>
             </Grid>
-            <Grid size={{ xs: 12, md: 8, lg: 4 }}>
+            <Grid size={{ xs: 12, md: 8, lg: 4 }} position="relative">
                 <CheckoutDialog {...{
-                    cartProducts, selected, navigate, handleSelectAllClick,
+                    testCart, selected, navigate, handleSelectAllClick,
                     numSelected: selected.length, rowCount: cartProducts?.length
                 }} />
             </Grid>

@@ -81,6 +81,24 @@ const detailHeadCells = [
   },
 ];
 
+//Item status
+const getStatus = (status) => {
+  switch (status) {
+    case 'REFUNDED':
+      return { status: 'Hoàn trả', color: 'default' };
+    case 'CANCELED':
+      return { status: 'Đã huỷ', color: 'error' };
+    case 'PENDING':
+      return { status: 'Đang chờ', color: 'warning' };
+    case 'SHIPPING':
+      return { status: 'Đang giao', color: 'info' };
+    case 'COMPLETED':
+      return { status: 'Đã giao', color: 'primary' };
+    default:
+      return { status: 'Không xác định', color: 'error' };
+  }
+}
+
 function FilterContent({ }) {
   return (
     <Grid container spacing={1} sx={{ width: '80vw', padding: '10px' }}>
@@ -116,8 +134,8 @@ function FilterContent({ }) {
   )
 }
 
-function OrderRow({ isSelected, isOrderSelected, index, id, order, dense, handleClick, onSelectAllDetail,
-  colSpan, mini }) {
+function OrderRow({ isSelected, isOrderSelected, index, id, order, dense,
+  handleClick, onSelectAllDetail, colSpan, mini }) {
   const [open, setOpen] = useState(false);
   const isItemSelected = isOrderSelected(id);
   const labelId = `enhanced-table-checkbox-${index}`;
@@ -125,25 +143,11 @@ function OrderRow({ isSelected, isOrderSelected, index, id, order, dense, handle
 
   //Total items in order
   let totalItems = 0;
-  order.orderDetails.forEach(function (item) { totalItems += item.amount; });
-
-  //Item status
-  const getStatus = (status) => {
-    switch (status) {
-      case 'REFUNDED':
-        return { status: 'Hoàn trả', color: 'default' };
-      case 'CANCELED':
-        return { status: 'Đã huỷ', color: 'error' };
-      case 'PENDING':
-        return { status: 'Đang chờ', color: 'warning' };
-      case 'SHIPPING':
-        return { status: 'Đang giao', color: 'info' };
-      case 'COMPLETED':
-        return { status: 'Đã giao', color: 'primary' };
-      default:
-        return { status: 'Không xác định', color: 'error' };
-    }
-  }
+  order.details.forEach(function (detail) {
+    detail?.items.forEach(function (item) {
+      totalItems += item.amount;
+    })
+  });
 
   const toggleOpen = () => { setOpen(prev => !prev); }
 
@@ -229,59 +233,63 @@ function OrderRow({ isSelected, isOrderSelected, index, id, order, dense, handle
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {order.orderDetails.map((detail, index) => {
-                    const itemStatus = getStatus(detail.status);
-                    const isDetailSelected = isSelected(detail.id);
-                    const detailLabelId = `table-checkbox-${index}`;
-
+                  {order?.details.map((temp, tempIndex) => {
                     return (
-                      <TableRow
-                        key={`${detail.id}-${index}`}
-                        hover
-                        tabIndex={-1}
-                        aria-checked={isDetailSelected}
-                        selected={isDetailSelected}
-                        sx={{ backgroundColor: 'background.default' }}
-                      >
-                        <TableCell padding="checkbox">
-                          <Checkbox color="primary"
-                            onChange={() => handleClick(order, detail.id)}
-                            checked={isDetailSelected}
-                            inputProps={{
-                              'aria-labelledby': detailLabelId,
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell align="left">
-                          <Link to={`/detail/${detail.bookId}`} style={{ display: 'flex', alignItems: 'center' }}>
-                            <LazyLoadImage
-                              src={`${detail.image}?size=small`}
-                              height={45}
-                              width={45}
-                              style={{ marginRight: '10px' }}
-                              placeholder={<Skeleton width={45} height={45} animation={false} variant="rectangular" />}
-                            />
-                            <Box>
-                              <ItemTitle>{detail.bookTitle}</ItemTitle>
-                              <ItemTitle className="secondary">ID: {idFormatter(detail.bookId)}</ItemTitle>
-                            </Box>
-                          </Link>
-                        </TableCell>
-                        <TableCell>{detail.price.toLocaleString()}đ</TableCell>
-                        <TableCell align="left">
-                          <Box>
-                            <ItemTitle>Thành tiền: {Math.round(detail.amount * detail.price).toLocaleString()}đ</ItemTitle>
-                            <ItemTitle className="secondary">Số lượng: {detail.amount}</ItemTitle>
-                          </Box>
-                        </TableCell>
-                        <TableCell align="left">
-                          <Chip label={itemStatus.status}
-                            color={itemStatus.color}
-                            sx={{ fontWeight: 'bold' }}
-                            variant="outlined"
-                          />
-                        </TableCell>
-                      </TableRow>
+                      temp?.items.map((detail, index) => {
+                        const itemStatus = getStatus(detail.status);
+                        const isDetailSelected = isSelected(detail.id);
+                        const detailLabelId = `table-checkbox-${index}`;
+
+                        return (
+                          <TableRow
+                            key={`${detail.id}-${index}`}
+                            hover
+                            tabIndex={-1}
+                            aria-checked={isDetailSelected}
+                            selected={isDetailSelected}
+                            sx={{ backgroundColor: 'background.default' }}
+                          >
+                            <TableCell padding="checkbox">
+                              <Checkbox color="primary"
+                                onChange={() => handleClick(order, detail.id)}
+                                checked={isDetailSelected}
+                                inputProps={{
+                                  'aria-labelledby': detailLabelId,
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell align="left">
+                              <Link to={`/detail/${detail.bookId}`} style={{ display: 'flex', alignItems: 'center' }}>
+                                <LazyLoadImage
+                                  src={`${detail.image}?size=small`}
+                                  height={45}
+                                  width={45}
+                                  style={{ marginRight: '10px' }}
+                                  placeholder={<Skeleton width={45} height={45} animation={false} variant="rectangular" />}
+                                />
+                                <Box>
+                                  <ItemTitle>{detail.bookTitle}</ItemTitle>
+                                  <ItemTitle className="secondary">ID: {idFormatter(detail.bookId)}</ItemTitle>
+                                </Box>
+                              </Link>
+                            </TableCell>
+                            <TableCell>{detail.price.toLocaleString()}đ</TableCell>
+                            <TableCell align="left">
+                              <Box>
+                                <ItemTitle>Thành tiền: {Math.round(detail.amount * detail.price).toLocaleString()}đ</ItemTitle>
+                                <ItemTitle className="secondary">Số lượng: {detail.amount}</ItemTitle>
+                              </Box>
+                            </TableCell>
+                            <TableCell align="left">
+                              <Chip label={itemStatus.status}
+                                color={itemStatus.color}
+                                sx={{ fontWeight: 'bold' }}
+                                variant="outlined"
+                              />
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })
                     )
                   })}
                 </TableBody>
@@ -354,7 +362,7 @@ export default function TableOrders({ setOrderCount, mini = false }) {
     //Determines which boxes gonna change
     let newSelected = [];
     let newDeselected = [];
-    let changed = order?.orderDetails;
+    let changed = order?.details;
     changed = changed.filter(detail => (e.target.checked !== isSelected(detail.id))).map((detail) => (detail.id));
 
     if (e.target.checked) { //If check all the empty boxes
@@ -383,8 +391,11 @@ export default function TableOrders({ setOrderCount, mini = false }) {
       }
     }
 
-    const isOrderSelected = (order?.orderDetails.some(detail => newSelected?.includes(detail.id))
-      || (selectedAll && order?.orderDetails.some(detail => !newDeselected?.includes(detail.id))));
+    const isOrderSelected = (order?.details.forEach(function (detail) {
+      detail?.items.some(detail => newSelected?.includes(detail.id))
+    })) || (selectedAll && order?.details.forEach(function (detail) {
+      detail?.items.some(detail => !newDeselected?.includes(detail.id))
+    }));
     handleSelectedOrder(order.id, isOrderSelected);
   }
 
@@ -429,8 +440,11 @@ export default function TableOrders({ setOrderCount, mini = false }) {
       setSelected(newSelected);
     }
 
-    const isOrderSelected = (order?.orderDetails.some(detail => newSelected?.includes(detail.id))
-      || (selectedAll && order?.orderDetails.some(detail => !newDeselected?.includes(detail.id))));
+    const isOrderSelected = (order?.details.forEach(function (detail) {
+      detail?.items.some(detail => newSelected?.includes(detail.id))
+    })) || (selectedAll && order?.details.forEach(function (detail) {
+      detail?.items.some(detail => !newDeselected?.includes(detail.id))
+    }));
     handleSelectedOrder(order.id, isOrderSelected);
   };
 
@@ -572,53 +586,53 @@ export default function TableOrders({ setOrderCount, mini = false }) {
 
   return (
     <TableContainer component={Paper}>
-        <CustomTableToolbar
-          numSelected={numSelected()}
-          icon={<ReceiptIcon />}
-          title={'đơn hàng'}
-          submitIcon={<MoreHoriz />}
-          submitTooltip={'Chỉnh sửa đơn hàng đã chọn'}
-          // onSubmitSelected={console.log('hehe')}
-          filterComponent={<FilterContent />}
-        />
-        <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
-          <Table
-            stickyHeader
-            sx={{ minWidth: mini ? 500 : 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <CustomTableHead
-              headCells={headCells}
-              numSelected={numSelected()}
-              sortBy={pagination.sortBy}
-              sortDir={pagination.sortDir}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              selectedAll={selectedAll}
-              mini={mini}
-            />
-            <TableBody>
-              {ordersRows}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <FooterContainer>
-          {mini ?
-            <Link to={'/manage-orders'}>Xem tất cả</Link>
-            :
-            <FormControlLabel
-              control={<Switch checked={dense} onChange={handleChangeDense} />}
-              label={<FooterLabel>Thu gọn</FooterLabel>}
-            />
-          }
-          <CustomTablePagination
-            pagination={pagination}
-            onPageChange={handleChangePage}
-            onSizeChange={handleChangeRowsPerPage}
-            count={data?.info?.totalElements ?? 0}
+      <CustomTableToolbar
+        numSelected={numSelected()}
+        icon={<ReceiptIcon />}
+        title={'đơn hàng'}
+        submitIcon={<MoreHoriz />}
+        submitTooltip={'Chỉnh sửa đơn hàng đã chọn'}
+        // onSubmitSelected={console.log('hehe')}
+        filterComponent={<FilterContent />}
+      />
+      <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
+        <Table
+          stickyHeader
+          sx={{ minWidth: mini ? 500 : 750 }}
+          aria-labelledby="tableTitle"
+          size={dense ? 'small' : 'medium'}
+        >
+          <CustomTableHead
+            headCells={headCells}
+            numSelected={numSelected()}
+            sortBy={pagination.sortBy}
+            sortDir={pagination.sortDir}
+            onSelectAllClick={handleSelectAllClick}
+            onRequestSort={handleRequestSort}
+            selectedAll={selectedAll}
+            mini={mini}
           />
-        </FooterContainer>
+          <TableBody>
+            {ordersRows}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <FooterContainer>
+        {mini ?
+          <Link to={'/manage-orders'}>Xem tất cả</Link>
+          :
+          <FormControlLabel
+            control={<Switch checked={dense} onChange={handleChangeDense} />}
+            label={<FooterLabel>Thu gọn</FooterLabel>}
+          />
+        }
+        <CustomTablePagination
+          pagination={pagination}
+          onPageChange={handleChangePage}
+          onSizeChange={handleChangeRowsPerPage}
+          count={data?.info?.totalElements ?? 0}
+        />
+      </FooterContainer>
     </TableContainer>
   );
 }
