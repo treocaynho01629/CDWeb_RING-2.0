@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Close, RemoveShoppingCart as RemoveShoppingCartIcon } from '@mui/icons-material';
-import { Card, Button, CardContent, Skeleton, Box, Popover, IconButton } from '@mui/material';
+import { Button, Skeleton, Box, Popover, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
@@ -8,6 +8,18 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 const MiniCartContainer = styled.div`
     width: 400px;
     padding: 10px 20px;
+`
+
+const CartTitleContainer = styled.div`
+    margin: 15px 0;
+`
+
+const EmptyCartContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: cneter;
+    height: 250px;
 `
 
 const ProductTitle = styled.h5`
@@ -31,13 +43,35 @@ const ProductTitle = styled.h5`
 const ProductPrice = styled.span`
     width: 100%;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 450;
     color: ${props => props.theme.palette.primary.main};
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     text-align: center;
     justify-content: space-between;
+`
+
+const ItemContainer = styled.div`
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+`
+
+const ItemInfo = styled.div`
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+    margin-left: 10px;
+`
+
+const ActionContainer = styled.div`
+    margin: 10px 0;
+    padding: 5px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 `
 //#endregion
 
@@ -49,9 +83,9 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products, removeProduct
             anchorEl={anchorElCart}
             onClose={handleClose}
             onClick={handleClose}
+            disableScrollLock
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            disableScrollLock
             sx={{ pointerEvents: 'none' }}
             slotProps={{
                 paper: {
@@ -59,6 +93,7 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products, removeProduct
                     sx: {
                         overflow: 'visible',
                         filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                        bgcolor: 'background.elevate',
                         mt: 1.5,
                         borderRadius: 0,
                         pointerEvents: 'auto',
@@ -71,7 +106,7 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products, removeProduct
                             right: 14,
                             width: 10,
                             height: 10,
-                            bgcolor: 'background.paper',
+                            bgcolor: 'background.elevate',
                             transform: 'translateY(-50%) rotate(45deg)',
                             zIndex: 0,
                         },
@@ -81,43 +116,41 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products, removeProduct
             }}
         >
             <MiniCartContainer>
-                <div style={{ margin: '20px 0px' }}><b>Sản phẩm trong giỏ hàng</b></div>
+                <CartTitleContainer><b>Sản phẩm trong giỏ hàng</b></CartTitleContainer>
                 {products?.length == 0 ?
-                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', height: '250px' }}>
+                    <EmptyCartContainer>
                         <RemoveShoppingCartIcon sx={{ fontSize: '50px' }} />
                         <b>GIỎ HÀNG TRỐNG</b>
-                    </div>
+                    </EmptyCartContainer>
                     :
                     <>
                         {products?.slice(0, 5).map((product, index) => (
-                            <Card key={`${index}-${product?.id}`}
-                                sx={{ display: 'flex', alignItems: 'center', marginBottom: 0.5 }}
-                            >
+                            <ItemContainer key={`cartitem-${index}-${product?.id}`}>
                                 <LazyLoadImage
                                     width={50}
                                     height={50}
-                                    style={{ objectFit: 'contain', marginLeft: '10px' }}
+                                    style={{ objectFit: 'contain' }}
                                     src={`${product?.image}?size=small`}
-                                    alt={`${product?.title} Cart item`}
-                                    placeholder={<Skeleton width={50} height={50} animation={false} variant="rectangular"/>}
+                                    alt={`Cart item: ${product?.title}`}
+                                    placeholder={<Skeleton width={50} height={50} animation={false} variant="rectangular" />}
                                 />
-                                <Box sx={{ display: 'flex', flexDirection: 'column', position: 'relative', width: '100%' }}>
-                                    <CardContent sx={{ width: '100%', padding: '10px !important' }}>
-                                        <ProductTitle>{product?.title}</ProductTitle>
-                                        <ProductPrice>{product?.price?.toLocaleString()}đ
-                                            <IconButton
-                                                aria-label="Remove item"
-                                                onClick={() => removeProduct(product?.id)}
-                                            >
-                                                <Close />
-                                            </IconButton>
-                                        </ProductPrice>
-                                    </CardContent>
-                                </Box>
-                            </Card>
+                                <ItemInfo>
+                                    <ProductTitle>{product?.title}</ProductTitle>
+                                    <ProductPrice>{product?.price?.toLocaleString()}đ
+                                        <IconButton
+                                            aria-label={`Remove item ${product?.title}`}
+                                            onClick={() => removeProduct(product?.id)}
+                                        >
+                                            <Close />
+                                        </IconButton>
+                                    </ProductPrice>
+                                </ItemInfo>
+                            </ItemContainer>
                         ))}
-                        <Box sx={{ marginTop: '15px', display: 'flex', justifyContent: 'space-between' }}>
-                            {products?.length <= 5 ? <p>&nbsp;</p> : <p>Và còn lại {products?.length - 5} trong giỏ</p>}
+                        <ActionContainer>
+                            <span>
+                                {products?.length <= 5 ? <>&nbsp;</> : `Còn lại ${products?.length - 5} trong giỏ`}
+                            </span>
                             <Link to={'/cart'}>
                                 <Button
                                     variant="contained"
@@ -127,7 +160,7 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products, removeProduct
                                     Xem giỏ hàng
                                 </Button>
                             </Link>
-                        </Box>
+                        </ActionContainer>
                     </>
                 }
             </MiniCartContainer>

@@ -40,10 +40,18 @@ export function ThemeContextProvider({ children }) {
                         main: "#424242",
                         contrastText: "#ffffffb3",
                     },
+                    background: {
+                        elevate: '#fff',
+                        contrast: '#f5f5f5'
+                    },
                     ...(mode === 'dark'
                         && {
                         text: {
                             primary: '#f1f1f1',
+                        },
+                        background: {
+                            elevate: '#1e1e1e',
+                            contrast: '#121212'
                         },
                     }),
                 },

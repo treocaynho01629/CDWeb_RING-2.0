@@ -4,12 +4,12 @@ import { Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, Search, Chevron
 import { Checkbox, Button, Grid2 as Grid, Table, TableBody, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
 import { Link, useNavigate } from "react-router-dom";
 import { booksApiSlice } from '../../features/books/booksApiSlice';
+import { useCalculateMutation } from '../../features/orders/ordersApiSlice';
 import CheckoutDialog from './CheckoutDialog';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import PropTypes from 'prop-types';
 import useCart from '../../hooks/useCart';
 import CartDetailRow from './CartDetailRow';
-import { useCalculateMutation } from '../../features/orders/ordersApiSlice';
 
 //#region styled
 const StyledTableCell = styled(TableCell)`
@@ -94,10 +94,14 @@ const StyledCheckbox = styled(Checkbox)`
 `
 
 const MainTitleContainer = styled.div`
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 20px 0px;
+
+    position: sticky;
+    top: 150px;
 
     ${props => props.theme.breakpoints.down("sm")} {
         padding: 20px 10px;
@@ -112,10 +116,21 @@ const Title = styled.h3`
     text-align: center;
     justify-content: center;
 `
+
+const StyledDeleteButton = styled(Button)`
+   /* position: 'absolute',
+                            right: 0,
+                            opacity: selected.length > 0 ? 1 : 0,
+                            visibility: selected.length > 0 ? 'visible' : 'hidden',
+                            transition: 'all .25s ease', */
+    position: absolute;
+    right: 0;
+    opacity: 1;
+`
 //#endregion
 
 function EnhancedTableHead(props) {
-    const { onSelectAllClick, numSelected, rowCount } = props;
+    const { onSelectAllClick, numSelected, rowCount, shrink } = props;
     let isIndeterminate = numSelected > 0 && numSelected < rowCount;
     let isSelectedAll = rowCount > 0 && numSelected === rowCount;
 
@@ -136,10 +151,19 @@ function EnhancedTableHead(props) {
                         inputProps={{ 'aria-label': 'Select all' }}
                     />
                 </StyledTableCell>
-                <StyledTableCell align="left">Sản phẩm ({rowCount})</StyledTableCell>
-                <StyledTableCell align="left" sx={{ width: '100px', display: { xs: 'none', md: 'table-cell' } }}>Đơn giá</StyledTableCell>
-                <StyledTableCell align="center" sx={{ width: '140px', display: { xs: 'none', sm: 'table-cell' } }}>Số lượng</StyledTableCell>
-                <StyledTableCell align="center" sx={{ width: '130px', display: { xs: 'none', md: 'table-cell' } }}>Tổng</StyledTableCell>
+                <StyledTableCell align="left">Chọn tất cả ({rowCount} sản phẩm)</StyledTableCell>
+                <StyledTableCell align="left" sx={{
+                    width: '100px',
+                    display: { xs: 'none', md: 'table-cell', md_lg: 'none', lg: 'table-cell' }
+                }}>Đơn giá</StyledTableCell>
+                <StyledTableCell align="center" sx={{
+                    width: '140px',
+                    display: { xs: 'none', sm: 'table-cell' }
+                }}>Số lượng</StyledTableCell>
+                <StyledTableCell align="left" sx={{
+                    width: '100px',
+                    display: { xs: 'none', md: 'table-cell' }
+                }}>Tổng</StyledTableCell>
                 <ActionTableCell></ActionTableCell>
             </TableRow>
         </StyledTableHead>
@@ -150,46 +174,62 @@ EnhancedTableHead.propTypes = {
     numSelected: PropTypes.number.isRequired,
     onSelectAllClick: PropTypes.func.isRequired,
     rowCount: PropTypes.number.isRequired,
+    shrink: PropTypes.bool.isRequired
 };
 
 const CartContent = () => {
-    const { cartProducts, removeProduct, decreaseAmount, increaseAmount, changeAmount } = useCart();
+    const { cartProducts, replaceProduct, removeProduct, removeShopProduct, decreaseAmount, increaseAmount, changeAmount } = useCart();
     const [selected, setSelected] = useState([]);
-    const [coupon, setCoupon] = useState('');
+    const [coupon, setCoupon] = useState('GIAMTOANBO');
+    const [shopCoupon, setShopCoupon] = useState('');
     const [contextProduct, setContextProduct] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
 
-    //TEST
-    const [testCart, setTestCart] = useState([]);
+    //For get similar
+    const [getBook] = booksApiSlice.useLazyGetBookQuery();
+
+    //Estimate/calculate price
+    const [checkoutCart, setCheckoutCart] = useState([]);
     const [calculate, { isLoading }] = useCalculateMutation();
 
-    //Test calculate
+    //#region construct
+    useEffect(() => {
+        if (selected.length) {
+            handleCalculate();
+        } else { //Reset cart
+            setCheckoutCart([]);
+        }
+    }, [selected, shopCoupon])
+
     const handleCalculate = async () => {
         if (isLoading) return;
 
-        //Create cart
-        let newProducts = cartProducts.filter(product => selected.includes(product?.id));
-        let test = newProducts.reduce((result, item) => {
-            if (!result[item.shopId]) { //Check if not exists shop >> Add new one
-                result[item.shopId] = { coupon: coupon[item.shopId], items: [] };
+        //Reduce cart
+        const estimateCart = cartProducts.reduce((result, item) => {
+            const { shopId, otherId, value } = item;
+
+            // Find or create the group for this id
+            let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
+
+            if (!detail) {
+                // If group doesn't exist, create a new one
+                detail = { shopId, coupon: shopCoupon[item.shopId], items: [] };
+                result.cart.push(detail);
             }
 
-            //Else push
-            result[item.shopId].items.push(item);
-            return result;
-        }, {});
-        let finalCart = { coupon: 'GIAMTOANBO', cart: Object.entries(test).map(([id, value]) => ({
-            shopId: id,
-            coupon: value.coupon,
-            items: value.items
-        }))};
-        setTestCart(finalCart);
+            // Add the otherId and value to the group's values
+            detail.items.push(item);
 
-        calculate(finalCart).unwrap()
+            return result;
+        }, { coupon: coupon, cart: [] });
+
+        setCheckoutCart(estimateCart);
+        calculate(estimateCart).unwrap()
             .then((data) => {
                 console.log(data);
+                syncCart(data);
             })
             .catch((err) => {
                 console.error(err);
@@ -205,10 +245,32 @@ const CartContent = () => {
             })
     }
 
-    //#region construct
-    useEffect(() => {
-        if (selected.length) handleCalculate();
-    }, [selected, coupon])
+    //Sync cart between client and server
+    const syncCart = (cart) => {
+        const details = cart?.details;
+
+        details.map((detail, index) => {
+            if (detail.shopName != null) { //Replace all items of that shop
+                const items = detail?.items;
+
+                items.map((item, index) => {
+                    if (item.title != null) { //Replace old item in cart
+                        const newItem = {
+                            ...item,
+                            shopId: detail.shopId,
+                            shopName: detail.shopName
+                        }
+
+                        replaceProduct(newItem);
+                    } else { //Remove invalid item
+                        removeProduct(item.id);
+                    }
+                })
+            } else { //Remove all items of the invalid Shop
+                removeShopProduct(detail.shopId);
+            }
+        })
+    }
 
     //Separate by shop
     const reduceCart = () => {
@@ -223,10 +285,9 @@ const CartContent = () => {
         }, {});
     }
 
-    const reducedCart = useMemo(() => reduceCart(), cartProducts);
+    const reducedCart = useMemo(() => reduceCart(), [cartProducts]);
 
-    //Get similar
-    const [getBook] = booksApiSlice.useLazyGetBookQuery();
+
 
     //Open context menu
     const handleClick = (e, product) => {
@@ -246,7 +307,9 @@ const CartContent = () => {
     //Select all checkboxes
     const handleSelectAllClick = (e) => {
         if (e.target.checked) {
-            const newSelected = cartProducts?.map((n) => n.id);
+            const newSelected = cartProducts?.map((item) => {
+                if (item.amount > 0) return item.id;
+            });
             setSelected(newSelected);
             return;
         }
@@ -274,14 +337,39 @@ const CartContent = () => {
         setSelected(newSelected);
     };
 
+    const handleDeselect = (id) => {
+        const selectedIndex = selected.indexOf(id);
+        let newSelected = [];
+
+        if (selectedIndex === 0) {
+            newSelected = newSelected.concat(selected.slice(1));
+        } else if (selectedIndex === selected.length - 1) {
+            newSelected = newSelected.concat(selected.slice(0, -1));
+        } else if (selectedIndex > 0) {
+            newSelected = newSelected.concat(
+                selected.slice(0, selectedIndex),
+                selected.slice(selectedIndex + 1),
+            );
+        }
+
+        setSelected(newSelected);
+    }
+
     //Select shop
     const handleSelectShop = (shop) => {
         let newSelected = [];
+        let disabled = [];
         const notSelected = shop?.products
             .filter(product => !selected.includes(product.id))
-            .map(product => product.id);
+            .map(product => {
+                if (product.amount > 0) {
+                    return product.id;
+                } else {
+                    disabled.push(product.id);
+                }
+            });
 
-        if (!notSelected.length) {
+        if (notSelected.length <= disabled.length) {
             const alreadySelected = shop?.products
                 .filter(product => selected.includes(product.id))
                 .map(product => product.id);
@@ -328,24 +416,26 @@ const CartContent = () => {
     }
 
     const handleChangeCoupon = (e, id) => {
-        setCoupon((prev) => ({ ...prev, [id]: 'GIAMGIAbfd538' }));
+        setShopCoupon((prev) => ({ ...prev, [id]: 'GIAMGIAbfd538' }));
     };
     //#endregion
 
     return (
-        <Grid container spacing={3} sx={{ position: 'relative', mb: 10, justifyContent: 'flex-end' }}>
-            <Grid size={{ xs: 12, lg: 8 }} position="relative">
+        <Grid container spacing={2} sx={{ position: 'relative', mb: 10, justifyContent: 'flex-end' }}>
+            <Grid size={{ xs: 12, md_lg: 8 }} position="relative">
                 <MainTitleContainer>
                     <Title><ShoppingCartIcon />&nbsp;GIỎ HÀNG ({cartProducts?.length})</Title>
                     <Button
                         variant="outlined"
                         color="error"
                         sx={{
-                            position: 'absolute',
+                            position: 'sticky',
+                            top: 150,
                             right: 0,
-                            opacity: selected.length > 0 ? 1 : 0,
-                            visibility: selected.length > 0 ? 'visible' : 'hidden',
+                            // opacity: selected.length > 0 ? 1 : 0,
+                            // visibility: selected.length > 0 ? 'visible' : 'hidden',
                             transition: 'all .25s ease',
+                            zIndex: 99,
                         }}
                         onClick={handleDeleteMultiple}
                         endIcon={<DeleteIcon />}
@@ -364,9 +454,9 @@ const CartContent = () => {
                             const shop = reducedCart[shopId];
 
                             return (<CartDetailRow {...{
-                                id: shopId, index, shop, coupon, isSelected, isShopSelected, handleSelect, handleSelectShop,
-                                handleDecrease, handleChangeQuantity, handleChangeCoupon, handleClick,
-                                StyledCheckbox, StyledTableCell, ActionTableCell
+                                id: shopId, index, shop, coupon: shopCoupon, isSelected, isShopSelected, handleSelect, handleDeselect,
+                                handleSelectShop, handleDecrease, increaseAmount, handleChangeQuantity, handleChangeCoupon,
+                                handleClick, StyledCheckbox, StyledTableCell, ActionTableCell
                             }} />)
                         })}
                     </TableBody>
@@ -384,9 +474,9 @@ const CartContent = () => {
                     </Link>
                 </Box>
             </Grid>
-            <Grid size={{ xs: 12, md: 8, lg: 4 }} position="relative">
+            <Grid size={{ xs: 12, md_lg: 4 }} position={{ xs: 'sticky', md_lg: 'relative' }} bottom={0}>
                 <CheckoutDialog {...{
-                    testCart, selected, navigate, handleSelectAllClick,
+                    checkoutCart, navigate, handleSelectAllClick,
                     numSelected: selected.length, rowCount: cartProducts?.length
                 }} />
             </Grid>

@@ -21,6 +21,7 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, the
                     sx: {
                         overflow: 'visible',
                         filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                        bgcolor: 'background.elevate',
                         mt: 1.5,
                         borderRadius: 0,
                         pointerEvents: 'auto',
@@ -39,7 +40,7 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, the
                             right: 14,
                             width: 10,
                             height: 10,
-                            bgcolor: 'background.paper',
+                            bgcolor: 'background.elevate',
                             transform: 'translateY(-50%) rotate(45deg)',
                             zIndex: 0,
                         },

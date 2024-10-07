@@ -60,7 +60,7 @@ const AppPagination = ({ pagination, onPageChange, onSizeChange }) => {
                     onChange={handlePageChange}
                     color="primary"
                     renderItem={(item) => (
-                        <StyledPageItem  {...item} />
+                        <StyledPageItem {...item} />
                     )}
                 />
             </Stack>

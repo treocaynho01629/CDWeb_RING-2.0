@@ -4,6 +4,7 @@ import { useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSli
 import { MobileExtendButton, Showmore, Title } from '../custom/GlobalComponents';
 import { Button, DialogActions, DialogTitle, IconButton, Rating, Box, Skeleton } from '@mui/material';
 import { KeyboardArrowRight, KeyboardArrowLeft, Star, StarBorder, EditOutlined } from '@mui/icons-material';
+import { ReactComponent as EmptyIcon } from '../../assets/empty.svg';
 import { numFormatter } from '../../ultils/covert';
 import useAuth from "../../hooks/useAuth";
 import CustomProgress from '../custom/CustomProgress';
@@ -74,9 +75,11 @@ const Label = styled.span`
     }
 `
 
-const EmptyImage = styled.img`
+const StyledEmptyIcon = styled(EmptyIcon)`
     height: 70px;
+    width: 70px;
     margin: 10px 0;
+    fill: ${props => props.theme.palette.text.icon};
 `
 //#endregion
 
@@ -169,7 +172,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
         reviewsContent = <MessageContainer>{error?.error}</MessageContainer>
     } else if (isUninitialized && (book?.reviewsInfo?.count[0] ?? 0) == 0) {
         reviewsContent = <MessageContainer>
-            <EmptyImage src="/empty.svg" />
+            <StyledEmptyIcon/>
             Chưa có đánh giá nào, hãy trở thành người đầu tiên!
         </MessageContainer>
     }
