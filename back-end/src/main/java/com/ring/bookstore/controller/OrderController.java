@@ -2,6 +2,7 @@ package com.ring.bookstore.controller;
 
 import java.util.List;
 
+import com.ring.bookstore.dtos.CalculateDTO;
 import com.ring.bookstore.request.CalculateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -37,9 +38,9 @@ public class OrderController {
 	//Calculate price
 	@PostMapping("/calculate")
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<OrderDTO> calculate(@RequestBody @Valid CalculateRequest request) {
-		OrderDTO orderDTO = orderService.calculate(request);
-		return new ResponseEntity< >(orderDTO, HttpStatus.CREATED);
+	public ResponseEntity<CalculateDTO> calculate(@RequestBody @Valid CalculateRequest request) {
+		CalculateDTO calculateResult = orderService.calculate(request);
+		return new ResponseEntity< >(calculateResult, HttpStatus.CREATED);
 	}
 	
 	//Commit order

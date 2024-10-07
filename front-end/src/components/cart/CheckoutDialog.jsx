@@ -1,14 +1,21 @@
 import styled from 'styled-components'
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, useMemo, useState, Suspense } from 'react';
 import { Sell as SellIcon, Payments as PaymentsIcon } from '@mui/icons-material';
-import { Checkbox, Divider, Drawer, FormControlLabel, useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery, useTheme, Button } from '@mui/material';
 import useAuth from "../../hooks/useAuth";
+
+const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
 
 //#region styled
 const CheckoutContainer = styled.div`
     display: block;
     position: relative;
     height: 100%;
+
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        position: sticky;
+        bottom: 20px;
+    }
 
     ${props => props.theme.breakpoints.down("sm")} {
         display: none;
@@ -28,7 +35,7 @@ const AltCheckoutContainer = styled.div`
     justify-content: space-between;
     display: none;
 
-    ${props => props.theme.breakpoints.down("sm")} {
+    ${props => props.theme.breakpoints.down("md_lg")} {
         display: flex;
     }
 `
@@ -110,178 +117,137 @@ const CouponButton = styled.p`
     }
 `
 
-const PayButton = styled.button`
-    background-color: ${props => props.theme.palette.primary.main};
-    padding: 15px 20px;
-    margin-top: 20px;
-    font-size: 15px;
-    font-weight: bold;
-    width: 100%;
-    height: 50px;
-    font-weight: 500;
-    border-radius: 0;
-    border: none;
-    flex-wrap: wrap;
-    white-space: nowrap;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all .25s ease;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        width: 80%;
-    }
-
-    &:hover {
-        background-color: ${props => props.theme.palette.action.hover};
-        color: ${props => props.theme.palette.text.primary};
-    }
-
-    &:disabled {
-        background-color: gray;
-        color: darkslategray;
-    }
-
-    &:focus {
-        outline: none;
-        border: none;
-    }
+const BuyButton = styled(Button)`
+    margin-top: 15px;
+    height: 100%;
+    line-height: 1.5;
 `
 //#endregion
 
-const CheckoutDialog = ({ testCart, selected, navigate, handleSelectAllClick, numSelected, rowCount }) => {
+const CheckoutDialog = ({ checkoutCart, navigate, rowCount }) => {
     const { token } = useAuth();
     const theme = useTheme();
-    const desktopMode = useMediaQuery(theme.breakpoints.up('sm'));
-    const [open, setOpen] = useState(false);
-    // const [checkoutCart, setCheckoutCart] = useState([]);
-
-    // useEffect(() => {
-    //     let newProducts = cartProducts?.filter(product => selected.includes(product?.id));
-    //     setCheckoutCart(newProducts);
-    // }, [selected, cartProducts])
+    const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
+    const tabletMode = useMediaQuery(theme.breakpoints.down('md_lg'));
+    const [open, setOpen] = useState(undefined);
 
     //Test estimate
-    const totalPrice = () => {
-        // let total = 0;
-        // checkoutCart?.forEach((item) => (totalPrice() += item.quantity * Math.round(item.price * (1 - item.discount))));
-        // return total;
+    const shippingPrice = () => {
+        return (10000 * (checkoutCart?.cart?.length ?? 0));
+    }
 
+    const totalPrice = () => {
         let total = 0;
-        testCart?.cart?.forEach((detail) => (
+        checkoutCart?.cart?.forEach((detail) => (
             detail?.items?.forEach((item) => (
                 total += item.quantity * Math.round(item.price * (1 - item.discount)
-            ))
-        )));
+                ))
+            )));
         return total;
     }
 
-    // const total = useMemo(() => totalPrice(), testCart);
-    // const total = totalPrice();
+    const shipping = useMemo(() => shippingPrice(), [checkoutCart]);
+    const total = useMemo(() => totalPrice(), [checkoutCart]);
 
     const toggleDrawer = (newOpen) => { setOpen(newOpen) };
 
     return (
         <>
-            {desktopMode
-                ?
-                <CheckoutContainer>
-                    <SecondaryTitleContainer>
-                        <Title>ĐƠN DỰ TÍNH&nbsp;</Title><SellIcon />
-                    </SecondaryTitleContainer>
-                    <Payout>
-                        <PayoutTitle>KHUYẾN MÃI</PayoutTitle>
-                        <PayoutRow>
-                            <PayoutText>Voucher RING:</PayoutText>
-                            <CouponButton>Chọn hoặc nhập mã&nbsp;
-                                <SellIcon />
-                            </CouponButton>
-                        </PayoutRow>
-                    </Payout>
-                    <Payout className="sticky">
-                        <PayoutTitle>THANH TOÁN</PayoutTitle>
-                        <PayoutRow>
-                            <PayoutText>Thành tiền:</PayoutText>
-                            <PayoutText>{totalPrice().toLocaleString()} đ</PayoutText>
-                        </PayoutRow>
-                        {/* <PayoutRow>
-                            <PayoutText>VAT:</PayoutText>
-                            <PayoutText>{testCart?.cart?.length ? 10 : 0}%</PayoutText>
-                        </PayoutRow> */}
-                        <PayoutRow>
-                            <PayoutText>Phí vận chuyển:</PayoutText>
-                            <PayoutText>{testCart?.cart?.length ? (10000 * testCart?.cart?.length) : 0}&nbsp;đ</PayoutText>
-                        </PayoutRow>
-                        <PayoutRow>
-                            <PayoutText>Tổng:</PayoutText>
-                            <PayoutPrice>{testCart?.cart?.length ? Math.round(totalPrice() + (10000 * testCart?.cart?.length)).toLocaleString() : 0}&nbsp;đ</PayoutPrice>
-                        </PayoutRow>
-                        <PayButton
-                            disabled={rowCount == 0}
-                            onClick={() => navigate('/checkout', { state: { products: checkoutCart } })}
-                        >
-                            <PaymentsIcon style={{ fontSize: 18 }} />&nbsp;
-                            {token ? `THANH TOÁN (${rowCount} SẢN PHẨM)` : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
-                        </PayButton>
-                    </Payout>
-                </CheckoutContainer >
-                :
-                <AltCheckoutContainer>
+            {mobileMode
+                ? <AltCheckoutContainer>
                     <AltPayout>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    disableRipple
-                                    disableFocusRipple
-                                    indeterminate={numSelected > 0 && numSelected < rowCount}
-                                    checked={rowCount > 0 && numSelected === rowCount}
-                                    color="primary"
-                                    inputProps={{ 'aria-label': 'select all' }}
-                                    onChange={handleSelectAllClick}
-                                />
-                            }
-                            sx={{ marginRight: 0 }}
-                            label="Tất cả" />
-                        <Divider orientation="vertical" flexItem />
-                        <PayoutPrice onClick={toggleDrawer(true)} style={{ cursor: 'pointer' }}>
-                            {testCart?.cart?.length ? Math.round(totalPrice() + (10000 * testCart?.cart?.length)).toLocaleString() : 0}&nbsp;đ
+                        <PayoutPrice onClick={() => toggleDrawer(true)} style={{ cursor: 'pointer' }}>
+                            {Math.round(total + (10000 * checkoutCart?.cart?.length)).toLocaleString()}&nbsp;đ
                         </PayoutPrice>
                     </AltPayout>
-                    <PayButton
-                        disabled={testCart?.cart?.length == 0}
-                        onClick={() => navigate('/checkout', { state: { products: testCart } })}
+                    <BuyButton
+                        variant="contained"
+                        size="large"
+                        fullWidth
+                        disabled={!checkoutCart?.cart?.length}
+                        onClick={() => navigate('/checkout', { state: { products: checkoutCart } })}
                     >
                         {token ? `THANH TOÁN (${rowCount})` : 'ĐĂNG NHẬP'}
-                    </PayButton>
-                    <Drawer
-                        anchor={'bottom'}
-                        open={open}
-                        onClose={toggleDrawer(false)}
-                    >
-                        <Payout style={{ marginBottom: 0 }}>
+                    </BuyButton>
+                    <Suspense fallback={null}>
+                        <SwipeableDrawer
+                            anchor="bottom"
+                            open={open}
+                            onOpen={() => toggleDrawer(true)}
+                            onClose={() => toggleDrawer(false)}
+                        >
+                            <Payout style={{ marginBottom: 0 }}>
+                                <PayoutTitle>THANH TOÁN</PayoutTitle>
+                                <PayoutRow>
+                                    <PayoutText>Thành tiền:</PayoutText>
+                                    <PayoutText>{total.toLocaleString()}&nbsp;đ</PayoutText>
+                                </PayoutRow>
+                                <PayoutRow>
+                                    <PayoutText>Phí vận chuyển:</PayoutText>
+                                    <PayoutText>{shipping.toLocaleString()}&nbsp;đ</PayoutText>
+                                </PayoutRow>
+                                <PayoutRow>
+                                    <PayoutText>Tổng:</PayoutText>
+                                    <PayoutPrice>{Math.round(total + shipping).toLocaleString()}&nbsp;đ</PayoutPrice>
+                                </PayoutRow>
+                            </Payout>
+                        </SwipeableDrawer>
+                    </Suspense>
+                </AltCheckoutContainer>
+                : tabletMode
+                    ? <CheckoutContainer>
+                        <Payout>
+                            <BuyButton
+                                variant="contained"
+                                size="large"
+                                fullWidth
+                                disabled={!checkoutCart?.cart?.length}
+                                onClick={() => navigate('/checkout', { state: { products: checkoutCart } })}
+                            >
+                                <PaymentsIcon style={{ fontSize: 18 }} />&nbsp;
+                                {token ? `THANH TOÁN (${rowCount} SẢN PHẨM)` : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
+                            </BuyButton>
+                        </Payout>
+                    </CheckoutContainer>
+                    : <CheckoutContainer>
+                        <SecondaryTitleContainer>
+                            <Title>ĐƠN DỰ TÍNH&nbsp;</Title><SellIcon />
+                        </SecondaryTitleContainer>
+                        <Payout>
+                            <PayoutTitle>KHUYẾN MÃI</PayoutTitle>
+                            <PayoutRow>
+                                <PayoutText>Voucher RING:</PayoutText>
+                                <CouponButton>Chọn hoặc nhập mã&nbsp;
+                                    <SellIcon />
+                                </CouponButton>
+                            </PayoutRow>
+                        </Payout>
+                        <Payout className="sticky">
                             <PayoutTitle>THANH TOÁN</PayoutTitle>
                             <PayoutRow>
                                 <PayoutText>Thành tiền:</PayoutText>
-                                <PayoutText>{totalPrice().toLocaleString()} đ</PayoutText>
+                                <PayoutText>{total.toLocaleString()}&nbsp;đ</PayoutText>
                             </PayoutRow>
-                            {/* <PayoutRow>
-                                <PayoutText>VAT:</PayoutText>
-                                <PayoutText>{testCart?.cart?.length ? 10 : 0}%</PayoutText>
-                            </PayoutRow> */}
                             <PayoutRow>
                                 <PayoutText>Phí vận chuyển:</PayoutText>
-                                <PayoutText>{testCart?.cart?.length ? (10000 * testCart?.cart?.length).toLocaleString() : 0}&nbsp;đ</PayoutText>
+                                <PayoutText>{shipping.toLocaleString()}&nbsp;đ</PayoutText>
                             </PayoutRow>
                             <PayoutRow>
                                 <PayoutText>Tổng:</PayoutText>
-                                <PayoutPrice>{testCart?.cart?.length ? Math.round(totalPrice() + (10000 * testCart?.cart?.length)).toLocaleString() : 0}&nbsp;đ</PayoutPrice>
+                                <PayoutPrice>{Math.round(total + shipping).toLocaleString()}&nbsp;đ</PayoutPrice>
                             </PayoutRow>
+                            <BuyButton
+                                variant="contained"
+                                size="large"
+                                fullWidth
+                                disabled={!checkoutCart?.cart?.length}
+                                onClick={() => navigate('/checkout', { state: { products: checkoutCart } })}
+                            >
+                                <PaymentsIcon style={{ fontSize: 18 }} />&nbsp;
+                                {token ? `THANH TOÁN (${rowCount} SẢN PHẨM)` : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
+                            </BuyButton>
                         </Payout>
-                    </Drawer>
-                </AltCheckoutContainer>
+                    </CheckoutContainer >
             }
         </>
     )

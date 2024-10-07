@@ -16,6 +16,21 @@ export const cartSlice = createSlice({
         state.products.push(action.payload);
       }
     },
+    //Replace product in cart
+    replaceInCart: (state, action) => {
+      const item = state.products.find((item) => item.id === action.payload.id);
+      if (item) { //If already in cart >> replace
+        item.slug = action.payload.slug;
+        item.title = action.payload.title;
+        item.amount = action.payload.amount;
+        item.price = action.payload.price;
+        item.discount = action.payload.discount;
+        item.shopId = action.payload.shopId;
+        item.shopName = action.payload.shopName;
+      } else { //Put to cart if not already
+        state.products.push(action.payload);
+      }
+    },
     //Decrease quantity
     decreaseQuantity: (state, action) => {
       const item = state.products.find((item) => item.id === action.payload);
@@ -53,6 +68,10 @@ export const cartSlice = createSlice({
     removeItem: (state, action) => {
       state.products = state.products.filter(item => item.id !== action.payload)
     },
+    //Remove shop product
+    removeShopItem: (state, action) => {
+      state.products = state.products.filter(item => item.shopId !== action.payload)
+    },
     //Clear cart
     resetCart: (state) => {
       state.products = []
@@ -80,7 +99,8 @@ export const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, increaseQuantity, decreaseQuantity, changeQuantity, removeItem, resetCart, addAddress, removeStateAddress } = cartSlice.actions;
+export const { addToCart, replaceInCart, increaseQuantity, decreaseQuantity, changeQuantity, 
+  removeItem, removeShopItem, resetCart, addAddress, removeStateAddress } = cartSlice.actions;
 export const selectCartProducts = (state) => state.cart.products;
 export const selectAddresses = (state) => state.cart.addresses;
 

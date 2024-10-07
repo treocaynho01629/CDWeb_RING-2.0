@@ -296,7 +296,7 @@ const Navbar = () => {
                     </Grid>
                 </Grid>
             </TopHeader>
-            <StyledAppBar sx={{ marginBottom: { xs: 0, md: 2 } }} position="sticky" elevation={0}>
+            <StyledAppBar sx={{ marginBottom: { xs: 0, md: 2 }, boxShadow: 'none' }} position="sticky">
                 <Wrapper>
                     <Grid container size="grow">
                         <Grid size={{ xs: 12, md: "grow" }} sx={{ display: 'flex', alignItems: 'center' }}>

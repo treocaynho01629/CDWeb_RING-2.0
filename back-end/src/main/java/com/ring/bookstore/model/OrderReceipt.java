@@ -74,6 +74,9 @@ public class OrderReceipt {
     @Column
     private Double total;
 
+    @Column
+    private Double totalDiscount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore

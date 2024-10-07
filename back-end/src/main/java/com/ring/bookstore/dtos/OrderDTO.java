@@ -11,6 +11,7 @@ public record OrderDTO(Long id,
                        String message,
                        LocalDateTime date,
                        Double total,
+                       Double totalDiscount,
                        String username,
                        List<OrderDetailDTO> details) {
 

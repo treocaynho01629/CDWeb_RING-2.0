@@ -113,7 +113,7 @@ const ProductAction = ({ book }) => {
         setAmountIndex(newValue);
     }
 
-    const toggleDrawer = (newOpen) => () => {
+    const toggleDrawer = (newOpen) => {
         setOpen(newOpen);
         setOpenNow(!newOpen);
     };
@@ -139,7 +139,7 @@ const ProductAction = ({ book }) => {
                         fullWidth
                         sx={{ maxWidth: '35%' }}
                         disabled={!book || book?.amount == 0}
-                        onClick={toggleDrawer(true)}
+                        onClick={() => toggleDrawer(true)}
                     >
                         <AddShoppingCart />
                     </BuyButton>
@@ -159,8 +159,8 @@ const ProductAction = ({ book }) => {
                         <SwipeableDrawer
                             anchor="bottom"
                             open={open}
-                            onOpen={toggleDrawer(true)}
-                            onClose={toggleDrawer(false)}
+                            onOpen={() => toggleDrawer(true)}
+                            onClose={() => toggleDrawer(false)}
                         >
                             <ProductDetailContainer>
                                 <StyledImage
@@ -182,8 +182,11 @@ const ProductAction = ({ book }) => {
                             <Box display="flex" alignItems="center" justifyContent={'space-between'} padding={'0 10px'}>
                                 <DetailTitle>Số lượng:</DetailTitle>
                                 <CustomAmountInput
+                                    disabled={!book || book?.amount == 0}
                                     size="small"
+                                    max={book?.amount}
                                     value={amountIndex}
+                                    error={1 > amountIndex > (book?.amount ?? 199)}
                                     onChange={(e) => handleChangeAmount(e.target.valueAsNumber)}
                                     handleDecrease={() => changeAmount(-1)}
                                     handleIncrease={() => changeAmount(1)}

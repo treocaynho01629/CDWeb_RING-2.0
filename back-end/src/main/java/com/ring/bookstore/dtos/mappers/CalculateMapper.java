@@ -1,84 +1,62 @@
 package com.ring.bookstore.dtos.mappers;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.ring.bookstore.dtos.OrderItemDTO;
+import com.ring.bookstore.dtos.*;
 import com.ring.bookstore.model.*;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.OrderDTO;
-import com.ring.bookstore.dtos.OrderDetailDTO;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class OrderMapper {
-
-    public OrderDTO orderToOrderDTO(OrderReceipt order) {
-        List<OrderDetail> orderDetails = order.getDetails();
-        List<OrderDetailDTO> detailDTOS = orderDetails.stream().map(this::detailToDetailDTO).collect(Collectors.toList());
-        Account user = order.getUser();
-
-        //If user deleted
-        String username = "Người dùng RING!";
-        if (user != null) username = user.getUsername();
-
-        return new OrderDTO(order.getId(),
-                order.getFullName(),
-                order.getEmail(),
-                order.getPhone(),
-                order.getOrderAddress(),
-                order.getOrderMessage(),
-                order.getOrderDate(),
-                order.getTotal(),
-                order.getTotalDiscount(),
-                username,
-                detailDTOS
-        );
-    }
-
-    public OrderDetailDTO detailToDetailDTO(OrderDetail detail) {
+public class CalculateMapper {
+    public CalculateDetailDTO detailToDetailDTO(OrderDetail detail) {
         List<OrderItem> orderItems = detail.getItems();
-        List<OrderItemDTO> itemDTOS = orderItems.stream().map(this::itemToItemDTO).collect(Collectors.toList());
-        Shop shop = detail.getShop();
+        List<CalculateItemDTO> itemDTOS = orderItems.stream().map(this::itemToItemDTO).collect(Collectors.toList());
 
-        return new OrderDetailDTO(detail.getId(),
-                shop.getId(),
-                shop.getName(),
+        //Shop
+        Shop shop = detail.getShop();
+        String shopName = (shopName = shop.getName()) != null ? shopName : null;
+
+        //Coupon
+        String coupon = detail.getCoupon() != null ? detail.getCoupon().getCode() : null;
+
+        return new CalculateDetailDTO(shop.getId(),
+                shopName,
                 detail.getTotalPrice(),
                 detail.getDiscount(),
                 detail.getShippingFee(),
                 detail.getShippingDiscount(),
+                coupon,
                 itemDTOS);
     }
 
-    public OrderItemDTO itemToItemDTO(OrderItem item) {
+    public CalculateItemDTO itemToItemDTO(OrderItem item) {
         Book book = item.getBook();
-        String fileDownloadUri = book.getImage().getFileDownloadUri();
+        double price = (price = book.getPrice()) != 0.0 ? price : -1.0;
+        short amount = (amount = book.getAmount()) != 0 ? amount : 0;
+        BigDecimal discount = (discount = book.getDiscount()) != null ? discount : null;
+        String title = (title = book.getTitle()) != null ? title : null;
+        String slug = (slug = book.getSlug()) != null ? slug : null;
 
-        return new OrderItemDTO(item.getId(),
-                item.getPrice(),
-                item.getDiscount(),
-                item.getAmount(),
-                item.getStatus(),
+        return new CalculateItemDTO(price,
+                discount,
+                amount,
                 book.getId(),
-                book.getSlug(),
-                fileDownloadUri,
-                book.getTitle());
+                slug,
+                title);
     }
 
     public CalculateDTO orderToCalculate(OrderReceipt order) {
         List<OrderDetail> orderDetails = order.getDetails();
-        List<OrderDetailDTO> detailDTOS = orderDetails.stream().map(this::detailToDetailDTO).collect(Collectors.toList());
+        List<CalculateDetailDTO> detailDTOS = orderDetails.stream().map(this::detailToDetailDTO).collect(Collectors.toList());
 
-        return new OrderDTO(null, null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                order.getTotal(),
+        //Coupon
+        String coupon = order.getCoupon() != null ? order.getCoupon().getCode() : null;
+
+        return new CalculateDTO(order.getTotal(),
                 order.getTotalDiscount(),
-                null,
+                coupon,
                 detailDTOS
         );
     }

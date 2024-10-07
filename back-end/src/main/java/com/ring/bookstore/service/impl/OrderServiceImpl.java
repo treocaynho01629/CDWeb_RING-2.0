@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.ring.bookstore.dtos.CalculateDTO;
 import com.ring.bookstore.dtos.ChartDTO;
+import com.ring.bookstore.dtos.mappers.CalculateMapper;
 import com.ring.bookstore.dtos.mappers.ChartDataMapper;
 import com.ring.bookstore.enums.CouponType;
-import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.*;
 import com.ring.bookstore.request.CalculateRequest;
@@ -47,10 +48,11 @@ public class OrderServiceImpl implements OrderService {
     private final CouponRepository couponRepo;
     private final EmailService emailService;
     private final OrderMapper orderMapper;
+    private final CalculateMapper calculateMapper;
     private final ChartDataMapper chartMapper;
 
     //Calculate
-    public OrderDTO calculate(CalculateRequest request) {
+    public CalculateDTO calculate(CalculateRequest request) {
         //Info validation
         List<CartDetailRequest> cart = request.getCart();
         if (cart != null && cart.isEmpty())
@@ -66,97 +68,121 @@ public class OrderServiceImpl implements OrderService {
         double totalDiscount = 0.0;
         int totalAmount = 0;
 
-
-
         //Create order details
         for (CartDetailRequest detail : cart) {
             //Validation
             Shop shop = shopRepo.findById(detail.getShopId()).orElse(null);
             List<CartItemRequest> items = detail.getItems();
-            if (shop == null || (items != null && items.isEmpty())) continue;
 
-            //Calculate
-            double shippingFee = 10000.0;
-            double detailTotal = 0.0;
-            int detailAmount = 0;
+            if (shop == null || (items != null && items.isEmpty())) {
+                //Create temp detail
+                var orderDetail = OrderDetail.builder()
+                        .shop(Shop.builder().id(detail.getShopId()).build())
+                        .totalPrice(0.0)
+                        .shippingFee(0.0)
+                        .discount(0.0)
+                        .shippingDiscount(0.0)
+                        .coupon(Coupon.builder().code(detail.getCoupon()).build())
+                        .items(new ArrayList<>()).build();
 
-            //Create detail
-            var orderDetail = OrderDetail.builder()
-                    .shop(shop)
-                    .items(new ArrayList<>()).build();
+                //Add to receipt
+                orderReceipt.addOrderDetail(orderDetail);
+            } else {
+                //Calculate
+                double shippingFee = 10000.0;
+                double detailTotal = 0.0;
+                int detailAmount = 0;
 
-            //Loop items
-            for (CartItemRequest item : items) {
-                //Validation
-                Book book = bookRepo.findById(item.getId()).orElse(null);
-                short quantity = item.getQuantity();
-                if (book == null || (quantity < 1 && quantity > book.getAmount())) continue;
-                if (!book.getShop().getId().equals(shop.getId())) continue;
+                //Create detail
+                var orderDetail = OrderDetail.builder()
+                        .shop(shop)
+                        .items(new ArrayList<>()).build();
 
-                //Calculate + info
-                double price = book.getPrice();
-                BigDecimal discount = book.getDiscount();
-                double currPrice = book.getPrice() * (BigDecimal.valueOf(1).subtract(discount)).doubleValue();
-                detailTotal += currPrice * quantity;
-                detailAmount += quantity;
+                //Loop items
+                for (CartItemRequest item : items) {
+                    //Validation
+                    Book book = bookRepo.findById(item.getId()).orElse(null);
 
-                var orderItem = OrderItem.builder()
-                        .amount(quantity)
-                        .book(book)
-                        .price(price)
-                        .discount(discount)
-                        .build();
+                    if (book == null || !book.getShop().getId().equals(shop.getId())) {
+                        //Create temp item
+                        var orderItem = OrderItem.builder()
+                                .book(Book.builder().id(item.getId()).build())
+                                .build();
 
-                orderDetail.addOrderItem(orderItem);
-            }
+                        orderDetail.addOrderItem(orderItem);
+                    } else {
+                        short quantity = item.getQuantity();
+                        if (quantity < 1 && quantity > book.getAmount()) {
+                            //Create replace item
+                            var orderItem = OrderItem.builder()
+                                    .book(book)
+                                    .build();
 
-            //Apply coupon
-            Coupon shopCoupon = couponRepo.findByCode(detail.getCoupon()).orElse(null);
-            if (shopCoupon != null) {
-                //Validate coupon
-                if (!shopCoupon.getShop().getId().equals(shop.getId())) continue;
+                            orderDetail.addOrderItem(orderItem);
+                        } else {
+                            //Calculate + info
+                            BigDecimal discount = book.getDiscount();
+                            double currPrice = book.getPrice() * (BigDecimal.valueOf(1).subtract(discount)).doubleValue();
+                            detailTotal += currPrice * quantity;
+                            detailAmount += quantity;
 
-                CouponDetail shopCouponDetail = shopCoupon.getDetail();
-                CouponType type = shopCouponDetail.getType();
-                BigDecimal discount = shopCouponDetail.getDiscount();
-                double maxDiscount = shopCouponDetail.getMaxDiscount();
-                double attribute = shopCouponDetail.getAttribute();
-                double discountValue = 0.0;
-                double shippingDiscount = 0.0;
+                            var orderItem = OrderItem.builder()
+                                    .book(book)
+                                    .build();
 
-                if (type.equals(CouponType.MIN_AMOUNT)) {
-                    if (detailAmount >= attribute) discountValue = detailTotal * discount.doubleValue();
-                } else if (type.equals(CouponType.MIN_VALUE)) {
-                    if (detailTotal >= attribute) discountValue = detailTotal * discount.doubleValue();
-                } else if (type.equals(CouponType.SHIPPING)) {
-                    if (detailTotal >= attribute) shippingDiscount = shippingFee * discount.doubleValue();
+                            orderDetail.addOrderItem(orderItem);
+                        }
+                    }
                 }
 
-                //Threshold
-                if (discountValue > maxDiscount) discountValue = maxDiscount;
-                if (shippingDiscount > maxDiscount) shippingDiscount = maxDiscount;
+                //Apply coupon
+                Coupon shopCoupon = couponRepo.findByCode(detail.getCoupon()).orElse(null);
+                if (shopCoupon != null) {
+                    //Validate coupon
+                    if (!shopCoupon.getShop().getId().equals(shop.getId())) continue;
 
-                //Add to detail
+                    CouponDetail shopCouponDetail = shopCoupon.getDetail();
+                    CouponType type = shopCouponDetail.getType();
+                    BigDecimal discount = shopCouponDetail.getDiscount();
+                    double maxDiscount = shopCouponDetail.getMaxDiscount();
+                    double attribute = shopCouponDetail.getAttribute();
+                    double discountValue = 0.0;
+                    double shippingDiscount = 0.0;
+
+                    if (type.equals(CouponType.MIN_AMOUNT)) {
+                        if (detailAmount >= attribute) discountValue = detailTotal * discount.doubleValue();
+                    } else if (type.equals(CouponType.MIN_VALUE)) {
+                        if (detailTotal >= attribute) discountValue = detailTotal * discount.doubleValue();
+                    } else if (type.equals(CouponType.SHIPPING)) {
+                        if (detailTotal >= attribute) shippingDiscount = shippingFee * discount.doubleValue();
+                    }
+
+                    //Threshold
+                    if (discountValue > maxDiscount) discountValue = maxDiscount;
+                    if (shippingDiscount > maxDiscount) shippingDiscount = maxDiscount;
+
+                    //Add to detail
+                    orderDetail.setTotalPrice(detailTotal);
+                    orderDetail.setDiscount(discountValue);
+                    orderDetail.setShippingFee(shippingFee);
+                    orderDetail.setShippingDiscount(shippingDiscount);
+
+                    //Add total discount
+                    totalDiscount += discountValue + shippingDiscount;
+                }
+
+                //Add to receipt total price + ship
+                totalPrice += detailTotal;
+                totalShippingFee += shippingFee;
+
+                //Set more detail
+                orderDetail.setCoupon(shopCoupon);
                 orderDetail.setTotalPrice(detailTotal);
-                orderDetail.setDiscount(discountValue);
                 orderDetail.setShippingFee(shippingFee);
-                orderDetail.setShippingDiscount(shippingDiscount);
 
-                //Add total discount
-                totalDiscount += discountValue + shippingDiscount;
+                //Add to receipt
+                orderReceipt.addOrderDetail(orderDetail);
             }
-
-            //Add to receipt total price + ship
-            totalPrice += detailTotal;
-            totalShippingFee += shippingFee;
-
-            //Set more detail
-            orderDetail.setCoupon(shopCoupon);
-            orderDetail.setTotalPrice(detailTotal);
-            orderDetail.setShippingFee(shippingFee);
-
-            //Add to receipt
-            orderReceipt.addOrderDetail(orderDetail);
         }
 
         //Main coupon
@@ -199,8 +225,10 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //Set value for receipt & return
-        orderReceipt.setTotal((totalPrice + totalShippingFee) - totalDiscount);
-        return orderMapper.orderToCalculate(orderReceipt);
+        orderReceipt.setCoupon(coupon);
+        orderReceipt.setTotal(totalPrice + totalShippingFee);
+        orderReceipt.setTotalDiscount(totalDiscount);
+        return calculateMapper.orderToCalculate(orderReceipt);
     }
 
     //Commit order

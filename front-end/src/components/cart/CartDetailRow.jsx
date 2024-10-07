@@ -1,6 +1,6 @@
 
 import styled from 'styled-components'
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { MoreHoriz, Storefront, KeyboardArrowRight } from '@mui/icons-material';
 import { IconButton, TableRow, Box, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
@@ -51,6 +51,12 @@ const StyledItemTableRow = styled(TableRow)`
             border: none;
         }
     }
+
+    &.error {
+        &:after{
+            border: .5px solid ${props => props.theme.palette.error.light};
+        }
+    }
 `
 
 const SpaceTableRow = styled(TableRow)`
@@ -87,12 +93,15 @@ const ItemTitle = styled.p`
       -webkit-box-orient: vertical;
     }
 
+    &.error {
+        color: ${props => props.theme.palette.error.light};
+    }
+
     &:hover {
         color: ${props => props.theme.palette.info.main};
     }
 
     ${props => props.theme.breakpoints.down("sm")} {
-        max-width: 95%;
         font-size: 13px;
 
         @supports (-webkit-line-clamp: 1) {
@@ -135,7 +144,7 @@ const ItemAction = styled.div`
 
 const Price = styled.p`
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 450;
     text-align: left;
     color: ${props => props.theme.palette.primary.main};
     margin: 0;
@@ -185,15 +194,123 @@ const StyledSkeleton = styled(Skeleton)`
     }
 `
 
-const hoverIcon = {
-    position: 'absolute',
-    right: 1,
-    top: 2,
-};
+const StyledIconButton = styled(IconButton)`
+    position: absolute;
+    right: 4px;
+    top: 4px;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        right: 0;
+        bottom: 0;
+        top: auto;
+    }
+`
 //#endregion
 
-const CartDetailRow = ({ id, index, shop, coupon, isSelected, isShopSelected, handleSelect, handleSelectShop,
-    handleDecrease, handleChangeQuantity, handleChangeCoupon, handleClick, 
+function ItemRow({ product, index, handleSelect, handleDeselect, isSelected, handleDecrease, increaseAmount,
+    handleChangeQuantity, handleClick, StyledCheckbox, StyledTableCell, ActionTableCell }) {
+    const isItemSelected = isSelected(product.id);
+    const labelId = `item-checkbox-${index}`;
+    const isDisabled = !product || product.amount < 1;
+
+    useEffect(() => {
+        if (product.amount < 1 || product.quantity < product.amount) handleDeselect(product.id);
+    }, [product.amount])
+
+    return (
+        <StyledItemTableRow
+            role="checkbox"
+            tabIndex={-1}
+            key={`item-${product.id}-${index}`}
+            className={isDisabled ? 'error' : ''}
+        >
+            <StyledTableCell padding="checkbox">
+                <StyledCheckbox
+                    disabled={isDisabled}
+                    disableRipple
+                    disableFocusRipple
+                    color="primary"
+                    checked={isItemSelected}
+                    inputProps={{ 'aria-labelledby': labelId }}
+                    onClick={() => handleSelect(product.id)}
+                />
+            </StyledTableCell>
+            <StyledTableCell component="th" scope="product">
+                <ItemContainer>
+                    <Link to={`/product/${product.slug}`}>
+                        <StyledLazyImage
+                            src={`${product.image}?size=small`}
+                            alt={`${product.title} Cart item`}
+                            placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
+                        />
+                    </Link>
+                    <ItemSummary>
+                        <Link to={`/product/${product.slug}`}>
+                            <ItemTitle className={isDisabled ? 'error' : ''}>{product.title}</ItemTitle>
+                        </Link>
+                        <ItemAction>
+                            <Box display={{ xs: 'block', md: 'none', md_lg: 'block', lg: 'none' }}>
+                                {product?.discount > 0 ? <>
+                                    <Discount>{product.price.toLocaleString()}đ</Discount>
+                                    <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
+                                </>
+                                    : <>
+                                        <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
+                                        <Discount><br /></Discount>
+                                    </>
+                                }
+
+                            </Box>
+                            <Box display={{ xs: 'flex', sm: 'none' }} mr={3}>
+                                <CustomAmountInput
+                                    disabled={isDisabled}
+                                    size="small"
+                                    max={product.amount}
+                                    value={product.quantity}
+                                    error={1 > product.quantity > (product.amount ?? 199)}
+                                    onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)}
+                                    handleDecrease={() => handleDecrease(product.quantity, product.id)}
+                                    handleIncrease={() => increaseAmount(product.id)}
+                                />
+                            </Box>
+                        </ItemAction>
+                    </ItemSummary>
+                </ItemContainer>
+            </StyledTableCell>
+            <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell', md_lg: 'none', lg: 'table-cell' } }}>
+                <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
+                {product?.discount > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
+            </StyledTableCell>
+            <StyledTableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                <CustomAmountInput
+                    disabled={isDisabled}
+                    size="small"
+                    max={product.amount}
+                    value={product.quantity}
+                    error={1 > product.quantity > (product.amount ?? 199)}
+                    onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)}
+                    handleDecrease={() => handleDecrease(product.quantity, product.id)}
+                    handleIncrease={() => increaseAmount(product.id)}
+                />
+                <AmountLeft>
+                    {product.amount > 0 ? `Còn ${product.amount} sản phẩm`
+                        : 'Hết hàng'}
+                </AmountLeft>
+            </StyledTableCell>
+            <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                <Price className="total">{(Math.round(product.price * (1 - (product?.discount || 0))) * product.quantity).toLocaleString()}đ</Price>
+            </StyledTableCell>
+            <ActionTableCell>
+                <StyledIconButton onClick={(e) => handleClick(e, product)}>
+                    <MoreHoriz />
+                </StyledIconButton>
+            </ActionTableCell>
+        </StyledItemTableRow>
+    )
+}
+
+const CartDetailRow = ({ id, index, shop, coupon, isSelected, isShopSelected, handleSelect, handleDeselect,
+    handleSelectShop, handleDecrease, handleChangeQuantity, handleChangeCoupon, handleClick, increaseAmount,
     StyledCheckbox, StyledTableCell, ActionTableCell }) => {
     const isGroupSelected = isShopSelected(shop);
     const shopLabelId = `shop-label-checkbox-${index}`;
@@ -223,90 +340,12 @@ const CartDetailRow = ({ id, index, shop, coupon, isSelected, isShopSelected, ha
                     </Link>
                 </StyledTableCell>
             </StyledTableRow>
-            {shop.products?.map((product, index) => {
-                const isItemSelected = isSelected(product.id);
-                const labelId = `enhanced-table-checkbox-${index}`;
-
-                return (
-                    <StyledItemTableRow
-                        role="checkbox"
-                        tabIndex={-1}
-                        key={product.id}
-                    >
-                        <StyledTableCell padding="checkbox">
-                            <StyledCheckbox
-                                disableRipple
-                                disableFocusRipple
-                                color="primary"
-                                checked={isItemSelected}
-                                inputProps={{ 'aria-labelledby': labelId }}
-                                onClick={() => handleSelect(product.id)}
-                            />
-                        </StyledTableCell>
-                        <StyledTableCell component="th" scope="product">
-                            <ItemContainer>
-                                <Link to={`/product/${product.slug}`}>
-                                    <StyledLazyImage
-                                        src={`${product.image}?size=small`}
-                                        alt={`${product.title} Cart item`}
-                                        placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
-                                    />
-                                </Link>
-                                <ItemSummary>
-                                    <Link to={`/product/${product.slug}`}>
-                                        <ItemTitle>{product.title}</ItemTitle>
-                                    </Link>
-                                    <ItemAction>
-                                        <Box display={{ xs: 'block', md: 'none' }}>
-                                            {product?.discount > 0 ? <>
-                                                <Discount>{product.price.toLocaleString()}đ</Discount>
-                                                <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                                            </>
-                                                : <>
-                                                    <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                                                    <Discount><br /></Discount>
-                                                </>
-                                            }
-
-                                        </Box>
-                                        <Box display={{ xs: 'flex', sm: 'none' }}>
-                                            <CustomAmountInput
-                                                size="small"
-                                                value={product.quantity}
-                                                onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)}
-                                                handleDecrease={() => handleDecrease(product.quantity, product.id)}
-                                                handleIncrease={() => increaseAmount(product.id)}
-                                            />
-                                        </Box>
-                                    </ItemAction>
-                                </ItemSummary>
-                            </ItemContainer>
-                        </StyledTableCell>
-                        <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                            <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                            {product?.discount > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
-                        </StyledTableCell>
-                        <StyledTableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                            <CustomAmountInput
-                                size="small"
-                                value={product.quantity}
-                                onChange={(e) => handleChangeQuantity(e.target.valueAsNumber, product.id)}
-                                handleDecrease={() => handleDecrease(product.quantity, product.id)}
-                                handleIncrease={() => increaseAmount(product.id)}
-                            />
-                            <AmountLeft>Còn {product.amount} sản phẩm</AmountLeft>
-                        </StyledTableCell>
-                        <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                            <Price className="total">{(Math.round(product.price * (1 - (product?.discount || 0))) * product.quantity).toLocaleString()}đ</Price>
-                        </StyledTableCell>
-                        <ActionTableCell>
-                            <IconButton sx={hoverIcon} onClick={(e) => handleClick(e, product)}>
-                                <MoreHoriz />
-                            </IconButton>
-                        </ActionTableCell>
-                    </StyledItemTableRow>
-                )
-            })}
+            {shop.products?.map((product, index) => (
+                <ItemRow {...{
+                    product, index, handleSelect, handleDeselect, isSelected, handleDecrease, handleChangeQuantity, handleClick,
+                    StyledCheckbox, StyledTableCell, ActionTableCell, increaseAmount
+                }} />
+            ))}
             <StyledTableRow role="coupon-row" tabIndex={-1}>
                 <StyledTableCell align="left" colSpan={6}>
                     <ShopTitle onClick={(e) => handleChangeCoupon(e, id)}>TEMP: {coupon[id]}</ShopTitle>

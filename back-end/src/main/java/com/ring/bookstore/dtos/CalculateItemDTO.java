@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 public record CalculateItemDTO(Double price,
                                BigDecimal discount,
                                Short amount,
-                               Long bookId,
-                               String bookSlug,
-                               String bookTitle) {
+                               Long id,
+                               String slug,
+                               String title) {
 
 }

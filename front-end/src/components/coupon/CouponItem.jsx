@@ -20,7 +20,7 @@ const CouponContainer = styled.div`
     &::before, &::after {
         content: "";
         position: absolute;
-        background-color: ${props => props.theme.palette.background.default};
+        background-color: ${props => props.theme.palette.background.elevate};
         border: .5px solid ${props => props.theme.palette.divider};
         background-image: ${props => props.theme.shadows[3]};
         border-left: none;
