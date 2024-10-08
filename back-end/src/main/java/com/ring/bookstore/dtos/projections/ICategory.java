@@ -1,20 +1,10 @@
 package com.ring.bookstore.dtos.projections;
 
-import com.ring.bookstore.model.Book;
-import com.ring.bookstore.model.Review;
+public interface ICategory {
 
-public interface IReview {
-    Review getReview();
+    Integer getId();
 
-    Long getUserId();
-
-    String getUsername();
+    String getName();
 
     String getImage();
-
-    Long getBookId();
-
-    String getBookTitle();
-
-    String getBookSlug();
 }

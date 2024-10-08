@@ -42,7 +42,7 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	from order_receipt o2 join order_detail o on o2.id = o.order_id
 	group by o2.user_id order by od DESC) t2\s
 	on t.user_id = t2.user_id
-	order BY orders desc limit 7
+	order by orders desc limit 7
 	""", nativeQuery = true)
 	List<Map<String,Object>> getTopUser(); //Top 7 users base on receipts and reviews
 	

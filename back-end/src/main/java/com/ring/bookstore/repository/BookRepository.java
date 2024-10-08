@@ -16,10 +16,13 @@ import com.ring.bookstore.model.Book;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>{
 	@Query("""
-	select b.id as id, b.slug as slug, b.title as title, b.description as description, b.image.name as image,
-	b.price as price, b.discount as discount, b.amount as amount, b.shop.id as shopId, b.shop.name as shopName,
+	select b.id as id, b.slug as slug, b.title as title, b.description as description, i.name as image,
+	b.price as price, b.discount as discount, b.amount as amount, s.id as shopId, s.name as shopName,
 	rv.rating as rating, od.totalOrders as totalOrders
-	from Book b left join (select r.book.id as book_id, avg(r.rating) as rating from Review r group by r.book.id) rv on b.id = rv.book_id
+	from Book b join b.shop s join b.image i
+	left join (select r.book.id as book_id, avg(r.rating) as rating 
+	    from Review r 
+	    group by r.book.id) rv on b.id = rv.book_id
 	left join (select o.book.id as book_id, sum(o.amount) as totalOrders 
 		from OrderItem o 
 		group by o.book.id) od on b.id = od.book_id
@@ -32,7 +35,7 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 	and b.price * (1 - b.discount) between :fromRange and :toRange
 	and coalesce(rv.rating, 0) >= :rating
 	and b.amount >= :amount
-	group by b, b.image.name, rv.rating, od.totalOrders, b.shop.id, b.shop.name
+	group by b, i.name, rv.rating, od.totalOrders, s.id, s.name
 	""")
 	Page<IBookDisplay> findBooksWithFilter(String keyword, //Get books by filtering
 			Integer cateId,
@@ -47,10 +50,10 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 			Pageable pageable);
 
 	@Query("""
-	select distinct b as book, b.shop.id as shopId, b.shop.name as shopName, b.image.name as image, 
+	select distinct b as book, s.id as shopId, s.name as shopName, i.name as image, 
 		od.totalOrders as totalOrders, rv.rating as rating, rv.totalRates as totalRates, 
 		rv.five as five, rv.four as four, rv.three as three, rv.two as two, rv.one as one
-	from Book b
+	from Book b join b.shop s join b.image i
 	left join (select o.book.id as book_id, sum(o.amount) as totalOrders 
 		from OrderItem o group by o.book.id) od on b.id = od.book_id
 	left join (
@@ -64,16 +67,16 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 	) rv on b.id = rv.book_id
 	join fetch BookDetail bd
 	where b.id = :id
-	group by b, b.image.name, bd, od.totalOrders, b.shop.name,
+	group by b, i.name, bd, od.totalOrders, s.name,
 	rv.rating, rv.totalRates, rv.five, rv.four, rv.three, rv.two, rv.one
 	""")
 	Optional<IBookDetail> findBookDetailById(Long id);
 
 	@Query("""
-	select distinct b as book, b.shop.id as shopId, b.shop.name as shopName, b.image.name as image, 
+	select distinct b as book, s.id as shopId, s.name as shopName, i.name as image, 
 		od.totalOrders as totalOrders, rv.rating as rating, rv.totalRates as totalRates, 
 		rv.five as five, rv.four as four, rv.three as three, rv.two as two, rv.one as one
-	from Book b
+	from Book b join b.shop s join b.image i
 	left join (select o.book.id as book_id, sum(o.amount) as totalOrders 
 		from OrderItem o group by o.book.id) od on b.id = od.book_id
 	left join (
@@ -87,20 +90,23 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 	) rv on b.id = rv.book_id
 	join fetch BookDetail bd
 	where b.slug = :slug
-	group by b, b.image.name, bd, od.totalOrders, b.shop.name,
+	group by b, i.name, bd, od.totalOrders, s.name,
 	rv.rating, rv.totalRates, rv.five, rv.four, rv.three, rv.two, rv.one
 	""")
 	Optional<IBookDetail> findBookDetailBySlug(String slug);
 
 	@Query("""
- 	select b.id as id, b.slug as slug, b.title as title, b.description as description, b.image.name as image,
-	b.price as price, b.discount as discount, b.amount as amount, b.shop.id as shopId, b.shop.name as shopName,
+    select b.id as id, b.slug as slug, b.title as title, b.description as description, i.name as image,
+	b.price as price, b.discount as discount, b.amount as amount, s.id as shopId, s.name as shopName,
 	rv.rating as rating, od.totalOrders as totalOrders
-	from Book b left join (select r.book.id as book_id, avg(r.rating) as rating from Review r group by r.book.id) rv on b.id = rv.book_id
+	from Book b join b.shop s join b.image i
+	left join (select r.book.id as book_id, avg(r.rating) as rating 
+	    from Review r 
+	    group by r.book.id) rv on b.id = rv.book_id
 	left join (select o.book.id as book_id, sum(o.amount) as totalOrders 
 		from OrderItem o 
 		group by o.book.id) od on b.id = od.book_id
-	group by b, b.image.name, rv.rating, od.totalOrders, b.shop.id, b.shop.name
+	group by b, i.name, rv.rating, od.totalOrders, s.id, s.name
 	order by random()
 	limit :amount
 	""")

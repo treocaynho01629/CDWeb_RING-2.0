@@ -1,35 +1,60 @@
 package com.ring.bookstore.dtos.mappers;
 
-import java.util.function.Function;
-
-import com.ring.bookstore.model.Book;
+import com.ring.bookstore.dtos.projections.IReview;
+import com.ring.bookstore.model.*;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.dtos.ReviewDTO;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Review;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Service
-public class ReviewMapper implements Function<Review, ReviewDTO> {
+public class ReviewMapper {
 
-    @Override
-    public ReviewDTO apply(Review review) {
+    public ReviewDTO reviewToDTO(Review review) {
 
         Account user = review.getUser();
+        AccountProfile profile = (profile = user.getProfile()) != null ? profile : null;
+        Image image = profile != null ? profile.getImage() : null;
+        String fileDownloadUri = image != null ? image.getFileDownloadUri() : null;
         Book book = review.getBook();
 
-        String username = user != null ? user.getUsername() : "Người dùng RING!";
-        Long userId = user != null ? user.getId() : null;
+        String username = (username = user.getUsername()) != null ? username  : "Người dùng RING!";
+        Long userId = user.getId();
 
         return new ReviewDTO(review.getId(),
                 review.getRContent(),
                 review.getRating(),
                 review.getCreatedDate(),
                 review.getLastModifiedDate(),
-                username,
                 userId,
-                book.getTitle(),
+                username,
+                fileDownloadUri,
                 book.getId(),
+                book.getTitle(),
                 book.getSlug());
+    }
+
+    public ReviewDTO projectionToDTO(IReview projection) {
+
+        Review review = projection.getReview();
+        String fileDownloadUri = projection.getImage() != null ?
+                ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/images/")
+                .path(projection.getImage())
+                .toUriString()
+                : null;
+
+        return new ReviewDTO(review.getId(),
+                review.getRContent(),
+                review.getRating(),
+                review.getCreatedDate(),
+                review.getLastModifiedDate(),
+                projection.getUserId(),
+                projection.getUsername(),
+                fileDownloadUri,
+                projection.getBookId(),
+                projection.getBookTitle(),
+                projection.getBookSlug());
     }
 }

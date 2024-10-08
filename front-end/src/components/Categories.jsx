@@ -1,28 +1,32 @@
 import styled from "styled-components"
-import { useRef } from "react"
+import { useRef, Fragment } from "react"
 import { IconButton, Skeleton } from "@mui/material";
 import { KeyboardArrowRight, KeyboardArrowLeft } from '@mui/icons-material';
 import { Link } from "react-router-dom"
-import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice";
-import { Fragment } from "react";
+import { useGetPreviewCategoriesQuery } from "../features/categories/categoriesApiSlice";
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 //#region styled
 const ItemContainer = styled.div`
     margin: 0px 3px;
-    padding: 8px 20px;
+    /* padding: 8px 20px; */
     font-size: 14px;
     font-weight: bold;
     white-space: nowrap;
     text-transform: capitalize;
-    background-color: ${props => props.theme.palette.divider};
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* background-color: ${props => props.theme.palette.divider}; */
     cursor: pointer;
     transition: all .25s ease;
 
-    &:hover {
+    /* &:hover {
       background-color: ${props => props.theme.palette.primary.main};
       color: ${props => props.theme.palette.primary.contrastText};
       transform: scale(1.025);
-    }
+    } */
 `
 
 const CateContainer = styled.div`
@@ -61,6 +65,11 @@ const CateContainer = styled.div`
 
 const ItemWrapper = styled.div`
     display: flex;
+`
+
+const ItemName = styled.span`
+    height: 50px;
+    width: 100%;
 `
 
 const Wrapper = styled.div`
@@ -112,7 +121,7 @@ const ButtonContainer = styled.div`
 //#endregion
 
 const Categories = () => {
-    const { data: categories, isLoading, isSuccess, isError } = useGetCategoriesQuery();
+    const { data: categories, isLoading, isSuccess, isError } = useGetPreviewCategoriesQuery();
     const slideRef = useRef();
 
     //Scroll
@@ -144,18 +153,19 @@ const Categories = () => {
                     <Fragment key={`main-${cateId}-${index}`}>
                         <ItemWrapper key={`cate-${cateId}-${index}`}>
                             <Link to={`/filters?cateId=${cateId}`} title={cate?.categoryName}>
-                                <ItemContainer>{cate?.categoryName}</ItemContainer>
+                                <ItemContainer>
+                                    <LazyLoadImage
+                                        width={45}
+                                        height={45}
+                                        style={{ objectFit: 'contain' }}
+                                        src={`${cate?.image}?size=tiny`}
+                                        alt={`Category item: ${cate?.categoryName}`}
+                                        placeholder={<Skeleton width={45} height={45} variant="rectangular" />}
+                                    />
+                                    <ItemName>{cate?.categoryName}</ItemName>
+                                </ItemContainer>
                             </Link>
                         </ItemWrapper>
-                        {
-                            cate?.subCates?.map((sub, subIndex) => (
-                                <ItemWrapper key={`sub-${sub?.id}-${subIndex}`}>
-                                    <Link to={`/filters?cateId=${cateId}`} title={sub.categoryName}>
-                                        <ItemContainer>{sub?.categoryName}</ItemContainer>
-                                    </Link>
-                                </ItemWrapper>
-                            ))
-                        }
                     </Fragment>
                 )
             })

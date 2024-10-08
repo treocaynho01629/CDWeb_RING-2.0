@@ -415,7 +415,7 @@ const Navbar = () => {
                                                 >
                                                     <Link to={'/profile/detail'} title="Tài khoản">
                                                         <StyledIconButton className="nav" aria-label="profile">
-                                                            <Avatar sx={{ width: 24, height: 24, fontSize: '16px' }} src={image ? image + '?size=small' : null} />
+                                                            <Avatar sx={{ width: 24, height: 24, fontSize: '16px' }} src={image ? image + '?size=tiny' : null} />
                                                             <IconText className="username">{username}</IconText>
                                                         </StyledIconButton>
                                                     </Link>

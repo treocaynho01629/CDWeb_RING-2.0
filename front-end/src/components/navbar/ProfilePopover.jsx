@@ -53,7 +53,7 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, the
         >
             <Link to={'/profile/detail'} style={{ color: 'inherit' }}>
                 <MenuItem>
-                    <Avatar src={image ? image + '?size=small' : null}/> Thông tin tài khoản
+                    <Avatar src={image ? image + '?size=tiny' : null}/> Thông tin tài khoản
                 </MenuItem>
             </Link>
             <Link to={'/profile/orders'} style={{ color: 'inherit' }}>

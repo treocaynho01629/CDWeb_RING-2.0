@@ -7,7 +7,6 @@ import com.ring.bookstore.exception.ImageResizerException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.imgscalr.Scalr;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,6 +33,9 @@ import java.util.stream.Collectors;
 @Service
 public class ImageServiceImpl implements ImageService {
 
+    @Value("${image.size.tiny}")
+    private Integer tinySize;
+
     @Value("${image.size.small}")
     private Integer smallSize;
 
@@ -44,12 +46,14 @@ public class ImageServiceImpl implements ImageService {
     private final ImageMapper imageMapper;
 
     //Map to DTO instead
+    @Transactional
     public ImageDTO uploadAndMap(MultipartFile file) throws ImageResizerException, IOException {
         Image savedImage = upload(file);
         ImageDTO dto = imageMapper.imageToDTO(savedImage); //Map to DTO
         return dto;
     }
 
+    @Transactional
     public ImageDTO replaceAndMap(MultipartFile file) throws ImageResizerException, IOException {
         Image savedImage = replace(file);
         ImageDTO dto = imageMapper.imageToDTO(savedImage); //Map to DTO
@@ -57,6 +61,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     //Upload to Database
+    @Transactional
     public Image upload(MultipartFile file) throws ImageResizerException, IOException {
         //File name & data
         String fileName = System.currentTimeMillis() + "_" + StringUtils.cleanPath(file.getOriginalFilename()); //With timestamp
@@ -73,6 +78,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     //Replace on Database
+    @Transactional
     public Image replace(MultipartFile file) throws ImageResizerException, IOException {
         //File name & data
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
@@ -102,7 +108,7 @@ public class ImageServiceImpl implements ImageService {
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
         imageRepo.deleteById(id);
 
-        return "Delete image " + image.getImage() + " successfully!";
+        return "Delete image " + image.getName() + " successfully!";
     }
 
     //Check if image with {name} already exists
@@ -112,9 +118,8 @@ public class ImageServiceImpl implements ImageService {
 
     //Get image by {name}
     public Image get(String name) {
-        Image image = imageRepo.findByName(name)
+        return imageRepo.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
-        return image;
     }
 
     //Save image to database
@@ -139,7 +144,9 @@ public class ImageServiceImpl implements ImageService {
             throw new ImageResizerException(HttpStatus.EXPECTATION_FAILED, "Resized image could not be saved.");
         }
     }
+
     //Get image with {reference (name)} and {type (size)}
+    @Transactional
     public Image resolve(String type, String reference) throws ImageResizerException {
         if (!type.equalsIgnoreCase(ImageSize.ORIGINAL.toString())) {
             try {
@@ -179,7 +186,9 @@ public class ImageServiceImpl implements ImageService {
 
     private BufferedImage resize(BufferedImage bufferedImage, String type) throws ImageResizerException {
         Integer size = -1; //Get resize size base on type
-        if (type.equalsIgnoreCase(ImageSize.SMALL.toString())) {
+        if (type.equalsIgnoreCase(ImageSize.TINY.toString())) {
+            size = tinySize;
+        } else if (type.equalsIgnoreCase(ImageSize.SMALL.toString())) {
             size = smallSize;
         } else if (type.equalsIgnoreCase(ImageSize.MEDIUM.toString())) {
             size = medSize;

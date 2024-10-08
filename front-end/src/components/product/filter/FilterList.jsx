@@ -27,11 +27,6 @@ const FilterText = styled.h3`
     color: inherit;
     display: flex;
     align-items: center;
-
-    &.secondary {
-      font-size: 13px;
-      color: ${props => props.theme.palette.text.secondary};
-    }
 `
 
 const LabelText = styled.span`
@@ -57,15 +52,32 @@ const StyledNumberInput = styled(TextField)(({ theme }) => ({
     "-webkit-appearance": "none",
   }
 }));
+
+const StyledListItemButton = styled(ListItemButton)`
+    padding: 0;
+    justify-content: space-between;
+
+    &.secondary {
+      padding-left: 16px;
+      font-size: 13px;
+      color: ${props => props.theme.palette.text.secondary};
+
+      &.Mui-selected {
+        color: ${props => props.theme.palette.primary.main};
+      }
+    }
+
+    &.Mui-selected {
+      color: ${props => props.theme.palette.primary.main};
+    }
+`
 //#endregion
 
 const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeCate }) => {
   const [open, setOpen] = useState(false); //Open sub cate
 
   //Change cate
-  const handleCateChange = (id) => {
-    onChangeCate(id);
-  }
+  const handleCateChange = (id) => { onChangeCate(id); }
 
   //Open sub cate
   const handleClick = (e, id) => {
@@ -94,14 +106,7 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
 
         return (
           <Box key={`${id}-${index}`}>
-            <ListItemButton
-              sx={{
-                pl: 0, py: 0,
-                justifyContent: 'space-between',
-                '&.Mui-selected': {
-                  color: 'primary.main'
-                },
-              }}
+            <StyledListItemButton
               selected={cateId == id}
               onClick={() => handleCateChange(id)}
             >
@@ -113,15 +118,18 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
                 </>
                 : null
               }
-            </ListItemButton>
-            {cate?.subCates
-              &&
+            </StyledListItemButton>
+            {cate?.subCates &&
               <Collapse in={open[id]} timeout="auto" unmountOnExit>
                 {cate.subCates?.map((sub, subIndex) => (
                   <List key={`${sub?.id}-${subIndex}`} component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 2, py: 0 }}>
-                      <FilterText className="secondary">{sub?.categoryName}</FilterText>
-                    </ListItemButton>
+                    <StyledListItemButton
+                      className="secondary"
+                      selected={cateId == sub?.id}
+                      onClick={() => handleCateChange(sub?.id)}
+                    >
+                      <FilterText>{sub?.categoryName}</FilterText>
+                    </StyledListItemButton>
                   </List>
                 ))}
               </Collapse>

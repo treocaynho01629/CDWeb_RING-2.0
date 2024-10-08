@@ -155,6 +155,7 @@ public class BookServiceImpl implements BookService {
             book.setImage(savedImage); //Set new image
         }
 
+        //FIX
 //        //Preview images
 //        if (files != null) {
 //            //upload
