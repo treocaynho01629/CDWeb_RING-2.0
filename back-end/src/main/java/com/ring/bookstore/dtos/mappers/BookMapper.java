@@ -47,7 +47,12 @@ public class BookMapper {
 
     public BookDetailDTO detailToDetailDTO(IBookDetail bookWithDetail) {
         Book book = bookWithDetail.getBook();
+
+        //Shop
         Long shopId = bookWithDetail.getShopId();
+        String shopName = bookWithDetail.getShopName();
+
+        //Info
         Integer totalOrders = bookWithDetail.getTotalOrders();
         Double rating = bookWithDetail.getRating();
         List<Integer> count = new ArrayList<>();
@@ -76,9 +81,6 @@ public class BookMapper {
                         .path(image.getName())
                         .toUriString())
                 .collect(Collectors.toList());
-//		List<Category> categories = new ArrayList<Category>();
-//		categories.add()
-//		if (book.getCate().getParent())
 
         return new BookDetailDTO(book.getId(),
                 book.getSlug(),
@@ -90,8 +92,8 @@ public class BookMapper {
                 book.getDescription(),
                 book.getType(),
                 book.getAuthor(),
-                bookWithDetail.getShopId(),
-                bookWithDetail.getShopName(),
+                shopId,
+                shopName,
                 book.getPublisher(),
                 book.getCate(),
                 detail.getSize(),

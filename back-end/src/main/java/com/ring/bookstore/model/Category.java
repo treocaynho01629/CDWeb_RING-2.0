@@ -33,15 +33,13 @@ public class Category {
     @Nationalized 
     private String categoryName;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cate", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private Set<Sub> cateSubs;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cate", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            mappedBy = "cate",
+            fetch = FetchType.LAZY)
     @JsonBackReference
     private Set<Book> cateBooks;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "parent_id")
     @JsonBackReference
     private Category parent;
@@ -62,5 +60,16 @@ public class Category {
     public void removeSubCate(Category subCate) {
         subCates.remove(subCate);
         subCate.setParent(null);
+    }
+
+    @PreRemove
+    private void updateOrRemoveBooks() {
+        for (Book b : this.cateBooks) {
+            if (this.parent != null) {
+                b.setCate(this.parent);
+            } else {
+                b.setCate(null);
+            }
+        }
     }
 }

@@ -52,15 +52,21 @@ public class Shop extends Auditable {
     @JoinColumn(name = "image_id")
     private Image image;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shop", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            mappedBy = "shop",
+            fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Book> books;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shop", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "shop",
+            fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Coupon> coupons;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            fetch = FetchType.LAZY)
     @JoinTable(	name = "following",
             joinColumns = @JoinColumn(name = "shop_id"),
             inverseJoinColumns = @JoinColumn(name = "follower_id"))

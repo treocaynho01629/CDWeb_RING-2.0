@@ -50,7 +50,7 @@ public class CouponController {
     }
 
     //Update coupon by id
-    @PutMapping
+    @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> updateCoupon(@PathVariable("id") Long id,
                                           @Valid @RequestPart("request") CouponRequest request,
@@ -82,7 +82,7 @@ public class CouponController {
 
     //Delete all coupons
     @DeleteMapping("/delete-all")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteAllCoupons() {
         couponService.deleteAllCoupons();
         return new ResponseEntity<>("All coupons deleted successfully!", HttpStatus.OK);

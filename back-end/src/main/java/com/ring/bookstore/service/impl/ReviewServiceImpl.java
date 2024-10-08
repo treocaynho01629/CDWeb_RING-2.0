@@ -2,6 +2,7 @@ package com.ring.bookstore.service.impl;
 
 import java.util.List;
 
+import com.ring.bookstore.dtos.projections.IReview;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.model.*;
 import org.springframework.data.domain.Page;
@@ -53,15 +54,15 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
         
         Review addedReview = reviewRepo.save(review); //Save to database
-		return reviewMapper.apply(addedReview); //Return added review
+		return reviewMapper.reviewToDTO(addedReview); //Return added review
 	}
 	
 	//Get reviews (ADMIN)
 	public Page<ReviewDTO> getReviews(Long bookId, Long userId, Integer rating, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
-		Page<Review> reviewsList = reviewRepo.findReviewsByFilter(bookId, userId, rating, pageable); //Fetch from database
-		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::apply);
+		Page<IReview> reviewsList = reviewRepo.findReviewsByFilter(bookId, userId, rating, pageable); //Fetch from database
+		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::projectionToDTO);
 		return reviewDtos;
 	}
 
@@ -69,8 +70,8 @@ public class ReviewServiceImpl implements ReviewService {
 	public Page<ReviewDTO> getReviewsByBookId(Long id, Integer rating, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
-		Page<Review> reviewsList = reviewRepo.findReviewsByBookId(id, rating, pageable); //Fetch from database
-		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::apply);
+		Page<IReview> reviewsList = reviewRepo.findReviewsByBookId(id, rating, pageable); //Fetch from database
+		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::projectionToDTO);
 		return reviewDtos;
 	}
 
@@ -78,8 +79,8 @@ public class ReviewServiceImpl implements ReviewService {
 	public Page<ReviewDTO> getUserReviews(Account user, Integer rating, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
-		Page<Review> reviewsList = reviewRepo.findUserReviews(user.getId(), rating, pageable); //Fetch from database
-		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::apply);
+		Page<IReview> reviewsList = reviewRepo.findUserReviews(user.getId(), rating, pageable); //Fetch from database
+		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::projectionToDTO);
 		return reviewDtos;
 	}
 
@@ -95,7 +96,7 @@ public class ReviewServiceImpl implements ReviewService {
 		//Set new review content
 		review.setRContent(request.getContent());
 		Review updatedReview = reviewRepo.save(review); //Save new review to database
-		return reviewMapper.apply(updatedReview); //Return added review
+		return reviewMapper.reviewToDTO(updatedReview); //Return added review
 	}
 
 	//Delete review by {id} (ADMIN)

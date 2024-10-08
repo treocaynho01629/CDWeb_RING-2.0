@@ -84,7 +84,7 @@ public class ShopController {
 
     //Delete all shops
     @DeleteMapping("/delete-all")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteAllShops() {
         shopService.deleteAllShops();
         return new ResponseEntity<>("All shops deleted successfully!", HttpStatus.OK);

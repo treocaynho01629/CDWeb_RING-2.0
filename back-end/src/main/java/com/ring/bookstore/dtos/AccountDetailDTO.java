@@ -5,7 +5,6 @@ import java.time.LocalDate;
 //Account details
 public record AccountDetailDTO(Long id,
                                String username,
-
                                String image,
                                String email,
                                Integer roles,

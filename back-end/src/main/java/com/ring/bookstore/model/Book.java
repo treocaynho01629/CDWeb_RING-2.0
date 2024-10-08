@@ -116,8 +116,7 @@ public class Book extends Auditable {
     @JsonIgnore
     private List<Review> bookReviews;
 
-    @OneToMany(cascade = CascadeType.ALL,
-            orphanRemoval = true,
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             mappedBy = "book",
             fetch = FetchType.LAZY)
     @LazyCollection(LazyCollectionOption.EXTRA)

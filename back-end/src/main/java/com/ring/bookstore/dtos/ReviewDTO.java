@@ -7,10 +7,11 @@ public record ReviewDTO(Long id,
                         Integer rating,
                         LocalDateTime date,
                         LocalDateTime updatedDate,
-                        String username,
                         Long userId,
-                        String bookTitle,
+                        String username,
+                        String userImage,
                         Long bookId,
+                        String bookTitle,
                         String bookSlug) {
 
 }
