@@ -111,7 +111,7 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
               onClick={() => handleCateChange(id)}
             >
               <FilterText>{cate?.categoryName}</FilterText>
-              {cate.subCates.length ?
+              {cate.subCates?.length ?
                 <>
                   {open[id] ? <ExpandLess onClick={(e) => handleClick(e, id)} />
                     : <ExpandMore onClick={(e) => handleClick(e, id)} />}

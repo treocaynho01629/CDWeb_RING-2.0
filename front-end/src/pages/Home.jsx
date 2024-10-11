@@ -1,19 +1,20 @@
 import styled from 'styled-components';
 import { useState, useEffect, lazy, Suspense } from "react";
-import { Grid2 as Grid, Button, Tabs } from '@mui/material';
+import { Button, Tabs } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
 import { useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import { LazyLoadComponent } from 'react-lazy-load-image-component';
 import { ExpandMore, Replay } from '@mui/icons-material';
 import useTitle from '../hooks/useTitle';
-import Categories from '../components/Categories';
+import Categories from '../components/other/Categories';
+import Suggest from '../components/other/Suggest';
 import Products from '../components/product/Products';
 import Slider from '../components/product/Slider';
 import CustomDivider from '../components/custom/CustomDivider';
 import CustomTab from '../components/custom/CustomTab';
-import ProductSimple from '../components/product/ProductSimple';
 import CustomPlaceholder from '../components/custom/CustomPlaceholder';
+import BannersSlider from '../components/other/BannersSlider';
 
 const ProductsSlider = lazy(() => import('../components/product/ProductsSlider'));
 
@@ -60,14 +61,7 @@ const defaultSize = 15;
 const defaultMore = 5;
 
 let sliderPlaceholder = (
-  <CustomPlaceholder sx={{
-    height: 'auto',
-    border: '.5px solid',
-    borderColor: 'action.hover',
-  }}
-  >
-    <ProductSimple />
-  </CustomPlaceholder>
+  <CustomPlaceholder sx={{ height: '50px' }} />
 )
 
 const OrderList = () => {
@@ -85,14 +79,9 @@ const OrderList = () => {
   return (
     <>
       <br />
-      <CustomDivider>Sản phẩm xếp theo</CustomDivider>
       <LazyLoadComponent>
-        <Suspense fallback={
-          <>
-            <ToggleGroupContainer><Tabs /></ToggleGroupContainer>
-            {sliderPlaceholder}
-          </>
-        }>
+        <Suspense fallback={sliderPlaceholder}>
+          <CustomDivider>Sản phẩm xếp theo</CustomDivider>
           <ToggleGroupContainer>
             <Tabs
               variant="scrollable"
@@ -105,34 +94,34 @@ const OrderList = () => {
             </Tabs>
           </ToggleGroupContainer>
           <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
+          <ButtonContainer>
+            {isError ?
+              <Button
+                variant="outlined"
+                color="error"
+                size="medium"
+                sx={{ width: '200px' }}
+                endIcon={<Replay sx={{ marginRight: '-10px' }} />}
+                onClick={() => refetch()}
+              >
+                Tải lại
+              </Button>
+              :
+              <Link to={`/filters?sortBy=${orderBy}`}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="medium"
+                  sx={{ width: '200px' }}
+                  endIcon={<ExpandMore sx={{ marginRight: '-10px' }} />}
+                >
+                  Xem thêm
+                </Button>
+              </Link>
+            }
+          </ButtonContainer>
         </Suspense>
       </LazyLoadComponent>
-      <ButtonContainer>
-        {isError ?
-          <Button
-            variant="outlined"
-            color="error"
-            size="medium"
-            sx={{ width: '200px' }}
-            endIcon={<Replay sx={{ marginRight: '-10px' }} />}
-            onClick={refetch}
-          >
-            Tải lại
-          </Button>
-          :
-          <Link to={`/filters?sortBy=${orderBy}`}>
-            <Button
-              variant="contained"
-              color="primary"
-              size="medium"
-              sx={{ width: '200px' }}
-              endIcon={<ExpandMore sx={{ marginRight: '-10px' }} />}
-            >
-              Xem thêm
-            </Button>
-          </Link>
-        }
-      </ButtonContainer>
     </>
   )
 }
@@ -181,14 +170,9 @@ const CateList = () => {
   return (
     <>
       <br />
-      <CustomDivider>Sản phẩm theo danh mục</CustomDivider>
       <LazyLoadComponent>
-        <Suspense fallback={
-          <>
-            <ToggleGroupContainer><Tabs /></ToggleGroupContainer>
-            {sliderPlaceholder}
-          </>
-        }>
+        <Suspense fallback={sliderPlaceholder}>
+          <CustomDivider>Sản phẩm theo danh mục</CustomDivider>
           <ToggleGroupContainer>
             <Tabs
               variant="scrollable"
@@ -199,34 +183,34 @@ const CateList = () => {
             </Tabs>
           </ToggleGroupContainer>
           <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
+          <ButtonContainer>
+            {isError ?
+              <Button
+                variant="outlined"
+                color="error"
+                size="medium"
+                sx={{ width: '200px' }}
+                endIcon={<Replay sx={{ marginRight: '-10px' }} />}
+                onClick={() => refetch()}
+              >
+                Tải lại
+              </Button>
+              :
+              <Link to={`/filters?cateId=${currCate}`}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="medium"
+                  sx={{ width: '200px' }}
+                  endIcon={<ExpandMore sx={{ marginRight: '-10px' }} />}
+                >
+                  Xem thêm
+                </Button>
+              </Link>
+            }
+          </ButtonContainer>
         </Suspense>
       </LazyLoadComponent>
-      <ButtonContainer>
-        {isError ?
-          <Button
-            variant="outlined"
-            color="error"
-            size="medium"
-            sx={{ width: '200px' }}
-            endIcon={<Replay sx={{ marginRight: '-10px' }} />}
-            onClick={refetch}
-          >
-            Tải lại
-          </Button>
-          :
-          <Link to={`/filters?cateId=${currCate}`}>
-            <Button
-              variant="contained"
-              color="primary"
-              size="medium"
-              sx={{ width: '200px' }}
-              endIcon={<ExpandMore sx={{ marginRight: '-10px' }} />}
-            >
-              Xem thêm
-            </Button>
-          </Link>
-        }
-      </ButtonContainer>
     </>
   )
 }
@@ -263,10 +247,15 @@ const Home = () => {
 
   return (
     <Wrapper>
-      <Slider />
-      <Categories />
-      <Grid sx={{ mb: 3, mt: -1 }} container spacing={4}>
-        <Grid size={12}>
+      {/* <Slider /> */}
+      <BannersSlider/>
+      <Suggest />
+      {/* <br/>
+      <br/>
+      <br/>
+      <br/> */}
+      <div>
+        <div>
           <br />
           <CustomDivider>Sản phẩm mới nhất</CustomDivider>
           <Products {...{ isLoading, data, isSuccess, isError }} />
@@ -278,7 +267,7 @@ const Home = () => {
                 size="medium"
                 sx={{ width: '200px' }}
                 endIcon={<Replay sx={{ marginRight: '-10px' }} />}
-                onClick={refetch}
+                onClick={() => refetch()}
               >
                 Tải lại
               </Button>
@@ -295,42 +284,43 @@ const Home = () => {
               </Button>
             }
           </ButtonContainer>
+          <Categories />
           <OrderList />
           <CateList />
           <br />
-          <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
           <LazyLoadComponent>
             <Suspense fallback={sliderPlaceholder}>
+              <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
               <ProductsSlider {...{ isLoading: loadRandom, isFetching: fetchRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
+              <ButtonContainer>
+                {isError ?
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="medium"
+                    sx={{ width: '200px' }}
+                    endIcon={<Replay sx={{ marginRight: '-10px' }} />}
+                    onClick={() => refetchRandom()}
+                  >
+                    Tải lại
+                  </Button>
+                  :
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="medium"
+                    sx={{ width: '200px' }}
+                    endIcon={<Replay sx={{ marginRight: '-10px' }} />}
+                    onClick={() => refetchRandom()}
+                  >
+                    Làm mới
+                  </Button>
+                }
+              </ButtonContainer>
             </Suspense>
           </LazyLoadComponent>
-          <ButtonContainer>
-            {isError ?
-              <Button
-                variant="outlined"
-                color="error"
-                size="medium"
-                sx={{ width: '200px' }}
-                endIcon={<Replay sx={{ marginRight: '-10px' }} />}
-                onClick={refetchRandom}
-              >
-                Tải lại
-              </Button>
-              :
-              <Button
-                variant="contained"
-                color="primary"
-                size="medium"
-                sx={{ width: '200px' }}
-                endIcon={<Replay sx={{ marginRight: '-10px' }} />}
-                onClick={refetchRandom}
-              >
-                Làm mới
-              </Button>
-            }
-          </ButtonContainer>
-        </Grid>
-      </Grid>
+        </div>
+      </div>
     </Wrapper>
   )
 }

@@ -3,7 +3,14 @@ import { apiSlice } from "../../app/api/apiSlice";
 
 const catesAdapter = createEntityAdapter({});
 const catesSelector = catesAdapter.getSelectors();
-const initialState = catesAdapter.getInitialState();
+const initialState = catesAdapter.getInitialState({
+    info: {
+        currPage: 0,
+        pageSize: 0,
+        totalElements: 0,
+        totalPages: 0,
+    },
+});
 
 export const categoriesApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -62,7 +69,16 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
                 }
             },
             transformResponse: responseData => {
-                return catesAdapter.setAll(initialState, responseData)
+                const { number, size, totalElements, totalPages, content } = responseData;
+                return catesAdapter.setAll({
+                    ...initialState,
+                    info: {
+                        currPage: number,
+                        pageSize: size,
+                        totalElements,
+                        totalPages
+                    }
+                }, content)
             },
             serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
                 if (queryArgs) {

@@ -1,6 +1,6 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.ImageInfoDTO;
+import com.ring.bookstore.dtos.images.ImageInfoDTO;
 import com.ring.bookstore.dtos.projections.IImageInfo;
 import com.ring.bookstore.enums.ImageSize;
 import com.ring.bookstore.exception.ImageResizerException;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ring.bookstore.dtos.ImageDTO;
+import com.ring.bookstore.dtos.images.ImageDTO;
 import com.ring.bookstore.dtos.mappers.ImageMapper;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.Image;

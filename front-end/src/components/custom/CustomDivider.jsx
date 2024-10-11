@@ -5,10 +5,10 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
     fontSize: 18,
     fontWeight: 'bold',
     textTransform: 'uppercase',
-    color: theme.palette.primary.main,
+    color: theme.palette.primary.dark,
     textAlign: 'center',
     justifyContent: 'center',
-    margin: '10px 0',
+    margin: '15px 0',
 
     [theme.breakpoints.down('sm')]: {
         fontSize: 16,

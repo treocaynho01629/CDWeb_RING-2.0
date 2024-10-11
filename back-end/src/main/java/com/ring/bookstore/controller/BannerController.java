@@ -1,10 +1,9 @@
 package com.ring.bookstore.controller;
 
 import com.ring.bookstore.config.CurrentAccount;
-import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.model.Account;
-import com.ring.bookstore.request.CouponRequest;
-import com.ring.bookstore.service.CouponService;
+import com.ring.bookstore.request.BannerRequest;
+import com.ring.bookstore.service.BannerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,75 +15,67 @@ import java.util.List;
 
 @RestController
 @CrossOrigin("http://localhost:5173")
-@RequestMapping("/api/coupons")
+@RequestMapping("/api/banners")
 @RequiredArgsConstructor
-public class CouponController {
+public class BannerController {
 
-    private final CouponService couponService;
+    private final BannerService bannerService;
 
-    //Get coupons
+    //Get banners
     @GetMapping
-    public ResponseEntity<?> getCoupons(@RequestParam(value = "type", required = false) CouponType type,
-                                        @RequestParam(value = "shopId", required = false) Long shopId,
+    public ResponseEntity<?> getBanners(@RequestParam(value = "shopId", required = false) Long shopId,
                                         @RequestParam(value = "byShop", required=false) Boolean byShop,
                                         @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                         @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
                                         @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                         @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
                                         @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir) {
-        return new ResponseEntity<>(couponService.getCoupons(pageNo, pageSize, sortBy, sortDir, type, keyword, shopId, byShop), HttpStatus.OK);
+        return new ResponseEntity<>(bannerService.getBanners(pageNo, pageSize, sortBy, sortDir, keyword, shopId, byShop), HttpStatus.OK);
     }
 
-    //Get coupon by {code}
-    @GetMapping("/{code}")
-    public ResponseEntity<?> getCoupon(@PathVariable("code") String code) {
-        return new ResponseEntity<>(couponService.getCouponByCode(code), HttpStatus.OK);
-    }
-
-    //Add coupon
+    //Add banner
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> createCoupon(@Valid @RequestPart("request") CouponRequest request,
+    public ResponseEntity<?> createBanner(@Valid @RequestPart("request") BannerRequest request,
                                           @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(couponService.addCoupon(request, currUser), HttpStatus.CREATED);
+        return new ResponseEntity<>(bannerService.addBanner(request, currUser), HttpStatus.CREATED);
     }
 
-    //Update coupon by id
+    //Update banner by id
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> updateCoupon(@PathVariable("id") Long id,
-                                          @Valid @RequestPart("request") CouponRequest request,
+    public ResponseEntity<?> updateBanner(@PathVariable("id") Long id,
+                                          @Valid @RequestPart("request") BannerRequest request,
                                           @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(couponService.updateCoupon(id, request, currUser), HttpStatus.CREATED);
+        return new ResponseEntity<>(bannerService.updateBanner(id, request, currUser), HttpStatus.CREATED);
     }
 
-    //Delete coupon
+    //Delete banner
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> deleteCoupon(@PathVariable("id") Long id, @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(couponService.deleteCoupon(id, currUser), HttpStatus.OK);
+    public ResponseEntity<?> deleteBanner(@PathVariable("id") Long id, @CurrentAccount Account currUser) {
+        return new ResponseEntity<>(bannerService.deleteBanner(id, currUser), HttpStatus.OK);
     }
 
-    //Delete multiples coupons in a lists of {ids}
+    //Delete multiples banners in a lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> deleteCoupons(@RequestParam(value = "type", required = false) CouponType type,
-                                           @RequestParam(value = "shopId", required = false) Long shopId,
+    public ResponseEntity<?> deleteBanners(@RequestParam(value = "shopId", required = false) Long shopId,
                                            @RequestParam(value = "byShop", required=false) Boolean byShop,
                                            @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                            @RequestParam("ids") List<Long> ids,
                                            @RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse,
                                            @CurrentAccount Account currUser
     ) {
-        couponService.deleteCoupons(type, keyword, shopId, byShop, ids, isInverse, currUser);
-        return new ResponseEntity<>("Coupons deleted successfully!", HttpStatus.OK);
+        bannerService.deleteBanners(keyword, shopId, byShop, ids, isInverse, currUser);
+        return new ResponseEntity<>("Banners deleted successfully!", HttpStatus.OK);
     }
 
-    //Delete all coupons
+    //Delete all banners
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteAllCoupons() {
-        couponService.deleteAllCoupons();
-        return new ResponseEntity<>("All coupons deleted successfully!", HttpStatus.OK);
+    public ResponseEntity<?> deleteAllBanners() {
+        bannerService.deleteAllBanners();
+        return new ResponseEntity<>("All banners deleted successfully!", HttpStatus.OK);
     }
 }

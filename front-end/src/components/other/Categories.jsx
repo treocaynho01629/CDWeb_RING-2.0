@@ -3,30 +3,58 @@ import { useRef, Fragment } from "react"
 import { IconButton, Skeleton } from "@mui/material";
 import { KeyboardArrowRight, KeyboardArrowLeft } from '@mui/icons-material';
 import { Link } from "react-router-dom"
-import { useGetPreviewCategoriesQuery } from "../features/categories/categoriesApiSlice";
+import { useGetPreviewCategoriesQuery } from "../../features/categories/categoriesApiSlice";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 //#region styled
+const StyledLazyImage = styled(LazyLoadImage)`
+    aspect-ratio: 1/1;
+    height: 65px;
+    width: 65px;
+    object-fit: contain;
+
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        height: 55px;
+        width: 55px;
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        height: 45px;
+        width: 45px;
+    }
+`
+
 const ItemContainer = styled.div`
-    margin: 0px 3px;
-    /* padding: 8px 20px; */
+    padding: 4px 0;
+    width: 100px;
+    height: 115px;
     font-size: 14px;
-    font-weight: bold;
-    white-space: nowrap;
-    text-transform: capitalize;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    /* background-color: ${props => props.theme.palette.divider}; */
+    border: .5px solid transparent;
     cursor: pointer;
     transition: all .25s ease;
 
-    /* &:hover {
-      background-color: ${props => props.theme.palette.primary.main};
-      color: ${props => props.theme.palette.primary.contrastText};
-      transform: scale(1.025);
-    } */
+    &:hover {
+      transform: translateY(-1px);
+      border-color: ${props => props.theme.palette.action.focus};
+      box-shadow: ${props => props.theme.shadows[1]};
+      ${StyledLazyImage} { filter: saturate(120%)}
+    }
+
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        width: 90px;
+        height: 100px;
+        font-size: 13px;
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 2px;
+        width: 70px;
+        height: 95px;
+        font-size: 12px;
+    }
 `
 
 const CateContainer = styled.div`
@@ -68,8 +96,11 @@ const ItemWrapper = styled.div`
 `
 
 const ItemName = styled.span`
-    height: 50px;
+    margin-top: 5px;
+    font-weight: bold;
+    text-transform: capitalize;
     width: 100%;
+    text-align: center;
 `
 
 const Wrapper = styled.div`
@@ -104,6 +135,7 @@ const ButtonContainer = styled.div`
         ${props => props.theme.palette.background.default} 80%,
         transparent 100%);
     display: flex;
+    align-items: center;
     transition: all .25s ease;
     opacity: 0;
     visibility: hidden;
@@ -154,13 +186,13 @@ const Categories = () => {
                         <ItemWrapper key={`cate-${cateId}-${index}`}>
                             <Link to={`/filters?cateId=${cateId}`} title={cate?.categoryName}>
                                 <ItemContainer>
-                                    <LazyLoadImage
-                                        width={45}
-                                        height={45}
+                                    <StyledLazyImage
+                                        width={65}
+                                        height={65}
                                         style={{ objectFit: 'contain' }}
                                         src={`${cate?.image}?size=tiny`}
                                         alt={`Category item: ${cate?.categoryName}`}
-                                        placeholder={<Skeleton width={45} height={45} variant="rectangular" />}
+                                        placeholder={<Skeleton width={65} height={65} variant="rectangular" />}
                                     />
                                     <ItemName>{cate?.categoryName}</ItemName>
                                 </ItemContainer>
@@ -178,12 +210,14 @@ const Categories = () => {
                 {catesContent}
             </Wrapper>
             <ButtonContainer className="button-container">
-                <IconButton aria-label="Scroll categories to left" onClick={() => scrollSlide(-500)}>
-                    <KeyboardArrowLeft fontSize="small" />
-                </IconButton>
-                <IconButton aria-label="Scroll categories to right" onClick={() => scrollSlide(500)}>
-                    <KeyboardArrowRight fontSize="small" />
-                </IconButton>
+                <div>
+                    <IconButton aria-label="Scroll categories to left" onClick={() => scrollSlide(-500)}>
+                        <KeyboardArrowLeft fontSize="small" />
+                    </IconButton>
+                    <IconButton aria-label="Scroll categories to right" onClick={() => scrollSlide(500)}>
+                        <KeyboardArrowRight fontSize="small" />
+                    </IconButton>
+                </div>
             </ButtonContainer>
         </CateContainer>
     )

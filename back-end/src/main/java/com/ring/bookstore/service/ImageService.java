@@ -1,11 +1,11 @@
 package com.ring.bookstore.service;
 
-import com.ring.bookstore.dtos.ImageInfoDTO;
+import com.ring.bookstore.dtos.images.ImageInfoDTO;
 import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ring.bookstore.dtos.ImageDTO;
+import com.ring.bookstore.dtos.images.ImageDTO;
 import com.ring.bookstore.model.Image;
 
 import java.awt.image.BufferedImage;

@@ -25,8 +25,8 @@ public interface CategoryRepository extends JpaRepository<Category, Integer>{
           from Book b join Image i on b.image.id = i.id
       ) t on c.id = t.cateId and t.rn = 1
       where t.image is not null
-      order by c.id
-      limit 10
+      order by c.parent.id desc nulls first
+      limit 12
     """)
     List<ICategory> findPreviewCategories();
 

@@ -1,6 +1,6 @@
 package com.ring.bookstore.dtos.projections;
 
-public interface ICategory {
+public interface IPublisher {
 
     Integer getId();
 

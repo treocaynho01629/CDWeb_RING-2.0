@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.ReviewDTO;
+import com.ring.bookstore.dtos.reviews.ReviewDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.request.ReviewRequest;
 

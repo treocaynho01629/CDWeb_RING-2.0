@@ -3,12 +3,12 @@ package com.ring.bookstore.dtos.mappers;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.ring.bookstore.dtos.OrderItemDTO;
+import com.ring.bookstore.dtos.orders.OrderItemDTO;
 import com.ring.bookstore.model.*;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.OrderDTO;
-import com.ring.bookstore.dtos.OrderDetailDTO;
+import com.ring.bookstore.dtos.orders.OrderDTO;
+import com.ring.bookstore.dtos.orders.OrderDetailDTO;
 
 @Service
 public class OrderMapper {

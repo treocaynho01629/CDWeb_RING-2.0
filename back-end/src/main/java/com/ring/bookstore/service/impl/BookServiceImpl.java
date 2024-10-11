@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.github.slugify.Slugify;
-import com.ring.bookstore.dtos.BookResponseDTO;
+import com.ring.bookstore.dtos.books.BookResponseDTO;
 import com.ring.bookstore.dtos.projections.IBookDetail;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.model.*;
@@ -22,8 +22,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ring.bookstore.dtos.BookDTO;
-import com.ring.bookstore.dtos.BookDetailDTO;
+import com.ring.bookstore.dtos.books.BookDTO;
+import com.ring.bookstore.dtos.books.BookDetailDTO;
 import com.ring.bookstore.dtos.projections.IBookDisplay;
 import com.ring.bookstore.dtos.mappers.BookMapper;
 import com.ring.bookstore.enums.RoleName;

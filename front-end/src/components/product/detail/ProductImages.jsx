@@ -163,6 +163,7 @@ const responsiveMini = {
             min: 900
         },
         items: 5,
+        slidesToSlide: 3,
         partialVisibilityGutter: 5
     },
     mobile: {
@@ -171,36 +172,31 @@ const responsiveMini = {
             min: 0
         },
         items: 6,
+        slidesToSlide: 3,
         partialVisibilityGutter: 5
     }
 };
 
 //Custom stuff
-const CustomLeftArrow = ({ carouselState, onClick, setSlideIndex }) => (
+const CustomLeftArrow = ({ onClick }) => (
     <CustomArrow
         className="custom-left-arrow"
-        onClick={() => {
-            onClick();
-            setSlideIndex(carouselState?.currentSlide);
-        }}
+        onClick={() => onClick()}
     >
         <KeyboardArrowLeft />
     </CustomArrow>
 );
 
-const CustomRightArrow = ({ carouselState, onClick, setSlideIndex }) => (
+const CustomRightArrow = ({ onClick }) => (
     <CustomArrow
         className="custom-right-arrow"
-        onClick={() => {
-            onClick();
-            setSlideIndex(carouselState?.currentSlide + 2);
-        }}
+        onClick={() => onClick()}
     >
         <KeyboardArrowRight />
     </CustomArrow>
 );
 
-const CustomButtonGroup = ({ book, images, setSlideIndex, goToSlide, carouselState }) => {
+const CustomButtonGroup = ({ book, images, goToSlide, carouselState }) => {
     const { currentSlide } = carouselState;
 
     return (
@@ -208,8 +204,8 @@ const CustomButtonGroup = ({ book, images, setSlideIndex, goToSlide, carouselSta
             <Carousel
                 responsive={responsiveMini}
                 autoPlay={false}
-                customLeftArrow={<CustomLeftArrow setSlideIndex={setSlideIndex} />}
-                customRightArrow={<CustomRightArrow setSlideIndex={setSlideIndex} />}
+                customLeftArrow={<CustomLeftArrow />}
+                customRightArrow={<CustomRightArrow />}
                 removeArrowOnDeviceType={["mobile"]}
                 minimumTouchDrag={80}
                 partialVisible
@@ -218,10 +214,7 @@ const CustomButtonGroup = ({ book, images, setSlideIndex, goToSlide, carouselSta
                 {book ? images.map((image, index) => (
                     <SmallImageSlide key={index}
                         className={`${index === currentSlide ? 'active' : ''}`}
-                        onClick={() => {
-                            goToSlide(index);
-                            setSlideIndex(index + 1);
-                        }}>
+                        onClick={() => goToSlide(index)}>
                         <StyledSmallLazyImage
                             src={`${image}?size=small`}
                             placeholder={<StyledSmallSkeleton variant="rectangular" />}
@@ -242,7 +235,7 @@ const CustomButtonGroup = ({ book, images, setSlideIndex, goToSlide, carouselSta
 
 const ProductImages = ({ book }) => {
     const [slideIndex, setSlideIndex] = useState(1);
-    const images = [].concat(book?.previewImages, book?.image);
+    let images = [].concat(book?.previewImages, book?.image);
 
     return (
         <ImgContainer>
@@ -252,8 +245,14 @@ const ProductImages = ({ book }) => {
                 renderButtonGroupOutside
                 responsive={responsive}
                 autoPlay={true}
+                pauseOnHover={true}
                 arrows={false}
-                autoPlaySpeed={10000}
+                rewindWithAnimation={true}
+                autoPlaySpeed={15000}
+                beforeChange={(nextSlide, { currentSlide, onMove }) => {
+                    setSlideIndex(nextSlide + 1);
+                }}
+                rewind
                 keyBoardControl
                 draggable
                 customButtonGroup={<CustomButtonGroup {...{ setSlideIndex, images, book }} />}

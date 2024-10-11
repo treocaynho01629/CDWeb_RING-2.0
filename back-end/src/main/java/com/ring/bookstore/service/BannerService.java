@@ -1,30 +1,28 @@
 package com.ring.bookstore.service;
 
-import com.ring.bookstore.enums.CouponType;
+import com.ring.bookstore.dtos.BannerDTO;
 import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Coupon;
-import com.ring.bookstore.request.CouponRequest;
+import com.ring.bookstore.model.Banner;
+import com.ring.bookstore.request.BannerRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public interface CouponService {
+public interface BannerService {
 
-    Page<Coupon> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                            CouponType type, String keyword, Long shopId, Boolean byShop);
+    Page<BannerDTO> getBanners(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
+                               String keyword, Long shopId, Boolean byShop);
 
-    Coupon getCouponByCode(String code);
+    Banner addBanner(BannerRequest request, Account user);
 
-    Coupon addCoupon(CouponRequest request, Account user);
+    Banner updateBanner(Long id, BannerRequest request, Account user);
 
-    Coupon updateCoupon(Long id, CouponRequest request, Account user);
+    Banner deleteBanner(Long id, Account user);
 
-    Coupon deleteCoupon(Long id, Account user);
-
-    void deleteCoupons(CouponType type, String keyword, Long shopId, Boolean byShop,
+    void deleteBanners(String keyword, Long shopId, Boolean byShop,
                        List<Long> ids, boolean isInverse, Account user);
 
-    void deleteAllCoupons();
+    void deleteAllBanners();
 }

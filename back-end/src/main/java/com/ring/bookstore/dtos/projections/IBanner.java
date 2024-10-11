@@ -1,13 +1,9 @@
 package com.ring.bookstore.dtos.projections;
 
-import java.time.LocalDateTime;
+public interface IBanner {
+    Integer getId();
 
-public interface IShopDetail {
-    String getOwnerUsername();
-
-    Long getOwnerId();
-
-    Long getId();
+    Long getShopId();
 
     String getName();
 
@@ -15,11 +11,6 @@ public interface IShopDetail {
 
     String getImage();
 
-    Integer getTotalReviews();
+    String getUrl();
 
-    Integer getTotalProducts();
-
-    Integer getTotalFollowers();
-
-    LocalDateTime getJoinedDate();
 }

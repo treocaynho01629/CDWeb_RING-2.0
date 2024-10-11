@@ -6,7 +6,7 @@ import java.util.function.Function;
 import com.ring.bookstore.model.Image;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.AccountDetailDTO;
+import com.ring.bookstore.dtos.accounts.AccountDetailDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.AccountProfile;
 

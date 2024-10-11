@@ -1,6 +1,8 @@
 package com.ring.bookstore.dtos.mappers;
 
-import com.ring.bookstore.dtos.*;
+import com.ring.bookstore.dtos.orders.CalculateDTO;
+import com.ring.bookstore.dtos.orders.CalculateDetailDTO;
+import com.ring.bookstore.dtos.orders.CalculateItemDTO;
 import com.ring.bookstore.model.*;
 import org.springframework.stereotype.Service;
 

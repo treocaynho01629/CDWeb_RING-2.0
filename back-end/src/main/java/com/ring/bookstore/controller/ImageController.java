@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.ring.bookstore.exception.ImageResizerException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ring.bookstore.dtos.ImageDTO;
+import com.ring.bookstore.dtos.images.ImageDTO;
 import com.ring.bookstore.model.Image;
 import com.ring.bookstore.service.ImageService;
 
