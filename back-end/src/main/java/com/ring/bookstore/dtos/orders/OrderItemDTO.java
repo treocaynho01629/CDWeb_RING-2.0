@@ -1,4 +1,4 @@
-package com.ring.bookstore.dtos;
+package com.ring.bookstore.dtos.orders;
 
 import com.ring.bookstore.enums.OrderStatus;
 

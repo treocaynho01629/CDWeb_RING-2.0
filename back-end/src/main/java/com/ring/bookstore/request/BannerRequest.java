@@ -1,45 +1,26 @@
 package com.ring.bookstore.request;
 
-import com.ring.bookstore.enums.CouponType;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CouponRequest {
+public class BannerRequest {
 	
-	@NotBlank(message = "Mã giảm giá không được bỏ trống!")
-	@Size(min = 5, max = 50, message = "Độ dài mã từ 5-50 kí tự")
-	private String code;
+	@NotBlank(message = "Tên banner không được bỏ trống!")
+	@Size(min = 5, max = 200, message = "Tên banner từ 5-200 kí tự")
+	private String name;
 
-	@NotNull(message = "Loại mã không được bỏ trống!")
-	private CouponType type;
+	@Size(max = 4000, message = "Độ dài mô tả từ tối đa 4000 kí tự")
+	private String description;
 
-	@Max(value = 9999, message = "Số lần sử dụng tối đa 9999")
-	private Short usage;
-
-	@Future(message = "Ngày hết hạn phải sau hôm nay!")
-	@DateTimeFormat(pattern = "dd-MM-yyyy")
-	private LocalDate expireDate;
-	
-	@NotNull(message = "Đơn vị không được bỏ trống!")
-	@Min(value = 0, message = "Đơn vị tối thiểu từ 0 trở lên")
-	private Double attribute;
-
-	private Double maxDiscount;
-
-	@DecimalMin(value = "0.0", inclusive = false)
-	@Digits(integer=5, fraction=4)
-	private BigDecimal discount;
+	@NotBlank(message = "Đường dẫn không bỏ trống!")
+	private String url;
 
 	private Long shopId;
 }

@@ -4,7 +4,7 @@ import com.ring.bookstore.dtos.projections.IReview;
 import com.ring.bookstore.model.*;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.ReviewDTO;
+import com.ring.bookstore.dtos.reviews.ReviewDTO;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Service

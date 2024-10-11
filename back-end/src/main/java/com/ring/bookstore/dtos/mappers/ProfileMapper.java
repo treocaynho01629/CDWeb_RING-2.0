@@ -6,10 +6,9 @@ import java.util.function.Function;
 import com.ring.bookstore.model.Image;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.ProfileDTO;
+import com.ring.bookstore.dtos.accounts.ProfileDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.AccountProfile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Service
 public class ProfileMapper implements Function<Account, ProfileDTO> {

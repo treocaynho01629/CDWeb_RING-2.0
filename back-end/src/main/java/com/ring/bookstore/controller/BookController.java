@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ring.bookstore.config.CurrentAccount;
-import com.ring.bookstore.dtos.BookDTO;
+import com.ring.bookstore.dtos.books.BookDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.request.BookRequest;

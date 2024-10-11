@@ -1,20 +1,15 @@
 package com.ring.bookstore.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
-import java.util.Set;
-
-import org.hibernate.annotations.Nationalized;
-
 import lombok.Getter;
 import lombok.Setter;
-
+import org.hibernate.annotations.Nationalized;
 
 @Entity
 @Getter
 @Setter
-public class Publisher {
+public class Banner {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -32,16 +27,23 @@ public class Publisher {
 
     @Column(length = 200)
     @Nationalized 
-    private String pubName;
+    private String name;
+
+    @Column(length = 4000)
+    @Nationalized
+    private String description;
+
+    @Column
+    private String url;
 
     @OneToOne(cascade = CascadeType.ALL,
             fetch = FetchType.LAZY,
             orphanRemoval = true)
-    @JoinColumn(name = "image_id")
+    @JoinColumn(name = "image_id", nullable = false)
     private Image image;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "publisher", fetch = FetchType.LAZY)
-    @JsonBackReference
-    private Set<Book> publisherBooks;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id")
+    @JsonIgnore
+    private Shop shop;
 }

@@ -1,8 +1,8 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.AccountDetailDTO;
+import com.ring.bookstore.dtos.accounts.AccountDetailDTO;
 import com.ring.bookstore.dtos.ChartDTO;
-import com.ring.bookstore.dtos.ProfileDTO;
+import com.ring.bookstore.dtos.accounts.ProfileDTO;
 import com.ring.bookstore.dtos.mappers.AccountDetailMapper;
 import com.ring.bookstore.dtos.mappers.ChartDataMapper;
 import com.ring.bookstore.dtos.mappers.ProfileMapper;

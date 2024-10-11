@@ -1,4 +1,4 @@
-package com.ring.bookstore.dtos;
+package com.ring.bookstore.dtos.books;
 
 import com.ring.bookstore.model.Category;
 import com.ring.bookstore.model.Publisher;

@@ -1,9 +1,10 @@
-package com.ring.bookstore.dtos;
+package com.ring.bookstore.dtos.books;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.ring.bookstore.dtos.reviews.ReviewsInfoDTO;
 import com.ring.bookstore.model.Category;
 import com.ring.bookstore.model.Publisher;
 

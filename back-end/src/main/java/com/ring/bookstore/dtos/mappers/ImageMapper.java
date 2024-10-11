@@ -1,11 +1,11 @@
 package com.ring.bookstore.dtos.mappers;
 
-import com.ring.bookstore.dtos.ImageInfoDTO;
+import com.ring.bookstore.dtos.images.ImageInfoDTO;
 import com.ring.bookstore.dtos.projections.IImageInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.ring.bookstore.dtos.ImageDTO;
+import com.ring.bookstore.dtos.images.ImageDTO;
 import com.ring.bookstore.model.Image;
 
 @Service

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.ring.bookstore.dtos.CalculateDTO;
+import com.ring.bookstore.dtos.orders.CalculateDTO;
 import com.ring.bookstore.dtos.ChartDTO;
 import com.ring.bookstore.dtos.mappers.CalculateMapper;
 import com.ring.bookstore.dtos.mappers.ChartDataMapper;
@@ -24,7 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.OrderDTO;
+import com.ring.bookstore.dtos.orders.OrderDTO;
 import com.ring.bookstore.dtos.mappers.OrderMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;

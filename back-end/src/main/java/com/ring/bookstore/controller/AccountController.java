@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ring.bookstore.config.CurrentAccount;
-import com.ring.bookstore.dtos.AccountDetailDTO;
-import com.ring.bookstore.dtos.ProfileDTO;
+import com.ring.bookstore.dtos.accounts.AccountDetailDTO;
+import com.ring.bookstore.dtos.accounts.ProfileDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.AccountProfile;
 import com.ring.bookstore.request.AccountRequest;

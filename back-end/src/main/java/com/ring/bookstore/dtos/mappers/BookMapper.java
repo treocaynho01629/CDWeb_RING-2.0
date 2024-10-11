@@ -1,8 +1,8 @@
 package com.ring.bookstore.dtos.mappers;
 
-import com.ring.bookstore.dtos.BookDetailDTO;
-import com.ring.bookstore.dtos.BookResponseDTO;
-import com.ring.bookstore.dtos.ReviewsInfoDTO;
+import com.ring.bookstore.dtos.books.BookDetailDTO;
+import com.ring.bookstore.dtos.books.BookResponseDTO;
+import com.ring.bookstore.dtos.reviews.ReviewsInfoDTO;
 import com.ring.bookstore.dtos.projections.IBookDetail;
 import com.ring.bookstore.model.Book;
 import com.ring.bookstore.model.BookDetail;
@@ -10,7 +10,7 @@ import com.ring.bookstore.model.Image;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.ring.bookstore.dtos.BookDTO;
+import com.ring.bookstore.dtos.books.BookDTO;
 import com.ring.bookstore.dtos.projections.IBookDisplay;
 
 import java.util.ArrayList;
