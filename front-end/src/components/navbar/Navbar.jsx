@@ -5,7 +5,7 @@ import {
     Search as SearchIcon, ShoppingCart, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
     Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, Storefront, Close, Notifications,
 } from '@mui/icons-material';
-import { Stack, Badge, IconButton, Avatar, Box, Grid2 as Grid, TextField, AppBar, useTheme, useMediaQuery } from '@mui/material';
+import { Stack, Badge, IconButton, Avatar, Box, Grid2 as Grid, TextField, AppBar, useTheme, useMediaQuery, useScrollTrigger } from '@mui/material';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ColorModeContext } from '../../ThemeContextProvider';
 import { LogoImage, LogoSubtitle, LogoTitle } from '../custom/GlobalComponents';
@@ -167,6 +167,13 @@ const StyledAppBar = muiStyled(AppBar)(({ theme }) => ({
     borderBottom: '.5px solid',
     borderColor: theme.palette.divider,
     top: 0,
+    transition: 'all .2s ease',
+
+    '&.top': {
+        backgroundColor: 'transparent',
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0))',
+        borderColor: 'transparent',
+    }
 }));
 
 const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
@@ -215,12 +222,16 @@ const StyledSearchForm = styled.form`
 
 const StyledSearchInput = muiStyled(TextField)(({ theme }) => ({
     color: 'inherit',
+    background: theme.palette.background.default,
+
     [theme.breakpoints.down('md')]: {
         width: '100%',
     },
     '& .MuiInputBase-input': {
+        background: theme.palette.background.default,
         transition: theme.transitions.create('width'),
         width: '100%',
+
         [theme.breakpoints.up('md')]: {
             width: '12ch',
             '&:focus': {
@@ -233,11 +244,17 @@ const StyledSearchInput = muiStyled(TextField)(({ theme }) => ({
 
 const Navbar = () => {
     //#region construct
-    const { cartProducts, removeProduct } = useCart();
+    const { cartProducts } = useCart();
     const location = useLocation();
     const colorMode = useContext(ColorModeContext);
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
+
+    //Test
+    const trigger = useScrollTrigger({
+        disableHysteresis: true,
+        threshold: 100
+    });
 
     //Drawer open state
     const [openDrawer, setOpenDrawer] = useState(undefined);
@@ -296,7 +313,14 @@ const Navbar = () => {
                     </Grid>
                 </Grid>
             </TopHeader>
-            <StyledAppBar sx={{ marginBottom: { xs: 0, md: 2 }, boxShadow: 'none' }} position="sticky">
+            <StyledAppBar
+                sx={{
+                    marginBottom: { xs: 0, md: 2 },
+                    boxShadow: 'none'
+                }}
+                className={!mobileMode || trigger ? '' : 'top'}
+                position="sticky"
+            >
                 <Wrapper>
                     <Grid container size="grow">
                         <Grid size={{ xs: 12, md: "grow" }} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -402,7 +426,7 @@ const Navbar = () => {
                                                 </Link>
                                                 <Suspense fallback={<></>}>
                                                     {anchorElCart !== undefined &&
-                                                        <MiniCart {...{ removeProduct, openCart, anchorElCart, handleClose: handleCartClose, products: cartProducts }} />
+                                                        <MiniCart {...{ openCart, anchorElCart, handleClose: handleCartClose, products: cartProducts }} />
                                                     }
                                                 </Suspense>
                                             </Box>

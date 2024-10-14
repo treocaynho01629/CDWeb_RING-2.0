@@ -71,7 +71,7 @@ const SmallImageSlide = styled.div`
     }
 `
 
-const CustomArrow = styled.button`
+const CustomArrowButton = styled.button`
     border-radius: 0;
     background-color: #0000005e;
     border: none;
@@ -103,6 +103,7 @@ const ImageSlide = styled.div`
     max-height: 450px;
     aspect-ratio: 1/1;
     display: grid;
+    background-clip: content-box;
 
     ${props => props.theme.breakpoints.down("md")} {
         padding: 5px 0 0 0;
@@ -113,6 +114,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
     object-fit: contain;
     width: 100%;
     max-height: 450px;
+    background-color: ${props => props.theme.palette.action.disabledBackground};
 
     &.hidden {display: none;}
 `
@@ -122,6 +124,7 @@ const StyledSmallLazyImage = styled(LazyLoadImage)`
     object-fit: contain;
     width: 100%;
     aspect-ratio: 1/1;
+    background-color: ${props => props.theme.palette.action.disabledBackground};
 `
 
 const StyledSkeleton = styled(Skeleton)`
@@ -178,22 +181,10 @@ const responsiveMini = {
 };
 
 //Custom stuff
-const CustomLeftArrow = ({ onClick }) => (
-    <CustomArrow
-        className="custom-left-arrow"
-        onClick={() => onClick()}
-    >
-        <KeyboardArrowLeft />
-    </CustomArrow>
-);
-
-const CustomRightArrow = ({ onClick }) => (
-    <CustomArrow
-        className="custom-right-arrow"
-        onClick={() => onClick()}
-    >
-        <KeyboardArrowRight />
-    </CustomArrow>
+const CustomArrow = ({ onClick, className, children }) => (
+    <CustomArrowButton className={className} onClick={() => onClick()}>
+        {children}
+    </CustomArrowButton>
 );
 
 const CustomButtonGroup = ({ book, images, goToSlide, carouselState }) => {
@@ -204,17 +195,20 @@ const CustomButtonGroup = ({ book, images, goToSlide, carouselState }) => {
             <Carousel
                 responsive={responsiveMini}
                 autoPlay={false}
-                customLeftArrow={<CustomLeftArrow />}
-                customRightArrow={<CustomRightArrow />}
+                customLeftArrow={<CustomArrow className="custom-left-arrow"><KeyboardArrowLeft /></CustomArrow>}
+                customRightArrow={<CustomArrow className="custom-right-arrow"><KeyboardArrowRight /></CustomArrow>}
                 removeArrowOnDeviceType={["mobile"]}
                 minimumTouchDrag={80}
+                focusOnSelect={true}
                 partialVisible
                 draggable
             >
                 {book ? images.map((image, index) => (
-                    <SmallImageSlide key={index}
+                    <SmallImageSlide
+                        key={index}
                         className={`${index === currentSlide ? 'active' : ''}`}
-                        onClick={() => goToSlide(index)}>
+                        onClick={() => goToSlide(index)}
+                    >
                         <StyledSmallLazyImage
                             src={`${image}?size=small`}
                             placeholder={<StyledSmallSkeleton variant="rectangular" />}
@@ -236,6 +230,18 @@ const CustomButtonGroup = ({ book, images, goToSlide, carouselState }) => {
 const ProductImages = ({ book }) => {
     const [slideIndex, setSlideIndex] = useState(1);
     let images = [].concat(book?.previewImages, book?.image);
+    images.push(book?.image);
+    images.push(book?.image);
+    images.push(book?.image);
+    images.push(book?.image);
+    images.push(book?.image);
+    images.push(book?.image);
+    images.push(book?.image);
+    images.push(book?.image);
+    images.push(book?.image);
+    images.push(book?.image);
+    images.push(book?.image);
+    images.push(book?.image);
 
     return (
         <ImgContainer>
@@ -249,9 +255,7 @@ const ProductImages = ({ book }) => {
                 arrows={false}
                 rewindWithAnimation={true}
                 autoPlaySpeed={15000}
-                beforeChange={(nextSlide, { currentSlide, onMove }) => {
-                    setSlideIndex(nextSlide + 1);
-                }}
+                beforeChange={(nextSlide) => { setSlideIndex(nextSlide + 1) }}
                 rewind
                 keyBoardControl
                 draggable

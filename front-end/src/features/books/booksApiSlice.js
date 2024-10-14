@@ -26,7 +26,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         }),
         getBooks: builder.query({
             query: (args) => {
-                const { page, size, sortBy, sortDir, keyword, cateId, rating, 
+                const { page, size, sortBy, sortDir, keyword, cateId, rating,
                     amount, pubId, type, shopId, sellerId, value } = args || {};
 
                 //Params

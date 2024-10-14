@@ -16,7 +16,7 @@ import com.ring.bookstore.model.Book;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>{
 	@Query("""
-	select b.id as id, b.slug as slug, b.title as title, b.description as description, i.name as image,
+	select b.id as id, b.slug as slug, b.title as title, i.name as image,
 	b.price as price, b.discount as discount, b.amount as amount, s.id as shopId, s.name as shopName,
 	rv.rating as rating, od.totalOrders as totalOrders
 	from Book b join b.shop s join b.image i
@@ -96,7 +96,7 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 	Optional<IBookDetail> findBookDetailBySlug(String slug);
 
 	@Query("""
-    select b.id as id, b.slug as slug, b.title as title, b.description as description, i.name as image,
+    select b.id as id, b.slug as slug, b.title as title, i.name as image,
 	b.price as price, b.discount as discount, b.amount as amount, s.id as shopId, s.name as shopName,
 	rv.rating as rating, od.totalOrders as totalOrders
 	from Book b join b.shop s join b.image i

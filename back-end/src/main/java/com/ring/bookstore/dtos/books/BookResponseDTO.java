@@ -8,7 +8,6 @@ import java.time.LocalDate;
 
 public record BookResponseDTO(Long id,
                               String slug,
-
                               Double price,
                               BigDecimal discount,
                               String title,

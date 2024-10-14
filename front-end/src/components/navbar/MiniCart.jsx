@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import { Close, RemoveShoppingCart as RemoveShoppingCartIcon } from '@mui/icons-material';
-import { Button, Skeleton, Box, Popover, IconButton } from '@mui/material';
+import { RemoveShoppingCart as RemoveShoppingCartIcon } from '@mui/icons-material';
+import { Button, Skeleton, Popover } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
@@ -43,7 +43,7 @@ const ProductTitle = styled.h5`
 const ProductPrice = styled.span`
     width: 100%;
     font-size: 16px;
-    font-weight: 450;
+    font-weight: 400;
     color: ${props => props.theme.palette.primary.main};
     display: flex;
     flex-wrap: wrap;
@@ -55,7 +55,7 @@ const ProductPrice = styled.span`
 const ItemContainer = styled.div`
     display: flex;
     align-items: center;
-    margin: 8px 0;
+    margin: 10px 0;
 `
 
 const ItemInfo = styled.div`
@@ -75,10 +75,11 @@ const ActionContainer = styled.div`
 `
 //#endregion
 
-const MiniCart = ({ openCart, anchorElCart, handleClose, products, removeProduct }) => {
+const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
     return (
         <Popover
             id="mouse-over-popover"
+            tabIndex={-1}
             open={openCart}
             anchorEl={anchorElCart}
             onClose={handleClose}
@@ -136,14 +137,7 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products, removeProduct
                                 />
                                 <ItemInfo>
                                     <ProductTitle>{product?.title}</ProductTitle>
-                                    <ProductPrice>{product?.price?.toLocaleString()}đ
-                                        <IconButton
-                                            aria-label={`Remove item ${product?.title}`}
-                                            onClick={() => removeProduct(product?.id)}
-                                        >
-                                            <Close />
-                                        </IconButton>
-                                    </ProductPrice>
+                                    <ProductPrice>{product?.price?.toLocaleString()}đ</ProductPrice>
                                 </ItemInfo>
                             </ItemContainer>
                         ))}

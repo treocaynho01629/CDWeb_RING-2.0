@@ -135,12 +135,16 @@ export function ThemeContextProvider({ children }) {
                     },
                     MuiInputBase: {
                         styleOverrides: {
-                            input: {
-                                "&:-webkit-autofill": {
-                                    transitionDelay: "9999s",
-                                    transitionProperty: "background-color, color",
+                            root: ({ theme }) => ({
+                                input: {
+                                    "&:-webkit-autofill": {
+                                        transitionDelay: "9999s",
+                                        transitionProperty: "all",
+                                        WebkitBoxShadow: '0 0 0 100px #0000000 inset',
+                                        WebkitTextFillColor: theme.palette.info.main
+                                    },
                                 },
-                            },
+                            })
                         },
                     },
                     MuiTableContainer: {

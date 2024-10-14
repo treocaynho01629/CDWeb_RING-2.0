@@ -7,6 +7,8 @@ import com.ring.bookstore.dtos.projections.IBookDetail;
 import com.ring.bookstore.model.Book;
 import com.ring.bookstore.model.BookDetail;
 import com.ring.bookstore.model.Image;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -17,8 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class BookMapper {
+
+    private final CategoryMapper cateMapper;
 
     public BookDTO displayToBookDTO(IBookDisplay book) {
 
@@ -34,7 +39,6 @@ public class BookMapper {
         return new BookDTO(book.getId(),
                 book.getSlug(),
                 book.getTitle(),
-                book.getDescription(),
                 fileDownloadUri,
                 book.getPrice(),
                 book.getDiscount(),
@@ -95,7 +99,7 @@ public class BookMapper {
                 shopId,
                 shopName,
                 book.getPublisher(),
-                book.getCate(),
+                cateMapper.cateToCateDTOWithParent(book.getCate()),
                 detail.getSize(),
                 detail.getPages(),
                 detail.getBDate(),
