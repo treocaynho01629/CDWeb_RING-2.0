@@ -10,8 +10,6 @@ public interface IBookDisplay {
 
     String getTitle();
 
-    String getDescription();
-
     String getImage();
 
     Double getPrice();

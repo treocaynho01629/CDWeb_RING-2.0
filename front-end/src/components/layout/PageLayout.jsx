@@ -11,9 +11,11 @@ const LayoutWrapper = styled.div`
         margin-right: auto;
         margin-left: auto;
         width: 750px;
+        position: relative;
     }
     @media (min-width: 992px) {
         width: 970px;
+        position: relative;
     }
     @media (min-width: 1200px) {
         width: 1170px;

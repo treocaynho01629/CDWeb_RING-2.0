@@ -9,16 +9,31 @@ import useCart from '../../hooks/useCart';
 //#region styled
 const StyledLazyImage = styled(LazyLoadImage)`
     aspect-ratio: 1/1;
-    max-height: 180px;
-    margin-bottom: 10px;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
-    transform: ${props => props.imagestyle};
     transition: filter .25s ease;
     z-index: -1;
+    background-color: ${props => props.theme.palette.action.disabledBackground};
 
     ${props => props.theme.breakpoints.down("sm")} {
         margin-bottom: 0;
     }
+`
+
+const StyledSkeleton = styled(Skeleton)`
+    aspect-ratio: 1/1;
+    width: 100%;
+    height: 100%;
+`
+
+const ImageContainer = styled.div`
+    aspect-ratio: 1/1;
+    width: 100%;
+    height: 100%;
+    max-height: 180px;
+    max-width: 180px;
+    margin-bottom: 10px;
 `
 
 const Container = styled.div`
@@ -39,7 +54,7 @@ const Container = styled.div`
     &:hover {
         border-color: ${props => props.theme.palette.action.focus};
         box-shadow: ${props => props.theme.shadows[1]};
-        ${StyledLazyImage} { filter: saturate(120%)}
+        ${ImageContainer} { filter: saturate(120%)}
     }
 
     ${props => props.theme.breakpoints.down("sm")} {
@@ -192,16 +207,6 @@ const StyledRating = styled(Rating)`
     display: flex;
     align-items: center;
 `
-
-const SkeletonContainer = styled.div`
-    width: 100%;
-    height: 200%;
-    max-height: 180px;
-    aspect-ratio: 1/1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-`
 //#endregion
 
 const Product = ({ book, scrollPosition }) => {
@@ -215,24 +220,14 @@ const Product = ({ book, scrollPosition }) => {
                     ?
                     <Link to={`/product/${book.slug}`} style={{ width: '100%', height: '100%' }}>
                         <ItemContainer>
-                            <StyledLazyImage
-                                src={`${book?.image}?size=small`}
-                                alt={`${book?.title} Thumbnail`}
-                                width={'100%'}
-                                scrollPosition={scrollPosition}
-                                placeholder={
-                                    <SkeletonContainer>
-                                        <Skeleton
-                                            variant="rectangular"
-                                            height={'100%'}
-                                            sx={{
-                                                aspectRatio: '1/1',
-                                                marginBottom: '10px',
-                                            }}
-                                        />
-                                    </SkeletonContainer>
-                                }
-                            />
+                            <ImageContainer>
+                                <StyledLazyImage
+                                    src={`${book?.image}?size=small`}
+                                    alt={`${book?.title} Thumbnail`}
+                                    scrollPosition={scrollPosition}
+                                    placeholder={<StyledSkeleton variant="rectangular" />}
+                                />
+                            </ImageContainer>
                             <Info>
                                 <MainInfo>
                                     <ProductInfo>
@@ -268,16 +263,9 @@ const Product = ({ book, scrollPosition }) => {
                     </Link>
                     :
                     <>
-                        <SkeletonContainer>
-                            <Skeleton
-                                variant="rectangular"
-                                height={'100%'}
-                                sx={{
-                                    aspectRatio: '1/1',
-                                    marginBottom: '10px',
-                                }}
-                            />
-                        </SkeletonContainer>
+                        <ImageContainer>
+                            <StyledSkeleton variant="rectangular" />
+                        </ImageContainer>
                         <Info>
                             <Skeleton variant="text" sx={{ fontSize: '16px' }} />
                             <Skeleton variant="text" sx={{ fontSize: '16px' }} width="60%" />

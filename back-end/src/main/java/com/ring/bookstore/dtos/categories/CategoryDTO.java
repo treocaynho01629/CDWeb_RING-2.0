@@ -1,4 +1,4 @@
-package com.ring.bookstore.dtos;
+package com.ring.bookstore.dtos.categories;
 
 import java.util.List;
 
@@ -6,9 +6,7 @@ import java.util.List;
 public record CategoryDTO(Integer id,
                           Integer parentId,
                           String categoryName,
-                          String description,
-                          List<CategoryDTO> ancestor,
-                          List<CategoryDTO> children,
-                          String image) {
+                          CategoryDTO parent,
+                          List<CategoryDTO> children) {
 
 }

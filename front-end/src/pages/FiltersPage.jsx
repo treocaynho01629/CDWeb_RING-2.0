@@ -39,7 +39,6 @@ const Wrapper = styled.div`
 const FiltersPage = () => {
     //#region construct
     const [searchParams, setSearchParams] = useSearchParams();
-    const initialKeywords = searchParams.get("keyword");
     const navigate = useNavigate();
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
@@ -47,7 +46,7 @@ const FiltersPage = () => {
     //Filter & pagination
     const [filters, setFilters] = useState({
         value: searchParams.get("value") ? searchParams.get("value").split(',') : [1000, 10000000],
-        keyword: initialKeywords ?? "",
+        keyword: searchParams.get("keyword") ?? "",
         type: searchParams.get("type") ?? "",
         shopId: searchParams.get("shopId") ?? "",
         pubId: searchParams.get("pubId") ?? [],
@@ -97,8 +96,26 @@ const FiltersPage = () => {
     }, [data])
 
     useEffect(() => {
-        setFilters({ ...filters, keyword: initialKeywords ?? "" });
-    }, [initialKeywords])
+        setFilters({
+            ...filters,
+            value: searchParams.get("value") ? searchParams.get("value").split(',') : [1000, 10000000],
+            keyword: searchParams.get("keyword") ?? "",
+            type: searchParams.get("type") ?? "",
+            shopId: searchParams.get("shopId") ?? "",
+            pubId: searchParams.get("pubId") ?? [],
+            cateId: searchParams.get("cateId") ?? "",
+            rating: searchParams.get("rating") ?? 0,
+            amount: searchParams.get("amount") ?? 1
+        });
+
+        setPagination({
+            ...pagination,
+            currPage: searchParams.get("pageNo") ? searchParams.get("pageNo") - 1 : 0,
+            pageSize: searchParams.get("pSize") ?? 16,
+            sortBy: searchParams.get("sortBy") ?? orderGroup[0].value,
+            sortDir: searchParams.get("sortDir") ?? "desc",
+        });
+    }, [searchParams])
 
     //Set title
     useTitle('RING! - Cửa hàng');

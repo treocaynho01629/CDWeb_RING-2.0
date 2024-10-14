@@ -6,7 +6,6 @@ import { suggest } from '../../ultils/suggest';
 //#region styled
 const ItemContainer = styled.div`
     padding: 4px 0;
-    height: 70px;
     font-size: 14px;
     display: flex;
     flex-direction: column;
@@ -17,7 +16,7 @@ const ItemContainer = styled.div`
     svg {
         padding: 5px;
         border-radius: 5px;
-        font-size: 2.8rem;
+        font-size: 2.6rem;
         color: ${props => props.theme.palette.common.white};
         background-color: ${props => props.$color};
     }
@@ -30,16 +29,15 @@ const ItemContainer = styled.div`
         font-size: 12px;
         
         svg {
-            font-size: 2.5rem;
+            font-size: 2.4rem;
         }
     }
 
     ${props => props.theme.breakpoints.down("sm")} {
         padding: 2px;
         width: 70px;
-        height: 65px;
+        height: 70px;
         font-size: 11px;
-        white-space: nowrap;
 
         svg {
             font-size: 2.2rem;
@@ -62,7 +60,7 @@ const ItemName = styled.span`
 
 const Suggest = () => {
     return (
-        <Grid container spacing={.5} size={12} justifyContent="center">
+        <Grid container spacing={.5} size={12} mt={{ xs: 0, md: 3}} position="relative" zIndex={2} justifyContent="center">
             {suggest?.map((tab, index) => (
                 <Grid size={{ xs: 2.4, md: 1.2 }} display="flex" justifyContent="center">
                     <ItemWrapper key={`suggest-tab-${index}`}>

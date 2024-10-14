@@ -1,4 +1,4 @@
-import { useState, useRef, lazy, Suspense } from 'react'
+import { useState, useRef, lazy, Suspense, Fragment } from 'react'
 import { Box, Skeleton, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { useParams, Navigate, NavLink, useSearchParams } from 'react-router-dom';
 import { useGetBookQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
@@ -15,6 +15,24 @@ const ProductsSlider = lazy(() => import('../components/product/ProductsSlider')
 const ShopDisplay = lazy(() => import('../components/product/detail/ShopDisplay'));
 const ProductDetailContainer = lazy(() => import('../components/product/detail/ProductDetailContainer'));
 const ReviewComponent = lazy(() => import('../components/review/ReviewComponent'));
+
+const createCrumbs = (cate) => {
+    if (cate?.parent) {
+        return ([
+            // <Crumb cate={cate?.parent} />,
+            createCrumbs(cate?.parent),
+            <NavLink to={`/filters?cateId=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
+                {cate?.categoryName}
+            </NavLink>
+        ])
+    } else {
+        return (
+            <NavLink to={`/filters?cateId=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
+                {cate?.categoryName}
+            </NavLink>
+        )
+    }
+}
 
 const ProductDetail = () => {
     const { slug, id } = useParams(); //Book ids
@@ -71,14 +89,11 @@ const ProductDetail = () => {
             <div style={{ display: 'relative' }}>
                 <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
                     {data
-                        ?
-                        [
+                        ? [
                             <NavLink to={`/filters`} key={'bread1'}>
                                 Danh mục sản phẩm
                             </NavLink>,
-                            <NavLink to={`/filters?cateId=${data?.category?.id}`} key={'bread2'}>
-                                {data?.category?.categoryName}
-                            </NavLink>,
+                            createCrumbs(data?.category),
                             <NavLink to={`/filters?pubId=${data?.publisher?.id}`} key={'bread3'}>
                                 {data?.publisher?.pubName}
                             </NavLink>,
@@ -147,7 +162,7 @@ const ProductDetail = () => {
                         <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
                     </Suspense>
                 </LazyLoadComponent>
-            </div>
+            </div >
         </>
     )
 }

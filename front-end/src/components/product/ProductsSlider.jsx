@@ -119,7 +119,6 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
       {(loading) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
       <Carousel
         responsive={responsive}
-        infinite={true}
         customLeftArrow={<CustomLeftArrow />}
         customRightArrow={<CustomRightArrow />}
         removeArrowOnDeviceType={["mobile"]}
