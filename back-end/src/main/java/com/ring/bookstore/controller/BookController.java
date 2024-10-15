@@ -74,13 +74,13 @@ public class BookController {
     //Get book details by {id}
     @GetMapping("/{id}")
     public ResponseEntity<?> getBookDetailById(@PathVariable("id") Long bookId) {
-        return new ResponseEntity<>(bookService.getBookDetailById(bookId), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.getBookDetail(bookId, null), HttpStatus.OK);
     }
 
     //Get book details by {id}
     @GetMapping("/slug/{slug}")
     public ResponseEntity<?> getBookDetailBySlug(@PathVariable("slug") String slug) {
-        return new ResponseEntity<>(bookService.getBookDetailBySlug(slug), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.getBookDetail(null, slug), HttpStatus.OK);
     }
 
     //Add new book

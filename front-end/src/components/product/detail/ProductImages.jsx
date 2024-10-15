@@ -211,7 +211,7 @@ const CustomButtonGroup = ({ book, images, goToSlide, carouselState }) => {
                     >
                         <StyledSmallLazyImage
                             src={`${image}?size=small`}
-                            placeholder={<StyledSmallSkeleton variant="rectangular" />}
+                            placeholder={<StyledSmallSkeleton variant="rectangular" animation={false}/>}
                         />
                     </SmallImageSlide>
                 ))
@@ -270,7 +270,7 @@ const ProductImages = ({ book }) => {
                             alt={`${book?.title} preview image #${index}`}
                             sizes="400px"
                             visibleByDefault={index == 0}
-                            placeholder={<StyledSmallSkeleton variant="rectangular" />}
+                            placeholder={<StyledSmallSkeleton variant="rectangular" animation={false}/>}
                         />
                     </ImageSlide>
                 ))

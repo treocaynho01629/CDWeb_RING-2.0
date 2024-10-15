@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { lazy, Suspense, useEffect, useState } from "react";
-import { useTheme, useMediaQuery, Grid2 as Grid } from '@mui/material';
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice";
+import { useTheme, useMediaQuery, Grid2 as Grid, Skeleton } from '@mui/material';
+import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useGetCategoriesQuery, useGetCategoryQuery } from "../features/categories/categoriesApiSlice";
 import { useGetPublishersQuery } from "../features/publishers/publishersApiSlice";
 import { useGetBooksQuery } from "../features/books/booksApiSlice";
 import { orderGroup } from "../ultils/filters";
@@ -11,6 +11,7 @@ import CustomDivider from "../components/custom/CustomDivider";
 import FilteredProducts from "../components/product/filter/FilteredProducts";
 import SortList from "../components/product/filter/SortList";
 import useTitle from "../hooks/useTitle";
+import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 
 const FilterList = lazy(() => import("../components/product/filter/FilterList"));
 const FilterDialog = lazy(() => import("../components/product/filter/FilterDialog"));
@@ -18,6 +19,7 @@ const FilterDialog = lazy(() => import("../components/product/filter/FilterDialo
 //#region styled
 const Wrapper = styled.div`
     display: flex;
+    flex-direction: column;
     
     @media (min-width: 600px) {
         margin-right: auto;
@@ -36,8 +38,29 @@ const Wrapper = styled.div`
 `
 //#endregion
 
+const createCrumbs = (cate) => {
+    if (cate?.parent) {
+        return ([
+            createCrumbs(cate?.parent),
+            <strong style={{ textDecoration: 'underline' }} key={`bread-cate-${cate?.id}`}>
+                {cate?.categoryName}
+            </strong>
+        ])
+    } else {
+        return (
+            cate?.parentId ? <NavLink to={`/filters/${cate?.slug}?cateId=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
+                {cate?.categoryName}
+            </NavLink>
+                : <strong style={{ textDecoration: 'underline' }} key={`bread-cate-${cate?.id}`}>
+                    {cate?.categoryName}
+                </strong>
+        )
+    }
+}
+
 const FiltersPage = () => {
     //#region construct
+    const { slug } = useParams(); //Category slug
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
     const theme = useTheme();
@@ -63,7 +86,8 @@ const FiltersPage = () => {
     })
 
     //Fetch data
-    const { data: cates, isLoading: loadCates, isSuccess: doneCates, isError: errorCates } = useGetCategoriesQuery(); //Categories
+    const { data: currCate, isLoading: loadCate, isSuccess: doneCate, isError: errorCate } = useGetCategoryQuery({ slug, include: 'parent' }, { skip: !slug });
+    const { data: cates, isLoading: loadCates, isSuccess: doneCates, isError: errorCates } = useGetCategoriesQuery({ include: 'children' }); //Categories
     const { data: pubs, isLoading: loadPubs, isSuccess: donePubs, isError: errorPubs } = useGetPublishersQuery(); //Publishers
     const { data, isError, error, isLoading, isSuccess } = useGetBooksQuery({ //Books
         page: pagination?.currPage,
@@ -133,16 +157,19 @@ const FiltersPage = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    const handleChangeCate = (id) => {
+    const handleChangeCate = (slug, id) => {
+        console.log(slug);
         handleChangePage(1);
         if (filters?.cateId == id || id == "") {
             setFilters({ ...filters, cateId: '' });
             searchParams.delete("cateId");
             setSearchParams(searchParams);
+            if (slug) navigate({ pathname: '/filters', search: searchParams.toString() });
         } else {
             searchParams.set("cateId", id);
             setSearchParams(searchParams);
             setFilters({ ...filters, cateId: id });
+            if (slug) navigate({ pathname: `/filters/${slug}`, search: searchParams.toString() });
         }
     }
 
@@ -264,14 +291,31 @@ const FiltersPage = () => {
         navigate('/filters')
     }
 
-    //Close dialog
-    const handleClose = () => {
-        setOpen(false);
-    };
+    const handleClose = () => { setOpen(false) };
     //#endregion
 
     return (
         <Wrapper>
+            <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
+                {!loadCate
+                    ? [
+                        slug ? [
+                            <NavLink to={'/filters'} key={'filters'}>
+                                Danh mục sản phẩm
+                            </NavLink>,
+                            createCrumbs(currCate)
+                        ] :
+                            <strong style={{ textDecoration: 'underline' }} key={'filters'}>
+                                Danh mục sản phẩm
+                            </strong>,
+                        filters?.keyword &&
+                        <strong style={{ textDecoration: 'underline' }} key={'keyword'}>
+                            {`Kết quả tìm kiếm: "${filters?.keyword}"`}
+                        </strong>
+                    ]
+                    : <Skeleton variant="text" sx={{ fontSize: '16px' }} width={200} />
+                }
+            </CustomBreadcrumbs>
             <Grid container spacing={4} size="grow" sx={{ display: 'flex', justifyContent: 'center' }}>
                 {mobileMode ?
                     <>
@@ -292,7 +336,7 @@ const FiltersPage = () => {
                     <Grid size={{ xs: 12, md: 3 }} display={{ xs: "none", md: "block" }} sx={{ overflowX: 'visible', zIndex: 1 }}>
                         <Suspense fallback={<></>}>
                             <FilterList
-                                {...{ filters, resetFilter, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
+                                {...{ filters, resetFilter, loadCates, doneCates, errorCates, cates, currCate, loadPubs, donePubs, errorPubs, pubs }}
                                 onChangeCate={handleChangeCate}
                                 onChangeRange={handleChangeRange}
                                 onChangePub={handleChangePub}

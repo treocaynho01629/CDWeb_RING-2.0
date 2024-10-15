@@ -184,7 +184,7 @@ const Categories = () => {
                 return (
                     <Fragment key={`main-${cateId}-${index}`}>
                         <ItemWrapper key={`cate-${cateId}-${index}`}>
-                            <Link to={`/filters?cateId=${cateId}`} title={cate?.categoryName}>
+                            <Link to={`/filters/${cate?.slug}?cateId=${cateId}`} title={cate?.categoryName}>
                                 <ItemContainer>
                                     <StyledLazyImage
                                         width={65}
@@ -192,7 +192,7 @@ const Categories = () => {
                                         style={{ objectFit: 'contain' }}
                                         src={`${cate?.image}?size=tiny`}
                                         alt={`Category item: ${cate?.categoryName}`}
-                                        placeholder={<Skeleton width={65} height={65} variant="rectangular" />}
+                                        placeholder={<Skeleton width={65} height={65} variant="rectangular" animation={false}/>}
                                     />
                                     <ItemName>{cate?.categoryName}</ItemName>
                                 </ItemContainer>

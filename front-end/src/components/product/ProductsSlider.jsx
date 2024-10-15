@@ -109,7 +109,7 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
             </ProductContainer>
           )
         })
-      ] : tempItems
+      ] : <p>TEMP</p>
   } else {
     productsCarousel = tempItems;
   }

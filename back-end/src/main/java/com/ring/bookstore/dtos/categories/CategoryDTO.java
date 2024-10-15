@@ -4,6 +4,7 @@ import java.util.List;
 
 //Category
 public record CategoryDTO(Integer id,
+                          String slug,
                           Integer parentId,
                           String categoryName,
                           CategoryDTO parent,

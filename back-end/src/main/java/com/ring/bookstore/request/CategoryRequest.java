@@ -18,4 +18,7 @@ public class CategoryRequest {
 	private String name;
 
 	private Integer parentId;
+
+	@Size(max = 500, message = "Mô tả không quá 500 kí tự")
+	private String description;
 }

@@ -24,13 +24,6 @@ public class CategoryController {
 
     private final CategoryService cateService;
 
-    //Get all categories
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllCategories() {
-        List<Category> categories = cateService.getAllCategories();
-        return new ResponseEntity<>(categories, HttpStatus.OK);
-    }
-
     //Get preview categories
     @GetMapping("/preview")
     public ResponseEntity<?> getPreviewCategories() {
@@ -40,17 +33,27 @@ public class CategoryController {
 
     //Get categories
     @GetMapping
-    public ResponseEntity<?> getCategories(@RequestParam(value = "include", required = false) String include,
-                                           @RequestParam(value = "parentId", required = false) Integer parentId,
-                                           @RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
-                                           @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo) {
-        return new ResponseEntity<>(cateService.getCategories(include, parentId, pageNo, pageSize), HttpStatus.OK);
+    public ResponseEntity<?> getCategories(@RequestParam(value = "pSize", defaultValue = "20") Integer pageSize,
+                                           @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                                           @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+                                           @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
+                                           @RequestParam(value = "include", required = false) String include,
+                                           @RequestParam(value = "parentId", required = false) Integer parentId) {
+        return new ResponseEntity<>(cateService.getCategories(pageNo, pageSize, sortBy, sortDir, include, parentId), HttpStatus.OK);
     }
 
     //Get category by {id}
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCategoryById(@PathVariable("id") Integer id) {
-        return new ResponseEntity<>(cateService.getCategoryById(id, "test"), HttpStatus.OK);
+    public ResponseEntity<?> getCategoryById(@PathVariable("id") Integer id,
+                                             @RequestParam(value = "include", required = false) String include) {
+        return new ResponseEntity<>(cateService.getCategory(id, null, include), HttpStatus.OK);
+    }
+
+    //Get category by {slug}
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<?> getCategoryBySlug(@PathVariable("slug") String slug,
+                                             @RequestParam(value = "include", required = false) String include) {
+        return new ResponseEntity<>(cateService.getCategory(null, slug, include), HttpStatus.OK);
     }
 
     //Add category
@@ -72,6 +75,7 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteCategory(@PathVariable("id") Integer id) {
+        cateService.deleteCategory(id);
         return new ResponseEntity<>("Category deleted!", HttpStatus.OK);
     }
 

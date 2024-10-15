@@ -31,10 +31,13 @@ public class Category {
     @Nationalized 
     private String categoryName;
 
-    @Column(length = 4000)
+    @Column(length = 500)
     @Nationalized
     @JsonIgnore
     private String description;
+
+    @Column(unique = true)
+    private String slug;
 
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             mappedBy = "cate",
@@ -62,6 +65,10 @@ public class Category {
     public void removeSubCate(Category subCate) {
         subCates.remove(subCate);
         subCate.setParent(null);
+    }
+
+    public Integer getParentId() {
+        return (parent != null) ? parent.getId() : null;
     }
 
     @PreRemove

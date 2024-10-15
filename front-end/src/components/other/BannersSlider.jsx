@@ -184,7 +184,7 @@ function Item({ banner, index }) {
                         aria-hidden
                         src={`${banner?.image}?size=tiny`}
                         visibleByDefault={index == 0}
-                        placeholder={<BackdropPlaceholder variant="rectangular" />}
+                        placeholder={<BackdropPlaceholder variant="rectangular" animation={false}/>}
                     />
                 </BackdropContainer>
                 <StyledLazyImage
@@ -192,7 +192,7 @@ function Item({ banner, index }) {
                     srcSet={`${banner?.image}?size=medium 350w, ${banner?.image} 600w`}
                     alt={banner?.name}
                     visibleByDefault={index == 0}
-                    placeholder={<StyledSkeleton variant="rectangular" animation="wave" />}
+                    placeholder={<StyledSkeleton variant="rectangular" animation={false}/>}
                 />
             </>
                 : <>
@@ -221,7 +221,7 @@ function ExtraItem({ banner, index, length, slideIndex }) {
                     srcSet={`${banner?.image}?size=medium 350w, ${banner?.image} 600w`}
                     alt={banner?.name}
                     visibleByDefault={true}
-                    placeholder={<StyledSkeleton variant="rectangular" />}
+                    placeholder={<StyledSkeleton variant="rectangular" animation={false}/>}
                 />
             </ExtraContainer>
         )
