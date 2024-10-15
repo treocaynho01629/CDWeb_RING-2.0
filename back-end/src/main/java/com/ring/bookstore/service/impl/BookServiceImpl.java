@@ -68,17 +68,9 @@ public class BookServiceImpl implements BookService {
         return bookDtos;
     }
 
-    //Get display book info by {id}
-    public BookDetailDTO getBookDetailById(Long id) {
-        IBookDetail book = bookRepo.findBookDetailById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Product not found!"));
-        BookDetailDTO bookDetailDTO = bookMapper.detailToDetailDTO(book); //Map to DTO
-        return bookDetailDTO;
-    }
-
-    //Get display book info by {slug}
-    public BookDetailDTO getBookDetailBySlug(String slug) {
-        IBookDetail book = bookRepo.findBookDetailBySlug(slug).orElseThrow(() ->
+    //Get book with detail
+    public BookDetailDTO getBookDetail(Long id, String slug) {
+        IBookDetail book = bookRepo.findBookDetail(id, slug).orElseThrow(() ->
                 new ResourceNotFoundException("Product not found!"));
         BookDetailDTO bookDetailDTO = bookMapper.detailToDetailDTO(book); //Map to DTO
         return bookDetailDTO;

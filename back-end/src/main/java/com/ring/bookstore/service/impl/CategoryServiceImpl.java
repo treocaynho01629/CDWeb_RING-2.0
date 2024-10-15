@@ -3,14 +3,18 @@ package com.ring.bookstore.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.github.slugify.Slugify;
 import com.ring.bookstore.dtos.categories.CategoryDTO;
+import com.ring.bookstore.dtos.categories.CategoryDetailDTO;
 import com.ring.bookstore.dtos.categories.PreviewCategoryDTO;
 import com.ring.bookstore.dtos.mappers.CategoryMapper;
 import com.ring.bookstore.dtos.projections.ICategory;
 import com.ring.bookstore.request.CategoryRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.exception.ResourceNotFoundException;
@@ -26,27 +30,23 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository cateRepo;
     private final CategoryMapper cateMapper;
-
-    //Get all categories
-    public List<Category> getAllCategories() {
-        return cateRepo.findAllByParentIsNull();
-    }
+    private final Slugify slg = Slugify.builder().lowerCase(false).build();
 
     @Override
-    public Page<CategoryDTO> getCategories(String include, Integer parentId, Integer pageNo, Integer pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+    public Page<CategoryDTO> getCategories(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
+                                           String include, Integer parentId) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
+                : Sort.by(sortBy).descending());
         Page<CategoryDTO> cateDtos = null;
 
-        if (include != null) {
-            if (include.equalsIgnoreCase("children")) {
-                Page<Category> catesList = cateRepo.findAllCatesWithChildren(parentId, pageable);
-                cateDtos = catesList.map(cateMapper::cateToCateDTOWithChildren);
-            } else if (include.equalsIgnoreCase("parent")) {
-                Page<Category> catesList = cateRepo.findAllCatesWithParent(parentId, pageable);
-                cateDtos = catesList.map(cateMapper::cateToCateDTOWithParent);
-            }
+        if (include != null && include.equalsIgnoreCase("children")) {
+            Page<Category> catesList = cateRepo.findCatesWithChildren(parentId, pageable);
+            cateDtos = catesList.map(category -> cateMapper.cateToCateDTO(category, "children"));
+        } else if (include != null && include.equalsIgnoreCase("parent")) {
+            Page<Category> catesList = cateRepo.findCatesWithParent(parentId, pageable);
+            cateDtos = catesList.map(category -> cateMapper.cateToCateDTO(category, "parent"));
         } else {
-            Page<Category> catesList = cateRepo.findAllCates(parentId, pageable);
+            Page<Category> catesList = cateRepo.findCates(parentId, pageable);
             cateDtos = catesList.map(cateMapper::cateToCateDTO);
         }
         return cateDtos;
@@ -58,17 +58,37 @@ public class CategoryServiceImpl implements CategoryService {
         return previews.stream().map(cateMapper::projectionToPreview).collect(Collectors.toList());
     }
 
-    //Get category by {id}
-    public Category getCategoryById(Integer id, String include) {
-        return cateRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Category not found!"));
+    //Get category
+    public CategoryDetailDTO getCategory(Integer id, String slug, String include) {
+        CategoryDetailDTO result = null;
+
+        if (include != null && include.equalsIgnoreCase("children")) {
+            Category cate = cateRepo.findCateWithChildren(id, slug).orElseThrow(() ->
+                    new ResourceNotFoundException("Category not found!"));
+            result = cateMapper.cateToDetailDTO(cate, "children");
+        } else if (include != null && include.equalsIgnoreCase("parent")) {
+            Category cate = cateRepo.findCateWithParent(id, slug).orElseThrow(() ->
+                    new ResourceNotFoundException("Category not found!"));
+            result = cateMapper.cateToDetailDTO(cate, "parent");
+        } else {
+            Category cate = cateRepo.findCate(id, slug).orElseThrow(() ->
+                    new ResourceNotFoundException("Category not found!"));
+            result = cateMapper.cateToDetailDTO(cate);
+        }
+
+        return result;
     }
 
-    @Override
+    @Transactional
     public Category addCategory(CategoryRequest request) {
+        //Slugify
+        String slug = slg.slugify(request.getName());
+
         //Create new category
         var category = Category.builder()
+                .slug(slug)
                 .categoryName(request.getName())
+                .description(request.getDescription())
                 .build();
 
         //Set parent
@@ -82,14 +102,19 @@ public class CategoryServiceImpl implements CategoryService {
         return addedCate;
     }
 
-    @Override
+    @Transactional
     public Category updateCategory(Integer id, CategoryRequest request) {
         //Get original category
         Category category = cateRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
+        //Set new info
+        String slug = slg.slugify(request.getName());
+
         //Update
+        category.setSlug(slug);
         category.setCategoryName(request.getName());
+        category.setDescription(request.getDescription());
 
         //Parent
         if (request.getParentId() != null && !request.getParentId().equals(category.getParent().getId())) {
@@ -103,12 +128,12 @@ public class CategoryServiceImpl implements CategoryService {
         return updatedCate;
     }
 
-    @Override
+    @Transactional
     public void deleteCategory(Integer id) {
         cateRepo.deleteById(id);
     }
 
-    @Override
+    @Transactional
     public void deleteCategories(List<Integer> ids, boolean isInverse) {
         if (isInverse) {
             cateRepo.deleteByIdIsNotIn(ids);

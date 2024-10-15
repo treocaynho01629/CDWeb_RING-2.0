@@ -103,6 +103,11 @@ const SkeletonContainer = styled.div`
     align-items: center;
     justify-content: center;
 `
+
+const StyledSkeleton = styled(Skeleton)`
+    height: 100%;
+    aspect-ratio: 1/1;
+`
 //#endregion
 
 const ProductPreview = ({ book, scrollPosition }) => {
@@ -118,11 +123,7 @@ const ProductPreview = ({ book, scrollPosition }) => {
                         scrollPosition={scrollPosition}
                         placeholder={
                             <SkeletonContainer>
-                                <Skeleton
-                                    variant="rectangular"
-                                    height={'100%'}
-                                    sx={{ aspectRatio: '1/1' }}
-                                />
+                                <StyledSkeleton variant="rectangular" animation={false}/>
                             </SkeletonContainer>
                         }
                     />

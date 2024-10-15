@@ -225,7 +225,7 @@ const Product = ({ book, scrollPosition }) => {
                                     src={`${book?.image}?size=small`}
                                     alt={`${book?.title} Thumbnail`}
                                     scrollPosition={scrollPosition}
-                                    placeholder={<StyledSkeleton variant="rectangular" />}
+                                    placeholder={<StyledSkeleton variant="rectangular" animation={false}/>}
                                 />
                             </ImageContainer>
                             <Info>

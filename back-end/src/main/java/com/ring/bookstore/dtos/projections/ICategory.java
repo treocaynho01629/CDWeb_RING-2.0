@@ -1,14 +1,10 @@
 package com.ring.bookstore.dtos.projections;
 
+import com.ring.bookstore.model.Category;
+
 public interface ICategory {
 
-    Integer getId();
-
-    Integer getParentId();
-
-    String getName();
-
-    String getDescription();
+    Category getCategory();
 
     String getImage();
 }

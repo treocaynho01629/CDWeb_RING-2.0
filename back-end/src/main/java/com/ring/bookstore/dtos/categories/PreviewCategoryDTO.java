@@ -1,9 +1,8 @@
 package com.ring.bookstore.dtos.categories;
 
-import java.util.List;
-
 //Category
 public record PreviewCategoryDTO(Integer id,
+                                 String slug,
                                  Integer parentId,
                                  String categoryName,
                                  String image) {

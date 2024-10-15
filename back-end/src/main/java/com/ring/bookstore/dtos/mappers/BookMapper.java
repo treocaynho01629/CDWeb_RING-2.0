@@ -99,7 +99,7 @@ public class BookMapper {
                 shopId,
                 shopName,
                 book.getPublisher(),
-                cateMapper.cateToCateDTOWithParent(book.getCate()),
+                cateMapper.cateToCateDTO(book.getCate(), "parent"),
                 detail.getSize(),
                 detail.getPages(),
                 detail.getBDate(),

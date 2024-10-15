@@ -66,34 +66,12 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 		from Review r group by r.book.id
 	) rv on b.id = rv.book_id
 	join fetch BookDetail bd
-	where b.id = :id
+	where case when coalesce(:id) is not null 
+  		then (b.id = :id) else (b.slug = :slug) end
 	group by b, i.name, bd, od.totalOrders, s.name,
 	rv.rating, rv.totalRates, rv.five, rv.four, rv.three, rv.two, rv.one
 	""")
-	Optional<IBookDetail> findBookDetailById(Long id);
-
-	@Query("""
-	select distinct b as book, s.id as shopId, s.name as shopName, i.name as image, 
-		od.totalOrders as totalOrders, rv.rating as rating, rv.totalRates as totalRates, 
-		rv.five as five, rv.four as four, rv.three as three, rv.two as two, rv.one as one
-	from Book b join b.shop s join b.image i
-	left join (select o.book.id as book_id, sum(o.amount) as totalOrders 
-		from OrderItem o group by o.book.id) od on b.id = od.book_id
-	left join (
-		select r.book.id as book_id, avg(r.rating) as rating, count(r.id) as totalRates,
-			sum(case when r.rating = 5 then 1 else 0 end) as five,
-			sum(case when r.rating = 4 then 1 else 0 end) as four,
-			sum(case when r.rating = 3 then 1 else 0 end) as three,
-			sum(case when r.rating = 2 then 1 else 0 end) as two,
-			sum(case when r.rating = 1 then 1 else 0 end) as one
-		from Review r group by r.book.id
-	) rv on b.id = rv.book_id
-	join fetch BookDetail bd
-	where b.slug = :slug
-	group by b, i.name, bd, od.totalOrders, s.name,
-	rv.rating, rv.totalRates, rv.five, rv.four, rv.three, rv.two, rv.one
-	""")
-	Optional<IBookDetail> findBookDetailBySlug(String slug);
+	Optional<IBookDetail> findBookDetail(Long id, String slug);
 
 	@Query("""
     select b.id as id, b.slug as slug, b.title as title, i.name as image,

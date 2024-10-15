@@ -77,7 +77,7 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
   const [open, setOpen] = useState(false); //Open sub cate
 
   //Change cate
-  const handleCateChange = (id) => { onChangeCate(id); }
+  const handleCateChange = (slug, id) => { onChangeCate(slug, id); }
 
   //Open sub cate
   const handleClick = (e, id) => {
@@ -108,10 +108,10 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
           <Box key={`${id}-${index}`}>
             <StyledListItemButton
               selected={cateId == id}
-              onClick={() => handleCateChange(id)}
+              onClick={() => handleCateChange(cate?.slug, id)}
             >
               <FilterText>{cate?.categoryName}</FilterText>
-              {cate.subCates?.length ?
+              {cate.children?.length ?
                 <>
                   {open[id] ? <ExpandLess onClick={(e) => handleClick(e, id)} />
                     : <ExpandMore onClick={(e) => handleClick(e, id)} />}
@@ -119,16 +119,16 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
                 : null
               }
             </StyledListItemButton>
-            {cate?.subCates &&
+            {cate?.children &&
               <Collapse in={open[id]} timeout="auto" unmountOnExit>
-                {cate.subCates?.map((sub, subIndex) => (
-                  <List key={`${sub?.id}-${subIndex}`} component="div" disablePadding>
+                {cate.children?.map((child, subIndex) => (
+                  <List key={`${child?.id}-${subIndex}`} component="div" disablePadding>
                     <StyledListItemButton
                       className="secondary"
-                      selected={cateId == sub?.id}
-                      onClick={() => handleCateChange(sub?.id)}
+                      selected={cateId == child?.id}
+                      onClick={() => handleCateChange(child?.slug, child?.id)}
                     >
-                      <FilterText>{sub?.categoryName}</FilterText>
+                      <FilterText>{child?.categoryName}</FilterText>
                     </StyledListItemButton>
                   </List>
                 ))}
@@ -500,11 +500,11 @@ const OtherFilters = ({ type, shop, setShop, onChangeType, onChangeShop }) => {
 const FilterList = (props) => {
   //#region construct
   const { filters, onChangeCate, onChangeRange, onChangePub, onChangeType, onChangeShop,
-    loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs, resetFilter
+    loadCates, doneCates, errorCates, cates, currCate, loadPubs, donePubs, errorPubs, pubs, resetFilter
   } = props;
 
   //Initial data
-  const [cateId, setCateId] = useState(filters?.cateId);
+  const [cateId, setCateId] = useState(filters?.cateId != "" ? filters?.cateId : currCate?.id);
   const [valueInput, setValueInput] = useState(filters?.value);
   const [type, setType] = useState(filters?.type);
   const [shop, setShop] = useState(filters?.shop);
@@ -512,8 +512,8 @@ const FilterList = (props) => {
 
   //Update value
   useEffect(() => {
-    setCateId(filters?.cateId);
-  }, [filters?.cateId]);
+    setCateId(filters?.cateId != "" ? filters?.cateId : currCate?.id);
+  }, [filters?.cateId, currCate]);
 
   useEffect(() => {
     setType(filters?.type);

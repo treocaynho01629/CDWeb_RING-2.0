@@ -19,15 +19,14 @@ const ReviewComponent = lazy(() => import('../components/review/ReviewComponent'
 const createCrumbs = (cate) => {
     if (cate?.parent) {
         return ([
-            // <Crumb cate={cate?.parent} />,
             createCrumbs(cate?.parent),
-            <NavLink to={`/filters?cateId=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
+            <NavLink to={`/filters/${cate?.slug}?cateId=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
                 {cate?.categoryName}
             </NavLink>
         ])
     } else {
         return (
-            <NavLink to={`/filters?cateId=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
+            <NavLink to={`/filters/${cate?.slug}?cateId=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
                 {cate?.categoryName}
             </NavLink>
         )
@@ -86,18 +85,18 @@ const ProductDetail = () => {
                     <PendingIndicator open={pending} message="Đang gửi yêu cầu..." />
                 </Suspense>
             }
-            <div style={{ display: 'relative' }}>
+            <Box display="relative">
                 <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
                     {data
                         ? [
-                            <NavLink to={`/filters`} key={'bread1'}>
+                            <NavLink to={'/filters'} key={'filters'}>
                                 Danh mục sản phẩm
                             </NavLink>,
                             createCrumbs(data?.category),
-                            <NavLink to={`/filters?pubId=${data?.publisher?.id}`} key={'bread3'}>
+                            <NavLink to={`/filters?pubId=${data?.publisher?.id}`} key={'publisher'}>
                                 {data?.publisher?.pubName}
                             </NavLink>,
-                            <strong style={{ textDecoration: 'underline' }} key={'bread4'}>{data?.title}</strong>
+                            <strong style={{ textDecoration: 'underline' }} key={'book-title'}>{data?.title}</strong>
                         ]
                         :
                         <Skeleton variant="text" sx={{ fontSize: '16px' }} width={300} />
@@ -162,7 +161,7 @@ const ProductDetail = () => {
                         <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
                     </Suspense>
                 </LazyLoadComponent>
-            </div >
+            </Box>
         </>
     )
 }

@@ -1,5 +1,6 @@
 import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
+import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
 
 const catesAdapter = createEntityAdapter({});
 const catesSelector = catesAdapter.getSelectors();
@@ -14,24 +15,14 @@ const initialState = catesAdapter.getInitialState({
 
 export const categoriesApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
-        getAllCategories: builder.query({
-            query: () => ({
-                url: '/api/categories/all',
+        getCategory: builder.query({
+            query: ({ id, slug, include }) => ({
+                url: `/api/categories/${slug ? 'slug/' + slug : id ? id : ''}${include ? `?include=${include}` : ''}`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError
                 },
             }),
-            transformResponse: responseData => {
-                return catesAdapter.setAll(initialState, responseData)
-            },
-            providesTags: (result, error, arg) => {
-                if (result?.ids) {
-                    return [
-                        { type: 'Category', id: 'LIST' },
-                        ...result.ids.map(id => ({ type: 'Category', id }))
-                    ]
-                } else return [{ type: 'Category', id: 'LIST' }]
-            }
+            providesTags: (result, error) => [{ type: 'Category', id: result.id }]
         }),
         getPreviewCategories: builder.query({
             query: () => ({
@@ -54,12 +45,16 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
         }),
         getCategories: builder.query({
             query: (args) => {
-                const { page, size } = args || {};
+                const { page, size, sortBy, sortDir, include, parentId } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
                 if (page) params.append('pageNo', page);
                 if (size) params.append('pSize', size);
+                if (sortBy) params.append('sortBy', sortBy);
+                if (sortDir) params.append('sortDir', sortDir);
+                if (include) params.append('include', include);
+                if (parentId) params.append('parentId', parentId);
 
                 return {
                     url: `/api/categories?${params.toString()}`,
@@ -178,7 +173,7 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
 })
 
 export const {
-    useGetAllCategoriesQuery,
+    useGetCategoryQuery,
     useGetPreviewCategoriesQuery,
     useGetCategoriesQuery,
     useCreateCategoryMutation,

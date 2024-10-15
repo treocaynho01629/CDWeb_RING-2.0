@@ -1,6 +1,7 @@
 package com.ring.bookstore.dtos.mappers;
 
 import com.ring.bookstore.dtos.categories.CategoryDTO;
+import com.ring.bookstore.dtos.categories.CategoryDetailDTO;
 import com.ring.bookstore.dtos.categories.PreviewCategoryDTO;
 import com.ring.bookstore.dtos.projections.ICategory;
 import com.ring.bookstore.model.Category;
@@ -14,49 +15,82 @@ import java.util.stream.Collectors;
 public class CategoryMapper {
 
     public CategoryDTO cateToCateDTO(Category category) {
-        Category parentCate = category.getParent();
-
         return new CategoryDTO(category.getId(),
-                parentCate != null ? parentCate.getId() : null,
+                category.getSlug(),
+                category.getParentId(),
                 category.getCategoryName(),
                 null,
                 null);
     }
 
-    public CategoryDTO cateToCateDTOWithChildren(Category category) {
-        List<CategoryDTO> children = category.getSubCates()
-                .stream().map(this::cateToCateDTO).collect(Collectors.toList());
-        Category parentCate = category.getParent();
+    public CategoryDTO cateToCateDTO(Category category, String include) {
+        List<CategoryDTO> children = null;
+        CategoryDTO parent = null;
+
+        //Include?
+        if (include == null) return this.cateToCateDTO(category);
+        if (include.equalsIgnoreCase("parent")){
+            Category parentCate = category.getParent();
+            parent = parentCate != null ? this.cateToCateDTO(category.getParent(), "parent") : null;
+        } else if (include.equalsIgnoreCase("children")) {
+            children = category.getSubCates()
+                    .stream().map(this::cateToCateDTO).collect(Collectors.toList());
+        }
 
         return new CategoryDTO(category.getId(),
-                parentCate != null ? parentCate.getId() : null,
+                category.getSlug(),
+                category.getParentId(),
                 category.getCategoryName(),
-                null,
+                parent,
                 children);
     }
 
-    public CategoryDTO cateToCateDTOWithParent(Category category) {
-        Category parentCate = category.getParent();
-        CategoryDTO parent = parentCate != null ? this.cateToCateDTOWithParent(category.getParent()) : null;
-
-        return new CategoryDTO(category.getId(),
-                parentCate != null ? parentCate.getId() : null,
+    public CategoryDetailDTO cateToDetailDTO(Category category) {
+        return new CategoryDetailDTO(category.getId(),
+                category.getSlug(),
+                category.getParentId(),
                 category.getCategoryName(),
-                parent,
+                category.getDescription(),
+                null,
                 null);
     }
 
-    public PreviewCategoryDTO projectionToPreview(ICategory category) {
+    public CategoryDetailDTO cateToDetailDTO(Category category, String include) {
+        List<CategoryDTO> children = null;
+        CategoryDTO parent = null;
+
+        //Include?
+        if (include == null) return this.cateToDetailDTO(category);
+        if (include.equalsIgnoreCase("parent")){
+            Category parentCate = category.getParent();
+            parent = parentCate != null ? this.cateToCateDTO(category.getParent(), "parent") : null;
+        } else if (include.equalsIgnoreCase("children")) {
+            children = category.getSubCates()
+                    .stream().map(this::cateToCateDTO).collect(Collectors.toList());
+        }
+
+        return new CategoryDetailDTO(category.getId(),
+                category.getSlug(),
+                category.getParentId(),
+                category.getCategoryName(),
+                category.getDescription(),
+                parent,
+                children);
+    }
+
+    public PreviewCategoryDTO projectionToPreview(ICategory projection) {
+        Category category = projection.getCategory();
 
         String fileDownloadUri = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
                 .path("/api/images/")
-                .path(category.getImage())
+                .path(projection.getImage())
                 .toUriString();
 
         return new PreviewCategoryDTO(category.getId(),
+                category.getSlug(),
                 category.getParentId(),
-                category.getName(),
+                category.getCategoryName(),
                 fileDownloadUri);
     }
 }
