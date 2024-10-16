@@ -69,26 +69,6 @@ const CateContainer = styled.div`
             visibility: visible;
         }
     }
-
-    &::before, &::after {
-        position: absolute;
-        top: 0;
-        width: 10%;
-        height: 100%;
-        content: "";
-        z-index: 1;
-        pointer-events: none;
-    }
-
-    &:before {
-        left: 0;
-        background-image: linear-gradient(to right, ${props => props.theme.palette.background.default}, transparent 90%);
-    }
-
-    &:after {
-        right: 0;
-        background-image: linear-gradient(to left, ${props => props.theme.palette.background.default}, transparent 90%);
-    }
 `
 
 const ItemWrapper = styled.div`
@@ -187,9 +167,6 @@ const Categories = () => {
                             <Link to={`/filters/${cate?.slug}?cateId=${cateId}`} title={cate?.categoryName}>
                                 <ItemContainer>
                                     <StyledLazyImage
-                                        width={65}
-                                        height={65}
-                                        style={{ objectFit: 'contain' }}
                                         src={`${cate?.image}?size=tiny`}
                                         alt={`Category item: ${cate?.categoryName}`}
                                         placeholder={<Skeleton width={65} height={65} variant="rectangular" animation={false}/>}

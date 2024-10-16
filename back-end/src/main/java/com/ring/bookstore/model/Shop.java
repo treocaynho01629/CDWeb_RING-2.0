@@ -73,6 +73,10 @@ public class Shop extends Auditable {
     @JsonIgnore
     private List<Account> followers;
 
+    public Long getImageId() {
+        return (this.image != null) ? this.image.getId() : null;
+    }
+
     public void removeAllBooks() {
         books.forEach(book -> book.setShop(null));
         this.books.clear();

@@ -48,11 +48,12 @@ export const bannersApiSlice = apiSlice.injectEndpoints({
             },
         }),
         createBanner: builder.mutation({
-            query: ({ id, newBanner }) => ({
+            query: (newBanner) => ({
                 url: `/api/banners/${id}`,
                 method: 'POST',
                 credentials: 'include',
-                body: { ...newBanner }
+                body: newBanner,
+                formData: true,
             }),
             invalidatesTags: [
                 { type: 'Banner', id: "LIST" }

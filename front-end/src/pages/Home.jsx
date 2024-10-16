@@ -1,11 +1,11 @@
 import styled from 'styled-components';
-import { useState, useEffect, lazy, Suspense } from "react";
-import { Button } from '@mui/material';
+import { useState, useEffect, lazy, Suspense, useRef } from "react";
+import { alpha, Button } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
 import { useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import { LazyLoadComponent } from 'react-lazy-load-image-component';
-import { ExpandMore, Replay } from '@mui/icons-material';
+import { Category, ExpandMore, GpsNotFixed, KeyboardArrowRight, Replay, ThumbUpAlt } from '@mui/icons-material';
 import { CustomTab, CustomTabs } from '../components/custom/CustomTabs';
 import useTitle from '../hooks/useTitle';
 import Categories from '../components/other/Categories';
@@ -14,6 +14,8 @@ import Products from '../components/product/Products';
 import CustomDivider from '../components/custom/CustomDivider';
 import CustomPlaceholder from '../components/custom/CustomPlaceholder';
 import BannersSlider from '../components/other/BannersSlider';
+import Publishers from '../components/other/Publishers';
+import { useGetPublishersQuery } from '../features/publishers/publishersApiSlice';
 
 const ProductsSlider = lazy(() => import('../components/product/ProductsSlider'));
 
@@ -64,13 +66,15 @@ const ToggleGroupContainer = styled.div`
 const TitleContainer = styled.div`
   position: relative;
   width: 100%;
-  border-bottom: 1px solid ${props => props.theme.palette.divider};
+  font-size: 18px;
+  font-weight: 450;
+  background-color: ${props => props.theme.palette.background.default};
   display: flex;
   align-items: center;
   justify-content: space-between;
   white-space: nowrap;
-  padding: 0 10px;
-  z-index: 2;
+  padding: 10px 15px;
+  margin-bottom: 5px;
 `
 
 const ButtonContainer = styled.div`
@@ -78,19 +82,67 @@ const ButtonContainer = styled.div`
   justify-content: center;
   margin-top: 20px;
 `
+
+const MoreButton = styled.span`
+  font-size: 12px;
+  font-weight: 450;
+  color: ${props => props.theme.palette.info.light};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+
+  &.error {
+    color: ${props => props.theme.palette.error.main};
+  }
+`
+
+const ContainerTitle = styled.span`
+  font-size: 18px;
+  font-weight: 450;
+  display: flex;
+  align-items: center;
+  color: ${props => props.theme.palette.primary.dark};
+
+  &.error {
+    color: ${props => props.theme.palette.error.main};
+  }
+`
+
+const Container = styled.div`
+  position: relative;
+  margin: 10px 0;
+`
+
+const SaleContainer = styled.div`
+  position: relative;
+  padding: 20px 0;
+  margin: 10px 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    height: 100%;
+    transform: translateX(-50%);
+    border: 1px solid ${props => props.theme.palette.primary.light};
+    background-color: ${props => alpha(props.theme.palette.primary.light, 0.1)};
+  }
+`
 //#endregion
 
 const orderTabs = [
   {
-    filter: { sortBy: 'totalOrders' },
+    filters: { sortBy: 'totalOrders' },
     label: 'Bán chạy',
   },
   {
-    filter: { sortBy: 'createdDate' },
+    filters: { sortBy: 'createdDate' },
     label: 'Mới nhất',
   },
   {
-    filter: { sortBy: 'rating' },
+    filters: { sortBy: 'rating' },
     label: 'Yêu thích',
   },
 ];
@@ -99,92 +151,85 @@ const defaultSize = 15;
 const defaultMore = 5;
 
 const cateToTabs = (cate) => {
-  console.log('voke')
   return (cate?.children?.flatMap(function (child, index) {
     return {
-      filter: { cateId: child?.id },
+      filters: { cateId: child?.id },
       label: child?.categoryName,
       slug: child?.slug
     }
   }))
 }
 
-const ProductsList = ({ tabs, title }) => {
+const ProductsList = ({ tabs, value, title }) => {
+  const listRef = useRef(null); //Scroll ref
   const [tabValue, setTabValue] = useState(0);
-  const slug = tabs ? tabs[tabValue].slug : null;
-  const filters = tabs ? { ...tabs[tabValue].filter, sortDir: 'desc' } : {};
+  const slug = tabs ? tabs[tabValue]?.slug : null;
+  const filters = tabs ? { ...tabs[tabValue]?.filters, sortDir: 'desc' } : value || {};
   const { data, isLoading, isFetching, isSuccess, isError, refetch } = useGetBooksQuery(
-    tabs ? filters : {},
-    { skip: !tabs }
+    tabs || value ? filters : {},
+    { skip: !tabs && !value }
   );
 
-  const handleChangeValue = (e, newValue) => { if (newValue !== null) { setTabValue(newValue) } };
-  // const getParams = () => {
-  //   const { sortBy, keyword, cateId, rating, amount, pubId, type, shopId, sellerId, value } = filters || {};
+  const handleChangeValue = (e, newValue) => {
+    if (newValue !== null) { 
+      setTabValue(newValue);
+      listRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
+    }
+  };
+  const getParams = () => {
+    const { sortBy, keyword, cateId, rating, amount, pubId, type, shopId, sellerId, value } = filters || {};
 
-  //   const params = new URLSearchParams();
-  //   if (sortBy) params.append('sortBy', sortBy);
-  //   if (keyword) params.append('keyword', keyword);
-  //   if (cateId) params.append('cateId', cateId);
-  //   if (rating) params.append('rating', rating);
-  //   if (amount) params.append('amount', amount);
-  //   if (type) params.append('type', type);
-  //   if (shopId) params.append('shopId', shopId);
-  //   if (sellerId) params.append('sellerId', sellerId);
-  //   if (pubId?.length) params.append('pubId', pubId);
-  //   if (value) {
-  //     params.append('fromRange', value[0]);
-  //     params.append('toRange', value[1]);
-  //   }
-
-  //   return params.toString();
-  // }
+    const params = new URLSearchParams();
+    if (sortBy) params.append('sortBy', sortBy);
+    if (keyword) params.append('keyword', keyword);
+    if (cateId) params.append('cateId', cateId);
+    if (rating) params.append('rating', rating);
+    if (amount) params.append('amount', amount);
+    if (type) params.append('type', type);
+    if (shopId) params.append('shopId', shopId);
+    if (sellerId) params.append('sellerId', sellerId);
+    if (pubId?.length) params.append('pubId', pubId);
+    if (value) {
+      params.append('fromRange', value[0]);
+      params.append('toRange', value[1]);
+    }
+    return params.toString();
+  }
 
   return (
     <LazyLoadComponent>
-      <Suspense fallback={<CustomPlaceholder sx={{ height: '50px' }} />}>
-        <TitleContainer>{title}</TitleContainer>
-        <ToggleGroupContainer>
-          <CustomTabs
-            variant="scrollable"
-            value={tabValue}
-            onChange={handleChangeValue}
-          >
-            {(!tabs?.length ? Array.from(new Array(1)) : tabs)?.map((tab, index) => (
-              <CustomTab
-                key={`${title}-tabs-${tab?.label}-${index}`}
-                label={tab?.label ?? 'Đang cập nhật'}
-                value={index ?? ''}
-              />
-            ))}
-          </CustomTabs>
-        </ToggleGroupContainer>
-        <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
-        {/* <ButtonContainer>
+      <Suspense fallback={<CustomPlaceholder sx={{ height: '100px' }} />}>
+        <TitleContainer ref={listRef}>
+          {title}
           {isError ?
-            <Button
-              variant="outlined"
-              color="error"
-              size="medium"
-              sx={{ width: '200px' }}
-              endIcon={<Replay sx={{ marginRight: '-10px' }} />}
-              onClick={() => refetch()}
-            >
-              Tải lại
-            </Button>
-            : tabs && <Link to={`/filters${slug ? `/${slug}` : ''}?${getParams()}`}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="medium"
-                sx={{ width: '200px' }}
-                endIcon={<ExpandMore sx={{ marginRight: '-10px' }} />}
-              >
-                Xem thêm
-              </Button>
+            <MoreButton className="error" onClick={() => refetch()}>
+              Tải lại <Replay />
+            </MoreButton>
+            :
+            <Link to={`/filters${slug ? `/${slug}` : ''}?${getParams()}`}>
+              <MoreButton>
+                Xem tất cả <KeyboardArrowRight />
+              </MoreButton>
             </Link>
           }
-        </ButtonContainer> */}
+        </TitleContainer>
+        {tabs &&
+          <ToggleGroupContainer>
+            <CustomTabs
+              value={tabValue}
+              onChange={handleChangeValue}
+            >
+              {(!tabs?.length ? Array.from(new Array(1)) : tabs)?.map((tab, index) => (
+                <CustomTab
+                  key={`${title}-tabs-${tab?.label}-${index}`}
+                  label={tab?.label ?? 'Đang cập nhật'}
+                  value={index ?? ''}
+                />
+              ))}
+            </CustomTabs>
+          </ToggleGroupContainer>
+        }
+        <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
       </Suspense>
     </LazyLoadComponent>
   )
@@ -232,6 +277,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [catesWithChilds, setCatesWithChilds] = useState([]);
   const [cates, setCates] = useState([]);
+  const [pubs, setPubs] = useState([]);
   const [pagination, setPagination] = useState({
     currPage: 0,
     pageSize: defaultSize,
@@ -240,6 +286,7 @@ const Home = () => {
 
   //Fetch
   const { data: categories, isLoading: loadCates, isSuccess: doneCates } = useGetCategoriesQuery({ include: 'children' });
+  const { data: publishers, isLoading: loadPubs, isSuccess: donePubs } = useGetPublishersQuery();
   const { data, isLoading, isSuccess, isError } = useGetBooksQuery({
     page: pagination?.currPage,
     size: pagination?.pageSize,
@@ -264,6 +311,17 @@ const Home = () => {
     }
   }, [categories]);
 
+  useEffect(() => {
+    if (!loadPubs && donePubs && publishers) {
+      const { entities, ids } = publishers;
+      let pubsList = ids?.map((id, index) => {
+        const pub = entities[id];
+        return ({ filters: { pubId: [id + ''] }, label: pub?.pubName });
+      })
+      setPubs(pubsList);
+    }
+  }, [publishers]);
+
   //Set title
   useTitle('RING! - Bookstore');
 
@@ -282,9 +340,23 @@ const Home = () => {
       {/* <Slider /> */}
       <BannersSlider />
       <Suggest />
-      <ProductsList {...{ tabs: orderTabs, title: 'Sale' }} />
-      <ProductsList {...{ tabs: [{ filter: { keyword: 'toriyama' }, label: 'Akira Toriyama' }] }} />
-      <Categories />
+      <CustomDivider>TIÊU ĐIỂM</CustomDivider>
+      <SaleContainer>
+        <ProductsList {...{
+          value: { sortBy: 'discount', sortDir: 'desc' },
+          title: <ContainerTitle className="error"><ThumbUpAlt />&nbsp;Top Khuyến Mãi</ContainerTitle>
+        }} />
+      </SaleContainer>
+      <ProductsList {...{
+        value: { keyword: 'toriyama' },
+        title: <ContainerTitle><GpsNotFixed />&nbsp;Akira Toriyama</ContainerTitle>
+      }} />
+      <Container>
+        <TitleContainer>
+          <ContainerTitle><Category />&nbsp;Danh mục sản phẩm</ContainerTitle>
+        </TitleContainer>
+        <Categories />
+      </Container>
       <CustomDivider>Sản phẩm mới nhất</CustomDivider>
       <Products {...{ isLoading, data, isSuccess, isError }} />
       <ButtonContainer>
@@ -312,15 +384,30 @@ const Home = () => {
           </Button>
         }
       </ButtonContainer>
-      <ProductsList {...{ tabs: orderTabs, title: 'Test' }} />
+      <ProductsList {...{ tabs: orderTabs, title: 'Trending' }} />
       <p>TOP STUFF</p>
-      <ProductsList {...{ tabs: orderTabs, title: 'Pub' }} />
-      <ProductsList {...{ tabs: orderTabs, title: 'Pub2' }} />
-      <p>PUB STUFF</p>
-      <ProductsList {...{ tabs: cateToTabs(catesWithChilds[0]), title: catesWithChilds[0]?.categoryName }} />
-      <ProductsList {...{ tabs: cateToTabs(catesWithChilds[1]), title: catesWithChilds[1]?.categoryName }} />
-      <ProductsList {...{ tabs: cateToTabs(catesWithChilds[2]), title: catesWithChilds[2]?.categoryName }} />
+      <ProductsList {...{ value: { cateId: cates[0]?.id }, title: cates[0]?.categoryName }} />
+      <ProductsList {...{ tabs: pubs || [], title: 'Thương hiệu nổi bật' }} />
+      <ProductsList {...{ tabs: pubs || [] }} />
+      <Container>
+        <TitleContainer>
+          <ContainerTitle><Category />&nbsp;Nhà xuất bản</ContainerTitle>
+        </TitleContainer>
+        <Publishers />
+      </Container>
+      {catesWithChilds.map((cate, index) => {
+        if (index < catesWithChilds?.length - 1) {
+          const tabs = cateToTabs(catesWithChilds[index]);
+          const title = catesWithChilds[index]?.categoryName;
+
+          return (<ProductsList {...{ tabs, title }} />)
+        }
+      })}
       <ProductsList {...{ tabs: orderTabs, title: 'Other Cate' }} />
+      <ProductsList {...{
+        tabs: cateToTabs(catesWithChilds[catesWithChilds.length - 1]),
+        title: catesWithChilds[catesWithChilds.length - 1]?.categoryName
+      }} />
       <RandomList />
     </Wrapper>
   )

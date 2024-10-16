@@ -5,15 +5,15 @@ import jakarta.persistence.*;
 
 import java.util.Set;
 
+import lombok.*;
 import org.hibernate.annotations.Nationalized;
-
-import lombok.Getter;
-import lombok.Setter;
 
 
 @Entity
-@Getter
-@Setter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Publisher {
 
     @Id
@@ -44,4 +44,7 @@ public class Publisher {
     @JsonBackReference
     private Set<Book> publisherBooks;
 
+    public Long getImageId() {
+        return (this.image != null) ? this.image.getId() : null;
+    }
 }

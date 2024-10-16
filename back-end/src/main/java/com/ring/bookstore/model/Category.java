@@ -68,7 +68,7 @@ public class Category {
     }
 
     public Integer getParentId() {
-        return (parent != null) ? parent.getId() : null;
+        return (this.parent != null) ? this.parent.getId() : null;
     }
 
     @PreRemove

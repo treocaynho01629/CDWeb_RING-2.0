@@ -24,7 +24,7 @@ public interface CategoryService {
 
     void deleteCategory(Integer id);
 
-    void deleteCategories(List<Integer> ids, boolean isInverse);
+    void deleteCategories(Integer parentId, List<Integer> ids, boolean isInverse);
 
     void deleteAllCategories();
 }

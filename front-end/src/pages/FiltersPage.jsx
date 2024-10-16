@@ -125,11 +125,11 @@ const FiltersPage = () => {
             value: searchParams.get("value") ? searchParams.get("value").split(',') : [1000, 10000000],
             keyword: searchParams.get("keyword") ?? "",
             type: searchParams.get("type") ?? "",
-            shopId: searchParams.get("shopId") ?? "",
-            pubId: searchParams.get("pubId") ?? [],
-            cateId: searchParams.get("cateId") ?? "",
-            rating: searchParams.get("rating") ?? 0,
-            amount: searchParams.get("amount") ?? 1
+            shopId: searchParams.get("shopId") ? +searchParams.get("shopId") : "",
+            pubId: searchParams.get("pubId") ? searchParams.get("pubId").split(',') : [],
+            cateId: searchParams.get("cateId") ? +searchParams.get("cateId") : "",
+            rating: searchParams.get("rating") ? +searchParams.get("rating") : 0,
+            amount: searchParams.get("amount") ? +searchParams.get("amount") : 1,
         });
 
         setPagination({
@@ -158,7 +158,6 @@ const FiltersPage = () => {
     }
 
     const handleChangeCate = (slug, id) => {
-        console.log(slug);
         handleChangePage(1);
         if (filters?.cateId == id || id == "") {
             setFilters({ ...filters, cateId: '' });
@@ -182,6 +181,8 @@ const FiltersPage = () => {
             searchParams.set("value", newValue);
             setSearchParams(searchParams);
         }
+
+        newValue = newValue.map(String); //Convert to string array
         setFilters({ ...filters, value: newValue });
     }
 

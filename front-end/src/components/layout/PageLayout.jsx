@@ -26,7 +26,7 @@ export default function PageLayout() {
     return (
         <>
             <Navbar />
-            {/* <ScrollToTopButton /> */}
+            <ScrollToTopButton />
             <LayoutWrapper>
                 <Outlet />
             </LayoutWrapper>

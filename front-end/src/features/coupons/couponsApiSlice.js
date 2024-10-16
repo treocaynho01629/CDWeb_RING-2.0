@@ -49,11 +49,12 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
             },
         }),
         createCoupon: builder.mutation({
-            query: ({ id, newCoupon }) => ({
+            query: (newCoupon) => ({
                 url: `/api/coupons/${id}`,
                 method: 'POST',
                 credentials: 'include',
-                body: { ...newCoupon }
+                body: newCoupon,
+                formData: true,
             }),
             invalidatesTags: [
                 { type: 'Coupon', id: "LIST" }

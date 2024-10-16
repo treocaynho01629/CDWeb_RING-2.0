@@ -3,22 +3,82 @@ import { apiSlice } from "../../app/api/apiSlice";
 
 const pubsAdapter = createEntityAdapter({});
 const pubsSelector = pubsAdapter.getSelectors();
-const initialState = pubsAdapter.getInitialState();
+const initialState = pubsAdapter.getInitialState({
+    info: {
+        currPage: 0,
+        pageSize: 0,
+        totalElements: 0,
+        totalPages: 0,
+    },
+});
 
 export const publishersApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getPublishers: builder.query({
-            query: () => ({
-                url: '/api/publishers',
+            query: (id) => ({
+                url: `/api/publishers/${id}`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError
                 },
             }),
-            transformResponse: responseData => {
-                return pubsAdapter.setAll(initialState, responseData)
+            providesTags: (result, error, { id }) => [
+                { type: 'Publisher', id }
+            ]
+        }),
+        getPublishers: builder.query({
+            query: (args) => {
+                const { page, size, sortBy, sortDir } = args || {};
+
+                //Params
+                const params = new URLSearchParams();
+                if (page) params.append('pageNo', page);
+                if (size) params.append('pSize', size);
+                if (sortBy) params.append('sortBy', sortBy);
+                if (sortDir) params.append('sortDir', sortDir);
+
+                return {
+                    url: `/api/publishers?${params.toString()}`,
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result.isError
+                    },
+                }
             },
-            serializeQueryArgs: ({ endpointName }) => {
-                return endpointName
+            transformResponse: responseData => {
+                const { number, size, totalElements, totalPages, content } = responseData;
+                return pubsAdapter.setAll({
+                    ...initialState,
+                    info: {
+                        currPage: number,
+                        pageSize: size,
+                        totalElements,
+                        totalPages
+                    }
+                }, content)
+            },
+            serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
+                if (queryArgs) {
+                    const { loadMore, ...mainQuery } = queryArgs;
+
+                    if (loadMore) { //Load more >> serialize without <pagination>
+                        const { page, size, ...rest } = mainQuery;
+                        if (JSON.stringify(rest) === "{}") return endpointName + 'Merge';
+                        return defaultSerializeQueryArgs({
+                            endpointName: endpointName + 'Merge',
+                            queryArgs: rest,
+                            endpointDefinition
+                        });
+                    }
+
+                    //Serialize like normal
+                    if (JSON.stringify(mainQuery) === "{}") return endpointName;
+                    return defaultSerializeQueryArgs({
+                        endpointName,
+                        queryArgs: mainQuery,
+                        endpointDefinition
+                    })
+                } else {
+                    return endpointName
+                }
             },
             merge: (currentCache, newItems) => {
                 currentCache.info = newItems.info;
@@ -39,11 +99,68 @@ export const publishersApiSlice = apiSlice.injectEndpoints({
                 } else return [{ type: 'Publisher', id: 'LIST' }]
             }
         }),
+        createPublisher: builder.mutation({
+            query: (newPublisher) => ({
+                url: '/api/publishers',
+                method: 'POST',
+                credentials: 'include',
+                body: newPublisher,
+                formData: true,
+            }),
+            invalidatesTags: [
+                { type: 'Publisher', id: "LIST" }
+            ]
+        }),
+        updatePublisher: builder.mutation({
+            query: ({ id, updatedPublisher }) => ({
+                url: `/api/publishers/${id}`,
+                method: 'PUT',
+                credentials: 'include',
+                body: updatedPublisher,
+                formData: true,
+            }),
+            invalidatesTags: (result, error, { id }) => [
+                { type: 'Publisher', id }
+            ]
+        }),
+        deletePublisher: builder.mutation({
+            query: (id) => ({
+                url: `/api/publishers/${id}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: (result, error, id) => [
+                { type: 'Publisher', id }
+            ]
+        }),
+        deletePublishers: builder.mutation({
+            query: (ids) => ({
+                url: `/api/publishers/delete-multiples?ids=${ids}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: (result, error) => [
+                { type: 'Publisher', id: "LIST" }
+            ]
+        }),
+        deleteAllPublishers: builder.mutation({
+            query: () => ({
+                url: '/api/publishers/delete-all',
+                method: 'DELETE'
+            }),
+            invalidatesTags: (result, error) => [
+                { type: 'Publisher', id: "LIST" }
+            ]
+        }),
     }),
 })
 
 export const {
-    useGetPublishersQuery
+    useGetPublisherQuery,
+    useGetPublishersQuery,
+    useCreatePublisherMutation,
+    useUpdatePublisherMutation,
+    useDeletePublisherMutation,
+    useDeletePublishersMutation,
+    useDeleteAllPublishersMutation
 } = publishersApiSlice
 
 export const selectPublishersResult = publishersApiSlice.endpoints.getPublishers.select()
