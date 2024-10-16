@@ -9,12 +9,15 @@ import com.ring.bookstore.dtos.categories.CategoryDetailDTO;
 import com.ring.bookstore.dtos.categories.PreviewCategoryDTO;
 import com.ring.bookstore.dtos.mappers.CategoryMapper;
 import com.ring.bookstore.dtos.projections.ICategory;
+import com.ring.bookstore.exception.HttpResponseException;
+import com.ring.bookstore.model.Coupon;
 import com.ring.bookstore.request.CategoryRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.exception.ResourceNotFoundException;
@@ -134,12 +137,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Transactional
-    public void deleteCategories(List<Integer> ids, boolean isInverse) {
-        if (isInverse) {
-            cateRepo.deleteByIdIsNotIn(ids);
-        } else {
-            cateRepo.deleteByIdIsIn(ids);
-        }
+    public void deleteCategories(Integer parentId, List<Integer> ids, boolean isInverse) {
+        List<Integer> listDelete = ids;
+        if (isInverse) listDelete = cateRepo.findInverseIds(parentId, ids);
+        cateRepo.deleteByIdIsIn(listDelete);
     }
 
     @Override

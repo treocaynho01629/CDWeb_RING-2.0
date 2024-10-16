@@ -18,6 +18,7 @@ const Container = styled.div`
     position: relative;
     overflow: hidden;
     border: .5px solid ${props => props.theme.palette.action.hover};
+    background-color: ${props => props.theme.palette.background.default};
     margin: 0 ${props => props.theme.spacing(.1)};
 
     &:hover {
@@ -89,6 +90,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
 const SkeletonContainer = styled.div`
     width: 100%;
     max-height: 160px;
+    margin: 5px 0;
     aspect-ratio: 1/1;
     display: flex;
     align-items: center;

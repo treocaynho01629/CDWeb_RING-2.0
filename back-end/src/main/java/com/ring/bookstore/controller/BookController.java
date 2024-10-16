@@ -42,7 +42,6 @@ public class BookController {
     private final BookService bookService;
     private final AccountRepository accRepo;
 
-
     //Get random books
     @GetMapping("/random")
     public ResponseEntity<?> getRandomBooks(@RequestParam(value = "amount", defaultValue = "5") Integer amount) {

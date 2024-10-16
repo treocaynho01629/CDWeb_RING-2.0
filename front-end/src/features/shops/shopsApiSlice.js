@@ -64,11 +64,12 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
             },
         }),
         createShop: builder.mutation({
-            query: ({ id, newShop }) => ({
-                url: `/api/shops/${id}`,
+            query: (newShop) => ({
+                url: '/api/shops',
                 method: 'POST',
                 credentials: 'include',
-                body: { ...newShop }
+                body: newShop,
+                formData: true,
             }),
             invalidatesTags: [
                 { type: 'Shop', id: "LIST" }

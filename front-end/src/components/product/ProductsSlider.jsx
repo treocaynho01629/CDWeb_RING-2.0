@@ -9,11 +9,12 @@ import "react-multi-carousel/lib/styles.css";
 //#region styled
 const Container = styled.div`
     position: relative;
+    min-height: 302px;
     max-height: 380px;
-    margin-bottom: 10px;
+    padding: 5px 0;
 
     ${props => props.theme.breakpoints.down("sm_md")} {
-      padding: 5px 5px;
+      padding: 5px;
     }
 `
 
@@ -22,12 +23,12 @@ const ProductContainer = styled.div`
     height: 100%;
 `
 
-const CustomArrow = styled.button`
+const CustomArrowButton = styled.button`
   border-radius: 0;
   background-color: #0000005e;
   border: none;
   outline: none;
-  height: 45px;
+  height: 35px;
   width: 35px;
   display: flex;
   align-items: center;
@@ -36,7 +37,6 @@ const CustomArrow = styled.button`
   opacity: .5;
   cursor: pointer;
   transition: all .25s ease;
-  z-index: 2;
 
   &:hover {
     opacity: .7;
@@ -44,24 +44,24 @@ const CustomArrow = styled.button`
   }
 
   svg {font-size: 2em;}
-  &.custom-left-arrow {left: 0;}
-  &.custom-right-arrow {right: 0; }
+  &.custom-left-arrow { left: 0; }
+  &.custom-right-arrow { right: 0; }
 `
 //#endregion
 
 const responsive = {
-  widescreen: {
-    breakpoint: { max: 3000, min: 1200 },
+  default: {
+    breakpoint: { max: 3000, min: 992 },
     items: 5,
     slidesToSlide: 5
   },
-  desktop: {
-    breakpoint: { max: 1200, min: 992 },
+  laptop: {
+    breakpoint: { max: 992, min: 768 },
     items: 4,
     slidesToSlide: 4
   },
   tablet: {
-    breakpoint: { max: 992, min: 600 },
+    breakpoint: { max: 768, min: 600 },
     items: 3,
     slidesToSlide: 3
   },
@@ -72,12 +72,10 @@ const responsive = {
   }
 };
 
-const CustomLeftArrow = ({ onClick }) => (
-  <CustomArrow className="custom-left-arrow" onClick={() => onClick()}><KeyboardArrowLeft /></CustomArrow>
-);
-
-const CustomRightArrow = ({ onClick }) => (
-  <CustomArrow className="custom-right-arrow" onClick={() => onClick()}><KeyboardArrowRight /></CustomArrow>
+const CustomArrow = ({ onClick, className, children }) => (
+  <CustomArrowButton className={className} onClick={() => onClick()}>
+      {children}
+  </CustomArrowButton>
 );
 
 const tempItems = [
@@ -119,8 +117,8 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
       {(loading) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
       <Carousel
         responsive={responsive}
-        customLeftArrow={<CustomLeftArrow />}
-        customRightArrow={<CustomRightArrow />}
+        customLeftArrow={<CustomArrow className="custom-left-arrow"><KeyboardArrowLeft/></CustomArrow>}
+        customRightArrow={<CustomArrow className="custom-right-arrow"><KeyboardArrowRight/></CustomArrow>}
         removeArrowOnDeviceType={["mobile"]}
         pauseOnHover
         keyBoardControl

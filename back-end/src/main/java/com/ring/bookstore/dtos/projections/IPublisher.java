@@ -1,10 +1,10 @@
 package com.ring.bookstore.dtos.projections;
 
+import com.ring.bookstore.model.Publisher;
+
 public interface IPublisher {
 
-    Integer getId();
-
-    String getName();
+    Publisher getPublisher();
 
     String getImage();
 }

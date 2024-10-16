@@ -49,22 +49,19 @@ public class Image {
     private byte[] image;
 
     //Image relation
-    @OneToOne(cascade = CascadeType.ALL,
-            orphanRemoval = true,
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             fetch = FetchType.LAZY,
             mappedBy = "image")
     @JsonIgnore
     private Book book;
 
-    @OneToOne(cascade = CascadeType.ALL,
-            orphanRemoval = true,
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             fetch = FetchType.LAZY,
             mappedBy = "image")
     @JsonIgnore
     private AccountProfile profile;
 
-    @OneToOne(cascade = CascadeType.ALL,
-            orphanRemoval = true,
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             fetch = FetchType.LAZY,
             mappedBy = "image")
     @JsonIgnore

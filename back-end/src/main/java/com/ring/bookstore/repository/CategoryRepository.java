@@ -1,6 +1,7 @@
 package com.ring.bookstore.repository;
 
 import com.ring.bookstore.dtos.projections.ICategory;
+import com.ring.bookstore.enums.CouponType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -80,7 +81,17 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     """)
     Optional<Category> findCateWithParent(Integer id, String slug);
 
+    @Query("""
+        select c.id from Category c
+        where (coalesce(:parentId) is null or c.parent.id = :parentId)
+              and c.id not in :ids
+	""")
+    List<Integer> findInverseIds(Integer parentId, List<Integer> ids);
+
+    @Query("""
+        delete from Category c
+        where size(c.subCates) = 0 and c.id in :ids
+	""")
     void deleteByIdIsIn(List<Integer> ids);
 
-    void deleteByIdIsNotIn(List<Integer> ids);
 }

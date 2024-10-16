@@ -1,33 +1,28 @@
 package com.ring.bookstore.dtos.mappers;
 
-import com.ring.bookstore.dtos.ShopDTO;
-import com.ring.bookstore.dtos.projections.IShopDetail;
+import com.ring.bookstore.dtos.PublisherDTO;
+import com.ring.bookstore.dtos.projections.IPublisher;
+import com.ring.bookstore.model.Publisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.function.Function;
 
 @Service
-public class ShopMapper implements Function<IShopDetail, ShopDTO> {
+public class PublisherMapper implements Function<IPublisher, PublisherDTO> {
 	
     @Override
-    public ShopDTO apply(IShopDetail shop) {
+    public PublisherDTO apply(IPublisher projection) {
+		Publisher publisher = projection.getPublisher();
 
         String fileDownloadUri = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
                 .path("/api/images/")
-                .path(shop.getImage())
+                .path(projection.getImage())
                 .toUriString();
 
-        return new ShopDTO(shop.getOwnerUsername()
-				, shop.getOwnerId()
-				, shop.getId()
-        		, shop.getName()
-        		, shop.getDescription()
-        		, fileDownloadUri
-        		, shop.getJoinedDate()
-        		, shop.getTotalReviews()
-                , shop.getTotalProducts()
-        		, shop.getTotalFollowers());
+        return new PublisherDTO(publisher.getId()
+				, publisher.getPubName()
+        		, fileDownloadUri);
     }
 }

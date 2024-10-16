@@ -22,13 +22,13 @@ const Products = ({ data, isError, isLoading, isSuccess, scrollPosition }) => {
         const book = entities[id];
 
         return (
-          <Grid key={`product-${id}-${index}`} size={{ xs: 6, sm: 4, md: 3, lg: 2.4 }}>
+          <Grid key={`product-${id}-${index}`} size={{ xs: 6, sm: 4, sm_md: 3, md_lg: 2.4 }}>
             <Product {...{ book, scrollPosition }} />
           </Grid>
         )
       })
       : Array.from(new Array(15)).map((item, index) => (
-        <Grid key={index} size={{ xs: 6, sm: 4, md: 3, lg: 2.4 }}>
+        <Grid key={index} size={{ xs: 6, sm: 4, sm_md: 3, md_lg: 2.4 }}>
           <Product />
         </Grid>
       ))

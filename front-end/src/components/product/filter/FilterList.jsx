@@ -184,6 +184,8 @@ const PublisherFilter = ({ loadPubs, donePubs, errorPubs, pubs, selectedPub, set
         );
       }
 
+      console.log(newSelected);
+
       setSelectedPub(newSelected);
       onChangePub(newSelected);
     }

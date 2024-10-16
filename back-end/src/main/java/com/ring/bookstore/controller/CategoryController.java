@@ -82,10 +82,11 @@ public class CategoryController {
     //Delete multiples categories in a lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteCategories(@RequestParam("ids") List<Integer> ids,
+    public ResponseEntity<?> deleteCategories(@RequestParam(value = "parentId", required = false) Integer parentId,
+                                              @RequestParam("ids") List<Integer> ids,
                                               @RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse
     ) {
-        cateService.deleteCategories(ids, isInverse);
+        cateService.deleteCategories(parentId, ids, isInverse);
         return new ResponseEntity<>("Categories deleted successfully!", HttpStatus.OK);
     }
 
