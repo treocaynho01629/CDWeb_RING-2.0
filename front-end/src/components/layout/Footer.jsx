@@ -1,6 +1,7 @@
 import styled from "styled-components"
-import { Facebook, YouTube, Instagram, Twitter, QrCode, LocalAtm, SystemSecurityUpdateGood, CreditCard } from '@mui/icons-material';
+import { Facebook, YouTube, Instagram, Twitter, QrCode, LocalAtm, SystemSecurityUpdateGood, CreditCard, ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Grid2 as Grid } from "@mui/material";
+import { useState } from "react";
 
 //#region styled
 const Container = styled.div`
@@ -37,8 +38,11 @@ const BotFooter = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 15px;
-    font-weight: bold;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 0 15px;
+        justify-content: center;
+    }
 `
 
 const Logo = styled.h1`
@@ -52,11 +56,20 @@ const Logo = styled.h1`
         color: ${props => props.theme.palette.text.secondary};
         margin: 0;
     }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        margin: 5px 0;
+    }
 `
 
 const Description = styled.p`
     margin: 14px 0px;
     font-size: 13px;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        text-align: center;
+        margin: 5px 0;
+    }
 `
 
 const Social = styled.div`
@@ -69,7 +82,7 @@ const SocialIcon = styled.div`
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    color: white;
+    color: ${props => props.theme.palette.common.white};
     background-color: #${props => props.color};
     display: flex;
     align-items: center;
@@ -102,15 +115,24 @@ const AddressContainer = styled.div`
 
     ${props => props.theme.breakpoints.down("sm")} {
         padding-top: 0;
+        margin-bottom: 5px;
+        border-bottom: .5px solid ${props => props.theme.palette.divider};
     }
 `
 
 
 const Title = styled.h4`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    svg {display: none;};
+
     ${props => props.theme.breakpoints.down("sm")} {
-        margin: 7px 0;
-        text-align: center;
+        margin: 5px 10px;
         color: ${props => props.theme.palette.primary.dark};
+
+        svg {display: block;};
     }
 `
 
@@ -121,6 +143,16 @@ const List = styled.ul`
 
     ${props => props.theme.breakpoints.down("sm")} {
         display: none;
+    }
+`
+
+const MobileList = styled.ul`
+    margin: 5px 0;
+    list-style: none;
+    display: none;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        display: block;
     }
 `
 
@@ -182,9 +214,15 @@ const BotText = styled.p`
       -webkit-line-clamp: 1;
       -webkit-box-orient: vertical;
     }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        width: 100%;
+        margin: 0;
+        font-size: 11px;
+    }
 `
 
-const Me = styled.b`
+const Name = styled.b`
     font-size: 14px;
     margin: 0 10px;
     text-decoration: underline;
@@ -195,7 +233,40 @@ const Me = styled.b`
 `
 //#endregion
 
+const support = <>
+    <ListItem>Chính sách đổi - trả - hoàn tiền</ListItem>
+    <ListItem>Phương thức vận chuyển</ListItem>
+    <ListItem>Phương thức thanh toán</ListItem>
+    <ListItem>Câu hỏi thường gặp</ListItem>
+    <ListItem>Hướng dẫn đặt hàng</ListItem>
+</>
+
+const information = <>
+    <ListItem>Giới thiệu</ListItem>
+    <ListItem>Tuyển dụng</ListItem>
+    <ListItem>Chính sách khiếu nại</ListItem>
+    <ListItem>Điều khoản sử dụng</ListItem>
+</>
+
+const services = <>
+    <ListItem>Chính sách bảo mật</ListItem>
+    <ListItem>Hệ thống hàng</ListItem>
+</>
+
+const payments = <>
+    <ListItem>Phương thức thanh toán</ListItem>
+    <PaymentList>
+        <Payment><QrCode />QR Code</Payment>
+        <Payment><LocalAtm />Tiền mặt</Payment>
+        <Payment><SystemSecurityUpdateGood />Internet Banking</Payment>
+        <Payment><CreditCard />Thẻ ATM</Payment>
+    </PaymentList>
+</>
+
 const Footer = () => {
+    const [open, setOpen] = useState(false);
+    const handleClick = (tab) => { setOpen(prev => ({ ...prev, [tab]: !prev[tab] })) };
+
     return (
         <Container>
             <Wrapper>
@@ -220,51 +291,41 @@ const Footer = () => {
                             </Social>
                         </AddressContainer>
                     </Grid>
-                    <Grid container spacing={.5} offset={{ xs: 0, lg: 'auto' }} size={{ xs: 12, lg: 'auto' }} mb={6}>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                            <Title>HỖ TRỢ</Title>
-                            <List>
-                                <ListItem>Chính sách đổi - trả - hoàn tiền</ListItem>
-                                <ListItem>Phương thức vận chuyển</ListItem>
-                                <ListItem>Phương thức thanh toán</ListItem>
-                                <ListItem>Câu hỏi thường gặp</ListItem>
-                                <ListItem>Hướng dẫn đặt hàng</ListItem>
-                            </List>
+                    <Grid container spacing={.5} offset={{ xs: 0, lg: 'auto' }} size={{ xs: 12, lg: 'auto' }} mb={{ xs: 3, sm: 6 }}>
+                        <Grid size={{ xs: 12, sm: 3 }}>
+                            <Title onClick={() => handleClick('support')}>
+                                HỖ TRỢ {open['support'] ? <ExpandLess /> : <ExpandMore />}
+                            </Title>
+                            <List>{support}</List>
+                            {open['support'] && <MobileList>{support}</MobileList>}
                         </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                            <Title>THÔNG TIN</Title>
-                            <List>
-                                <ListItem>Giới thiệu</ListItem>
-                                <ListItem>Tuyển dụng</ListItem>
-                                <ListItem>Chính sách khiếu nại</ListItem>
-                                <ListItem>Điều khoản sử dụng</ListItem>
-                            </List>
+                        <Grid size={{ xs: 12, sm: 3 }}>
+                            <Title onClick={() => handleClick('information')}>
+                                THÔNG TIN {open['information'] ? <ExpandLess /> : <ExpandMore />}
+                            </Title>
+                            <List>{information}</List>
+                            {open['information'] && <MobileList>{information}</MobileList>}
                         </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                            <Title>DỊCH VỤ</Title>
-                            <List>
-                                <ListItem>Chính sách bảo mật</ListItem>
-                                <ListItem>Hệ thống hàng</ListItem>
-                            </List>
+                        <Grid size={{ xs: 12, sm: 3 }}>
+                            <Title onClick={() => handleClick('services')}>
+                                DỊCH VỤ {open['services'] ? <ExpandLess /> : <ExpandMore />}
+                            </Title>
+                            <List>{services}</List>
+                            {open['services'] && <MobileList>{information}</MobileList>}
                         </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                            <Title>THANH TOÁN</Title>
-                            <List>
-                                <ListItem>Phương thức thanh toán</ListItem>
-                                <PaymentList>
-                                    <Payment><QrCode />QR Code</Payment>
-                                    <Payment><LocalAtm />Tiền mặt</Payment>
-                                    <Payment><SystemSecurityUpdateGood />Internet Banking</Payment>
-                                    <Payment><CreditCard />Thẻ ATM</Payment>
-                                </PaymentList>
-                            </List>
+                        <Grid size={{ xs: 12, sm: 3 }}>
+                            <Title onClick={() => handleClick('payments')}>
+                                THANH TOÁN {open['payments'] ? <ExpandLess /> : <ExpandMore />}
+                            </Title>
+                            <List>{payments}</List>
+                            {open['payments'] && <MobileList>{payments}</MobileList>}
                         </Grid>
                     </Grid>
                 </Grid>
             </Wrapper>
             <BotFooter>
-                <BotText>Giấy chứng nhận Đăng ý kính doanh do NLU - TP.HCM cấp ngày 01/01/2022.</BotText>
-                <Me>DoraZ</Me>
+                <BotText>Giấy chứng nhận Đăng ý kính doanh do TP.HCM cấp ngày 01/01/2022.</BotText>
+                <Name>DoraZ</Name>
             </BotFooter>
         </Container>
     )

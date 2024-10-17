@@ -1,6 +1,7 @@
 package com.ring.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -38,6 +39,7 @@ public class Publisher {
             fetch = FetchType.LAZY,
             orphanRemoval = true)
     @JoinColumn(name = "image_id")
+    @JsonIgnore
     private Image image;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "publisher", fetch = FetchType.LAZY)

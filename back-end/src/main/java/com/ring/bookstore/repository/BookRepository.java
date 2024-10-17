@@ -23,7 +23,7 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 	left join (select r.book.id as book_id, avg(r.rating) as rating 
 	    from Review r 
 	    group by r.book.id) rv on b.id = rv.book_id
-	left join (select o.book.id as book_id, sum(o.amount) as totalOrders 
+	left join (select o.book.id as book_id, sum(o.quantity) as totalOrders 
 		from OrderItem o 
 		group by o.book.id) od on b.id = od.book_id
 	where concat (b.title, b.author) ilike %:keyword%
@@ -54,7 +54,7 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 		od.totalOrders as totalOrders, rv.rating as rating, rv.totalRates as totalRates, 
 		rv.five as five, rv.four as four, rv.three as three, rv.two as two, rv.one as one
 	from Book b join b.shop s join b.image i
-	left join (select o.book.id as book_id, sum(o.amount) as totalOrders 
+	left join (select o.book.id as book_id, sum(o.quantity) as totalOrders 
 		from OrderItem o group by o.book.id) od on b.id = od.book_id
 	left join (
 		select r.book.id as book_id, avg(r.rating) as rating, count(r.id) as totalRates,
@@ -81,7 +81,7 @@ public interface BookRepository extends JpaRepository<Book, Long>{
 	left join (select r.book.id as book_id, avg(r.rating) as rating 
 	    from Review r 
 	    group by r.book.id) rv on b.id = rv.book_id
-	left join (select o.book.id as book_id, sum(o.amount) as totalOrders 
+	left join (select o.book.id as book_id, sum(o.quantity) as totalOrders 
 		from OrderItem o 
 		group by o.book.id) od on b.id = od.book_id
 	group by b, i.name, rv.rating, od.totalOrders, s.id, s.name

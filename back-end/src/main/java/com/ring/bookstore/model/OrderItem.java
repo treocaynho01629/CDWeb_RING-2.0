@@ -30,7 +30,10 @@ public class OrderItem {
     private Long id;
 
     @Column
-    private Short amount;
+    private Short quantity;
+
+    @Transient
+    private Short amount; //From book's stock
 
     @Column
     private Double price;

@@ -66,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
         double totalPrice = 0.0;
         double totalShippingFee = 0.0;
         double totalDiscount = 0.0;
-        int totalAmount = 0;
+        int totalQuantity = 0;
 
         //Create order details
         for (CartDetailRequest detail : cart) {
@@ -91,7 +91,8 @@ public class OrderServiceImpl implements OrderService {
                 //Calculate
                 double shippingFee = 10000.0;
                 double detailTotal = 0.0;
-                int detailAmount = 0;
+                double discountDeal = 0.0;
+                int detailQuantity = 0;
 
                 //Create detail
                 var orderDetail = OrderDetail.builder()
@@ -103,7 +104,7 @@ public class OrderServiceImpl implements OrderService {
                     //Validation
                     Book book = bookRepo.findById(item.getId()).orElse(null);
 
-                    if (book == null || !book.getShop().getId().equals(shop.getId())) {
+                    if (book == null || !book.getShopId().equals(shop.getId())) {
                         //Create temp item
                         var orderItem = OrderItem.builder()
                                 .book(Book.builder().id(item.getId()).build())
@@ -112,26 +113,21 @@ public class OrderServiceImpl implements OrderService {
                         orderDetail.addOrderItem(orderItem);
                     } else {
                         short quantity = item.getQuantity();
-                        if (quantity < 1 && quantity > book.getAmount()) {
-                            //Create replace item
-                            var orderItem = OrderItem.builder()
-                                    .book(book)
-                                    .build();
-
-                            orderDetail.addOrderItem(orderItem);
-                        } else {
+                        if (!(quantity < 1 && quantity > book.getAmount())) {
                             //Calculate + info
-                            BigDecimal discount = book.getDiscount();
-                            double currPrice = book.getPrice() * (BigDecimal.valueOf(1).subtract(discount)).doubleValue();
-                            detailTotal += currPrice * quantity;
-                            detailAmount += quantity;
-
-                            var orderItem = OrderItem.builder()
-                                    .book(book)
-                                    .build();
-
-                            orderDetail.addOrderItem(orderItem);
+                            double deal = book.getPrice() * book.getDiscount().doubleValue();
+                            detailTotal += book.getPrice() * quantity; //Not include the discount
+                            detailQuantity += quantity;
+                            discountDeal += deal;
                         }
+
+                        //Add item
+                        var orderItem = OrderItem.builder()
+                                .book(book)
+                                .quantity(quantity)
+                                .build();
+
+                        orderDetail.addOrderItem(orderItem);
                     }
                 }
 
@@ -139,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
                 Coupon shopCoupon = couponRepo.findByCode(detail.getCoupon()).orElse(null);
                 if (shopCoupon != null) {
                     //Validate coupon
-                    if (!shopCoupon.getShop().getId().equals(shop.getId())) continue;
+                    if (!shopCoupon.getShopId().equals(shop.getId())) continue;
 
                     CouponDetail shopCouponDetail = shopCoupon.getDetail();
                     CouponType type = shopCouponDetail.getType();
@@ -150,7 +146,7 @@ public class OrderServiceImpl implements OrderService {
                     double shippingDiscount = 0.0;
 
                     if (type.equals(CouponType.MIN_AMOUNT)) {
-                        if (detailAmount >= attribute) discountValue = detailTotal * discount.doubleValue();
+                        if (detailQuantity >= attribute) discountValue = detailTotal * discount.doubleValue();
                     } else if (type.equals(CouponType.MIN_VALUE)) {
                         if (detailTotal >= attribute) discountValue = detailTotal * discount.doubleValue();
                     } else if (type.equals(CouponType.SHIPPING)) {
@@ -160,6 +156,9 @@ public class OrderServiceImpl implements OrderService {
                     //Threshold
                     if (discountValue > maxDiscount) discountValue = maxDiscount;
                     if (shippingDiscount > maxDiscount) shippingDiscount = maxDiscount;
+
+                    //Add discount deal to discount value (Threshold for coupon only)
+                    discountValue += discountDeal;
 
                     //Add to detail
                     orderDetail.setTotalPrice(detailTotal);
@@ -197,7 +196,7 @@ public class OrderServiceImpl implements OrderService {
             double shippingDiscount = 0.0;
 
             if (type.equals(CouponType.MIN_AMOUNT)) {
-                if (totalAmount >= attribute) discountValue = totalPrice * discount.doubleValue();
+                if (totalQuantity >= attribute) discountValue = totalPrice * discount.doubleValue();
             } else if (type.equals(CouponType.MIN_VALUE)) {
                 if (totalPrice >= attribute) discountValue = totalPrice * discount.doubleValue();
             } else if (type.equals(CouponType.SHIPPING)) {

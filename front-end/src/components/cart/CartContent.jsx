@@ -1,90 +1,20 @@
 import styled from 'styled-components'
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Suspense, lazy } from "react";
 import { Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, Search, ChevronLeft } from '@mui/icons-material';
-import { Checkbox, Button, Grid2 as Grid, Table, TableBody, TableHead, TableRow, Box, Menu, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
+import { Checkbox, Button, Grid2 as Grid, Table, TableBody, TableRow, Box, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
 import { Link, useNavigate } from "react-router-dom";
 import { booksApiSlice } from '../../features/books/booksApiSlice';
 import { useCalculateMutation } from '../../features/orders/ordersApiSlice';
-import CheckoutDialog from './CheckoutDialog';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import PropTypes from 'prop-types';
+import { ActionTableCell, StyledTableCell, StyledTableHead } from '../custom/CustomTableComponents';
 import useCart from '../../hooks/useCart';
+import CheckoutDialog from './CheckoutDialog';
+import PropTypes from 'prop-types';
 import CartDetailRow from './CartDetailRow';
 
+const Menu = lazy(() => import('@mui/material/Menu'));
+const CouponDialog = lazy(() => import('../coupon/CouponDialog'));
+
 //#region styled
-const StyledTableCell = styled(TableCell)`
-    &.${tableCellClasses.root} {
-        border: none;
-    }
-
-    &.${tableCellClasses.head} {
-        font-weight: bold;
-    }
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        &.${tableCellClasses.body} {
-            padding: 8px 8px 8px 4px;
-        }
-
-        &.${tableCellClasses.head} {
-            padding: 4px;
-        }
-
-        &.${tableCellClasses.paddingCheckbox} {
-            padding: 0;
-        }
-    }
-`
-
-const ActionTableCell = styled(TableCell)`
-    &.${tableCellClasses.root} {
-        border: none;
-        padding: 0;
-        width: 8px;
-    }
-`
-
-const StyledTableHead = styled(TableHead)`
-    position: sticky; 
-    top: ${props => props.theme.mixins.toolbar.minHeight + 16.5}px;
-    background-color: ${props => props.theme.palette.background.default};
-    z-index: 2;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        top: ${props => props.theme.mixins.toolbar.minHeight + 4.5}px;
-
-        &:before{
-            display: none;            
-        }
-    }
-
-    &:before{
-        content: "";
-        position: absolute;
-        left: -10px;
-        top: -16px;
-        width: calc(100% + 20px);
-        height: calc(100% + 16px);
-        background-color: ${props => props.theme.palette.background.default};
-        z-index: -1;
-    }
-
-    &:after{
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        border: .5px solid ${props => props.theme.palette.action.focus};
-
-        ${props => props.theme.breakpoints.down("sm")} {
-            border-left: none;
-            border-right: none;
-        }
-    }
-`
-
 const StyledCheckbox = styled(Checkbox)`
     margin-left: 8px;
 
@@ -95,13 +25,7 @@ const StyledCheckbox = styled(Checkbox)`
 
 const MainTitleContainer = styled.div`
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding: 20px 0px;
-
-    position: sticky;
-    top: 150px;
 
     ${props => props.theme.breakpoints.down("sm")} {
         padding: 20px 10px;
@@ -114,23 +38,25 @@ const Title = styled.h3`
     flex-wrap: wrap;
     align-items: center;
     text-align: center;
-    justify-content: center;
 `
 
 const StyledDeleteButton = styled(Button)`
-   /* position: 'absolute',
-                            right: 0,
-                            opacity: selected.length > 0 ? 1 : 0,
-                            visibility: selected.length > 0 ? 'visible' : 'hidden',
-                            transition: 'all .25s ease', */
     position: absolute;
-    right: 0;
-    opacity: 1;
+    right: 8px;
+    background-color: transparent;
+    z-index: 1;
+    visibility: visible;
+    transition: all .2s ease;
+
+    &.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
 `
 //#endregion
 
 function EnhancedTableHead(props) {
-    const { onSelectAllClick, numSelected, rowCount, shrink } = props;
+    const { onSelectAllClick, numSelected, rowCount } = props;
     let isIndeterminate = numSelected > 0 && numSelected < rowCount;
     let isSelectedAll = rowCount > 0 && numSelected === rowCount;
 
@@ -152,19 +78,40 @@ function EnhancedTableHead(props) {
                     />
                 </StyledTableCell>
                 <StyledTableCell align="left">Chọn tất cả ({rowCount} sản phẩm)</StyledTableCell>
-                <StyledTableCell align="left" sx={{
-                    width: '100px',
-                    display: { xs: 'none', md: 'table-cell', md_lg: 'none', lg: 'table-cell' }
-                }}>Đơn giá</StyledTableCell>
-                <StyledTableCell align="center" sx={{
-                    width: '140px',
-                    display: { xs: 'none', sm: 'table-cell' }
-                }}>Số lượng</StyledTableCell>
-                <StyledTableCell align="left" sx={{
-                    width: '100px',
-                    display: { xs: 'none', md: 'table-cell' }
-                }}>Tổng</StyledTableCell>
-                <ActionTableCell></ActionTableCell>
+                <StyledTableCell align="left" className={numSelected > 0 ? 'hidden' : ''}
+                    sx={{
+                        width: '100px',
+                        display: { xs: 'none', md: 'table-cell', md_lg: 'none', lg: 'table-cell' }
+                    }}
+                >
+                    Đơn giá
+                </StyledTableCell>
+                <StyledTableCell align="center" className={numSelected > 0 ? 'hidden' : ''}
+                    sx={{
+                        width: '140px',
+                        display: { xs: 'none', sm: 'table-cell' }
+                    }}
+                >
+                    Số lượng
+                </StyledTableCell>
+                <StyledTableCell align="left" className={numSelected > 0 ? 'hidden' : ''}
+                    sx={{
+                        width: '100px',
+                        display: { xs: 'none', md: 'table-cell' }
+                    }}
+                >
+                    Tổng
+                </StyledTableCell>
+                <ActionTableCell>
+                    <StyledDeleteButton
+                        className={numSelected > 0 ? '' : 'hidden'}
+                        color="error"
+                        endIcon={<DeleteIcon />}
+                        disableRipple
+                    >
+                        Xoá
+                    </StyledDeleteButton>
+                </ActionTableCell>
             </TableRow>
         </StyledTableHead>
     );
@@ -174,7 +121,6 @@ EnhancedTableHead.propTypes = {
     numSelected: PropTypes.number.isRequired,
     onSelectAllClick: PropTypes.func.isRequired,
     rowCount: PropTypes.number.isRequired,
-    shrink: PropTypes.bool.isRequired
 };
 
 const CartContent = () => {
@@ -182,7 +128,12 @@ const CartContent = () => {
     const [selected, setSelected] = useState([]);
     const [coupon, setCoupon] = useState('GIAMTOANBO');
     const [shopCoupon, setShopCoupon] = useState('');
+    const [calculated, setCaculated] = useState(null);
+
+    //Dialog/Menu
     const [contextProduct, setContextProduct] = useState(null);
+    const [contextShop, setContextShop] = useState(null);
+    const [openDialog, setOpenDialog] = useState(undefined);
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
@@ -200,35 +151,37 @@ const CartContent = () => {
             handleCalculate();
         } else { //Reset cart
             setCheckoutCart([]);
+            setCaculated(null);
         }
-    }, [selected, shopCoupon])
+    }, [selected, shopCoupon, coupon, cartProducts])
 
     const handleCalculate = async () => {
         if (isLoading) return;
 
         //Reduce cart
         const estimateCart = cartProducts.reduce((result, item) => {
-            const { shopId, otherId, value } = item;
+            const { id, shopId } = item;
 
-            // Find or create the group for this id
-            let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
+            if (selected.indexOf(id) !== -1) { //Get selected items in redux store
+                //Find or create shop
+                let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
 
-            if (!detail) {
-                // If group doesn't exist, create a new one
-                detail = { shopId, coupon: shopCoupon[item.shopId], items: [] };
-                result.cart.push(detail);
+                if (!detail) {
+                    detail = { shopId, coupon: shopCoupon[item.shopId], items: [] };
+                    result.cart.push(detail);
+                }
+
+                //Add items for that shop
+                detail.items.push(item);
             }
-
-            // Add the otherId and value to the group's values
-            detail.items.push(item);
 
             return result;
         }, { coupon: coupon, cart: [] });
 
-        setCheckoutCart(estimateCart);
+        setCheckoutCart(estimateCart); //Set cart for estimate
         calculate(estimateCart).unwrap()
             .then((data) => {
-                console.log(data);
+                setCaculated(data);
                 syncCart(data);
             })
             .catch((err) => {
@@ -284,10 +237,7 @@ const CartContent = () => {
             return result;
         }, {});
     }
-
     const reducedCart = useMemo(() => reduceCart(), [cartProducts]);
-
-
 
     //Open context menu
     const handleClick = (e, product) => {
@@ -299,6 +249,15 @@ const CartContent = () => {
         setAnchorEl(null);
         setContextProduct(null);
     };
+
+    const handleOpenDialog = (shopId) => {
+        setOpenDialog(true);
+        setContextShop(shopId);
+    }
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+        setContextShop(null);
+    }
 
     //Selected?
     const isShopSelected = (shop) => shop?.products.some(product => selected.includes(product.id));
@@ -426,23 +385,6 @@ const CartContent = () => {
             <Grid size={{ xs: 12, md_lg: 8 }} position="relative">
                 <MainTitleContainer>
                     <Title><ShoppingCartIcon />&nbsp;GIỎ HÀNG ({cartProducts?.length})</Title>
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        sx={{
-                            position: 'sticky',
-                            top: 150,
-                            right: 0,
-                            // opacity: selected.length > 0 ? 1 : 0,
-                            // visibility: selected.length > 0 ? 'visible' : 'hidden',
-                            transition: 'all .25s ease',
-                            zIndex: 99,
-                        }}
-                        onClick={handleDeleteMultiple}
-                        endIcon={<DeleteIcon />}
-                    >
-                        Xoá
-                    </Button>
                 </MainTitleContainer>
                 <Table aria-label="cart-table">
                     <EnhancedTableHead
@@ -455,9 +397,9 @@ const CartContent = () => {
                             const shop = reducedCart[shopId];
 
                             return (<CartDetailRow {...{
-                                id: shopId, index, shop, coupon: shopCoupon, isSelected, isShopSelected, handleSelect, handleDeselect,
-                                handleSelectShop, handleDecrease, increaseAmount, handleChangeQuantity, handleChangeCoupon,
-                                handleClick, StyledCheckbox, StyledTableCell, ActionTableCell
+                                id: shopId, index, shop, coupon: shopCoupon, isSelected, isShopSelected, handleSelect,
+                                handleDeselect, handleSelectShop, handleDecrease, increaseAmount, handleChangeQuantity,
+                                handleClick, handleOpenDialog, StyledCheckbox
                             }} />)
                         })}
                     </TableBody>
@@ -476,30 +418,34 @@ const CartContent = () => {
                 </Box>
             </Grid>
             <Grid size={{ xs: 12, md_lg: 4 }} position={{ xs: 'sticky', md_lg: 'relative' }} bottom={0}>
-                <CheckoutDialog {...{
-                    checkoutCart, navigate, handleSelectAllClick,
-                    numSelected: selected.length, rowCount: cartProducts?.length
-                }} />
+                <CheckoutDialog {...{ checkoutCart, navigate, pending: isLoading, calculated, numSelected: selected.length }} />
             </Grid>
-            <Menu
-                open={open}
-                onClose={handleClose}
-                MenuListProps={{ 'aria-labelledby': 'basic-button' }}
-                anchorEl={anchorEl}
-            >
-                <MenuItem onClick={handleDeleteContext}>
-                    <ListItemIcon >
-                        <DeleteIcon sx={{ color: 'error.main' }} fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText sx={{ color: 'error.main' }}>Xoá khỏi giỏ</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={handleFindSimilar}>
-                    <ListItemIcon>
-                        <Search fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Tìm sản phẩm tương tự</ListItemText>
-                </MenuItem>
-            </Menu>
+            <Suspense fallback={<></>}>
+                {openDialog !== undefined && <CouponDialog {...{ openDialog, handleCloseDialog, shopId: contextShop }} />}
+            </Suspense>
+            <Suspense fallback={<></>}>
+                {open !== undefined &&
+                    <Menu
+                        open={open}
+                        onClose={handleClose}
+                        MenuListProps={{ 'aria-labelledby': 'basic-button' }}
+                        anchorEl={anchorEl}
+                    >
+                        <MenuItem onClick={handleDeleteContext}>
+                            <ListItemIcon >
+                                <DeleteIcon sx={{ color: 'error.main' }} fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText sx={{ color: 'error.main' }}>Xoá khỏi giỏ</ListItemText>
+                        </MenuItem>
+                        <MenuItem onClick={handleFindSimilar}>
+                            <ListItemIcon>
+                                <Search fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Tìm sản phẩm tương tự</ListItemText>
+                        </MenuItem>
+                    </Menu>
+                }
+            </Suspense>
         </Grid>
     )
 }

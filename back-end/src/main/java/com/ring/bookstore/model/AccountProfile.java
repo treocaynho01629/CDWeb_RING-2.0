@@ -58,6 +58,7 @@ public class AccountProfile {
             fetch = FetchType.LAZY,
             orphanRemoval = true)
     @JoinColumn(name = "image_id")
+    @JsonIgnore
     private Image image;
 
     @OneToOne(fetch = FetchType.LAZY)

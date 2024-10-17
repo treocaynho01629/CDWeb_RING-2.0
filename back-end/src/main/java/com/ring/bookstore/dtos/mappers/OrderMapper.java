@@ -58,7 +58,7 @@ public class OrderMapper {
         return new OrderItemDTO(item.getId(),
                 item.getPrice(),
                 item.getDiscount(),
-                item.getAmount(),
+                item.getQuantity(),
                 item.getStatus(),
                 book.getId(),
                 book.getSlug(),

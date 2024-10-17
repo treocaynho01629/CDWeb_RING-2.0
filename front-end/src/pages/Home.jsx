@@ -7,6 +7,8 @@ import { useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/book
 import { LazyLoadComponent } from 'react-lazy-load-image-component';
 import { Category, ExpandMore, GpsNotFixed, KeyboardArrowRight, Replay, ThumbUpAlt } from '@mui/icons-material';
 import { CustomTab, CustomTabs } from '../components/custom/CustomTabs';
+import { useGetPublishersQuery } from '../features/publishers/publishersApiSlice';
+import { orderTabs } from '../ultils/suggest';
 import useTitle from '../hooks/useTitle';
 import Categories from '../components/other/Categories';
 import Suggest from '../components/other/Suggest';
@@ -15,7 +17,7 @@ import CustomDivider from '../components/custom/CustomDivider';
 import CustomPlaceholder from '../components/custom/CustomPlaceholder';
 import BannersSlider from '../components/other/BannersSlider';
 import Publishers from '../components/other/Publishers';
-import { useGetPublishersQuery } from '../features/publishers/publishersApiSlice';
+import BigProductsSlider from '../components/product/BigProductsSlider';
 
 const ProductsSlider = lazy(() => import('../components/product/ProductsSlider'));
 
@@ -128,24 +130,11 @@ const SaleContainer = styled.div`
     transform: translateX(-50%);
     border: 1px solid ${props => props.theme.palette.primary.light};
     background-color: ${props => alpha(props.theme.palette.primary.light, 0.1)};
+    border-left: none;
+    border-right: none;
   }
 `
 //#endregion
-
-const orderTabs = [
-  {
-    filters: { sortBy: 'totalOrders' },
-    label: 'Bán chạy',
-  },
-  {
-    filters: { sortBy: 'createdDate' },
-    label: 'Mới nhất',
-  },
-  {
-    filters: { sortBy: 'rating' },
-    label: 'Yêu thích',
-  },
-];
 
 const defaultSize = 15;
 const defaultMore = 5;
@@ -337,7 +326,6 @@ const Home = () => {
 
   return (
     <Wrapper>
-      {/* <Slider /> */}
       <BannersSlider />
       <Suggest />
       <CustomDivider>TIÊU ĐIỂM</CustomDivider>
@@ -387,8 +375,8 @@ const Home = () => {
       <ProductsList {...{ tabs: orderTabs, title: 'Trending' }} />
       <p>TOP STUFF</p>
       <ProductsList {...{ value: { cateId: cates[0]?.id }, title: cates[0]?.categoryName }} />
-      <ProductsList {...{ tabs: pubs || [], title: 'Thương hiệu nổi bật' }} />
-      <ProductsList {...{ tabs: pubs || [] }} />
+      <ProductsList {...{ tabs: pubs.slice(0, 4) || [], title: 'Thương hiệu nổi bật' }} />
+      <ProductsList {...{ tabs: pubs.slice(5, 9) || [] }} />
       <Container>
         <TitleContainer>
           <ContainerTitle><Category />&nbsp;Nhà xuất bản</ContainerTitle>
@@ -403,6 +391,7 @@ const Home = () => {
           return (<ProductsList {...{ tabs, title }} />)
         }
       })}
+      <BigProductsSlider />
       <ProductsList {...{ tabs: orderTabs, title: 'Other Cate' }} />
       <ProductsList {...{
         tabs: cateToTabs(catesWithChilds[catesWithChilds.length - 1]),

@@ -58,6 +58,7 @@ public class Book extends Auditable {
             fetch = FetchType.LAZY,
             orphanRemoval = true)
     @JoinColumn(name = "image_id", nullable = false)
+    @JsonIgnore
     private Image image;
 
     @Column
@@ -122,6 +123,13 @@ public class Book extends Auditable {
     @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
     private List<OrderItem> orderItems;
+
+    public Long getImageId() {
+        return (this.image != null) ? this.image.getId() : null;
+    }
+    public Long getShopId() {
+        return (this.shop != null) ? this.shop.getId() : null;
+    }
 
     public void addReview(Review review) {
         bookReviews.add(review);

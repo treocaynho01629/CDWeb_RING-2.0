@@ -14,7 +14,7 @@ const CheckoutContainer = styled.div`
 
     ${props => props.theme.breakpoints.down("md_lg")} {
         position: sticky;
-        bottom: 20px;
+        bottom: 0;
     }
 
     ${props => props.theme.breakpoints.down("sm")} {
@@ -56,18 +56,29 @@ const Title = styled.h3`
     justify-content: center;
 `
 
-const Payout = styled.div`
+const CheckoutBox = styled.div`
     border: .5px solid ${props => props.theme.palette.action.focus};
     padding: 20px;
     margin-bottom: 20px;
+    background-color: ${props => props.theme.palette.background.default};
 
     &.sticky {
+        margin-bottom: -0.5px;
         position: sticky;
         top: ${props => props.theme.mixins.toolbar.minHeight + 15}px;
     }
 `
 
-const AltPayout = styled.div`
+const CheckoutStack = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+`
+
+const CheckoutPriceContainer = styled.div`
+`
+
+const AltCheckoutBox = styled.div`
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -75,32 +86,38 @@ const AltPayout = styled.div`
     padding: 0 7px;
 `
 
-const PayoutTitle = styled.h5`
-    margin: 0;
+const CheckoutTitle = styled.span`
+    font-size: 16px;
 `
 
-const PayoutRow = styled.div`
+const CheckoutRow = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: ${props => props.theme.palette.action.focus};
-    margin-top: 10px;
-    padding: 0px 10px;
+    padding: 4px 0;
 `
 
-const PayoutText = styled.p`
-    font-size: 15px;
-    font-weight: 500;
-    margin: 8px 0;
-    display: flex;
-    align-items: center;
+const CheckoutText = styled.span`
+    font-size: 14px;
+    font-weight: 400;
 `
 
-const PayoutPrice = styled.p`
+const CheckoutPrice = styled.span`
     font-size: 16px;
     font-weight: bold;
-    color: red;
-    margin: 0;
+    color: ${props => props.theme.palette.error.main};
+    cursor: pointer;
+`
+
+const SavePrice = styled.span`
+    font-size: 14px;
+    font-weight: 450;
+    color: ${props => props.theme.palette.success.dark};
+`
+
+const SubText = styled.span`
+    font-size: 12px;
+    color: ${props => props.theme.palette.text.secondary};
 `
 
 const CouponButton = styled.p`
@@ -117,138 +134,254 @@ const CouponButton = styled.p`
     }
 `
 
-const BuyButton = styled(Button)`
-    margin-top: 15px;
+const CheckoutButton = styled(Button)`
     height: 100%;
     line-height: 1.5;
 `
 //#endregion
 
-const CheckoutDialog = ({ checkoutCart, navigate, rowCount }) => {
+const tempShippingFee = 10000;
+
+const CheckoutDialog = ({ checkoutCart, navigate, pending, calculated, numSelected }) => {
     const { token } = useAuth();
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
     const tabletMode = useMediaQuery(theme.breakpoints.down('md_lg'));
     const [open, setOpen] = useState(undefined);
 
-    //Test estimate
-    const shippingPrice = () => {
-        return (10000 * (checkoutCart?.cart?.length ?? 0));
-    }
+    //Estimate before receive caculated price from server
+    const estimatePrice = () => {
+        let estimate = { deal: 0, total: 0, shipping: 0, subTotal: 0 }; //Initial value
 
-    const totalPrice = () => {
-        let total = 0;
-        checkoutCart?.cart?.forEach((detail) => (
-            detail?.items?.forEach((item) => (
-                total += item.quantity * Math.round(item.price * (1 - item.discount)
-                ))
-            )));
-        return total;
-    }
+        if (checkoutCart?.cart?.length) {
+            let deal = 0;
+            let total = 0;
+            const shipping = tempShippingFee * (checkoutCart?.cart?.length || 0);
 
-    const shipping = useMemo(() => shippingPrice(), [checkoutCart]);
-    const total = useMemo(() => totalPrice(), [checkoutCart]);
+            //Loop & calculate
+            checkoutCart?.cart?.forEach((detail) => (
+                detail?.items?.forEach((item) => {
+                    const discount = Math.round(item.price * item.discount);
+
+                    //Both deal & total price
+                    deal += item.quantity * discount;
+                    total += item.quantity * item.price;
+                })
+            ));
+
+            //Set values
+            estimate = { deal, total, shipping, subTotal: total + shipping - deal };
+        }
+        return estimate;
+    }
+    const calculatedInfo = () => {
+        let info = {
+            deal: 0,
+            total: 0,
+            shipping: 0,
+            couponDiscount: 0,
+            totalDiscount: 0,
+            shippingDiscount: 0,
+            subTotal: 0,
+        }
+
+        if (calculated) {
+            let deal = 0;
+            let total = 0;
+            let shipping = 0;
+            let shippingDiscount = 0;
+            const totalDiscount = calculated?.totalDiscount || 0;
+            const finalTotal = calculated?.total || 0;
+
+            //Loop & calculate shipping discount
+            calculated?.details?.forEach((detail) => {
+                detail?.items?.forEach((item) => {
+                    const discount = Math.round(item.price * item.discount);
+
+                    //Both deal & total price
+                    deal += item.quantity * discount;
+                    total += item.quantity * item.price;
+                })
+
+                //Shipping
+                shipping += detail?.shippingFee;
+                shippingDiscount += detail?.shippingDiscount;
+            });
+
+            //Set info values
+            info = {
+                deal,
+                total: finalTotal - shipping,
+                shipping,
+                couponDiscount: totalDiscount - shippingDiscount - deal,
+                totalDiscount,
+                shippingDiscount,
+                subTotal: (calculated?.total || 0) - totalDiscount,
+            }
+        }
+        return info;
+    }
 
     const toggleDrawer = (newOpen) => { setOpen(newOpen) };
+
+    //Info
+    const estimate = useMemo(() => estimatePrice(), [checkoutCart]);
+    const info = useMemo(() => calculatedInfo(), [calculated]);
+    const displayInfo = {
+        deal: (pending && !info)  ? estimate.deal : info.deal,
+        total: (pending && !info)  ? estimate.total : info.total,
+        shipping: (pending && !info) ? estimate.shipping : info.shipping,
+        couponDiscount: info.couponDiscount,
+        totalDiscount: info.totalDiscount,
+        shippingDiscount: info.shippingDiscount,
+        subTotal: (pending && !info)  ? estimate.subTotal : info.subTotal
+    }
 
     return (
         <>
             {mobileMode
                 ? <AltCheckoutContainer>
-                    <AltPayout>
-                        <PayoutPrice onClick={() => toggleDrawer(true)} style={{ cursor: 'pointer' }}>
-                            {Math.round(total + (10000 * checkoutCart?.cart?.length)).toLocaleString()}&nbsp;đ
-                        </PayoutPrice>
-                    </AltPayout>
-                    <BuyButton
+                    <AltCheckoutBox>
+                        <CheckoutPrice onClick={() => toggleDrawer(true)}>
+                            {Math.round(displayInfo.subTotal).toLocaleString()}đ
+                        </CheckoutPrice>
+                    </AltCheckoutBox>
+                    <CheckoutButton
                         variant="contained"
                         size="large"
                         fullWidth
-                        disabled={!checkoutCart?.cart?.length}
+                        disabled={!numSelected || pending}
                         onClick={() => navigate('/checkout', { state: { products: checkoutCart } })}
                     >
-                        {token ? `THANH TOÁN (${rowCount})` : 'ĐĂNG NHẬP'}
-                    </BuyButton>
-                    <Suspense fallback={null}>
-                        <SwipeableDrawer
-                            anchor="bottom"
-                            open={open}
-                            onOpen={() => toggleDrawer(true)}
-                            onClose={() => toggleDrawer(false)}
-                        >
-                            <Payout style={{ marginBottom: 0 }}>
-                                <PayoutTitle>THANH TOÁN</PayoutTitle>
-                                <PayoutRow>
-                                    <PayoutText>Thành tiền:</PayoutText>
-                                    <PayoutText>{total.toLocaleString()}&nbsp;đ</PayoutText>
-                                </PayoutRow>
-                                <PayoutRow>
-                                    <PayoutText>Phí vận chuyển:</PayoutText>
-                                    <PayoutText>{shipping.toLocaleString()}&nbsp;đ</PayoutText>
-                                </PayoutRow>
-                                <PayoutRow>
-                                    <PayoutText>Tổng:</PayoutText>
-                                    <PayoutPrice>{Math.round(total + shipping).toLocaleString()}&nbsp;đ</PayoutPrice>
-                                </PayoutRow>
-                            </Payout>
-                        </SwipeableDrawer>
-                    </Suspense>
+                        {token ? `Thanh toán (${numSelected})` : 'Đăng nhập'}
+                    </CheckoutButton>
                 </AltCheckoutContainer>
                 : tabletMode
                     ? <CheckoutContainer>
-                        <Payout>
-                            <BuyButton
-                                variant="contained"
-                                size="large"
-                                fullWidth
-                                disabled={!checkoutCart?.cart?.length}
-                                onClick={() => navigate('/checkout', { state: { products: checkoutCart } })}
-                            >
-                                <PaymentsIcon style={{ fontSize: 18 }} />&nbsp;
-                                {token ? `THANH TOÁN (${rowCount} SẢN PHẨM)` : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
-                            </BuyButton>
-                        </Payout>
+                        <CheckoutBox className="sticky">
+                            <CheckoutStack>
+                                <CheckoutPriceContainer>
+                                    <CheckoutText>
+                                        Tổng thanh toán: ({numSelected} Sản phẩm)&emsp;
+                                        {numSelected && <SubText>(Đã bao gồm VAT)</SubText>}
+                                    </CheckoutText>
+                                    <CheckoutPrice onClick={() => toggleDrawer(true)}>
+                                        {Math.round(displayInfo.subTotal).toLocaleString()}đ
+                                    </CheckoutPrice>&emsp;
+                                    <SavePrice>
+                                        {pending ? 'Đang tạm tính'
+                                            : `Tiết kiệm ${Math.round(displayInfo.totalDiscount).toLocaleString()}đ`}
+                                    </SavePrice>
+                                </CheckoutPriceContainer>
+                                <CheckoutButton
+                                    variant="contained"
+                                    size="large"
+                                    fullWidth
+                                    sx={{ maxWidth: '35%' }}
+                                    disabled={!numSelected || pending}
+                                    onClick={() => navigate('/checkout', { state: { products: checkoutCart } })}
+                                >
+                                    {token ? 'Thanh toán' : 'Đăng nhập'}
+                                </CheckoutButton>
+                            </CheckoutStack>
+                        </CheckoutBox>
                     </CheckoutContainer>
                     : <CheckoutContainer>
                         <SecondaryTitleContainer>
                             <Title>ĐƠN DỰ TÍNH&nbsp;</Title><SellIcon />
                         </SecondaryTitleContainer>
-                        <Payout>
-                            <PayoutTitle>KHUYẾN MÃI</PayoutTitle>
-                            <PayoutRow>
-                                <PayoutText>Voucher RING:</PayoutText>
+                        <CheckoutBox>
+                            <CheckoutTitle>KHUYẾN MÃI</CheckoutTitle>
+                            <CheckoutRow>
+                                <CheckoutText>Voucher RING:</CheckoutText>
                                 <CouponButton>Chọn hoặc nhập mã&nbsp;
                                     <SellIcon />
                                 </CouponButton>
-                            </PayoutRow>
-                        </Payout>
-                        <Payout className="sticky">
-                            <PayoutTitle>THANH TOÁN</PayoutTitle>
-                            <PayoutRow>
-                                <PayoutText>Thành tiền:</PayoutText>
-                                <PayoutText>{total.toLocaleString()}&nbsp;đ</PayoutText>
-                            </PayoutRow>
-                            <PayoutRow>
-                                <PayoutText>Phí vận chuyển:</PayoutText>
-                                <PayoutText>{shipping.toLocaleString()}&nbsp;đ</PayoutText>
-                            </PayoutRow>
-                            <PayoutRow>
-                                <PayoutText>Tổng:</PayoutText>
-                                <PayoutPrice>{Math.round(total + shipping).toLocaleString()}&nbsp;đ</PayoutPrice>
-                            </PayoutRow>
-                            <BuyButton
+                            </CheckoutRow>
+                        </CheckoutBox>
+                        <CheckoutBox className="sticky">
+                            <CheckoutTitle>THANH TOÁN</CheckoutTitle>
+                            <CheckoutRow>
+                                <CheckoutText>Tiền hàng:</CheckoutText>
+                                <CheckoutText>{(displayInfo.total).toLocaleString()}đ</CheckoutText>
+                            </CheckoutRow>
+                            <CheckoutRow>
+                                <CheckoutText>Phí vận chuyển:</CheckoutText>
+                                <CheckoutText>{displayInfo.shipping.toLocaleString()}đ</CheckoutText>
+                            </CheckoutRow>
+                            {(!pending && displayInfo.shippingDiscount > 0) &&
+                                <CheckoutRow>
+                                    <CheckoutText>Khuyến mãi vận chuyển:</CheckoutText>
+                                    <CheckoutText>-{displayInfo.shippingDiscount.toLocaleString()}đ</CheckoutText>
+                                </CheckoutRow>
+                            }
+                            {(!pending && displayInfo.deal > 0) &&
+                                <CheckoutRow>
+                                    <CheckoutText>Giảm giá sản phẩm:</CheckoutText>
+                                    <CheckoutText>-{displayInfo.deal.toLocaleString()}đ</CheckoutText>
+                                </CheckoutRow>
+                            }
+                            {(!pending && displayInfo.couponDiscount > 0) &&
+                                <CheckoutRow>
+                                    <CheckoutText>Giảm giá từ coupon:</CheckoutText>
+                                    <CheckoutText>-{displayInfo.couponDiscount.toLocaleString()}đ</CheckoutText>
+                                </CheckoutRow>
+                            }
+                            <CheckoutRow>
+                                <CheckoutText>Tổng:</CheckoutText>
+                                <CheckoutPrice>{Math.round(displayInfo.subTotal).toLocaleString()}đ</CheckoutPrice>
+                            </CheckoutRow>
+                            <CheckoutButton
                                 variant="contained"
                                 size="large"
                                 fullWidth
-                                disabled={!checkoutCart?.cart?.length}
+                                disabled={!numSelected || pending}
                                 onClick={() => navigate('/checkout', { state: { products: checkoutCart } })}
+                                startIcon={<PaymentsIcon />}
                             >
-                                <PaymentsIcon style={{ fontSize: 18 }} />&nbsp;
-                                {token ? `THANH TOÁN (${rowCount} SẢN PHẨM)` : 'ĐĂNG NHẬP ĐỂ THANH TOÁN'}
-                            </BuyButton>
-                        </Payout>
+                                {token ? `Thanh toán (${numSelected})` : 'Đăng nhập để Thanh toán'}
+                            </CheckoutButton>
+                        </CheckoutBox>
                     </CheckoutContainer >
             }
+            <Suspense fallback={null}>
+                {open != undefined &&
+                    <SwipeableDrawer
+                        anchor="bottom"
+                        open={open}
+                        onOpen={() => toggleDrawer(true)}
+                        onClose={() => toggleDrawer(false)}
+                    >
+                        <CheckoutBox>
+                            <CheckoutTitle>THANH TOÁN</CheckoutTitle>
+                            <CheckoutRow>
+                                <CheckoutText>Tiền hàng:</CheckoutText>
+                                <CheckoutText>{(displayInfo.total).toLocaleString()}đ</CheckoutText>
+                            </CheckoutRow>
+                            <CheckoutRow>
+                                <CheckoutText>Phí vận chuyển:</CheckoutText>
+                                <CheckoutText>{displayInfo.shipping.toLocaleString()}đ</CheckoutText>
+                            </CheckoutRow>
+                            <CheckoutRow>
+                                <CheckoutText>Khuyến mãi vận chuyển:</CheckoutText>
+                                <CheckoutText>-{displayInfo.shippingDiscount.toLocaleString()}đ</CheckoutText>
+                            </CheckoutRow>
+                            <CheckoutRow>
+                                <CheckoutText>Giảm giá sản phẩm:</CheckoutText>
+                                <CheckoutText>-{displayInfo.deal.toLocaleString()}đ</CheckoutText>
+                            </CheckoutRow>
+                            <CheckoutRow>
+                                <CheckoutText>Giảm giá từ coupon:</CheckoutText>
+                                <CheckoutText>-{displayInfo.couponDiscount.toLocaleString()}đ</CheckoutText>
+                            </CheckoutRow>
+                            <CheckoutRow>
+                                <CheckoutText>Tổng:</CheckoutText>
+                                <CheckoutPrice>{Math.round(displayInfo.subTotal).toLocaleString()}đ</CheckoutPrice>
+                            </CheckoutRow>
+                        </CheckoutBox>
+                    </SwipeableDrawer>
+                }
+            </Suspense>
         </>
     )
 }

@@ -1,72 +1,14 @@
 
 import styled from 'styled-components'
 import { Fragment, useEffect } from 'react';
-import { MoreHoriz, Storefront, KeyboardArrowRight } from '@mui/icons-material';
-import { IconButton, TableRow, Box, Skeleton } from '@mui/material';
+import { MoreHoriz, Storefront, KeyboardArrowRight, LocalActivityOutlined } from '@mui/icons-material';
+import { IconButton, Box, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Link } from 'react-router-dom';
+import { ActionTableCell, StyledItemTableRow, StyledTableRow, SpaceTableRow, StyledTableCell } from '../custom/CustomTableComponents';
 import CustomAmountInput from '../custom/CustomAmountInput';
 
 //#region styled
-const StyledTableRow = styled(TableRow)`
-    position: relative;
-
-    &:after{
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        border: .5px solid ${props => props.theme.palette.action.focus};
-        z-index: -1;
-
-        &.shop {
-            border-bottom: none;
-        }
-
-        ${props => props.theme.breakpoints.down("sm")} {
-            border-left: none;
-            border-right: none;
-        }
-    }
-`
-
-const StyledItemTableRow = styled(TableRow)`
-    position: relative;
-
-    &:after{
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        border: .5px solid ${props => props.theme.palette.action.focus};
-        border-top: none;
-        border-bottom: none;
-        z-index: -1;
-
-        ${props => props.theme.breakpoints.down("sm")} {
-            border: none;
-        }
-    }
-
-    &.error {
-        &:after{
-            border: .5px solid ${props => props.theme.palette.error.light};
-        }
-    }
-`
-
-const SpaceTableRow = styled(TableRow)`
-    height: 16px;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        height: 8px;
-    }
-`
-
 const ItemContainer = styled.div`
     display: flex;
     width: 100%;
@@ -123,6 +65,25 @@ const ShopTitle = styled.b`
     
     svg { color: ${props => props.theme.palette.text.secondary} }
 
+    ${props => props.theme.breakpoints.down("sm")} {
+        font-size: 14px;
+        margin: 8px 0;
+    }
+`
+
+const CouponButton = styled.b`
+    font-size: 15px;
+	white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+
+    span {
+        display: flex;
+        align-items: center;
+    }
+    
     ${props => props.theme.breakpoints.down("sm")} {
         font-size: 14px;
         margin: 8px 0;
@@ -208,7 +169,7 @@ const StyledIconButton = styled(IconButton)`
 //#endregion
 
 function ItemRow({ product, index, handleSelect, handleDeselect, isSelected, handleDecrease, increaseAmount,
-    handleChangeQuantity, handleClick, StyledCheckbox, StyledTableCell, ActionTableCell }) {
+    handleChangeQuantity, handleClick, StyledCheckbox }) {
     const isItemSelected = isSelected(product.id);
     const labelId = `item-checkbox-${index}`;
     const isDisabled = !product || product.amount < 1;
@@ -310,8 +271,8 @@ function ItemRow({ product, index, handleSelect, handleDeselect, isSelected, han
 }
 
 const CartDetailRow = ({ id, index, shop, coupon, isSelected, isShopSelected, handleSelect, handleDeselect,
-    handleSelectShop, handleDecrease, handleChangeQuantity, handleChangeCoupon, handleClick, increaseAmount,
-    StyledCheckbox, StyledTableCell, ActionTableCell }) => {
+    handleSelectShop, handleDecrease, handleChangeQuantity, handleClick, increaseAmount,
+    handleOpenDialog, StyledCheckbox }) => {
     const isGroupSelected = isShopSelected(shop);
     const shopLabelId = `shop-label-checkbox-${index}`;
 
@@ -323,7 +284,7 @@ const CartDetailRow = ({ id, index, shop, coupon, isSelected, isShopSelected, ha
                 className="shop"
                 tabIndex={-1}
             >
-                <StyledTableCell sx={{ paddingTop: '4px' }} padding="checkbox">
+                <StyledTableCell padding="checkbox">
                     <StyledCheckbox
                         color="primary"
                         onChange={() => handleSelectShop(shop)}
@@ -332,7 +293,7 @@ const CartDetailRow = ({ id, index, shop, coupon, isSelected, isShopSelected, ha
                     />
                 </StyledTableCell>
                 <StyledTableCell align="left" colSpan={5}>
-                    <Link to={`/filters`}>
+                    <Link to={'/filters'}>
                         <ShopTitle>
                             <ShopTag>Đối tác</ShopTag>
                             <Storefront />&nbsp;{shop.shopName}<KeyboardArrowRight fontSize="small" />
@@ -342,13 +303,19 @@ const CartDetailRow = ({ id, index, shop, coupon, isSelected, isShopSelected, ha
             </StyledTableRow>
             {shop.products?.map((product, index) => (
                 <ItemRow {...{
-                    product, index, handleSelect, handleDeselect, isSelected, handleDecrease, handleChangeQuantity, handleClick,
-                    StyledCheckbox, StyledTableCell, ActionTableCell, increaseAmount
+                    product, index, handleSelect, handleDeselect, isSelected, handleDecrease, handleChangeQuantity, 
+                    handleClick, increaseAmount, StyledCheckbox
                 }} />
             ))}
             <StyledTableRow role="coupon-row" tabIndex={-1}>
                 <StyledTableCell align="left" colSpan={6}>
-                    <ShopTitle onClick={(e) => handleChangeCoupon(e, id)}>TEMP: {coupon[id]}</ShopTitle>
+                    <CouponButton onClick={() => handleOpenDialog(id)}>
+                        <span>
+                            <LocalActivityOutlined color="error"/>&nbsp;
+                            Thêm mã giảm giá: {coupon[id]}
+                        </span>
+                        <KeyboardArrowRight fontSize="small" />
+                    </CouponButton>
                 </StyledTableCell>
             </StyledTableRow>
         </Fragment>

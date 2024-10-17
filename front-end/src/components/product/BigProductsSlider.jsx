@@ -210,7 +210,7 @@ function Item({ book, index }) {
                             <InfoContainer>
                                 <Link to={`/product/${book.slug}`} style={{ color: 'inherit' }}>
                                     <Title>{book.title}</Title>
-                                    <Description>{book.description}</Description>
+                                    {/* <Description>{book.description}</Description> */}
                                 </Link>
                                 <Button
                                     variant="contained"
@@ -246,7 +246,7 @@ function Item({ book, index }) {
     )
 }
 
-const Slider = () => {
+const BigProductsSlider = () => {
     const { data, isLoading, isSuccess, isError } = useGetRandomBooksQuery({ amount: 5 });
 
     let productsCarousel;
@@ -304,4 +304,4 @@ const Slider = () => {
     )
 }
 
-export default Slider
+export default BigProductsSlider
