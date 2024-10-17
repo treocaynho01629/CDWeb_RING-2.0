@@ -40,6 +40,7 @@ public class Banner {
             fetch = FetchType.LAZY,
             orphanRemoval = true)
     @JoinColumn(name = "image_id", nullable = false)
+    @JsonIgnore
     private Image image;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public record OrderItemDTO(Long id,
                            Double price,
                            BigDecimal discount,
-                           Short amount,
+                           Short quantity,
                            OrderStatus status,
                            Long bookId,
                            String bookSlug,

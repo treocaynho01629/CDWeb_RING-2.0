@@ -81,7 +81,7 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
 
   //Open sub cate
   const handleClick = (e, id) => {
-    setOpen((prevState) => ({ ...prevState, [id]: !prevState[id] }));
+    setOpen(prev => ({ ...prev, [id]: !prev[id] }));
     e.stopPropagation();
   };
 
@@ -111,13 +111,9 @@ const CateFilter = ({ loadCates, doneCates, errorCates, cates, cateId, onChangeC
               onClick={() => handleCateChange(cate?.slug, id)}
             >
               <FilterText>{cate?.categoryName}</FilterText>
-              {cate.children?.length ?
-                <>
-                  {open[id] ? <ExpandLess onClick={(e) => handleClick(e, id)} />
-                    : <ExpandMore onClick={(e) => handleClick(e, id)} />}
-                </>
-                : null
-              }
+              {cate.children?.length ? open[id] ? <ExpandLess onClick={(e) => handleClick(e, id)} />
+                : <ExpandMore onClick={(e) => handleClick(e, id)} />
+                : null}
             </StyledListItemButton>
             {cate?.children &&
               <Collapse in={open[id]} timeout="auto" unmountOnExit>

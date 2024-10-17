@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Add, Close, LocalShipping, Sell, ShoppingBasket } from '@mui/icons-material'
+import { Add, Close, Loyalty } from '@mui/icons-material'
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, useMediaQuery, Box, Skeleton } from '@mui/material'
 import { useGetCouponsQuery } from '../../features/coupons/couponsApiSlice';
 import { useTheme } from '@emotion/react';
 import CouponItem from './CouponItem'
 import styled from 'styled-components'
+import { getCouponSumary } from '../../ultils/coupon';
 
 //#region styled
 const DetailTitle = styled.h4`
@@ -17,17 +18,6 @@ const DetailTitle = styled.h4`
     }
 `
 //#endregion
-
-const getCouponSumary = (type) => {
-    switch (type) {
-        case 'SHIPPING':
-            return { name: 'Mã giảm phí vận chuyển', sumary: 'Áp dụng cho đơn hàng từ', color: 'primary', icon: <LocalShipping /> };
-        case 'MIN_VALUE':
-            return { name: 'Mã giảm', sumary: 'Áp dụng cho đơn hàng từ', color: 'error', icon: <Sell /> };
-        case 'MIN_AMOUNT':
-            return { name: 'Mã giảm', sumary: 'Áp dụng khi mua', color: 'warning', icon: <ShoppingBasket /> };
-    }
-}
 
 const CouponDialog = ({ selectMode, shopId, openDialog, handleCloseDialog }) => {
     const theme = useTheme();
@@ -118,7 +108,7 @@ const CouponDialog = ({ selectMode, shopId, openDialog, handleCloseDialog }) => 
 
     return (
         <Dialog open={openDialog} scroll={'paper'} maxWidth={'sm'} fullWidth onClose={handleCloseDialog} fullScreen={fullScreen}>
-            <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><Sell />&nbsp;Thông tin ưu đãi</DialogTitle>
+            <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><Loyalty />&nbsp;Thông tin ưu đãi</DialogTitle>
             <DialogContent sx={{ padding: { xs: 1, sm: '20px 24px' }, paddingTop: 0 }}>
                 {couponsContent}
             </DialogContent>

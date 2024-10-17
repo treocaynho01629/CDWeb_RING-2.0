@@ -1,9 +1,10 @@
 import styled from 'styled-components'
 import { lazy, Suspense, useState } from 'react'
-import { KeyboardArrowRight, LabelOff, LocalShipping, Sell, ShoppingBasket } from '@mui/icons-material'
+import { KeyboardArrowRight, LabelOff} from '@mui/icons-material'
 import { MobileExtendButton } from '../custom/GlobalComponents'
 import { useGetCouponsQuery } from '../../features/coupons/couponsApiSlice'
 import { Skeleton } from '@mui/material'
+import { getCouponSumary } from '../../ultils/coupon'
 
 const Popover = lazy(() => import('@mui/material/Popover'));
 const CouponItem = lazy(() => import('./CouponItem'));
@@ -187,17 +188,6 @@ const CouponMessage = styled.span`
     }
 `
 //#endregion
-
-const getCouponSumary = (type) => {
-    switch (type) {
-        case 'SHIPPING':
-            return { name: 'Mã giảm phí vận chuyển', sumary: 'Áp dụng cho đơn hàng từ', color: 'primary', icon: <LocalShipping /> };
-        case 'MIN_VALUE':
-            return { name: 'Mã giảm', sumary: 'Áp dụng cho đơn hàng từ', color: 'error', icon: <Sell /> };
-        case 'MIN_AMOUNT':
-            return { name: 'Mã giảm', sumary: 'Áp dụng khi mua', color: 'warning', icon: <ShoppingBasket /> };
-    }
-}
 
 const CouponPreview = ({ shopId }) => {
     const { data, isLoading, isSuccess, isError } = useGetCouponsQuery({ shop: shopId, size: 4 }, { skip: !shopId });

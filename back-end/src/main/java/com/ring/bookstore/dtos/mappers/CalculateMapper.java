@@ -44,6 +44,7 @@ public class CalculateMapper {
         return new CalculateItemDTO(price,
                 discount,
                 amount,
+                item.getQuantity(),
                 book.getId(),
                 slug,
                 title);

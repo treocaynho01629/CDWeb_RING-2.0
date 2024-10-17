@@ -47,7 +47,7 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	List<Map<String,Object>> getTopUser(); //Top 7 users base on receipts and reviews
 	
 	@Query("""
-	select a.username as name, coalesce(sum(o.amount), 0) as books, coalesce(sum(o.amount * o.price), 0) as sales
+	select a.username as name, coalesce(sum(o.quantity), 0) as books, coalesce(sum(o.quantity * o.price), 0) as sales
 	from Account a join Book b on a.id = b.shop.owner.id 
 	left join OrderItem o on b.id = o.book.id
 	group by a.username

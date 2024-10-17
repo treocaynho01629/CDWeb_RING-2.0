@@ -75,8 +75,7 @@ const SocialContainer = styled.div`
 const Contact = styled.p`
     height: 35px;
     font-size: 12px;
-    margin-top: 0;
-    margin-bottom: 0;
+    margin: 0;
     margin-right: 20px;
     font-weight: 400;
     display: flex;
@@ -94,8 +93,7 @@ const Social = styled.p`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    margin-top: 0;
-    margin-bottom: 0;
+    margin: 0;
     padding: 0 10px;
     height: 35px;
     transition: all 0.5s ease;
@@ -166,7 +164,7 @@ const StyledAppBar = muiStyled(AppBar)(({ theme }) => ({
     backgroundColor: theme.palette.background.default,
     borderBottom: '.5px solid',
     borderColor: theme.palette.divider,
-    top: 0,
+    top: '-0.5px',
     transition: 'all .2s ease',
 
     '&.top': {
@@ -250,10 +248,10 @@ const Navbar = () => {
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
 
-    //Test
+    //Transparent trigger
     const trigger = useScrollTrigger({
         disableHysteresis: true,
-        threshold: 100
+        threshold: 40
     });
 
     //Drawer open state

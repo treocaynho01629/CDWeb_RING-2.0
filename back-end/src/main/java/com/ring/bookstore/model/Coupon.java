@@ -46,4 +46,8 @@ public class Coupon extends Auditable {
     @JoinColumn(name = "shop_id")
     @JsonIgnore
     private Shop shop;
+
+    public Long getShopId() {
+        return (this.shop != null) ? this.shop.getId() : null;
+    }
 }

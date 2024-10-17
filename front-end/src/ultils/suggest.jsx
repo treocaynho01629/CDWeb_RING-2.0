@@ -62,3 +62,18 @@ export const suggest = [
         url: '/'
     },
 ];
+
+export const orderTabs = [
+    {
+        filters: { sortBy: 'totalOrders' },
+        label: 'Bán chạy',
+    },
+    {
+        filters: { sortBy: 'createdDate' },
+        label: 'Mới nhất',
+    },
+    {
+        filters: { sortBy: 'rating' },
+        label: 'Yêu thích',
+    },
+];

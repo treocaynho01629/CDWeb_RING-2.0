@@ -50,6 +50,7 @@ public class Shop extends Auditable {
             fetch = FetchType.LAZY,
             orphanRemoval = true)
     @JoinColumn(name = "image_id")
+    @JsonIgnore
     private Image image;
 
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
