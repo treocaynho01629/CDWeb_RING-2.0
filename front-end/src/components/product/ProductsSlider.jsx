@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import CustomProgress from '../custom/CustomProgress';
 import Carousel from "react-multi-carousel";
-import ProductSimple from "./ProductSimple"
+import ProductSimple from "./ProductSimple";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { trackWindowScroll } from "react-lazy-load-image-component";
 import "react-multi-carousel/lib/styles.css";

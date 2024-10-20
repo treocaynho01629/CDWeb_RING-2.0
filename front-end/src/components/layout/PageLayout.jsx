@@ -5,19 +5,21 @@ import Footer from "./Footer";
 import ScrollToTopButton from "./ScrollToTopButton";
 
 const LayoutWrapper = styled.div`
-    @media (min-width: 768px) {
+    position: relative;
+
+    ${props => props.theme.breakpoints.up("sm_md")} {
         padding-right: 15px;
         padding-left: 15px;
         margin-right: auto;
         margin-left: auto;
         width: 750px;
-        position: relative;
     }
-    @media (min-width: 992px) {
+
+    ${props => props.theme.breakpoints.up("md_lg")} {
         width: 970px;
-        position: relative;
     }
-    @media (min-width: 1200px) {
+
+    ${props => props.theme.breakpoints.up("lg")} {
         width: 1170px;
     }
 `

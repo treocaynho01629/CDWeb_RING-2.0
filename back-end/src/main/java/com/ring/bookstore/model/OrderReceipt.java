@@ -1,16 +1,7 @@
 package com.ring.bookstore.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -94,6 +85,22 @@ public class OrderReceipt {
     @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
     private List<OrderDetail> details;
+
+    //For mapping result
+    @Transient
+    private Double productsPrice;
+
+    @Transient
+    private Double shippingFee;
+
+    @Transient
+    private Double shippingDiscount;
+
+    @Transient
+    private Double dealDiscount;
+
+    @Transient
+    private Double couponDiscount;
 
     public void addOrderDetail(OrderDetail detail) {
         details.add(detail);

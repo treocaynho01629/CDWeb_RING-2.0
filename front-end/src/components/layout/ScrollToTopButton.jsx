@@ -21,8 +21,8 @@ const myEffect = keyframes`
 
 const ButtonContainer = styled('div')(({ theme }) => ({
     position: 'fixed',
-    bottom: 32,
-    right: 32,
+    bottom: theme.spacing(4),
+    right: theme.spacing(4),
     zIndex: 99,
 
     [theme.breakpoints.down('sm')]: {
