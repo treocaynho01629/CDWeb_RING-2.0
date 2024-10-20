@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.ring.bookstore.dtos.CouponDiscountDTO;
 import com.ring.bookstore.dtos.orders.CalculateDTO;
 import com.ring.bookstore.dtos.ChartDTO;
 import com.ring.bookstore.dtos.mappers.CalculateMapper;
 import com.ring.bookstore.dtos.mappers.ChartDataMapper;
-import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.*;
-import com.ring.bookstore.request.CalculateRequest;
-import com.ring.bookstore.request.CartDetailRequest;
+import com.ring.bookstore.request.*;
+import com.ring.bookstore.service.CouponService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +29,6 @@ import com.ring.bookstore.dtos.mappers.OrderMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.request.CartItemRequest;
-import com.ring.bookstore.request.OrderRequest;
 import com.ring.bookstore.service.EmailService;
 import com.ring.bookstore.service.OrderService;
 
@@ -42,11 +40,13 @@ import lombok.RequiredArgsConstructor;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderReceiptRepository orderRepo;
-    private final OrderDetailRepository detailRepo;
     private final BookRepository bookRepo;
     private final ShopRepository shopRepo;
     private final CouponRepository couponRepo;
+
+    private final CouponService couponService;
     private final EmailService emailService;
+
     private final OrderMapper orderMapper;
     private final CalculateMapper calculateMapper;
     private final ChartDataMapper chartMapper;
@@ -57,15 +57,19 @@ public class OrderServiceImpl implements OrderService {
         List<CartDetailRequest> cart = request.getCart();
         if (cart != null && cart.isEmpty())
             throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Cart cannot be empty!");
-        Coupon coupon = couponRepo.findByCode(request.getCoupon()).orElse(null);
 
         //Create receipt
         var orderReceipt = OrderReceipt.builder().details(new ArrayList<>()).build();
 
         //Calculate
-        double totalPrice = 0.0;
+        double totalPrice = 0.0; //Total price (exclude discount)
         double totalShippingFee = 0.0;
         double totalDiscount = 0.0;
+
+        //For result
+        double totalDealDiscount = 0.0; //From deal (% discount in Book)
+        double totalCouponDiscount = 0.0; //From coupon
+        double totalShippingDiscount = 0.0;
         int totalQuantity = 0;
 
         //Create order details
@@ -89,10 +93,13 @@ public class OrderServiceImpl implements OrderService {
                 orderReceipt.addOrderDetail(orderDetail);
             } else {
                 //Calculate
-                double shippingFee = 10000.0;
-                double detailTotal = 0.0;
-                double discountDeal = 0.0;
-                int detailQuantity = 0;
+                double shippingFee = 10000.0; //Will change later
+                double detailTotal = 0.0; //Total price of Books in detail (exclude discount)
+                double discountDeal = 0.0; //Total discount from deal (% discount in Book)
+                double discountCoupon = 0.0; //Total discount from coupon
+                double discountValue = 0.0; //Total discount of detail (exclude shipping discount)
+                double discountShipping = 0.0; //Shipping discount of detail
+                int detailQuantity = 0; //Total amount of Books in detail
 
                 //Create detail
                 var orderDetail = OrderDetail.builder()
@@ -116,9 +123,9 @@ public class OrderServiceImpl implements OrderService {
                         if (!(quantity < 1 && quantity > book.getAmount())) {
                             //Calculate + info
                             double deal = book.getPrice() * book.getDiscount().doubleValue();
-                            detailTotal += book.getPrice() * quantity; //Not include the discount
                             detailQuantity += quantity;
-                            discountDeal += deal;
+                            detailTotal += book.getPrice() * quantity; //Not include the deal discount
+                            discountDeal += deal * quantity;
                         }
 
                         //Add item
@@ -131,53 +138,44 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
 
-                //Apply coupon
-                Coupon shopCoupon = couponRepo.findByCode(detail.getCoupon()).orElse(null);
-                if (shopCoupon != null) {
-                    //Validate coupon
-                    if (!shopCoupon.getShopId().equals(shop.getId())) continue;
+                //Coupon
+                Coupon shopCoupon = couponRepo.findByCode(detail.getCoupon())
+                        .orElse(couponRepo.recommendCoupon(shop.getId(),
+                            detailTotal - discountDeal, detailQuantity).orElse(null));
+                if (shopCoupon != null
+                        && shopCoupon.getShopId().equals(shop.getId())
+                            && !couponService.isExpired(shopCoupon)) {
+                    //Apply coupon (must use price with deal discount)
+                    CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(shopCoupon,
+                        new CartStateRequest(detailTotal - discountDeal, shippingFee, detailQuantity));
 
-                    CouponDetail shopCouponDetail = shopCoupon.getDetail();
-                    CouponType type = shopCouponDetail.getType();
-                    BigDecimal discount = shopCouponDetail.getDiscount();
-                    double maxDiscount = shopCouponDetail.getMaxDiscount();
-                    double attribute = shopCouponDetail.getAttribute();
-                    double discountValue = 0.0;
-                    double shippingDiscount = 0.0;
-
-                    if (type.equals(CouponType.MIN_AMOUNT)) {
-                        if (detailQuantity >= attribute) discountValue = detailTotal * discount.doubleValue();
-                    } else if (type.equals(CouponType.MIN_VALUE)) {
-                        if (detailTotal >= attribute) discountValue = detailTotal * discount.doubleValue();
-                    } else if (type.equals(CouponType.SHIPPING)) {
-                        if (detailTotal >= attribute) shippingDiscount = shippingFee * discount.doubleValue();
+                    if (discountFromCoupon != null) {
+                        discountCoupon = discountFromCoupon.discountValue();
+                        discountShipping = discountFromCoupon.discountShipping();
                     }
-
-                    //Threshold
-                    if (discountValue > maxDiscount) discountValue = maxDiscount;
-                    if (shippingDiscount > maxDiscount) shippingDiscount = maxDiscount;
-
-                    //Add discount deal to discount value (Threshold for coupon only)
-                    discountValue += discountDeal;
-
-                    //Add to detail
-                    orderDetail.setTotalPrice(detailTotal);
-                    orderDetail.setDiscount(discountValue);
-                    orderDetail.setShippingFee(shippingFee);
-                    orderDetail.setShippingDiscount(shippingDiscount);
-
-                    //Add total discount
-                    totalDiscount += discountValue + shippingDiscount;
                 }
 
-                //Add to receipt total price + ship
+                //Add discount deal & discount coupon
+                discountValue += (discountDeal + discountCoupon);
+
+                //Add to receipt total
                 totalPrice += detailTotal;
+                totalQuantity += detailQuantity;
                 totalShippingFee += shippingFee;
+                totalCouponDiscount += discountCoupon;
+                totalDealDiscount += discountDeal;
 
                 //Set more detail
+                orderDetail.setTotalPrice(detailTotal);
+                orderDetail.setDiscount(discountValue);
+                orderDetail.setShippingFee(shippingFee);
+                orderDetail.setShippingDiscount(discountShipping);
                 orderDetail.setCoupon(shopCoupon);
                 orderDetail.setTotalPrice(detailTotal);
                 orderDetail.setShippingFee(shippingFee);
+
+                //Result mapping
+                orderDetail.setCouponDiscount(discountCoupon);
 
                 //Add to receipt
                 orderReceipt.addOrderDetail(orderDetail);
@@ -185,29 +183,24 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //Main coupon
-        if (coupon != null && coupon.getShop() == null) {
-            //Validate coupon
-            CouponDetail couponDetail = coupon.getDetail();
-            CouponType type = couponDetail.getType();
-            BigDecimal discount = couponDetail.getDiscount();
-            double maxDiscount = couponDetail.getMaxDiscount();
-            double attribute = couponDetail.getAttribute();
+        Coupon coupon = couponRepo.findByCode(request.getCoupon())
+            .orElse(couponRepo.recommendCoupon(null, totalPrice - totalDealDiscount, totalQuantity)
+                .orElse(null));
+
+        if (coupon != null && coupon.getShop() == null && !couponService.isExpired(coupon)) {
             double discountValue = 0.0;
             double shippingDiscount = 0.0;
 
-            if (type.equals(CouponType.MIN_AMOUNT)) {
-                if (totalQuantity >= attribute) discountValue = totalPrice * discount.doubleValue();
-            } else if (type.equals(CouponType.MIN_VALUE)) {
-                if (totalPrice >= attribute) discountValue = totalPrice * discount.doubleValue();
-            } else if (type.equals(CouponType.SHIPPING)) {
-                if (totalPrice >= attribute) shippingDiscount = totalShippingFee * discount.doubleValue();
+            //Apply coupon (must use price with deal discount)
+            CouponDiscountDTO discountAll = couponService.applyCoupon(coupon,
+                    new CartStateRequest((totalPrice - totalDealDiscount), totalShippingFee, totalQuantity));
+
+            if (discountAll != null) {
+                discountValue = discountAll.discountValue();
+                shippingDiscount = discountAll.discountShipping();
             }
 
-            //Threshold
-            if (discountValue > maxDiscount) discountValue = maxDiscount;
-            if (shippingDiscount > maxDiscount) shippingDiscount = maxDiscount;
-
-            //Apply
+            //Split discount for each detail
             int totalDetail = orderReceipt.getDetails().size();
             double applyDiscount = discountValue / totalDetail;
             double applyShippingDiscount = shippingDiscount / totalDetail;
@@ -219,14 +212,30 @@ public class OrderServiceImpl implements OrderService {
                         : detail.getShippingDiscount()) + applyShippingDiscount);
             }
 
-            //Apply discount for receipt
-            totalDiscount += discountValue + shippingDiscount;
+            //Add to total
+            totalCouponDiscount += discountValue;
+            totalShippingDiscount += shippingDiscount;
         }
+
+        //Free
+        if (totalCouponDiscount >= totalPrice) totalCouponDiscount = totalPrice;
+        if (totalShippingDiscount >= totalShippingFee) totalShippingDiscount = totalShippingFee;
+
+        //Total discount
+        totalDiscount = totalCouponDiscount + totalDealDiscount + totalShippingDiscount;
 
         //Set value for receipt & return
         orderReceipt.setCoupon(coupon);
         orderReceipt.setTotal(totalPrice + totalShippingFee);
         orderReceipt.setTotalDiscount(totalDiscount);
+
+        //For mapping result
+        orderReceipt.setProductsPrice(totalPrice);
+        orderReceipt.setShippingFee(totalShippingFee);
+        orderReceipt.setDealDiscount(totalDealDiscount);
+        orderReceipt.setCouponDiscount(totalCouponDiscount);
+        orderReceipt.setShippingDiscount(totalShippingDiscount);
+
         return calculateMapper.orderToCalculate(orderReceipt);
     }
 

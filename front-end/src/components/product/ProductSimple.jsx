@@ -120,7 +120,7 @@ const ProductSimple = ({ book, scrollPosition }) => {
                         scrollPosition={scrollPosition}
                         placeholder={
                             <SkeletonContainer>
-                                <StyledSkeleton variant="rectangular" animation="false"/>
+                                <StyledSkeleton variant="rectangular" animation={false}/>
                             </SkeletonContainer>
                         }
                     />

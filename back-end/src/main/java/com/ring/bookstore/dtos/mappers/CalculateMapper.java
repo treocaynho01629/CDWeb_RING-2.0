@@ -27,6 +27,7 @@ public class CalculateMapper {
                 shopName,
                 detail.getTotalPrice(),
                 detail.getDiscount(),
+                detail.getCouponDiscount(),
                 detail.getShippingFee(),
                 detail.getShippingDiscount(),
                 coupon,
@@ -58,7 +59,12 @@ public class CalculateMapper {
         String coupon = order.getCoupon() != null ? order.getCoupon().getCode() : null;
 
         return new CalculateDTO(order.getTotal(),
+                order.getProductsPrice(),
+                order.getShippingFee(),
                 order.getTotalDiscount(),
+                order.getDealDiscount(),
+                order.getCouponDiscount(),
+                order.getShippingDiscount(),
                 coupon,
                 detailDTOS
         );

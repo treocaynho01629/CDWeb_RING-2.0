@@ -1,5 +1,6 @@
 package com.ring.bookstore.service.impl;
 
+import com.ring.bookstore.dtos.CouponDiscountDTO;
 import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
@@ -8,6 +9,7 @@ import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.CouponDetailRepository;
 import com.ring.bookstore.repository.CouponRepository;
 import com.ring.bookstore.repository.ShopRepository;
+import com.ring.bookstore.request.CartStateRequest;
 import com.ring.bookstore.request.CouponRequest;
 import com.ring.bookstore.service.CouponService;
 import jakarta.transaction.Transactional;
@@ -21,6 +23,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -33,12 +37,13 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public Page<Coupon> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                                   CouponType type, String keyword, Long shopId, Boolean byShop) {
+                           CouponType type, String keyword, Long shopId, Boolean byShop, Boolean showExpired) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<Coupon> couponsList = couponRepo.findCouponByFilter(type, keyword, shopId, byShop, pageable);
+        Page<Coupon> couponsList = couponRepo.findCouponByFilter(type, keyword, shopId,
+                byShop, showExpired, pageable);
         return couponsList;
     }
 
@@ -47,6 +52,15 @@ public class CouponServiceImpl implements CouponService {
         Coupon coupon = couponRepo.findByCode(code).orElseThrow(() ->
                 new ResourceNotFoundException("Coupon not found!"));
         return coupon;
+    }
+
+    public List<Coupon> recommendCoupons(List<Long> shopIds) {
+        return couponRepo.recommendCoupons(shopIds);
+    }
+
+    @Override
+    public Coupon recommendCoupon(Long shopId, CartStateRequest state) {
+       return couponRepo.recommendCoupon(shopId, state.getValue(), state.getQuantity()).orElse(null);
     }
 
     //Add coupon (SELLER)
@@ -128,7 +142,7 @@ public class CouponServiceImpl implements CouponService {
         return updatedCoupon;
     }
 
-    @Override
+    @Transactional
     public Coupon deleteCoupon(Long id, Account user) {
         Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
         //Check if correct seller or admin
@@ -139,11 +153,11 @@ public class CouponServiceImpl implements CouponService {
         return coupon;
     }
 
-    @Override
+    @Transactional
     public void deleteCoupons(CouponType type, String keyword, Long shopId, Boolean byShop,
-                              List<Long> ids, boolean isInverse, Account user) {
+                        Boolean showExpired, List<Long> ids, boolean isInverse, Account user) {
         List<Long> listDelete = ids;
-        if (isInverse) listDelete = couponRepo.findInverseIds(type, keyword, shopId, byShop, ids);
+        if (isInverse) listDelete = couponRepo.findInverseIds(type, keyword, shopId, byShop, showExpired, ids);
 
         //Loop and delete
         for (Long id : listDelete) {
@@ -155,9 +169,70 @@ public class CouponServiceImpl implements CouponService {
         }
     }
 
-    @Override
+    @Transactional
     public void deleteAllCoupons() {
         couponRepo.deleteAll();
+    }
+
+    public CouponDiscountDTO applyCoupon(Coupon coupon, CartStateRequest request) {
+        CouponDetail couponDetail = coupon.getDetail();
+        CouponType type = couponDetail.getType();
+        BigDecimal discount = couponDetail.getDiscount();
+
+        //Current
+        double currValue = request.getValue();
+        double shippingFee = request.getShippingFee();
+        int currQuantity = request.getQuantity();
+
+        //Coupon
+        double maxDiscount = couponDetail.getMaxDiscount();
+        double attribute = couponDetail.getAttribute();
+
+        //Discount
+        double discountValue = 0.0;
+        double discountShipping = 0.0;
+
+        //Check conditions & apply
+        if (type.equals(CouponType.MIN_AMOUNT)) {
+            if (currQuantity >= attribute) discountValue = currValue * discount.doubleValue();
+        } else if (type.equals(CouponType.MIN_VALUE)) {
+            if (currValue >= attribute) discountValue = currValue * discount.doubleValue();
+        } else if (type.equals(CouponType.SHIPPING)) {
+            if (currValue >= attribute) discountShipping = shippingFee * discount.doubleValue();
+        }
+
+        //If not usable
+        if (discountValue == 0.0 && discountShipping == 0.0) return null;
+
+        //Threshold
+        if (discountValue > maxDiscount) discountValue = maxDiscount;
+        if (discountShipping > maxDiscount) discountShipping = maxDiscount;
+
+        return new CouponDiscountDTO(discountValue, discountShipping);
+    }
+
+    public boolean isExpired(Coupon coupon) {
+        CouponDetail couponDetail = coupon.getDetail();
+        return (couponDetail.getUsage() <= 0 || couponDetail.getExpDate().isBefore(LocalDate.now()));
+    }
+
+    protected boolean isApplicable(Coupon coupon, CartStateRequest request) {
+        CouponDetail couponDetail = coupon.getDetail();
+        CouponType type = couponDetail.getType();
+        double attribute = couponDetail.getAttribute();
+
+        //Current
+        double currValue = request.getValue();
+        int currQuantity = request.getQuantity();
+
+        //Check conditions & apply
+        if (type.equals(CouponType.MIN_AMOUNT)) {
+            return (currQuantity >= attribute);
+        } else if (type.equals(CouponType.MIN_VALUE) || type.equals(CouponType.SHIPPING)) {
+            return (currValue >= attribute);
+        }
+
+        return false;
     }
 
     //Check valid role function

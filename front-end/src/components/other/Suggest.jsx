@@ -62,7 +62,7 @@ const Suggest = () => {
     return (
         <Grid container spacing={.5} size={12} mt={{ xs: 0, md: 3}} position="relative" zIndex={2} justifyContent="center">
             {suggest?.map((tab, index) => (
-                <Grid size={{ xs: 2.4, md: 1.2 }} display="flex" justifyContent="center">
+                <Grid key={`suggest-${index}`} size={{ xs: 2.4, md: 1.2 }} display="flex" justifyContent="center">
                     <ItemWrapper key={`suggest-tab-${index}`}>
                         <Link to={tab.url} title={tab.label}>
                             <ItemContainer $color={tab.color}>

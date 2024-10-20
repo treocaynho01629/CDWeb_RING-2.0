@@ -150,14 +150,17 @@ const ProductDetail = () => {
                 </Stack>
                 <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
                 <LazyLoadComponent>
-                    <Suspense fallback={<CustomPlaceholder sx={{
-                        height: 'auto',
-                        border: '.5px solid',
-                        borderColor: 'action.hover',
-                    }}
+                    <Suspense fallback={
+                        <CustomPlaceholder sx={{
+                            height: 'auto',
+                            border: '.5px solid',
+                            borderColor: 'action.hover',
+                        }}
+                        >
+                            <ProductSimple />
+                        </CustomPlaceholder>
+                    }
                     >
-                        <ProductSimple />
-                    </CustomPlaceholder>}>
                         <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
                     </Suspense>
                 </LazyLoadComponent>

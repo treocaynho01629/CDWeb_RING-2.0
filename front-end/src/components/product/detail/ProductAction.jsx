@@ -23,6 +23,7 @@ const AmountCount = styled.span`
 `
 
 const FilterContainer = styled.div`
+    position: relative;
     margin: 0px 0px 30px 0px;
     width: 100%;
     display: block;
@@ -38,7 +39,7 @@ const AltFilterContainer = styled.div`
     left: 0;
     width: 100%;
     height: 50px;
-    z-index: 99;
+    z-index: ${props => props.theme.zIndex.appBar};
     box-shadow: ${props => props.theme.shadows[12]};
     background-color: ${props => props.theme.palette.background.default};
     align-items: flex-end;

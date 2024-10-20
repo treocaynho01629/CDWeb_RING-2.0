@@ -56,7 +56,7 @@ export const StyledTableHead = styled(TableHead)`
     background-color: ${props => props.theme.palette.background.default};
     z-index: 2;
 
-    &:before{
+    &:before {
         content: "";
         position: absolute;
         left: -10px;
@@ -67,7 +67,7 @@ export const StyledTableHead = styled(TableHead)`
         z-index: -1;
     }
 
-    &:after{
+    &:after {
         content: "";
         position: absolute;
         left: 0;
@@ -82,10 +82,15 @@ export const StyledTableHead = styled(TableHead)`
         }
     }
 
+    ${props => props.theme.breakpoints.down("sm_md")} {
+        &:before { width: 100%;}
+        &:after { width: 100%;}
+    }
+
     ${props => props.theme.breakpoints.down("sm")} {
         top: ${props => props.theme.mixins.toolbar.minHeight + 4}px;
 
-        &:before{ display: none;}
+        &:before { display: none; }
         &:after { width: 100%;}
     }
 `

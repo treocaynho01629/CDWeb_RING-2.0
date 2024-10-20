@@ -217,8 +217,7 @@ function ExtraItem({ banner, index, length, slideIndex }) {
                 style={{ display: (index == showIndex || index == showIndex2) ? 'flex' : 'none' }}
             >
                 <StyledLazyImage
-                    src={banner?.image}
-                    srcSet={`${banner?.image}?size=medium 350w, ${banner?.image} 600w`}
+                    src={`${banner?.image}?size=medium`}
                     alt={banner?.name}
                     visibleByDefault={true}
                     placeholder={<StyledSkeleton variant="rectangular" animation={false}/>}
@@ -248,7 +247,7 @@ const BannersSlider = () => {
 
             ids?.map((id, index) => {
                 const banner = entities[id];
-                bannersContent.push(<Item banner={banner} index={index} />);
+                bannersContent.push(<Item key={`banner-${banner?.id}-${index}`} banner={banner} index={index} />);
                 extraBanners.push(
                     <Fragment key={`extra-${banner?.id}-${index}`}>
                         <ExtraItem {...{ banner, index, length: ids?.length, slideIndex }} />

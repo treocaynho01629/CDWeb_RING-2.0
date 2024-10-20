@@ -71,6 +71,10 @@ public class OrderDetail {
     @JsonIgnore
     private List<OrderItem> items;
 
+    //For mapping result
+    @Transient
+    private Double couponDiscount;
+
     public void addOrderItem(OrderItem item) {
         items.add(item);
         item.setDetail(this);

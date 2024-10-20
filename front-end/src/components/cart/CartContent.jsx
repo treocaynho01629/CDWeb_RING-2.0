@@ -1,11 +1,12 @@
 import styled from 'styled-components'
 import { useEffect, useMemo, useState, Suspense, lazy } from "react";
-import { Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, Search, ChevronLeft } from '@mui/icons-material';
+import { Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, Search, ChevronLeft, Sell } from '@mui/icons-material';
 import { Checkbox, Button, Grid2 as Grid, Table, TableBody, TableRow, Box, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
 import { Link, useNavigate } from "react-router-dom";
 import { booksApiSlice } from '../../features/books/booksApiSlice';
 import { useCalculateMutation } from '../../features/orders/ordersApiSlice';
 import { ActionTableCell, StyledTableCell, StyledTableHead } from '../custom/CustomTableComponents';
+import { useDebouncedCallback } from 'use-debounce';
 import useCart from '../../hooks/useCart';
 import CheckoutDialog from './CheckoutDialog';
 import PropTypes from 'prop-types';
@@ -23,9 +24,18 @@ const StyledCheckbox = styled(Checkbox)`
     }
 `
 
-const MainTitleContainer = styled.div`
+const TitleContainer = styled.div`
     position: relative;
     padding: 20px 0px;
+    
+    &.end {
+        text-align: end;
+        direction: rtl;
+
+        ${props => props.theme.breakpoints.down("md_lg")} {
+            display: none;
+        }
+    }
 
     ${props => props.theme.breakpoints.down("sm")} {
         padding: 20px 10px;
@@ -126,7 +136,7 @@ EnhancedTableHead.propTypes = {
 const CartContent = () => {
     const { cartProducts, replaceProduct, removeProduct, removeShopProduct, decreaseAmount, increaseAmount, changeAmount } = useCart();
     const [selected, setSelected] = useState([]);
-    const [coupon, setCoupon] = useState('GIAMTOANBO');
+    const [coupon, setCoupon] = useState('');
     const [shopCoupon, setShopCoupon] = useState('');
     const [calculated, setCaculated] = useState(null);
 
@@ -148,16 +158,14 @@ const CartContent = () => {
     //#region construct
     useEffect(() => {
         if (selected.length) {
-            handleCalculate();
+            handleEstimate();
         } else { //Reset cart
             setCheckoutCart([]);
             setCaculated(null);
         }
     }, [selected, shopCoupon, coupon, cartProducts])
 
-    const handleCalculate = async () => {
-        if (isLoading) return;
-
+    const handleEstimate = async () => {
         //Reduce cart
         const estimateCart = cartProducts.reduce((result, item) => {
             const { id, shopId } = item;
@@ -179,8 +187,15 @@ const CartContent = () => {
         }, { coupon: coupon, cart: [] });
 
         setCheckoutCart(estimateCart); //Set cart for estimate
+        handleCalculate(estimateCart); //Calculate price
+    }
+
+    const handleCalculate = useDebouncedCallback(async (estimateCart) => {
+        if (isLoading) return;
+
         calculate(estimateCart).unwrap()
             .then((data) => {
+                console.log(data);
                 setCaculated(data);
                 syncCart(data);
             })
@@ -196,7 +211,7 @@ const CartContent = () => {
                     console.error('Đặt hàng thất bại!')
                 }
             })
-    }
+    }, 500);
 
     //Sync cart between client and server
     const syncCart = (cart) => {
@@ -383,9 +398,9 @@ const CartContent = () => {
     return (
         <Grid container spacing={2} sx={{ position: 'relative', mb: 10, justifyContent: 'flex-end' }}>
             <Grid size={{ xs: 12, md_lg: 8 }} position="relative">
-                <MainTitleContainer>
+                <TitleContainer>
                     <Title><ShoppingCartIcon />&nbsp;GIỎ HÀNG ({cartProducts?.length})</Title>
-                </MainTitleContainer>
+                </TitleContainer>
                 <Table aria-label="cart-table">
                     <EnhancedTableHead
                         numSelected={selected.length}
@@ -418,7 +433,10 @@ const CartContent = () => {
                 </Box>
             </Grid>
             <Grid size={{ xs: 12, md_lg: 4 }} position={{ xs: 'sticky', md_lg: 'relative' }} bottom={0}>
-                <CheckoutDialog {...{ checkoutCart, navigate, pending: isLoading, calculated, numSelected: selected.length }} />
+                <TitleContainer className="end">
+                    <Title><Sell />&nbsp;ĐƠN DỰ TÍNH</Title>
+                </TitleContainer>
+                <CheckoutDialog {...{ checkoutCart, navigate, calculating: isLoading, calculated, numSelected: selected.length }} />
             </Grid>
             <Suspense fallback={<></>}>
                 {openDialog !== undefined && <CouponDialog {...{ openDialog, handleCloseDialog, shopId: contextShop }} />}
