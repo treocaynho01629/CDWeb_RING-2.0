@@ -82,6 +82,9 @@ const CouponButton = styled.b`
     span {
         display: flex;
         align-items: center;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
     }
     
     ${props => props.theme.breakpoints.down("sm")} {
@@ -277,7 +280,7 @@ const CartDetailRow = ({ id, index, shop, coupon, isSelected, isShopSelected, ha
     const shopLabelId = `shop-label-checkbox-${index}`;
 
     return (
-        <Fragment key={`space-${id}-${index}`}>
+        <Fragment key={`detail-${id}-${index}`}>
             <SpaceTableRow />
             <StyledTableRow
                 role="shop-checkbox"
@@ -302,17 +305,22 @@ const CartDetailRow = ({ id, index, shop, coupon, isSelected, isShopSelected, ha
                 </StyledTableCell>
             </StyledTableRow>
             {shop.products?.map((product, index) => (
-                <ItemRow {...{
-                    product, index, handleSelect, handleDeselect, isSelected, handleDecrease, handleChangeQuantity, 
-                    handleClick, increaseAmount, StyledCheckbox
-                }} />
+                <ItemRow key={`item-${product.id}-${index}`}
+                    {...{
+                        product, index, handleSelect, handleDeselect, isSelected, handleDecrease, handleChangeQuantity,
+                        handleClick, increaseAmount, StyledCheckbox
+                    }} />
             ))}
-            <StyledTableRow role="coupon-row" tabIndex={-1}>
+            <StyledTableRow role="coupon-row">
                 <StyledTableCell align="left" colSpan={6}>
                     <CouponButton onClick={() => handleOpenDialog(id)}>
                         <span>
-                            <LocalActivityOutlined color="error"/>&nbsp;
-                            Thêm mã giảm giá: {coupon[id]}
+                            <LocalActivityOutlined color="error" />&nbsp;
+                            {coupon ? coupon?.couponDiscount > 0
+                                ? isGroupSelected ? `Đã giảm ${coupon?.couponDiscount.toLocaleString()}đ` : 'Thêm mã giảm giá'
+                                : `Mua thêm để giảm ${coupon?.detail.discount * 100}% - giảm tối đa ${coupon?.detail.maxDiscount.toLocaleString()}đ`
+                                : 'Thêm mã giảm giá'
+                            }
                         </span>
                         <KeyboardArrowRight fontSize="small" />
                     </CouponButton>

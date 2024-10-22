@@ -1,0 +1,164 @@
+import styled from 'styled-components'
+import { getCouponSumary } from '../../ultils/coupon'
+
+//#region styled
+const CouponContainer = styled.div`
+    position: relative;
+    border-radius: 5px;
+    height: 100%;
+    background-color: ${props => props.theme.palette.background.default};
+    border: .5px solid ${props => props.theme.palette.divider};
+    box-shadow: ${props => props.theme.shadows[1]};
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+
+    &::before, &::after {
+        content: "";
+        position: absolute;
+        background-color: ${props => props.theme.palette.background.default};
+        border: .5px solid ${props => props.theme.palette.divider};
+        background-image: ${props => props.theme.shadows[3]};
+        border-left: none;
+        border-bottom: none;
+        width: 10px;
+        height: 10px;
+        border-radius: 100%;
+        left: 60px;
+        z-index: 1;
+    }
+
+    &:after {
+        top: -5px;
+        transform: rotate(135deg);
+    }
+
+    &:before {
+        bottom: -5px;
+        transform: rotate(-45deg);
+    }
+
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        margin: 0;
+
+        &::before, &::after {
+            left: 35px;
+        }
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        background-color: transparent;
+        box-shadow: none;
+        border: none;
+
+        &::before, &::after {
+            display: none;
+        }
+    }
+`
+
+const CouponIcon = styled.div`
+    height: 50px;
+    aspect-ratio: 1/1;
+    background-color: ${props => props.theme.palette.primary.light};
+    color: ${props => props.theme.palette.primary.contrastText};
+    border-right: 5px dotted ${props => props.theme.palette.background.default};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    border-radius: 5px;
+
+    svg { font-size: 30px;}
+
+    &.error {
+        background-color: ${props => props.theme.palette.error.light};
+        color: ${props => props.theme.palette.error.contrastText};
+    }
+
+    &.warning {
+        background-color: ${props => props.theme.palette.warning.light};
+        color: ${props => props.theme.palette.warning.contrastText};
+    }
+
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        width: 30px;
+        height: 30px;
+        margin: 5px;
+        border-right-width: 3px;
+
+        svg { font-size: 17px;}
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        width: 22px;
+        height: 22px;
+        margin: 0;
+        border: .5px solid ${props => props.theme.palette.divider};
+        border-right: none;
+        border-radius: 6px;
+        background-color: ${props => props.theme.palette.primary.light};
+        color: ${props => props.theme.palette.primary.dark};
+
+        &.error {
+            color: ${props => props.theme.palette.error.dark};
+        }
+
+        &.warning {
+            color: ${props => props.theme.palette.warning.dark};
+        }
+
+        svg { font-size: 15px; }
+    }
+`
+
+const CouponDesc = styled.b`
+    position: relative;
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+    font-size: 14px;
+    font-weight: 450;
+    margin-right: 5px;
+	
+	@supports (-webkit-line-clamp: 1) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: initial;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        font-size: 13px;
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        font-size: 12px;
+        max-width: 120px;
+        border-radius: 6px;
+        padding: 0 10px;
+        height: 22px;
+        border: .5px solid ${props => props.theme.palette.divider};
+        border-left: none;
+    }
+`
+//#endregion
+
+const CouponDisplay = ({ coupon }) => {
+    const sumary = getCouponSumary(coupon?.detail?.type);
+
+    return (
+        <CouponContainer>
+            <CouponIcon className={sumary?.color}>
+                {sumary?.icon}
+            </CouponIcon>
+            <CouponDesc>
+                {`${sumary?.name} ${coupon?.detail?.discount * 100}% - giảm tối đa ${coupon?.detail?.maxDiscount.toLocaleString()} đ`}
+            </CouponDesc>
+        </CouponContainer>
+    )
+}
+
+export default CouponDisplay

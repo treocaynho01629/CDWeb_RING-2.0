@@ -8,17 +8,22 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getCoupons: builder.query({
             query: (args) => {
-                const { type, shop, byShop, page, size, sortBy, sortDir } = args || {};
+                const { type, shop, byShop, showExpired, recommendState, page, size, sortBy, sortDir } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
                 if (type) params.append('type', type);
                 if (shop) params.append('shopId', shop);
-                if (byShop) params.append('byShop', byShop);
+                if (byShop != null) params.append('byShop', byShop);
+                if (showExpired != null) params.append('showExpired', showExpired);
                 if (page) params.append('pageNo', page);
                 if (size) params.append('pSize', size);
                 if (sortBy) params.append('sortBy', sortBy);
                 if (sortDir) params.append('sortDir', sortDir);
+                if (recommendState) {
+                    params.append('rValue', recommendState?.value);
+                    params.append('rQuantity', recommendState?.quantity);
+                }
 
                 return {
                     url: `/api/coupons?${params.toString()}`,

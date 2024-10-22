@@ -1,4 +1,4 @@
-import { Button, Skeleton } from '@mui/material'
+import { Button, Skeleton, Paper } from '@mui/material'
 import styled from 'styled-components'
 
 //#region styledc
@@ -6,6 +6,7 @@ const Wrapper = styled.div`
     padding: 5px;
     overflow: hidden;
     position: relative;
+    width: 100%;
 `
 
 const CouponContainer = styled.div`
@@ -17,19 +18,9 @@ const CouponContainer = styled.div`
     border: .5px solid ${props => props.theme.palette.divider};
     box-shadow: ${props => props.theme.shadows[1]};
 
-    &::before, &::after {
-        content: "";
-        position: absolute;
-        background-color: ${props => props.theme.palette.background.elevate};
-        border: .5px solid ${props => props.theme.palette.divider};
-        background-image: ${props => props.theme.shadows[3]};
-        border-left: none;
-        border-bottom: none;
-        width: 30px;
-        height: 30px;
-        border-radius: 100%;
-        top: calc(50% - 15px);
-        z-index: 1;
+    &.disabled {
+        filter: grayscale(1);
+        pointer-events: none;
     }
 
     &:after {
@@ -43,13 +34,36 @@ const CouponContainer = styled.div`
     }
 
     ${props => props.theme.breakpoints.down("sm")} {
-        padding-bottom: 15px;
+        padding: 5px 2px;
+    }
+`
 
-        &::before, &::after {
-            width: 20px;
-            height: 20px;
-            top: calc(50% - 10px);
-        }
+const CouponEdge = styled(Paper)`
+    position: absolute;
+    border: .5px solid ${props => props.theme.palette.divider};
+    border-left: none;
+    border-bottom: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    box-shadow: none;
+    top: calc(50% - 15px);
+    z-index: 1;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        width: 20px;
+        height: 20px;
+        top: calc(50% - 10px);
+    }
+
+    &.left {
+        left: -12px;
+        transform: rotate(45deg);
+    }
+
+    &.right {
+        right: -12px;
+        transform: rotate(-135deg);
     }
 `
 
@@ -72,8 +86,9 @@ const CouponAction = styled.div`
 
     ${props => props.theme.breakpoints.down("sm")} {
         position: absolute;
+        padding: 0;
         right: 2%;
-        bottom: 0;
+        bottom: 3%;
         height: 30%;
     }
 `
@@ -82,11 +97,24 @@ const CouponMain = styled.div`
     position: relative;
     height: 100%;
     padding-left: 10px;
-
+    max-width: 80%;
+    
     h2 {
         font-size: 15px;
         margin: 0;
         text-transform: uppercase;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        
+        @supports (-webkit-line-clamp: 1) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: initial;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+        }
     }
 
     p {
@@ -166,14 +194,16 @@ const CouponItem = ({ coupon, sumary, isSelect }) => {
     return (
         <Wrapper>
             {coupon ?
-                <CouponContainer>
+                <CouponContainer className={coupon?.isUsable ? '' : 'disabled'}>
+                    <CouponEdge elevation={24} className="left"/>
+                    <CouponEdge elevation={24} className="right"/>
                     <CouponContent>
                         <CouponIcon className={sumary?.color}>
                             {sumary?.icon}
                         </CouponIcon>
                         <CouponMain>
-                            <h2>{`${sumary?.name} ${coupon?.detail.discount * 100}% - giảm tối đa ${coupon?.detail.maxDiscount.toLocaleString()} đ`}</h2>
-                            <p>{`${sumary?.sumary} ${coupon?.detail.attribute.toLocaleString()}đ`}</p>
+                            <h2>{`${sumary?.name} ${coupon?.detail.discount * 100}% - giảm tối đa ${coupon?.detail.maxDiscount.toLocaleString()}đ`}</h2>
+                            <p>{`${sumary?.sumary} ${coupon?.detail.attribute.toLocaleString()} ${sumary?.unit}`}</p>
                             <span>HSD:&nbsp;
                                 {date.toLocaleDateString("en-GB", {
                                     year: "numeric",

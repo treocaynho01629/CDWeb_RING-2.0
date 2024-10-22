@@ -1,5 +1,6 @@
 package com.ring.bookstore.service.impl;
 
+import com.ring.bookstore.dtos.BannerDTO;
 import com.ring.bookstore.dtos.CouponDiscountDTO;
 import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.enums.RoleName;
@@ -37,30 +38,40 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public Page<Coupon> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                           CouponType type, String keyword, Long shopId, Boolean byShop, Boolean showExpired) {
+                                   CouponType type, String keyword, Long shopId, Boolean byShop, Boolean showExpired,
+                                   Double rValue, Integer rQuantity) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
         //Fetch from database
         Page<Coupon> couponsList = couponRepo.findCouponByFilter(type, keyword, shopId,
                 byShop, showExpired, pageable);
+        if (rValue != null || rQuantity != null) {
+            CartStateRequest request = CartStateRequest.builder().value(rValue).quantity(rQuantity).build();
+            couponsList = couponsList.map(coupon -> markUsable(coupon, request));
+        }
         return couponsList;
     }
 
     @Override
-    public Coupon getCouponByCode(String code) {
+    public Coupon getCouponByCode(String code, Double rValue, Integer rQuantity) {
         Coupon coupon = couponRepo.findByCode(code).orElseThrow(() ->
                 new ResourceNotFoundException("Coupon not found!"));
+        if (rValue != null || rQuantity != null) {
+            CartStateRequest request = CartStateRequest.builder().value(rValue).quantity(rQuantity).build();
+            coupon = markUsable(coupon, request);
+        }
         return coupon;
     }
 
     public List<Coupon> recommendCoupons(List<Long> shopIds) {
-        return couponRepo.recommendCoupons(shopIds);
+        List<Coupon> couponsList = couponRepo.recommendCoupons(shopIds);
+        return couponsList;
     }
 
     @Override
     public Coupon recommendCoupon(Long shopId, CartStateRequest state) {
-       return couponRepo.recommendCoupon(shopId, state.getValue(), state.getQuantity()).orElse(null);
+        return couponRepo.recommendCoupon(shopId, state.getValue(), state.getQuantity()).orElse(null);
     }
 
     //Add coupon (SELLER)
@@ -155,7 +166,7 @@ public class CouponServiceImpl implements CouponService {
 
     @Transactional
     public void deleteCoupons(CouponType type, String keyword, Long shopId, Boolean byShop,
-                        Boolean showExpired, List<Long> ids, boolean isInverse, Account user) {
+                              Boolean showExpired, List<Long> ids, boolean isInverse, Account user) {
         List<Long> listDelete = ids;
         if (isInverse) listDelete = couponRepo.findInverseIds(type, keyword, shopId, byShop, showExpired, ids);
 
@@ -216,7 +227,7 @@ public class CouponServiceImpl implements CouponService {
         return (couponDetail.getUsage() <= 0 || couponDetail.getExpDate().isBefore(LocalDate.now()));
     }
 
-    protected boolean isApplicable(Coupon coupon, CartStateRequest request) {
+    protected Coupon markUsable(Coupon coupon, CartStateRequest request) {
         CouponDetail couponDetail = coupon.getDetail();
         CouponType type = couponDetail.getType();
         double attribute = couponDetail.getAttribute();
@@ -227,12 +238,12 @@ public class CouponServiceImpl implements CouponService {
 
         //Check conditions & apply
         if (type.equals(CouponType.MIN_AMOUNT)) {
-            return (currQuantity >= attribute);
+            coupon.setIsUsable(currQuantity >= attribute);
         } else if (type.equals(CouponType.MIN_VALUE) || type.equals(CouponType.SHIPPING)) {
-            return (currValue >= attribute);
+            coupon.setIsUsable(currValue >= attribute);
         }
 
-        return false;
+        return coupon;
     }
 
     //Check valid role function

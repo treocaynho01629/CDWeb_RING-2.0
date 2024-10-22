@@ -19,13 +19,20 @@ const DetailTitle = styled.h4`
 `
 //#endregion
 
-const CouponDialog = ({ selectMode, shopId, openDialog, handleCloseDialog }) => {
+const CouponDialog = ({ selectMode, shopId, recommendState, openDialog, handleCloseDialog }) => {
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const [isSelect, setIsSelect] = useState(selectMode);
 
     //Fetch coupon
-    const { data, isLoading, isSuccess, isError } = useGetCouponsQuery({ shop: shopId, size: 4 }, { skip: (!shopId || isSelect) });
+    const { data, isLoading, isSuccess, isError } = useGetCouponsQuery({
+        shop: shopId,
+        byShop: shopId != null,
+        recommendState,
+        size: 4
+    },
+        { skip: (!shopId && !isSelect) }
+    );
 
     const toggleSelect = () => { setIsSelect(prev => !prev) }
 
@@ -83,14 +90,14 @@ const CouponDialog = ({ selectMode, shopId, openDialog, handleCloseDialog }) => 
 
         couponsContent = (
             <>
-                {coupons.length != 0 && <>
-                    <DetailTitle>Mã giảm giá</DetailTitle>
-                    {coupons}
-                </>
-                }
                 {shippingCoupons.length != 0 && <>
                     <DetailTitle>Mã vận chuyển</DetailTitle>
                     {shippingCoupons}
+                </>
+                }
+                {coupons.length != 0 && <>
+                    <DetailTitle>Mã giảm giá</DetailTitle>
+                    {coupons}
                 </>
                 }
                 {otherCoupons.length != 0 && <>

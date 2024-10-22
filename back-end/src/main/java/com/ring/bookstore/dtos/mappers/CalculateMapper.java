@@ -20,9 +20,6 @@ public class CalculateMapper {
         Shop shop = detail.getShop();
         String shopName = (shopName = shop.getName()) != null ? shopName : null;
 
-        //Coupon
-        String coupon = detail.getCoupon() != null ? detail.getCoupon().getCode() : null;
-
         return new CalculateDetailDTO(shop.getId(),
                 shopName,
                 detail.getTotalPrice(),
@@ -30,7 +27,7 @@ public class CalculateMapper {
                 detail.getCouponDiscount(),
                 detail.getShippingFee(),
                 detail.getShippingDiscount(),
-                coupon,
+                detail.getCoupon(),
                 itemDTOS);
     }
 
@@ -55,9 +52,6 @@ public class CalculateMapper {
         List<OrderDetail> orderDetails = order.getDetails();
         List<CalculateDetailDTO> detailDTOS = orderDetails.stream().map(this::detailToDetailDTO).collect(Collectors.toList());
 
-        //Coupon
-        String coupon = order.getCoupon() != null ? order.getCoupon().getCode() : null;
-
         return new CalculateDTO(order.getTotal(),
                 order.getProductsPrice(),
                 order.getShippingFee(),
@@ -65,7 +59,7 @@ public class CalculateMapper {
                 order.getDealDiscount(),
                 order.getCouponDiscount(),
                 order.getShippingDiscount(),
-                coupon,
+                order.getCoupon(),
                 detailDTOS
         );
     }

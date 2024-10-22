@@ -57,7 +57,6 @@ const ItemsContainer = styled.div`
 `
 
 const Coupon = styled.div`
-    width: 100%;    
     position: relative;
     display: flex;
     overflow: hidden;
@@ -93,8 +92,15 @@ const CouponIcon = styled.div`
     ${props => props.theme.breakpoints.down("md")} {
         width: 22px;
         height: 22px;
-        background-color: ${props => props.theme.palette.primary.light};
         color: ${props => props.theme.palette.primary.dark};
+
+        &.error {
+            color: ${props => props.theme.palette.error.dark};
+        }
+
+        &.warning {
+            color: ${props => props.theme.palette.warning.dark};
+        }
 
         svg { font-size: 15px; }
     }
@@ -150,6 +156,12 @@ const CouponContent = styled.div`
                 bottom: -3px;
                 left: -3px;
             }
+        }
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        &::before, &::after {
+            display: none;
         }
     }
 `
@@ -275,15 +287,16 @@ const CouponPreview = ({ shopId }) => {
                                     sx={{ pointerEvents: 'none' }}
                                     slotProps={{
                                         paper: {
-                                            elevation: 0,
+                                            elevation: 24,
                                             sx: {
                                                 overflow: 'visible',
                                                 filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.32))',
-                                                backgroundColor: 'background.elevate',
+                                                backgroundColor: 'background.default',
                                                 mt: .5,
                                                 padding: 1,
                                                 borderRadius: 0,
                                                 pointerEvents: 'auto',
+                                                width: '550px'
                                             },
                                             onMouseLeave: handleClose
                                         }

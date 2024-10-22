@@ -43,13 +43,13 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 		select c 
 		from Coupon c
 		join (
-			select c.id as id, c.shop.id as shopId, 
-			row_number() over (partition by c.shop.id order by c.shop.id) as rn
+			select c2.id as id, c2.shop.id as shopId, 
+			row_number() over (partition by c2.shop.id order by c2.shop.id) as rn
 			from Coupon c2 join CouponDetail cd on c2.detail.id = cd.id
 			where (cd.expDate > now() and cd.usage > 0)
 				and c2.shop.id in :shopIds or c2.shop.id is null
 		) t on c.id = t.id and t.rn = 1
-		order by c.detail.discount desc
+		order by c.detail.attribute asc, c.detail.discount desc, c.detail.maxDiscount desc
 	""")
 	List<Coupon> recommendCoupons(List<Long> shopIds);
 
@@ -61,8 +61,8 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 				com.ring.bookstore.enums.CouponType.SHIPPING) and cd.attribute < :value)
 			or (coalesce(:quantity) is null 
 				or (cd.type = com.ring.bookstore.enums.CouponType.MIN_AMOUNT and cd.attribute < :quantity))) 
-		group by c.shop.id, c.id, cd.discount
-		order by cd.discount desc
+		group by c.shop.id, c.id, cd.attribute, cd.discount, cd.maxDiscount
+		order by cd.attribute asc, cd.discount desc, cd.maxDiscount desc
 		limit 1
 	""")
 	Optional<Coupon> recommendCoupon(Long shopId, Double value, Integer quantity);
