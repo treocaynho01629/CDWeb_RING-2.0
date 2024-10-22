@@ -139,9 +139,9 @@ public class OrderServiceImpl implements OrderService {
                 }
 
                 //Coupon
-                Coupon shopCoupon = couponRepo.findByCode(detail.getCoupon())
-                        .orElse(couponRepo.recommendCoupon(shop.getId(),
-                            detailTotal - discountDeal, detailQuantity).orElse(null));
+                Coupon shopCoupon = detail.getCoupon() == null ? null : couponRepo.findByCode(detail.getCoupon())
+                    .orElse(couponRepo.recommendCoupon(shop.getId(),detailTotal - discountDeal, detailQuantity)
+                            .orElse(null));
                 if (shopCoupon != null
                         && shopCoupon.getShopId().equals(shop.getId())
                             && !couponService.isExpired(shopCoupon)) {
@@ -183,7 +183,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //Main coupon
-        Coupon coupon = couponRepo.findByCode(request.getCoupon())
+        Coupon coupon = request.getCoupon() == null ? null : couponRepo.findByCode(request.getCoupon())
             .orElse(couponRepo.recommendCoupon(null, totalPrice - totalDealDiscount, totalQuantity)
                 .orElse(null));
 

@@ -65,6 +65,8 @@ const StyledDeleteButton = styled(Button)`
 `
 //#endregion
 
+const tempShippingFee = 10000;
+
 function EnhancedTableHead(props) {
     const { onSelectAllClick, numSelected, rowCount } = props;
     let isIndeterminate = numSelected > 0 && numSelected < rowCount;
@@ -138,11 +140,12 @@ const CartContent = () => {
     const [selected, setSelected] = useState([]);
     const [coupon, setCoupon] = useState('');
     const [shopCoupon, setShopCoupon] = useState('');
-    const [calculated, setCaculated] = useState(null);
+    const [recommendState, setRecommendState] = useState(null);
 
     //Dialog/Menu
     const [contextProduct, setContextProduct] = useState(null);
     const [contextShop, setContextShop] = useState(null);
+    const [contextState, setContextState] = useState(null);
     const [openDialog, setOpenDialog] = useState(undefined);
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -152,42 +155,95 @@ const CartContent = () => {
     const [getBook] = booksApiSlice.useLazyGetBookQuery();
 
     //Estimate/calculate price
-    const [checkoutCart, setCheckoutCart] = useState([]);
+    const [estimated, setEstimated] = useState({ deal: 0, total: 0, shipping: 0, subTotal: 0 });
+    const [calculated, setCaculated] = useState(null);
     const [calculate, { isLoading }] = useCalculateMutation();
 
     //#region construct
     useEffect(() => {
-        if (selected.length) {
-            handleEstimate();
-        } else { //Reset cart
-            setCheckoutCart([]);
-            setCaculated(null);
-        }
-    }, [selected, shopCoupon, coupon, cartProducts])
+        handleCartChange();
+    }, [selected, cartProducts])
 
-    const handleEstimate = async () => {
-        //Reduce cart
-        const estimateCart = cartProducts.reduce((result, item) => {
-            const { id, shopId } = item;
+    const handleCartChange = () => {
+        if (selected.length > 0) {
+            //Reduce cart
+            const estimateCart = cartProducts.reduce((result, item) => {
+                const { id, shopId } = item;
 
-            if (selected.indexOf(id) !== -1) { //Get selected items in redux store
-                //Find or create shop
-                let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
+                if (selected.indexOf(id) !== -1) { //Get selected items in redux store
+                    //Find or create shop
+                    let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
 
-                if (!detail) {
-                    detail = { shopId, coupon: shopCoupon[item.shopId], items: [] };
-                    result.cart.push(detail);
+                    if (!detail) {
+                        detail = {
+                            shopId,
+                            coupon: shopCoupon[shopId] == null ? '' : shopCoupon[shopId]?.code,
+                            items: [],
+                        };
+                        result.cart.push(detail);
+                    }
+
+                    //Add items for that shop
+                    detail.items.push(item);
                 }
 
-                //Add items for that shop
-                detail.items.push(item);
-            }
+                return result;
+            }, { coupon: coupon?.code == null ? '' : coupon?.code, cart: [] });
 
-            return result;
-        }, { coupon: coupon, cart: [] });
+            handleEstimate(estimateCart); //Estimate price
+            handleCalculate(estimateCart); //Calculate price
+        } else { //Reset
+            handleEstimate(null);
+            setCaculated(null);
+        }
+    }
 
-        setCheckoutCart(estimateCart); //Set cart for estimate
-        handleCalculate(estimateCart); //Calculate price
+    const handleResetCart = () => {
+        setSelected([]);
+        setCaculated(null);
+    }
+
+    //Estimate before receive caculated price from server
+    const handleEstimate = (estimateCart) => {
+        let estimate = { deal: 0, total: 0, shipping: 0, subTotal: 0 }; //Initial value
+        let cartDetails = {};
+
+        if (estimateCart?.cart?.length) {
+            let totalDeal = 0;
+            let totalPrice = 0;
+            let totalQuantity = 0;
+            const shipping = tempShippingFee * (estimateCart?.cart?.length || 0);
+
+            //Loop & calculate
+            estimateCart?.cart?.forEach((detail) => {
+                let deal = 0;
+                let total = 0;
+                let quantity = 0;
+
+                detail?.items?.forEach((item) => {
+                    const discount = Math.round(item.price * item.discount);
+
+                    //Both deal & total price
+                    deal += item.quantity * discount;
+                    total += item.quantity * item.price;
+                    quantity += item.quantity;
+                })
+
+                //Set value & cart state
+                totalDeal += deal;
+                totalPrice += total;
+                totalQuantity += quantity;
+                cartDetails[detail?.shopId] = { value: total - deal, quantity };
+            });
+
+            //Set values
+            estimate = { deal: totalDeal, total: totalPrice, shipping, subTotal: (totalPrice + shipping - totalDeal) };
+
+            //Set cart state
+            setRecommendState({ value: totalPrice - totalDeal, quantity: totalQuantity, details: cartDetails });
+        }
+
+        setEstimated(estimate);
     }
 
     const handleCalculate = useDebouncedCallback(async (estimateCart) => {
@@ -231,13 +287,24 @@ const CartContent = () => {
 
                         replaceProduct(newItem);
                     } else { //Remove invalid item
+                        handleResetCart();
                         removeProduct(item.id);
                     }
                 })
+
+                //Replace recommend coupon
+                if (detail?.coupon != null) {
+                    let newCoupon = { ...detail.coupon, couponDiscount: detail?.couponDiscount || 0 };
+                    setShopCoupon((prev) => ({ ...prev, [detail?.shopId]: newCoupon }));
+                }
             } else { //Remove all items of the invalid Shop
+                handleResetCart();
                 removeShopProduct(detail.shopId);
             }
         })
+
+        //Replace recommend coupon
+        if (cart?.coupon != null) setCoupon(cart.coupon);
     }
 
     //Separate by shop
@@ -268,6 +335,7 @@ const CartContent = () => {
     const handleOpenDialog = (shopId) => {
         setOpenDialog(true);
         setContextShop(shopId);
+        setContextState(shopId ? recommendState?.details[shopId] : { value: recommendState?.value, quantity: recommendState?.quantity });
     }
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -411,11 +479,12 @@ const CartContent = () => {
                         {Object.keys(reducedCart).map((shopId, index) => {
                             const shop = reducedCart[shopId];
 
-                            return (<CartDetailRow {...{
-                                id: shopId, index, shop, coupon: shopCoupon, isSelected, isShopSelected, handleSelect,
-                                handleDeselect, handleSelectShop, handleDecrease, increaseAmount, handleChangeQuantity,
-                                handleClick, handleOpenDialog, StyledCheckbox
-                            }} />)
+                            return (<CartDetailRow key={`detail-${shopId}-${index}`}
+                                {...{
+                                    id: shopId, index, shop, coupon: shopCoupon[shopId], isSelected, isShopSelected, handleSelect,
+                                    handleDeselect, handleSelectShop, handleDecrease, increaseAmount, handleChangeQuantity,
+                                    handleClick, handleOpenDialog, StyledCheckbox
+                                }} />)
                         })}
                     </TableBody>
                 </Table>
@@ -436,10 +505,14 @@ const CartContent = () => {
                 <TitleContainer className="end">
                     <Title><Sell />&nbsp;ĐƠN DỰ TÍNH</Title>
                 </TitleContainer>
-                <CheckoutDialog {...{ checkoutCart, navigate, calculating: isLoading, calculated, numSelected: selected.length }} />
+                <CheckoutDialog {...{
+                    coupon: coupon, navigate, calculating: isLoading,
+                    calculated, estimated, numSelected: selected.length, handleOpenDialog
+                }} />
             </Grid>
             <Suspense fallback={<></>}>
-                {openDialog !== undefined && <CouponDialog {...{ openDialog, handleCloseDialog, shopId: contextShop }} />}
+                {openDialog !== undefined
+                    && <CouponDialog {...{ openDialog, handleCloseDialog, shopId: contextShop, recommendState: contextState, selectMode: true }} />}
             </Suspense>
             <Suspense fallback={<></>}>
                 {open !== undefined &&

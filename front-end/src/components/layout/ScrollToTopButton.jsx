@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { Zoom, Fab } from "@mui/material";
 import { keyframes, styled } from '@mui/system';
 import { KeyboardArrowUp } from "@mui/icons-material";
+import { useLocation } from "react-router-dom";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 
 const myEffect = keyframes`
@@ -21,13 +22,34 @@ const myEffect = keyframes`
 
 const ButtonContainer = styled('div')(({ theme }) => ({
     position: 'fixed',
-    bottom: theme.spacing(4),
-    right: theme.spacing(4),
-    zIndex: 99,
+    bottom: theme.spacing(3),
+    right: theme.spacing(3),
+    zIndex: 1,
+
+    '&.medium': {
+        bottom: theme.spacing(8),
+    },
+
+    [theme.breakpoints.down('sm_md')]: {
+        bottom: theme.spacing(2),
+        right: theme.spacing(2),
+
+        '&.high': {
+            bottom: theme.spacing(17),
+        }
+    },
 
     [theme.breakpoints.down('sm')]: {
-        bottom: 55,
-        right: 15,
+        bottom: theme.spacing(1.5),
+        right: theme.spacing(1.5),
+
+        '&.medium': {
+            bottom: theme.spacing(7.5),
+        },
+
+        '&.high': {
+            bottom: theme.spacing(14),
+        }
     },
 }));
 
@@ -52,8 +74,16 @@ const StyledFab = styled(Fab)(({ theme }) => ({
     },
 }));
 
+const buttonHeightMap = {
+    '/cart': 'high',
+    '/checkout': 'high',
+    '/product': 'medium',
+};
+  
 const ScrollToTopButton = () => {
     const trigger = useScrollTrigger({ threshold: 100 });
+    const location = useLocation();
+    const pathname = `/${location.pathname.split('/')[1]}`;
 
     const scrollToTop = useCallback(() => {
         window.scrollTo({ top: 0, behavior: "smooth" })
@@ -61,7 +91,7 @@ const ScrollToTopButton = () => {
 
     return (
         <Zoom in={trigger}>
-            <ButtonContainer role="presentation">
+            <ButtonContainer role="presentation" className={buttonHeightMap[pathname]}>
                 <StyledFab
                     onClick={scrollToTop}
                     size="medium"

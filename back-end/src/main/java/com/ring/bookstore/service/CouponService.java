@@ -15,9 +15,10 @@ import java.util.List;
 public interface CouponService {
 
     Page<Coupon> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                        CouponType type, String keyword, Long shopId, Boolean byShop, Boolean showExpired);
+                            CouponType type, String keyword, Long shopId, Boolean byShop,
+                            Boolean showExpired, Double rValue, Integer rQuantity);
 
-    Coupon getCouponByCode(String code);
+    Coupon getCouponByCode(String code, Double rValue, Integer rQuantity);
 
     List<Coupon> recommendCoupons(List<Long> shopIds);
 

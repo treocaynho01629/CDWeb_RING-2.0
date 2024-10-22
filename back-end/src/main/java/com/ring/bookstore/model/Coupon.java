@@ -47,6 +47,9 @@ public class Coupon extends Auditable {
     @JsonIgnore
     private Shop shop;
 
+    @Transient
+    private Boolean isUsable;
+
     public Long getShopId() {
         return (this.shop != null) ? this.shop.getId() : null;
     }

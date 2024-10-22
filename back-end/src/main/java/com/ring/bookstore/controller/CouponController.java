@@ -29,18 +29,22 @@ public class CouponController {
                                         @RequestParam(value = "byShop", required = false) Boolean byShop,
                                         @RequestParam(value = "showExpired", required = false) Boolean showExpired,
                                         @RequestParam(value = "keyword", required = false) String keyword,
+                                        @RequestParam(value = "rValue", required = false) Double recommendValue,
+                                        @RequestParam(value = "rQuantity", required = false) Integer recommendQuantity,
                                         @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
                                         @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                         @RequestParam(value = "sortBy", defaultValue = "detail.discount") String sortBy,
                                         @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
         return new ResponseEntity<>(couponService.getCoupons(pageNo, pageSize, sortBy, sortDir,
-                type, keyword, shopId, byShop, showExpired), HttpStatus.OK);
+                type, keyword, shopId, byShop, showExpired, recommendValue, recommendQuantity), HttpStatus.OK);
     }
 
     //Get coupon by {code}
     @GetMapping("/{code}")
-    public ResponseEntity<?> getCoupon(@PathVariable("code") String code) {
-        return new ResponseEntity<>(couponService.getCouponByCode(code), HttpStatus.OK);
+    public ResponseEntity<?> getCoupon(@PathVariable("code") String code,
+                                       @RequestParam(value = "rValue", required = false) Double recommendValue,
+                                       @RequestParam(value = "rQuantity", required = false) Integer recommendQuantity) {
+        return new ResponseEntity<>(couponService.getCouponByCode(code, recommendValue, recommendQuantity), HttpStatus.OK);
     }
 
     //Get coupons
