@@ -33,7 +33,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
 @Validated

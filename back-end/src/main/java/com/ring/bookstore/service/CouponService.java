@@ -15,10 +15,10 @@ import java.util.List;
 public interface CouponService {
 
     Page<Coupon> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                            CouponType type, String keyword, Long shopId, Boolean byShop,
-                            Boolean showExpired, Double rValue, Integer rQuantity);
+                            List<CouponType> types, String keyword, Long shopId, Boolean byShop,
+                            Boolean showExpired, Double cValue, Integer cQuantity);
 
-    Coupon getCouponByCode(String code, Double rValue, Integer rQuantity);
+    Coupon getCouponByCode(String code, Double cValue, Integer cQuantity);
 
     List<Coupon> recommendCoupons(List<Long> shopIds);
 
@@ -34,7 +34,7 @@ public interface CouponService {
 
     boolean isExpired(Coupon coupon);
 
-    void deleteCoupons(CouponType type, String keyword, Long shopId, Boolean byShop,
+    void deleteCoupons(List<CouponType> types, String keyword, Long shopId, Boolean byShop,
                        Boolean showExpired, List<Long> ids, boolean isInverse, Account user);
 
     void deleteAllCoupons();

@@ -13,30 +13,30 @@ import java.util.Optional;
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     @Query("""
-		select c from Coupon c join fetch CouponDetail cd
+		select c from Coupon c join c.detail cd
 		where (coalesce(:showExpired) is null or (cd.expDate > now() and cd.usage > 0))
 		and (coalesce(:keyword) is null or c.code = :keyword)
-		and (coalesce(:type) is null or cd.type = :type)
+		and (coalesce(:types) is null or cd.type in :types)
 		and (coalesce(:shopId) is null or c.shop.id = :shopId)
 		and (coalesce(:byShop) is null or case when :byShop = true 
 			then c.shop.id is not null else c.shop.id is null end)
-		group by c.id, c.detail.discount
+		group by c.id, cd.discount
 	""")
-    Page<Coupon> findCouponByFilter(CouponType type, String keyword, Long shopId,
+    Page<Coupon> findCouponByFilter(List<CouponType> types, String keyword, Long shopId,
 									Boolean byShop, Boolean showExpired, Pageable pageable);
 
 	@Query("""
 		select c.id from Coupon c join c.detail cd 
 		where (coalesce(:showExpired) is null or (cd.expDate > now() and cd.usage > 0))
 		and (coalesce(:keyword) is null or c.code = :keyword)
-		and (coalesce(:type) is null or cd.type = :type)
+		and (coalesce(:types) is null or cd.type in :types)
 		and (coalesce(:shopId) is null or c.shop.id = :shopId)
 		and (coalesce(:byShop) is null or case when :byShop = true 
 			then c.shop.id is not null else c.shop.id is null end)
 		and c.id not in :ids
 		group by c.id
 	""")
-	List<Long> findInverseIds(CouponType type, String keyword, Long shopId,
+	List<Long> findInverseIds(List<CouponType> types, String keyword, Long shopId,
 							  Boolean byShop, Boolean showExpired, List<Long> ids);
 
 	@Query("""

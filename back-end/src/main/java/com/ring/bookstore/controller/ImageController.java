@@ -26,7 +26,6 @@ import com.ring.bookstore.service.ImageService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
 public class ImageController {

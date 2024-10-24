@@ -34,7 +34,6 @@ const LoginTab = ({ pending, setPending }) => {
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
 
-    const userRef = useRef();
     const errRef = useRef();
 
     //Login value
@@ -130,7 +129,6 @@ const LoginTab = ({ pending, setPending }) => {
                             type="text"
                             id="username"
                             autoComplete="username"
-                            ref={userRef}
                             onChange={(e) => setUsername(e.target.value)}
                             value={username}
                             size="small"
