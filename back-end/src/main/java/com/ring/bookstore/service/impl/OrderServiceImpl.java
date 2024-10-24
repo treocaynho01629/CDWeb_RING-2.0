@@ -150,6 +150,7 @@ public class OrderServiceImpl implements OrderService {
                         new CartStateRequest(detailTotal - discountDeal, shippingFee, detailQuantity));
 
                     if (discountFromCoupon != null) {
+                        shopCoupon.setIsUsable(true);
                         discountCoupon = discountFromCoupon.discountValue();
                         discountShipping = discountFromCoupon.discountShipping();
                     }
@@ -196,6 +197,7 @@ public class OrderServiceImpl implements OrderService {
                     new CartStateRequest((totalPrice - totalDealDiscount), totalShippingFee, totalQuantity));
 
             if (discountAll != null) {
+                coupon.setIsUsable(true);
                 discountValue = discountAll.discountValue();
                 shippingDiscount = discountAll.discountShipping();
             }

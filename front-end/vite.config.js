@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import { visualizer } from 'rollup-plugin-visualizer';
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
 
@@ -6,6 +7,13 @@ import svgr from 'vite-plugin-svgr'
 export default defineConfig({
     plugins: [
         react(),
+        visualizer({
+            template: "treemap", // or sunburst
+            open: true,
+            gzipSize: true,
+            brotliSize: true,
+            filename: "analyse.html", // will be saved in project's root
+        }),
         svgr({
             svgrOptions: { exportType: 'named', ref: true, svgo: false, titleProp: true },
             include: '**/*.svg',
@@ -19,7 +27,7 @@ export default defineConfig({
                         return id.toString().split('node_modules/')[1].split('/')[0].toString();
                     }
                 }
-            }
-        }
+            },
+        },
     },
 })

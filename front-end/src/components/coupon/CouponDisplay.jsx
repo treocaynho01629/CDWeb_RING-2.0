@@ -6,6 +6,7 @@ const CouponContainer = styled.div`
     position: relative;
     border-radius: 5px;
     height: 100%;
+    width: 100%;
     background-color: ${props => props.theme.palette.background.default};
     border: .5px solid ${props => props.theme.palette.divider};
     box-shadow: ${props => props.theme.shadows[1]};

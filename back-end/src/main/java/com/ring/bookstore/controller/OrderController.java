@@ -26,7 +26,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
@@ -35,7 +34,6 @@ public class OrderController {
 
 	//Calculate price
 	@PostMapping("/calculate")
-	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<CalculateDTO> calculate(@RequestBody @Valid CalculateRequest request) {
 		CalculateDTO calculateResult = orderService.calculate(request);
 		return new ResponseEntity< >(calculateResult, HttpStatus.CREATED);

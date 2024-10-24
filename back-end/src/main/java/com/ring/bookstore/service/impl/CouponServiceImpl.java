@@ -1,6 +1,5 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.BannerDTO;
 import com.ring.bookstore.dtos.CouponDiscountDTO;
 import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.enums.RoleName;
@@ -38,27 +37,27 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public Page<Coupon> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                                   CouponType type, String keyword, Long shopId, Boolean byShop, Boolean showExpired,
-                                   Double rValue, Integer rQuantity) {
+                                   List<CouponType> types, String keyword, Long shopId, Boolean byShop, Boolean showExpired,
+                                   Double cValue, Integer cQuantity) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<Coupon> couponsList = couponRepo.findCouponByFilter(type, keyword, shopId,
+        Page<Coupon> couponsList = couponRepo.findCouponByFilter(types, keyword, shopId,
                 byShop, showExpired, pageable);
-        if (rValue != null || rQuantity != null) {
-            CartStateRequest request = CartStateRequest.builder().value(rValue).quantity(rQuantity).build();
+        if (cValue != null || cQuantity != null) {
+            CartStateRequest request = CartStateRequest.builder().value(cValue).quantity(cQuantity).build();
             couponsList = couponsList.map(coupon -> markUsable(coupon, request));
         }
         return couponsList;
     }
 
     @Override
-    public Coupon getCouponByCode(String code, Double rValue, Integer rQuantity) {
+    public Coupon getCouponByCode(String code, Double cValue, Integer cQuantity) {
         Coupon coupon = couponRepo.findByCode(code).orElseThrow(() ->
                 new ResourceNotFoundException("Coupon not found!"));
-        if (rValue != null || rQuantity != null) {
-            CartStateRequest request = CartStateRequest.builder().value(rValue).quantity(rQuantity).build();
+        if (cValue != null || cQuantity != null) {
+            CartStateRequest request = CartStateRequest.builder().value(cValue).quantity(cQuantity).build();
             coupon = markUsable(coupon, request);
         }
         return coupon;
@@ -165,10 +164,10 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Transactional
-    public void deleteCoupons(CouponType type, String keyword, Long shopId, Boolean byShop,
+    public void deleteCoupons(List<CouponType> types, String keyword, Long shopId, Boolean byShop,
                               Boolean showExpired, List<Long> ids, boolean isInverse, Account user) {
         List<Long> listDelete = ids;
-        if (isInverse) listDelete = couponRepo.findInverseIds(type, keyword, shopId, byShop, showExpired, ids);
+        if (isInverse) listDelete = couponRepo.findInverseIds(types, keyword, shopId, byShop, showExpired, ids);
 
         //Loop and delete
         for (Long id : listDelete) {
@@ -233,13 +232,14 @@ public class CouponServiceImpl implements CouponService {
         double attribute = couponDetail.getAttribute();
 
         //Current
-        double currValue = request.getValue();
-        int currQuantity = request.getQuantity();
+        double currValue = request.getValue() != null ? request.getValue() : -1;
+        int currQuantity = request.getQuantity() != null ? request.getQuantity() : -1;
 
         //Check conditions & apply
-        if (type.equals(CouponType.MIN_AMOUNT)) {
+        if (type.equals(CouponType.MIN_AMOUNT) && currValue > -1) {
             coupon.setIsUsable(currQuantity >= attribute);
-        } else if (type.equals(CouponType.MIN_VALUE) || type.equals(CouponType.SHIPPING)) {
+        } else if (currValue > -1 &&
+                (type.equals(CouponType.MIN_VALUE) || type.equals(CouponType.SHIPPING))) {
             coupon.setIsUsable(currValue >= attribute);
         }
 

@@ -2,6 +2,7 @@ import { ThemeProvider as MUIThemeProvider, StyledEngineProvider, CssBaseline, c
 import { ThemeProvider as ScThemeProvider } from "styled-components";
 import { createContext, useMemo, useState } from "react";
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
+import darkScrollbar from '@mui/material/darkScrollbar';
 
 export const ColorModeContext = createContext({ toggleColorMode: () => { } });
 
@@ -59,6 +60,23 @@ export function ThemeContextProvider({ children }) {
                     borderRadius: 0,
                 },
                 components: {
+                    MuiCssBaseline: {
+                        styleOverrides: (theme) => ({
+                            html: {
+                                ...darkScrollbar(
+                                    mode === "light"
+                                        ? {
+                                            track: theme.palette.background.default,
+                                            thumb: theme.palette.action.disabled,
+                                            active: theme.palette.text.primary,
+                                        }
+                                        : undefined
+                                ),
+                                //scrollbarWidth for Firefox
+                                scrollbarWidth: "thin"
+                            }
+                        }),
+                    },
                     MuiButton: {
                         styleOverrides: {
                             root: ({ theme }) => ({
@@ -147,48 +165,48 @@ export function ThemeContextProvider({ children }) {
                             })
                         },
                     },
-                    MuiTableContainer: {
-                        styleOverrides: {
-                            root: ({ theme }) => ({
-                                "&::-webkit-scrollbar": {
-                                    width: 7,
-                                    height: 7,
-                                },
-                                "&::-webkit-scrollbar-track": {
-                                    background: 'inherit',
-                                    boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0)',
-                                },
-                                "&::-webkit-scrollbar-thumb": {
-                                    backgroundColor: theme.palette.action.focus,
-                                    borderRadius: '20px',
-                                },
-                                '&::-webkit-scrollbar-corner': {
-                                    background: 'inherit',
-                                },
-                            }),
-                        },
-                    },
-                    MuiPaper: {
-                        styleOverrides: {
-                            root: ({ theme }) => ({
-                                "&::-webkit-scrollbar": {
-                                    width: 5,
-                                    height: 5,
-                                },
-                                "&::-webkit-scrollbar-track": {
-                                    background: 'inherit',
-                                    boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0)',
-                                },
-                                "&::-webkit-scrollbar-thumb": {
-                                    backgroundColor: theme.palette.action.hover,
-                                    borderRadius: '20px',
-                                },
-                                '&::-webkit-scrollbar-corner': {
-                                    background: 'inherit',
-                                },
-                            }),
-                        },
-                    },
+                    // MuiTableContainer: {
+                    //     styleOverrides: {
+                    //         root: ({ theme }) => ({
+                    //             "&::-webkit-scrollbar": {
+                    //                 width: 7,
+                    //                 height: 7,
+                    //             },
+                    //             "&::-webkit-scrollbar-track": {
+                    //                 background: 'inherit',
+                    //                 boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0)',
+                    //             },
+                    //             "&::-webkit-scrollbar-thumb": {
+                    //                 backgroundColor: theme.palette.action.focus,
+                    //                 borderRadius: '20px',
+                    //             },
+                    //             '&::-webkit-scrollbar-corner': {
+                    //                 background: 'inherit',
+                    //             },
+                    //         }),
+                    //     },
+                    // },
+                    // MuiPaper: {
+                    //     styleOverrides: {
+                    //         root: ({ theme }) => ({
+                    //             "&::-webkit-scrollbar": {
+                    //                 width: 5,
+                    //                 height: 5,
+                    //             },
+                    //             "&::-webkit-scrollbar-track": {
+                    //                 background: 'inherit',
+                    //                 boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0)',
+                    //             },
+                    //             "&::-webkit-scrollbar-thumb": {
+                    //                 backgroundColor: theme.palette.action.hover,
+                    //                 borderRadius: '20px',
+                    //             },
+                    //             '&::-webkit-scrollbar-corner': {
+                    //                 background: 'inherit',
+                    //             },
+                    //         }),
+                    //     },
+                    // },
                 },
                 breakpoints: {
                     values: {

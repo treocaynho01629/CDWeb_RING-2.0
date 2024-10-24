@@ -1,4 +1,4 @@
-import { Button, Skeleton, Paper } from '@mui/material'
+import { Button, Skeleton, Paper, alpha } from '@mui/material'
 import styled from 'styled-components'
 
 //#region styledc
@@ -7,35 +7,6 @@ const Wrapper = styled.div`
     overflow: hidden;
     position: relative;
     width: 100%;
-`
-
-const CouponContainer = styled.div`
-    position: relative;
-    border-radius: 5px;
-    padding: 5px;
-    height: 100%;
-    background-color: ${props => props.theme.palette.background.default};
-    border: .5px solid ${props => props.theme.palette.divider};
-    box-shadow: ${props => props.theme.shadows[1]};
-
-    &.disabled {
-        filter: grayscale(1);
-        pointer-events: none;
-    }
-
-    &:after {
-        right: -12px;
-        transform: rotate(-135deg);
-    }
-
-    &:before {
-        left: -12px;
-        transform: rotate(45deg);
-    }
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        padding: 5px 2px;
-    }
 `
 
 const CouponEdge = styled(Paper)`
@@ -67,12 +38,72 @@ const CouponEdge = styled(Paper)`
     }
 `
 
+const CouponContainer = styled.div`
+    position: relative;
+    border-radius: 5px;
+    padding: 5px;
+    height: 100%;
+    background-color: ${props => props.theme.palette.background.default};
+    border: .5px solid ${props => props.theme.palette.divider};
+    box-shadow: ${props => props.theme.shadows[1]};
+
+    &.active {
+        background-color: ${props => alpha(props.theme.palette.primary.light, 0.1)};
+        border-color: ${props => props.theme.palette.primary.main};
+
+        ${CouponEdge} {
+            border-color: ${props => props.theme.palette.primary.main};
+        }
+    }
+
+    &.disabled {
+        filter: grayscale(1);
+        pointer-events: none;
+
+        &::after {
+            content: "CHƯA THOẢ ĐIỀU KIỆN";
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            width: 120px;
+            height: 56px;
+            font-weight: bold;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            background-color: ${props => props.theme.palette.background.default};
+            color: ${props => props.theme.palette.text.disabled};
+            border: 1px solid ${props => props.theme.palette.divider};
+            border-radius: 6px;
+            transform: rotate(-10deg);
+        }
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 5px 2px;
+
+        &.disabled {
+            &::after {
+                right: 10px;
+                bottom: 10px;
+                width: 70px;
+                height: 40px;
+                font-size: 11px;
+            }
+        }
+    }
+`
+
 const CouponContent = styled.div`
     display: flex;
     position: relative;
     height: 100%;
     padding: 0 10px;
     align-items: center;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 0 5px;
+    }
 `
 
 const CouponAction = styled.div`
@@ -97,7 +128,8 @@ const CouponMain = styled.div`
     position: relative;
     height: 100%;
     padding-left: 10px;
-    max-width: 80%;
+    max-width: 75%;
+    width: 100%;
     
     h2 {
         font-size: 15px;
@@ -123,11 +155,6 @@ const CouponMain = styled.div`
         color: ${props => props.theme.palette.text.secondary};
     }
 
-    span {
-        font-size: 14px;
-        color: ${props => props.theme.palette.info.light};
-    }
-
     ${props => props.theme.breakpoints.down("sm")} {
         h2 {
             font-size: 14px;
@@ -137,9 +164,39 @@ const CouponMain = styled.div`
         p { 
             margin: 0;
             font-size: 13px;
+            width: 80%;
         }
         
         span { font-size: 12px; }
+    }
+`
+
+const Expire = styled.div`
+    display: flex;
+    width: 80%;
+`
+
+const ExpText = styled.span`
+    font-size: 14px;
+    margin-right: 10px;
+    font-weight: 450;
+
+    &::before { content: "Còn:"; }
+
+    &.date {
+        color: ${props => props.theme.palette.info.light};
+        font-weight: normal;
+
+        &::before { content: "HSD:"; }
+    }
+
+    &.error {
+        color: ${props => props.theme.palette.error.main};
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {   
+        font-size: 12px;
+        &::before { content: ""; }
     }
 `
 
@@ -168,11 +225,9 @@ const CouponIcon = styled.div`
     }
 
     ${props => props.theme.breakpoints.down("sm")} {
-        width: 50px;
-        height: 50px;
+        width: 70px;
+        height: 70px;
         margin: 5px;
-
-        svg { font-size: 20px;}
     }
 `
 
@@ -188,39 +243,49 @@ const CouponCode = styled.span`
 `
 //#endregion
 
-const CouponItem = ({ coupon, sumary, isSelect }) => {
+const CouponItem = ({ coupon, sumary, isDisabled, isSelected, selectMode, onClickApply }) => {
     const date = new Date(coupon?.detail.expDate);
+    const warnDate = new Date();
+    warnDate.setDate(warnDate.getDate() + 2);
+
+    const handleClick = () => { isSelected ? onClickApply(null) : onClickApply(coupon); }
 
     return (
         <Wrapper>
             {coupon ?
-                <CouponContainer className={coupon?.isUsable ? '' : 'disabled'}>
-                    <CouponEdge elevation={24} className="left"/>
-                    <CouponEdge elevation={24} className="right"/>
+                <CouponContainer className={selectMode && isDisabled ? 'disabled' : isSelected ? 'active' : ''}>
+                    <CouponEdge elevation={24} className="left" />
+                    <CouponEdge elevation={24} className="right" />
                     <CouponContent>
                         <CouponIcon className={sumary?.color}>
                             {sumary?.icon}
                         </CouponIcon>
                         <CouponMain>
                             <h2>{`${sumary?.name} ${coupon?.detail.discount * 100}% - giảm tối đa ${coupon?.detail.maxDiscount.toLocaleString()}đ`}</h2>
-                            <p>{`${sumary?.sumary} ${coupon?.detail.attribute.toLocaleString()} ${sumary?.unit}`}</p>
-                            <span>HSD:&nbsp;
-                                {date.toLocaleDateString("en-GB", {
-                                    year: "numeric",
-                                    month: "2-digit",
-                                    day: "2-digit",
-                                })}
-                            </span>
+                            <p>{`${sumary?.sumary} ${coupon?.detail.attribute.toLocaleString()}${sumary?.unit}`}</p>
+                            <Expire>
+                                <ExpText className={date <= warnDate ? 'date error' : 'date'}>&nbsp;
+                                    {date.toLocaleDateString("en-GB", {
+                                        year: "numeric",
+                                        month: "2-digit",
+                                        day: "2-digit",
+                                    })}
+                                </ExpText>
+                                {coupon?.detail.usage < 100
+                                    && <ExpText className="error">&nbsp;{coupon?.detail.usage} lượt</ExpText>}
+                            </Expire>
                         </CouponMain>
                     </CouponContent>
                     <CouponAction>
                         <CouponCode>{coupon?.code}</CouponCode>
-                        {isSelect
-                            ?
-                            <Button disableRipple>Áp dụng</Button>
-                            :
-                            <Button disableRipple>Lưu</Button>
-                        }
+                        {selectMode ? <Button
+                            disableRipple
+                            color={isSelected ? 'error' : 'primary'}
+                            onClick={handleClick}
+                        >
+                            {isSelected ? 'Bỏ chọn' : 'Áp dụng'}
+                        </Button>
+                            : <Button disableRipple>Lưu</Button>}
                     </CouponAction>
                 </CouponContainer>
                 : <Skeleton

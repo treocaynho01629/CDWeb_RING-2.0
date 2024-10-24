@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/publishers")
 @RequiredArgsConstructor
 public class PublisherController {

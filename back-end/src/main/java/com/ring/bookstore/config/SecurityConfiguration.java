@@ -55,6 +55,7 @@ public class SecurityConfiguration { //Security config
 					"/api/coupons/**",
 					"/api/banners/**",
 					"/api/images/**",
+					"/api/orders/calculate",
 					"/v2/api-docs",
 					"v3/api-docs",
 					"v3/api-docs/**",

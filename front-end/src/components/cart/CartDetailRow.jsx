@@ -178,7 +178,7 @@ function ItemRow({ product, index, handleSelect, handleDeselect, isSelected, han
     const isDisabled = !product || product.amount < 1;
 
     useEffect(() => {
-        if (product.amount < 1 || product.quantity < product.amount) handleDeselect(product.id);
+        if (product.amount < 1 || product.quantity > product.amount) handleDeselect(product.id);
     }, [product.amount])
 
     return (
@@ -273,7 +273,7 @@ function ItemRow({ product, index, handleSelect, handleDeselect, isSelected, han
     )
 }
 
-const CartDetailRow = ({ id, index, shop, coupon, isSelected, isShopSelected, handleSelect, handleDeselect,
+const CartDetailRow = ({ id, index, shop, coupon, couponDiscount, isSelected, isShopSelected, handleSelect, handleDeselect,
     handleSelectShop, handleDecrease, handleChangeQuantity, handleClick, increaseAmount,
     handleOpenDialog, StyledCheckbox }) => {
     const isGroupSelected = isShopSelected(shop);
@@ -316,9 +316,12 @@ const CartDetailRow = ({ id, index, shop, coupon, isSelected, isShopSelected, ha
                     <CouponButton onClick={() => handleOpenDialog(id)}>
                         <span>
                             <LocalActivityOutlined color="error" />&nbsp;
-                            {coupon ? coupon?.couponDiscount > 0
-                                ? isGroupSelected ? `Đã giảm ${coupon?.couponDiscount.toLocaleString()}đ` : 'Thêm mã giảm giá'
-                                : `Mua thêm để giảm ${coupon?.detail.discount * 100}% - giảm tối đa ${coupon?.detail.maxDiscount.toLocaleString()}đ`
+                            {coupon
+                                ? couponDiscount
+                                    ? isGroupSelected
+                                        ? `Đã giảm ${couponDiscount.toLocaleString()}đ`
+                                        : `Mua thêm để giảm ${coupon?.detail.discount * 100}% - giảm tối đa ${coupon?.detail.maxDiscount.toLocaleString()}đ`
+                                    : `Mua thêm để giảm ${coupon?.detail.discount * 100}% - giảm tối đa ${coupon?.detail.maxDiscount.toLocaleString()}đ`
                                 : 'Thêm mã giảm giá'
                             }
                         </span>

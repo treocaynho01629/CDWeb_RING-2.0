@@ -157,7 +157,6 @@ const RegisterTab = ({ pending, setPending }) => {
                         type="email"
                         id="email"
                         autoComplete="off"
-                        ref={userRef}
                         onChange={(e) => setEmail(e.target.value)}
                         value={email}
                         aria-invalid={validEmail ? "false" : "true"}

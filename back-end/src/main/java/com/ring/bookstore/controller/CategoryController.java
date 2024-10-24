@@ -17,7 +17,6 @@ import com.ring.bookstore.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {

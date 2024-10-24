@@ -6,7 +6,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { booksApiSlice } from '../../features/books/booksApiSlice';
 import { useCalculateMutation } from '../../features/orders/ordersApiSlice';
 import { ActionTableCell, StyledTableCell, StyledTableHead } from '../custom/CustomTableComponents';
-import { useDebouncedCallback } from 'use-debounce';
+import { debounce, isEqual } from 'lodash-es';
+import { useGetRecommendCouponsQuery } from '../../features/coupons/couponsApiSlice';
 import useCart from '../../hooks/useCart';
 import CheckoutDialog from './CheckoutDialog';
 import PropTypes from 'prop-types';
@@ -138,60 +139,85 @@ EnhancedTableHead.propTypes = {
 const CartContent = () => {
     const { cartProducts, replaceProduct, removeProduct, removeShopProduct, decreaseAmount, increaseAmount, changeAmount } = useCart();
     const [selected, setSelected] = useState([]);
+    const [shopIds, setShopIds] = useState([]);
     const [coupon, setCoupon] = useState('');
     const [shopCoupon, setShopCoupon] = useState('');
-    const [recommendState, setRecommendState] = useState(null);
+    const [couponDiscount, setCouponDiscount] = useState(0);
+    const [checkState, setCheckState] = useState(null);
 
     //Dialog/Menu
     const [contextProduct, setContextProduct] = useState(null);
     const [contextShop, setContextShop] = useState(null);
     const [contextState, setContextState] = useState(null);
+    const [contextCoupon, setContextCoupon] = useState(null);
     const [openDialog, setOpenDialog] = useState(undefined);
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
 
+    //Recommend coupons
+    const { data: recommend, isLoading: loadRecommend, isSuccess: doneRecommend } = useGetRecommendCouponsQuery({ shopIds }, { skip: !shopIds.length });
+
     //For get similar
     const [getBook] = booksApiSlice.useLazyGetBookQuery();
 
     //Estimate/calculate price
-    const [estimated, setEstimated] = useState({ deal: 0, total: 0, shipping: 0, subTotal: 0 });
+    const [estimated, setEstimated] = useState({ deal: 0, subTotal: 0, shipping: 0, total: 0 });
     const [calculated, setCaculated] = useState(null);
     const [calculate, { isLoading }] = useCalculateMutation();
 
     //#region construct
     useEffect(() => {
         handleCartChange();
-    }, [selected, cartProducts])
+    }, [selected, cartProducts, shopCoupon, coupon])
+
+    //Set recommend coupons
+    useEffect(() => {
+        if (recommend && !loadRecommend && doneRecommend) {
+            const { ids, entities } = recommend;
+            
+            ids.forEach((id) => {
+                const coupon = entities[id];
+
+                if (coupon?.shopId) {
+                    setShopCoupon((prev) => ({ ...prev, [coupon?.shopId]: coupon }));
+                } else {
+                    setCoupon(coupon);
+                }
+            })
+        }
+    }, [recommend, loadRecommend])
 
     const handleCartChange = () => {
         if (selected.length > 0) {
-            //Reduce cart
-            const estimateCart = cartProducts.reduce((result, item) => {
-                const { id, shopId } = item;
+            if (doneRecommend) {
+                //Reduce cart
+                const estimateCart = cartProducts.reduce((result, item) => {
+                    const { id, shopId } = item;
 
-                if (selected.indexOf(id) !== -1) { //Get selected items in redux store
-                    //Find or create shop
-                    let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
+                    if (selected.indexOf(id) !== -1) { //Get selected items in redux store
+                        //Find or create shop
+                        let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
 
-                    if (!detail) {
-                        detail = {
-                            shopId,
-                            coupon: shopCoupon[shopId] == null ? '' : shopCoupon[shopId]?.code,
-                            items: [],
-                        };
-                        result.cart.push(detail);
+                        if (!detail) {
+                            detail = {
+                                shopId,
+                                coupon: shopCoupon[shopId] == null ? '' : shopCoupon[shopId]?.code,
+                                items: [],
+                            };
+                            result.cart.push(detail);
+                        }
+
+                        //Add items for that shop
+                        detail.items.push(item);
                     }
 
-                    //Add items for that shop
-                    detail.items.push(item);
-                }
+                    return result;
+                }, { coupon: coupon?.code == null ? '' : coupon?.code, cart: [] });
 
-                return result;
-            }, { coupon: coupon?.code == null ? '' : coupon?.code, cart: [] });
-
-            handleEstimate(estimateCart); //Estimate price
-            handleCalculate(estimateCart); //Calculate price
+                handleEstimate(estimateCart); //Estimate price
+                handleCalculate(estimateCart); //Calculate price
+            }
         } else { //Reset
             handleEstimate(null);
             setCaculated(null);
@@ -205,19 +231,19 @@ const CartContent = () => {
 
     //Estimate before receive caculated price from server
     const handleEstimate = (estimateCart) => {
-        let estimate = { deal: 0, total: 0, shipping: 0, subTotal: 0 }; //Initial value
+        let estimate = { deal: 0, subTotal: 0, shipping: 0, total: 0 }; //Initial value
         let cartDetails = {};
 
         if (estimateCart?.cart?.length) {
             let totalDeal = 0;
-            let totalPrice = 0;
+            let subTotal = 0;
             let totalQuantity = 0;
             const shipping = tempShippingFee * (estimateCart?.cart?.length || 0);
 
             //Loop & calculate
             estimateCart?.cart?.forEach((detail) => {
                 let deal = 0;
-                let total = 0;
+                let productTotal = 0;
                 let quantity = 0;
 
                 detail?.items?.forEach((item) => {
@@ -225,28 +251,28 @@ const CartContent = () => {
 
                     //Both deal & total price
                     deal += item.quantity * discount;
-                    total += item.quantity * item.price;
+                    productTotal += item.quantity * item.price;
                     quantity += item.quantity;
                 })
 
                 //Set value & cart state
                 totalDeal += deal;
-                totalPrice += total;
+                subTotal += productTotal;
                 totalQuantity += quantity;
-                cartDetails[detail?.shopId] = { value: total - deal, quantity };
+                cartDetails[detail?.shopId] = { value: productTotal - deal, quantity };
             });
 
             //Set values
-            estimate = { deal: totalDeal, total: totalPrice, shipping, subTotal: (totalPrice + shipping - totalDeal) };
+            estimate = { deal: totalDeal, subTotal, shipping, total: (subTotal + shipping - totalDeal) };
 
             //Set cart state
-            setRecommendState({ value: totalPrice - totalDeal, quantity: totalQuantity, details: cartDetails });
+            setCheckState({ value: subTotal - totalDeal, quantity: totalQuantity, details: cartDetails });
         }
 
         setEstimated(estimate);
     }
 
-    const handleCalculate = useDebouncedCallback(async (estimateCart) => {
+    const handleCalculate = debounce(async (estimateCart) => {
         if (isLoading) return;
 
         calculate(estimateCart).unwrap()
@@ -273,11 +299,11 @@ const CartContent = () => {
     const syncCart = (cart) => {
         const details = cart?.details;
 
-        details.map((detail, index) => {
+        details.forEach((detail, index) => {
             if (detail.shopName != null) { //Replace all items of that shop
                 const items = detail?.items;
 
-                items.map((item, index) => {
+                items.forEach((item, index) => {
                     if (item.title != null) { //Replace old item in cart
                         const newItem = {
                             ...item,
@@ -293,9 +319,13 @@ const CartContent = () => {
                 })
 
                 //Replace recommend coupon
-                if (detail?.coupon != null) {
-                    let newCoupon = { ...detail.coupon, couponDiscount: detail?.couponDiscount || 0 };
-                    setShopCoupon((prev) => ({ ...prev, [detail?.shopId]: newCoupon }));
+                setCouponDiscount((prev) => ({
+                    ...prev,
+                    [detail?.shopId]: detail?.couponDiscount > 0 ? detail?.couponDiscount : detail?.shippingDiscount
+                }));
+                if (detail?.coupon != null && !isEqual(detail.coupon, shopCoupon[detail?.shopId])) {
+                    console.log('a')
+                    setShopCoupon((prev) => ({ ...prev, [detail?.shopId]: detail.coupon }));
                 }
             } else { //Remove all items of the invalid Shop
                 handleResetCart();
@@ -304,20 +334,25 @@ const CartContent = () => {
         })
 
         //Replace recommend coupon
-        if (cart?.coupon != null) setCoupon(cart.coupon);
+        if (cart?.coupon != null && !isEqual(cart?.coupon, coupon)) setCoupon(cart.coupon);
     }
 
     //Separate by shop
     const reduceCart = () => {
-        return cartProducts.reduce((result, item) => {
+        let shopIds = [];
+        let resultCart = cartProducts.reduce((result, item) => {
             if (!result[item.shopId]) { //Check if not exists shop >> Add new one
                 result[item.shopId] = { shopName: item.shopName, products: [] };
+                shopIds.push(item.shopId);
             }
 
             //Else push
             result[item.shopId].products.push(item);
             return result;
         }, {});
+
+        setShopIds(shopIds);
+        return resultCart;
     }
     const reducedCart = useMemo(() => reduceCart(), [cartProducts]);
 
@@ -335,12 +370,16 @@ const CartContent = () => {
     const handleOpenDialog = (shopId) => {
         setOpenDialog(true);
         setContextShop(shopId);
-        setContextState(shopId ? recommendState?.details[shopId] : { value: recommendState?.value, quantity: recommendState?.quantity });
-    }
+        setContextState(shopId ? checkState?.details[shopId] : { value: checkState?.value, quantity: checkState?.quantity });
+        setContextCoupon(shopId ? shopCoupon[shopId] : coupon)
+    };
+
     const handleCloseDialog = () => {
         setOpenDialog(false);
         setContextShop(null);
-    }
+        setContextState(null);
+        setContextCoupon(null);
+    };
 
     //Selected?
     const isShopSelected = (shop) => shop?.products.some(product => selected.includes(product.id));
@@ -395,7 +434,7 @@ const CartContent = () => {
         }
 
         setSelected(newSelected);
-    }
+    };
 
     //Select shop
     const handleSelectShop = (shop) => {
@@ -426,28 +465,28 @@ const CartContent = () => {
     const handleDeleteContext = () => {
         handleDelete(contextProduct?.id);
         handleClose();
-    }
+    };
 
     const handleDelete = (id) => {
         if (isSelected(id)) handleSelect(id);
         removeProduct(id);
         handleClose();
-    }
+    };
 
     const handleDecrease = (quantity, id) => {
         if (quantity == 1 && isSelected(id)) handleSelect(id); //Unselect if remove
         decreaseAmount(id)
-    }
+    };
 
     const handleChangeQuantity = (quantity, id) => {
         if (quantity < 1 && isSelected(id)) handleSelect(id); //Unselect if remove
         changeAmount({ quantity, id })
-    }
+    };
 
     const handleDeleteMultiple = () => {
-        selected.map((id) => { removeProduct(id) });
+        selected.forEach((id) => { removeProduct(id) });
         setSelected([]);
-    }
+    };
 
     const handleFindSimilar = async () => {
         getBook({ id: contextProduct?.id })
@@ -456,10 +495,14 @@ const CartContent = () => {
                 &pubId=${book?.publisher?.id}&type=${book?.type}`))
             .catch((rejected) => console.error(rejected));
         handleClose();
-    }
+    };
 
-    const handleChangeCoupon = (e, id) => {
-        setShopCoupon((prev) => ({ ...prev, [id]: 'GIAMGIAbfd538' }));
+    const handleChangeCoupon = (coupon, shopId) => {
+        if (shopId) {
+            setShopCoupon((prev) => ({ ...prev, [shopId]: coupon }));
+        } else {
+            setCoupon(coupon);
+        }
     };
     //#endregion
 
@@ -481,7 +524,8 @@ const CartContent = () => {
 
                             return (<CartDetailRow key={`detail-${shopId}-${index}`}
                                 {...{
-                                    id: shopId, index, shop, coupon: shopCoupon[shopId], isSelected, isShopSelected, handleSelect,
+                                    id: shopId, index, shop, isSelected, isShopSelected, handleSelect,
+                                    coupon: shopCoupon[shopId], couponDiscount: couponDiscount[shopId],
                                     handleDeselect, handleSelectShop, handleDecrease, increaseAmount, handleChangeQuantity,
                                     handleClick, handleOpenDialog, StyledCheckbox
                                 }} />)
@@ -512,7 +556,10 @@ const CartContent = () => {
             </Grid>
             <Suspense fallback={<></>}>
                 {openDialog !== undefined
-                    && <CouponDialog {...{ openDialog, handleCloseDialog, shopId: contextShop, recommendState: contextState, selectMode: true }} />}
+                    && <CouponDialog {...{
+                        openDialog, handleCloseDialog, shopId: contextShop, checkState: contextState,
+                        numSelected: selected.length, selectedCoupon: contextCoupon, selectMode: true, onClickApply: handleChangeCoupon
+                    }} />}
             </Suspense>
             <Suspense fallback={<></>}>
                 {open !== undefined &&

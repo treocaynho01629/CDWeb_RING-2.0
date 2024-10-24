@@ -195,12 +195,12 @@ const CheckoutDialog = ({ coupon, navigate, handleOpenDialog, calculating, estim
     //Info
     const displayInfo = {
         deal: (calculating || !calculated) ? estimated?.deal : calculated?.dealDiscount,
-        total: (calculating || !calculated) ? estimated?.total : calculated?.productsTotal,
+        subTotal: (calculating || !calculated) ? estimated?.subTotal : calculated?.productsTotal,
         shipping: (calculating || !calculated) ? estimated?.shipping : calculated?.shippingFee,
         couponDiscount: calculated?.couponDiscount || 0,
         totalDiscount: calculated?.totalDiscount || 0,
         shippingDiscount: calculated?.shippingDiscount || 0,
-        subTotal: (calculating || !calculated) ? estimated?.subTotal : calculated?.total - calculated?.totalDiscount
+        total: (calculating || !calculated) ? estimated?.total : calculated?.total - calculated?.totalDiscount
     }
 
     //Component stuff
@@ -208,7 +208,7 @@ const CheckoutDialog = ({ coupon, navigate, handleOpenDialog, calculating, estim
         <DetailContainer>
             <CheckoutRow>
                 <CheckoutText>Tiền hàng:</CheckoutText>
-                <CheckoutText>{(displayInfo.total).toLocaleString()}đ</CheckoutText>
+                <CheckoutText>{(displayInfo.subTotal).toLocaleString()}đ</CheckoutText>
             </CheckoutRow>
             <CheckoutRow>
                 <CheckoutText>Phí vận chuyển:</CheckoutText>
@@ -238,7 +238,7 @@ const CheckoutDialog = ({ coupon, navigate, handleOpenDialog, calculating, estim
             {!numSelected ?
                 <CheckoutText className="error">Vui lòng chọn sản phẩm</CheckoutText>
                 : <PriceContainer>
-                    <CheckoutPrice>{displayInfo.subTotal.toLocaleString()}đ</CheckoutPrice>
+                    <CheckoutPrice>{displayInfo.total.toLocaleString()}đ</CheckoutPrice>
                     {(!calculating && displayInfo.totalDiscount > 0) &&
                         <SavePrice>Tiết kiệm {Math.round(displayInfo.totalDiscount).toLocaleString()}đ</SavePrice>}
                     <SubText>(Đã bao gồm VAT nếu có)</SubText>
@@ -270,7 +270,7 @@ const CheckoutDialog = ({ coupon, navigate, handleOpenDialog, calculating, estim
                                 {!numSelected ?
                                     <CheckoutText className="error">Vui lòng chọn sản phẩm</CheckoutText>
                                     : <PriceContainer>
-                                        <CheckoutPrice>{displayInfo.subTotal.toLocaleString()}đ</CheckoutPrice>
+                                        <CheckoutPrice>{displayInfo.total.toLocaleString()}đ</CheckoutPrice>
                                         {(!calculating && displayInfo.totalDiscount > 0) &&
                                             <SavePrice>Tiết kiệm {Math.round(displayInfo.totalDiscount).toLocaleString()}đ</SavePrice>}
                                     </PriceContainer>
@@ -311,7 +311,7 @@ const CheckoutDialog = ({ coupon, navigate, handleOpenDialog, calculating, estim
                                         </CheckoutText>
                                         <PriceContainer>
                                             <CheckoutPrice onClick={() => toggleDrawer(true)}>
-                                                {Math.round(displayInfo.subTotal).toLocaleString()}đ
+                                                {Math.round(displayInfo.total).toLocaleString()}đ
                                             </CheckoutPrice>&emsp;
                                             {(!calculating && displayInfo.totalDiscount > 0) &&
                                                 <SavePrice>Tiết kiệm {Math.round(displayInfo.totalDiscount).toLocaleString()}đ</SavePrice>}

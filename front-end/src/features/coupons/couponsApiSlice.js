@@ -1,18 +1,47 @@
 import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
+import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
 
 const couponsAdapter = createEntityAdapter({});
-const initialState = couponsAdapter.getInitialState();
+const couponsSelector = couponsAdapter.getSelectors();
+const initialState = couponsAdapter.getInitialState({
+    info: {
+        currPage: 0,
+        pageSize: 0,
+        totalElements: 0,
+        totalPages: 0,
+    },
+});
 
 export const couponsApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
-        getCoupons: builder.query({
+        getCoupon: builder.query({
             query: (args) => {
-                const { type, shop, byShop, showExpired, recommendState, page, size, sortBy, sortDir } = args || {};
+                const { code, cValue, cQuantity } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
-                if (type) params.append('type', type);
+                if (cValue) params.append('cValue', cValue);
+                if (cQuantity) params.append('cQuantity', cQuantity);
+
+                return {
+                    url: `/api/coupons/${code}?${params.toString()}`,
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result.isError
+                    },
+                }
+            },
+            providesTags: (result, error) => [
+                result ? { type: 'Coupon', id: result.id } : { type: 'Coupon' }
+            ]
+        }),
+        getCoupons: builder.query({
+            query: (args) => {
+                const { types, shop, byShop, showExpired, cValue, cQuantity, page, size, sortBy, sortDir } = args || {};
+
+                //Params
+                const params = new URLSearchParams();
+                if (types) params.append('types', types);
                 if (shop) params.append('shopId', shop);
                 if (byShop != null) params.append('byShop', byShop);
                 if (showExpired != null) params.append('showExpired', showExpired);
@@ -20,10 +49,8 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
                 if (size) params.append('pSize', size);
                 if (sortBy) params.append('sortBy', sortBy);
                 if (sortDir) params.append('sortDir', sortDir);
-                if (recommendState) {
-                    params.append('rValue', recommendState?.value);
-                    params.append('rQuantity', recommendState?.quantity);
-                }
+                if (cValue) params.append('cValue', cValue);
+                if (cQuantity) params.append('cQuantity', cQuantity);
 
                 return {
                     url: `/api/coupons?${params.toString()}`,
@@ -43,6 +70,68 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
                         totalPages
                     }
                 }, content)
+            },
+            serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
+                if (queryArgs) {
+                    const { loadMore, ...mainQuery } = queryArgs;
+
+                    if (loadMore) { //Load more >> serialize without <pagination>
+                        const { page, size, ...rest } = mainQuery;
+                        if (JSON.stringify(rest) === "{}") return endpointName + 'Merge';
+                        return defaultSerializeQueryArgs({
+                            endpointName: endpointName + 'Merge',
+                            queryArgs: rest,
+                            endpointDefinition
+                        });
+                    }
+
+                    //Serialize like normal
+                    if (JSON.stringify(mainQuery) === "{}") return endpointName;
+                    return defaultSerializeQueryArgs({
+                        endpointName,
+                        queryArgs: mainQuery,
+                        endpointDefinition
+                    })
+                } else {
+                    return endpointName
+                }
+            },
+            merge: (currentCache, newItems) => {
+                currentCache.info = newItems.info;
+                couponsAdapter.upsertMany(
+                    currentCache, couponsSelector.selectAll(newItems)
+                )
+            },
+            forceRefetch: ({ currentArg, previousArg }) => {
+                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
+                return isForceRefetch
+            },
+            providesTags: (result, error, arg) => {
+                if (result?.ids) {
+                    return [
+                        { type: 'Coupon', id: 'LIST' },
+                        ...result.ids.map(id => ({ type: 'Coupon', id }))
+                    ]
+                } else return [{ type: 'Coupon', id: 'LIST' }]
+            },
+        }),
+        getRecommendCoupons: builder.query({
+            query: (args) => {
+                const { shopIds } = args || {};
+
+                //Params
+                const params = new URLSearchParams();
+                if (shopIds) params.append('shopIds', shopIds);
+
+                return {
+                    url: `/api/coupons/recommend?${params.toString()}`,
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result.isError
+                    },
+                }
+            },
+            transformResponse: responseData => {
+                return couponsAdapter.setAll(initialState, responseData)
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
@@ -88,13 +177,14 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
         }),
         deleteCoupons: builder.mutation({
             query: (arg) => {
-                const { type, shop, byShop, ids, isInverse} = args || {};
+                const { types, shop, byShop, showExpired, ids, isInverse } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
-                if (type) params.append('type', type);
+                if (types) params.append('types', types);
                 if (shop) params.append('shopId', shop);
-                if (byShop) params.append('byShop', byShop);
+                if (byShop != null) params.append('byShop', byShop);
+                if (showExpired != null) params.append('showExpired', showExpired);
                 if (ids) params.append('ids', ids);
                 if (isInverse) params.append('isInverse', isInverse);
 
@@ -120,7 +210,9 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
 })
 
 export const {
+    useGetCouponQuery,
     useGetCouponsQuery,
+    useGetRecommendCouponsQuery,
     useCreateCouponMutation,
     useUpdateCouponMutation,
     useDeleteCouponMutation,

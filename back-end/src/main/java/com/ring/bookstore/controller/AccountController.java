@@ -30,7 +30,6 @@ import com.ring.bookstore.service.AccountService;
 import jakarta.validation.Valid;
 
 @RestController
-@CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/accounts")
 public class AccountController {
 	

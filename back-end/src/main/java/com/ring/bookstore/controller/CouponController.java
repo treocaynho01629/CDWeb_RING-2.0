@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/coupons")
 @RequiredArgsConstructor
 public class CouponController {
@@ -24,27 +23,27 @@ public class CouponController {
 
     //Get coupons
     @GetMapping
-    public ResponseEntity<?> getCoupons(@RequestParam(value = "type", required = false) CouponType type,
+    public ResponseEntity<?> getCoupons(@RequestParam(value = "types", required = false) List<CouponType> types,
                                         @RequestParam(value = "shopId", required = false) Long shopId,
                                         @RequestParam(value = "byShop", required = false) Boolean byShop,
                                         @RequestParam(value = "showExpired", required = false) Boolean showExpired,
                                         @RequestParam(value = "keyword", required = false) String keyword,
-                                        @RequestParam(value = "rValue", required = false) Double recommendValue,
-                                        @RequestParam(value = "rQuantity", required = false) Integer recommendQuantity,
+                                        @RequestParam(value = "cValue", required = false) Double checkValue,
+                                        @RequestParam(value = "cQuantity", required = false) Integer checkQuantity,
                                         @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
                                         @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                         @RequestParam(value = "sortBy", defaultValue = "detail.discount") String sortBy,
                                         @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
         return new ResponseEntity<>(couponService.getCoupons(pageNo, pageSize, sortBy, sortDir,
-                type, keyword, shopId, byShop, showExpired, recommendValue, recommendQuantity), HttpStatus.OK);
+                types, keyword, shopId, byShop, showExpired, checkValue, checkQuantity), HttpStatus.OK);
     }
 
     //Get coupon by {code}
     @GetMapping("/{code}")
     public ResponseEntity<?> getCoupon(@PathVariable("code") String code,
-                                       @RequestParam(value = "rValue", required = false) Double recommendValue,
-                                       @RequestParam(value = "rQuantity", required = false) Integer recommendQuantity) {
-        return new ResponseEntity<>(couponService.getCouponByCode(code, recommendValue, recommendQuantity), HttpStatus.OK);
+                                       @RequestParam(value = "cValue", required = false) Double checkValue,
+                                       @RequestParam(value = "cQuantity", required = false) Integer checkQuantity) {
+        return new ResponseEntity<>(couponService.getCouponByCode(code, checkValue, checkQuantity), HttpStatus.OK);
     }
 
     //Get coupons
@@ -80,7 +79,7 @@ public class CouponController {
     //Delete multiples coupons in a lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> deleteCoupons(@RequestParam(value = "type", required = false) CouponType type,
+    public ResponseEntity<?> deleteCoupons(@RequestParam(value = "types", required = false) List<CouponType> types,
                                            @RequestParam(value = "shopId", required = false) Long shopId,
                                            @RequestParam(value = "byShop", required = false) Boolean byShop,
                                            @RequestParam(value = "showExpired", required = false) Boolean showExpired,
@@ -89,7 +88,7 @@ public class CouponController {
                                            @RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse,
                                            @CurrentAccount Account currUser
     ) {
-        couponService.deleteCoupons(type, keyword, shopId, byShop, showExpired, ids, isInverse, currUser);
+        couponService.deleteCoupons(types, keyword, shopId, byShop, showExpired, ids, isInverse, currUser);
         return new ResponseEntity<>("Coupons deleted successfully!", HttpStatus.OK);
     }
 
