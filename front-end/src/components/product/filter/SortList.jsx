@@ -1,176 +1,179 @@
 import styled from "styled-components"
-import { useEffect, useState } from 'react'
-import { styled as muiStyled } from '@mui/system';
-import { Grid2 as Grid, Button, MenuItem, ToggleButton, ToggleButtonGroup, TextField } from '@mui/material';
-import { Search, Sort } from '@mui/icons-material';
+import { Suspense, lazy } from "react";
+import { Button, MenuItem, TextField, InputAdornment, IconButton } from '@mui/material';
+import { Sort, Straight } from '@mui/icons-material';
 import { orderGroup } from "../../../ultils/filters";
-import QuickPagination from "../../custom/QuickPagination";
+
+const QuickPagination = lazy(() => import("../../custom/QuickPagination"));
 
 //#region styled
 const Container = styled.div`
-    margin: 20px 0;
+    position: sticky; 
+    top: ${props => props.theme.mixins.toolbar.minHeight + 16}px;
     background-color: ${props => props.theme.palette.background.default};
-    
-    /* ${props => props.theme.breakpoints.down("sm_md")} {
-        position: sticky;
-        top: 66.5px;
-        left: 0;
-        z-index: 100;
-    } */
+    margin: 20px 0;
+    z-index: 2;
+
+    &:before {
+        content: "";
+        position: absolute;
+        left: -10px;
+        top: -16px;
+        width: calc(100% + 20px);
+        height: calc(100% + 16px);
+        background-color: ${props => props.theme.palette.background.default};
+        z-index: -1;
+    }
+
+    ${props => props.theme.breakpoints.down("sm_md")} {
+        &:before { width: 100%;}
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        top: ${props => props.theme.mixins.toolbar.minHeight + 4}px;
+        border-bottom: .5px solid ${props => props.theme.palette.divider};
+        margin: 0 0 20px;
+
+        &:before { display: none; }
+    }
 `
 
 const SortContainer = styled.div`
     width: 100%;
-`
-
-const Keyword = styled.div`
     display: flex;
     align-items: center;
-    margin: 10px 0;
+`
 
-    b {
-        color: ${props => props.theme.palette.warning.main};
+const MainContainer = styled.div`
+    display: flex;
+    align-items: center;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        width: 100%;
     }
 `
 
-const StyledToggleButtonGroup = muiStyled(ToggleButtonGroup)(({ theme }) => ({
-    '& .MuiToggleButtonGroup-grouped': {
-        backgroundColor: '#272727',
-        color: '#ffffffb2',
-        fontWeight: 400,
-        border: 0,
-        borderRadius: 0,
-    },
+const AltContainer = styled.div`
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-end;
 
-    [theme.breakpoints.down('sm_md')]: {
-        width: '100%',
-    },
-}));
+    ${props => props.theme.breakpoints.down("sm")} {
+        display: none;
+    }
+`
 
-const StyledToggleButton = muiStyled(ToggleButton)(({ theme }) => ({
-    padding: '10px 15px',
-    marginRight: '5px',
-    textTransform: 'none',
-    fontSize: '14px',
-    minWidth: '25%',
-    transition: 'all .3s ease',
-
-    '&:hover': {
-        backgroundColor: theme.palette.primary.main,
-    },
-    '&.Mui-selected': {
-        backgroundColor: theme.palette.primary.main,
-        color: 'white',
-    },
-    '&:focus': {
-        outline: 'none',
-        border: 'none',
-    },
-    [theme.breakpoints.down('sm_md')]: {
-        marginRight: 0,
-    },
-}));
-
-const FilterTitle = styled.h4`
+const FilterTitle = styled.span`
     display: block;
     margin-right: 15px;
+    font-weight: 450;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        display: none;
+    }
+`
+
+const StyledInput = styled(TextField)`
+    margin-right: ${props => props.theme.spacing(1)};
+
+    &.sort {
+        .MuiSelect-select {
+            padding-right: 0 !important;
+        }
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        margin-right: 0;
+
+        .MuiOutlinedInput-notchedOutline {
+            border: none;
+        }
+    }
+`
+
+const StyledSortButton = styled(Button)`
+    padding-left: 0;
+    padding-right: 0;
+    display: none;
+    max-width: 100px;
+    color: ${props => props.theme.palette.text.primary};
 
     ${props => props.theme.breakpoints.down("md_lg")} {
-        display: none;
+        display: flex;
     }
 `
 //#endregion
 
-const SortList = (props) => {
-    const { filters, pagination, onChangeOrder, onChangeDir, onSizeChange, onPageChange, setOpen } = props;
-
-    //Initial value
-    const [sortBy, setSortBy] = useState(pagination?.sortBy);
-    const [sortDir, setSortDir] = useState(pagination?.sortDir);
-
-    //Update sort
-    useEffect(() => {
-        setSortBy(pagination?.sortBy);
-        setSortDir(pagination?.sortDir);
-    }, [pagination])
-
-    //Change order by
-    const handleChangeOrder = (event, newValue) => {
-        if (newValue != null && onChangeOrder) onChangeOrder(newValue);
+const SortList = ({ mobileMode, pagination, onChangeOrder, onChangeDir, onChangeAmount, onPageChange, setOpen }) => {
+    const handleChangeOrder = (e) => { if (onChangeOrder) onChangeOrder(e.target.value) };
+    const handleChangeDir = () => {
+        let newValue = pagination?.sortDir == 'desc' ? 'asc' : 'desc';
+        if (onChangeDir) onChangeDir(newValue);
     };
+    const handleMouseDown = (e) => { e.preventDefault() };
+    const handleChangeAmount = (e) => { if (onChangeAmount) onChangeAmount(e.target.value) };
+    const handleSetOpen = () => { if (setOpen) setOpen(true) };
 
-    //Change sort direction
-    const handleChangeDir = (event) => {
-        if (onChangeDir) onChangeDir(event.target.value)
-    };
-
-    //Change amount display
-    const handleChangeSize = (event) => { if (onSizeChange) onSizeChange(event.target.value) }
-
-    //Toggle open filter dialog
-    const handleSetOpen = (event) => { if (setOpen) setOpen(true) }
+    const endAdornment =
+        <InputAdornment position="end">
+            <IconButton
+                aria-label="toggle sort direction"
+                onClick={handleChangeDir}
+                onMouseDown={handleMouseDown}
+                sx={{ padding: 0, mr: -.5 }}
+                edge="end"
+            >
+                <Straight style={{ transform: pagination?.sortDir == 'desc' ? 'scaleY(-1)' : 'scaleY(1)' }} />
+            </IconButton>
+        </InputAdornment>
 
     return (
         <Container>
             <SortContainer>
-                {filters?.keyword &&
-                    <Keyword><Search /> Kết quả từ khoá: '<b>{filters.keyword}</b>'</Keyword>
+                <MainContainer>
+                    <FilterTitle>Xếp theo</FilterTitle>
+                    <StyledInput
+                        size="small"
+                        select
+                        className="sort"
+                        fullWidth={mobileMode}
+                        value={pagination?.sortBy}
+                        onChange={handleChangeOrder}
+                        slotProps={{
+                            input: { endAdornment },
+                            select: { IconComponent: () => null }
+                        }}
+                    >
+                        {orderGroup.map((order, index) => (
+                            <MenuItem key={`${order.label}-${index}`} value={order.value}>{order.label}</MenuItem>
+                        ))}
+                    </StyledInput>
+                    <StyledInput
+                        size="small"
+                        select
+                        fullWidth={mobileMode}
+                        value={pagination?.amount}
+                        onChange={handleChangeAmount}
+                    >
+                        <MenuItem value={1}>Còn hàng</MenuItem>
+                        <MenuItem value={0}>Tất cả</MenuItem>
+                    </StyledInput>
+                    <StyledSortButton
+                        fullWidth={mobileMode}
+                        onClick={handleSetOpen}
+                        endIcon={<Sort />}
+                    >
+                        Lọc
+                    </StyledSortButton>
+                </MainContainer>
+                {!mobileMode && <Suspense fallback={null}>
+                    <AltContainer>
+                        <QuickPagination {...{ pagination, onPageChange }} />
+                    </AltContainer>
+                </Suspense>
                 }
-                <Grid container size="grow" spacing={0} sx={{ width: '100%' }}>
-                    <Grid size={{ xs: 12, sm: 8 }} sx={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '5px' }}>
-                        <FilterTitle>Xếp theo</FilterTitle>
-                        <StyledToggleButtonGroup
-                            value={sortBy}
-                            exclusive
-                            onChange={handleChangeOrder}
-                            size="large"
-                        >
-                            {orderGroup.map((order, index) => (
-                                <StyledToggleButton
-                                    key={`${order?.label}-${index}`}
-                                    value={order?.value}
-                                >
-                                    {order?.label}
-                                </StyledToggleButton>
-                            ))}
-                        </StyledToggleButtonGroup>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-end' } }}>
-                        <TextField
-                            size="small"
-                            select
-                            value={sortDir}
-                            onChange={handleChangeDir}
-                        >
-                            <MenuItem value={'desc'}>Cao đến thấp</MenuItem>
-                            <MenuItem value={'asc'}>Thấp đến cao</MenuItem>
-                        </TextField>
-                        <TextField
-                            size="small"
-                            select
-                            value={pagination?.pageSize}
-                            onChange={handleChangeSize}
-                            sx={{ marginLeft: '5px', display: { xs: 'block', sm: 'none' } }}
-                        >
-                            <MenuItem value={8}>Hiển thị 8</MenuItem>
-                            <MenuItem value={16}>Hiển thị 16</MenuItem>
-                            <MenuItem value={24}>Hiển thị 24</MenuItem>
-                            <MenuItem value={48}>Hiển thị 48</MenuItem>
-                        </TextField>
-                        {/* <QuickPagination {...{ pagination, onPageChange, onSizeChange }} /> */}
-                        <Button
-                            size="small"
-                            variant="outlined"
-                            sx={{ height: '40px', marginLeft: '5px', display: { xs: 'flex', md: 'none' } }}
-                            onClick={handleSetOpen}
-                            startIcon={<Sort />}
-                        >
-                            Lọc
-                        </Button>
-                    </Grid>
-                </Grid>
             </SortContainer>
-        </Container>
+        </Container >
     )
 }
 

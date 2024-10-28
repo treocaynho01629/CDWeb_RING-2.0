@@ -175,7 +175,7 @@ const CartContent = () => {
     useEffect(() => {
         if (recommend && !loadRecommend && doneRecommend) {
             const { ids, entities } = recommend;
-            
+
             ids.forEach((id) => {
                 const coupon = entities[id];
 
@@ -200,11 +200,7 @@ const CartContent = () => {
                         let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
 
                         if (!detail) {
-                            detail = {
-                                shopId,
-                                coupon: shopCoupon[shopId] == null ? '' : shopCoupon[shopId]?.code,
-                                items: [],
-                            };
+                            detail = { shopId, coupon: shopCoupon[shopId]?.code, items: [] };
                             result.cart.push(detail);
                         }
 
@@ -213,7 +209,7 @@ const CartContent = () => {
                     }
 
                     return result;
-                }, { coupon: coupon?.code == null ? '' : coupon?.code, cart: [] });
+                }, { coupon: coupon?.code, cart: [] });
 
                 handleEstimate(estimateCart); //Estimate price
                 handleCalculate(estimateCart); //Calculate price
@@ -277,7 +273,6 @@ const CartContent = () => {
 
         calculate(estimateCart).unwrap()
             .then((data) => {
-                console.log(data);
                 setCaculated(data);
                 syncCart(data);
             })
@@ -323,8 +318,10 @@ const CartContent = () => {
                     ...prev,
                     [detail?.shopId]: detail?.couponDiscount > 0 ? detail?.couponDiscount : detail?.shippingDiscount
                 }));
-                if (detail?.coupon != null && !isEqual(detail.coupon, shopCoupon[detail?.shopId])) {
-                    console.log('a')
+                if (detail?.coupon != null
+                    && shopCoupon[detail?.shopId] != null
+                    && !isEqual(detail.coupon, shopCoupon[detail?.shopId]
+                    )) {
                     setShopCoupon((prev) => ({ ...prev, [detail?.shopId]: detail.coupon }));
                 }
             } else { //Remove all items of the invalid Shop
@@ -334,7 +331,7 @@ const CartContent = () => {
         })
 
         //Replace recommend coupon
-        if (cart?.coupon != null && !isEqual(cart?.coupon, coupon)) setCoupon(cart.coupon);
+        if (cart?.coupon != null && coupon != null && !isEqual(cart?.coupon, coupon)) setCoupon(cart.coupon);
     }
 
     //Separate by shop
@@ -524,11 +521,14 @@ const CartContent = () => {
 
                             return (<CartDetailRow key={`detail-${shopId}-${index}`}
                                 {...{
-                                    id: shopId, index, shop, isSelected, isShopSelected, handleSelect,
+                                    StyledCheckbox,
+                                    id: shopId, index, shop, isSelected, isShopSelected,
+                                    handleSelect, handleDeselect, handleSelectShop,
                                     coupon: shopCoupon[shopId], couponDiscount: couponDiscount[shopId],
-                                    handleDeselect, handleSelectShop, handleDecrease, increaseAmount, handleChangeQuantity,
-                                    handleClick, handleOpenDialog, StyledCheckbox
-                                }} />)
+                                    handleDecrease, increaseAmount, handleChangeQuantity,
+                                    handleClick, handleOpenDialog
+                                }}
+                            />)
                         })}
                     </TableBody>
                 </Table>

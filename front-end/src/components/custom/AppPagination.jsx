@@ -1,6 +1,4 @@
 import styled from "styled-components"
-import { useEffect, useState } from 'react'
-import { styled as muiStyled } from '@mui/system';
 import { Pagination, PaginationItem, Stack, MenuItem, TextField } from '@mui/material';
 
 //#region styled
@@ -14,35 +12,29 @@ const Container = styled.div`
     }
 `
 
-const StyledPageItem = muiStyled(PaginationItem)(({ theme }) => ({
-    backgroundColor: theme.palette.action.focus,
+const StyledPageItem = styled(PaginationItem)`
+    background-color: ${props => props.theme.palette.action.focus};
 
-    '&:hover': {
-        backgroundColor: theme.palette.primary.light,
-        color: theme.palette.primary.contrastText,
-    },
+    &:hover {
+        background-color: ${props => props.theme.palette.primary.light};
+        color: ${props => props.theme.palette.primary.contrastText};
+    }
 
-    '&.Mui-disabled': {
-        display: 'none',
-    },
+    &.Mui-disabled {
+        display: none;
+    }
 
-    '&.MuiPaginationItem-ellipsis': {
-        backgroundColor: 'transparent',
-        fontWeight: 'bold',
-    },
-}));
+    &.MuiPaginationItem-ellipsis {
+        background-color: transparent;
+        font-weight: bold;
+    }
+`
 //#endregion
 
-const AppPagination = ({ pagination, onPageChange, onSizeChange }) => {
+const AppPagination = ({ mobileMode, pagination, onPageChange, onSizeChange }) => {
     //Initial value
-    const [page, setPage] = useState(pagination.currPage + 1);
-    const [count, setCount] = useState(pagination.totalPages ?? 0);
-
-    //Update value
-    useEffect(() => {
-        setPage(pagination?.currPage + 1);
-        setCount(pagination?.totalPages);
-    }, [pagination])
+    const currPage = pagination?.currPage + 1;
+    const totalPages = pagination?.totalPages;
 
     //Change current page
     const handlePageChange = (e, page) => { if (onPageChange) onPageChange(page) }
@@ -54,11 +46,11 @@ const AppPagination = ({ pagination, onPageChange, onSizeChange }) => {
         <Container>
             <Stack spacing={2} sx={{ my: 5 }}>
                 <Pagination
-                    count={count ? count : 0}
+                    page={currPage ?? 1}
+                    count={totalPages}
                     shape="rounded"
-                    page={page}
-                    onChange={handlePageChange}
                     color="primary"
+                    onChange={handlePageChange}
                     renderItem={(item) => (
                         <StyledPageItem {...item} />
                     )}
@@ -71,8 +63,7 @@ const AppPagination = ({ pagination, onPageChange, onSizeChange }) => {
                 onChange={handleChangeSize}
                 sx={{ display: { xs: 'none', sm: 'block' } }}
             >
-                <MenuItem value={8}>Hiển thị 8</MenuItem>
-                <MenuItem value={16}>Hiển thị 16</MenuItem>
+                <MenuItem value={12}>Hiển thị 12</MenuItem>
                 <MenuItem value={24}>Hiển thị 24</MenuItem>
                 <MenuItem value={48}>Hiển thị 48</MenuItem>
             </TextField>

@@ -174,22 +174,18 @@ const ProductsList = ({ tabs, value, title }) => {
     }
   };
   const getParams = () => {
-    const { sortBy, keyword, cateId, rating, amount, pubId, type, shopId, sellerId, value } = filters || {};
+    const { sortBy, keyword, cateId, rating, amount, pubId, type, shopId, sellerId } = filters || {};
 
     const params = new URLSearchParams();
-    if (sortBy) params.append('sortBy', sortBy);
-    if (keyword) params.append('keyword', keyword);
-    if (cateId) params.append('cateId', cateId);
+    if (sortBy) params.append('sort', sortBy);
+    if (keyword) params.append('q', keyword);
+    if (cateId) params.append('cate', cateId);
     if (rating) params.append('rating', rating);
     if (amount) params.append('amount', amount);
     if (type) params.append('type', type);
-    if (shopId) params.append('shopId', shopId);
+    if (shopId) params.append('shop', shopId);
     if (sellerId) params.append('sellerId', sellerId);
-    if (pubId?.length) params.append('pubId', pubId);
-    if (value) {
-      params.append('fromRange', value[0]);
-      params.append('toRange', value[1]);
-    }
+    if (pubId?.length) params.append('pubs', pubId);
     return params.toString();
   }
 

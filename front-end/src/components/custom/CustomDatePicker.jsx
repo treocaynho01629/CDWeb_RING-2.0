@@ -1,8 +1,9 @@
 import { FormControl } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { viVN } from '@mui/x-date-pickers/locales';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import localeVi from "dayjs/locale/vi";
 
 const StyledDatePicker = styled(DatePicker)(({ theme }) => ({

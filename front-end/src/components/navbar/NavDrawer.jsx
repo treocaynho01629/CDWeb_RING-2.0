@@ -1,4 +1,4 @@
-import { styled } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import {
     ShoppingCart, DeliveryDining as DeliveryDiningIcon, Lock as LockIcon, Logout, Speed as SpeedIcon, Notifications,
     Storefront, KeyboardArrowLeft, Brightness3, Brightness7

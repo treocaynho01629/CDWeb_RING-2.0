@@ -130,7 +130,7 @@ const CouponDialog = ({ numSelected, selectMode, shopId, checkState, openDialog,
                 const coupon = entities[id];
                 const type = coupon.detail.type;
                 const sumary = getCouponSumary(type);
-                const isDisabled = !coupon.isUsable;
+                const isDisabled = selectMode && !coupon.isUsable;
                 const isSelected = tempCoupon?.id == id;
 
                 return (<CouponItem key={`coupon-${id}-${index}`}
@@ -173,7 +173,7 @@ const CouponDialog = ({ numSelected, selectMode, shopId, checkState, openDialog,
                 const coupon = entities[id];
                 const type = coupon.detail.type;
                 const sumary = getCouponSumary(type);
-                const isDisabled = !coupon.isUsable;
+                const isDisabled = selectMode && !coupon.isUsable;
                 const isSelected = tempCoupon?.id == id;
 
                 return (<CouponItem key={`coupon-${id}-${index}`}
@@ -185,7 +185,7 @@ const CouponDialog = ({ numSelected, selectMode, shopId, checkState, openDialog,
     if (currCoupon) {
         const type = currCoupon?.detail?.type;
         const sumary = getCouponSumary(type);
-        const isDisabled = !currCoupon?.isUsable || currCoupon?.shopId != shopId;
+        const isDisabled = selectMode && (!currCoupon?.isUsable || currCoupon?.shopId != shopId);
         const isSelected = tempCoupon?.id == currCoupon?.id;
 
         topCoupon = <CouponItem key={`top-coupon-${currCoupon?.id}`}

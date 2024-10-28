@@ -24,6 +24,10 @@ export default defineConfig({
             output: {
                 manualChunks(id) {
                     if (id.includes('node_modules')) {
+                        if (id.includes('@mui/x-date-pickers')) {
+                            return 'mui-date-pickers';
+                        }
+
                         return id.toString().split('node_modules/')[1].split('/')[0].toString();
                     }
                 }

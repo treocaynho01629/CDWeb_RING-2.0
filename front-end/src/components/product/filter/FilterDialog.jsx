@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from "react"
 import { Box, Divider, Button, MenuItem, Skeleton, Chip, Stack, DialogContent, Dialog, DialogActions, DialogTitle, useMediaQuery, useTheme, InputAdornment, TextField } from '@mui/material';
 import { PriceChange as PriceChangeIcon, Category as CategoryIcon, Class as ClassIcon, Tune as TuneIcon, Check, FilterAltOff } from '@mui/icons-material';
 import { marks, bookTypes } from "../../../ultils/filters";
-import CustomSlider from "../../custom/CustomSlider";
+import CustomSlider from '../../custom/CustomSlider';
 
 //#region styled
 const TitleContainer = styled.div`

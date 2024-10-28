@@ -72,7 +72,6 @@ export function ThemeContextProvider({ children }) {
                                         }
                                         : undefined
                                 ),
-                                //scrollbarWidth for Firefox
                                 scrollbarWidth: "thin"
                             }
                         }),
@@ -155,6 +154,18 @@ export function ThemeContextProvider({ children }) {
                         styleOverrides: {
                             root: ({ theme }) => ({
                                 input: {
+                                    "input[type=number]::-webkit-outer-spin-button": {
+                                        WebkitAppearance: "none",
+                                    },
+                                    "input[type=number]::-webkit-inner-spin-button": {
+                                        WebkitAppearance: "none",
+                                    },
+                                    "input[type=number]": {
+                                        MozAppearance: "textfield",
+                                    },
+                                    "input[type=number]:hover, input[type=number]:focus": {
+                                        MozAppearance: "number-input",
+                                    },
                                     "&:-webkit-autofill": {
                                         transitionDelay: "9999s",
                                         transitionProperty: "all",
@@ -165,48 +176,6 @@ export function ThemeContextProvider({ children }) {
                             })
                         },
                     },
-                    // MuiTableContainer: {
-                    //     styleOverrides: {
-                    //         root: ({ theme }) => ({
-                    //             "&::-webkit-scrollbar": {
-                    //                 width: 7,
-                    //                 height: 7,
-                    //             },
-                    //             "&::-webkit-scrollbar-track": {
-                    //                 background: 'inherit',
-                    //                 boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0)',
-                    //             },
-                    //             "&::-webkit-scrollbar-thumb": {
-                    //                 backgroundColor: theme.palette.action.focus,
-                    //                 borderRadius: '20px',
-                    //             },
-                    //             '&::-webkit-scrollbar-corner': {
-                    //                 background: 'inherit',
-                    //             },
-                    //         }),
-                    //     },
-                    // },
-                    // MuiPaper: {
-                    //     styleOverrides: {
-                    //         root: ({ theme }) => ({
-                    //             "&::-webkit-scrollbar": {
-                    //                 width: 5,
-                    //                 height: 5,
-                    //             },
-                    //             "&::-webkit-scrollbar-track": {
-                    //                 background: 'inherit',
-                    //                 boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0)',
-                    //             },
-                    //             "&::-webkit-scrollbar-thumb": {
-                    //                 backgroundColor: theme.palette.action.hover,
-                    //                 borderRadius: '20px',
-                    //             },
-                    //             '&::-webkit-scrollbar-corner': {
-                    //                 background: 'inherit',
-                    //             },
-                    //         }),
-                    //     },
-                    // },
                 },
                 breakpoints: {
                     values: {

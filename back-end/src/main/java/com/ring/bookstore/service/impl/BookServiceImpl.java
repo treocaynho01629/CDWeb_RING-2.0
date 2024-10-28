@@ -57,13 +57,13 @@ public class BookServiceImpl implements BookService {
 
     //Get books with filter
     public Page<BookDTO> getBooks(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword, Integer rating, Integer amount,
-                                  Integer cateId, List<Integer> pubId, Long shopId, Long sellerId, String type, Double fromRange, Double toRange) {
+                                  Integer cateId, List<Integer> pubIds, Long shopId, Long sellerId, List<String> types, Double fromRange, Double toRange) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<IBookDisplay> booksList = bookRepo.findBooksWithFilter(keyword, cateId, pubId, shopId
-                , sellerId, type, fromRange, toRange, rating, amount, pageable);
+        Page<IBookDisplay> booksList = bookRepo.findBooksWithFilter(keyword, cateId, pubIds, types,
+                shopId, sellerId, fromRange, toRange, rating, amount, pageable);
         Page<BookDTO> bookDtos = booksList.map(bookMapper::displayToBookDTO);
         return bookDtos;
     }

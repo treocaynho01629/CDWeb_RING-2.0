@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { styled as muiStyled } from '@mui/system';
+import { styled as muiStyled } from '@mui/material/styles';
 import { Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
 import { Skeleton, Rating, Box, Grid2 as Grid, alpha, Divider, Stack } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -269,7 +269,7 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                                     </Detail>
                                     <Detail>
 
-                                        {book ? <>Tác giả: &nbsp;<Link to={`/filters?keyword=${book?.author}`}>{book?.author}</Link></>
+                                        {book ? <>Tác giả: &nbsp;<Link to={`/filters?q=${book?.author}`}>{book?.author}</Link></>
                                             : <Skeleton variant="text" sx={{ fontSize: '14px' }} width="90%" />}
                                     </Detail>
                                 </Box>
