@@ -1,12 +1,13 @@
 import styled from "styled-components"
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Box, Button, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton, TextField } from "@mui/material";
 import { Check, Person } from "@mui/icons-material";
 import { PHONE_REGEX } from "../../ultils/regex";
 import { useGetProfileQuery, useUpdateProfileMutation } from "../../features/users/usersApiSlice";
 import { Instruction, Title } from '../custom/GlobalComponents';
-import CustomDatePicker from "../custom/CustomDatePicker";
 import dayjs from 'dayjs';
+
+const CustomDatePicker = lazy(() => import('../custom/CustomDatePicker'));
 
 //#region styled
 const Wrapper = styled.div`
@@ -213,31 +214,32 @@ const ProfileDetail = ({ pending, setPending }) => {
                             <InfoTitle><InfoText>Ngày sinh: </InfoText></InfoTitle>
                             <InfoStack>
                                 <InfoStackContainer>
-                                    {editDob
-                                        ?
-                                        <CustomDatePicker
-                                            required
-                                            value={dob}
-                                            className="custom-date-picker"
-                                            onChange={newValue => setDob(newValue)}
-                                            size="small"
-                                            slotProps={{
-                                                textField: {
-                                                    size: "small",
-                                                    fullWidth: true,
-                                                    error: err?.data?.errors?.dob,
-                                                    helperText: err?.data?.errors?.dob,
-                                                },
-                                            }}
-                                        />
+                                    {editDob ?
+                                        <Suspense fallback={<>
+                                            {loadProfile ? <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
+                                                : <InfoText>{dob.format('DD/MM/YYYY')}</InfoText>}
+                                            <InfoText className={`edit ${loadProfile ? 'disabled' : ''}`} onClick={() => setEditDob(true)}>Thay đổi</InfoText>
+                                        </>}>
+                                            <CustomDatePicker
+                                                required
+                                                value={dob}
+                                                className="custom-date-picker"
+                                                onChange={newValue => setDob(newValue)}
+                                                size="small"
+                                                slotProps={{
+                                                    textField: {
+                                                        size: "small",
+                                                        fullWidth: true,
+                                                        error: err?.data?.errors?.dob,
+                                                        helperText: err?.data?.errors?.dob,
+                                                    },
+                                                }}
+                                            />
+                                        </Suspense>
                                         :
                                         <>
-                                            {loadProfile
-                                                ?
-                                                <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
-                                                :
-                                                <InfoText>{dob.format('DD/MM/YYYY')}</InfoText>
-                                            }
+                                            {loadProfile ? <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
+                                                : <InfoText>{dob.format('DD/MM/YYYY')}</InfoText>}
                                             <InfoText className={`edit ${loadProfile ? 'disabled' : ''}`} onClick={() => setEditDob(true)}>Thay đổi</InfoText>
                                         </>
                                     }

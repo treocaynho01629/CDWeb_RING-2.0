@@ -1,23 +1,46 @@
 export const marks = [
     {
         value: 0,
-        label: '0 đ',
+        label: '0đ',
     },
     {
-        value: 3.75,
+        value: 3.325,
         label: '',
     },
     {
-        value: 7.5,
-        label: '200,000 đ',
+        value: 6.65,
+        label: '100,000đ',
     },
     {
-        value: 11.25,
+        value: 9.975,
         label: '',
     },
     {
-        value: 15,
+        value: 13.3,
         label: '10tr',
+    },
+];
+
+export const suggestPrices = [
+    {
+        value: [0, 150000],
+        label: '0đ - 150,000đ',
+    },
+    {
+        value: [150000, 300000],
+        label: '150,000đ - 300,000đ',
+    },
+    {
+        value: [300000, 500000],
+        label: '300,000đ - 500,000đ',
+    },
+    {
+        value: [500000, 700000],
+        label: '500,000đ - 700,000đ',
+    },
+    {
+        value: [700000, 10000000],
+        label: '700,000đ trở lên',
     },
 ];
 

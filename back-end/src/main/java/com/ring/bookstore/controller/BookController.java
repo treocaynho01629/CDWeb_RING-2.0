@@ -39,7 +39,6 @@ import lombok.RequiredArgsConstructor;
 public class BookController {
 
     private final BookService bookService;
-    private final AccountRepository accRepo;
 
     //Get random books
     @GetMapping("/random")
@@ -56,16 +55,16 @@ public class BookController {
                                       @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
                                       @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                       @RequestParam(value = "cateId", required = false) Integer cateId,
-                                      @RequestParam(value = "pubId", required = false) List<Integer> pubId,
+                                      @RequestParam(value = "pubIds", required = false) List<Integer> pubIds,
                                       @RequestParam(value = "shopId", required = false) Long shopId,
                                       @RequestParam(value = "sellerId", required = false) Long sellerId,
-                                      @RequestParam(value = "type", defaultValue = "") String type,
-                                      @RequestParam(value = "fromRange", defaultValue = "1000") Double fromRange,
+                                      @RequestParam(value = "types", required = false) List<String> types,
+                                      @RequestParam(value = "fromRange", defaultValue = "0") Double fromRange,
                                       @RequestParam(value = "toRange", defaultValue = "100000000") Double toRange,
                                       @RequestParam(value = "rating", defaultValue = "0") Integer rating,
                                       @RequestParam(value = "amount", defaultValue = "1") Integer amount) {
         Page<BookDTO> books = bookService.getBooks(pageNo, pageSize, sortBy, sortDir, keyword,
-                rating, amount, cateId, pubId, shopId, sellerId, type, fromRange, toRange);
+                rating, amount, cateId, pubIds, shopId, sellerId, types, fromRange, toRange);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
@@ -124,13 +123,5 @@ public class BookController {
     public ResponseEntity<?> deleteAllBooks(@CurrentAccount Account currUser) {
         bookService.deleteAllBooks(currUser);
         return new ResponseEntity<>("All products deleted successfully!", HttpStatus.OK);
-    }
-
-    //Test purpose
-    @GetMapping("/test/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getTest(@PathVariable("id") long bookId) {
-        Account test = accRepo.findByUsername("chuotcon1").orElse(null);
-        return new ResponseEntity<>(test, HttpStatus.OK);
     }
 }

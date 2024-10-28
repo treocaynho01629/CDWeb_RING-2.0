@@ -3,9 +3,9 @@ import { lazy, useState, Suspense } from 'react';
 import { ShoppingCartCheckout, LocalActivityOutlined, KeyboardArrowRight } from '@mui/icons-material';
 import { useMediaQuery, useTheme, Button } from '@mui/material';
 import useAuth from "../../hooks/useAuth";
-import CouponDisplay from '../coupon/CouponDisplay';
 
 const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
+const CouponDisplay = lazy(() => import('../coupon/CouponDisplay'));
 
 //#region styled
 const CheckoutContainer = styled.div`
@@ -181,8 +181,6 @@ const CheckoutButton = styled(Button)`
 `
 //#endregion
 
-
-
 const CheckoutDialog = ({ coupon, navigate, handleOpenDialog, calculating, estimated, calculated, numSelected }) => {
     const { token } = useAuth();
     const theme = useTheme();
@@ -280,7 +278,7 @@ const CheckoutDialog = ({ coupon, navigate, handleOpenDialog, calculating, estim
                                 variant="contained"
                                 size="large"
                                 fullWidth
-                                sx={{ maxWidth: '40%' }}
+                                sx={{ maxWidth: '42%' }}
                                 disabled={!numSelected || calculating}
                                 onClick={() => navigate('/checkout', { state: { products: '' } })}
                             >

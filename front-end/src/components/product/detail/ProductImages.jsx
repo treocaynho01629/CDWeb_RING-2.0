@@ -114,7 +114,6 @@ const StyledLazyImage = styled(LazyLoadImage)`
     object-fit: contain;
     width: 100%;
     max-height: 450px;
-    background-color: ${props => props.theme.palette.action.disabledBackground};
 
     &.hidden {display: none;}
 `
@@ -230,18 +229,6 @@ const CustomButtonGroup = ({ book, images, goToSlide, carouselState }) => {
 const ProductImages = ({ book }) => {
     const [slideIndex, setSlideIndex] = useState(1);
     let images = [].concat(book?.previewImages, book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
-    images.push(book?.image);
 
     return (
         <ImgContainer>

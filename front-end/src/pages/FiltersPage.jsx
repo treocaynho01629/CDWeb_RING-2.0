@@ -1,11 +1,12 @@
 import styled from "styled-components";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useTheme, useMediaQuery, Grid2 as Grid, Skeleton } from '@mui/material';
+import { Search } from "@mui/icons-material";
 import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { useGetCategoriesQuery, useGetCategoryQuery } from "../features/categories/categoriesApiSlice";
-import { useGetPublishersQuery } from "../features/publishers/publishersApiSlice";
+import { useGetCategoryQuery } from "../features/categories/categoriesApiSlice";
 import { useGetBooksQuery } from "../features/books/booksApiSlice";
 import { orderGroup } from "../ultils/filters";
+import { debounce, isEqual } from "lodash-es";
 import AppPagination from "../components/custom/AppPagination";
 import CustomDivider from "../components/custom/CustomDivider";
 import FilteredProducts from "../components/product/filter/FilteredProducts";
@@ -20,6 +21,7 @@ const FilterDialog = lazy(() => import("../components/product/filter/FilterDialo
 const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
+    position: relative;
     
     @media (min-width: 600px) {
         margin-right: auto;
@@ -34,6 +36,16 @@ const Wrapper = styled.div`
     }
     @media (min-width: 1200px) {
         width: 1170px;
+    }
+`
+
+const Keyword = styled.div`
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+
+    b {
+        color: ${props => props.theme.palette.warning.main};
     }
 `
 //#endregion
@@ -63,44 +75,44 @@ const FiltersPage = () => {
     const { slug } = useParams(); //Category slug
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
+    const scrollRef = useRef(null);
     const theme = useTheme();
-    const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
+    const mobileMode = useMediaQuery(theme.breakpoints.down('sm'));
+    const tabletMode = useMediaQuery(theme.breakpoints.down('md_lg'));
 
     //Filter & pagination
     const [filters, setFilters] = useState({
-        value: searchParams.get("value") ? searchParams.get("value").split(',') : [1000, 10000000],
-        keyword: searchParams.get("keyword") ?? "",
-        type: searchParams.get("type") ?? "",
-        shopId: searchParams.get("shopId") ?? "",
-        pubId: searchParams.get("pubId") ?? [],
-        cateId: searchParams.get("cateId") ?? "",
+        value: searchParams.get("value") ? searchParams.get("value").split(',').map(Number) : [0, 10000000],
+        keyword: searchParams.get("q") ?? "",
+        types: searchParams.get("types") ?? [],
+        shopId: searchParams.get("shop") ?? "",
+        pubIds: searchParams.get("pubs") ?? [],
+        cateId: searchParams.get("cate") ?? "",
         rating: searchParams.get("rating") ?? 0,
-        amount: searchParams.get("amount") ?? 1
     })
     const [pagination, setPagination] = useState({
-        currPage: searchParams.get("pageNo") ? searchParams.get("pageNo") - 1 : 0,
-        pageSize: searchParams.get("pSize") ?? 16,
+        currPage: searchParams.get("pNo") ? searchParams.get("pNo") - 1 : 0,
+        pageSize: searchParams.get("pSize") ?? 24,
         totalPages: 0,
-        sortBy: searchParams.get("sortBy") ?? orderGroup[0].value,
-        sortDir: searchParams.get("sortDir") ?? "desc",
+        sortBy: searchParams.get("sort") ?? orderGroup[0].value,
+        sortDir: searchParams.get("dir") ?? "desc",
+        amount: searchParams.get("a") ?? 1
     })
 
     //Fetch data
-    const { data: currCate, isLoading: loadCate, isSuccess: doneCate, isError: errorCate } = useGetCategoryQuery({ slug, include: 'parent' }, { skip: !slug });
-    const { data: cates, isLoading: loadCates, isSuccess: doneCates, isError: errorCates } = useGetCategoriesQuery({ include: 'children' }); //Categories
-    const { data: pubs, isLoading: loadPubs, isSuccess: donePubs, isError: errorPubs } = useGetPublishersQuery(); //Publishers
-    const { data, isError, error, isLoading, isSuccess } = useGetBooksQuery({ //Books
+    const { data: currCate, isLoading: loadCate } = useGetCategoryQuery({ slug, include: 'parent' }, { skip: !slug });
+    const { data, isLoading, isSuccess, isError, error } = useGetBooksQuery({ //Books
         page: pagination?.currPage,
         size: pagination?.pageSize,
         sortBy: pagination?.sortBy,
         sortDir: pagination?.sortDir,
+        amount: pagination?.amount,
         keyword: filters?.keyword,
         cateId: filters?.cateId,
         rating: filters?.rating,
-        amount: filters?.amount,
-        type: filters?.type,
+        types: filters?.types,
         shopId: filters?.shopId,
-        pubId: filters?.pubId,
+        pubIds: filters?.pubIds,
         value: filters?.value
     });
 
@@ -114,67 +126,112 @@ const FiltersPage = () => {
                 ...pagination,
                 currPage: data.info.currPage,
                 pageSize: data.info.pageSize,
-                totalPages: data.info.totalPages,
+                totalPages: data.info.totalPages
             });
         }
     }, [data])
 
     useEffect(() => {
-        setFilters({
-            ...filters,
-            value: searchParams.get("value") ? searchParams.get("value").split(',') : [1000, 10000000],
-            keyword: searchParams.get("keyword") ?? "",
-            type: searchParams.get("type") ?? "",
-            shopId: searchParams.get("shopId") ? +searchParams.get("shopId") : "",
-            pubId: searchParams.get("pubId") ? searchParams.get("pubId").split(',') : [],
-            cateId: searchParams.get("cateId") ? +searchParams.get("cateId") : "",
-            rating: searchParams.get("rating") ? +searchParams.get("rating") : 0,
-            amount: searchParams.get("amount") ? +searchParams.get("amount") : 1,
-        });
-
-        setPagination({
-            ...pagination,
-            currPage: searchParams.get("pageNo") ? searchParams.get("pageNo") - 1 : 0,
-            pageSize: searchParams.get("pSize") ?? 16,
-            sortBy: searchParams.get("sortBy") ?? orderGroup[0].value,
-            sortDir: searchParams.get("sortDir") ?? "desc",
-        });
+        if (searchParams.get("q")) {
+            setFilters({ ...filters, keyword: searchParams.get("q") ?? "" });
+        } else {
+            setFilters({ ...filters, keyword: "" })
+        }
     }, [searchParams])
 
     //Set title
     useTitle('RING! - Cửa hàng');
 
-    //Handle change: replace filters value & set search params
-    const handleChangePage = (page) => {
+    //Handle change
+    const handleChangePage = useCallback((page) => {
         if (page == 1) {
-            searchParams.delete("pageNo");
+            searchParams.delete("pNo");
             setSearchParams(searchParams);
         } else {
-            searchParams.set("pageNo", page);
+            searchParams.set("pNo", page);
             setSearchParams(searchParams);
         }
         setPagination({ ...pagination, currPage: page - 1 });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+        scrollRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, [pagination])
 
-    const handleChangeCate = (slug, id) => {
-        handleChangePage(1);
-        if (filters?.cateId == id || id == "") {
-            setFilters({ ...filters, cateId: '' });
-            searchParams.delete("cateId");
+    const handleChangeOrder = useCallback((newValue) => {
+        if (newValue == orderGroup[0].value) {
+            searchParams.delete("sort");
             setSearchParams(searchParams);
-            if (slug) navigate({ pathname: '/filters', search: searchParams.toString() });
         } else {
-            searchParams.set("cateId", id);
+            searchParams.set("sort", newValue);
+            setSearchParams(searchParams);
+        }
+        setPagination({ ...pagination, sortBy: newValue });
+    }, [pagination])
+
+    const handleChangeDir = useCallback((newValue) => {
+        if (newValue == 'desc') {
+            searchParams.delete("dir");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("dir", newValue);
+            setSearchParams(searchParams);
+        }
+        setPagination({ ...pagination, sortDir: newValue });
+    }, [pagination])
+
+    const handleChangeSize = useCallback((newValue) => {
+        handleChangePage(1);
+        if (newValue == 24) {
+            searchParams.delete("pSize");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("pSize", newValue);
+            setSearchParams(searchParams);
+        }
+        setPagination({ ...pagination, pageSize: newValue });
+    }, [pagination])
+
+    const handleChangeAmount = useCallback((newValue) => {
+        handleChangePage(1);
+        if (newValue == 1) {
+            searchParams.delete("amount");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("amount", newValue);
+            setSearchParams(searchParams);
+        }
+        setPagination({ ...pagination, amount: newValue });
+    }, [pagination])
+
+    const handleChangeCate = useCallback((slug, id) => {
+        handleChangePage(1);
+        if (filters?.cateId == id || id == "" || id == null) {
+            setFilters({ ...filters, cateId: '' });
+            searchParams.delete("cate");
+            setSearchParams(searchParams);
+            navigate({ pathname: '/filters', search: searchParams.toString() });
+        } else {
+            searchParams.set("cate", id);
             setSearchParams(searchParams);
             setFilters({ ...filters, cateId: id });
             if (slug) navigate({ pathname: `/filters/${slug}`, search: searchParams.toString() });
         }
-    }
+    }, [filters, slug])
 
-    const handleChangeRange = (newValue) => {
+    //Filters
+    const handleChangePub = useCallback(debounce((newValue) => {
         handleChangePage(1);
-        if (newValue.toString() == [1000, 10000000].toString()) {
+        if (newValue.length == 0) {
+            searchParams.delete("pubs");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("pubs", newValue);
+            setSearchParams(searchParams);
+        }
+        setFilters({ ...filters, pubIds: newValue });
+    }, 500), [filters])
+
+    const handleChangeRange = useCallback(debounce((newValue) => {
+        handleChangePage(1);
+        if (isEqual(newValue, [0, 10000000])) {
             searchParams.delete("value");
             setSearchParams(searchParams);
         } else {
@@ -182,115 +239,77 @@ const FiltersPage = () => {
             setSearchParams(searchParams);
         }
 
-        newValue = newValue.map(String); //Convert to string array
         setFilters({ ...filters, value: newValue });
-    }
+    }, 1000), [filters])
 
-    const handleChangeOrder = (newValue) => {
-        if (newValue != null) {
-            setPagination({ ...pagination, sortBy: newValue });
-            searchParams.set("sortBy", newValue);
-            setSearchParams(searchParams);
-        }
-    }
-
-    const handleChangeDir = (newValue) => {
-        if (newValue == 'desc') {
-            searchParams.delete("sortDir");
-            setSearchParams(searchParams);
-        } else {
-            searchParams.set("sortDir", newValue);
-            setSearchParams(searchParams);
-        }
-        setPagination({ ...pagination, sortDir: newValue });
-    }
-
-    const handleChangeSize = (newValue) => {
-        handleChangePage(1);
-        if (newValue == 16) {
-            searchParams.delete("pSize");
-            setSearchParams(searchParams);
-        } else {
-            searchParams.set("pSize", newValue);
-            setSearchParams(searchParams);
-        }
-
-        //Reset to first page
-        searchParams.set("pageNo", page);
-        setSearchParams(searchParams);
-        setPagination({ ...pagination, pageSize: newValue, currPage: 0 });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    const handleChangeSearch = (newValue) => {
+    const handleChangeSearch = useCallback((newValue) => {
         handleChangePage(1);
         if (newValue == "" || newValue == null) {
-            searchParams.delete("keyword");
+            searchParams.delete("q");
             setSearchParams(searchParams);
         } else {
-            searchParams.set("keyword", newValue);
+            searchParams.set("q", newValue);
             setSearchParams(searchParams);
         }
         setFilters({ ...filters, keyword: newValue ?? '' });
-    }
+    }, [filters])
 
-    const handleChangePub = (newValue) => {
-        handleChangePage(1);
-        if (newValue.length == 0) {
-            searchParams.delete("pubId");
-            setSearchParams(searchParams);
-        } else {
-            searchParams.set("pubId", newValue);
-            setSearchParams(searchParams);
-        }
-        setFilters({ ...filters, pubId: newValue });
-    }
-
-    const handleChangeType = (newValue) => {
+    const handleChangeType = useCallback(debounce((newValue) => {
         handleChangePage(1);
         if (newValue == "") {
-            searchParams.delete("type");
+            searchParams.delete("types");
             setSearchParams(searchParams);
         } else {
-            searchParams.set("type", newValue);
+            searchParams.set("types", newValue);
             setSearchParams(searchParams);
         }
-        setFilters({ ...filters, type: newValue });
-    }
+        setFilters({ ...filters, types: newValue });
+    }, 500), [filters])
 
-    const handleChangeShop = (newValue) => {
+    const handleChangeRate = useCallback((newValue) => {
         handleChangePage(1);
-        if (newValue == "") {
-            searchParams.delete("shopId");
+        if (newValue == 0) {
+            searchParams.delete("rating");
             setSearchParams(searchParams);
         } else {
-            searchParams.set("shopId", newValue);
+            searchParams.set("rating", newValue);
+            setSearchParams(searchParams);
+        }
+        setFilters({ ...filters, rating: newValue });
+    }, [filters])
+
+    const handleChangeShop = useCallback((newValue) => {
+        handleChangePage(1);
+        if (newValue == "") {
+            searchParams.delete("shop");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("shop", newValue);
             setSearchParams(searchParams);
         }
         setFilters({ ...filters, shopId: newValue });
-    }
+    }, [filters])
 
-    //Reset filters
-    const resetFilter = () => {
+    //Reset
+    const resetFilter = useCallback(() => {
+        handleChangePage(1);
         setFilters({
-            value: [1000, 10000000],
             keyword: "",
-            type: "",
-            rating: 0,
-            amount: 1,
-            shopId: "",
-            pubId: [],
             cateId: "",
+            types: [],
+            pubIds: [],
+            value: [0, 10000000],
+            rating: 0,
+            shopId: "",
         })
         setPagination({
-            ...pagination,
-            currPage: 0,
-            pageSize: 16,
+            pageSize: 24,
             sortBy: orderGroup[0].value,
             sortDir: "desc",
+            amount: 1,
         })
         navigate('/filters')
-    }
+    }, [])
 
     const handleClose = () => { setOpen(false) };
     //#endregion
@@ -301,7 +320,10 @@ const FiltersPage = () => {
                 {!loadCate
                     ? [
                         slug ? [
-                            <NavLink to={'/filters'} key={'filters'}>
+                            <NavLink onClick={(e) => {
+                                e.preventDefault();
+                                handleChangeCate();
+                            }} key={'filters'}>
                                 Danh mục sản phẩm
                             </NavLink>,
                             createCrumbs(currCate)
@@ -317,46 +339,46 @@ const FiltersPage = () => {
                     : <Skeleton variant="text" sx={{ fontSize: '16px' }} width={200} />
                 }
             </CustomBreadcrumbs>
-            <Grid container spacing={4} size="grow" sx={{ display: 'flex', justifyContent: 'center' }}>
-                {mobileMode ?
-                    <>
-                        {open &&
-                            <Suspense fallback={<></>}>
-                                <FilterDialog
-                                    {...{ filters, setFilters, resetFilter, open, handleClose, loadCates, doneCates, errorCates, cates, loadPubs, donePubs, errorPubs, pubs }}
-                                    onChangeCate={handleChangeCate}
-                                    onChangeRange={handleChangeRange}
-                                    onChangePub={handleChangePub}
-                                    onChangeType={handleChangeType}
-                                    onChangeShop={handleChangeShop}
-                                />
-                            </Suspense>
-                        }
-                    </>
-                    :
-                    <Grid size={{ xs: 12, md: 3 }} display={{ xs: "none", md: "block" }} sx={{ overflowX: 'visible', zIndex: 1 }}>
-                        <Suspense fallback={<></>}>
+            <Grid container spacing={4} size="grow" position="relative" display="flex" justifyContent="center">
+                {tabletMode ?
+                    open && <Suspense fallback={null}>
+                        <FilterDialog
+                            {...{ filters, setFilters, resetFilter, open, handleClose }}
+                            onChangeCate={handleChangeCate}
+                            onChangeRange={handleChangeRange}
+                            onChangePub={handleChangePub}
+                            onChangeType={handleChangeType}
+                            onChangeShop={handleChangeShop}
+                        />
+                    </Suspense>
+                    : <Grid size={{ xs: 12, md_lg: 2.8 }} position="relative">
+                        <Suspense fallback={null}>
                             <FilterList
-                                {...{ filters, resetFilter, loadCates, doneCates, errorCates, cates, currCate, loadPubs, donePubs, errorPubs, pubs }}
+                                {...{ filters, resetFilter }}
                                 onChangeCate={handleChangeCate}
                                 onChangeRange={handleChangeRange}
                                 onChangePub={handleChangePub}
                                 onChangeType={handleChangeType}
-                                onChangeShop={handleChangeShop} />
+                                onChangeRate={handleChangeRate}
+                            />
                         </Suspense>
                     </Grid>
                 }
-                <Grid size={{ xs: 12, md: 9 }}>
-                    <CustomDivider sx={{ display: { xs: 'none', md: 'flex' } }}>{filters?.shop ? `SẢN PHẨM CỦA ${filters.shop}` : 'DANH MỤC SẢN PHẨM'}</CustomDivider>
-                    <SortList filters={filters}
-                        pagination={pagination}
+                <Grid ref={scrollRef} size={{ xs: 12, md_lg: 9.2 }} position="relative">
+                    <CustomDivider sx={{ display: { xs: 'none', md: 'flex' } }}>
+                        {filters?.shop ? `SẢN PHẨM CỦA ${filters.shop}` : 'DANH MỤC SẢN PHẨM'}
+                    </CustomDivider>
+                    {filters?.keyword &&
+                        <Keyword><Search /> Kết quả từ khoá: '<b>{filters.keyword}</b>'</Keyword>
+                    }
+                    <SortList {...{ filters, pagination, mobileMode }}
                         onChangeOrder={handleChangeOrder}
                         onChangeDir={handleChangeDir}
-                        onSizeChange={handleChangeSize}
+                        onChangeAmount={handleChangeAmount}
                         onPageChange={handleChangePage}
                         setOpen={setOpen} />
                     <FilteredProducts {...{ data, isError, error, isLoading, isSuccess, pageSize: pagination?.pageSize }} />
-                    <AppPagination pagination={pagination}
+                    <AppPagination {...{ pagination, mobileMode }}
                         onPageChange={handleChangePage}
                         onSizeChange={handleChangeSize} />
                 </Grid>

@@ -132,7 +132,7 @@ const ProductDetailContainer = ({ loading, book, mobileMode }) => {
           <tr>
             <InfoTitle><InfoText className="secondary">Tác giả: </InfoText></InfoTitle>
             <InfoStack>
-              <Link to={`/filters?keyword=${book?.author}`}>
+              <Link to={`/filters?q=${book?.author}`}>
                 <InfoText>{book?.author}</InfoText>
               </Link>
             </InfoStack>
@@ -255,11 +255,8 @@ const ProductDetailContainer = ({ loading, book, mobileMode }) => {
               className={minimize ? '' : 'expand'}
               onClick={toggleMinimize}
             >
-              {minimize ?
-                <>Xem thêm <KeyboardArrowDown /> </>
-                :
-                <>Ẩn bớt <KeyboardArrowUp /> </>
-              }
+              {minimize ? <>Xem thêm <KeyboardArrowDown /></>
+                : <>Ẩn bớt <KeyboardArrowUp /></>}
             </Showmore>}
           </DescriptionContainer>
         </DetailContainer>

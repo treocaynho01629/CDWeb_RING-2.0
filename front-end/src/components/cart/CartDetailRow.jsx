@@ -199,7 +199,7 @@ function ItemRow({ product, index, handleSelect, handleDeselect, isSelected, han
                     onClick={() => handleSelect(product.id)}
                 />
             </StyledTableCell>
-            <StyledTableCell component="th" scope="product">
+            <StyledTableCell component="th" id={labelId} scope="row">
                 <ItemContainer>
                     <Link to={`/product/${product.slug}`}>
                         <StyledLazyImage
@@ -295,7 +295,7 @@ const CartDetailRow = ({ id, index, shop, coupon, couponDiscount, isSelected, is
                         inputProps={{ 'aria-labelledby': shopLabelId }}
                     />
                 </StyledTableCell>
-                <StyledTableCell align="left" colSpan={5}>
+                <StyledTableCell align="left" colSpan={5} component="th" id={shopLabelId} scope="row">
                     <Link to={'/filters'}>
                         <ShopTitle>
                             <ShopTag>Đối tác</ShopTag>

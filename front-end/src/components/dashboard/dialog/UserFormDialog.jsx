@@ -3,9 +3,9 @@ import { styled as muiStyled } from '@mui/material/styles';
 import { useState } from 'react'
 import { TextField, InputAdornment, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, FormControl } from '@mui/material';
 import { Check as CheckIcon, Close as CloseIcon, Person as PersonIcon, VisibilityOff, Visibility } from '@mui/icons-material';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 
 //#region styled
@@ -112,48 +112,48 @@ const CustomInput = styled(TextField)({
   },
 });
 
-const CustomDatePicker = styled(DatePicker)({
-  '& .MuiInputBase-root': {
-    borderRadius: 0
-  },
-  '& label.Mui-focused': {
-    color: '#A0AAB4'
-  },
-  '& .MuiInput-underline:after': {
-    borderBottomColor: '#B2BAC2',
-  },
-  '& .MuiOutlinedInput-root': {
-    borderRadius: 0,
-    '& fieldset': {
-      borderRadius: 0,
-      borderColor: '#E0E3E7',
-    },
-    '&:hover fieldset': {
-      borderRadius: 0,
-      borderColor: '#B2BAC2',
-    },
-    '&.Mui-focused fieldset': {
-      borderRadius: 0,
-      borderColor: '#6F7E8C',
-    },
-  },
-  '& input:valid + fieldset': {
-    borderColor: 'lightgray',
-    borderRadius: 0,
-    borderWidth: 1,
-  },
-  '& input:invalid + fieldset': {
-    borderColor: '#e66161',
-    borderRadius: 0,
-    borderWidth: 1,
-  },
-  '& input:valid:focus + fieldset': {
-    borderColor: '#63e399',
-    borderLeftWidth: 4,
-    borderRadius: 0,
-    padding: '4px !important',
-  },
-});
+// const CustomDatePicker = styled(DatePicker)({
+//   '& .MuiInputBase-root': {
+//     borderRadius: 0
+//   },
+//   '& label.Mui-focused': {
+//     color: '#A0AAB4'
+//   },
+//   '& .MuiInput-underline:after': {
+//     borderBottomColor: '#B2BAC2',
+//   },
+//   '& .MuiOutlinedInput-root': {
+//     borderRadius: 0,
+//     '& fieldset': {
+//       borderRadius: 0,
+//       borderColor: '#E0E3E7',
+//     },
+//     '&:hover fieldset': {
+//       borderRadius: 0,
+//       borderColor: '#B2BAC2',
+//     },
+//     '&.Mui-focused fieldset': {
+//       borderRadius: 0,
+//       borderColor: '#6F7E8C',
+//     },
+//   },
+//   '& input:valid + fieldset': {
+//     borderColor: 'lightgray',
+//     borderRadius: 0,
+//     borderWidth: 1,
+//   },
+//   '& input:invalid + fieldset': {
+//     borderColor: '#e66161',
+//     borderRadius: 0,
+//     borderWidth: 1,
+//   },
+//   '& input:valid:focus + fieldset': {
+//     borderColor: '#63e399',
+//     borderLeftWidth: 4,
+//     borderRadius: 0,
+//     padding: '4px !important',
+//   },
+// });
 //#endregion
 
 const ACCOUNT_URL = 'api/accounts';
@@ -388,7 +388,7 @@ const UserFormDialog = ({ open, handleClose, userId }) => {
               </CustomInput>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+              {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <FormControl margin="dense" fullWidth>
                   <CustomDatePicker
                     label="Ngày sinh"
@@ -399,7 +399,7 @@ const UserFormDialog = ({ open, handleClose, userId }) => {
                     helperText={err?.response?.data?.errors?.dob}
                   />
                 </FormControl>
-              </LocalizationProvider>
+              </LocalizationProvider> */}
             </Grid>
           </Grid>
           <Grid item xs={12}>

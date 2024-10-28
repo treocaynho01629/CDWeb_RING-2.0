@@ -1,65 +1,52 @@
 import styled from "styled-components"
-import { useEffect, useState } from 'react'
-import { Stack, Button } from '@mui/material';
-import { AspectRatio, KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import { IconButton } from '@mui/material';
+import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 
 //#region styled
 const Container = styled.div`
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin: 40px 0;
 `
 
-const PaginateButton = styled.button`
-    border: none;
-    background-color: ${props => props.theme.palette.action.focus};
+const StyledButton = styled(IconButton)`
+    border-radius: 0;
+    padding: ${props => props.theme.spacing(.8)};
+    border: .5px solid ${props => props.theme.palette.divider};
+    
+    &:last-child { border-left: none};
+`
 
+const Count = styled.span`
+    font-size: 16px;
+    margin-right: ${props => props.theme.spacing(1)};
+
+    b { color: ${props => props.theme.palette.warning.light}}
 `
 //#endregion
 
-const QuickPagination = (props) => {
-    const { pagination, onPageChange, onSizeChange } = props;
+const QuickPagination = ({ pagination, onPageChange }) => {
+    const currPage = pagination?.currPage;
+    const totalPages = pagination?.totalPages;
 
-    //Initial value
-    const [page, setPage] = useState(pagination.currPage);
-    const [count, setCount] = useState(pagination.totalPages);
-
-    //Update value
-    useEffect(() => {
-        setPage(pagination?.currPage + 1);
-        setCount(pagination?.totalPages);
-    }, [pagination])
-
-    //Change current page
-    const handlePageChange = (event, page) => {
-        if (onPageChange) {
-            onPageChange(page);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }
-
-    //Change amount display
-    const handleChangeSize = (event) => {if (onSizeChange) onSizeChange(event.target.value)}
+    const handlePageChange = (page) => { if (onPageChange) onPageChange(page) }
 
     return (
         <Container>
-            <Button variant="outlined" sx={{aspectRatio: 1/1}}>
-                <KeyboardArrowLeft/>
-            </Button>
-            <Button>
-                <KeyboardArrowRight/>
-            </Button>
-            {/* <Stack spacing={2} sx={{ my: 5 }}>
-                <Pagination count={count ? count : 0} shape="rounded"
-                    page={page}
-                    onChange={handlePageChange}
-                    renderItem={(item) => (
-                        <StyledPageItem
-                            {...item}
-                        />
-                    )} />
-            </Stack> */}
+            {totalPages && <Count><b>{currPage + 1}</b>{totalPages && `/${totalPages}`}</Count>}
+            <StyledButton
+                aria-label="prev-page"
+                disabled={currPage == 0}
+                onClick={() => handlePageChange(currPage)}
+            >
+                <KeyboardArrowLeft />
+            </StyledButton>
+            <StyledButton
+                aria-label="next-page"
+                disabled={!totalPages || currPage + 1 == totalPages}
+                onClick={() => handlePageChange(currPage + 2)}
+            >
+                <KeyboardArrowRight />
+            </StyledButton>
         </Container>
     )
 }

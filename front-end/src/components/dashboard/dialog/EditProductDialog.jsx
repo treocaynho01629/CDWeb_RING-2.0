@@ -2,14 +2,12 @@ import styled from 'styled-components'
 import { useState, useEffect } from 'react'
 import { Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, FormControl, Button, TextField, TextareaAutosize } from '@mui/material';
 import { Check, Close } from '@mui/icons-material';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useCreateBookMutation, useGetBookQuery, useUpdateBookMutation } from '../../../features/books/booksApiSlice';
 import { useGetPublishersQuery } from '../../../features/publishers/publishersApiSlice';
 import { useGetCategoriesQuery } from '../../../features/categories/categoriesApiSlice';
 import dayjs from 'dayjs';
 import CustomDropZone from '../custom/CustomDropZone';
-import CustomDatePicker from '../../custom/CustomDatePicker';
+// import CustomDatePicker from '../../custom/CustomDatePicker';
 
 //#region styled
 const Instruction = styled.p`
@@ -392,22 +390,18 @@ const EditProductDialog = ({ id, open, handleClose }) => {
 
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <FormControl margin="dense" fullWidth>
-                    <CustomDatePicker
-                      label="Ngày xuất bản"
-                      value={date}
-                      className="DatePicker"
-                      onChange={(newValue) => setDate(newValue)}
-                      slotProps={{
-                        textField: {
-                          error: err?.response?.data?.errors?.date,
-                          helperText: err?.response?.data?.errors?.date,
-                        },
-                      }}
-                    />
-                  </FormControl>
-                </LocalizationProvider>
+                {/* <CustomDatePicker
+                  label="Ngày xuất bản"
+                  value={date}
+                  className="DatePicker"
+                  onChange={(newValue) => setDate(newValue)}
+                  slotProps={{
+                    textField: {
+                      error: err?.response?.data?.errors?.date,
+                      helperText: err?.response?.data?.errors?.date,
+                    },
+                  }}
+                /> */}
               </Grid>
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>

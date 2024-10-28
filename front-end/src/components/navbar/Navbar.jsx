@@ -1,12 +1,12 @@
 import styled from 'styled-components';
 import { lazy, Suspense, useContext, useState } from 'react';
-import { styled as muiStyled } from '@mui/system';
+import { styled as muiStyled } from '@mui/material/styles';
 import {
     Search as SearchIcon, ShoppingCart, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
     Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, Storefront, Close, Notifications,
 } from '@mui/icons-material';
 import { Stack, Badge, IconButton, Avatar, Box, Grid2 as Grid, TextField, AppBar, useTheme, useMediaQuery, useScrollTrigger } from '@mui/material';
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ColorModeContext } from '../../ThemeContextProvider';
 import { LogoImage, LogoSubtitle, LogoTitle } from '../custom/GlobalComponents';
 import useLogout from "../../hooks/useLogout";
@@ -243,6 +243,7 @@ const StyledSearchInput = muiStyled(TextField)(({ theme }) => ({
 const Navbar = () => {
     //#region construct
     const { cartProducts } = useCart();
+    const [searchParams, setSearchParams] = useSearchParams();
     const location = useLocation();
     const colorMode = useContext(ColorModeContext);
     const theme = useTheme();
@@ -283,9 +284,18 @@ const Navbar = () => {
     const toggleSearch = () => { setToggle(prev => !prev) };
 
     //Confirm search
-    const handleSubmitSearch = (e) => {
+    const handleNavigateStore = (e, value) => {
         e.preventDefault();
-        navigate(`/filters?keyword=${searchField}`);
+        let { pathname } = location;
+        let search;
+        if (!pathname.startsWith('/filters')) {
+            pathname = '/filters';
+            search = value != '' ? `?q=${value}` : '';
+        } else {
+            value != '' ? searchParams.set('q', value) : searchParams.delete('q');
+            search = searchParams.toString();
+        }
+        navigate({ pathname, search });
     }
     //#endregion
 
@@ -335,14 +345,12 @@ const Navbar = () => {
                                             </IconButton>
                                         </Box>
                                         <Suspense fallback={<></>}>
-                                            {openDrawer !== undefined &&
-                                                <NavDrawer {...{
-                                                    openDrawer, username, roles, location,
-                                                    products: cartProducts, logout, theme, colorMode,
-                                                    handleOpen: () => handleToggleDrawer(true),
-                                                    handleClose: () => handleToggleDrawer(false)
-                                                }} />
-                                            }
+                                            <NavDrawer {...{
+                                                openDrawer, username, roles, location,
+                                                products: cartProducts, logout, theme, colorMode,
+                                                handleOpen: () => handleToggleDrawer(true),
+                                                handleClose: () => handleToggleDrawer(false)
+                                            }} />
                                         </Suspense>
                                     </>
                                 }
@@ -360,12 +368,12 @@ const Navbar = () => {
                                     justifyContent={isToggleSearch ? { xs: 'space-between', md: 'flex-start' } : 'flex-start'}
                                     flexDirection={{ xs: 'row-reverse', md: 'row' }}
                                 >
-                                    <Link to={'/filters'} title="Duyệt cửa hàng">
+                                    <Link onClick={(e) => handleNavigateStore(e, '')} title="Duyệt cửa hàng">
                                         <StyledIconButton aria-label="explore">
                                             <Storefront sx={{ fontSize: '26px' }} />
                                         </StyledIconButton>
                                     </Link>
-                                    <StyledSearchForm onSubmit={handleSubmitSearch}>
+                                    <StyledSearchForm onSubmit={(e) => handleNavigateStore(e, searchField)}>
                                         {isToggleSearch &&
                                             <StyledSearchInput
                                                 placeholder='Tìm kiếm... '

@@ -4,7 +4,8 @@ import { styled } from '@mui/material/styles';
 const StyledSlider = styled(Slider)(({ theme }) => ({
     color: theme.palette.primary.main,
     height: 8,
-
+    marginBottom: theme.spacing(1.5),
+    
     '& .MuiSlider-track': {
         border: 'none',
     },
