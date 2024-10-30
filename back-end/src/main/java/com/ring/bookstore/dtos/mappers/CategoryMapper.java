@@ -8,6 +8,7 @@ import com.ring.bookstore.model.Category;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,9 @@ public class CategoryMapper {
             parent = parentCate != null ? this.cateToCateDTO(category.getParent(), "parent") : null;
         } else if (include.equalsIgnoreCase("children")) {
             children = category.getSubCates()
-                    .stream().map(this::cateToCateDTO).collect(Collectors.toList());
+                    .stream()
+                    .sorted(Comparator.comparingInt(Category::getId))
+                    .map(this::cateToCateDTO).collect(Collectors.toList());
         }
 
         return new CategoryDTO(category.getId(),
@@ -66,7 +69,9 @@ public class CategoryMapper {
             parent = parentCate != null ? this.cateToCateDTO(category.getParent(), "parent") : null;
         } else if (include.equalsIgnoreCase("children")) {
             children = category.getSubCates()
-                    .stream().map(this::cateToCateDTO).collect(Collectors.toList());
+                    .stream()
+                    .sorted(Comparator.comparingInt(Category::getId))
+                    .map(this::cateToCateDTO).collect(Collectors.toList());
         }
 
         return new CategoryDetailDTO(category.getId(),

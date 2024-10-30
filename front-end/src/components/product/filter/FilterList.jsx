@@ -1,10 +1,11 @@
 import styled from 'styled-components'
-import { useState, useEffect, Fragment, memo } from "react"
+import { useState, useEffect, Fragment, memo, useCallback, useRef } from "react"
 import { Button, Divider, Checkbox, FormGroup, FormControlLabel, List, ListItemButton, Collapse, Skeleton, Stack, Badge, Radio } from '@mui/material';
-import { ExpandLess, ExpandMore, Category, FilterAltOff, KeyboardArrowUp, KeyboardArrowDown, Star, StarBorder } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, FilterAltOff, Star, StarBorder, CategoryOutlined } from '@mui/icons-material';
 import { bookTypes, suggestPrices } from "../../../ultils/filters";
 import { useGetCategoriesQuery } from '../../../features/categories/categoriesApiSlice';
 import { useGetPublishersQuery } from '../../../features/publishers/publishersApiSlice';
+import { debounce } from 'lodash-es';
 import CustomDivider from '../../custom/CustomDivider';
 import PriceRangeSlider from './PriceRangeSlider';
 
@@ -22,6 +23,7 @@ const Filter = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    scroll-margin: ${props => props.theme.mixins.toolbar.minHeight};
 `
 
 const FilterText = styled.h3`
@@ -92,6 +94,7 @@ const LIMIT_PUBS = 10;
 const CateFilter = memo(({ cateId, onChangeCate }) => {
   const [open, setOpen] = useState(false); //Open sub cate
   const [showmore, setShowmore] = useState(false);
+  const childContainedRef = useRef(null);
   const [pagination, setPagination] = useState({
     isMore: true, //Merge new data
     currPage: null, //null is default to 0
@@ -117,7 +120,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
   }, [data]);
 
   //Change cate
-  const handleCateChange = (slug, id) => { onChangeCate(slug, id); }
+  const handleCateChange = (cate) => { onChangeCate({ id: cate?.id, slug: cate?.slug }); }
 
   //Open sub cate
   const handleClick = (e, id) => {
@@ -138,8 +141,9 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
   let isMore = pagination?.totalPages > (pagination?.currPage || 0) + 1;
   let isCollapsable = pagination?.totalElements > LIMIT_CATES;
   let containedSelected = () => {
-    let cateIndex = data?.ids?.indexOf(cateId);
-    return cateId && (cateIndex < 0 || cateIndex >= LIMIT_CATES);
+    let checkId = childContainedRef.current || cateId;
+    let cateIndex = data?.ids?.indexOf(+checkId);
+    return checkId && (cateIndex < 0 || cateIndex >= LIMIT_CATES);
   }
   let catesContent;
 
@@ -163,36 +167,38 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
 
       ids?.forEach((id, index) => {
         const cate = entities[id];
-        const containedSelected = cate?.children && cate?.children.some(child => child.id === cateId);
-
-        const item = <Fragment key={`cate-${id}-${index}`}>
-          <StyledListItemButton
-            selected={cateId == id}
-            onClick={() => handleCateChange(cate?.slug, id)}
-          >
-            <FilterText>{cate?.categoryName}</FilterText>
-            {cate.children?.length ? open[id] ? <ExpandLess onClick={(e) => handleClick(e, id)} />
-              : <Badge color="primary" variant="dot" invisible={!containedSelected}>
-                <ExpandMore onClick={(e) => handleClick(e, id)} />
-              </Badge>
-              : null}
-          </StyledListItemButton>
-          {cate?.children &&
-            <Collapse in={open[id]} timeout="auto" unmountOnExit>
-              {cate.children?.map((child, subIndex) => (
-                <List key={`${child?.id}-${subIndex}`} component="div" disablePadding>
-                  <StyledListItemButton
-                    className="secondary"
-                    selected={cateId == child?.id}
-                    onClick={() => handleCateChange(child?.slug, child?.id)}
-                  >
-                    <FilterText>{child?.categoryName}</FilterText>
-                  </StyledListItemButton>
-                </List>
-              ))}
-            </Collapse>
-          }
-        </Fragment>
+        const containedSelected = cate?.children && cate.children.some(child => child.id == cateId);
+        if (containedSelected) childContainedRef.current = id;
+        const item = (
+          <Fragment key={`cate-${id}-${index}`}>
+            <StyledListItemButton
+              selected={cateId == id}
+              onClick={() => handleCateChange(cate)}
+            >
+              <FilterText>{cate?.categoryName}</FilterText>
+              {cate.children?.length ? open[id] ? <ExpandLess onClick={(e) => handleClick(e, id)} />
+                : <Badge color="primary" variant="dot" invisible={!containedSelected}>
+                  <ExpandMore onClick={(e) => handleClick(e, id)} />
+                </Badge>
+                : null}
+            </StyledListItemButton>
+            {cate?.children &&
+              <Collapse in={open[id]} timeout="auto" unmountOnExit>
+                {cate.children?.map((child, subIndex) => (
+                  <List key={`${child?.id}-${subIndex}`} component="div" disablePadding>
+                    <StyledListItemButton
+                      className="secondary"
+                      selected={cateId == child?.id}
+                      onClick={() => handleCateChange(child)}
+                    >
+                      <FilterText>{child?.categoryName}</FilterText>
+                    </StyledListItemButton>
+                  </List>
+                ))}
+              </Collapse>
+            }
+          </Fragment>
+        )
 
         if (index < LIMIT_CATES) {
           limitContent.push(item);
@@ -221,7 +227,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
   return (
     <Filter>
       <TitleContainer>
-        <FilterText><Category />&nbsp;Danh mục</FilterText>
+        <FilterText><CategoryOutlined />&nbsp;Danh mục</FilterText>
       </TitleContainer>
       <List sx={{ width: '100%', py: 0 }} component="nav" aria-labelledby="nested-list-categories">
         {catesContent}
@@ -230,15 +236,15 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
         {(!showmore || isMore)
           ? <>Xem thêm
             <Badge color="primary" variant="dot" invisible={!containedSelected()}>
-              <KeyboardArrowDown />
+              <ExpandMore />
             </Badge></>
-          : <>Ẩn bớt <KeyboardArrowUp /></>}
+          : <>Ẩn bớt <ExpandLess /></>}
       </Showmore>}
     </Filter >
   )
 })
 
-const PublisherFilter = memo(({ pubs, onChangePub }) => {
+const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
   const [selectedPub, setSelectedPub] = useState(pubs || []);
   const [showmore, setShowmore] = useState(false);
   const [pagination, setPagination] = useState({
@@ -253,9 +259,7 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
     loadMore: pagination?.isMore,
   });
 
-  useEffect(() => {
-    setSelectedPub(pubs);
-  }, [pubs]);
+  useEffect(() => { setSelectedPub(pubs); }, [pubs]);
 
   useEffect(() => {
     if (data && !isLoading && isSuccess) {
@@ -371,7 +375,7 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
   }
 
   return (
-    <Filter>
+    <Filter ref={pubsRef}>
       <TitleContainer>
         <FilterText>Nhà xuất bản</FilterText>
       </TitleContainer>
@@ -382,25 +386,24 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
         {(!showmore || isMore)
           ? <>Xem thêm
             <Badge color="primary" variant="dot" invisible={!containedSelected}>
-              <KeyboardArrowDown />
+              <ExpandMore />
             </Badge></>
-          : <>Ẩn bớt <KeyboardArrowUp /></>}
+          : <>Ẩn bớt <ExpandLess /></>}
       </Showmore>}
     </Filter>
   )
 })
 
-const RangeFilter = memo(({ value, onChangeRange }) => {
+const RangeFilter = memo(({ value, onChangeInputRange, onChangeRange, valueRef }) => {
   const [valueInput, setValueInput] = useState(value || [0, 10000000]);
 
-  useEffect(() => {
-    setValueInput(value);
-  }, [value]);
+  useEffect(() => { setValueInput(value); }, [value]);
 
   //Change
   const handleSelect = (e) => {
     let newValue = e.target.value.split(',').map(Number);
     setValueInput(newValue);
+    handleUpdateInputRange(newValue);
   }
 
   const handleChangeRange = (value) => {
@@ -408,12 +411,13 @@ const RangeFilter = memo(({ value, onChangeRange }) => {
     handleUpdateRange(value);
   }
 
+  const handleUpdateInputRange = (newValue) => { if (onChangeInputRange) onChangeInputRange(newValue) };
   const handleUpdateRange = (newValue) => { if (onChangeRange) onChangeRange(newValue) };
 
   const isSelected = (currValue) => (valueInput[0] == currValue[0] && valueInput[1] == currValue[1]);
 
   return (
-    <Filter>
+    <Filter ref={valueRef}>
       <TitleContainer>
         <FilterText>Khoảng giá</FilterText>
       </TitleContainer>
@@ -443,7 +447,7 @@ const RangeFilter = memo(({ value, onChangeRange }) => {
   )
 })
 
-const TypeFilters = memo(({ types, onChangeType }) => {
+const TypeFilter = memo(({ types, onChangeType, typesRef }) => {
   const [selectedType, setSelectedType] = useState(types || []);
 
   useEffect(() => { setSelectedType(types); }, [types]);
@@ -473,7 +477,7 @@ const TypeFilters = memo(({ types, onChangeType }) => {
   const isSelected = (type) => selectedType.indexOf(type) !== -1;
 
   return (
-    <Filter>
+    <Filter ref={typesRef}>
       <TitleContainer>
         <FilterText>Hình thức bìa</FilterText>
       </TitleContainer>
@@ -502,14 +506,14 @@ const TypeFilters = memo(({ types, onChangeType }) => {
   )
 })
 
-const RateFilters = memo(({ rating, onChangeRate }) => {
+const RateFilter = memo(({ rating, onChangeRate, rateRef }) => {
   const handleChangeRate = (e) => {
     let newValue = e.target.value;
     if (onChangeRate) onChangeRate(newValue);
   }
 
   return (
-    <Filter>
+    <Filter ref={rateRef}>
       <TitleContainer>
         <FilterText>Đánh giá</FilterText>
       </TitleContainer>
@@ -546,7 +550,17 @@ const RateFilters = memo(({ rating, onChangeRate }) => {
   )
 })
 
-const FilterList = ({ filters, onChangeCate, onChangeRange, onChangePub, onChangeType, onChangeRate, resetFilter }) => {
+const FilterList = ({ filters, setFilters, resetFilter, pubsRef, typesRef, valueRef, rateRef }) => {
+
+  const onChangeCate = useCallback((newValue) => {
+    setFilters(prev => ({ ...prev, cate: prev.cate.id == newValue?.id ? { id: '', slug: '' } : newValue }));
+  }, [])
+  const onChangePub = useCallback(debounce((newValue) => { setFilters(prev => ({ ...prev, pubIds: newValue })); }, 500), []);
+  const onChangeInputRange = useCallback((newValue) => { setFilters(prev => ({ ...prev, value: newValue })); }, []);
+  const onChangeRange = useCallback(debounce((newValue) => { setFilters(prev => ({ ...prev, value: newValue })); }, 1000), []);
+  const onChangeType = useCallback(debounce((newValue) => { setFilters(prev => ({ ...prev, types: newValue })); }, 500), []);
+  const onChangeRate = useCallback((newValue) => { setFilters(prev => ({ ...prev, rating: prev.rating == newValue ? '' : newValue })); }, [])
+
   return (
     <FilterWrapper>
       <CustomDivider>BỘ LỌC</CustomDivider>
@@ -556,11 +570,11 @@ const FilterList = ({ filters, onChangeCate, onChangeRange, onChangePub, onChang
         flexWrap="wrap"
         divider={<Divider flexItem />}
       >
-        <CateFilter {...{ cateId: filters?.cateId, onChangeCate }} />
-        <RangeFilter {...{ value: filters?.value, onChangeRange }} />
-        <PublisherFilter {...{ pubs: filters?.pubIds, onChangePub }} />
-        <TypeFilters {...{ types: filters?.types, onChangeType }} />
-        <RateFilters {...{ rating: filters?.rating, onChangeRate }} />
+        <CateFilter {...{ cateId: filters?.cate.id, onChangeCate }} />
+        <PublisherFilter {...{ pubs: filters?.pubIds, onChangePub, pubsRef }} />
+        <RangeFilter {...{ value: filters?.value, onChangeInputRange, onChangeRange, valueRef }} />
+        <TypeFilter {...{ types: filters?.types, onChangeType, typesRef }} />
+        <RateFilter {...{ rating: filters?.rating, onChangeRate, rateRef }} />
       </Stack>
       <Button
         variant="contained"

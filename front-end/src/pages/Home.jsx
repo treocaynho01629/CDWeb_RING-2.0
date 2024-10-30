@@ -168,6 +168,7 @@ const ProductsList = ({ tabs, value, title }) => {
   );
 
   const handleChangeValue = (e, newValue) => {
+    console.log(newValue)
     if (newValue !== null) {
       setTabValue(newValue);
       listRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -185,7 +186,7 @@ const ProductsList = ({ tabs, value, title }) => {
     if (type) params.append('type', type);
     if (shopId) params.append('shop', shopId);
     if (sellerId) params.append('sellerId', sellerId);
-    if (pubId?.length) params.append('pubs', pubId);
+    if (pubId) params.append('pubs', pubId);
     return params.toString();
   }
 
@@ -198,7 +199,7 @@ const ProductsList = ({ tabs, value, title }) => {
             Tải lại <Replay />
           </MoreButton>
           :
-          <Link to={`/filters${slug ? `/${slug}` : ''}?${getParams()}`}>
+          <Link to={`/store${slug ? `/${slug}` : ''}?${getParams()}`}>
             <MoreButton>
               Xem tất cả <KeyboardArrowRight />
             </MoreButton>
@@ -318,7 +319,7 @@ const Home = () => {
   //Show more
   const handleShowMore = () => {
     if (pagination?.currPage >= 5) {
-      navigate('/filters');
+      navigate('/store');
     } else {
       let nextPage = (data?.ids?.length / defaultMore);
       setPagination({ ...pagination, currPage: nextPage, pageSize: defaultMore })

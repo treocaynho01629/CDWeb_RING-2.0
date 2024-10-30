@@ -1,4 +1,4 @@
-import { useState, useRef, lazy, Suspense, Fragment } from 'react'
+import { useState, useRef, lazy, Suspense } from 'react'
 import { Box, Skeleton, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { useParams, Navigate, NavLink, useSearchParams } from 'react-router-dom';
 import { useGetBookQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
@@ -20,13 +20,13 @@ const createCrumbs = (cate) => {
     if (cate?.parent) {
         return ([
             createCrumbs(cate?.parent),
-            <NavLink to={`/filters/${cate?.slug}?cateId=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
+            <NavLink to={`/store/${cate?.slug}?cate=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
                 {cate?.categoryName}
             </NavLink>
         ])
     } else {
         return (
-            <NavLink to={`/filters/${cate?.slug}?cateId=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
+            <NavLink to={`/store/${cate?.slug}?cate=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
                 {cate?.categoryName}
             </NavLink>
         )
@@ -89,11 +89,11 @@ const ProductDetail = () => {
                 <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
                     {data
                         ? [
-                            <NavLink to={'/filters'} key={'filters'}>
+                            <NavLink to={'/store'} key={'filters'}>
                                 Danh mục sản phẩm
                             </NavLink>,
                             createCrumbs(data?.category),
-                            <NavLink to={`/filters?pubId=${data?.publisher?.id}`} key={'publisher'}>
+                            <NavLink to={`/store?pubs=${data?.publisher?.id}`} key={'publisher'}>
                                 {data?.publisher?.pubName}
                             </NavLink>,
                             <strong style={{ textDecoration: 'underline' }} key={'book-title'}>{data?.title}</strong>
@@ -131,7 +131,7 @@ const ProductDetail = () => {
                             </Suspense>
                         </LazyLoadComponent>
                     </Stack>
-                    <Box ref={reviewRef} sx={{ scrollMargin: '80px' }}>
+                    <Box ref={reviewRef} sx={{ scrollMargin: theme.mixins.toolbar.minHeight }}>
                         <LazyLoadComponent>
                             <Suspense fallback={<CustomPlaceholder sx={{
                                 width: '100%',

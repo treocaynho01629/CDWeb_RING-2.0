@@ -85,6 +85,10 @@ const StyledInput = styled(TextField)`
     ${props => props.theme.breakpoints.down("sm")} {
         margin-right: 0;
 
+        .MuiSelect-select {
+            font-size: 14px;
+        }
+        
         .MuiOutlinedInput-notchedOutline {
             border: none;
         }

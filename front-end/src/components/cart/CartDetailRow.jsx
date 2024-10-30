@@ -296,7 +296,7 @@ const CartDetailRow = ({ id, index, shop, coupon, couponDiscount, isSelected, is
                     />
                 </StyledTableCell>
                 <StyledTableCell align="left" colSpan={5} component="th" id={shopLabelId} scope="row">
-                    <Link to={'/filters'}>
+                    <Link to={'/store'}>
                         <ShopTitle>
                             <ShopTag>Đối tác</ShopTag>
                             <Storefront />&nbsp;{shop.shopName}<KeyboardArrowRight fontSize="small" />

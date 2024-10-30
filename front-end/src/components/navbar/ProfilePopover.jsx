@@ -1,4 +1,4 @@
-import { Brightness3, Brightness7, DeliveryDining as DeliveryDiningIcon, Logout, Speed as SpeedIcon } from '@mui/icons-material';
+import { Brightness3, Brightness7, DeliveryDiningOutlined, LockOutlined, Speed } from '@mui/icons-material';
 import { Avatar, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
 import { Link } from 'react-router-dom';
 
@@ -59,7 +59,7 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, the
             <Link to={'/profile/orders'} style={{ color: 'inherit' }}>
                 <MenuItem>
                     <ListItemIcon>
-                        <DeliveryDiningIcon fontSize="small" />
+                        <DeliveryDiningOutlined fontSize="small" />
                     </ListItemIcon>
                     Đơn giao
                 </MenuItem>
@@ -69,7 +69,7 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, the
                 <Link to={'/dashboard'} style={{ color: 'inherit' }}>
                     <MenuItem>
                         <ListItemIcon>
-                            <SpeedIcon fontSize="small" />
+                            <Speed fontSize="small" />
                         </ListItemIcon>
                         Dashboard
                     </MenuItem>
@@ -83,7 +83,7 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, the
             </MenuItem>
             <MenuItem onClick={() => logout()}>
                 <ListItemIcon>
-                    <Logout fontSize="small" />
+                    <LockOutlined fontSize="small" />
                 </ListItemIcon>
                 Đăng xuất
             </MenuItem>

@@ -90,6 +90,8 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
   let productsCarousel;
   const loading = (isLoading || isFetching || isError || isUninitialized);
 
+  console.log('rerender')
+
   if (loading) {
     productsCarousel = tempItems;
   } else if (isSuccess) {
@@ -114,7 +116,7 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
 
   return (
     <Container>
-      {(loading) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
+      {loading && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
       <Carousel
         responsive={responsive}
         customLeftArrow={<CustomArrow className="custom-left-arrow"><KeyboardArrowLeft/></CustomArrow>}

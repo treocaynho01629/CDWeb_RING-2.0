@@ -264,17 +264,17 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                             >
                                 <Box display="flex" justifyContent="space-between" width="100%">
                                     <Detail>
-                                        {book ? <>Nhà xuất bản:&nbsp;<Link to={`/filters?pubId=${book?.publisher?.id}`}>{book?.publisher?.pubName}</Link></>
+                                        {book ? <>Nhà xuất bản:&nbsp;<Link to={`/store?pubs=${book?.publisher?.id}`}>{book?.publisher?.pubName}</Link></>
                                             : <Skeleton variant="text" sx={{ fontSize: '14px' }} width="90%" />}
                                     </Detail>
                                     <Detail>
 
-                                        {book ? <>Tác giả: &nbsp;<Link to={`/filters?q=${book?.author}`}>{book?.author}</Link></>
+                                        {book ? <>Tác giả: &nbsp;<Link to={`/store?q=${book?.author}`}>{book?.author}</Link></>
                                             : <Skeleton variant="text" sx={{ fontSize: '14px' }} width="90%" />}
                                     </Detail>
                                 </Box>
                                 <Detail>
-                                    {book ? <>Hình thức bìa: &nbsp;<Link to={`/filters?type=${book?.type}`}> {book?.type}</Link></>
+                                    {book ? <>Hình thức bìa: &nbsp;<Link to={`/store?types=${book?.type}`}> {book?.type}</Link></>
                                         : <Skeleton variant="text" sx={{ fontSize: '14px' }} width="90%" />}
                                 </Detail>
                             </Stack>

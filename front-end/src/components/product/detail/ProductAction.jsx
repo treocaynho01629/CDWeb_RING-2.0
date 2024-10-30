@@ -162,6 +162,7 @@ const ProductAction = ({ book }) => {
                             open={open}
                             onOpen={() => toggleDrawer(true)}
                             onClose={() => toggleDrawer(false)}
+                            disableSwipeToOpen={true}
                         >
                             <ProductDetailContainer>
                                 <StyledImage

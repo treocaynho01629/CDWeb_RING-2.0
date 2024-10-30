@@ -164,7 +164,7 @@ const Categories = () => {
                 return (
                     <Fragment key={`main-${cateId}-${index}`}>
                         <ItemWrapper key={`cate-${cateId}-${index}`}>
-                            <Link to={`/filters/${cate?.slug}?cateId=${cateId}`} title={cate?.categoryName}>
+                            <Link to={`/store/${cate?.slug}?cate=${cateId}`} title={cate?.categoryName}>
                                 <ItemContainer>
                                     <StyledLazyImage
                                         src={`${cate?.image}?size=tiny`}

@@ -32,7 +32,7 @@ const QuickPagination = ({ pagination, onPageChange }) => {
 
     return (
         <Container>
-            {totalPages && <Count><b>{currPage + 1}</b>{totalPages && `/${totalPages}`}</Count>}
+            {totalPages > 0 && <Count><b>{currPage + 1}</b>{totalPages && `/${totalPages}`}</Count>}
             <StyledButton
                 aria-label="prev-page"
                 disabled={currPage == 0}
