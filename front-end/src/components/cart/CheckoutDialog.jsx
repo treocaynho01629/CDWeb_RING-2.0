@@ -371,6 +371,7 @@ const CheckoutDialog = ({ coupon, navigate, handleOpenDialog, calculating, estim
                         open={open}
                         onOpen={() => toggleDrawer(true)}
                         onClose={() => toggleDrawer(false)}
+                        disableSwipeToOpen={true}
                     >
                         <CheckoutBox>
                             <CheckoutTitle>THANH TOÁN</CheckoutTitle>

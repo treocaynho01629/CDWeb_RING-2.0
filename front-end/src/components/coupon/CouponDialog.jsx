@@ -41,7 +41,7 @@ const CouponsContainer = styled.div`
 `
 //#endregion
 
-const CouponDialog = ({ numSelected, selectMode, shopId, checkState, openDialog, selectedCoupon, handleCloseDialog, onClickApply }) => {
+const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, openDialog, selectedCoupon, handleCloseDialog, onClickApply }) => {
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const inputRef = useRef(null);
@@ -134,7 +134,7 @@ const CouponDialog = ({ numSelected, selectMode, shopId, checkState, openDialog,
                 const isSelected = tempCoupon?.id == id;
 
                 return (<CouponItem key={`coupon-${id}-${index}`}
-                    {...{ coupon, sumary, selectMode: true, isDisabled, isSelected, onClickApply: setTempCoupon }} />)
+                    {...{ coupon, sumary, selectMode, isDisabled, isSelected, onClickApply: setTempCoupon }} />)
             })}
         </> : null;
     }
@@ -177,7 +177,7 @@ const CouponDialog = ({ numSelected, selectMode, shopId, checkState, openDialog,
                 const isSelected = tempCoupon?.id == id;
 
                 return (<CouponItem key={`coupon-${id}-${index}`}
-                    {...{ coupon, sumary, selectMode: true, isDisabled, isSelected, onClickApply: setTempCoupon }} />)
+                    {...{ coupon, sumary, selectMode, isDisabled, isSelected, onClickApply: setTempCoupon }} />)
             })}
         </> : null;
     }
@@ -189,7 +189,7 @@ const CouponDialog = ({ numSelected, selectMode, shopId, checkState, openDialog,
         const isSelected = tempCoupon?.id == currCoupon?.id;
 
         topCoupon = <CouponItem key={`top-coupon-${currCoupon?.id}`}
-            {...{ coupon: currCoupon, sumary, selectMode: true, isDisabled, isSelected, onClickApply: setTempCoupon }}
+            {...{ coupon: currCoupon, sumary, selectMode, isDisabled, isSelected, onClickApply: setTempCoupon }}
         />;
     }
 

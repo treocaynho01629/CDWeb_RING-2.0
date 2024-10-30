@@ -5,9 +5,14 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
     color: theme.palette.primary.main,
     height: 8,
     marginBottom: theme.spacing(1.5),
-    
+
     '& .MuiSlider-track': {
         border: 'none',
+        background: 'transparent',
+        backgroundImage: `linear-gradient(to right, 
+        ${theme.palette.primary.dark}, 
+        ${theme.palette.primary.main} 50%, 
+        ${theme.palette.primary.light})`,
     },
 
     '& .MuiSlider-thumb': {

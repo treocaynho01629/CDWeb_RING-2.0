@@ -278,13 +278,14 @@ const CouponItem = ({ coupon, sumary, isDisabled, isSelected, selectMode, onClic
                     </CouponContent>
                     <CouponAction>
                         <CouponCode>{coupon?.code}</CouponCode>
-                        {selectMode ? <Button
-                            disableRipple
-                            color={isSelected ? 'error' : 'primary'}
-                            onClick={handleClick}
-                        >
-                            {isSelected ? 'Bỏ chọn' : 'Áp dụng'}
-                        </Button>
+                        {selectMode ?
+                            <Button
+                                disableRipple
+                                color={isSelected ? 'error' : 'primary'}
+                                onClick={handleClick}
+                            >
+                                {isSelected ? 'Bỏ chọn' : 'Áp dụng'}
+                            </Button>
                             : <Button disableRipple>Lưu</Button>}
                     </CouponAction>
                 </CouponContainer>

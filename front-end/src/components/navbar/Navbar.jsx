@@ -1,9 +1,8 @@
 import styled from 'styled-components';
 import { lazy, Suspense, useContext, useState } from 'react';
 import { styled as muiStyled } from '@mui/material/styles';
-import {
-    Search as SearchIcon, ShoppingCart, Mail as MailIcon, Phone as PhoneIcon, Facebook as FacebookIcon, YouTube as YouTubeIcon,
-    Instagram as InstagramIcon, Twitter as TwitterIcon, Menu as MenuIcon, Lock as LockIcon, Storefront, Close, Notifications,
+import { Search, Mail, Phone, Facebook, YouTube, LinkedIn, Twitter, Menu, LockOutlined, Storefront, 
+    Close, ShoppingCartOutlined, NotificationsOutlined,
 } from '@mui/icons-material';
 import { Stack, Badge, IconButton, Avatar, Box, Grid2 as Grid, TextField, AppBar, useTheme, useMediaQuery, useScrollTrigger } from '@mui/material';
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
@@ -165,11 +164,17 @@ const StyledAppBar = muiStyled(AppBar)(({ theme }) => ({
     borderBottom: '.5px solid',
     borderColor: theme.palette.divider,
     top: '-0.5px',
-    transition: 'all .2s ease',
+    marginBottom: 2,
+    boxShadow: 'none',
+    position: 'sticky',
+    transition: 'all .15s ease',
+
+    [theme.breakpoints.down('md')]: {
+        marginBottom: 0,
+    },
 
     '&.top': {
         backgroundColor: 'transparent',
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0))',
         borderColor: 'transparent',
     }
 }));
@@ -288,8 +293,8 @@ const Navbar = () => {
         e.preventDefault();
         let { pathname } = location;
         let search;
-        if (!pathname.startsWith('/filters')) {
-            pathname = '/filters';
+        if (!pathname.startsWith('/store')) {
+            pathname = '/store';
             search = value != '' ? `?q=${value}` : '';
         } else {
             value != '' ? searchParams.set('q', value) : searchParams.delete('q');
@@ -307,28 +312,21 @@ const Navbar = () => {
                 <Grid container size="grow">
                     <Grid size={{ xs: 12, md: 6 }}>
                         <ContactContainer>
-                            <Contact><PhoneIcon sx={{ fontSize: 18, marginRight: 1 }} />+8419130248</Contact>
-                            <Contact><MailIcon sx={{ fontSize: 18, marginRight: 1 }} />haductrong01629@gmail.com</Contact>
+                            <Contact><Phone sx={{ fontSize: 18, marginRight: 1 }} />+8419130248</Contact>
+                            <Contact><Mail sx={{ fontSize: 18, marginRight: 1 }} />haductrong01629@gmail.com</Contact>
                         </ContactContainer>
                     </Grid>
                     <Grid size={{ xs: 12, md: 6 }}>
                         <SocialContainer>
-                            <Social color="3B5999"><FacebookIcon sx={{ fontSize: 18 }} /></Social>
-                            <Social color="FF0000"><YouTubeIcon sx={{ fontSize: 18 }} /></Social>
-                            <Social color="E4405F"><InstagramIcon sx={{ fontSize: 18 }} /></Social>
-                            <Social color="55ACEE"><TwitterIcon sx={{ fontSize: 18 }} /></Social>
+                            <Social color="3B5999"><Facebook sx={{ fontSize: 18 }} /></Social>
+                            <Social color="FF0000"><YouTube sx={{ fontSize: 18 }} /></Social>
+                            <Social color="0A66C2"><LinkedIn sx={{ fontSize: 18 }} /></Social>
+                            <Social color="55ACEE"><Twitter sx={{ fontSize: 18 }} /></Social>
                         </SocialContainer>
                     </Grid>
                 </Grid>
             </TopHeader>
-            <StyledAppBar
-                sx={{
-                    marginBottom: { xs: 0, md: 2 },
-                    boxShadow: 'none'
-                }}
-                className={!mobileMode || trigger ? '' : 'top'}
-                position="sticky"
-            >
+            <StyledAppBar className={!mobileMode || trigger ? '' : 'top'} elevation={0}>
                 <Wrapper>
                     <Grid container size="grow">
                         <Grid size={{ xs: 12, md: "grow" }} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -341,7 +339,7 @@ const Navbar = () => {
                                             alignItems="center"
                                         >
                                             <IconButton onClick={() => handleToggleDrawer(true)}>
-                                                <MenuIcon sx={{ fontSize: 26 }} />
+                                                <Menu sx={{ fontSize: 26 }} />
                                             </IconButton>
                                         </Box>
                                         <Suspense fallback={<></>}>
@@ -387,13 +385,13 @@ const Navbar = () => {
                                                 size="small"
                                                 slotProps={{
                                                     input: {
-                                                        startAdornment: (< SearchIcon sx={{ marginRight: 1 }} />)
+                                                        startAdornment: (< Search sx={{ marginRight: 1 }} />)
                                                     },
                                                 }}
                                             />
                                         }
                                         <StyledIconButton aria-label="search toggle" onClick={() => toggleSearch()}>
-                                            {isToggleSearch ? <Close sx={{ fontSize: '26px' }} /> : <SearchIcon sx={{ fontSize: '26px' }} />}
+                                            {isToggleSearch ? <Close sx={{ fontSize: '26px' }} /> : <Search sx={{ fontSize: '26px' }} />}
                                         </StyledIconButton>
                                     </StyledSearchForm>
                                 </Box>
@@ -409,7 +407,7 @@ const Navbar = () => {
                                                     vertical: 'top',
                                                     horizontal: 'right',
                                                 }}>
-                                                    <Notifications />
+                                                    <NotificationsOutlined />
                                                 </Badge>
                                                 <IconText>Thông báo</IconText>
                                             </StyledIconButton>
@@ -425,7 +423,7 @@ const Navbar = () => {
                                                             vertical: 'top',
                                                             horizontal: 'right',
                                                         }}>
-                                                            <ShoppingCart />
+                                                            <ShoppingCartOutlined />
                                                         </Badge>
                                                         <IconText>Giỏ hàng</IconText>
                                                     </StyledIconButton>
@@ -461,7 +459,7 @@ const Navbar = () => {
                                             ) : (
                                                 <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">
                                                     <StyledIconButton className="nav" aria-label="login">
-                                                        <LockIcon />
+                                                        <LockOutlined />
                                                         <IconText className="username">Đăng nhập</IconText>
                                                     </StyledIconButton>
                                                 </Link>

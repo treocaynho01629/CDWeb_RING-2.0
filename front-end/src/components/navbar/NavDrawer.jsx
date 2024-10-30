@@ -1,6 +1,6 @@
 import { styled } from '@mui/material/styles';
 import {
-    ShoppingCart, DeliveryDining as DeliveryDiningIcon, Lock as LockIcon, Logout, Speed as SpeedIcon, Notifications,
+    ShoppingCartOutlined, DeliveryDiningOutlined, Lock, Logout, Speed, NotificationsOutlined,
     Storefront, KeyboardArrowLeft, Brightness3, Brightness7
 } from '@mui/icons-material';
 import { Avatar, ListItemIcon, Divider, Box, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText, IconButton } from '@mui/material';
@@ -35,8 +35,6 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
             open={openDrawer}
             onOpen={handleOpen}
             onClose={handleClose}
-            disableSwipeToOpen={false}
-            ModalProps={{ keepMounted: true }}
         >
             <DrawerContainer>
                 <Box sx={{ marginY: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -51,7 +49,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                 </Box>
                 <Divider />
                 <List>
-                    <Link to={'/filters'}>
+                    <Link to={'/store'}>
                         <ListItem disablePadding onClick={handleClose}>
                             <ListItemButton>
                                 <ListItemIcon>
@@ -67,7 +65,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                     <ListItem disablePadding onClick={handleClose}>
                         <ListItemButton>
                             <ListItemIcon>
-                                <Notifications />
+                                <NotificationsOutlined />
                             </ListItemIcon>
                             <ListItemText primary="Thông báo" />
                         </ListItemButton>
@@ -76,7 +74,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                         <ListItem disablePadding onClick={handleClose}>
                             <ListItemButton >
                                 <ListItemIcon>
-                                    <ShoppingCart />
+                                    <ShoppingCartOutlined />
                                 </ListItemIcon>
                                 <ListItemText primary={`Giỏ hàng (${products?.length} sản phẩm)`} />
                             </ListItemButton>
@@ -103,7 +101,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                                 <Link to={'/profile/orders'}>
                                     <ListItemButton onClick={handleClose}>
                                         <ListItemIcon>
-                                            <DeliveryDiningIcon />
+                                            <DeliveryDiningOutlined />
                                         </ListItemIcon>
                                         <ListItemText primary="Đơn giao" />
                                     </ListItemButton>
@@ -117,7 +115,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                                     <ListItem disablePadding onClick={handleClose}>
                                         <ListItemButton>
                                             <ListItemIcon>
-                                                <SpeedIcon />
+                                                <Speed />
                                             </ListItemIcon>
                                             <ListItemText primary="Dashboard" />
                                         </ListItemButton>
@@ -148,7 +146,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                             <ListItem disablePadding onClick={handleClose}>
                                 <ListItemButton>
                                     <ListItemIcon>
-                                        <LockIcon />
+                                        <Lock />
                                     </ListItemIcon>
                                     <ListItemText primary="Đăng nhập" />
                                 </ListItemButton>

@@ -1,26 +1,38 @@
 import styled from 'styled-components'
-import { NavLink } from 'react-router-dom';
-import { Breadcrumbs, useTheme } from '@mui/material';
+import { Link } from 'react-router-dom';
+import { Breadcrumbs } from '@mui/material';
 
 const BreadcrumbsContainer = styled.div`
     margin: 20px 10px;
     display: block;
+
+    a.active {
+        font-weight: 450;
+        text-decoration: underline;
+        color: ${props => props.theme.palette.primary.dark};
+        pointer-events: none;
+    }
 
     ${props => props.theme.breakpoints.down("sm")} {
         display: none;
     }
 `
 
+const StyledMainCrumb = styled(Link)`
+    background-color: ${props => props.theme.palette.primary.main};
+    color: ${props => props.theme.palette.primary.contrastText};
+    padding: 5px 15px;
+`
+
 export default function CustomBreadcrumbs(props) {
     const { children } = props;
-    const theme = useTheme();
 
     return (
         <BreadcrumbsContainer>
             <Breadcrumbs {...props}>
-                <NavLink to={`/`} style={{ backgroundColor: theme.palette.primary.main, padding: '5px 15px', color: theme.palette.primary.contrastText }}>
+                <StyledMainCrumb to={'/'}>
                     Trang chủ
-                </NavLink>
+                </StyledMainCrumb>
                 {children}
             </Breadcrumbs>
         </BreadcrumbsContainer>

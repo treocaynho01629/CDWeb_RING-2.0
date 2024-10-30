@@ -5,13 +5,13 @@ export const suggest = [
         icon: <Whatshot />,
         color: '#d07165',
         label: 'Hot',
-        url: '/filters?sortBy=totalOrders'
+        url: '/store?sortBy=totalOrders'
     },
     {
         icon: <LocalMall />,
         color: '#c685c3 ',
         label: 'Tìm kiếm',
-        url: '/filters'
+        url: '/store'
     },
     {
         icon: <Loyalty />,
@@ -23,7 +23,7 @@ export const suggest = [
         icon: <NewReleases />,
         color: '#ddb067',
         label: 'Sản phẩm mới',
-        url: '/filters?sortBy=createdDate'
+        url: '/store?sortBy=createdDate'
     },
     {
         icon: <Store />,
@@ -47,7 +47,7 @@ export const suggest = [
         icon: <ThumbUp />,
         color: '#e6eb62 ',
         label: 'Yêu thích',
-        url: '/filters?sortBy=rating'
+        url: '/store?sortBy=rating'
     },
     {
         icon: <InsertEmoticon />,

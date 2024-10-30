@@ -208,7 +208,7 @@ const OrdersList = ({ Title }) => {
                     order?.orderDetails?.map((detail, index) => (
                         <OrderItemContainer key={`${detail.id}-${index}`}>
                             <HeadContainer>
-                                <Link to={`/filters?seller=${detail.sellerName}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
+                                <Link to={`/store?seller=${detail.sellerName}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
                                     <SellerTag>Đối tác&nbsp;<Check fontSize="small" /></SellerTag>
                                     {detail.sellerName}
                                     <Button

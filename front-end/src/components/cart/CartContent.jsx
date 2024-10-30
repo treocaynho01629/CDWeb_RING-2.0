@@ -488,8 +488,8 @@ const CartContent = () => {
     const handleFindSimilar = async () => {
         getBook({ id: contextProduct?.id })
             .unwrap()
-            .then((book) => navigate(`/filters/${book?.category?.slug}?cateId=${book?.category?.id}
-                &pubId=${book?.publisher?.id}&type=${book?.type}`))
+            .then((book) => navigate(`/store/${book?.category?.slug}?cate=${book?.category?.id}
+                &pubs=${book?.publisher?.id}&types=${book?.type}`))
             .catch((rejected) => console.error(rejected));
         handleClose();
     };

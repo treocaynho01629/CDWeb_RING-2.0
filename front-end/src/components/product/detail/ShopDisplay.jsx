@@ -105,7 +105,7 @@ const ShopDisplay = ({ id, name }) => {
                         </ShopInfo>
                         :
                         <ShopInfo>
-                            <Link to={`/filters?shopId=${id}`}>
+                            <Link to={`/store?shopId=${id}`}>
                                 <Avatar
                                     alt={`${name || data?.name} shop avatar`}
                                     sx={{
@@ -124,7 +124,7 @@ const ShopDisplay = ({ id, name }) => {
                                 alignItems="center"
                                 flexGrow={1}
                             >
-                                <Link to={`/filters?shopId=${id}`}>
+                                <Link to={`/store?shopId=${id}`}>
                                     <Box mb={{ xs: 0, md: 1 }}>
                                         <ShopName>{data?.name}</ShopName>
                                         <Verified><VerifiedIcon sx={{ fontSize: '16px', marginRight: 1 }} color="primary" />Đối tác RING!</Verified>

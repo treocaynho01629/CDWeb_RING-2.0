@@ -132,7 +132,7 @@ const ProductDetailContainer = ({ loading, book, mobileMode }) => {
           <tr>
             <InfoTitle><InfoText className="secondary">Tác giả: </InfoText></InfoTitle>
             <InfoStack>
-              <Link to={`/filters?q=${book?.author}`}>
+              <Link to={`/store?q=${book?.author}`}>
                 <InfoText>{book?.author}</InfoText>
               </Link>
             </InfoStack>
@@ -140,7 +140,7 @@ const ProductDetailContainer = ({ loading, book, mobileMode }) => {
           <tr>
             <InfoTitle><InfoText className="secondary">Nhà xuất bản: </InfoText></InfoTitle>
             <InfoStack>
-              <Link to={`/filters?pubId=${book?.publisher?.id}`}>
+              <Link to={`/store?pubs=${book?.publisher?.id}`}>
                 <InfoText>{book?.publisher?.pubName}</InfoText>
               </Link>
             </InfoStack>
@@ -168,7 +168,7 @@ const ProductDetailContainer = ({ loading, book, mobileMode }) => {
           <tr>
             <InfoTitle><InfoText className="secondary">Hình thức: </InfoText></InfoTitle>
             <InfoStack>
-              <Link to={`/filters?type=${book?.type}`}>
+              <Link to={`/store?types=${book?.type}`}>
                 <InfoText>{book?.type}</InfoText>
               </Link>
             </InfoStack>
@@ -217,6 +217,7 @@ const ProductDetailContainer = ({ loading, book, mobileMode }) => {
                   open={openDetail}
                   onOpen={() => setOpenDetail(true)}
                   onClose={() => setOpenDetail(false)}
+                  disableSwipeToOpen={true}
                 >
                   <Box sx={{ padding: '0 12px' }}>
                     <Title>Thông tin chi tiết</Title>

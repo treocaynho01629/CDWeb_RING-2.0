@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { Button, TextField, Box } from '@mui/material';
-import { forwardRef, useEffect, useMemo, useState } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { NumericFormat } from 'react-number-format';
 import { marks } from "../../../ultils/filters";
 import CustomSlider from '../../custom/CustomSlider';
@@ -61,41 +61,35 @@ function valuetext(value) {
     return `${scaledValue.toLocaleString()}đ`;
 }
 
-const PriceRangeSlider = ({ value, onChange }) => {
+const PriceRangeSlider = ({ value, onChange, disabledLabel }) => {
     //Range value
     const firstValue = useMemo(() => reverseCalculateValue(value[0]), [value[0]]);
     const secondValue = useMemo(() => reverseCalculateValue(value[1]), [value[1]]);
-    const [rangeValue, setRangeValue] = useState(firstValue, secondValue);
-
-    //Reset slider value on load
-    useEffect(() => {
-        handleBlur();
-    }, []);
+    const inputValue = useRef([...value]);
+    const [rangeValue, setRangeValue] = useState([firstValue, secondValue]);
 
     useEffect(() => {
         setRangeValue([reverseCalculateValue(value[0]), reverseCalculateValue(value[1])]);
     }, [value]);
 
     //Change range functions
-    const handleChangeRange = (e, newValue) => { setRangeValue(newValue); };
-
-    const handleCommitedRange = (e, newValue) => {
-        //New value
+    const handleChangeRange = (e, newValue) => { 
+        setRangeValue(newValue); 
         const firstInput = calculateValue(newValue[0]);
         const secondInput = calculateValue(newValue[1]);
         const newInputValue = [firstInput, secondInput];
-        onChange(newInputValue);
+        inputValue.current = newInputValue;
     };
 
-    const handleInputChange = (e) => {
+    const handleInputFromChange = (e) => {
         //Input
-        let newValue = [...value];
-        let calculatedInputValue = e.target.value === '' ? '' : Number(e.target.value);
+        let newValue = inputValue.current;
+        let newInputFrom = e.target.value === '' ? '' : Number(e.target.value);
 
         //Threshold
-        if (calculatedInputValue < 0) calculatedInputValue = 0;
-        if (calculatedInputValue > 10000000) calculatedInputValue = 10000000;
-        newValue[0] = calculatedInputValue;
+        if (newInputFrom < 0) newInputFrom = 0;
+        if (newInputFrom > 10000000) newInputFrom = 10000000;
+        newValue[0] = newInputFrom;
 
         //Range
         let newRangeValue = [...rangeValue]
@@ -103,55 +97,44 @@ const PriceRangeSlider = ({ value, onChange }) => {
         newRangeValue[0] = calculatedValue;
 
         //Set
-        onChange(newValue);
         setRangeValue(newRangeValue);
+        inputValue.current = newValue;
     };
 
-    const handleInputChange2 = (e) => {
+    const handleInputToChange = (e) => {
         //Input
-        let newValue = [...value];
-        let calculatedInputValue = e.target.value === '' ? '' : Number(e.target.value);
+        let newValue = inputValue.current;
+        let newInputTo = e.target.value === '' ? '' : Number(e.target.value);
 
         //Threshold
-        if (calculatedInputValue < 0) calculatedInputValue = 0;
-        if (calculatedInputValue > 10000000) calculatedInputValue = 10000000;
-        newValue[1] = calculatedInputValue;
+        if (newInputTo < 0) newInputTo = 0;
+        if (newInputTo > 10000000) newInputTo = 10000000;
+        newValue[1] = newInputTo;
 
         //Range
         let newRangeValue = [...rangeValue]
         newRangeValue[1] = reverseCalculateValue(newValue[1]);
 
         //Set
-        onChange(newValue);
         setRangeValue(newRangeValue);
+        inputValue.current = newValue;
     };
 
-    const handleBlur = () => {
-        let newValue = [...value];
-        if (newValue[0] < 0) {
-            newValue[0] = 0;
-            onChange(newValue);
-        } else if (newValue[0] > 10000000) {
-            newValue[0] = 10000000;
-            onChange(newValue);
-        }
+    const handleChange = () => { if(onChange) onChange(inputValue.current); };
 
-        if (newValue[1] < 0) {
-            newValue[1] = 0;
-            onChange(newValue);
-        } else if (newValue[1] > 10000000) {
-            newValue[1] = 10000000;
-            onChange(newValue);
-        }
-    };
+    const handleReset = () => { 
+        const defaultValue = [0, 10000000];
+        inputValue.current = defaultValue;
+        onChange(defaultValue);
+    }
 
     return (
         <Box>
-            <Box display="flex" justifyContent="space-between" alignItems="center" flexDirection={{ xs: 'column', md_lg: 'row' }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
                 <TextField
-                    onChange={handleInputChange}
-                    onBlur={handleBlur}
-                    value={value[0]}
+                    onChange={handleInputFromChange}
+                    onBlur={handleChange}
+                    value={inputValue.current[0]}
                     size="small"
                     slotProps={{
                         input: { sx: { fontSize: 14, 'input': { textAlign: 'center' } }, inputComponent: NumericFormatCustom }
@@ -159,9 +142,9 @@ const PriceRangeSlider = ({ value, onChange }) => {
                 />
                 &nbsp;&minus;&nbsp;
                 <TextField
-                    onChange={handleInputChange2}
-                    onBlur={handleBlur}
-                    value={value[1]}
+                    onChange={handleInputToChange}
+                    onBlur={handleChange}
+                    value={inputValue.current[1]}
                     size="small"
                     slotProps={{
                         input: { sx: { fontSize: 14, 'input': { textAlign: 'center' } }, inputComponent: NumericFormatCustom }
@@ -177,11 +160,11 @@ const PriceRangeSlider = ({ value, onChange }) => {
                     max={13.3}
                     scale={calculateValue}
                     marks={marks}
-                    valueLabelDisplay="auto"
+                    valueLabelDisplay={disabledLabel ? 'off' : 'auto'}
                     getAriaValueText={valuetext}
                     valueLabelFormat={valuetext}
                     onChange={handleChangeRange}
-                    onChangeCommitted={handleCommitedRange}
+                    onChangeCommitted={handleChange}
                 />
             </Box>
             <Button
@@ -189,8 +172,7 @@ const PriceRangeSlider = ({ value, onChange }) => {
                 color="warning"
                 size="large"
                 fullWidth
-                sx={{ marginTop: 1 }}
-                onClick={() => onChange([0, 10000000])}
+                onClick={handleReset}
             >
                 Đặt lại
             </Button>
