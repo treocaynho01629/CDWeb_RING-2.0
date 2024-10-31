@@ -17,9 +17,11 @@ const CustomPlaceholder = (props) => {
       }}>
         <CircularProgress color="primary" size={40} thickness={5} />
       </Box>
-      <Box visibility="hidden">
-        {children}
-      </Box>
+      {children != null &&
+        <Box visibility="hidden">
+          {children}
+        </Box>
+      }
     </Box>
   )
 }

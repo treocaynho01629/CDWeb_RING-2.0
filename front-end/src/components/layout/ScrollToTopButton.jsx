@@ -18,8 +18,10 @@ const ButtonContainer = styled.div`
         transform: scale(0);
     }
 
-    &.medium {
-        bottom: ${props => props.theme.spacing(8)};
+    ${props => props.theme.breakpoints.down("md")} {
+        &.medium {
+            bottom: ${props => props.theme.spacing(8)};
+        }
     }
 
     ${props => props.theme.breakpoints.down("sm_md")} {

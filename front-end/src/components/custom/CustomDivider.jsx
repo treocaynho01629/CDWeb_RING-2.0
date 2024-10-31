@@ -19,7 +19,6 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
     },
 }));
 
-
 export default function CustomDivider(props) {
     return <StyledDivider {...props} />;
 }

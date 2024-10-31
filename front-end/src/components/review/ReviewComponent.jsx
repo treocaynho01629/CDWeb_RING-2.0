@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
 import { MobileExtendButton, Showmore, Title } from '../custom/GlobalComponents';
-import { Button, DialogActions, DialogTitle, IconButton, Rating, Box, Skeleton } from '@mui/material';
+import { Button, DialogActions, DialogTitle, Rating, Box, Skeleton } from '@mui/material';
 import { KeyboardArrowRight, KeyboardArrowLeft, Star, StarBorder, EditOutlined } from '@mui/icons-material';
 import { ReactComponent as EmptyIcon } from '../../assets/empty.svg';
 import { numFormatter } from '../../ultils/covert';
@@ -172,7 +172,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
         reviewsContent = <MessageContainer>{error?.error}</MessageContainer>
     } else if (isUninitialized && (book?.reviewsInfo?.count[0] ?? 0) == 0) {
         reviewsContent = <MessageContainer>
-            <StyledEmptyIcon/>
+            <StyledEmptyIcon />
             Chưa có đánh giá nào, hãy trở thành người đầu tiên!
         </MessageContainer>
     }
@@ -258,8 +258,8 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                         open={isReview}
                         onClose={() => handleToggleReview(false)}
                     >
-                        <DialogTitle>
-                            <IconButton onClick={() => handleToggleReview(false)}><KeyboardArrowLeft /></IconButton> Đánh giá
+                        <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
+                            <KeyboardArrowLeft onClick={() => handleToggleReview(false)} style={{ marginRight: '4px' }} /> Đánh giá
                         </DialogTitle>
                         <Suspense fallback={<CustomPlaceholder />}>
                             <DialogContent

@@ -205,7 +205,7 @@ const FiltersPage = () => {
         setFilters(prev => ({
             ...prev,
             keyword: searchParams.get("q") ?? DEFAULT_FILTERS.keyword,
-            cate: { id: +searchParams.get("cate"), slug: cSlug ?? DEFAULT_FILTERS.cate.slug }
+            cate: { id: searchParams.get("cate") ? +searchParams.get("cate") : '', slug: cSlug ?? DEFAULT_FILTERS.cate.slug }
         }));
     }, [cSlug, searchParams])
 
@@ -220,6 +220,7 @@ const FiltersPage = () => {
     //#endregion
 
     let loading = (isLoading || isFetching || isError || isUninitialized);
+    let isChanged = !isEqual(filters, DEFAULT_FILTERS);
 
     return (
         <Wrapper>
@@ -254,12 +255,12 @@ const FiltersPage = () => {
                     {!tabletMode &&
                         <Suspense fallback={null}>
                             <FiltersDisplay {...{
-                                filters, setFilters, resetFilter, defaultFilters: DEFAULT_FILTERS,
+                                filters, setFilters, resetFilter, defaultFilters: DEFAULT_FILTERS, isChanged,
                                 pubsRef, typesRef, valueRef, rateRef
                             }} />
                         </Suspense>
                     }
-                    <SortList {...{ filters, pagination, mobileMode, setOpen }}
+                    <SortList {...{ filters, pagination, mobileMode, setOpen, isChanged }}
                         onChangeOrder={handleChangeOrder}
                         onChangeDir={handleChangeDir}
                         onChangeAmount={handleChangeAmount}

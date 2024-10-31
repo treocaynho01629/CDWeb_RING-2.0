@@ -90,8 +90,6 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
   let productsCarousel;
   const loading = (isLoading || isFetching || isError || isUninitialized);
 
-  console.log('rerender')
-
   if (loading) {
     productsCarousel = tempItems;
   } else if (isSuccess) {
