@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Facebook, YouTube, Instagram, Twitter, QrCode, LocalAtm, SystemSecurityUpdateGood, CreditCard, ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Facebook, YouTube, LinkedIn, Twitter, QrCode, LocalAtm, SystemSecurityUpdateGood, CreditCard, ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Grid2 as Grid } from "@mui/material";
 import { useState } from "react";
 
@@ -276,18 +276,10 @@ const Footer = () => {
                             <Logo>RING!&nbsp; <p>- BOOKSTORE</p></Logo>
                             <Description>Khu phố 6, Phường Linh Trung, TP. Thủ Đức - TP. Hồ Chí Minh</Description>
                             <Social>
-                                <SocialIcon color="3B5999">
-                                    <Facebook />
-                                </SocialIcon>
-                                <SocialIcon color="FF0000">
-                                    <YouTube />
-                                </SocialIcon>
-                                <SocialIcon color="E4405F">
-                                    <Instagram />
-                                </SocialIcon>
-                                <SocialIcon color="55ACEE">
-                                    <Twitter />
-                                </SocialIcon>
+                                <SocialIcon color="3B5999"><Facebook /></SocialIcon>
+                                <SocialIcon color="FF0000"><YouTube /></SocialIcon>
+                                <SocialIcon color="0A66C2"><LinkedIn /></SocialIcon>
+                                <SocialIcon color="55ACEE"><Twitter /></SocialIcon>
                             </Social>
                         </AddressContainer>
                     </Grid>

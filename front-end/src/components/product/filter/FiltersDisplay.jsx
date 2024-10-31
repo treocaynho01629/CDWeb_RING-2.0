@@ -67,7 +67,7 @@ const Keyword = styled.div`
 `
 //#endregion
 
-const FiltersDisplay = memo(({ filters, setFilters, defaultFilters, resetFilter, pubsRef, typesRef, valueRef, rateRef }) => {
+const FiltersDisplay = memo(({ filters, setFilters, defaultFilters, resetFilter, isChanged, pubsRef, typesRef, valueRef, rateRef }) => {
     const { keyword, cate, shopId, ...leftFilters } = filters;
     let filtersApplied = [];
 
@@ -86,7 +86,7 @@ const FiltersDisplay = memo(({ filters, setFilters, defaultFilters, resetFilter,
     const createChips = () => {
         let content = [];
 
-        if (!isEqual(filters, defaultFilters)) {
+        if (isChanged) {
             if (!isEqual(filters.pubIds, defaultFilters.pubIds)) {
                 content.push(<FilterChip key={'chip-pubs'} onClick={scrollToPubs}>
                     Nhà xuất bản ({filters.pubIds.length})

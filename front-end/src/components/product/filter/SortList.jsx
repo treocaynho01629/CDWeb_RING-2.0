@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import { Suspense, lazy } from "react";
-import { Button, MenuItem, TextField, InputAdornment, IconButton } from '@mui/material';
+import { Button, MenuItem, TextField, InputAdornment, IconButton, Badge } from '@mui/material';
 import { Sort, Straight } from '@mui/icons-material';
 import { orderGroup } from "../../../ultils/filters";
 
@@ -108,7 +108,7 @@ const StyledSortButton = styled(Button)`
 `
 //#endregion
 
-const SortList = ({ mobileMode, pagination, onChangeOrder, onChangeDir, onChangeAmount, onPageChange, setOpen }) => {
+const SortList = ({ mobileMode, pagination, onChangeOrder, onChangeDir, onChangeAmount, onPageChange, setOpen, isChanged }) => {
     const handleChangeOrder = (e) => { if (onChangeOrder) onChangeOrder(e.target.value) };
     const handleChangeDir = () => {
         let newValue = pagination?.sortDir == 'desc' ? 'asc' : 'desc';
@@ -165,7 +165,11 @@ const SortList = ({ mobileMode, pagination, onChangeOrder, onChangeDir, onChange
                     <StyledSortButton
                         fullWidth={mobileMode}
                         onClick={handleSetOpen}
-                        endIcon={<Sort />}
+                        endIcon={
+                            <Badge color="primary" variant="dot" invisible={!isChanged}>
+                                <Sort />
+                            </Badge>
+                        }
                     >
                         Lọc
                     </StyledSortButton>

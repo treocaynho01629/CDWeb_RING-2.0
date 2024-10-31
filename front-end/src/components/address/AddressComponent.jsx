@@ -1,7 +1,6 @@
-import { useTheme } from "styled-components"
 import { useState } from 'react'
 import { useGetProfileQuery, useUpdateProfileMutation } from '../../features/users/usersApiSlice';
-import { Box, Button, CircularProgress, Dialog, ListItemIcon, ListItemText, Menu, MenuItem, useMediaQuery } from '@mui/material';
+import { Box, Button, CircularProgress, Dialog, ListItemIcon, ListItemText, Menu, MenuItem, useTheme, useMediaQuery } from '@mui/material';
 import { AddHome, Delete, Home, LocationOn } from '@mui/icons-material';
 import { Title } from "../custom/GlobalComponents";
 import AddressItem from './AddressItem'
@@ -139,7 +138,7 @@ const AddressComponent = ({ pending, setPending }) => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => handleOpen()}
+            onClick={handleOpen}
             endIcon={<AddHome />}
           >
             Thêm địa chỉ
