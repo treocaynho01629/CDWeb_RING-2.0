@@ -17,19 +17,13 @@ const ProductDetailContainer = lazy(() => import('../components/product/detail/P
 const ReviewComponent = lazy(() => import('../components/review/ReviewComponent'));
 
 const createCrumbs = (cate) => {
-    if (cate?.parent) {
+    if (cate) {
         return ([
             createCrumbs(cate?.parent),
-            <NavLink to={`/store/${cate?.slug}?cate=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
+            <NavLink to={`/store/${cate?.slug}?cate=${cate?.id}`} end key={`crumb-${cate?.id}`}>
                 {cate?.categoryName}
             </NavLink>
         ])
-    } else {
-        return (
-            <NavLink to={`/store/${cate?.slug}?cate=${cate?.id}`} key={`bread-cate-${cate?.id}`}>
-                {cate?.categoryName}
-            </NavLink>
-        )
     }
 }
 
@@ -89,14 +83,14 @@ const ProductDetail = () => {
                 <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
                     {data
                         ? [
-                            <NavLink to={'/store'} key={'filters'}>
+                            <NavLink to={'/store'} key={'store'}>
                                 Danh mục sản phẩm
                             </NavLink>,
                             createCrumbs(data?.category),
                             <NavLink to={`/store?pubs=${data?.publisher?.id}`} key={'publisher'}>
                                 {data?.publisher?.pubName}
                             </NavLink>,
-                            <strong style={{ textDecoration: 'underline' }} key={'book-title'}>{data?.title}</strong>
+                            <NavLink to="#" key={'book-title'}>{data?.title}</NavLink>
                         ]
                         :
                         <Skeleton variant="text" sx={{ fontSize: '16px' }} width={300} />

@@ -66,7 +66,8 @@ function App() {
 
                 <Route element={<ProfileLayout />}>
                   <Route path="/profile/detail/:tab?" element={<Profile />} />
-                  <Route path="/profile/orders/:id?" element={<Orders />} />
+                  <Route path="/profile/order" element={<Orders />} />
+                  <Route path="/profile/review" element={<Orders />} />
                 </Route>
               </Route>
             </Route>

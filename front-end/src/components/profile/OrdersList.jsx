@@ -1,57 +1,78 @@
 import styled from "styled-components"
 import { useState } from 'react';
 import { useGetOrdersByUserQuery } from '../../features/orders/ordersApiSlice';
-import { Check, DeliveryDining, Receipt, Storefront } from '@mui/icons-material';
+import { Check, DeliveryDiningOutlined, KeyboardArrowLeft, KeyboardArrowRight, Receipt, Storefront } from '@mui/icons-material';
 import { Box, Button, Skeleton } from '@mui/material';
 import { Link } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { Title } from "../custom/GlobalComponents";
 import CustomProgress from '../custom/CustomProgress';
 import useCart from '../../hooks/useCart';
 
 //#region styled
 const ItemTitle = styled.p`
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 14px;
     text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
-    margin: 0;
+    margin: 5px 0px;
 	
-	@supports (-webkit-line-clamp: 1) {
+	@supports (-webkit-line-clamp: 2) {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: initial;
       display: -webkit-box;
-      -webkit-line-clamp: 1;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
     }
+
+    &:hover {
+        color: ${props => props.theme.palette.info.main};
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        font-size: 13px;
+
+        @supports (-webkit-line-clamp: 1) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: initial;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+        }
+    }
+`
+
+const Shop = styled.b`
+    font-size: 15px;
+	white-space: nowrap;
+    display: flex;
+    align-items: center;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        font-size: 14px;
+        margin: 8px 0;
+    }
+`
+
+const ShopTag = styled.span`
+    background-color: ${props => props.theme.palette.primary.main};
+    color: ${props => props.theme.palette.primary.contrastText};
+    padding: 2px 10px;
+    margin-right: 8px;
+`
+
+const StatusTag = styled.span`
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-weight: 450;
+    color: ${props => props.theme.palette.primary.dark};
 
     ${props => props.theme.breakpoints.down("sm")} {
         font-size: 14px;
     }
-`
-
-const SellerTag = styled.p`
-    background-color: ${props => props.theme.palette.primary.main};
-    color: ${props => props.theme.palette.primary.contrastText};
-    display: flex;
-    align-items: center;
-    margin: 0;
-    padding: 2px 10px;
-    margin-right: 10px;
-`
-
-const StatusTag = styled.p`
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    margin: 0;
-    font-weight: bold;
-    padding-left: 5px;
-    margin-left: 10px;
-    border-left: .5px solid;
-    border-color: ${props => props.theme.palette.action.focus};
-    color: ${props => props.theme.palette.primary.main};
 `
 
 const DetailText = styled.p`
@@ -60,72 +81,106 @@ const DetailText = styled.p`
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    text-decoration: underline;
     color: ${props => props.theme.palette.primary.dark};
 `
 
-const Amount = styled.p`
+const Amount = styled.span`
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 450;
+    margin-right: ${props => props.theme.spacing(2)};
+    color: ${props => props.theme.palette.text.secondary};
 
-    &.alt {
-        display: none;
-        
-        ${props => props.theme.breakpoints.down("sm")} {
-            display: block;
-        }
+    b {
+        color: ${props => props.theme.palette.warning.main};
     }
 `
 
+const ContentContainer = styled.div`
+    margin-left: 10px;
+    width: 100%;
+    max-height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+`
+
+const StuffContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        flex-direction: row-reverse;
+    }
+`
+
+const PriceContainer = styled.div`
+`
+
 const Price = styled.p`
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 16px;
+    font-weight: 450;
+    text-align: left;
+    color: ${props => props.theme.palette.primary.main};
     margin: 0;
-    color: ${props => props.theme.palette.text.secondary};
 
     &.total {
-        font-size: 16px;
-        color: ${props => props.theme.palette.primary.main};
+        color: ${props => props.theme.palette.warning.light};
     }
+`
+
+const Discount = styled.p`
+    font-size: 12px;
+    color: ${props => props.theme.palette.text.disabled};
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    text-align: center;
+    text-decoration: line-through;
 `
 
 const OrderItemContainer = styled.div`
     border: .5px solid;
     border-color: ${props => props.theme.palette.action.focus};
-    margin-bottom: 15px;
+    margin-bottom: ${props => props.theme.spacing(2)};
 `
 
 const HeadContainer = styled.div`
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    font-size: 16px;
+    padding: ${props => props.theme.spacing(2)};
     border-bottom: .5px solid;
     border-color: ${props => props.theme.palette.action.focus};
-    background-color: ${props => props.theme.palette.action.hover};
 
     ${props => props.theme.breakpoints.down("sm")} {
-        font-size: 14px;
-        svg { font-size: 18px;}
+        padding: ${props => props.theme.spacing(1)};
     }
 `
 
 const BodyContainer = styled.div`
-    padding: 15px;
+    position: relative;
+    width: 100%;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    padding: ${props => props.theme.spacing(2)};
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: ${props => props.theme.spacing(1)};
+    }
 `
 
 const BotContainer = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
+    padding: ${props => props.theme.spacing(2)};
     border-top: .5px solid;
     border-color: ${props => props.theme.palette.action.focus};
 
     ${props => props.theme.breakpoints.down("sm")} {
+        padding: ${props => props.theme.spacing(1)};
         font-size: 14px;
         align-items: flex-start;
     }
@@ -157,7 +212,78 @@ const StyledSkeleton = styled(Skeleton)`
 
 const defaultSize = 5;
 
-const OrdersList = ({ Title }) => {
+function OrderItem({ order, handleAddToCart }) {
+
+    return (
+        <>
+            {order?.details?.map((detail, index) => (
+                <OrderItemContainer key={`order-${detail?.id}-${index}`}>
+                    <HeadContainer>
+                        <Link to={`/store/${detail?.shopId}`}>
+                            <Shop>
+                                <ShopTag>Đối tác</ShopTag>
+                                <Storefront />&nbsp;{detail?.shopName}<KeyboardArrowRight fontSize="small" />
+                            </Shop>
+                        </Link>
+                        <Link to={`/profile/orders/detail${detail?.id}`}>
+                            <StatusTag><Check />ĐÃ GIAO</StatusTag>
+                        </Link>
+                    </HeadContainer>
+                    {detail?.items?.map((item, itemIndex) => (
+                        <Link key={`item-${item?.id}-${itemIndex}`} to={`/product/${item?.bookSlug}`}>
+                            <BodyContainer>
+                                <StyledLazyImage
+                                    src={`${item?.image}?size=small`}
+                                    alt={`${item?.bookTitle} Order item`}
+                                    placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
+                                />
+                                <ContentContainer>
+                                    <ItemTitle>{item?.bookTitle}</ItemTitle>
+                                    <StuffContainer>
+                                        <Amount>Số lượng: <b>{item?.quantity}</b></Amount>
+                                        <PriceContainer>
+                                            <Discount>{item?.discount > 0 ? `${item.price.toLocaleString()}đ` : ''}</Discount>
+                                            <Price>{Math.round(item.price * (1 - (item?.discount || 0))).toLocaleString()}đ</Price>
+                                        </PriceContainer>
+                                    </StuffContainer>
+                                </ContentContainer>
+                            </BodyContainer>
+                        </Link>
+                    ))}
+                    <BotContainer>
+                        <Link to={`/profile/orders/detail${detail?.id}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
+                            <DetailText><DeliveryDiningOutlined />&nbsp;Chi tiết đơn hàng</DetailText>
+                        </Link>
+                        <Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '5px' }}>
+                                <p style={{ margin: 0 }}>Thành tiền:</p>
+                                <Price className="total">&nbsp;{(detail?.totalPrice - detail?.totalDiscount).toLocaleString()}đ</Price>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <Link to={`/product/${detail?.slug}`}>
+                            </Link>
+                                <Button variant="contained" color="primary">
+                                    Mua lại
+                                </Button>
+                                <Box display={{ xs: 'none', sm: 'block' }}>
+                                    <Link to={`/product/${detail?.slug}?tab=reviews`}>
+                                        <Button variant="outlined" color="secondary" sx={{ marginLeft: '10px' }}>
+                                            Đánh giá sản phẩm
+                                        </Button>
+                                    </Link>
+                                </Box>
+                            </Box>
+                        </Box>
+                    </BotContainer>
+                </OrderItemContainer>
+            )
+            )}
+        </>
+
+    )
+}
+
+const OrdersList = () => {
     const { addProduct } = useCart();
     const [pagination, setPagination] = useState({
         currPage: 0,
@@ -180,7 +306,7 @@ const OrdersList = ({ Title }) => {
         //     image: detail.image,
         //     quantity: 1,
         // })
-        console.log('deal with this later');
+        console.log('FIX');
     };
 
     //Show more
@@ -204,79 +330,7 @@ const OrdersList = ({ Title }) => {
             ? ids?.map((id) => {
                 const order = entities[id];
 
-                return (
-                    order?.orderDetails?.map((detail, index) => (
-                        <OrderItemContainer key={`${detail.id}-${index}`}>
-                            <HeadContainer>
-                                <Link to={`/store?seller=${detail.sellerName}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
-                                    <SellerTag>Đối tác&nbsp;<Check fontSize="small" /></SellerTag>
-                                    {detail.sellerName}
-                                    <Button
-                                        variant="outlined"
-                                        sx={{
-                                            display: { xs: 'none', md_lg: 'flex' },
-                                            marginLeft: '10px',
-                                            paddingLeft: '7px',
-                                            paddingRight: '7px',
-                                            whiteSpace: 'nowrap'
-                                        }}
-                                        startIcon={<Storefront />}
-                                    >
-                                        Xem Shop
-                                    </Button>
-                                </Link>
-                                <Link to={`/profile/orders/${order.id}--${detail.id}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
-                                    <StatusTag><Check />ĐÃ GIAO</StatusTag>
-                                </Link>
-                            </HeadContainer>
-                            <Link to={`/product/${detail.slug}`} style={{ color: 'inherit' }}>
-                                <BodyContainer>
-                                    <Box display="flex">
-                                        <StyledLazyImage
-                                            src={`${detail.image}?size=small`}
-                                            alt={`${detail.title} Order item`}
-                                            placeholder={<StyledSkeleton variant="rectangular" animation={false}/>}
-                                        />
-                                        <div style={{ marginLeft: '20px', marginTop: '10px' }}>
-                                            <ItemTitle>{detail.bookTitle}</ItemTitle>
-                                            <Amount>Số lượng: {detail.amount}</Amount>
-                                        </div>
-                                    </Box>
-                                    <Box display={{ xs: 'none', sm: 'block' }}>
-                                        <Price>{detail.price.toLocaleString()}đ</Price>
-                                    </Box>
-                                </BodyContainer>
-                            </Link>
-                            <BotContainer>
-                                <Link to={`/profile/orders/${order.id}--${detail.id}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
-                                    <DetailText><DeliveryDining />&nbsp;Chi tiết đơn hàng</DetailText>
-                                </Link>
-                                <Box>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '5px' }}>
-                                        <p style={{ margin: 0 }}>Thành tiền:</p>
-                                        <Price className="total">&nbsp;{(detail.price * detail.amount).toLocaleString()}đ</Price>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={() => handleAddToCart(detail)}
-                                        >
-                                            Mua lại
-                                        </Button>
-                                        <Box display={{ xs: 'none', sm: 'block' }}>
-                                            <Link to={`/product/${detail.slug}?tab=reviews`}>
-                                                <Button variant="outlined" sx={{ marginLeft: '10px' }}>
-                                                    Đánh giá sản phẩm
-                                                </Button>
-                                            </Link>
-                                        </Box>
-                                    </Box>
-                                </Box>
-                            </BotContainer>
-                        </OrderItemContainer>
-                    ))
-                )
+                return (<OrderItem {...{ order, handleAddToCart }} />)
             })
             :
             <Box sx={{ marginBottom: 5 }}>Chưa có đơn hàng nào</Box>
@@ -286,15 +340,18 @@ const OrdersList = ({ Title }) => {
 
     return (
         <>
-            <Title><Receipt />&nbsp;ĐƠN HÀNG CỦA BẠN</Title>
+            <Title className="primary">
+                <Link to={'/profile/detail'}><KeyboardArrowLeft /></Link>
+                <Receipt />&nbsp;ĐƠN HÀNG CỦA BẠN
+            </Title>
             {ordersContent}
             {/* <div style={{
-                        display: more?.last ? 'none' : 'flex',
-                        justifyContent: 'center',
-                        margin: '20px 0px'
-                    }}>
-                        <Button onClick={handleShowMore}>Xem thêm</Button>
-                    </div> */}
+                display: more?.last ? 'none' : 'flex',
+                justifyContent: 'center',
+                margin: '20px 0px'
+            }}>
+                <Button onClick={handleShowMore}>Xem thêm</Button>
+            </div> */}
         </>
     )
 }

@@ -11,6 +11,7 @@ import com.ring.bookstore.dtos.orders.CalculateDTO;
 import com.ring.bookstore.dtos.ChartDTO;
 import com.ring.bookstore.dtos.mappers.CalculateMapper;
 import com.ring.bookstore.dtos.mappers.ChartDataMapper;
+import com.ring.bookstore.dtos.orders.DetailOrderDTO;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.*;
 import com.ring.bookstore.request.*;
@@ -40,6 +41,7 @@ import lombok.RequiredArgsConstructor;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderReceiptRepository orderRepo;
+    private final OrderDetailRepository detailRepo;
     private final BookRepository bookRepo;
     private final ShopRepository shopRepo;
     private final CouponRepository couponRepo;
@@ -370,6 +372,14 @@ public class OrderServiceImpl implements OrderService {
         OrderReceipt order = orderRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found!"));
         OrderDTO orderDTO = orderMapper.orderToOrderDTO(order); //Map to DTO
         return orderDTO;
+    }
+
+    //Get detail order by {detail's id}
+    @Override
+    public DetailOrderDTO getDetailOrder(Long id) {
+        OrderDetail orderDetail = detailRepo.findDetailById(id).orElseThrow(() -> new ResourceNotFoundException("Detail not found!"));
+        DetailOrderDTO detailDTO = orderMapper.orderToDetailDTO(orderDetail); //Map to DTO
+        return detailDTO;
     }
 
     //Get monthly sales

@@ -74,7 +74,7 @@ const ForgotDialog = ({ open, setOpen }) => {
 
     return (
         <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
-            <DialogTitle sx={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>Nhập email tài khoản</DialogTitle>
+            <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>Nhập email tài khoản</DialogTitle>
             <DialogContent sx={{ overflow: 'visible' }}>
                 <form onSubmit={handleForgotPassword}>
                     <Instruction

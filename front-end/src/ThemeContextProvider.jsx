@@ -28,13 +28,16 @@ export function ThemeContextProvider({ children }) {
                         contrastText: "#ffffff",
                     },
                     info: {
-                        main: "#636de3",
+                        main: "#63aee3",
                     },
                     error: {
-                        main: "#e66161"
+                        main: "#ef5350"
+                    },
+                    warning: {
+                        main: "#ffa726"
                     },
                     success: {
-                        main: "#63e399",
+                        main: "#6de363",
                         contrastText: "#ffffff",
                     },
                     secondary: {
@@ -43,7 +46,6 @@ export function ThemeContextProvider({ children }) {
                     },
                     background: {
                         elevate: '#fff',
-                        contrast: '#f5f5f5'
                     },
                     ...(mode === 'dark'
                         && {
@@ -51,8 +53,9 @@ export function ThemeContextProvider({ children }) {
                             primary: '#f1f1f1',
                         },
                         background: {
+                            default: '#080d08',
+                            paper: '#080d08',
                             elevate: '#1e1e1e',
-                            contrast: '#121212'
                         },
                     }),
                 },

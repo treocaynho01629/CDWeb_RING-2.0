@@ -1,14 +1,23 @@
 import styled from "styled-components"
 import { useState } from "react";
-import { List, Collapse, Avatar, ListItemButton, Badge } from '@mui/material';
-import { ExpandLess, ExpandMore, EditOutlined, Person as PersonIcon, Receipt as ReceiptIcon, Try as TryIcon } from '@mui/icons-material';
+import { List, Collapse, Avatar, ListItemButton, Badge, Divider, alpha } from '@mui/material';
+import {
+    ExpandLess, ExpandMore, EditOutlined, Person as PersonIcon, RateReviewOutlined, KeyboardArrowRight,
+    PersonAddAlt1, LocalShippingOutlined, Replay, DomainVerification, PendingOutlined, ReceiptLongOutlined,
+    LocalActivityOutlined
+} from '@mui/icons-material';
 import { NavLink } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { MobileExtendButton } from "../custom/GlobalComponents";
 
 //#region styled
 const ListContainer = styled.div`
     position: relative;
     width: 100%;
+
+    ${props => props.theme.breakpoints.down("md")} {
+        padding: 10px 12px;
+    }
 `
 
 const ProfileContainer = styled.div`
@@ -16,21 +25,35 @@ const ProfileContainer = styled.div`
     padding: 15px 10px;
 
     ${props => props.theme.breakpoints.down("md")} {
-        padding: 10px 15px;
+        padding: 10px 2px;
+        padding-top: 0;
     }
 `
 
 const MainProfile = styled.div`
     display: flex;
-    align-items: center;
     width: 100%;
-    margin-bottom: ${props => props.theme.spacing(1.5)};
+    
+
+    ${props => props.theme.breakpoints.down("md")} {
+        margin-bottom: ${props => props.theme.spacing(1.5)};
+    }
 `
 
 const InfoContainer = styled.div`
     margin-left: ${props => props.theme.spacing(1)};
     overflow: hidden;
     width: 100%;
+`
+
+const StyledAvatar = styled(Avatar)`
+    width: 45px;
+    height: 45px;
+
+    ${props => props.theme.breakpoints.down("md")} {
+        width: 55px;
+        height: 55px;
+    }
 `
 
 const UserContainer = styled.div`
@@ -49,8 +72,10 @@ const Username = styled.span`
 `
 
 const Name = styled.p`
-    margin: -2px 0;
-    font-size: 14px;
+    margin-top: -4px;
+    margin-bottom: -2px;
+    font-size: 16px;
+    font-weight: 400;
     color: ${props => props.theme.palette.text.secondary};
     text-overflow: ellipsis;
 	overflow: hidden;
@@ -84,48 +109,35 @@ const EditButton = styled.span`
     max-width: 100px;
     align-items: center;
     font-weight: 500;
-    padding: 2px 10px;
+    display: none;
+    padding: 4px;
+    border-radius: 50%;
+    aspect-ratio: 1/1;
     font-size: 13px;
-    border-radius: 15px;
-    white-space: nowrap;
-    background-color: ${props => props.theme.palette.action.focus};
+    justify-content: flex-end;
+    background-color: ${props => props.theme.palette.grey[300]};
+    border: 2px solid ${props => props.theme.palette.background.default};
     cursor: pointer;
 
     svg {
-        font-size: 16px;
-        margin-right: 3px;
+        font-size: 16px; 
+        margin-right: 0; 
     }
 
     &:hover {
-        text-decoration: underline;
         color: ${props => props.theme.palette.primary.main};
-        background-color: ${props => props.theme.palette.action.hover};
+        background-color: ${props => props.theme.palette.grey[200]};
         transition: .25s ease;
     }
 
-    &.badge {
-        display: none;
-        padding: 4px;
-        border-radius: 50%;
-        aspect-ratio: 1/1;
-        justify-content: flex-end;
-        background-color: ${props => props.theme.palette.grey[300]};
-        border: 2px solid ${props => props.theme.palette.background.default};
-
-        svg {
-            font-size: 16px; 
-            margin-right: 0; 
-        }
-    }
-
     ${props => props.theme.breakpoints.down("md")} {
-        display: none;
-
-        &.badge {  display: flex; }
+        display: flex;
     }
 `
 
 const ItemText = styled.h3`
+    position: relative;
+    width: 100%;
     font-size: 16px;
     margin: 5px 0px;
     color: inherit;
@@ -136,8 +148,7 @@ const ItemText = styled.h3`
 
 const StyledListItemButton = styled(ListItemButton)`
     justify-content: space-between;
-    padding-top: ${props => props.theme.spacing(.5)};
-    padding-bottom: ${props => props.theme.spacing(.5)};
+    padding: ${props => props.theme.spacing(.5)} ${props => props.theme.spacing(2)};
 
     &.secondary {
         padding: 0;
@@ -159,6 +170,14 @@ const StyledListItemButton = styled(ListItemButton)`
             background-color: ${props => props.theme.palette.action.hover};
         }
     }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: ${props => props.theme.spacing(.5)} 0;
+
+        ${ItemText} {
+            font-size: 14px;
+        }
+    }
 `
 
 const AdditionalInfo = styled.div`
@@ -172,21 +191,52 @@ const Additional = styled.span`
     justify-content: center;
     align-items: center;
     flex-grow: 1;
-    padding: 1px 4px;
-    border: .5px solid ${props => props.theme.palette.primary.main};
-`
-
-const AddContainer = styled.span`
     font-size: 14px;
-    color: ${props => props.theme.palette.text.secondary};
+
+    svg {
+        font-size: 15px;
+        margin-right: 3px;
+    }
+
+    b { 
+        margin-left: 5px;
+        color: ${props => props.theme.palette.warning.main}; 
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        font-size: 12px;
+    }
 `
 
-const AddCount = styled.p`
-    margin-top: -4px;
-    margin-bottom: 0;
-    font-size: 13px;
-    font-weight: 500;
-    color: ${props => props.theme.palette.text.primary};
+const NavWrapper = styled.div`
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+`
+
+const NavItem = styled.div`
+    width: 25%;
+    padding: 4px 0;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all .25s ease;
+
+    p {
+        margin: 5px 0;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    svg {
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 2.6rem;
+        color: ${props => props.theme.palette.primary.dark};
+        background-color: ${props => alpha(props.theme.palette.primary.light, .3)};
+    }
 `
 //#endregion
 
@@ -202,15 +252,15 @@ const ProfileTabsList = ({ profile, loading, error, tabletMode }) => {
 
     return (
         <ListContainer>
-            <NavLink to={'/profile/detail/info'}>
-                <ProfileContainer>
+            <ProfileContainer>
+                <NavLink to={'/profile/detail/info'}>
                     <MainProfile>
                         <Badge
                             overlap="circular"
                             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                             badgeContent={<EditButton className="badge"><EditOutlined /></EditButton>}
                         >
-                            <Avatar sx={{ width: 55, height: 55 }} src={image ? image + '?size=tiny' : null} />
+                            <StyledAvatar src={image ? image + '?size=tiny' : null} />
                         </Badge>
                         <InfoContainer>
                             <UserContainer>
@@ -219,71 +269,118 @@ const ProfileTabsList = ({ profile, loading, error, tabletMode }) => {
                                     {role == 3 ? 'Admin' : role == 2 ? 'Đối tác' : 'Thành viên'}
                                 </Role>
                             </UserContainer>
-                            <EditButton><EditOutlined />Sửa hồ sơ</EditButton>
                         </InfoContainer>
                     </MainProfile>
+                </NavLink>
+                {tabletMode &&
                     <AdditionalInfo>
                         <Additional>
-                            <AddContainer>Theo dõi<AddCount>99 Shop</AddCount></AddContainer>
+                            <PersonAddAlt1 color="warning" />Theo dõi:<b>99</b>
                         </Additional>
                         <Additional>
-                            <AddContainer>Mã giảm<AddCount>99 Mã</AddCount></AddContainer>
+                            <PersonAddAlt1 color="warning" />Theo dõi:<b>99</b>
                         </Additional>
                         <Additional>
-                            <AddContainer>Địa chỉ<AddCount>99 Địa chỉ</AddCount></AddContainer>
+                            <PersonAddAlt1 color="warning" />Theo dõi:<b>99</b>
                         </Additional>
                     </AdditionalInfo>
-                </ProfileContainer>
-            </NavLink>
+                }
+            </ProfileContainer>
+            <Divider />
             <List sx={{ width: '100%', py: 0 }} component="profile-nav">
-                <NavLink to={'/profile/detail'}>
-                    {({ isActive }) => (
-                        <StyledListItemButton selected={isActive} onClick={toggleOpen} tabIndex={-1}>
-                            <ItemText><PersonIcon />&nbsp;Tài khoản của tôi</ItemText>
-                            {open ? <ExpandLess /> : <ExpandMore />}
-                        </StyledListItemButton>
-                    )}
-                </NavLink>
-                <Collapse in={open} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                        <NavLink to={'/profile/detail/info'} end>
+                {!tabletMode &&
+                    <>
+                        <NavLink to={'/profile/detail'}>
                             {({ isActive }) => (
-                                <StyledListItemButton selected={isActive} className="secondary">
-                                    <ItemText>Hồ sơ</ItemText>
+                                <StyledListItemButton selected={isActive} onClick={toggleOpen} tabIndex={-1}>
+                                    <ItemText><PersonIcon />&nbsp;Tài khoản của tôi</ItemText>
+                                    {open ? <ExpandLess /> : <ExpandMore />}
                                 </StyledListItemButton>
                             )}
                         </NavLink>
-                    </List>
-                    <List component="div" disablePadding>
-                        <NavLink to={'/profile/detail/address'} end>
-                            {({ isActive }) => (
-                                <StyledListItemButton selected={isActive} className="secondary" >
-                                    <ItemText>Địa chỉ</ItemText>
-                                </StyledListItemButton>
-                            )}
-                        </NavLink>
-                    </List>
-                    <List component="div" disablePadding>
-                        <NavLink to={'/profile/detail/password'} end>
-                            {({ isActive }) => (
-                                <StyledListItemButton selected={isActive} className="secondary">
-                                    <ItemText>Đổi mật khẩu</ItemText>
-                                </StyledListItemButton>
-                            )}
-                        </NavLink>
-                    </List>
-                </Collapse>
+                        <Collapse in={open} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <NavLink to={'/profile/detail/info'} end>
+                                    {({ isActive }) => (
+                                        <StyledListItemButton selected={isActive} className="secondary">
+                                            <ItemText>Hồ sơ</ItemText>
+                                        </StyledListItemButton>
+                                    )}
+                                </NavLink>
+                            </List>
+                            <List component="div" disablePadding>
+                                <NavLink to={'/profile/detail/address'} end>
+                                    {({ isActive }) => (
+                                        <StyledListItemButton selected={isActive} className="secondary" >
+                                            <ItemText>Sổ địa chỉ</ItemText>
+                                        </StyledListItemButton>
+                                    )}
+                                </NavLink>
+                            </List>
+                            <List component="div" disablePadding>
+                                <NavLink to={'/profile/detail/password'} end>
+                                    {({ isActive }) => (
+                                        <StyledListItemButton selected={isActive} className="secondary">
+                                            <ItemText>Đổi mật khẩu</ItemText>
+                                        </StyledListItemButton>
+                                    )}
+                                </NavLink>
+                            </List>
+                        </Collapse>
+                    </>
+                }
                 <NavLink to={'/profile/orders'} end>
                     {({ isActive }) => (
                         <StyledListItemButton selected={isActive} tabIndex={-1}>
-                            <ItemText><ReceiptIcon />&nbsp;Đơn hàng</ItemText>
+                            <ItemText><ReceiptLongOutlined />&nbsp;Đơn hàng
+                                <MobileExtendButton>
+                                    <KeyboardArrowRight fontSize="small" />
+                                </MobileExtendButton>
+                            </ItemText>
                         </StyledListItemButton>
                     )}
                 </NavLink>
+                {tabletMode &&
+                    <NavWrapper>
+                        <NavItem>
+                            <PendingOutlined />
+                            <p>Đang xử lý</p>
+                        </NavItem>
+                        <NavItem>
+                            <LocalShippingOutlined />
+                            <p>Đang vận chuyển</p>
+                        </NavItem>
+                        <NavItem>
+                            <DomainVerification />
+                            <p>Đã giao</p>
+                        </NavItem>
+                        <NavItem>
+                            <Replay />
+                            <p>Đổi trả</p>
+                        </NavItem>
+                    </NavWrapper>
+                }
+                <Divider />
                 <NavLink to={'/profile/reviews'} end>
                     {({ isActive }) => (
                         <StyledListItemButton selected={isActive} tabIndex={-1}>
-                            <ItemText><TryIcon />&nbsp;Đánh giá</ItemText>
+                            <ItemText><RateReviewOutlined />&nbsp;Đánh giá
+                                <MobileExtendButton>
+                                    <KeyboardArrowRight fontSize="small" />
+                                </MobileExtendButton>
+                            </ItemText>
+                        </StyledListItemButton>
+                    )}
+                </NavLink>
+                <Divider />
+                <NavLink to={'/profile/reviews'} end>
+                    {({ isActive }) => (
+                        <StyledListItemButton selected={isActive} tabIndex={-1}>
+                            <ItemText><LocalActivityOutlined />&nbsp;Mã giảm giá
+                                <MobileExtendButton>
+                                    <KeyboardArrowRight fontSize="small" />
+                                </MobileExtendButton>
+                            </ItemText>
                         </StyledListItemButton>
                     )}
                 </NavLink>

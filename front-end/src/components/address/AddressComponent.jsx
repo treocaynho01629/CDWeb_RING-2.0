@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useGetProfileQuery, useUpdateProfileMutation } from '../../features/users/usersApiSlice';
 import { Box, Button, CircularProgress, Dialog, ListItemIcon, ListItemText, Menu, MenuItem, useTheme, useMediaQuery } from '@mui/material';
-import { AddHome, Delete, Home, LocationOn } from '@mui/icons-material';
+import { AddHome, Delete, Home, KeyboardArrowLeft, LocationOn } from '@mui/icons-material';
 import { Title } from "../custom/GlobalComponents";
 import AddressItem from './AddressItem'
 import AddressForm from './AddressForm'
 import useCart from '../../hooks/useCart';
+import { Link } from 'react-router-dom';
 
 const AddressComponent = ({ pending, setPending }) => {
   const { addresses, addNewAddress, removeAddress } = useCart();
@@ -130,21 +131,20 @@ const AddressComponent = ({ pending, setPending }) => {
 
   return (
     <>
-      <Box padding={{ xs: '0 15px', sm: 0 }}>
-        <Title className="primary">
-          <Box display="flex" alignItems="center" flexGrow={1}>
-            <LocationOn />&nbsp;Địa chỉ của bạn
-          </Box>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpen}
-            endIcon={<AddHome />}
-          >
-            Thêm địa chỉ
-          </Button>
-        </Title>
-      </Box>
+      <Title className="primary">
+        <Box display="flex" alignItems="center" flexGrow={1}>
+          <Link to={'/profile/detail/info'}><KeyboardArrowLeft /></Link>
+          <LocationOn />&nbsp;Địa chỉ của bạn
+        </Box>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleOpen}
+          endIcon={<AddHome />}
+        >
+          Thêm địa chỉ
+        </Button>
+      </Title>
       {
         (loadProfile && !profile)
           ?

@@ -1,6 +1,7 @@
 package com.ring.bookstore.controller;
 
 import com.ring.bookstore.dtos.orders.CalculateDTO;
+import com.ring.bookstore.dtos.orders.DetailOrderDTO;
 import com.ring.bookstore.request.CalculateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -66,6 +67,14 @@ public class OrderController {
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> getOrderById(@PathVariable("id") Long id){
 		OrderDTO order = orderService.getOrderById(id);
+        return new ResponseEntity< >(order, HttpStatus.OK);
+    }
+
+    //Get order by {id}
+    @GetMapping("/detail/{id}")
+    @PreAuthorize("hasAnyRole('USER')")
+    public ResponseEntity<?> getOrderDetailById(@PathVariable("id") Long id){
+        DetailOrderDTO order = orderService.getDetailOrder(id);
         return new ResponseEntity< >(order, HttpStatus.OK);
     }
 	

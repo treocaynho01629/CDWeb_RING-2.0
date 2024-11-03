@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Box, Stack, Button } from '@mui/material';
-import { Check, Password } from "@mui/icons-material";
+import { Check, KeyboardArrowLeft, Password } from "@mui/icons-material";
 import { PWD_REGEX } from "../../ultils/regex";
 import { useChangePasswordMutation } from '../../features/users/usersApiSlice';
 import { Instruction, Title } from '../custom/GlobalComponents';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components'
 import CustomPasswordInput from "../custom/CustomPasswordInput";
 
 const Wrapper = styled.div`
-    ${props => props.theme.breakpoints.down("sm")} {
-        padding: 0 15px;
-    }
 `
 
 const ResetPassComponent = ({ pending, setPending }) => {
@@ -102,7 +100,10 @@ const ResetPassComponent = ({ pending, setPending }) => {
 
     return (
         <Wrapper>
-            <Title className="primary"><Password />&nbsp;Thay đổi mật khẩu</Title>
+            <Title className="primary">
+                <Link to={'/profile/detail/info'}><KeyboardArrowLeft /></Link>
+                <Password />&nbsp;Thay đổi mật khẩu
+            </Title>
             <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
             <form style={{ marginTop: '30px' }} onSubmit={handleChangePassword}>
                 <Stack spacing={2} direction="column" alignItems={{ xs: 'center', md: 'start' }}>

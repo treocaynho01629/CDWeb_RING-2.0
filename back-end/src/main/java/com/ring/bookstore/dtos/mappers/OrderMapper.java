@@ -3,6 +3,7 @@ package com.ring.bookstore.dtos.mappers;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ring.bookstore.dtos.orders.DetailOrderDTO;
 import com.ring.bookstore.dtos.orders.OrderItemDTO;
 import com.ring.bookstore.model.*;
 import org.springframework.stereotype.Service;
@@ -64,5 +65,28 @@ public class OrderMapper {
                 book.getSlug(),
                 fileDownloadUri,
                 book.getTitle());
+    }
+
+    public DetailOrderDTO orderToDetailDTO(OrderDetail detail) {
+        List<OrderItem> orderItems = detail.getItems();
+        List<OrderItemDTO> itemDTOS = orderItems.stream().map(this::itemToItemDTO).collect(Collectors.toList());
+        OrderReceipt order = detail.getOrder();
+        Shop shop = detail.getShop();
+
+        return new DetailOrderDTO(order.getId(),
+                order.getFullName(),
+                order.getEmail(),
+                order.getPhone(),
+                order.getOrderAddress(),
+                order.getOrderMessage(),
+                order.getOrderDate(),
+                detail.getId(),
+                shop.getId(),
+                shop.getName(),
+                detail.getTotalPrice(),
+                detail.getDiscount(),
+                detail.getShippingFee(),
+                detail.getShippingDiscount(),
+                itemDTOS);
     }
 }
