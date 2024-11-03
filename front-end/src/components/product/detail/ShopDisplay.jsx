@@ -64,6 +64,7 @@ const ShopDetail = styled.span`
     ${props => props.theme.breakpoints.down("md")} {
         font-size: 12px;
         width: auto;
+        justify-content: center;
 
         b { margin-left: 5px; }
         &.hide-on-mobile {display: none}

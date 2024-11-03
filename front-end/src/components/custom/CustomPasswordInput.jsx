@@ -1,4 +1,4 @@
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { IconButton, InputAdornment } from '@mui/material';
 import { useState } from 'react';
 import TextField from '@mui/material/TextField';
@@ -18,7 +18,7 @@ export default function CustomPasswordInput(props) {
                 onMouseDown={handleMouseDownPassword}
                 edge="end"
             >
-                {showPassword ? <Visibility /> : <VisibilityOff />}
+                {showPassword ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
             </IconButton>
         </InputAdornment>
 

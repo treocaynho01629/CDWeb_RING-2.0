@@ -17,6 +17,10 @@ const ItemContainer = styled.div`
 const ItemSummary = styled.div`
     margin-left: 10px;
     width: 100%;
+    max-height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 `
 
 const ItemTitle = styled.p`
@@ -57,7 +61,7 @@ const ItemTitle = styled.p`
     }
 `
 
-const ShopTitle = styled.b`
+const Shop = styled.b`
     font-size: 15px;
 	white-space: nowrap;
     display: flex;
@@ -214,16 +218,8 @@ function ItemRow({ product, index, handleSelect, handleDeselect, isSelected, han
                         </Link>
                         <ItemAction>
                             <Box display={{ xs: 'block', md: 'none', md_lg: 'block', lg: 'none' }}>
-                                {product?.discount > 0 ? <>
-                                    <Discount>{product.price.toLocaleString()}đ</Discount>
-                                    <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                                </>
-                                    : <>
-                                        <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                                        <Discount><br /></Discount>
-                                    </>
-                                }
-
+                                <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
+                                <Discount>{product?.discount > 0 ? `${product.price.toLocaleString()}đ` : ''}</Discount>
                             </Box>
                             <Box display={{ xs: 'flex', sm: 'none' }} mr={3}>
                                 <CustomAmountInput
@@ -297,10 +293,10 @@ const CartDetailRow = ({ id, index, shop, coupon, couponDiscount, isSelected, is
                 </StyledTableCell>
                 <StyledTableCell align="left" colSpan={5} component="th" id={shopLabelId} scope="row">
                     <Link to={'/store'}>
-                        <ShopTitle>
+                        <Shop>
                             <ShopTag>Đối tác</ShopTag>
                             <Storefront />&nbsp;{shop.shopName}<KeyboardArrowRight fontSize="small" />
-                        </ShopTitle>
+                        </Shop>
                     </Link>
                 </StyledTableCell>
             </StyledTableRow>

@@ -47,6 +47,13 @@ public class BookController {
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
+    //Get books by ids
+    @GetMapping("/find")
+    public ResponseEntity<?> getRandomBooks(@RequestParam(value = "ids") List<Long> ids) {
+        List<BookDTO> books = bookService.getBooksByIds(ids);
+        return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
     //Get books with filtering
     @GetMapping()
     public ResponseEntity<?> getBooks(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
@@ -57,14 +64,13 @@ public class BookController {
                                       @RequestParam(value = "cateId", required = false) Integer cateId,
                                       @RequestParam(value = "pubIds", required = false) List<Integer> pubIds,
                                       @RequestParam(value = "shopId", required = false) Long shopId,
-                                      @RequestParam(value = "sellerId", required = false) Long sellerId,
                                       @RequestParam(value = "types", required = false) List<String> types,
                                       @RequestParam(value = "fromRange", defaultValue = "0") Double fromRange,
                                       @RequestParam(value = "toRange", defaultValue = "100000000") Double toRange,
                                       @RequestParam(value = "rating", defaultValue = "0") Integer rating,
                                       @RequestParam(value = "amount", defaultValue = "1") Integer amount) {
         Page<BookDTO> books = bookService.getBooks(pageNo, pageSize, sortBy, sortDir, keyword,
-                rating, amount, cateId, pubIds, shopId, sellerId, types, fromRange, toRange);
+                rating, amount, cateId, pubIds, shopId, types, fromRange, toRange);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 

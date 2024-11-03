@@ -39,7 +39,7 @@ const Cart = () => {
     return (
         <Wrapper>
             <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
-                <strong style={{ textDecoration: 'underline' }}>Giỏ hàng</strong>
+                <NavLink to={'/cart'}>Giỏ hàng</NavLink>
             </CustomBreadcrumbs>
             {cartProducts?.length == 0 ? <EmptyWrapper>
                 <StyledEmptyIcon />

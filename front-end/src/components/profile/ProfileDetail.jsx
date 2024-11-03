@@ -1,10 +1,10 @@
 import styled from "styled-components"
 import { useEffect, useState, lazy, Suspense } from "react";
-import { Button, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton, TextField, DialogContent, DialogActions, IconButton } from "@mui/material";
-import { Check, KeyboardArrowLeft, Person } from "@mui/icons-material";
+import { Button, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton, TextField } from "@mui/material";
+import { Check, KeyboardArrowLeft, KeyboardArrowRight, Person } from "@mui/icons-material";
 import { PHONE_REGEX } from "../../ultils/regex";
 import { useUpdateProfileMutation } from "../../features/users/usersApiSlice";
-import { Instruction, Title } from '../custom/GlobalComponents';
+import { Instruction, MobileExtendButton, Title } from '../custom/GlobalComponents';
 import { Link } from "react-router-dom";
 import dayjs from 'dayjs';
 
@@ -48,6 +48,7 @@ const InfoStack = styled.td`
 `
 
 const InfoStackContainer = styled.div`
+    position: relative;
     height: 56px;
     display: flex;
     align-items: center;
@@ -136,7 +137,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
             <TableContainer>
                 <tbody>
                     <InfoRow>
-                        <InfoTitle><InfoText>Tên đăng nhập: </InfoText></InfoTitle>
+                        <InfoTitle><InfoText>Tên đăng nhập </InfoText></InfoTitle>
                         <InfoStack><InfoStackContainer>
                             {loading
                                 ?
@@ -147,7 +148,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                         </InfoStackContainer></InfoStack>
                     </InfoRow>
                     <InfoRow>
-                        <InfoTitle><InfoText>Email: </InfoText></InfoTitle>
+                        <InfoTitle><InfoText>Email </InfoText></InfoTitle>
                         <InfoStack>
                             <InfoStackContainer>
                                 {loading
@@ -160,7 +161,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                         </InfoStack>
                     </InfoRow>
                     <InfoRow>
-                        <InfoTitle><InfoText>Họ & Tên: </InfoText></InfoTitle>
+                        <InfoTitle><InfoText>Họ & Tên </InfoText></InfoTitle>
                         <InfoStack>
                             <InfoStackContainer>
                                 {loading
@@ -183,7 +184,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                         </InfoStack>
                     </InfoRow>
                     <InfoRow>
-                        <InfoTitle><InfoText>Số điện thoại: </InfoText></InfoTitle>
+                        <InfoTitle><InfoText>Số điện thoại </InfoText></InfoTitle>
                         <InfoStack>
                             <InfoStackContainer>
                                 {editPhone
@@ -213,7 +214,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                         </InfoStack>
                     </InfoRow>
                     <InfoRow>
-                        <InfoTitle><InfoText>Ngày sinh: </InfoText></InfoTitle>
+                        <InfoTitle><InfoText>Ngày sinh </InfoText></InfoTitle>
                         <InfoStack>
                             <InfoStackContainer>
                                 {editDob ?
@@ -249,7 +250,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                         </InfoStack>
                     </InfoRow>
                     <InfoRow>
-                        <InfoTitle><InfoText>Giới tính: </InfoText></InfoTitle>
+                        <InfoTitle><InfoText>Giới tính </InfoText></InfoTitle>
                         <InfoStack>
                             <InfoStackContainer>
                                 {tabletMode ?
@@ -290,6 +291,34 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                             </InfoStackContainer>
                         </InfoStack>
                     </InfoRow>
+                    {tabletMode &&
+                        <>
+                            <InfoRow>
+                                <InfoTitle><InfoText>Sổ địa chỉ </InfoText></InfoTitle>
+                                <InfoStack>
+                                    <Link to={'/profile/detail/address'}>
+                                        <InfoStackContainer>
+                                            <MobileExtendButton>
+                                                <KeyboardArrowRight fontSize="small" />
+                                            </MobileExtendButton>
+                                        </InfoStackContainer>
+                                    </Link>
+                                </InfoStack>
+                            </InfoRow>
+                            <InfoRow>
+                                <InfoTitle><InfoText>Thiết lập mật khẩu </InfoText></InfoTitle>
+                                <InfoStack>
+                                    <Link to={'/profile/detail/password'}>
+                                        <InfoStackContainer>
+                                            <MobileExtendButton>
+                                                <KeyboardArrowRight fontSize="small" />
+                                            </MobileExtendButton>
+                                        </InfoStackContainer>
+                                    </Link>
+                                </InfoStack>
+                            </InfoRow>
+                        </>
+                    }
                 </tbody>
             </TableContainer>
             <Button
@@ -298,7 +327,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                 size="large"
                 disabled={loading}
                 onClick={handleChangeInfo}
-                sx={{ mt: 5 }}
+                sx={{ mt: 2, mb: 4 }}
                 startIcon={<Check />}
             >
                 Lưu thông tin

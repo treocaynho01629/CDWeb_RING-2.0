@@ -68,8 +68,7 @@ const StyledDeleteButton = styled(Button)`
 
 const tempShippingFee = 10000;
 
-function EnhancedTableHead(props) {
-    const { onSelectAllClick, numSelected, rowCount } = props;
+function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, handleDeleteMultiple }) {
     let isIndeterminate = numSelected > 0 && numSelected < rowCount;
     let isSelectedAll = rowCount > 0 && numSelected === rowCount;
 
@@ -121,6 +120,7 @@ function EnhancedTableHead(props) {
                         color="error"
                         endIcon={<DeleteIcon />}
                         disableRipple
+                        onClick={handleDeleteMultiple}
                     >
                         Xoá
                     </StyledDeleteButton>
@@ -137,7 +137,8 @@ EnhancedTableHead.propTypes = {
 };
 
 const CartContent = () => {
-    const { cartProducts, replaceProduct, removeProduct, removeShopProduct, decreaseAmount, increaseAmount, changeAmount } = useCart();
+    const { cartProducts, replaceProduct, removeProduct, removeShopProduct, clearCart, 
+        decreaseAmount, increaseAmount, changeAmount } = useCart();
     const [selected, setSelected] = useState([]);
     const [shopIds, setShopIds] = useState([]);
     const [coupon, setCoupon] = useState('');
@@ -163,7 +164,7 @@ const CartContent = () => {
 
     //Estimate/calculate price
     const [estimated, setEstimated] = useState({ deal: 0, subTotal: 0, shipping: 0, total: 0 });
-    const [calculated, setCaculated] = useState(null);
+    const [calculated, setCalculated] = useState(null);
     const [calculate, { isLoading }] = useCalculateMutation();
 
     //#region construct
@@ -189,7 +190,7 @@ const CartContent = () => {
     }, [recommend, loadRecommend])
 
     const handleCartChange = () => {
-        if (selected.length > 0) {
+        if (selected.length > 0 && cartProducts.length > 0) {
             if (doneRecommend) {
                 //Reduce cart
                 const estimateCart = cartProducts.reduce((result, item) => {
@@ -216,13 +217,13 @@ const CartContent = () => {
             }
         } else { //Reset
             handleEstimate(null);
-            setCaculated(null);
+            setCalculated(null);
         }
     }
 
     const handleResetCart = () => {
         setSelected([]);
-        setCaculated(null);
+        setCalculated(null);
     }
 
     //Estimate before receive caculated price from server
@@ -273,7 +274,7 @@ const CartContent = () => {
 
         calculate(estimateCart).unwrap()
             .then((data) => {
-                setCaculated(data);
+                setCalculated(data);
                 syncCart(data);
             })
             .catch((err) => {
@@ -481,8 +482,12 @@ const CartContent = () => {
     };
 
     const handleDeleteMultiple = () => {
-        selected.forEach((id) => { removeProduct(id) });
-        setSelected([]);
+        if (selected.length == cartProducts.length) {
+            clearCart();
+        } else {
+            selected.forEach((id) => { removeProduct(id) });
+        }
+        handleResetCart();
     };
 
     const handleFindSimilar = async () => {
@@ -513,6 +518,7 @@ const CartContent = () => {
                     <EnhancedTableHead
                         numSelected={selected.length}
                         onSelectAllClick={handleSelectAllClick}
+                        handleDeleteMultiple={handleDeleteMultiple}
                         rowCount={cartProducts?.length}
                     />
                     <TableBody>

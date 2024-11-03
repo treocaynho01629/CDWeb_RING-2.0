@@ -17,7 +17,7 @@ const ProductPolicies = lazy(() => import('./ProductPolicies'));
 //#region styled
 const InfoContainer = styled.div`
     height: 100%;
-    padding: 20px;
+    padding: ${props => props.theme.spacing(2.5)};
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -26,7 +26,8 @@ const InfoContainer = styled.div`
     a {color: ${props => props.theme.palette.info.main}};
 
     ${props => props.theme.breakpoints.down("md")} {
-        padding: 0 12px 10px 12px;
+        padding: 0 ${props => props.theme.spacing(1.5)};
+        padding-bottom: ${props => props.theme.spacing(1)};
         border-top: none;
     }
 `

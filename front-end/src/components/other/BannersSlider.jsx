@@ -66,9 +66,9 @@ const CustomArrowButton = styled.button`
 
 const BackdropContainer = styled.div`
     position: absolute;
-    top: -30%;
+    top: 0;
     width: 100%;
-    height: 100%;
+    height: 70%;
     overflow: hidden;
     opacity: .9;
     display: none;
@@ -184,7 +184,7 @@ function Item({ banner, index }) {
                         aria-hidden
                         src={`${banner?.image}?size=tiny`}
                         visibleByDefault={index == 0}
-                        placeholder={<BackdropPlaceholder variant="rectangular" animation={false}/>}
+                        placeholder={<BackdropPlaceholder variant="rectangular" animation={false} />}
                     />
                 </BackdropContainer>
                 <StyledLazyImage
@@ -192,7 +192,7 @@ function Item({ banner, index }) {
                     srcSet={`${banner?.image}?size=medium 350w, ${banner?.image} 600w`}
                     alt={banner?.name}
                     visibleByDefault={index == 0}
-                    placeholder={<StyledSkeleton variant="rectangular" animation={false}/>}
+                    placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
                 />
             </>
                 : <>
@@ -220,7 +220,7 @@ function ExtraItem({ banner, index, length, slideIndex }) {
                     src={`${banner?.image}?size=medium`}
                     alt={banner?.name}
                     visibleByDefault={true}
-                    placeholder={<StyledSkeleton variant="rectangular" animation={false}/>}
+                    placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
                 />
             </ExtraContainer>
         )
@@ -261,16 +261,16 @@ const BannersSlider = () => {
     }
 
     return (
-        <Grid container spacing={1} size={12} mb={{ xs: 2.5, md: -1 }}>
+        <Grid container spacing={1} size={12} mb={{ xs: 2.5, md: -1 }} mt={{ xs: 0, md: 2 }}>
             <Grid size={{ xs: 12, md: 'grow' }}>
                 <Carousel
                     responsive={responsive}
                     autoPlay
                     infinite
                     autoPlaySpeed={15000}
-                    customLeftArrow={<CustomArrow className="custom-left-arrow"><KeyboardArrowLeft/></CustomArrow>}
-                    customRightArrow={<CustomArrow className="custom-right-arrow"><KeyboardArrowRight/></CustomArrow>}
-                    customDot={<CustomDot/>}
+                    customLeftArrow={<CustomArrow className="custom-left-arrow"><KeyboardArrowLeft /></CustomArrow>}
+                    customRightArrow={<CustomArrow className="custom-right-arrow"><KeyboardArrowRight /></CustomArrow>}
+                    customDot={<CustomDot />}
                     beforeChange={(nextSlide) => {
                         setSlideIndex(nextSlide > 5 ? nextSlide - 6 : nextSlide < 2 ? nextSlide + 2 : nextSlide - 2);
                     }}

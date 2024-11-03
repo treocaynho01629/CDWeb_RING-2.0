@@ -21,11 +21,11 @@ const DialogContent = lazy(() => import('@mui/material/DialogContent'));
 //#region styled
 const ReviewsWrapper = styled.div`
     position: relative;
-    padding: 10px 20px;
+    padding: ${props => props.theme.spacing(1)} ${props => props.theme.spacing(2.5)};
     border: .5px solid ${props => props.theme.palette.divider};
 
     ${props => props.theme.breakpoints.down("md")} {
-        padding: 0 12px;
+        padding: 0 ${props => props.theme.spacing(1.5)};
     }
 `
 
@@ -33,7 +33,7 @@ const ReviewsContainer = styled.div`
     position: relative;
     
     ${props => props.theme.breakpoints.down("md")} {
-        margin-bottom: 20px;
+        margin-bottom: ${props => props.theme.spacing(2.5)};
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
@@ -78,7 +78,7 @@ const Label = styled.span`
 const StyledEmptyIcon = styled(EmptyIcon)`
     height: 70px;
     width: 70px;
-    margin: 10px 0;
+    margin: ${props => props.theme.spacing(1)} 0;
     fill: ${props => props.theme.palette.text.icon};
 `
 //#endregion

@@ -187,7 +187,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
     return (
         <>
             <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><LocationOnIcon />&nbsp;Địa chỉ người nhận</DialogTitle>
-            <DialogContent sx={{ marginX: '10px' }}>
+            <DialogContent>
                 <form style={{ paddingTop: 10 }} onSubmit={handleSubmit}>
                     <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
                     <Grid container size="grow" spacing={1}>

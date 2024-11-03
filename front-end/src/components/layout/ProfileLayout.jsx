@@ -14,9 +14,9 @@ export default function ProfileLayout() {
     const { data, isLoading, isSuccess, error } = useGetProfileQuery();
 
     return (
-        <Grid container columnSpacing={4}>
-            {(!mobileMode || showTabs) &&
-                <Grid size={{ xs: 12, md: 3.5, lg: 3 }} display="flex" justifyContent="center">
+        <Grid container columnSpacing={{ xs: 1, md_lg: 3 }}>
+            {(!tabletMode || showTabs) &&
+                <Grid size={{ xs: 12, md: 3.75, lg: 3 }} display="flex" justifyContent="center">
                     <ProfileTabsList {...{ profile: data, loading: isLoading, error, tabletMode }} />
                 </Grid>
             }

@@ -125,7 +125,7 @@ const SaleContainer = styled.div`
     position: absolute;
     top: 0;
     left: 50%;
-    width: 100vw;
+    width: 99vw;
     height: 100%;
     transform: translateX(-50%);
     border: 1px solid ${props => props.theme.palette.primary.light};

@@ -1,7 +1,7 @@
 import { styled } from '@mui/material/styles';
 import {
-    ShoppingCartOutlined, DeliveryDiningOutlined, Lock, Logout, Speed, NotificationsOutlined,
-    Storefront, KeyboardArrowLeft, Brightness3, Brightness7
+    ShoppingCartOutlined, DeliveryDiningOutlined, LockOutlined, Logout, Speed, NotificationsOutlined,
+    Storefront, KeyboardArrowLeft, Brightness3, Brightness7,
 } from '@mui/icons-material';
 import { Avatar, ListItemIcon, Divider, Box, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -147,7 +147,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                             <ListItem disablePadding onClick={handleClose}>
                                 <ListItemButton>
                                     <ListItemIcon>
-                                        <Lock />
+                                        <LockOutlined />
                                     </ListItemIcon>
                                     <ListItemText primary="Đăng nhập" />
                                 </ListItemButton>

@@ -21,6 +21,27 @@ const Title = styled.h1`
     font-weight: 400;
     color: inherit;
 `
+
+const LoginForm = styled.form`
+    width: 90%;
+    max-width: 450px;
+`
+
+const Forgot = styled.span`
+    text-decoration: underline;
+    color: ${props => props.theme.palette.primary.main};
+    cursor: pointer;
+
+    &:hover {
+        color: ${props => props.theme.palette.primary.dark};
+    }
+`
+
+const ActionContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+`
 //#endregion
 
 const LoginTab = ({ pending, setPending }) => {
@@ -107,16 +128,15 @@ const LoginTab = ({ pending, setPending }) => {
                 <Button
                     color="error"
                     size="large"
-                    onClick={() => logout()}
+                    onClick={logout}
                     startIcon={<Logout />}
                 >
                     Kết thúc phiên đăng nhập?
-
                 </Button>
             </div>
             :
             <>
-                <form onSubmit={handleSubmitLogin}>
+                <LoginForm onSubmit={handleSubmitLogin}>
                     <Title>Đăng nhập</Title>
                     <Stack spacing={1} direction="column">
                         <Instruction ref={errRef}
@@ -131,18 +151,14 @@ const LoginTab = ({ pending, setPending }) => {
                             autoComplete="username"
                             onChange={(e) => setUsername(e.target.value)}
                             value={username}
-                            size="small"
-                            margin="dense"
                         />
                         <CustomPasswordInput
                             label="Mật khẩu"
                             autoComplete="password"
                             onChange={(e) => setPassword(e.target.value)}
                             value={password}
-                            size="small"
-                            margin="dense"
                         />
-                        <div className="persistCheck" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <ActionContainer className="persistCheck">
                             <FormControlLabel control={
                                 <Checkbox
                                     checked={currPersist}
@@ -154,9 +170,8 @@ const LoginTab = ({ pending, setPending }) => {
                             }
                                 label="Lưu đăng nhập"
                             />
-                            <a style={{ textDecoration: 'underline', cursor: 'pointer', color: '#63e399' }} //FIX
-                                onClick={handleOpen}>Quên mật khẩu</a>
-                        </div>
+                            <Forgot onClick={handleOpen}>Quên mật khẩu?</Forgot>
+                        </ActionContainer>
                         <Button
                             disabled={isLoading}
                             variant="contained"
@@ -164,12 +179,12 @@ const LoginTab = ({ pending, setPending }) => {
                             size="large"
                             type="submit"
                             aria-label="submit login"
-                            sx={{ width: '50%' }}
+                            sx={{ width: '150px' }}
                         >
                             Đăng nhập
                         </Button>
                     </Stack>
-                </form>
+                </LoginForm>
                 {open !== undefined &&
                     <Suspense fallback={<></>}>
                         <ForgotDialog {...{ open, setOpen }} />
