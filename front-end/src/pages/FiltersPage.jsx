@@ -158,7 +158,7 @@ const FiltersPage = () => {
     }, [data])
 
     //Go to first page on change + update path
-    useDeepEffect(() => { handleChangePage(1); }, [filters])   
+    useDeepEffect(() => { handleChangePage(1); }, [filters])
     useEffect(() => { updatePath(); }, [pagination])
 
     //Update keyword & cate
@@ -197,8 +197,8 @@ const FiltersPage = () => {
         pagination.amount == DEFAULT_PAGINATION.amount ? searchParams.delete("amount") : searchParams.set("amount", pagination.amount);
 
         //Set
-        setSearchParams(searchParams);
-        navigate({ pathname: `/store/${filters?.cate.slug}`, search: searchParams.toString() });
+        const newPath = `/store${filters?.cate.slug ? `/${filters?.cate.slug}` : ''}`
+        navigate({ pathname: newPath, search: searchParams.toString() }, { replace: true });
     }, [filters, pagination])
 
     const updateFilters = useCallback(() => {

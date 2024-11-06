@@ -1,48 +1,17 @@
-import styled from 'styled-components';
-import { useState, useRef, useEffect, Suspense, lazy } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Stack, Button, FormControlLabel, Checkbox, TextField } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { jwtDecode } from 'jwt-decode';
 import { useDispatch } from 'react-redux';
 import { setAuth, setPersist } from '../../features/auth/authReducer';
 import { useAuthenticateMutation } from '../../features/auth/authApiSlice';
 import { Instruction } from '../custom/GlobalComponents';
+import { AuthActionContainer, AuthForm, AuthHighlight, AuthText, AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
 import { Logout } from '@mui/icons-material';
 import CustomPasswordInput from '../custom/CustomPasswordInput';
 import useAuth from '../../hooks/useAuth';
 import useLogout from '../../hooks/useLogout';
-
-const ForgotDialog = lazy(() => import("./ForgotDialog"));
-
-//#region styled
-const Title = styled.h1`
-    font-size: 30px;
-    font-weight: 400;
-    color: inherit;
-`
-
-const LoginForm = styled.form`
-    width: 90%;
-    max-width: 450px;
-`
-
-const Forgot = styled.span`
-    text-decoration: underline;
-    color: ${props => props.theme.palette.primary.main};
-    cursor: pointer;
-
-    &:hover {
-        color: ${props => props.theme.palette.primary.dark};
-    }
-`
-
-const ActionContainer = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-`
-//#endregion
 
 const LoginTab = ({ pending, setPending }) => {
     const dispatch = useDispatch();
@@ -54,20 +23,16 @@ const LoginTab = ({ pending, setPending }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
-
     const errRef = useRef();
 
     //Login value
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [currPersist, setCurrPersist] = useState(false);
+    const [cookies, setCookie] = useCookies(['refreshToken']);
 
     //Error
     const [errMsgLogin, setErrMsgLogin] = useState(location.state?.errorMsg ?? '');
-
-    //Other
-    const [open, setOpen] = useState(undefined);
-    const [cookies, setCookie] = useCookies(['refreshToken']);
 
     //Error message reset when reinput stuff
     useEffect(() => {
@@ -75,7 +40,6 @@ const LoginTab = ({ pending, setPending }) => {
     }, [username, password])
 
     const togglePersist = () => { setCurrPersist(prev => !prev) } //Toggle persist
-    const handleOpen = () => setOpen(true); //Open dialog
 
     //Login
     const handleSubmitLogin = async (e) => {
@@ -109,10 +73,10 @@ const LoginTab = ({ pending, setPending }) => {
                 console.error(err);
                 if (!err?.status) {
                     setErrMsgLogin('Server không phản hồi');
-                } else if (err?.status === 404) {
+                } else if (err?.status === 403 || err?.status === 400) {
                     setErrMsgLogin('Sai tên tài khoản hoặc mật khẩu!');
-                } else if (err?.status === 400) {
-                    setErrMsgLogin('Sai định dạng thông tin!');
+                } else if (err?.status === 429) {
+                    setErrMsgLogin('Bạn đã thử quá nhiều lần, vui lòng thử lại sau!');
                 } else {
                     setErrMsgLogin('Đăng nhập thất bại');
                 }
@@ -124,7 +88,7 @@ const LoginTab = ({ pending, setPending }) => {
     return (
         (persist || loginedUser) ?
             <div>
-                <Title>Xin chào {loginedUser}</Title>
+                <AuthTitle>Xin chào {loginedUser}</AuthTitle>
                 <Button
                     color="error"
                     size="large"
@@ -136,11 +100,11 @@ const LoginTab = ({ pending, setPending }) => {
             </div>
             :
             <>
-                <LoginForm onSubmit={handleSubmitLogin}>
-                    <Title>Đăng nhập</Title>
-                    <Stack spacing={1} direction="column">
+                <AuthForm onSubmit={handleSubmitLogin}>
+                    <AuthTitle>Đăng nhập tài khoản</AuthTitle>
+                    <Stack spacing={1.5} direction="column">
                         <Instruction ref={errRef}
-                            style={{ display: errMsgLogin ? "block" : "none" }}
+                            display={errMsgLogin ? "block" : "none"}
                             aria-live="assertive">
                             {errMsgLogin}
                         </Instruction>
@@ -158,7 +122,7 @@ const LoginTab = ({ pending, setPending }) => {
                             onChange={(e) => setPassword(e.target.value)}
                             value={password}
                         />
-                        <ActionContainer className="persistCheck">
+                        <AuthActionContainer className="persistCheck">
                             <FormControlLabel control={
                                 <Checkbox
                                     checked={currPersist}
@@ -170,26 +134,27 @@ const LoginTab = ({ pending, setPending }) => {
                             }
                                 label="Lưu đăng nhập"
                             />
-                            <Forgot onClick={handleOpen}>Quên mật khẩu?</Forgot>
-                        </ActionContainer>
-                        <Button
+                            <Link to={'/reset'}>
+                                <AuthHighlight className="warning">Quên mật khẩu?</AuthHighlight>
+                            </Link>
+                        </AuthActionContainer>
+                        <ConfirmButton
                             disabled={isLoading}
                             variant="contained"
                             color="primary"
                             size="large"
                             type="submit"
                             aria-label="submit login"
-                            sx={{ width: '150px' }}
                         >
                             Đăng nhập
-                        </Button>
+                        </ConfirmButton>
                     </Stack>
-                </LoginForm>
-                {open !== undefined &&
-                    <Suspense fallback={<></>}>
-                        <ForgotDialog {...{ open, setOpen }} />
-                    </Suspense>
-                }
+                    <AuthText>Chưa có tài khoản?&nbsp;
+                        <Link to={'/auth/register'}>
+                            <AuthHighlight>Đăng ký</AuthHighlight>
+                        </Link>
+                    </AuthText>
+                </AuthForm>
             </>
     )
 }

@@ -10,7 +10,7 @@ const RequireAuth = ({ allowedRoles }) => {
             ? <Outlet /> //Auth with ROLE
             : token
                 ? <Navigate to="/unauthorized" state={{ from: location }} replace /> //To error page
-                : <Navigate to="/login" state={{ from: location }} replace /> //To login if not logged in
+                : <Navigate to='/auth/login' state={{ from: location }} replace /> //To login if not logged in
     );
 }
 

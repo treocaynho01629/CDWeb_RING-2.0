@@ -93,14 +93,14 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
       }
       addNewAddress(newAddress);
     } else {
-      navigate('/login', { state: { from: location }, replace: true });
+      navigate('/auth/login', { state: { from: location }, replace: true });
     }
   }
 
   const handleUpdateAddress = (newAddress) => {
     if (updating) return;
     if (!profile) { //To login page if anonymous
-      navigate('/login', { state: { from: location }, replace: true });
+      navigate('/auth/login', { state: { from: location }, replace: true });
       return;
     }
 
@@ -131,7 +131,7 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
   const handleSetDefault = (newAddress) => {
     if (pending) return;
     if (!profile) { //To login page if anonymous
-      navigate('/login', { state: { from: location }, replace: true });
+      navigate('/auth/login', { state: { from: location }, replace: true });
       return;
     }
 

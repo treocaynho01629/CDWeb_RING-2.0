@@ -45,12 +45,12 @@ const PersistLogin = () => {
                 : pending
                     ?
                     <PendingIndicator open={true} message="Đang xác thực đăng nhập ...">
-                        <Button variant="contained" color="error" onClick={() => logout()}>Đăng xuất?</Button>
+                        <Button variant="contained" color="error" onClick={logout}>Đăng xuất?</Button>
                     </PendingIndicator>
                     : isSuccess
                         ? <Outlet />
                         : isError
-                        && <Navigate to="/login" state={{ from: location, errorMsg: 'Đã xảy ra lỗi xác thực, vui lòng đăng nhập lại!' }} replace /> //To login page if error
+                        && <Navigate to='/auth/login' state={{ from: location, errorMsg: 'Đã xảy ra lỗi xác thực, vui lòng đăng nhập lại!' }} replace /> //To login page if error
             }
         </>
     )

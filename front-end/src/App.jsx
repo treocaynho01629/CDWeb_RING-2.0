@@ -16,7 +16,7 @@ const FiltersPage = Loadable(lazy(() => import('./pages/FiltersPage')));
 const ProductDetail = Loadable(lazy(() => import('./pages/ProductDetail')));
 const Cart = Loadable(lazy(() => import('./pages/Cart')));
 const Home = Loadable(lazy(() => import('./pages/Home')));
-const SignPage = Loadable(lazy(() => import('./pages/SignPage')));
+const AuthPage = Loadable(lazy(() => import('./pages/AuthPage.jsx')));
 
 const ProfileLayout = Loadable(lazy(() => import('./components/layout/ProfileLayout')));
 const ResetPage = Loadable(lazy(() => import('./pages/ResetPage')));
@@ -42,15 +42,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
             //PUBLIC
-          <Route path="/reset-password" element={<ResetPage />} />
+          <Route path="/reset/:token?" element={<ResetPage />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
 
             //MISSING
           <Route path="*" element={<Missing />} />
 
           <Route element={<PersistLogin />}>
-            <Route path="/login" element={<SignPage />} />
-            <Route path="/signup" element={<SignPage />} />
+            <Route path="/auth/:tab" element={<AuthPage />} />
 
             <Route element={<PageLayout />}>
                 //ANONYMOUS

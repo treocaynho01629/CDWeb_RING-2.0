@@ -8,9 +8,8 @@ export const Instruction = styled.p`
 `
 
 export const LogoImage = styled.img`
-    width: 40px;
     height: 40px;
-    padding: 0;
+    padding: 4px;
 `
 
 export const LogoTitle = styled.span`

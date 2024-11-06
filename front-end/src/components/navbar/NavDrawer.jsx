@@ -5,14 +5,16 @@ import {
 } from '@mui/icons-material';
 import { Avatar, ListItemIcon, Divider, Box, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { LogoImage, LogoSubtitle, LogoTitle } from '../custom/GlobalComponents';
+import { LogoImage } from '../custom/GlobalComponents';
 
 //#region styled
-const DrawerLogo = styled('h2')`
+const DrawerLogo = styled('div')`
     position: relative;
     display: flex;
     align-items: center;
-    margin: 5px 0px 5px 15px;
+    justify-content: center;
+    margin-left: 5px;
+    width: 100%;
 `
 
 const DrawerContainer = styled(Box)(({ theme }) => `
@@ -39,11 +41,9 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
         >
             <DrawerContainer>
                 <Box sx={{ marginY: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Link to={`/`} onClick={handleClose}>
+                    <Link to={'/'} onClick={handleClose}>
                         <DrawerLogo>
-                            <LogoImage src="/bell.svg" className="logo" alt="RING! logo" />
-                            <LogoTitle>RING!&nbsp;</LogoTitle>
-                            <LogoSubtitle>- BOOKSTORES</LogoSubtitle>
+                            <LogoImage src="/full-logo.svg" className="logo" alt="RING! logo" />
                         </DrawerLogo>
                     </Link>
                     <IconButton onClick={handleClose}><KeyboardArrowLeft sx={{ fontSize: 26 }} /></IconButton>
@@ -143,7 +143,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                     </Box>
                     :
                     <List>
-                        <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">
+                        <Link to={'/auth/login'} state={{ from: location }} replace title="Đăng nhập">
                             <ListItem disablePadding onClick={handleClose}>
                                 <ListItemButton>
                                     <ListItemIcon>

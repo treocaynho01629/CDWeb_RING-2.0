@@ -179,7 +179,7 @@ const DashboardDrawer = ({ open, setOpen }) => {
     <>
       <DrawerHeader>
         <NavLink to={'/dashboard'}>
-          <ImageLogo src="/bell.svg" className={open ? 'open' : ''} alt="RING! logo" />
+          <ImageLogo src="/logo.svg" className={open ? 'open' : ''} alt="RING! logo" />
         </NavLink>
       </DrawerHeader>
       <List disablePadding>
