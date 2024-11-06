@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 import { lazy, Suspense, useContext, useState } from 'react';
 import { styled as muiStyled } from '@mui/material/styles';
-import { Search, Mail, Phone, Facebook, YouTube, LinkedIn, Twitter, Menu, LockOutlined, Storefront, 
+import {
+    Search, Mail, Phone, Facebook, YouTube, LinkedIn, Twitter, Menu, LockOutlined, Storefront,
     Close, ShoppingCartOutlined, NotificationsOutlined,
 } from '@mui/icons-material';
 import { Stack, Badge, IconButton, Avatar, Box, Grid2 as Grid, TextField, AppBar, useTheme, useMediaQuery, useScrollTrigger } from '@mui/material';
@@ -354,9 +355,7 @@ const Navbar = () => {
                                 }
                                 <Link to={`/`}>
                                     <Logo className={isToggleSearch ? 'active' : ''}>
-                                        <LogoImage src="/bell.svg" className="logo" alt="RING! logo" />
-                                        <LogoTitle>RING!&nbsp;</LogoTitle>
-                                        <LogoSubtitle>- BOOKSTORES</LogoSubtitle>
+                                        <LogoImage src="/full-logo.svg" className="logo" alt="RING! logo" />
                                     </Logo>
                                 </Link>
                                 <Box
@@ -457,7 +456,7 @@ const Navbar = () => {
                                                     </Suspense>
                                                 </Box>
                                             ) : (
-                                                <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">
+                                                <Link to={'/auth/login'} state={{ from: location }} replace title="Đăng nhập">
                                                     <StyledIconButton className="nav" aria-label="login">
                                                         <LockOutlined />
                                                         <IconText className="username">Đăng nhập</IconText>

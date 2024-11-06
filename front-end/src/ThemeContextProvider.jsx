@@ -100,32 +100,6 @@ export function ThemeContextProvider({ children }) {
                             }),
                         },
                     },
-                    MuiTextField: {
-                        styleOverrides: {
-                            root: ({ theme }) => ({
-                                '--TextField-brandBorderColor': theme.palette.divider,
-                                '--TextField-brandBorderHoverColor': theme.palette.action.hover,
-                                '--TextField-brandBorderFocusedColor': theme.palette.action.focus,
-                                '& label.Mui-focused': {
-                                    color: theme.palette.text.primary,
-                                },
-                                '& input:valid:focus + fieldset': {
-                                    borderColor: theme.palette.primary.main,
-                                    borderLeftWidth: 4,
-                                    padding: '4px !important',
-                                },
-                                '& input:invalid:focus + fieldset': {
-                                    borderColor: theme.palette.error.main,
-                                    borderWidth: 1,
-                                    borderLeftWidth: 4,
-                                    padding: '4px !important',
-                                },
-                                '& .MuiFormHelperText-root': {
-                                    width: 250,
-                                },
-                            }),
-                        },
-                    },
                     MuiDialogTitle: {
                         styleOverrides: {
                             root: ({ theme }) => ({
@@ -135,6 +109,21 @@ export function ThemeContextProvider({ children }) {
                                     padding: 10,
                                     height: theme.mixins.toolbar.minHeight,
                                 }
+                            }),
+                        },
+                    },
+                    MuiTextField: {
+                        styleOverrides: {
+                            root: ({ theme }) => ({
+                                '--TextField-brandBorderColor': theme.palette.divider,
+                                '--TextField-brandBorderHoverColor': theme.palette.action.hover,
+                                '--TextField-brandBorderFocusedColor': theme.palette.primary.main,
+                                '& label.Mui-focused': {
+                                    color: theme.palette.primary.dark,
+                                },
+                                '& .MuiFormHelperText-root': {
+                                    whiteSpace: 'nowrap'
+                                },
                             }),
                         },
                     },

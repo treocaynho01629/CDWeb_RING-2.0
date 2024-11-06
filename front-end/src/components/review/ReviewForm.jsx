@@ -152,7 +152,7 @@ const ReviewForm = ({ username, bookId, open, handleClose, mobileMode, handlePag
                     <div>
                         <div><SuggestText>Bạn chưa đăng nhập, hãy Đăng nhập để đánh giá</SuggestText></div>
                         <br />
-                        <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">
+                        <Link to={'/auth/login'} state={{ from: location }} replace title="Đăng nhập">
                             <Button
                                 variant="contained"
                                 color="primary"
@@ -208,7 +208,7 @@ const ReviewForm = ({ username, bookId, open, handleClose, mobileMode, handlePag
                             </Button>
                 )
                     :
-                    <Link to={'/login'} state={{ from: location }} replace title="Đăng nhập">
+                    <Link to={'/auth/login'} state={{ from: location }} replace title="Đăng nhập">
                         <Button
                             variant="contained"
                             color="primary"

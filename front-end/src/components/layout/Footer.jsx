@@ -45,20 +45,19 @@ const BotFooter = styled.div`
     }
 `
 
-const Logo = styled.h1`
-    font-size: 30px;
-    font-family: abel;
-    color: ${props => props.theme.palette.primary.main};
-    display: flex;
-    white-space: nowrap;
+const Logo = styled.img`
+    max-height: 70px;
+    width: auto;
+    object-fit: contain;
+    object-position: left;
 
-    p {
-        color: ${props => props.theme.palette.text.secondary};
-        margin: 0;
+    ${props => props.theme.breakpoints.down("md")} {
+        max-height: 55px;
     }
 
     ${props => props.theme.breakpoints.down("sm")} {
-        margin: 5px 0;
+        max-height: 40px;
+        margin: 10px 0; 
     }
 `
 
@@ -119,7 +118,6 @@ const AddressContainer = styled.div`
         border-bottom: .5px solid ${props => props.theme.palette.divider};
     }
 `
-
 
 const Title = styled.h4`
     display: flex;
@@ -273,7 +271,7 @@ const Footer = () => {
                 <Grid container spacing={1} size="grow">
                     <Grid size={{ xs: 12, lg: 'auto' }} >
                         <AddressContainer>
-                            <Logo>RING!&nbsp; <p>- BOOKSTORE</p></Logo>
+                            <Logo src="/full-logo.svg" alt="RING! logo" />
                             <Description>Khu phố 6, Phường Linh Trung, TP. Thủ Đức - TP. Hồ Chí Minh</Description>
                             <Social>
                                 <SocialIcon color="3B5999"><Facebook /></SocialIcon>

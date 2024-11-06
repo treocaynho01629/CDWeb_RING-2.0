@@ -1,18 +1,11 @@
-import styled from 'styled-components';
 import { useState, useRef, useEffect } from 'react';
 import { Stack, Button, TextField } from '@mui/material';
 import { useRegisterMutation } from '../../features/auth/authApiSlice';
 import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from '../../ultils/regex';
 import { Instruction } from '../custom/GlobalComponents';
+import { AuthForm, AuthHighlight, AuthText, AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
+import { Link } from 'react-router-dom';
 import CustomPasswordInput from '../custom/CustomPasswordInput';
-
-//#region styled
-const Title = styled.h1`
-    font-size: 30px;
-    font-weight: 400;
-    color: inherit;
-`
-//#endregion
 
 const RegisterTab = ({ pending, setPending }) => {
     const userRef = useRef();
@@ -127,89 +120,85 @@ const RegisterTab = ({ pending, setPending }) => {
     const validRegister = [validName, validPass, validMatch, validEmail].every(Boolean);
 
     return (
-        <>
-            <form onSubmit={handleSubmit}>
-                <Title>Đăng ký tài khoản mới</Title>
-                <Stack spacing={1} direction="column">
-                    <Instruction ref={errRef}
-                        style={{ display: errMsg ? "block" : "none" }}
-                        aria-live="assertive">
-                        {errMsg}
-                    </Instruction>
-                    <TextField
-                        label="Tên đăng nhập"
-                        type="text"
-                        id="new-username"
-                        autoComplete="username"
-                        ref={userRef}
-                        onChange={(e) => setUsername(e.target.value)}
-                        value={username}
-                        aria-invalid={validName ? "false" : "true"}
-                        onFocus={() => setUserFocus(true)}
-                        onBlur={() => setUserFocus(false)}
-                        error={(userFocus && username && !validName) || err?.data?.errors?.username}
-                        helperText={userFocus && username && !validName ? "4 đến 24 kí tự." : err?.data?.errors?.username}
-                        size="small"
-                        margin="dense"
-                    />
-                    <TextField
-                        label='Địa chỉ email'
-                        type="email"
-                        id="email"
-                        autoComplete="off"
-                        onChange={(e) => setEmail(e.target.value)}
-                        value={email}
-                        aria-invalid={validEmail ? "false" : "true"}
-                        aria-describedby="uidnote"
-                        onFocus={() => setEmailFocus(true)}
-                        onBlur={() => setEmailFocus(false)}
-                        error={(emailFocus && email && !validEmail) || err?.data?.errors?.email}
-                        helperText={emailFocus && email && !validEmail ? "Sai định dạng email." : err?.data?.errors?.email}
-                        size="small"
-                        margin="dense"
-                    />
-                    <CustomPasswordInput
-                        label='Mật khẩu'
-                        onChange={(e) => setPassword(e.target.value)}
-                        value={password}
-                        aria-invalid={validPass ? "false" : "true"}
-                        aria-describedby="new password"
-                        onFocus={() => setPassFocus(true)}
-                        onBlur={() => setPassFocus(false)}
-                        error={(password && !validPass) || err?.data?.errors?.pass}
-                        helperText={passFocus && password && !validPass ? "8 đến 24 kí tự. Phải bao gồm chữ in hoa và ký tự đặc biệt."
-                            : err?.data?.errors?.pass}
-                        size="small"
-                        margin="dense"
-                    />
-                    <CustomPasswordInput
-                        label='Nhập lại mật khẩu'
-                        onChange={(e) => setMatchPass(e.target.value)}
-                        value={matchPass}
-                        aria-invalid={validMatch ? "false" : "true"}
-                        aria-describedby="confirm new password"
-                        error={(matchPass && !validMatch) || err?.data?.errors?.pass}
-                        helperText={matchPass && !validMatch ? "Không trùng mật khẩu."
-                            : err?.data?.errors?.pass}
-                        size="small"
-                        margin="dense"
-                    />
-
-                    <br />
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        type="submit"
-                        aria-label="submit register"
-                        sx={{ width: '50%' }}
-                        disabled={!validRegister || isLoading}
-                    >
-                        Đăng ký
-                    </Button>
-                </Stack>
-            </form>
-        </>
+        <AuthForm onSubmit={handleSubmit}>
+            <AuthTitle>Đăng ký tài khoản mới</AuthTitle>
+            <Stack spacing={1.5} direction="column">
+                <Instruction ref={errRef}
+                    display={errMsg ? "block" : "none"}
+                    aria-live="assertive">
+                    {errMsg}
+                </Instruction>
+                <TextField
+                    label="Tên đăng nhập"
+                    type="text"
+                    id="new-username"
+                    autoComplete="username"
+                    ref={userRef}
+                    onChange={(e) => setUsername(e.target.value)}
+                    value={username}
+                    aria-invalid={validName ? "false" : "true"}
+                    onFocus={() => setUserFocus(true)}
+                    onBlur={() => setUserFocus(false)}
+                    error={(userFocus && username && !validName) || err?.data?.errors?.username}
+                    helperText={userFocus && username && !validName ? "4 đến 24 kí tự." : err?.data?.errors?.username}
+                />
+                <TextField
+                    label='Địa chỉ email'
+                    type="email"
+                    id="email"
+                    autoComplete="off"
+                    onChange={(e) => setEmail(e.target.value)}
+                    value={email}
+                    aria-invalid={validEmail ? "false" : "true"}
+                    aria-describedby="uidnote"
+                    onFocus={() => setEmailFocus(true)}
+                    onBlur={() => setEmailFocus(false)}
+                    error={(emailFocus && email && !validEmail) || err?.data?.errors?.email}
+                    helperText={emailFocus && email && !validEmail ? "Sai định dạng email." : err?.data?.errors?.email}
+                />
+                <CustomPasswordInput
+                    label='Mật khẩu'
+                    onChange={(e) => setPassword(e.target.value)}
+                    value={password}
+                    aria-invalid={validPass ? "false" : "true"}
+                    aria-describedby="new password"
+                    onFocus={() => setPassFocus(true)}
+                    onBlur={() => setPassFocus(false)}
+                    error={(password && !validPass) || err?.data?.errors?.pass}
+                    helperText={passFocus && password && !validPass ? "8 đến 24 kí tự. Phải bao gồm chữ in hoa và ký tự đặc biệt."
+                        : err?.data?.errors?.pass}
+                />
+                <CustomPasswordInput
+                    label='Nhập lại mật khẩu'
+                    onChange={(e) => setMatchPass(e.target.value)}
+                    value={matchPass}
+                    aria-invalid={validMatch ? "false" : "true"}
+                    aria-describedby="confirm new password"
+                    error={(matchPass && !validMatch) || err?.data?.errors?.pass}
+                    helperText={matchPass && !validMatch ? "Không trùng mật khẩu."
+                        : err?.data?.errors?.pass}
+                />
+                <p style={{ textAlign: 'center' }}>Bằng việc đăng kí, bạn đã đồng ý với <br />
+                    <AuthHighlight className="warning">Điều khoản dịch vụ</AuthHighlight>&nbsp;&&nbsp;
+                    <AuthHighlight className="warning">Chính sách bảo mật</AuthHighlight>
+                </p>
+                <ConfirmButton
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    type="submit"
+                    aria-label="submit register"
+                    disabled={!validRegister || isLoading}
+                >
+                    Đăng ký
+                </ConfirmButton>
+            </Stack>
+            <AuthText>Đã có tài khoản?&nbsp;
+                <Link to={'/auth/login'}>
+                    <AuthHighlight>Đăng nhập</AuthHighlight>
+                </Link>
+            </AuthText>
+        </AuthForm>
     )
 }
 

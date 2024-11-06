@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.ring.bookstore.exception.ExceptionMessage;
@@ -68,6 +70,22 @@ public class ApplicationExceptionHandler{
     	Map<String, String> errorMap = new HashMap<>();
         errorMap.put("errorMessage", e.getMessage());
         return new ExceptionMessage(HttpStatus.PAYLOAD_TOO_LARGE.value() , "File size exceed maximum limit!", errorMap);
+    }
+
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ExceptionMessage handleTooManyAttemptsException(HttpClientErrorException e) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("errorMessage", e.getMessage());
+        return new ExceptionMessage(HttpStatus.TOO_MANY_REQUESTS.value() , e.getStatusText(), errorMap);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadCredentialsException.class)
+    public ExceptionMessage handleBadCredentialsException(BadCredentialsException e) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("errorMessage", e.getMessage());
+        return new ExceptionMessage(HttpStatus.BAD_REQUEST.value() , e.getMessage(), errorMap);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

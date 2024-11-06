@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,7 +33,7 @@ import com.ring.bookstore.service.RoleService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -49,6 +50,7 @@ public class AuthenticationService {
 	private final RoleService roleService;
 	private final EmailService emailService;
 	private final JwtService jwtService;
+    private final LoginProtectionService loginProtectionService;
 	private static final long EXPIRE_TOKEN_AFTER_MINUTES = 30;
 	
 	@Value("${ring.client-url}")
@@ -98,7 +100,11 @@ public class AuthenticationService {
 
 	//Authenticate
 	public AuthenticationResponse authenticate(AuthenticationRequest request) throws ResourceNotFoundException {
-		//Check if user with this username exists
+        if (loginProtectionService.isBlocked(request.getUsername())) {
+			throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "Authentication blocked due to too many failed login attempts!");
+		}
+
+        //Check if user with this username exists
 		var user = accountRepo.findByUsername(request.getUsername())
 				.orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
@@ -109,12 +115,17 @@ public class AuthenticationService {
 
 			SecurityContextHolder.getContext().setAuthentication(authentication); //All good >> security context
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Token not found!");
+			// Record failed login attempt
+			loginProtectionService.loginFailed(request.getUsername());
+			throw new BadCredentialsException("Invalid Username or Password!");
 		}
 
 		//Generate new JWT & refresh token
 		var jwtToken = generateToken(user);
 		var refreshToken = jwtService.generateRefreshToken(user);
+
+		// Record successful login
+		loginProtectionService.loginSucceeded(request.getUsername());
 
 		//Return authentication response
 		return AuthenticationResponse
@@ -196,8 +207,8 @@ public class AuthenticationService {
 	private String updateResetToken(Account user) {
 		StringBuilder token = new StringBuilder(); //Random string token
 
-		String resetToken = token.append(UUID.randomUUID().toString())
-				.append(UUID.randomUUID().toString()).toString();
+		String resetToken = token.append(UUID.randomUUID())
+				.append(UUID.randomUUID()).toString();
 		
 		user.setResetPassToken(resetToken);
 		user.setTokenCreationDate(LocalDateTime.now());
@@ -210,7 +221,7 @@ public class AuthenticationService {
 	public Account resetPassword(ResetPassRequest request) {
 		//Check if user with username exists
 		var user = accountRepo.findByResetPassToken(request.getToken())
-				.orElseThrow(() -> new ResourceNotFoundException("User with this token not found!"));
+				.orElseThrow(() -> new ResourceNotFoundException("User with this token does not exist!"));
 		//Check token expiration
 		if (isTokenExpired(user.getTokenCreationDate())) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Token hết hạn!");
         //Validate new password
