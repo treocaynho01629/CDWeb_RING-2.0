@@ -55,6 +55,15 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 } else return [{ type: 'Review', id: 'LIST' }]
             },
         }),
+        getReviewByBookId: builder.query({
+            query: (id) => ({
+                url: `/api/reviews/book/${id}`,
+                validateStatus: (response, result) => {
+                    return response.status === 200 && !result.isError
+                },
+            }),
+            providesTags: (result, error, id) => [{ type: 'Review', id }]
+        }),
         getReviewsByBookId: builder.query({
             query: (args) => {
                 const { id, page, size, sortBy, sortDir, rating } = args || {};
@@ -68,7 +77,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 if (rating) params.append('rating', rating);
 
                 return {
-                    url: `/api/reviews/${id}?${params.toString()}`,
+                    url: `/api/reviews/books/${id}?${params.toString()}`,
                     validateStatus: (response, result) => {
                         return response.status === 200 && !result.isError
                     },
@@ -125,6 +134,41 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                         totalPages
                     }
                 }, content)
+            },
+            serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
+                if (queryArgs) {
+                    const { loadMore, ...mainQuery } = queryArgs;
+
+                    if (loadMore) { //Load more >> serialize without <pagination>
+                        const { page, size, ...rest } = mainQuery;
+                        if (JSON.stringify(rest) === "{}") return endpointName + 'Merge';
+                        return defaultSerializeQueryArgs({
+                            endpointName: endpointName + 'Merge',
+                            queryArgs: rest,
+                            endpointDefinition
+                        });
+                    }
+
+                    //Serialize like normal
+                    if (JSON.stringify(mainQuery) === "{}") return endpointName;
+                    return defaultSerializeQueryArgs({
+                        endpointName,
+                        queryArgs: mainQuery,
+                        endpointDefinition
+                    })
+                } else {
+                    return endpointName
+                }
+            },
+            merge: (currentCache, newItems) => {
+                currentCache.info = newItems.info;
+                reviewsAdapter.upsertMany(
+                    currentCache, reviewsSelector.selectAll(newItems)
+                )
+            },
+            forceRefetch: ({ currentArg, previousArg }) => {
+                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
+                return isForceRefetch
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
@@ -190,6 +234,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
 
 export const {
     useGetReviewsQuery,
+    useGetReviewByBookIdQuery,
     useGetReviewsByBookIdQuery,
     useGetMyReviewsQuery,
     useCreateReviewMutation,

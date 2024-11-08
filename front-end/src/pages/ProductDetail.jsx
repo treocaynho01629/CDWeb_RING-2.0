@@ -34,7 +34,7 @@ const ProductDetail = () => {
     const [pending, setPending] = useState(false); //For reviewing & changing address
     const reviewRef = useRef(null); //Ref for scroll
     const theme = useTheme();
-    const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
+    const tabletMode = useMediaQuery(theme.breakpoints.down('md'));
 
     //Fetch data
     const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom } = useGetRandomBooksQuery({ amount: 10 });
@@ -120,7 +120,7 @@ const ProductDetail = () => {
                             />}>
                                 <ProductDetailContainer {...{
                                     loading: (isLoading || isFetching), book: data,
-                                    reviewRef, scrollIntoTab, mobileMode, pending, setPending
+                                    reviewRef, scrollIntoTab, mobileMode: tabletMode, pending, setPending
                                 }} />
                             </Suspense>
                         </LazyLoadComponent>
@@ -135,7 +135,7 @@ const ProductDetail = () => {
                             }}
                             />}>
                                 <ReviewComponent {...{
-                                    book: data, scrollIntoTab, mobileMode,
+                                    book: data, scrollIntoTab, mobileMode: tabletMode,
                                     pending, setPending, isReview, handleToggleReview
                                 }} />
                             </Suspense>

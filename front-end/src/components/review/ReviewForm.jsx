@@ -100,7 +100,7 @@ const ReviewForm = ({ username, bookId, open, handleClose, mobileMode, handlePag
     return (
         <Dialog open={open} scroll={'paper'} maxWidth={'md'} fullWidth onClose={handleClose} fullScreen={mobileMode}>
             <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><Edit />&nbsp;Đánh giá sản phẩm</DialogTitle> //FIX
-            <DialogContent>
+            <DialogContent sx={{ pt: 0, px: { xs: 1, sm: 3 } }}>
                 {username ?
                     <div>
                         <form onSubmit={handleSubmitReview}>
@@ -143,7 +143,7 @@ const ReviewForm = ({ username, bookId, open, handleClose, mobileMode, handlePag
                                 variant="outlined"
                                 value={content}
                                 onChange={handleChangeContent}
-                                error={err || errMsg}
+                                error={err.length > 0 || errMsg != ''}
                                 helperText={errMsg}
                             />
                         </form>

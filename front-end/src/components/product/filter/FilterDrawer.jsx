@@ -593,6 +593,9 @@ const FilterDrawer = ({ filters, setFilters, resetFilter, open, handleClose, han
       open={open}
       onOpen={handleOpen}
       onClose={handleClose}
+      disableBackdropTransition
+      disableDiscovery
+      swipeAreaWidth={8}
       disableSwipeToOpen={false}
     >
       <DrawerContainer>

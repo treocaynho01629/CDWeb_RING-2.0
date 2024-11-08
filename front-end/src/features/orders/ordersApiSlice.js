@@ -89,6 +89,41 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                     }
                 }, content)
             },
+            serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
+                if (queryArgs) {
+                    const { loadMore, ...mainQuery } = queryArgs;
+
+                    if (loadMore) { //Load more >> serialize without <pagination>
+                        const { page, size, ...rest } = mainQuery;
+                        if (JSON.stringify(rest) === "{}") return endpointName + 'Merge';
+                        return defaultSerializeQueryArgs({
+                            endpointName: endpointName + 'Merge',
+                            queryArgs: rest,
+                            endpointDefinition
+                        });
+                    }
+
+                    //Serialize like normal
+                    if (JSON.stringify(mainQuery) === "{}") return endpointName;
+                    return defaultSerializeQueryArgs({
+                        endpointName,
+                        queryArgs: mainQuery,
+                        endpointDefinition
+                    })
+                } else {
+                    return endpointName
+                }
+            },
+            merge: (currentCache, newItems) => {
+                currentCache.info = newItems.info;
+                ordersAdapter.upsertMany(
+                    currentCache, ordersSelector.selectAll(newItems)
+                )
+            },
+            forceRefetch: ({ currentArg, previousArg }) => {
+                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
+                return isForceRefetch
+            },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
                     return [
