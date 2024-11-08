@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { useEffect, useState, lazy, Suspense } from 'react'
-import { useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
+import { useGetReviewByBookIdQuery, useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
 import { MobileExtendButton, Showmore, Title } from '../custom/GlobalComponents';
 import { Button, DialogActions, DialogTitle, Rating, Box, Skeleton } from '@mui/material';
 import { KeyboardArrowRight, KeyboardArrowLeft, Star, StarBorder, EditOutlined } from '@mui/icons-material';
@@ -98,6 +98,10 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
     });
 
     //Fetch reviews
+    const productReviewsCount = book?.reviewsInfo?.count[0] ?? 0;
+    const haveReviews = !(!book || productReviewsCount == 0);
+    const { data: userReview, isSuccess: doneReview, error: errorReview } = useGetReviewByBookIdQuery(book?.id, //User's review of this product
+        { skip: !username || !haveReviews });
     const { data, isLoading, isFetching, isSuccess, isUninitialized, isError, error } = useGetReviewsByBookIdQuery({
         id: book?.id,
         page: pagination?.currPage,
@@ -105,7 +109,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
         sortBy: pagination?.sortBy,
         sortDir: 'desc',
         rating: filterBy === 'all' ? null : filterBy
-    }, { skip: (!book || (book?.reviewsInfo?.count[0] ?? 0) == 0) })
+    }, { skip: !haveReviews })
     const loading = (isLoading || isFetching || isError || isUninitialized);
 
     //Set pagination after fetch
@@ -142,7 +146,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
     if (isLoading && !isUninitialized) {
         reviewsContent = <>
             {(loading) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
-            {[...Array(pagination?.page)].map((item, index) =>
+            {[...Array(productReviewsCount > pagination?.pageSize ? pagination?.pageSize : productReviewsCount)].map((item, index) =>
                 <div key={`temp-review-${index}`}>
                     <ReviewItem />
                 </div>
@@ -152,25 +156,27 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
         const { ids, entities } = data;
 
         reviewsContent = <>
+            {(doneReview && userReview) && <ReviewItem {...{ username, review: userReview }} />}
             {ids?.length ?
                 ids?.map((id, index) => {
                     const review = entities[id];
 
-                    return (
-                        <div key={`${id}-${index}`}>
-                            <ReviewItem {...{ username, review }} />
-                        </div>
-                    )
+                    if (id != userReview?.id) { //User's review exclude cuz it already on top
+                        return (
+                            <div key={`${id}-${index}`}>
+                                <ReviewItem {...{ username, review }} />
+                            </div>
+                        )
+                    }
                 })
                 : <MessageContainer>Không có đánh giá nào!</MessageContainer>
             }
             {(ids?.length > 0 && ids?.length < pagination.pageSize)
                 && <MessageContainer>Không còn đánh giá nào!</MessageContainer>}
         </>
-
     } else if (isError) {
         reviewsContent = <MessageContainer>{error?.error}</MessageContainer>
-    } else if (isUninitialized && (book?.reviewsInfo?.count[0] ?? 0) == 0) {
+    } else if (isUninitialized && productReviewsCount == 0) {
         reviewsContent = <MessageContainer>
             <StyledEmptyIcon />
             Chưa có đánh giá nào, hãy trở thành người đầu tiên!
@@ -222,7 +228,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                                     emptyIcon={<StarBorder sx={{ fontSize: 16 }} />}
                                 />
                                 <Label>{(book?.reviewsInfo?.rating ?? 0).toFixed(1)}/5</Label>
-                                <Label className="secondary">({numFormatter(book?.reviewsInfo?.count[0] ?? 0)} đánh giá)</Label>
+                                <Label className="secondary">({numFormatter(productReviewsCount)} đánh giá)</Label>
                             </>
                                 : <Skeleton variant="text" sx={{ fontSize: '16px' }} width={200} />
                             }
@@ -230,7 +236,10 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                         </ReviewSummary>
                         :
                         <Suspense fallback={<CustomPlaceholder sx={{ height: { xs: 131, md: 140 } }} />}>
-                            <ReviewInfo handleClick={handleOpenForm} book={book} />
+                            <ReviewInfo {...{
+                                handleClick: handleOpenForm, book,
+                                disabled: errorReview?.status == 409, editable: userReview != null
+                            }} />
                         </Suspense>
                     }
                 </TitleContainer>
@@ -245,12 +254,12 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
             <ReviewsContainer>
                 {mobileMode ? reviewsContent : mainContent}
             </ReviewsContainer>
-            {(mobileMode && book?.reviewsInfo?.count[0] > 0) &&
+            {(mobileMode && book?.reviewsInfo?.count[0] > 0) && //View all
                 <Showmore onClick={() => handleToggleReview(true)}>
-                    <Label>Xem tất cả ({numFormatter(book?.reviewsInfo?.count[0] ?? 0)} đánh giá) <KeyboardArrowRight fontSize="small" /></Label>
+                    <Label>Xem tất cả ({numFormatter(productReviewsCount)} đánh giá) <KeyboardArrowRight fontSize="small" /></Label>
                 </Showmore>
             }
-            {(isReview !== undefined && mobileMode) &&
+            {(isReview !== undefined && mobileMode) && //Mobile component
                 <Suspense fallback={null}>
                     <Dialog
                         fullScreen
@@ -276,11 +285,11 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                                 size="large"
                                 fullWidth
                                 sx={{ marginY: '10px' }}
-                                disabled={!book}
+                                disabled={!book || errorReview?.status == 409}
                                 onClick={() => setOpenForm(true)}
                                 startIcon={<EditOutlined />}
                             >
-                                Viết đánh giá
+                                {errorReview?.status == 409 ? 'Phải mua sản phẩm' : userReview ? 'Sửa đánh giá' : 'Viết đánh giá'}
                             </Button>
                         </DialogActions>
                     </Dialog>

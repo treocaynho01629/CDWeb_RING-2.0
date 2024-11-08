@@ -113,7 +113,7 @@ LinearProgressWithLabel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-const ReviewInfo = ({ handleClick, book }) => {
+const ReviewInfo = ({ handleClick, book, disabled, editable }) => {
     const reviewPercent = (value) => {
         const total = book?.reviewsInfo?.count[0] ?? 0;
         const result = (value == 0 || total == 0) ? 0 : (value / total) * 100;
@@ -157,10 +157,11 @@ const ReviewInfo = ({ handleClick, book }) => {
                     <Button
                         variant="outlined"
                         size="large"
+                        disabled={disabled}
                         onClick={handleClick}
                         startIcon={<EditOutlined />}
                     >
-                        Viết đánh giá
+                        {disabled ? 'Phải mua sản phẩm' : editable ? 'Sửa đánh giá' : 'Viết đánh giá'}
                     </Button>
                     : <Skeleton variant="rectangular" sx={{ height: 42, width: 160 }} />
                 }

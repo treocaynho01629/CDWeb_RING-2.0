@@ -37,7 +37,14 @@ public class ReviewController {
     }
 
     //Get reviews for book's {id}
-    @GetMapping("/{id}")
+    @GetMapping("/book/{id}")
+    public ResponseEntity<?> getReviewByBook(@PathVariable("id") Long bookId,
+                                             @CurrentAccount Account currUser) {
+        return new ResponseEntity<>(reviewService.getReviewByBook(bookId, currUser), HttpStatus.OK);
+    }
+
+    //Get reviews for book's {id}
+    @GetMapping("/books/{id}")
     public ResponseEntity<?> getReviewsByBookId(@PathVariable("id") Long bookId,
                                                 @RequestParam(value = "rating", required = false) Integer rating,
                                                 @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,

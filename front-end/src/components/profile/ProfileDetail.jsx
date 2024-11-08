@@ -127,7 +127,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
             })
     }
 
-    return (
+    return ( //FIX profile pic
         <>
             <Title className="primary">
                 <Link to={'/profile/detail'}><KeyboardArrowLeft /></Link>

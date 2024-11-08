@@ -8,7 +8,7 @@ import {
 import { Stack, Badge, IconButton, Avatar, Box, Grid2 as Grid, TextField, AppBar, useTheme, useMediaQuery, useScrollTrigger } from '@mui/material';
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ColorModeContext } from '../../ThemeContextProvider';
-import { LogoImage, LogoSubtitle, LogoTitle } from '../custom/GlobalComponents';
+import { LogoImage, LogoSubtitle } from '../custom/GlobalComponents';
 import useLogout from "../../hooks/useLogout";
 import useAuth from "../../hooks/useAuth";
 import useCart from '../../hooks/useCart';
@@ -253,7 +253,7 @@ const Navbar = () => {
     const location = useLocation();
     const colorMode = useContext(ColorModeContext);
     const theme = useTheme();
-    const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
+    const tabletMode = useMediaQuery(theme.breakpoints.down('md'));
 
     //Transparent trigger
     const trigger = useScrollTrigger({
@@ -327,12 +327,12 @@ const Navbar = () => {
                     </Grid>
                 </Grid>
             </TopHeader>
-            <StyledAppBar className={!mobileMode || trigger ? '' : 'top'} elevation={0}>
+            <StyledAppBar className={!tabletMode || trigger ? '' : 'top'} elevation={0}>
                 <Wrapper>
                     <Grid container size="grow">
                         <Grid size={{ xs: 12, md: "grow" }} sx={{ display: 'flex', alignItems: 'center' }}>
                             <Left>
-                                {mobileMode &&
+                                {tabletMode &&
                                     <>
                                         <Box
                                             display={isToggleSearch ? 'none' : 'flex'}
@@ -396,7 +396,7 @@ const Navbar = () => {
                                 </Box>
                             </Left>
                         </Grid>
-                        {!mobileMode &&
+                        {!tabletMode &&
                             <Grid size={{ xs: 12, md: "auto" }} sx={{ display: { xs: 'none', md: 'flex' } }}>
                                 <Right>
                                     <NavItem>

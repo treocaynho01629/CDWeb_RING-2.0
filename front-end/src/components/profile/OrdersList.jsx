@@ -292,7 +292,7 @@ const OrdersList = () => {
     })
 
     //Fetch orders
-    const { data: orders, isLoading, isSuccess } = useGetOrdersByUserQuery({
+    const { data, isLoading, isSuccess, isError, error } = useGetOrdersByUserQuery({
         page: pagination?.currPage,
         size: pagination?.pageSize,
         loadMore: pagination?.isMore
@@ -310,21 +310,17 @@ const OrdersList = () => {
     };
 
     //Show more
-    const handleShowMore = () => {
-        let nextPage = (orders?.ids?.length / defaultSize);
+    const handleShowMore = () => { //FIX
+        let nextPage = (data?.ids?.length / defaultSize);
         setPagination({ ...pagination, currPage: nextPage })
     }
 
     let ordersContent;
 
     if (isLoading) {
-        ordersContent =
-            <>
-                <CustomProgress color="primary" />
-                <br /><br />
-            </>
+        ordersContent = <CustomProgress color="primary" />
     } else if (isSuccess) {
-        const { ids, entities } = orders;
+        const { ids, entities } = data;
 
         ordersContent = ids?.length
             ? ids?.map((id) => {

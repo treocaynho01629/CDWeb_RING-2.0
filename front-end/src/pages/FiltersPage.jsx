@@ -14,7 +14,7 @@ import useTitle from "../hooks/useTitle";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 
 const FilterList = lazy(() => import("../components/product/filter/FilterList"));
-const FilterDialog = lazy(() => import("../components/product/filter/FilterDrawer"));
+const FilterDrawer = lazy(() => import("../components/product/filter/FilterDrawer"));
 const FiltersDisplay = lazy(() => import("../components/product/filter/FiltersDisplay"));
 
 //#region styled
@@ -36,16 +36,6 @@ const Wrapper = styled.div`
     }
     @media (min-width: 1200px) {
         width: 1170px;
-    }
-`
-
-const Keyword = styled.div`
-    display: flex;
-    align-items: center;
-    margin: 10px 0;
-
-    b {
-        color: ${props => props.theme.palette.warning.main};
     }
 `
 //#endregion
@@ -143,7 +133,7 @@ const FiltersPage = () => {
     });
 
     //Dialog open state
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(undefined);
 
     //Set pagination after fetch
     useEffect(() => {
@@ -242,7 +232,7 @@ const FiltersPage = () => {
             <Grid container spacing={4} size="grow" position="relative" display="flex" justifyContent="center">
                 {tabletMode ?
                     <Suspense fallback={null}>
-                        <FilterDialog {...{ filters, setFilters, resetFilter, open, handleClose, handleOpen }} />
+                        <FilterDrawer {...{ filters, setFilters, resetFilter, open, handleOpen, handleClose }} />
                     </Suspense>
                     : <Grid size={{ xs: 12, md_lg: 2.8 }} position="relative">
                         <Suspense fallback={null}>

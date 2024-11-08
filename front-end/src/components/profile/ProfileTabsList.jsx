@@ -329,7 +329,7 @@ const ProfileTabsList = ({ profile, loading, error, tabletMode }) => {
                         </Collapse>
                     </>
                 }
-                <NavLink to={'/profile/orders'} end>
+                <NavLink to={'/profile/order'} end>
                     {({ isActive }) => (
                         <StyledListItemButton selected={isActive} tabIndex={-1}>
                             <ItemText><ReceiptLongOutlined />&nbsp;Đơn hàng
@@ -361,7 +361,7 @@ const ProfileTabsList = ({ profile, loading, error, tabletMode }) => {
                     </NavWrapper>
                 }
                 <Divider />
-                <NavLink to={'/profile/reviews'} end>
+                <NavLink to={'/profile/review'} end>
                     {({ isActive }) => (
                         <StyledListItemButton selected={isActive} tabIndex={-1}>
                             <ItemText><RateReviewOutlined />&nbsp;Đánh giá
@@ -373,7 +373,7 @@ const ProfileTabsList = ({ profile, loading, error, tabletMode }) => {
                     )}
                 </NavLink>
                 <Divider />
-                <NavLink to={'/profile/reviews'} end>
+                <NavLink to={'/profile/coupon'} end>
                     {({ isActive }) => (
                         <StyledListItemButton selected={isActive} tabIndex={-1}>
                             <ItemText><LocalActivityOutlined />&nbsp;Mã giảm giá

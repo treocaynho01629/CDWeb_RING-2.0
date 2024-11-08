@@ -39,12 +39,13 @@ public class ReviewServiceImpl implements ReviewService {
 	//Review
 	public ReviewDTO review(Long id, ReviewRequest request, Account user) {
 		//Book validation
-		Book book = bookRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Book not found")); 
+		Book book = bookRepo.findById(id).orElseThrow(()
+				-> new ResourceNotFoundException("Book not found"));
 		//Check if user had bought it yet
 		if (!orderRepo.existsByUserBuyBook(id, user.getUsername())) throw new HttpResponseException(HttpStatus.NO_CONTENT, "Hãy mua sản phẩm để có thể đánh giá!");
 		//Check if user had reviewed it yet
-		if (reviewRepo.existsByBook_IdAndUser_Id(id, user.getId())) throw new HttpResponseException(HttpStatus.ALREADY_REPORTED, "Bạn đã đánh giá sản phẩm rồi!");
-		
+		if (reviewRepo.findByBook_IdAndUser_Id(id, user.getId()).isPresent()) throw new HttpResponseException(HttpStatus.ALREADY_REPORTED, "Bạn đã đánh giá sản phẩm rồi!");
+
 		//Create review
         var review = Review.builder()
                 .book(book)
@@ -82,6 +83,15 @@ public class ReviewServiceImpl implements ReviewService {
 		Page<IReview> reviewsList = reviewRepo.findUserReviews(user.getId(), rating, pageable); //Fetch from database
 		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::projectionToDTO);
 		return reviewDtos;
+	}
+
+	//Get review by book
+	public ReviewDTO getReviewByBook(Long id, Account user) {
+		if (!orderRepo.existsByUserBuyBook(id, user.getUsername()))
+			throw new HttpResponseException(HttpStatus.NO_CONTENT, "Hãy mua sản phẩm để có thể đánh giá!");
+		Review review = reviewRepo.findByBook_IdAndUser_Id(id, user.getId()).orElseThrow(()
+				-> new ResourceNotFoundException("You have not review this product!"));
+		return reviewMapper.reviewToDTO(review);
 	}
 
 	//Update review

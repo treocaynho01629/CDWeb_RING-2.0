@@ -23,6 +23,7 @@ const ResetPage = Loadable(lazy(() => import('./pages/ResetPage')));
 const Checkout = Loadable(lazy(() => import('./pages/Checkout')));
 const Profile = Loadable(lazy(() => import('./pages/Profile')));
 const Orders = Loadable(lazy(() => import('./pages/Orders')));
+const Reviews = Loadable(lazy(() => import('./pages/Reviews')));
 
 const DashboardLayout = lazy(() => import('./components/dashboard/DashboardLayout'));
 const ManageProducts = Loadable(lazy(() => import('./pages/dashboard/ManageProducts')));
@@ -66,7 +67,7 @@ function App() {
                 <Route element={<ProfileLayout />}>
                   <Route path="/profile/detail/:tab?" element={<Profile />} />
                   <Route path="/profile/order" element={<Orders />} />
-                  <Route path="/profile/review" element={<Orders />} />
+                  <Route path="/profile/review" element={<Reviews />} />
                 </Route>
               </Route>
             </Route>

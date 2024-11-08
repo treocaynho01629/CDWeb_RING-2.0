@@ -18,13 +18,15 @@ public interface ReviewService {
 
     Page<ReviewDTO> getReviewsByBookId(Long bookId, Integer rating, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
 
-	ReviewDTO review(Long id, ReviewRequest request, Account user);
+    ReviewDTO getReviewByBook(Long id, Account user);
 
-	ReviewDTO updateReview(Long id, ReviewRequest request, Account user);
+    ReviewDTO review(Long id, ReviewRequest request, Account user);
 
-	void deleteReview(Long id);
+    ReviewDTO updateReview(Long id, ReviewRequest request, Account user);
 
-	void deleteReviews(Long bookId, Long userId, Integer rating, List<Long> ids, boolean isInverse);
+    void deleteReview(Long id);
+
+    void deleteReviews(Long bookId, Long userId, Integer rating, List<Long> ids, boolean isInverse);
 
     void deleteAllReviews();
 }

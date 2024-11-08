@@ -1,12 +1,10 @@
 import styled from 'styled-components'
 import { AddShoppingCart } from '@mui/icons-material';
-import { Button, Box, Divider, useTheme, useMediaQuery, Skeleton } from '@mui/material';
-import { lazy, Suspense, useState } from 'react';
+import { Button, Box, Divider, useTheme, useMediaQuery, Skeleton, SwipeableDrawer } from '@mui/material';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CustomAmountInput from '../../custom/CustomAmountInput';
 import useCart from '../../../hooks/useCart';
-
-const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
 
 //#region styled
 const AmountCount = styled.span`
@@ -64,8 +62,8 @@ const BuyButton = styled(Button)`
 
 const StyledImage = styled.img`
     object-fit: contain;
-    width: 125px;
-    height: 125px;
+    width: 115px;
+    height: 115px;
     border: .5px solid ${props => props.theme.palette.action.focus};
 `
 
@@ -76,14 +74,10 @@ const ProductDetailContainer = styled.div`
     position: relative;
 `
 
-const Price = styled.p`
+const Price = styled.span`
     color: ${props => props.theme.palette.primary.main};
-    margin-left: 20px;
-
-    &.old {
-        color: ${props => props.theme.palette.text.secondary};
-        text-decoration: line-through;
-    }
+    margin: 10px 20px;
+    margin-right: 0;
 `
 
 const Discount = styled(Price)`
@@ -96,10 +90,10 @@ const Discount = styled(Price)`
 const ProductAction = ({ book }) => {
     const theme = useTheme();
     const navigate = useNavigate();
-    const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
+    const tabletMode = useMediaQuery(theme.breakpoints.down('md'));
     const [amountIndex, setAmountIndex] = useState(1); //Amount add to cart
     const [open, setOpen] = useState(undefined);
-    const [openNow, setOpenNow] = useState(false); //FIX
+    const [openNow, setOpenNow] = useState(false);
     const { addProduct } = useCart();
 
     //Change add amount
@@ -114,14 +108,24 @@ const ProductAction = ({ book }) => {
         setAmountIndex(newValue);
     }
 
-    const toggleDrawer = (newOpen) => {
-        setOpen(newOpen);
-        setOpenNow(!newOpen);
+    const handleOpen = () => {
+        setOpen(true);
+        setOpenNow(false);
     };
+
+    const handleOpenNow = () => {
+        setOpen(false);
+        setOpenNow(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+        setOpenNow(false);
+    }
 
     //Add to cart
     const handleAddToCart = (book) => {
-        setOpen(false); //Close drawer
+        handleClose();
         addProduct(book, amountIndex);
     };
 
@@ -131,7 +135,7 @@ const ProductAction = ({ book }) => {
     }
 
     return (
-        mobileMode ?
+        tabletMode ?
             <>
                 <AltFilterContainer >
                     <BuyButton
@@ -140,7 +144,7 @@ const ProductAction = ({ book }) => {
                         fullWidth
                         sx={{ maxWidth: '35%' }}
                         disabled={!book || book?.amount == 0}
-                        onClick={() => toggleDrawer(true)}
+                        onClick={handleOpen}
                     >
                         <AddShoppingCart />
                     </BuyButton>
@@ -149,63 +153,71 @@ const ProductAction = ({ book }) => {
                         size="large"
                         fullWidth
                         disabled={!book || book?.amount == 0}
-                        onClick={() => handleBuyNow(book)}
+                        onClick={handleOpenNow}
                     >
                         {book?.amount == 0 ? 'Hết hàng'
                             : `Mua ngay (${(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)`}
                     </BuyButton>
                 </AltFilterContainer>
-                <Suspense fallback={<></>}>
-                    {open !== undefined &&
-                        <SwipeableDrawer
-                            anchor="bottom"
-                            open={open}
-                            onOpen={() => toggleDrawer(true)}
-                            onClose={() => toggleDrawer(false)}
-                            disableSwipeToOpen={true}
-                        >
-                            <ProductDetailContainer>
-                                <StyledImage
-                                    src={book?.image}
-                                    alt={'Product image'}
-                                    sizes='300px'
-                                />
-                                <Box>
-                                    <Box display="flex">
-                                        <Price>{Math.round(book?.price * (1 - book?.discount)).toLocaleString()}đ</Price>
-                                        {book?.discount > 0 && <Discount>{book?.price.toLocaleString()}đ</Discount>}
-                                    </Box>
-                                    <AmountCount className={book?.amount > 0 ? '' : 'error'}>
-                                        {book?.amount > 0 ? `(${book?.amount}) sản phẩm còn lại` : 'Tạm thời hết hàng'}
-                                    </AmountCount>
-                                </Box>
-                            </ProductDetailContainer>
-                            <Divider sx={{ my: 2 }} />
-                            <Box display="flex" alignItems="center" justifyContent={'space-between'} padding={'0 10px'}>
-                                <DetailTitle>Số lượng:</DetailTitle>
-                                <CustomAmountInput
-                                    disabled={!book || book?.amount == 0}
-                                    size="small"
-                                    max={book?.amount}
-                                    value={amountIndex}
-                                    error={1 > amountIndex > (book?.amount ?? 199)}
-                                    onChange={(e) => handleChangeAmount(e.target.valueAsNumber)}
-                                    handleDecrease={() => changeAmount(-1)}
-                                    handleIncrease={() => changeAmount(1)}
-                                />
+                <SwipeableDrawer
+                    anchor="bottom"
+                    open={open || openNow}
+                    onClose={handleClose}
+                    disableBackdropTransition
+                    disableSwipeToOpen={true}
+                >
+                    <ProductDetailContainer>
+                        <StyledImage
+                            src={book?.image}
+                            alt={`${book?.title} preview image`}
+                            sizes='250px'
+                        />
+                        <Box>
+                            <Box display="flex">
+                                <Price>{Math.round(book?.price * (1 - book?.discount)).toLocaleString()}đ</Price>
+                                {book?.discount > 0 && <Discount>{book?.price.toLocaleString()}đ</Discount>}
                             </Box>
-                            <BuyButton
-                                variant="outlined"
-                                color="primary"
-                                size="large"
-                                sx={{ margin: '5px' }}
-                                onClick={() => handleAddToCart(book)}
-                            >
-                                Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)
-                            </BuyButton>
-                        </SwipeableDrawer>
+                            <AmountCount className={book?.amount > 0 ? '' : 'error'}>
+                                {book?.amount > 0 ? `(${book?.amount}) sản phẩm còn lại` : 'Tạm thời hết hàng'}
+                            </AmountCount>
+                        </Box>
+                    </ProductDetailContainer>
+                    <Divider sx={{ my: 2 }} />
+                    <Box display="flex" alignItems="center" justifyContent={'space-between'} padding={'0 10px'}>
+                        <DetailTitle>Số lượng:</DetailTitle>
+                        <CustomAmountInput
+                            disabled={!book || book?.amount == 0}
+                            size="small"
+                            max={book?.amount}
+                            value={amountIndex}
+                            error={1 > amountIndex > (book?.amount ?? 199)}
+                            onChange={(e) => handleChangeAmount(e.target.valueAsNumber)}
+                            handleDecrease={() => changeAmount(-1)}
+                            handleIncrease={() => changeAmount(1)}
+                        />
+                    </Box>
+                    {openNow ?
+                        <BuyButton
+                            variant="outlined"
+                            color="warning"
+                            size="large"
+                            sx={{ margin: '5px' }}
+                            onClick={() => handleBuyNow(book)}
+                        >
+                            Mua ngay ({(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)
+                        </BuyButton>
+                        :
+                        <BuyButton
+                            variant="outlined"
+                            color="primary"
+                            size="large"
+                            sx={{ margin: '5px' }}
+                            onClick={() => handleAddToCart(book)}
+                        >
+                            Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)
+                        </BuyButton>
                     }
-                </Suspense>
+                </SwipeableDrawer>
             </>
             : <FilterContainer>
                 <Box display="flex" alignItems="center" flexWrap="wrap">

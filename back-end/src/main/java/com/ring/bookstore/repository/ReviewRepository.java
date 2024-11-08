@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.ring.bookstore.model.Review;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long>{
@@ -62,5 +63,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long>{
 	""")
 	Page<IReview> findUserReviews(Long id, Integer rating, Pageable pageable); //Get reviews by user's {id}
 	
-	boolean existsByBook_IdAndUser_Id(Long bookId, Long userId); //Check if user has review this book before
+	Optional<Review> findByBook_IdAndUser_Id(Long bookId, Long userId); //Get user's review of this book
 }

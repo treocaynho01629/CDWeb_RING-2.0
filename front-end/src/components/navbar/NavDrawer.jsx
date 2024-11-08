@@ -37,7 +37,10 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
             open={openDrawer}
             onOpen={handleOpen}
             onClose={handleClose}
-            disableSwipeToOpen={true}
+            disableBackdropTransition
+            disableDiscovery
+            swipeAreaWidth={8}
+            disableSwipeToOpen={false}
         >
             <DrawerContainer>
                 <Box sx={{ marginY: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
