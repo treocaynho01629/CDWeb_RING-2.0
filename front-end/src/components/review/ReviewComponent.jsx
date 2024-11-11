@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useEffect, useState, lazy, Suspense } from 'react'
+import { useEffect, useState, lazy, Suspense, Fragment } from 'react'
 import { useGetReviewByBookIdQuery, useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
 import { MobileExtendButton, Showmore, Title } from '../custom/GlobalComponents';
 import { Button, DialogActions, DialogTitle, Rating, Box, Skeleton } from '@mui/material';
@@ -101,7 +101,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
     const productReviewsCount = book?.reviewsInfo?.count[0] ?? 0;
     const haveReviews = !(!book || productReviewsCount == 0);
     const { data: userReview, isSuccess: doneReview, error: errorReview } = useGetReviewByBookIdQuery(book?.id, //User's review of this product
-        { skip: !username || !haveReviews });
+        { skip: !username });
     const { data, isLoading, isFetching, isSuccess, isUninitialized, isError, error } = useGetReviewsByBookIdQuery({
         id: book?.id,
         page: pagination?.currPage,
@@ -147,25 +147,25 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
         reviewsContent = <>
             {(loading) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
             {[...Array(productReviewsCount > pagination?.pageSize ? pagination?.pageSize : productReviewsCount)].map((item, index) =>
-                <div key={`temp-review-${index}`}>
+                <Fragment key={`temp-review-${index}`}>
                     <ReviewItem />
-                </div>
+                </Fragment>
             )}
         </>
     } else if (isSuccess) {
         const { ids, entities } = data;
 
         reviewsContent = <>
-            {(doneReview && userReview) && <ReviewItem {...{ username, review: userReview }} />}
+            {(doneReview && userReview) && <ReviewItem {...{ username, review: userReview, handleClick: handleOpenForm }} />}
             {ids?.length ?
                 ids?.map((id, index) => {
                     const review = entities[id];
 
                     if (id != userReview?.id) { //User's review exclude cuz it already on top
                         return (
-                            <div key={`${id}-${index}`}>
-                                <ReviewItem {...{ username, review }} />
-                            </div>
+                            <Fragment key={`${id}-${index}`}>
+                                <ReviewItem {...{ username, review, handleClick: handleOpenForm }} />
+                            </Fragment>
                         )
                     }
                 })
@@ -238,7 +238,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                         <Suspense fallback={<CustomPlaceholder sx={{ height: { xs: 131, md: 140 } }} />}>
                             <ReviewInfo {...{
                                 handleClick: handleOpenForm, book,
-                                disabled: errorReview?.status == 409, editable: userReview != null
+                                disabled: errorReview?.status == 409, editable: (haveReviews && userReview != null)
                             }} />
                         </Suspense>
                     }
@@ -289,7 +289,8 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                                 onClick={() => setOpenForm(true)}
                                 startIcon={<EditOutlined />}
                             >
-                                {errorReview?.status == 409 ? 'Phải mua sản phẩm' : userReview ? 'Sửa đánh giá' : 'Viết đánh giá'}
+                                {errorReview?.status == 409 ? 'Mua sản phẩm' : 
+                                    (haveReviews && userReview != null) ? 'Sửa đánh giá' : 'Viết đánh giá'}
                             </Button>
                         </DialogActions>
                     </Dialog>
@@ -299,7 +300,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                 <Suspense fallback={null}>
                     <ReviewForm {...{
                         username, bookId: book?.id, open: openForm, handleClose: handleCloseForm,
-                        mobileMode, pending, setPending, handlePageChange
+                        mobileMode, pending, setPending, handlePageChange, review: haveReviews ? userReview : null
                     }} />
                 </Suspense>
             }

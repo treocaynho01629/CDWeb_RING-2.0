@@ -1,11 +1,12 @@
 import styled from "styled-components"
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useGetOrdersByUserQuery } from '../../features/orders/ordersApiSlice';
-import { Check, DeliveryDiningOutlined, KeyboardArrowLeft, KeyboardArrowRight, Receipt, Storefront } from '@mui/icons-material';
+import { Check, DeliveryDiningOutlined, KeyboardArrowLeft, KeyboardArrowRight, MoreHoriz, Receipt, Storefront } from '@mui/icons-material';
 import { Box, Button, Skeleton } from '@mui/material';
 import { Link } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Title } from "../custom/GlobalComponents";
+import { booksApiSlice } from "../../features/books/booksApiSlice";
 import CustomProgress from '../custom/CustomProgress';
 import useCart from '../../hooks/useCart';
 
@@ -216,67 +217,71 @@ function OrderItem({ order, handleAddToCart }) {
 
     return (
         <>
-            {order?.details?.map((detail, index) => (
-                <OrderItemContainer key={`order-${detail?.id}-${index}`}>
-                    <HeadContainer>
-                        <Link to={`/store/${detail?.shopId}`}>
-                            <Shop>
-                                <ShopTag>Đối tác</ShopTag>
-                                <Storefront />&nbsp;{detail?.shopName}<KeyboardArrowRight fontSize="small" />
-                            </Shop>
-                        </Link>
-                        <Link to={`/profile/orders/detail${detail?.id}`}>
-                            <StatusTag><Check />ĐÃ GIAO</StatusTag>
-                        </Link>
-                    </HeadContainer>
-                    {detail?.items?.map((item, itemIndex) => (
-                        <Link key={`item-${item?.id}-${itemIndex}`} to={`/product/${item?.bookSlug}`}>
-                            <BodyContainer>
-                                <StyledLazyImage
-                                    src={`${item?.image}?size=small`}
-                                    alt={`${item?.bookTitle} Order item`}
-                                    placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
-                                />
-                                <ContentContainer>
-                                    <ItemTitle>{item?.bookTitle}</ItemTitle>
-                                    <StuffContainer>
-                                        <Amount>Số lượng: <b>{item?.quantity}</b></Amount>
-                                        <PriceContainer>
-                                            <Discount>{item?.discount > 0 ? `${item.price.toLocaleString()}đ` : ''}</Discount>
-                                            <Price>{Math.round(item.price * (1 - (item?.discount || 0))).toLocaleString()}đ</Price>
-                                        </PriceContainer>
-                                    </StuffContainer>
-                                </ContentContainer>
-                            </BodyContainer>
-                        </Link>
-                    ))}
-                    <BotContainer>
-                        <Link to={`/profile/orders/detail${detail?.id}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
-                            <DetailText><DeliveryDiningOutlined />&nbsp;Chi tiết đơn hàng</DetailText>
-                        </Link>
-                        <Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '5px' }}>
-                                <p style={{ margin: 0 }}>Thành tiền:</p>
-                                <Price className="total">&nbsp;{(detail?.totalPrice - detail?.totalDiscount).toLocaleString()}đ</Price>
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Link to={`/product/${detail?.slug}`}>
+            {order?.details?.map((detail, index) => {
+                const isCompleted = detail?.items.every(item => item.status == 'COMPLETED');
+
+                return (
+                    <OrderItemContainer key={`order-${detail?.id}-${index}`}>
+                        <HeadContainer>
+                            <Link to={`/store/${detail?.shopId}`}>
+                                <Shop>
+                                    <ShopTag>Đối tác</ShopTag>
+                                    <Storefront />&nbsp;{detail?.shopName}<KeyboardArrowRight fontSize="small" />
+                                </Shop>
                             </Link>
-                                <Button variant="contained" color="primary">
-                                    Mua lại
-                                </Button>
-                                <Box display={{ xs: 'none', sm: 'block' }}>
-                                    <Link to={`/product/${detail?.slug}?tab=reviews`}>
+                            <Link to={`/profile/order/detail${detail?.id}`}>
+                                <StatusTag>
+                                    {isCompleted ? <><Check />ĐÃ GIAO</> : <><MoreHoriz />ĐANG GIAO</>}
+                                </StatusTag>
+                            </Link>
+                        </HeadContainer>
+                        {detail?.items?.map((item, itemIndex) => (
+                            <Link key={`item-${item?.id}-${itemIndex}`} to={`/product/${item?.bookSlug}`}>
+                                <BodyContainer>
+                                    <StyledLazyImage
+                                        src={`${item?.image}?size=small`}
+                                        alt={`${item?.bookTitle} Order item`}
+                                        placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
+                                    />
+                                    <ContentContainer>
+                                        <ItemTitle>{item?.bookTitle}</ItemTitle>
+                                        <StuffContainer>
+                                            <Amount>Số lượng: <b>{item?.quantity}</b></Amount>
+                                            <PriceContainer>
+                                                <Discount>{item?.discount > 0 ? `${item.price.toLocaleString()}đ` : ''}</Discount>
+                                                <Price>{Math.round(item.price * (1 - (item?.discount || 0))).toLocaleString()}đ</Price>
+                                            </PriceContainer>
+                                        </StuffContainer>
+                                    </ContentContainer>
+                                </BodyContainer>
+                            </Link>
+                        ))}
+                        <BotContainer>
+                            <Link to={`/profile/order/detail${detail?.id}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
+                                <DetailText><DeliveryDiningOutlined />&nbsp;Chi tiết đơn hàng</DetailText>
+                            </Link>
+                            <Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '5px' }}>
+                                    <p style={{ margin: 0 }}>Thành tiền:</p>
+                                    <Price className="total">&nbsp;{(detail?.totalPrice - detail?.totalDiscount).toLocaleString()}đ</Price>
+                                </Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                    <Link to={`/product/${detail?.slug}`}>
+                                    </Link>
+                                    <Button variant="contained" color="primary" onClick={() => handleAddToCart(detail)}>
+                                        Mua lại
+                                    </Button>
+                                    <Link to={`/product/${detail?.items[0]?.bookSlug}?review=true`}>
                                         <Button variant="outlined" color="secondary" sx={{ marginLeft: '10px' }}>
-                                            Đánh giá sản phẩm
+                                            Đánh giá
                                         </Button>
                                     </Link>
                                 </Box>
                             </Box>
-                        </Box>
-                    </BotContainer>
-                </OrderItemContainer>
-            )
+                        </BotContainer>
+                    </OrderItemContainer>
+                )
+            }
             )}
         </>
 
@@ -297,16 +302,29 @@ const OrdersList = () => {
         size: pagination?.pageSize,
         loadMore: pagination?.isMore
     });
+    const [getBought] = booksApiSlice.useLazyGetBooksByIdsQuery();
 
-    const handleAddToCart = (detail) => {
-        // addProduct({
-        //     id: detail.bookId,
-        //     title: detail.bookTitle,
-        //     price: detail.price,
-        //     image: detail.image,
-        //     quantity: 1,
-        // })
-        console.log('FIX');
+    const handleAddToCart = async (detail) => {
+        const ids = detail?.items?.map(item => item.bookId);
+        getBought(ids) //Fetch books with new info
+            .unwrap()
+            .then((books) => {
+                const { ids, entities } = books;
+
+                ids.forEach((id) => {
+                    const book = entities[id];
+                    if (book.amount > 0) { //Check for stock
+                        addProduct(book, 1);
+                    } else {
+                        async function alert() {
+                            const { enqueueSnackbar } = await import('notistack');
+                            enqueueSnackbar('Sản phẩm đã hết hàng!', { variant: 'error' });
+                        }
+                        alert();
+                    }
+                })
+            })
+            .catch((rejected) => console.error(rejected));
     };
 
     //Show more
@@ -323,10 +341,14 @@ const OrdersList = () => {
         const { ids, entities } = data;
 
         ordersContent = ids?.length
-            ? ids?.map((id) => {
+            ? ids?.map((id, index) => {
                 const order = entities[id];
 
-                return (<OrderItem {...{ order, handleAddToCart }} />)
+                return (
+                    <Fragment key={`order-${id}-${index}`}>
+                        <OrderItem {...{ order, handleAddToCart }} />
+                    </Fragment>
+                )
             })
             :
             <Box sx={{ marginBottom: 5 }}>Chưa có đơn hàng nào</Box>

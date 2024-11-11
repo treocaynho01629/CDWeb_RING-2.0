@@ -1,8 +1,13 @@
 import styled from 'styled-components'
-import { AccessTime, CalendarMonth, Star, StarBorder, ReportGmailerrorred, BorderColor } from '@mui/icons-material';
+import { AccessTime, CalendarMonth, Star, StarBorder, ReportGmailerrorred, BorderColor, BorderColorOutlined } from '@mui/icons-material';
 import { Avatar, Rating, Skeleton } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 //#region styled
+const ReviewContainer = styled.div`
+    margin-bottom: ${props => props.theme.spacing(1)};
+`
+
 const Profile = styled.div`
     display: flex;
     align-items: flex-start;
@@ -20,11 +25,11 @@ const Profile = styled.div`
 `
 
 const RateContent = styled.div`
-    margin: 10px 0 20px;
+    margin: ${props => props.theme.spacing(1)} 0 ${props => props.theme.spacing(2)};
     font-size: 15px;
 
     ${props => props.theme.breakpoints.down("sm")} {
-        margin: 5px 0 20px;
+        margin: ${props => props.theme.spacing(0.5)} 0 ${props => props.theme.spacing(2)};
     }
 `
 
@@ -38,6 +43,19 @@ const ActionButton = styled.span`
 
     &.mobile { display: none;}
 
+    svg {
+        color: ${props => props.theme.palette.text.secondary};
+        font-size: 20px;
+    }
+
+    &:hover {
+        color: ${props => props.theme.palette.warning.main};
+
+        svg {
+            color: ${props => props.theme.palette.warning.main};
+        }
+    }
+
     ${props => props.theme.breakpoints.down("sm")} {
         display: none;
         &.mobile { display: flex;} 
@@ -48,7 +66,7 @@ const RatingInfo = styled.p`
     font-size: 14px;
     padding: 0;
     margin: 0;
-    margin-right: 10px;
+    margin-right: ${props => props.theme.spacing(1)};
     font-weight: 400;
     display: flex;
     align-items: center;
@@ -70,13 +88,21 @@ const TimeContainer = styled.div`
     flex-grow: 1;
     justify-content: flex-end;
 `
+
+const ProductContent = styled.div`
+    font-size: 14px;
+    padding: ${props => props.theme.spacing(0.5)};
+    margin-bottom: ${props => props.theme.spacing(2)};
+    color: ${props => props.theme.palette.text.secondary};
+    border: .5px solid ${props => props.theme.palette.warning.main};
+`
 //#endregion
 
-const ReviewItem = ({ review, username }) => {
+const ReviewItem = ({ review, username, isPreview, handleClick }) => {
     const date = new Date(review?.date);
 
     return (
-        <>
+        <ReviewContainer>
             <Profile className={(username && username === review?.username) ? 'active' : ''}>
                 <InfoContainer>
                     {review ? <>
@@ -118,13 +144,13 @@ const ReviewItem = ({ review, username }) => {
                                 day: "2-digit",
                             })}
                         </RatingInfo>
-                        {username === review?.username ?
+                        {((username && username === review?.username) || isPreview) ?
                             <ActionButton className="mobile">
-                                <BorderColor sx={{ fontSize: 20, color: 'text.secondary' }} />
+                                <BorderColorOutlined />
                             </ActionButton>
                             :
                             <ActionButton className="mobile">
-                                <ReportGmailerrorred sx={{ fontSize: 20, color: 'text.secondary' }} />
+                                <ReportGmailerrorred />
                             </ActionButton>
                         }
                     </>
@@ -144,18 +170,25 @@ const ReviewItem = ({ review, username }) => {
                     </>
                 }
             </RateContent>
+            {isPreview &&
+                <Link to={`/product/${review?.bookSlug}`} title="Đi đến sản phẩm">
+                    <ProductContent>
+                        {review?.bookTitle}
+                    </ProductContent>
+                </Link>
+            }
             {review ?
-                (username && username === review?.username) ?
-                    <ActionButton>
-                        <BorderColor sx={{ fontSize: 20, color: 'text.secondary' }} />&nbsp;Chỉnh sửa
+                ((username && username === review?.username) || isPreview) ?
+                    <ActionButton onClick={handleClick}>
+                        <BorderColorOutlined />&nbsp;Chỉnh sửa
                     </ActionButton>
                     :
                     <ActionButton>
-                        <ReportGmailerrorred sx={{ fontSize: 20, color: 'text.secondary' }} />&nbsp;Báo cáo
+                        <ReportGmailerrorred />&nbsp;Báo cáo
                     </ActionButton>
                 : <Skeleton variant="text" sx={{ fontSize: '14px' }} width={80} />
             }
-        </>
+        </ReviewContainer>
     )
 }
 

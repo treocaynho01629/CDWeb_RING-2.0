@@ -2,8 +2,8 @@ import styled from 'styled-components'
 import { Close, Edit, Star, StarBorder } from '@mui/icons-material';
 import { Rating, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, TextareaAutosize } from '@mui/material';
 import { Link, useLocation } from "react-router-dom";
-import { useCreateReviewMutation } from '../../features/reviews/reviewsApiSlice';
-import { useState } from 'react';
+import { useCreateReviewMutation, useUpdateReviewMutation } from '../../features/reviews/reviewsApiSlice';
+import { useEffect, useState } from 'react';
 import { rateLabels } from '../../ultils/filters';
 
 //#region styled
@@ -39,12 +39,12 @@ const SuggestText = styled.b`
 `
 //#endregion
 
-const ReviewForm = ({ username, bookId, open, handleClose, mobileMode, handlePageChange, pending, setPending }) => {
+const ReviewForm = ({ username, bookId, review, open, handleClose, mobileMode, handlePageChange, pending, setPending }) => {
     const location = useLocation();
 
     //Initial value
-    const [content, setContent] = useState('');
-    const [rating, setRating] = useState(5);
+    const [content, setContent] = useState(review?.content ?? '');
+    const [rating, setRating] = useState(review?.rating ?? 5);
     const [hover, setHover] = useState(-1);
 
     //Error
@@ -52,54 +52,93 @@ const ReviewForm = ({ username, bookId, open, handleClose, mobileMode, handlePag
     const [errMsg, setErrMsg] = useState('');
 
     //Review hook
-    const [review, { isLoading: reviewing }] = useCreateReviewMutation();
+    const [sendReview, { isLoading: reviewing }] = useCreateReviewMutation();
+    const [editReview, { isLoading: editing }] = useUpdateReviewMutation();
+
+    useEffect(() => {
+        setContent(review?.content ?? '');
+        setRating(review?.rating ?? 5);
+    }, [review])
 
     const handleChangeContent = (e) => { setContent(e.target.value) };
 
     //Review
     const handleSubmitReview = async (e) => {
         e.preventDefault();
-        if (reviewing || pending) return;
+        if (reviewing || editing || pending) return;
 
         setPending(true);
         const { enqueueSnackbar } = await import('notistack');
 
-        review({
-            id: bookId,
-            newReview: {
-                content: content,
-                rating: rating
-            },
-        }).unwrap()
-            .then((data) => {
-                enqueueSnackbar('Đánh giá thành công!', { variant: 'success' });
-                setContent('');
-                setErr([]);
-                setErrMsg('');
-                setRating(5);
-                handlePageChange(1);
-                setPending(false);
-            })
-            .catch((err) => {
-                console.error(err);
-                setErr(err);
-                if (!err?.status) {
-                    setErrMsg("Server không phản hồi!");
-                } else if (err?.status === 400) {
-                    setErrMsg(err.data.errors.content);
-                } else if (err?.status === 409) {
-                    setErrMsg(err.data.errors.errorMessage);
-                } else {
-                    setErrMsg("Đánh giá thất bại!");
-                }
-                enqueueSnackbar('Đánh giá thất bại!', { variant: 'error' });
-                setPending(false);
-            })
+        if (review?.content) { //Edit
+            editReview({
+                id: review?.id,
+                updateReview: {
+                    content: content,
+                    rating: rating
+                },
+            }).unwrap()
+                .then((data) => {
+                    enqueueSnackbar('Chỉnh sửa thành công!', { variant: 'success' });
+                    setErr([]);
+                    setErrMsg('');
+                    handleClose();
+                })
+                .catch((err) => {
+                    console.error(err);
+                    setErr(err);
+                    if (!err?.status) {
+                        setErrMsg("Server không phản hồi!");
+                    } else if (err?.status === 400) {
+                        setErrMsg(err.data.errors.content);
+                    } else if (err?.status === 409) {
+                        setErrMsg(err.data.errors.errorMessage);
+                    } else {
+                        setErrMsg("Chỉnh sửa thất bại!");
+                    }
+                    enqueueSnackbar('Chỉnh sửa thất bại!', { variant: 'error' });
+                })
+        } else { //New review
+            sendReview({
+                id: bookId,
+                newReview: {
+                    content: content,
+                    rating: rating
+                },
+            }).unwrap()
+                .then((data) => {
+                    enqueueSnackbar('Đánh giá thành công!', { variant: 'success' });
+                    setContent('');
+                    setErr([]);
+                    setErrMsg('');
+                    setRating(5);
+                    handlePageChange(1);
+                    handleClose();
+                })
+                .catch((err) => {
+                    console.error(err);
+                    setErr(err);
+                    if (!err?.status) {
+                        setErrMsg("Server không phản hồi!");
+                    } else if (err?.status === 400) {
+                        setErrMsg(err.data.errors.content);
+                    } else if (err?.status === 409) {
+                        setErrMsg(err.data.errors.errorMessage);
+                    } else {
+                        setErrMsg("Đánh giá thất bại!");
+                    }
+                    enqueueSnackbar('Đánh giá thất bại!', { variant: 'error' });
+                })
+        }
+
+        setPending(false);
     }
 
     return (
         <Dialog open={open} scroll={'paper'} maxWidth={'md'} fullWidth onClose={handleClose} fullScreen={mobileMode}>
-            <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><Edit />&nbsp;Đánh giá sản phẩm</DialogTitle> //FIX
+            <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><Edit />&nbsp;
+                {review?.content ? 'Chỉnh sửa đánh giá' : 'Đánh giá sản phẩm'}
+            </DialogTitle>
             <DialogContent sx={{ pt: 0, px: { xs: 1, sm: 3 } }}>
                 {username ?
                     <div>
@@ -192,7 +231,10 @@ const ReviewForm = ({ username, bookId, open, handleClose, mobileMode, handlePag
                                 color="primary"
                                 size="large"
                                 sx={{ marginY: '10px' }}
-                                onClick={() => scrollTo(0, 0)}
+                                onClick={() => {
+                                    handleClose();
+                                    scrollTo(0, 0);
+                                }}
                             >
                                 Mua ngay
                             </Button>
@@ -204,7 +246,7 @@ const ReviewForm = ({ username, bookId, open, handleClose, mobileMode, handlePag
                                 sx={{ marginY: '10px' }}
                                 onClick={handleSubmitReview}
                             >
-                                Gửi đánh giá
+                                {review?.content ? 'Sửa đánh giá' : 'Gửi đánh giá'}
                             </Button>
                 )
                     :

@@ -22,7 +22,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                     return response.status === 200 && !result.isError
                 },
             }),
-            providesTags: (result, error) => [{ type: 'Book', id: result.id }]
+            providesTags: (result, error) => [{ type: 'Book', id: result ? result.id : 'LIST' }]
         }),
         getBooks: builder.query({
             query: (args) => {
@@ -43,8 +43,8 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 if (shopId) params.append('shopId', shopId);
                 if (pubIds?.length) params.append('pubIds', pubIds);
                 if (value) {
-                    if(value[0] != 0) params.append('fromRange', value[0]);
-                    if(value[1] != 10000000) params.append('toRange', value[1]);
+                    if (value[0] != 0) params.append('fromRange', value[0]);
+                    if (value[1] != 10000000) params.append('toRange', value[1]);
                 }
 
                 return {
@@ -100,6 +100,31 @@ export const booksApiSlice = apiSlice.injectEndpoints({
             forceRefetch: ({ currentArg, previousArg }) => {
                 const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
                 return isForceRefetch
+            },
+            providesTags: (result, error, arg) => {
+                if (result?.ids) {
+                    return [
+                        { type: 'Book', id: 'LIST' },
+                        ...result.ids.map(id => ({ type: 'Book', id }))
+                    ]
+                } else return [{ type: 'Book', id: 'LIST' }]
+            }
+        }),
+        getBooksByIds: builder.query({
+            query: (ids) => {
+                //Params
+                const params = new URLSearchParams();
+                if (ids?.length) params.append('ids', ids);
+
+                return {
+                    url: `/api/books/find?${params.toString()}`,
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result.isError
+                    },
+                }
+            },
+            transformResponse: responseData => {
+                return booksAdapter.setAll(initialState, responseData)
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
@@ -190,6 +215,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
 export const {
     useGetBookQuery,
     useGetBooksQuery,
+    useGetBooksByIdsQuery,
     useGetRandomBooksQuery,
     useCreateBookMutation,
     useUpdateBookMutation,

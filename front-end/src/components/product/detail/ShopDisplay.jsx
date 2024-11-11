@@ -98,7 +98,7 @@ const ShopDisplay = ({ id, name }) => {
                                 flexGrow={1}
                             >
                                 <Box mb={{ xs: 0, md: 1 }}>
-                                    <Skeleton variant="text" sx={{ fontSize: { xs: '15px', md: '18px' }, width: { xs: 110, md: 200 } }} />
+                                    <Skeleton variant="text" sx={{ fontSize: { xs: '15px', md: '18px' }, width: { xs: 110, md: '90%' } }} />
                                     <Skeleton variant="text" sx={{ fontSize: '13px' }} width={100} />
                                 </Box>
                                 <Skeleton variant="rectangular" sx={{ height: 35, width: { xs: 100, md: '100%' } }} />

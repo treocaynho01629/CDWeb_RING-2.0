@@ -67,7 +67,7 @@ const ProductDetail = () => {
     } else if (isSuccess) {
         product = <ProductContent {...{ book: data, handleToggleReview, pending, setPending }} />
     } else if (isError && error?.status === 404) {
-        product = <Navigate to={'/missing'} />
+        product = <Navigate to={'/missing'} replace />
     } else {
         product = <ProductContent />
     }

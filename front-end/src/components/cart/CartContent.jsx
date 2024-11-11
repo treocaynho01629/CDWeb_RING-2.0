@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useEffect, useMemo, useState, Suspense, lazy } from "react";
+import { useEffect, useMemo, useState, Suspense, lazy, useCallback } from "react";
 import { Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, Search, ChevronLeft, Sell } from '@mui/icons-material';
 import { Checkbox, Button, Grid2 as Grid, Table, TableBody, TableRow, Box, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
 import { Link, useNavigate } from "react-router-dom";
@@ -137,7 +137,7 @@ EnhancedTableHead.propTypes = {
 };
 
 const CartContent = () => {
-    const { cartProducts, replaceProduct, removeProduct, removeShopProduct, clearCart, 
+    const { cartProducts, replaceProduct, removeProduct, removeShopProduct, clearCart,
         decreaseAmount, increaseAmount, changeAmount } = useCart();
     const [selected, setSelected] = useState([]);
     const [shopIds, setShopIds] = useState([]);
@@ -190,55 +190,54 @@ const CartContent = () => {
     }, [recommend, loadRecommend])
 
     const handleCartChange = () => {
-        if (selected.length > 0 && cartProducts.length > 0) {
-            if (doneRecommend) {
-                //Reduce cart
-                const estimateCart = cartProducts.reduce((result, item) => {
-                    const { id, shopId } = item;
+        if (selected.length > 0 && cartProducts.length > 0 && doneRecommend) {
+            //Reduce cart
+            const selectedCart = cartProducts.reduce((result, item) => {
+                const { id, shopId } = item;
 
-                    if (selected.indexOf(id) !== -1) { //Get selected items in redux store
-                        //Find or create shop
-                        let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
+                if (selected.indexOf(id) !== -1) { //Get selected items in redux store
+                    //Find or create shop
+                    let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
 
-                        if (!detail) {
-                            detail = { shopId, coupon: shopCoupon[shopId]?.code, items: [] };
-                            result.cart.push(detail);
-                        }
-
-                        //Add items for that shop
-                        detail.items.push(item);
+                    if (!detail) {
+                        detail = { shopId, coupon: shopCoupon[shopId]?.code, items: [] };
+                        result.cart.push(detail);
                     }
 
-                    return result;
-                }, { coupon: coupon?.code, cart: [] });
+                    //Add items for that shop
+                    detail.items.push(item);
+                }
 
-                handleEstimate(estimateCart); //Estimate price
-                handleCalculate(estimateCart); //Calculate price
-            }
+                return result;
+            }, { coupon: coupon?.code, cart: [] });
+
+            handleEstimate(selectedCart); //Estimate price
+            handleCalculate(selectedCart); //Calculate price
         } else { //Reset
             handleEstimate(null);
+            handleCalculate(null);
             setCalculated(null);
         }
     }
 
-    const handleResetCart = () => {
+    const handleClearSelect = () => {
         setSelected([]);
         setCalculated(null);
     }
 
     //Estimate before receive caculated price from server
-    const handleEstimate = (estimateCart) => {
+    const handleEstimate = (cart) => {
         let estimate = { deal: 0, subTotal: 0, shipping: 0, total: 0 }; //Initial value
         let cartDetails = {};
 
-        if (estimateCart?.cart?.length) {
+        if (cart?.cart?.length) {
             let totalDeal = 0;
             let subTotal = 0;
             let totalQuantity = 0;
-            const shipping = tempShippingFee * (estimateCart?.cart?.length || 0);
+            const shipping = tempShippingFee * (cart?.cart?.length || 0);
 
             //Loop & calculate
-            estimateCart?.cart?.forEach((detail) => {
+            cart?.cart?.forEach((detail) => {
                 let deal = 0;
                 let productTotal = 0;
                 let quantity = 0;
@@ -269,10 +268,11 @@ const CartContent = () => {
         setEstimated(estimate);
     }
 
-    const handleCalculate = debounce(async (estimateCart) => {
-        if (isLoading) return;
+    //Calculate server side
+    const handleCalculate = useCallback(debounce(async (cart) => {
+        if (isLoading || cart == null) return;
 
-        calculate(estimateCart).unwrap()
+        calculate(cart).unwrap()
             .then((data) => {
                 setCalculated(data);
                 syncCart(data);
@@ -284,15 +284,16 @@ const CartContent = () => {
                 } else if (err?.status === 409) {
                     console.error(err?.data?.errors?.errorMessage);
                 } else if (err?.status === 400) {
-                    console.error('Sai định dạng thông tin!');
+                    console.error('Sai định dạng giỏ hàng!');
                 } else {
-                    console.error('Đặt hàng thất bại!')
+                    console.error('Tính trước đơn hàng thất bại!')
                 }
             })
-    }, 500);
+    }, 500), []);
 
     //Sync cart between client and server
     const syncCart = (cart) => {
+        if (!cartProducts?.length) return;
         const details = cart?.details;
 
         details.forEach((detail, index) => {
@@ -309,7 +310,7 @@ const CartContent = () => {
 
                         replaceProduct(newItem);
                     } else { //Remove invalid item
-                        handleResetCart();
+                        handleClearSelect();
                         removeProduct(item.id);
                     }
                 })
@@ -326,7 +327,7 @@ const CartContent = () => {
                     setShopCoupon((prev) => ({ ...prev, [detail?.shopId]: detail.coupon }));
                 }
             } else { //Remove all items of the invalid Shop
-                handleResetCart();
+                handleClearSelect();
                 removeShopProduct(detail.shopId);
             }
         })
@@ -469,6 +470,7 @@ const CartContent = () => {
         if (isSelected(id)) handleSelect(id);
         removeProduct(id);
         handleClose();
+        handleCalculate.cancel();
     };
 
     const handleDecrease = (quantity, id) => {
@@ -487,7 +489,8 @@ const CartContent = () => {
         } else {
             selected.forEach((id) => { removeProduct(id) });
         }
-        handleResetCart();
+        handleClearSelect();
+        handleCalculate.cancel();
     };
 
     const handleFindSimilar = async () => {

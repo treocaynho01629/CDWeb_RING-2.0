@@ -66,7 +66,7 @@ public class ReviewController {
         return new ResponseEntity<>(reviewService.getUserReviews(currUser, rating, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
     }
 
-    //Review
+    //Review by bookId
     @PostMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> reviewBook(@PathVariable("id") Long bookId,
