@@ -49,7 +49,7 @@ public class BookController {
 
     //Get books by ids
     @GetMapping("/find")
-    public ResponseEntity<?> getRandomBooks(@RequestParam(value = "ids") List<Long> ids) {
+    public ResponseEntity<?> getBooksByIds(@RequestParam(value = "ids") List<Long> ids) {
         List<BookDTO> books = bookService.getBooksByIds(ids);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }

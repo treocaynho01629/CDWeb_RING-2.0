@@ -11,7 +11,8 @@ export const cartSlice = createSlice({
     addToCart: (state, action) => {
       const item = state.products.find((item) => item.id === action.payload.id);
       if (item) { //If already in cart >> increase quantity
-        item.quantity += action.payload.quantity;
+        const newQuantity = item.quantity + action.payload.quantity;
+        newQuantity > (item.amount ?? 199) ? item.quantity = (item.amount ?? 199) :  item.quantity += action.payload.quantity;
       } else { //Put to cart if not already
         state.products.push(action.payload);
       }
@@ -46,7 +47,7 @@ export const cartSlice = createSlice({
     increaseQuantity: (state, action) => {
       const item = state.products.find((item) => item.id === action.payload);
       const newQuantity = item.quantity + 1;
-      if (item) { newQuantity > (item.amount ?? 199) ? item.quantity = (item.amount ?? 199) : item.quantity++};
+      if (item) { newQuantity > (item.amount ?? 199) ? item.quantity = (item.amount ?? 199) : item.quantity++ };
     },
     //Input quantity
     changeQuantity: (state, action) => {
@@ -99,7 +100,7 @@ export const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, replaceInCart, increaseQuantity, decreaseQuantity, changeQuantity, 
+export const { addToCart, replaceInCart, increaseQuantity, decreaseQuantity, changeQuantity,
   removeItem, removeShopItem, resetCart, addAddress, removeStateAddress } = cartSlice.actions;
 export const selectCartProducts = (state) => state.cart.products;
 export const selectAddresses = (state) => state.cart.addresses;

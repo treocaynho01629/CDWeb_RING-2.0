@@ -138,8 +138,6 @@ const Logo = styled.h2`
     transition: all .25s ease;
 
     &.active {
-        ${LogoSubtitle} {width: 0;}
-        
         ${props => props.theme.breakpoints.down("md")} {
             width: 0;
         }
@@ -147,9 +145,6 @@ const Logo = styled.h2`
 
     ${props => props.theme.breakpoints.down("md_lg")} {
         margin: 5px 0px 5px 0px;
-        width: 110px;
-
-        ${LogoSubtitle} {width: 0;}
     }
 `
 

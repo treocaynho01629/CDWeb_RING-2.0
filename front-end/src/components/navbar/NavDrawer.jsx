@@ -102,7 +102,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                             </ListItem>
 
                             <ListItem disablePadding>
-                                <Link to={'/profile/orders'}>
+                                <Link to={'/profile/order'}>
                                     <ListItemButton onClick={handleClose}>
                                         <ListItemIcon>
                                             <DeliveryDiningOutlined />

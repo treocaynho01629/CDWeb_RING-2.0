@@ -148,8 +148,13 @@ const ReviewInfo = ({ handleClick, book, disabled, editable }) => {
                         <LinearProgressWithLabel
                             key={`progress-${index + 1}`}
                             label={`${index + 1} sao`}
-                            value={reviewPercent(book?.reviewsInfo?.count[index + 1] ?? 0)} />
-                        : <Skeleton variant="rectangular" sx={{ height: 10, width: '90%', ml: '5%', my: { xs: '8px', md: '10px' } }} />
+                            value={reviewPercent(book?.reviewsInfo?.count[index + 1] ?? 0)}
+                        />
+                        : <Skeleton
+                            key={`temp-${index + 1}`}
+                            variant="rectangular"
+                            sx={{ height: 10, width: '90%', ml: '5%', my: { xs: '8px', md: '10px' } }}
+                        />
                 ))}
             </ProgressContainer>
             <ButtonContainer>
@@ -161,7 +166,7 @@ const ReviewInfo = ({ handleClick, book, disabled, editable }) => {
                         onClick={handleClick}
                         startIcon={<EditOutlined />}
                     >
-                        {disabled ? 'Phải mua sản phẩm' : editable ? 'Sửa đánh giá' : 'Viết đánh giá'}
+                        {disabled ? 'Mua sản phẩm' : editable ? 'Sửa đánh giá' : 'Viết đánh giá'}
                     </Button>
                     : <Skeleton variant="rectangular" sx={{ height: 42, width: 160 }} />
                 }

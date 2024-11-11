@@ -62,7 +62,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                     return response.status === 200 && !result.isError
                 },
             }),
-            providesTags: (result, error, id) => [{ type: 'Review', id }]
+            providesTags: (result, error) => [{ type: 'Review', id: result ? result.id : 'LIST' }]
         }),
         getReviewsByBookId: builder.query({
             query: (args) => {
@@ -186,7 +186,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 credentials: 'include',
                 body: { ...newReview }
             }),
-            invalidatesTags: [
+            invalidatesTags: (result, error, { id }) => [
                 { type: 'Review', id: "LIST" }
             ]
         }),

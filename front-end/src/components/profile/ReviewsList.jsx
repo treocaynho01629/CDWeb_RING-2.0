@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { KeyboardArrowLeft, Try } from "@mui/icons-material";
 import { useGetMyReviewsQuery } from "../../features/reviews/reviewsApiSlice";
 import { Title } from "../custom/GlobalComponents";
@@ -48,9 +48,9 @@ const ReviewsList = () => {
                     const review = entities[id];
 
                     return (
-                        <div key={`${id}-${index}`}>
-                            <ReviewItem {...{ username: 'FIX', review }} />
-                        </div>
+                        <Fragment key={`${id}-${index}`}>
+                            <ReviewItem review={review} isPreview={true} />
+                        </Fragment>
                     )
                 })
                 : <MessageContainer>Không có đánh giá nào!</MessageContainer>

@@ -104,6 +104,7 @@ public class ReviewServiceImpl implements ReviewService {
 		if (!isUserValid(review, user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
 
 		//Set new review content
+		review.setRating(request.getRating());
 		review.setRContent(request.getContent());
 		Review updatedReview = reviewRepo.save(review); //Save new review to database
 		return reviewMapper.reviewToDTO(updatedReview); //Return added review
