@@ -321,8 +321,8 @@ const Home = () => {
     if (pagination?.currPage >= 5) {
       navigate('/store');
     } else {
-      let nextPage = (data?.ids?.length / defaultMore);
-      setPagination({ ...pagination, currPage: nextPage, pageSize: defaultMore })
+      const nextPage = (data?.ids?.length / defaultMore);
+      if (nextPage >= 1) setPagination({ ...pagination, currPage: nextPage, pageSize: defaultMore });
     }
   }
 

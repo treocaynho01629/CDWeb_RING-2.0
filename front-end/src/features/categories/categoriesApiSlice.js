@@ -1,6 +1,7 @@
 import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
 import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
+import { isEqual } from 'lodash-es';
 
 const catesAdapter = createEntityAdapter({});
 const catesSelector = catesAdapter.getSelectors();
@@ -107,7 +108,7 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
                 )
             },
             forceRefetch: ({ currentArg, previousArg }) => {
-                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
+                const isForceRefetch = (currentArg?.loadMore && !isEqual(currentArg, previousArg))
                 return isForceRefetch
             },
             providesTags: (result, error, arg) => {

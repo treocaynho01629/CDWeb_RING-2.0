@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Title } from "../custom/GlobalComponents";
 import { booksApiSlice } from "../../features/books/booksApiSlice";
+import { debounce } from "lodash-es";
 import CustomProgress from '../custom/CustomProgress';
 import useCart from '../../hooks/useCart';
 
@@ -209,6 +210,9 @@ const StyledSkeleton = styled(Skeleton)`
         width: 80px;
     }
 `
+
+const OrdersContainer = styled.div`
+`
 //#endregion
 
 const defaultSize = 5;
@@ -328,10 +332,19 @@ const OrdersList = () => {
     };
 
     //Show more
-    const handleShowMore = () => { //FIX
-        let nextPage = (data?.ids?.length / defaultSize);
-        setPagination({ ...pagination, currPage: nextPage })
+    const handleShowMore = () => {
+        let currPage = (pagination?.currPage || 0) + 1;
+        if (data?.info?.totalPages > currPage) {
+            setPagination({ ...pagination, currPage });
+        }
     }
+
+    const handleScroll = (e) => {
+        const trigger = document.body.scrollHeight - 300 < window.scrollY + window.innerHeight;
+        if (trigger) handleShowMore();
+    }
+
+    window.addEventListener("scroll", debounce(handleScroll, 500));
 
     let ordersContent;
 
@@ -362,14 +375,10 @@ const OrdersList = () => {
                 <Link to={'/profile/detail'}><KeyboardArrowLeft /></Link>
                 <Receipt />&nbsp;ĐƠN HÀNG CỦA BẠN
             </Title>
-            {ordersContent}
-            {/* <div style={{
-                display: more?.last ? 'none' : 'flex',
-                justifyContent: 'center',
-                margin: '20px 0px'
-            }}>
-                <Button onClick={handleShowMore}>Xem thêm</Button>
-            </div> */}
+            <OrdersContainer>
+                {ordersContent}
+                {isLoading && <p>FIX</p>}
+            </OrdersContainer>
         </>
     )
 }
