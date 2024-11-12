@@ -1,98 +1,219 @@
 import './App.css';
-import { lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom';
-import { Loader } from './components/layout/Loadable';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import useReachable from './hooks/useReachable';
-import Loadable from './components/layout/Loadable';
 import Layout from './components/layout/Layout';
 import PageLayout from './components/layout/PageLayout';
 import RequireAuth from './components/authorize/RequireAuth';
 import PersistLogin from './components/authorize/PersistsLogin';
-import ScrollToTop from './components/layout/ScrollToTop.jsx';
-
-const Missing = Loadable(lazy(() => import('./pages/error/Missing')));
-const Unauthorized = Loadable(lazy(() => import('./pages/error/Unauthorized')));
-const FiltersPage = Loadable(lazy(() => import('./pages/FiltersPage')));
-const ProductDetail = Loadable(lazy(() => import('./pages/ProductDetail')));
-const Cart = Loadable(lazy(() => import('./pages/Cart')));
-const Home = Loadable(lazy(() => import('./pages/Home')));
-const AuthPage = Loadable(lazy(() => import('./pages/AuthPage.jsx')));
-
-const ProfileLayout = Loadable(lazy(() => import('./components/layout/ProfileLayout')));
-const ResetPage = Loadable(lazy(() => import('./pages/ResetPage')));
-const Checkout = Loadable(lazy(() => import('./pages/Checkout')));
-const Profile = Loadable(lazy(() => import('./pages/Profile')));
-const Orders = Loadable(lazy(() => import('./pages/Orders')));
-const Reviews = Loadable(lazy(() => import('./pages/Reviews')));
-
-const DashboardLayout = lazy(() => import('./components/dashboard/DashboardLayout'));
-const ManageProducts = Loadable(lazy(() => import('./pages/dashboard/ManageProducts')));
-const ManageUsers = Loadable(lazy(() => import('./pages/dashboard/ManageUsers')));
-const ManageOrders = Loadable(lazy(() => import('./pages/dashboard/ManageOrders')));
-const ManageReviews = Loadable(lazy(() => import('./pages/dashboard/ManageReviews')));
-const DetailProduct = Loadable(lazy(() => import('./pages/dashboard/DetailProduct.jsx')));
-const DetailAccount = Loadable(lazy(() => import('./pages/dashboard/DetailAccount.jsx')));
-const Dashboard = Loadable(lazy(() => import('./pages/dashboard/Dashboard')));
 
 function App() {
   useReachable(); //Test connection to server
 
-  return (
-    <Suspense fallback={<Loader />}>
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Layout />}>
-            //PUBLIC
-          <Route path="/reset/:token?" element={<ResetPage />} />
-          <Route path="/unauthorized" element={<Unauthorized />} />
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Layout />,
+      children: [
+        {
+          path: "reset/:token?",
+          lazy: async () => {
+            let ResetPage = await import("./pages/ResetPage")
+            return { Component: ResetPage.default }
+          },
+        },
+        {
+          path: "unauthorized",
+          lazy: async () => {
+            let Unauthorized = await import("./pages/error/Unauthorized")
+            return { Component: Unauthorized.default }
+          },
+        },
+        {
+          path: "*",
+          lazy: async () => {
+            let Missing = await import("./pages/error/Missing")
+            return { Component: Missing.default }
+          },
+        },
+        {
+          element: <PersistLogin />,
+          children: [
+            {
+              path: "auth/:tab",
+              lazy: async () => {
+                let AuthPage = await import("./pages/AuthPage")
+                return { Component: AuthPage.default }
+              },
+            },
+            {
+              element: <PageLayout />,
+              children: [
+                {
+                  path: "/",
+                  lazy: async () => {
+                    let Home = await import("./pages/Home")
+                    return { Component: Home.default }
+                  },
+                },
+                {
+                  path: "store/:cSlug?",
+                  lazy: async () => {
+                    let FiltersPage = await import("./pages/FiltersPage")
+                    return { Component: FiltersPage.default }
+                  },
+                },
+                {
+                  path: "product/:slug",
+                  lazy: async () => {
+                    let ProductDetail = await import("./pages/ProductDetail")
+                    return { Component: ProductDetail.default }
+                  },
+                },
+                {
+                  path: "product-id/:id",
+                  lazy: async () => {
+                    let ProductDetail = await import("./pages/ProductDetail")
+                    return { Component: ProductDetail.default }
+                  },
+                },
+                {
+                  path: "cart",
+                  lazy: async () => {
+                    let Cart = await import("./pages/Cart")
+                    return { Component: Cart.default }
+                  },
+                },
+                {
+                  element: <RequireAuth allowedRoles={['ROLE_USER']} />,
+                  children: [
+                    {
+                      path: "checkout",
+                      lazy: async () => {
+                        let Checkout = await import("./pages/Checkout")
+                        return { Component: Checkout.default }
+                      },
+                    },
+                    {
+                      lazy: async () => {
+                        let ProfileLayout = await import("./components/layout/ProfileLayout")
+                        return { Component: ProfileLayout.default }
+                      },
+                      children: [
+                        {
+                          path: "profile/detail/:tab?",
+                          lazy: async () => {
+                            let Profile = await import("./pages/Profile")
+                            return { Component: Profile.default }
+                          },
+                        },
+                        {
+                          path: "profile/order",
+                          lazy: async () => {
+                            let Orders = await import("./pages/Orders")
+                            return { Component: Orders.default }
+                          },
+                        },
+                        {
+                          path: "profile/review",
+                          lazy: async () => {
+                            let Reviews = await import("./pages/Reviews")
+                            return { Component: Reviews.default }
+                          },
+                        },
+                      ]
+                    },
+                  ]
+                },
+              ]
+            },
+            {
+              lazy: async () => {
+                let DashboardLayout = await import("./components/dashboard/DashboardLayout")
+                return { Component: DashboardLayout.default }
+              },
+              children: [
+                {
+                  element: <RequireAuth allowedRoles={['ROLE_SELLER']} />,
+                  children: [
+                    {
+                      path: "dashboard",
+                      lazy: async () => {
+                        let Dashboard = await import("./pages/dashboard/Dashboard")
+                        return { Component: Dashboard.default }
+                      },
+                    },
+                    {
+                      path: "manage-products",
+                      lazy: async () => {
+                        let ManageProducts = await import("./pages/dashboard/ManageProducts")
+                        return { Component: ManageProducts.default }
+                      },
+                    },
+                    {
+                      path: "manage-orders",
+                      lazy: async () => {
+                        let ManageOrders = await import("./pages/dashboard/ManageOrders")
+                        return { Component: ManageOrders.default }
+                      },
+                    },
+                    {
+                      path: "detail/:id",
+                      lazy: async () => {
+                        let DetailProduct = await import("./pages/dashboard/DetailProduct")
+                        return { Component: DetailProduct.default }
+                      },
+                    },
+                    {
+                      path: "user/:id",
+                      lazy: async () => {
+                        let DetailAccount = await import("./pages/dashboard/DetailAccount")
+                        return { Component: DetailAccount.default }
+                      },
+                    },
+                  ]
+                },
+                {
+                  element: <RequireAuth allowedRoles={['ROLE_ADMIN']} />,
+                  children: [
+                    {
+                      path: "manage-users",
+                      lazy: async () => {
+                        let ManageUsers = await import("./pages/dashboard/ManageUsers")
+                        return { Component: ManageUsers.default }
+                      },
+                    },
+                    {
+                      path: "manage-reviews",
+                      lazy: async () => {
+                        let ManageReviews = await import("./pages/dashboard/ManageReviews")
+                        return { Component: ManageReviews.default }
+                      },
+                    },
+                  ]
+                },
+              ]
+            },
+          ]
+        },
+      ],
+    },
+  ], {
+    future: {
+      v7_relativeSplatPath: true,
+      v7_fetcherPersist: true,
+      v7_normalizeFormMethod: true,
+      v7_partialHydration: true,
+      v7_skipActionStatusRevalidation: true,
+      v7_skipActionErrorRevalidation: true,
+    }
+  });
 
-            //MISSING
-          <Route path="*" element={<Missing />} />
-
-          <Route element={<PersistLogin />}>
-            <Route path="/auth/:tab" element={<AuthPage />} />
-
-            <Route element={<PageLayout />}>
-                //ANONYMOUS
-              <Route path="/" element={<Home />} />
-              <Route path="/store/:cSlug?" element={<FiltersPage />} />
-              <Route path="/product/:slug" element={<ProductDetail />} />
-              <Route path="/product-id/:id" element={<ProductDetail />} />
-              <Route path="/cart" element={<Cart />} />
-
-                //USER
-              <Route element={<RequireAuth allowedRoles={['ROLE_USER']} />}>
-                <Route path="/checkout" element={<Checkout />} />
-
-                <Route element={<ProfileLayout />}>
-                  <Route path="/profile/detail/:tab?" element={<Profile />} />
-                  <Route path="/profile/order" element={<Orders />} />
-                  <Route path="/profile/review" element={<Reviews />} />
-                </Route>
-              </Route>
-            </Route>
-
-            <Route element={<DashboardLayout />}>
-                //SELLER
-              <Route element={<RequireAuth allowedRoles={['ROLE_SELLER']} />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/manage-products" element={<ManageProducts />} />
-                <Route path="/manage-orders" element={<ManageOrders />} />
-                <Route path="/detail/:id" element={<DetailProduct />} />
-                <Route path="/user/:id" element={<DetailAccount />} />
-              </Route>
-
-                //ADMIN
-              <Route element={<RequireAuth allowedRoles={['ROLE_ADMIN']} />}>
-                <Route path="/manage-users" element={<ManageUsers />} />
-                <Route path="/manage-reviews" element={<ManageReviews />} />
-              </Route>
-            </Route>
-          </Route>
-        </Route>
-      </Routes>
-    </Suspense>
-  )
+  return <RouterProvider
+    router={router}
+    future={{
+      v7_startTransition: true,
+    }}
+  />;
 }
 
 export default App

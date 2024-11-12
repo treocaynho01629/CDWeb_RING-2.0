@@ -1,7 +1,7 @@
 import './index.css'
+import React from 'react';
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from "redux-persist/integration/react";
 import { CookiesProvider } from "react-cookie";
@@ -10,19 +10,17 @@ import { ThemeContextProvider } from './ThemeContextProvider';
 import CustomSnackbarProvider from './components/layout/CustomSnackbarProvider';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <CookiesProvider>
-    <BrowserRouter>
+  <React.StrictMode>
+    <CookiesProvider>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <ThemeContextProvider>
             <CustomSnackbarProvider>
-              <Routes>
-                <Route path="/*" element={<App />} />
-              </Routes>
+              <App />
             </CustomSnackbarProvider>
           </ThemeContextProvider>
         </PersistGate>
       </Provider>
-    </BrowserRouter>
-  </CookiesProvider>
+    </CookiesProvider>
+  </React.StrictMode>
 )

@@ -148,7 +148,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
   const childContainedRef = useRef(null);
   const [pagination, setPagination] = useState({
     isMore: true, //Merge new data
-    currPage: null, //null is default to 0
+    currPage: 0,
     totalPages: 0,
     totalElements: 0,
   })
@@ -183,7 +183,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
     if (pagination?.totalPages <= currPage) {
       setShowmore(prev => !prev);
     } else {
-      setPagination({ ...pagination, currPage: currPage });
+      setPagination({ ...pagination, currPage });
       setShowmore(true);
     }
   }
@@ -304,7 +304,7 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
   const [showmore, setShowmore] = useState(false);
   const [pagination, setPagination] = useState({
     isMore: true, //Merge new data
-    currPage: null, //null is default to 0
+    currPage: 0,
     totalPages: 0,
     totalElements: 0,
   })
@@ -356,7 +356,7 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
     if (pagination?.totalPages <= currPage) {
       setShowmore(prev => !prev);
     } else {
-      setPagination({ ...pagination, currPage: currPage });
+      setPagination({ ...pagination, currPage });
       setShowmore(true);
     }
   }

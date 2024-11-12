@@ -1,5 +1,6 @@
 import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
+import { isEqual } from 'lodash-es';
 
 const reviewsAdapter = createEntityAdapter({});
 const initialState = reviewsAdapter.getInitialState({
@@ -167,7 +168,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 )
             },
             forceRefetch: ({ currentArg, previousArg }) => {
-                const isForceRefetch = (currentArg?.loadMore && (currentArg != previousArg))
+                const isForceRefetch = (currentArg?.loadMore && !isEqual(currentArg, previousArg))
                 return isForceRefetch
             },
             providesTags: (result, error, arg) => {
