@@ -2,11 +2,10 @@ import styled from 'styled-components'
 import { useState, lazy, Suspense } from "react";
 import { useParams } from 'react-router-dom';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
-import Loadable from '../components/layout/Loadable';
 
 const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
-const ForgotTab = Loadable(lazy(() => import('../components/authorize/ForgotTab')));
-const ResetTab = Loadable(lazy(() => import('../components/authorize/ResetTab')));
+const ForgotTab = lazy(() => import('../components/authorize/ForgotTab'));
+const ResetTab = lazy(() => import('../components/authorize/ResetTab'));
 
 //#region styled
 const Wrapper = styled.div`
