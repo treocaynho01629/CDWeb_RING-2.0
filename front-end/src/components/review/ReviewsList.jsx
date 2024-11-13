@@ -3,7 +3,7 @@ import { KeyboardArrowLeft, Try } from "@mui/icons-material";
 import { useGetMyReviewsQuery } from "../../features/reviews/reviewsApiSlice";
 import { Title } from "../custom/GlobalComponents";
 import { Link } from "react-router-dom";
-import ReviewItem from "../review/ReviewItem";
+import ReviewItem from "./ReviewItem";
 import styled from "styled-components";
 import CustomProgress from "../custom/CustomProgress";
 

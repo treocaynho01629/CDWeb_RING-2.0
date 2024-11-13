@@ -7,8 +7,8 @@ import {
     LocalActivityOutlined
 } from '@mui/icons-material';
 import { NavLink } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
 import { MobileExtendButton } from "../custom/GlobalComponents";
+import useAuth from "../../hooks/useAuth";
 
 //#region styled
 const ListContainer = styled.div`
@@ -115,6 +115,7 @@ const EditButton = styled.span`
     aspect-ratio: 1/1;
     font-size: 13px;
     justify-content: flex-end;
+    color: ${props => props.theme.palette.common.black};
     background-color: ${props => props.theme.palette.grey[300]};
     border: 2px solid ${props => props.theme.palette.background.default};
     cursor: pointer;
@@ -272,7 +273,7 @@ const ProfileTabsList = ({ profile, loading, error, tabletMode }) => {
                         </InfoContainer>
                     </MainProfile>
                 </NavLink>
-                {tabletMode &&
+                {tabletMode && //FIX Counter
                     <AdditionalInfo>
                         <Additional>
                             <PersonAddAlt1 color="warning" />Theo dõi:<b>99</b>

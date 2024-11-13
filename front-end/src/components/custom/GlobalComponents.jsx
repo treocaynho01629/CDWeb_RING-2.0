@@ -79,6 +79,7 @@ export const Title = styled.h3`
     margin: 0 0 20px;
     padding: 15px 0;
     border-bottom: .5px solid ${props => props.theme.palette.divider};
+    width: 100%;
 
     a {
         display: none;
@@ -97,18 +98,6 @@ export const Title = styled.h3`
         text-transform: none;
 
         a { display: flex; }
-    }
-`
-
-export const TabContentContainer = styled.div`
-    position: relative;
-    padding: 0 ${props => props.theme.spacing(2)};
-    border: 0.5px solid ${props => props.theme.palette.action.focus};
-    min-height: 60dvh;
-
-    ${props => props.theme.breakpoints.down("md")} {
-        padding: 0 ${props => props.theme.spacing(1)};
-        border: none;
     }
 `
 
@@ -150,5 +139,23 @@ export const Showmore = styled.div`
 
     ${props => props.theme.breakpoints.down("md")} {
         margin-top: 0;
+    }
+`
+
+export const Message = styled.span`
+    margin: 20px 0 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: wrap;
+
+    &.warning {
+        color: ${props => props.theme.palette.warning.main};
+    }
+
+    &.error {
+        color: ${props => props.theme.palette.error.main};
     }
 `

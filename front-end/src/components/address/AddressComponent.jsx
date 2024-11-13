@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useGetProfileQuery, useUpdateProfileMutation } from '../../features/users/usersApiSlice';
-import { Box, Button, CircularProgress, Dialog, ListItemIcon, ListItemText, Menu, MenuItem, useTheme, useMediaQuery } from '@mui/material';
+import { Box, Button, CircularProgress, Dialog, ListItemIcon, ListItemText, Menu, MenuItem, useTheme, useMediaQuery, DialogContent } from '@mui/material';
 import { AddHome, Delete, Home, KeyboardArrowLeft, LocationOn } from '@mui/icons-material';
-import { Title } from "../custom/GlobalComponents";
+import { StyledDialogTitle } from '../custom/ProfileComponents';
+import { Link } from 'react-router-dom';
 import AddressItem from './AddressItem'
 import AddressForm from './AddressForm'
 import useCart from '../../hooks/useCart';
-import { Link } from 'react-router-dom';
 
 const AddressComponent = ({ pending, setPending }) => {
   const { addresses, addNewAddress, removeAddress } = useCart();
@@ -131,71 +131,70 @@ const AddressComponent = ({ pending, setPending }) => {
 
   return (
     <>
-      <Title className="primary">
+      <StyledDialogTitle>
         <Box display="flex" alignItems="center" flexGrow={1}>
           <Link to={'/profile/detail/info'}><KeyboardArrowLeft /></Link>
           <LocationOn />&nbsp;Địa chỉ của bạn
         </Box>
         <Button
-          variant="contained"
-          color="primary"
+          color="success"
           onClick={handleOpen}
           endIcon={<AddHome />}
+          size="small"
+          sx={{ fontSize: 10 }}
         >
           Thêm địa chỉ
         </Button>
-      </Title>
-      {
-        (loadProfile && !profile)
-          ?
-          <Box display="flex" alignItems="center" justifyContent="center" height={'40dvh'}>
-            <CircularProgress
-              color="primary"
-              size={40}
-              thickness={5}
-            />
-          </Box>
-          :
-          <>
-            <Box sx={{ marginBottom: '5px' }}>
-              <AddressItem {...{ addressInfo: profile, handleOpen, handleClick }} />
+      </StyledDialogTitle>
+      <DialogContent sx={{ p: { xs: 1, sm: 2, md: 0 }, mt: { xs: 1, md: 0 } }}>
+        {
+          (loadProfile && !profile)
+            ?
+            <Box display="flex" alignItems="center" justifyContent="center" height={'40dvh'}>
+              <CircularProgress color="primary" size={40} thickness={5} />
             </Box>
-            {addresses?.map((address, index) => (
-              <Box key={`${address?.id}-${index}`} sx={{ marginBottom: '5px' }}>
-                <AddressItem {...{ addressInfo: address, handleOpen, handleClick }} />
+            :
+            <Box minHeight={'70dvh'}>
+              <Box sx={{ marginBottom: '5px' }}>
+                <AddressItem {...{ addressInfo: profile, handleOpen, handleClick }} />
               </Box>
-            ))}
-            <br />
-            <Dialog open={open} scroll={'paper'} maxWidth={'sm'} fullWidth onClose={handleClose} fullScreen={fullScreen}>
-              <AddressForm {...{
-                open, handleClose, addressInfo: contextAddress, err, setErr, errMsg, setErrMsg, getFullAddress,
-                addNewAddress, pending, setPending, handleRemoveAddress, handleUpdateAddress, defaultAddressToStore
-              }} />
-            </Dialog>
-            <Menu
-              open={openContext}
-              onClose={handleCloseContext}
-              anchorEl={anchorEl}
-              sx={{ display: { xs: 'none', sm: 'block' } }}
-              MenuListProps={{
-                'aria-labelledby': 'basic-button',
-              }}
-            >
-              <MenuItem disabled={isDefault} onClick={() => handleRemoveAddress(contextAddress?.id)}>
-                <ListItemIcon >
-                  <Delete sx={{ color: 'error.main' }} fontSize="small" />
-                </ListItemIcon>
-                <ListItemText sx={{ color: 'error.main' }}>Xoá địa chỉ</ListItemText>
-              </MenuItem>
-              <MenuItem disabled={isDefault} onClick={() => handleSetDefault(contextAddress)}>
-                <ListItemIcon>
-                  <Home fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Đặt làm mặc định</ListItemText>
-              </MenuItem>
-            </Menu >
-          </>
-      }
+              {addresses?.map((address, index) => (
+                <Box key={`${address?.id}-${index}`} sx={{ marginBottom: '5px' }}>
+                  <AddressItem {...{ addressInfo: address, handleOpen, handleClick }} />
+                </Box>
+              ))}
+              <br />
+              <Dialog open={open} scroll={'paper'} maxWidth={'sm'} fullWidth onClose={handleClose} fullScreen={fullScreen}>
+                <AddressForm {...{
+                  open, handleClose, addressInfo: contextAddress, err, setErr, errMsg, setErrMsg, getFullAddress,
+                  addNewAddress, pending, setPending, handleRemoveAddress, handleUpdateAddress, defaultAddressToStore
+                }} />
+              </Dialog>
+              <Menu
+                open={openContext}
+                onClose={handleCloseContext}
+                anchorEl={anchorEl}
+                sx={{ display: { xs: 'none', sm: 'block' } }}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-button',
+                }}
+              >
+                <MenuItem disabled={isDefault} onClick={() => handleRemoveAddress(contextAddress?.id)}>
+                  <ListItemIcon >
+                    <Delete sx={{ color: 'error.main' }} fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText sx={{ color: 'error.main' }}>Xoá địa chỉ</ListItemText>
+                </MenuItem>
+                <MenuItem disabled={isDefault} onClick={() => handleSetDefault(contextAddress)}>
+                  <ListItemIcon>
+                    <Home fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Đặt làm mặc định</ListItemText>
+                </MenuItem>
+              </Menu >
+            </Box>
+        }
+      </DialogContent>
     </>
   )
 }

@@ -1,4 +1,4 @@
-import { TabContentContainer } from "../components/custom/GlobalComponents";
+import { TabContentContainer } from "../components/custom/ProfileComponents";
 import useTitle from '../hooks/useTitle';
 import ReviewsList from "../components/profile/ReviewsList";
 
