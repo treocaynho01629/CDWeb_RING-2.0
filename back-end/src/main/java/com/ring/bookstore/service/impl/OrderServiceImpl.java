@@ -11,7 +11,9 @@ import com.ring.bookstore.dtos.orders.CalculateDTO;
 import com.ring.bookstore.dtos.ChartDTO;
 import com.ring.bookstore.dtos.mappers.CalculateMapper;
 import com.ring.bookstore.dtos.mappers.ChartDataMapper;
-import com.ring.bookstore.dtos.orders.DetailOrderDTO;
+import com.ring.bookstore.dtos.orders.OrderDetailDTO;
+import com.ring.bookstore.dtos.orders.OrderDTO;
+import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.*;
 import com.ring.bookstore.request.*;
@@ -25,7 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.orders.OrderDTO;
+import com.ring.bookstore.dtos.orders.ReceiptDTO;
 import com.ring.bookstore.dtos.mappers.OrderMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
@@ -243,7 +245,7 @@ public class OrderServiceImpl implements OrderService {
         return calculateMapper.orderToCalculate(orderReceipt);
     }
 
-    //Commit order
+    //Commit order //FIX
     @Transactional
     public OrderReceipt checkout(OrderRequest request, Account user) {
 
@@ -329,7 +331,7 @@ public class OrderServiceImpl implements OrderService {
 
     //Get all orders
     @Override
-    public Page<OrderDTO> getAllOrders(Account user, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+    public Page<ReceiptDTO> getAllReceipts(Account user, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
@@ -342,7 +344,7 @@ public class OrderServiceImpl implements OrderService {
             ordersList = orderRepo.findAllBySellerId(user.getId(), pageable); //If SELLER, only get their
         }
 
-        Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::orderToOrderDTO);
+        Page<ReceiptDTO> ordersDTO = ordersList.map(orderMapper::orderToOrderDTO);
         return ordersDTO;
     }
 
@@ -352,33 +354,33 @@ public class OrderServiceImpl implements OrderService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
-        Page<OrderReceipt> ordersList = orderRepo.findAllByBookId(id, pageable); //Fetch from database
-        Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::orderToOrderDTO);
+        Page<OrderDetail> ordersList = detailRepo.findAllByBookId(id, pageable); //Fetch from database
+        Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::detailToDetailDTO);
         return ordersDTO;
     }
 
     //Get current user's orders
     @Override
-    public Page<OrderDTO> getOrdersByUser(Account user, Integer pageNo, Integer pageSize) {
+    public Page<OrderDTO> getOrdersByUser(Account user, OrderStatus status, String keyword, Integer pageNo, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize); //Pagination
-        Page<OrderReceipt> ordersList = orderRepo.findAllByUserId(user.getId(), pageable); //Fetch from database
-        Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::orderToOrderDTO);
+        Page<OrderDetail> ordersList = detailRepo.findAllByUserId(user.getId(), status, keyword, pageable); //Fetch from database
+        Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::detailToDetailDTO);
         return ordersDTO;
     }
 
     //Get order by {id}
     @Override
-    public OrderDTO getOrderById(Long id) {
+    public ReceiptDTO getReceipt(Long id) {
         OrderReceipt order = orderRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found!"));
-        OrderDTO orderDTO = orderMapper.orderToOrderDTO(order); //Map to DTO
-        return orderDTO;
+        ReceiptDTO receiptDTO = orderMapper.orderToOrderDTO(order); //Map to DTO
+        return receiptDTO;
     }
 
     //Get detail order by {detail's id}
     @Override
-    public DetailOrderDTO getDetailOrder(Long id) {
+    public OrderDetailDTO getOrderDetail(Long id) {
         OrderDetail orderDetail = detailRepo.findDetailById(id).orElseThrow(() -> new ResourceNotFoundException("Detail not found!"));
-        DetailOrderDTO detailDTO = orderMapper.orderToDetailDTO(orderDetail); //Map to DTO
+        OrderDetailDTO detailDTO = orderMapper.orderToDetailDTO(orderDetail); //Map to DTO
         return detailDTO;
     }
 

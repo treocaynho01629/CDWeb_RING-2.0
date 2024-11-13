@@ -108,7 +108,7 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
                 )
             },
             forceRefetch: ({ currentArg, previousArg }) => {
-                const isForceRefetch = (currentArg?.loadMore && !isEqual(currentArg, previousArg))
+                const isForceRefetch = (currentArg?.loadMore && !isEqual(currentArg, previousArg) && currentArg?.page > previousArg?.page);
                 return isForceRefetch
             },
             providesTags: (result, error, arg) => {

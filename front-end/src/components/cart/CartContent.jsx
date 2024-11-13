@@ -12,6 +12,7 @@ import useCart from '../../hooks/useCart';
 import CheckoutDialog from './CheckoutDialog';
 import PropTypes from 'prop-types';
 import CartDetailRow from './CartDetailRow';
+import useDeepEffect from '../../hooks/useDeepEffect';
 
 const Menu = lazy(() => import('@mui/material/Menu'));
 const CouponDialog = lazy(() => import('../coupon/CouponDialog'));
@@ -168,7 +169,7 @@ const CartContent = () => {
     const [calculate, { isLoading }] = useCalculateMutation();
 
     //#region construct
-    useEffect(() => {
+    useDeepEffect(() => {
         handleCartChange();
     }, [selected, cartProducts, shopCoupon, coupon])
 

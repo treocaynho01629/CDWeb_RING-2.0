@@ -1,7 +1,6 @@
 package com.ring.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ring.bookstore.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,10 +39,6 @@ public class OrderItem {
 
     @Column(precision = 5, scale = 4)
     private BigDecimal discount;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
-    private OrderStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "detail_id")

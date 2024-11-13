@@ -4,7 +4,7 @@ import { useTheme, useMediaQuery, Grid2 as Grid, Skeleton } from '@mui/material'
 import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useGetCategoryQuery } from "../features/categories/categoriesApiSlice";
 import { useGetBooksQuery } from "../features/books/booksApiSlice";
-import { orderGroup } from "../ultils/filters";
+import { sortBy } from "../ultils/filters";
 import { isEqual } from "lodash-es";
 import AppPagination from "../components/custom/AppPagination";
 import CustomDivider from "../components/custom/CustomDivider";
@@ -12,6 +12,7 @@ import FilteredProducts from "../components/product/filter/FilteredProducts";
 import SortList from "../components/product/filter/SortList";
 import useTitle from "../hooks/useTitle";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
+import useDeepEffect from "../hooks/useDeepEffect";
 
 const FilterList = lazy(() => import("../components/product/filter/FilterList"));
 const FilterDrawer = lazy(() => import("../components/product/filter/FilterDrawer"));
@@ -53,7 +54,7 @@ const DEFAULT_PAGINATION = {
     currPage: 0,
     pageSize: 24,
     totalPages: 0,
-    sortBy: orderGroup[0].value,
+    sortBy: sortBy[0].value,
     sortDir: "desc",
     amount: 1
 }
@@ -68,12 +69,6 @@ const createCrumbs = (cate) => {
         ])
     }
     return;
-}
-
-function useDeepEffect(callback, dependencies) {
-    const previousDeps = useRef();
-    if (!isEqual(previousDeps.current, dependencies)) previousDeps.current = dependencies;
-    useEffect(callback, [previousDeps.current]);
 }
 
 const FiltersPage = () => {

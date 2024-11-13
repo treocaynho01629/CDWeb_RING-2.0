@@ -168,7 +168,6 @@ const ProductsList = ({ tabs, value, title }) => {
   );
 
   const handleChangeValue = (e, newValue) => {
-    console.log(newValue)
     if (newValue !== null) {
       setTabValue(newValue);
       listRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -322,7 +321,7 @@ const Home = () => {
       navigate('/store');
     } else {
       const nextPage = (data?.ids?.length / defaultMore);
-      if (nextPage >= 1) setPagination({ ...pagination, currPage: nextPage, pageSize: defaultMore });
+      if (nextPage >= 1 && nextPage % 1 != 0) setPagination({ ...pagination, currPage: nextPage, pageSize: defaultMore });
     }
   }
 

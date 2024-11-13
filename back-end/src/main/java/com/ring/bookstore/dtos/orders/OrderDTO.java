@@ -1,18 +1,18 @@
 package com.ring.bookstore.dtos.orders;
 
-import java.time.LocalDateTime;
+import com.ring.bookstore.enums.OrderStatus;
+
 import java.util.List;
 
+//Order detail
 public record OrderDTO(Long id,
-                       String fullName,
-                       String email,
-                       String phone,
-                       String address,
-                       String message,
-                       LocalDateTime date,
-                       Double total,
+                       Long shopId,
+                       String shopName,
+                       Double totalPrice,
                        Double totalDiscount,
-                       String username,
-                       List<OrderDetailDTO> details) {
+                       Double shippingFee,
+                       Double shippingDiscount,
+                       OrderStatus status,
+                       List<OrderItemDTO> items) {
 
 }
