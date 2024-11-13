@@ -9,7 +9,7 @@ export default defineConfig({
         react(),
         visualizer({
             template: "treemap", // or sunburst
-            open: true,
+            open: false,
             gzipSize: true,
             brotliSize: true,
             filename: "analyse.html", // will be saved in project's root

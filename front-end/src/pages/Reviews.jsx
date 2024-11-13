@@ -1,6 +1,6 @@
 import { TabContentContainer } from "../components/custom/ProfileComponents";
+import ReviewsList from "../components/review/ReviewsList";
 import useTitle from '../hooks/useTitle';
-import ReviewsList from "../components/profile/ReviewsList";
 
 const Orders = () => {
     //Set title

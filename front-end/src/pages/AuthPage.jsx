@@ -3,11 +3,10 @@ import { useState, lazy, Suspense } from "react";
 import { useParams } from 'react-router-dom';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 import useTitle from '../hooks/useTitle';
-import Loadable from '../components/layout/Loadable';
 
 const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
-const RegisterTab = Loadable(lazy(() => import('../components/authorize/RegisterTab')));
-const LoginTab = Loadable(lazy(() => import('../components/authorize/LoginTab')));
+const RegisterTab = lazy(() => import('../components/authorize/RegisterTab'));
+const LoginTab = lazy(() => import('../components/authorize/LoginTab'));
 
 //#region styled
 const rotate = keyframes`
