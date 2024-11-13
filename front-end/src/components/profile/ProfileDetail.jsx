@@ -1,11 +1,12 @@
 import styled from "styled-components"
 import { useEffect, useState, lazy, Suspense } from "react";
-import { Button, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton, TextField } from "@mui/material";
+import { Button, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton, TextField, DialogContent } from "@mui/material";
 import { Check, KeyboardArrowLeft, KeyboardArrowRight, Person } from "@mui/icons-material";
 import { PHONE_REGEX } from "../../ultils/regex";
 import { useUpdateProfileMutation } from "../../features/users/usersApiSlice";
-import { Instruction, MobileExtendButton, Title } from '../custom/GlobalComponents';
+import { Instruction, MobileExtendButton } from '../custom/GlobalComponents';
 import { Link } from "react-router-dom";
+import { StyledDialogTitle } from "../custom/ProfileComponents";
 import dayjs from 'dayjs';
 
 const CustomDatePicker = lazy(() => import('../custom/CustomDatePicker'));
@@ -13,6 +14,7 @@ const CustomDatePicker = lazy(() => import('../custom/CustomDatePicker'));
 //#region styled
 const TableContainer = styled.table`
     width: 100%;
+    border-collapse: collapse;
 `
 
 const InfoText = styled.span`
@@ -49,11 +51,12 @@ const InfoStack = styled.td`
 
 const InfoStackContainer = styled.div`
     position: relative;
-    height: 56px;
+    height: 52px;
     display: flex;
     align-items: center;
 
     ${props => props.theme.breakpoints.down("sm")} {
+        height: 48px;
         justify-content: space-between;
     }
 `
@@ -129,209 +132,211 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
 
     return ( //FIX profile pic
         <>
-            <Title className="primary">
+            <StyledDialogTitle>
                 <Link to={'/profile/detail'}><KeyboardArrowLeft /></Link>
                 <Person />&nbsp;Hồ sơ của bạn
-            </Title>
-            <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
-            <TableContainer>
-                <tbody>
-                    <InfoRow>
-                        <InfoTitle><InfoText>Tên đăng nhập </InfoText></InfoTitle>
-                        <InfoStack><InfoStackContainer>
-                            {loading
-                                ?
-                                <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
-                                :
-                                <InfoText>{profile?.username}</InfoText>
-                            }
-                        </InfoStackContainer></InfoStack>
-                    </InfoRow>
-                    <InfoRow>
-                        <InfoTitle><InfoText>Email </InfoText></InfoTitle>
-                        <InfoStack>
-                            <InfoStackContainer>
+            </StyledDialogTitle>
+            <DialogContent sx={{ p: { xs: 1, sm: 2, md: 0 }, mt: { xs: 1, md: 0 } }}>
+                <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
+                <TableContainer>
+                    <tbody>
+                        <InfoRow>
+                            <InfoTitle><InfoText>Tên đăng nhập </InfoText></InfoTitle>
+                            <InfoStack><InfoStackContainer>
                                 {loading
                                     ?
-                                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width="40%" />
+                                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
                                     :
-                                    <InfoText>{profile?.email.replace(/(\w{3})[\w.-]+@([\w.]+\w)/, "$1***@$2")}</InfoText>
+                                    <InfoText>{profile?.username}</InfoText>
                                 }
-                            </InfoStackContainer>
-                        </InfoStack>
-                    </InfoRow>
-                    <InfoRow>
-                        <InfoTitle><InfoText>Họ & Tên </InfoText></InfoTitle>
-                        <InfoStack>
-                            <InfoStackContainer>
-                                {loading
-                                    ?
-                                    <Skeleton variant="rectangular" height={40} width={'100%'} />
-                                    :
-                                    <TextField
-                                        required
-                                        type="text"
-                                        id="name"
-                                        onChange={e => setName(e.target.value)}
-                                        value={name}
-                                        error={err?.data?.errors?.name}
-                                        helperText={err?.data?.errors?.name}
-                                        size="small"
-                                        fullWidth
-                                    />
-                                }
-                            </InfoStackContainer>
-                        </InfoStack>
-                    </InfoRow>
-                    <InfoRow>
-                        <InfoTitle><InfoText>Số điện thoại </InfoText></InfoTitle>
-                        <InfoStack>
-                            <InfoStackContainer>
-                                {editPhone
-                                    ?
-                                    <TextField
-                                        required
-                                        id="phone"
-                                        onChange={e => setPhone(e.target.value)}
-                                        value={phone}
-                                        error={phone && !validPhone || err?.data?.errors?.phone}
-                                        helperText={phone && !validPhone ? "Sai định dạng số điện thoại!" : err?.data?.errors?.phone}
-                                        size="small"
-                                        fullWidth
-                                    />
-                                    :
-                                    <>
-                                        {loading
-                                            ?
-                                            <Skeleton variant="text" sx={{ fontSize: '16px' }} width="25%" />
-                                            :
-                                            <InfoText>{phone.replace(/\d(?=\d{2})/g, '*')}</InfoText>
-                                        }
-                                        <InfoText className={`edit ${loading ? 'disabled' : ''}`} onClick={() => setEditPhone(true)}>Thay đổi</InfoText>
-                                    </>
-                                }
-                            </InfoStackContainer>
-                        </InfoStack>
-                    </InfoRow>
-                    <InfoRow>
-                        <InfoTitle><InfoText>Ngày sinh </InfoText></InfoTitle>
-                        <InfoStack>
-                            <InfoStackContainer>
-                                {editDob ?
-                                    <Suspense fallback={<>
-                                        {loading ? <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
-                                            : <InfoText>{dob.format('DD/MM/YYYY')}</InfoText>}
-                                        <InfoText className={`edit ${loading ? 'disabled' : ''}`} onClick={() => setEditDob(true)}>Thay đổi</InfoText>
-                                    </>}>
-                                        <CustomDatePicker
-                                            required
-                                            value={dob}
-                                            className="custom-date-picker"
-                                            onChange={newValue => setDob(newValue)}
-                                            size="small"
-                                            slotProps={{
-                                                textField: {
-                                                    size: "small",
-                                                    fullWidth: true,
-                                                    error: err?.data?.errors?.dob,
-                                                    helperText: err?.data?.errors?.dob,
-                                                },
-                                            }}
-                                        />
-                                    </Suspense>
-                                    :
-                                    <>
-                                        {loading ? <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
-                                            : <InfoText>{dob.format('DD/MM/YYYY')}</InfoText>}
-                                        <InfoText className={`edit ${loading ? 'disabled' : ''}`} onClick={() => setEditDob(true)}>Thay đổi</InfoText>
-                                    </>
-                                }
-                            </InfoStackContainer>
-                        </InfoStack>
-                    </InfoRow>
-                    <InfoRow>
-                        <InfoTitle><InfoText>Giới tính </InfoText></InfoTitle>
-                        <InfoStack>
-                            <InfoStackContainer>
-                                {tabletMode ?
-                                    loading ? <Skeleton variant="rectangular" height={40} width="100%" />
+                            </InfoStackContainer></InfoStack>
+                        </InfoRow>
+                        <InfoRow>
+                            <InfoTitle><InfoText>Email </InfoText></InfoTitle>
+                            <InfoStack>
+                                <InfoStackContainer>
+                                    {loading
+                                        ?
+                                        <Skeleton variant="text" sx={{ fontSize: '16px' }} width="40%" />
+                                        :
+                                        <InfoText>{profile?.email.replace(/(\w{3})[\w.-]+@([\w.]+\w)/, "$1***@$2")}</InfoText>
+                                    }
+                                </InfoStackContainer>
+                            </InfoStack>
+                        </InfoRow>
+                        <InfoRow>
+                            <InfoTitle><InfoText>Họ & Tên </InfoText></InfoTitle>
+                            <InfoStack>
+                                <InfoStackContainer>
+                                    {loading
+                                        ?
+                                        <Skeleton variant="rectangular" height={40} width={'100%'} />
                                         :
                                         <TextField
                                             required
-                                            select
-                                            value={gender}
-                                            onChange={(e) => setGender(e.target.value)}
+                                            type="text"
+                                            id="name"
+                                            onChange={e => setName(e.target.value)}
+                                            value={name}
+                                            error={err?.data?.errors?.name}
+                                            helperText={err?.data?.errors?.name}
                                             size="small"
                                             fullWidth
-                                        >
-                                            <MenuItem value="Nam">Nam</MenuItem>
-                                            <MenuItem value="Nữ">Nữ</MenuItem>
-                                            <MenuItem value="">Không</MenuItem>
-                                        </TextField>
-
-                                    :
-                                    loading ?
-                                        <>
-                                            <Skeleton variant="text" width={75} sx={{ fontSize: 14, mr: 2 }} />
-                                            <Skeleton variant="text" width={75} sx={{ fontSize: 14, mr: 2 }} />
-                                            <Skeleton variant="text" width={75} sx={{ fontSize: 14 }} />
-                                        </>
+                                        />
+                                    }
+                                </InfoStackContainer>
+                            </InfoStack>
+                        </InfoRow>
+                        <InfoRow>
+                            <InfoTitle><InfoText>Số điện thoại </InfoText></InfoTitle>
+                            <InfoStack>
+                                <InfoStackContainer>
+                                    {editPhone
+                                        ?
+                                        <TextField
+                                            required
+                                            id="phone"
+                                            onChange={e => setPhone(e.target.value)}
+                                            value={phone}
+                                            error={phone && !validPhone || err?.data?.errors?.phone}
+                                            helperText={phone && !validPhone ? "Sai định dạng số điện thoại!" : err?.data?.errors?.phone}
+                                            size="small"
+                                            fullWidth
+                                        />
                                         :
-                                        <RadioGroup
-                                            spacing={1}
-                                            row
-                                            value={gender}
-                                            onChange={e => setGender(e.target.value)}
-                                        >
-                                            <FormControlLabel value="Nam" control={<Radio color="primary" />} label="Nam" />
-                                            <FormControlLabel value="Nữ" control={<Radio color="primary" />} label="Nữ" />
-                                            <FormControlLabel value="" control={<Radio color="primary" />} label="Không" />
-                                        </RadioGroup>
-                                }
-                            </InfoStackContainer>
-                        </InfoStack>
-                    </InfoRow>
-                    {tabletMode &&
-                        <>
-                            <InfoRow>
-                                <InfoTitle><InfoText>Sổ địa chỉ </InfoText></InfoTitle>
-                                <InfoStack>
-                                    <Link to={'/profile/detail/address'}>
-                                        <InfoStackContainer>
-                                            <MobileExtendButton>
-                                                <KeyboardArrowRight fontSize="small" />
-                                            </MobileExtendButton>
-                                        </InfoStackContainer>
-                                    </Link>
-                                </InfoStack>
-                            </InfoRow>
-                            <InfoRow>
-                                <InfoTitle><InfoText>Thiết lập mật khẩu </InfoText></InfoTitle>
-                                <InfoStack>
-                                    <Link to={'/profile/detail/password'}>
-                                        <InfoStackContainer>
-                                            <MobileExtendButton>
-                                                <KeyboardArrowRight fontSize="small" />
-                                            </MobileExtendButton>
-                                        </InfoStackContainer>
-                                    </Link>
-                                </InfoStack>
-                            </InfoRow>
-                        </>
-                    }
-                </tbody>
-            </TableContainer>
-            <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                disabled={loading}
-                onClick={handleChangeInfo}
-                sx={{ mt: 2, mb: 4 }}
-                startIcon={<Check />}
-            >
-                Lưu thông tin
-            </Button>
+                                        <>
+                                            {loading
+                                                ?
+                                                <Skeleton variant="text" sx={{ fontSize: '16px' }} width="25%" />
+                                                :
+                                                <InfoText>{phone.replace(/\d(?=\d{2})/g, '*')}</InfoText>
+                                            }
+                                            <InfoText className={`edit ${loading ? 'disabled' : ''}`} onClick={() => setEditPhone(true)}>Thay đổi</InfoText>
+                                        </>
+                                    }
+                                </InfoStackContainer>
+                            </InfoStack>
+                        </InfoRow>
+                        <InfoRow>
+                            <InfoTitle><InfoText>Ngày sinh </InfoText></InfoTitle>
+                            <InfoStack>
+                                <InfoStackContainer>
+                                    {editDob ?
+                                        <Suspense fallback={<>
+                                            {loading ? <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
+                                                : <InfoText>{dob.format('DD/MM/YYYY')}</InfoText>}
+                                            <InfoText className={`edit ${loading ? 'disabled' : ''}`} onClick={() => setEditDob(true)}>Thay đổi</InfoText>
+                                        </>}>
+                                            <CustomDatePicker
+                                                required
+                                                value={dob}
+                                                className="custom-date-picker"
+                                                onChange={newValue => setDob(newValue)}
+                                                size="small"
+                                                slotProps={{
+                                                    textField: {
+                                                        size: "small",
+                                                        fullWidth: true,
+                                                        error: err?.data?.errors?.dob,
+                                                        helperText: err?.data?.errors?.dob,
+                                                    },
+                                                }}
+                                            />
+                                        </Suspense>
+                                        :
+                                        <>
+                                            {loading ? <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
+                                                : <InfoText>{dob.format('DD/MM/YYYY')}</InfoText>}
+                                            <InfoText className={`edit ${loading ? 'disabled' : ''}`} onClick={() => setEditDob(true)}>Thay đổi</InfoText>
+                                        </>
+                                    }
+                                </InfoStackContainer>
+                            </InfoStack>
+                        </InfoRow>
+                        <InfoRow>
+                            <InfoTitle><InfoText>Giới tính </InfoText></InfoTitle>
+                            <InfoStack>
+                                <InfoStackContainer>
+                                    {tabletMode ?
+                                        loading ? <Skeleton variant="rectangular" height={40} width="100%" />
+                                            :
+                                            <TextField
+                                                required
+                                                select
+                                                value={gender}
+                                                onChange={(e) => setGender(e.target.value)}
+                                                size="small"
+                                                fullWidth
+                                            >
+                                                <MenuItem value="Nam">Nam</MenuItem>
+                                                <MenuItem value="Nữ">Nữ</MenuItem>
+                                                <MenuItem value="">Không</MenuItem>
+                                            </TextField>
+
+                                        :
+                                        loading ?
+                                            <>
+                                                <Skeleton variant="text" width={75} sx={{ fontSize: 14, mr: 2 }} />
+                                                <Skeleton variant="text" width={75} sx={{ fontSize: 14, mr: 2 }} />
+                                                <Skeleton variant="text" width={75} sx={{ fontSize: 14 }} />
+                                            </>
+                                            :
+                                            <RadioGroup
+                                                spacing={1}
+                                                row
+                                                value={gender}
+                                                onChange={e => setGender(e.target.value)}
+                                            >
+                                                <FormControlLabel value="Nam" control={<Radio color="primary" />} label="Nam" />
+                                                <FormControlLabel value="Nữ" control={<Radio color="primary" />} label="Nữ" />
+                                                <FormControlLabel value="" control={<Radio color="primary" />} label="Không" />
+                                            </RadioGroup>
+                                    }
+                                </InfoStackContainer>
+                            </InfoStack>
+                        </InfoRow>
+                        {tabletMode &&
+                            <>
+                                <InfoRow>
+                                    <InfoTitle><InfoText>Sổ địa chỉ </InfoText></InfoTitle>
+                                    <InfoStack>
+                                        <Link to={'/profile/detail/address'}>
+                                            <InfoStackContainer>
+                                                <MobileExtendButton>
+                                                    <KeyboardArrowRight fontSize="small" />
+                                                </MobileExtendButton>
+                                            </InfoStackContainer>
+                                        </Link>
+                                    </InfoStack>
+                                </InfoRow>
+                                <InfoRow>
+                                    <InfoTitle><InfoText>Thiết lập mật khẩu </InfoText></InfoTitle>
+                                    <InfoStack>
+                                        <Link to={'/profile/detail/password'}>
+                                            <InfoStackContainer>
+                                                <MobileExtendButton>
+                                                    <KeyboardArrowRight fontSize="small" />
+                                                </MobileExtendButton>
+                                            </InfoStackContainer>
+                                        </Link>
+                                    </InfoStack>
+                                </InfoRow>
+                            </>
+                        }
+                    </tbody>
+                </TableContainer>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    disabled={loading}
+                    onClick={handleChangeInfo}
+                    sx={{ mt: 2, mb: 4 }}
+                    startIcon={<Check />}
+                >
+                    Lưu thông tin
+                </Button>
+            </DialogContent>
         </>
     )
 }

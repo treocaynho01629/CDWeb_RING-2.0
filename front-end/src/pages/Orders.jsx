@@ -1,34 +1,37 @@
-import { TabContentContainer } from "../components/custom/GlobalComponents";
-import styled from "styled-components"
 import useTitle from '../hooks/useTitle';
-import CustomPlaceholder from "../components/custom/CustomPlaceholder";
-import OrdersList from "../components/profile/OrdersList";
-
-//#region styled
-const Wrapper = styled.div`
-`
-
-const PlaceholderContainer = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 40dvh;
-`
-//#endregion
-
-const tempLoad = ( <PlaceholderContainer><CustomPlaceholder /></PlaceholderContainer>)
+import OrdersList from "../components/order/OrdersList";
+import { Dialog } from "@mui/material";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { TabContentContainer } from "../components/custom/ProfileComponents";
 
 const Orders = () => {
+    const { tabletMode, mobileMode } = useOutletContext();
+    const navigate = useNavigate();
+
     //Set title
     useTitle('Đơn hàng');
-    //FIX
 
     return (
-        <Wrapper>
-            <TabContentContainer>
-                <OrdersList />
-            </TabContentContainer>
-        </Wrapper >
+        <div>
+            {tabletMode ?
+                <Dialog
+                    open={tabletMode}
+                    onClose={() => navigate('/profile/detail')}
+                    fullScreen={mobileMode}
+                    scroll={'paper'}
+                    maxWidth={'md'}
+                    fullWidth
+                    PaperProps={{ elevation: 0 }}
+                >
+                    <OrdersList />
+                </Dialog>
+                :
+                <TabContentContainer>
+                    <OrdersList />
+                </TabContentContainer>
+            }
+
+        </div >
     )
 }
 

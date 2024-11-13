@@ -15,7 +15,7 @@ export default function ProfileLayout() {
 
     return (
         <Grid container columnSpacing={{ xs: 1, md_lg: 3 }} sx={{ marginTop: { xs: 0, md: 4 } }}>
-            {(!tabletMode || showTabs) &&
+            {(!mobileMode || showTabs) &&
                 <Grid size={{ xs: 12, md: 3.75, lg: 3 }} display="flex" justifyContent="center">
                     <ProfileTabsList {...{ profile: data, loading: isLoading, error, tabletMode }} />
                 </Grid>

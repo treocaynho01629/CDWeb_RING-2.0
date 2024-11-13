@@ -253,7 +253,7 @@ const Navbar = () => {
     //Transparent trigger
     const trigger = useScrollTrigger({
         disableHysteresis: true,
-        threshold: 40
+        threshold: 20
     });
 
     //Drawer open state

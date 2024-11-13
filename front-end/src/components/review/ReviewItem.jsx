@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { AccessTime, CalendarMonth, Star, StarBorder, ReportGmailerrorred, BorderColor, BorderColorOutlined } from '@mui/icons-material';
+import { AccessTime, CalendarMonth, Star, StarBorder, ReportGmailerrorred, BorderColorOutlined } from '@mui/icons-material';
 import { Avatar, Rating, Skeleton } from '@mui/material';
 import { Link } from 'react-router-dom';
 
@@ -145,7 +145,7 @@ const ReviewItem = ({ review, username, isPreview, handleClick }) => {
                             })}
                         </RatingInfo>
                         {((username && username === review?.username) || isPreview) ?
-                            <ActionButton className="mobile">
+                            <ActionButton className="mobile" onClick={handleClick}>
                                 <BorderColorOutlined />
                             </ActionButton>
                             :

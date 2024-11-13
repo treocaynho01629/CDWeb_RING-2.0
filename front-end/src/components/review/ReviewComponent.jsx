@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { useEffect, useState, lazy, Suspense, Fragment } from 'react'
 import { useGetReviewByBookIdQuery, useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
-import { MobileExtendButton, Showmore, Title } from '../custom/GlobalComponents';
+import { Message, MobileExtendButton, Showmore, Title } from '../custom/GlobalComponents';
 import { Button, DialogActions, DialogTitle, Rating, Box, Skeleton } from '@mui/material';
 import { KeyboardArrowRight, KeyboardArrowLeft, Star, StarBorder, EditOutlined } from '@mui/icons-material';
 import { ReactComponent as EmptyIcon } from '../../assets/empty.svg';
@@ -39,16 +39,6 @@ const ReviewsContainer = styled.div`
         white-space: nowrap;
         max-height: 200px;
   }
-`
-
-const MessageContainer = styled.span`
-    margin: 20px 0 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    white-space: wrap;
 `
 
 const TitleContainer = styled.div`
@@ -169,18 +159,21 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                         )
                     }
                 })
-                : <MessageContainer>Không có đánh giá nào!</MessageContainer>
+                : <Message>
+                    <StyledEmptyIcon />
+                    Chưa có đánh giá nào, hãy trở thành người đầu tiên!
+                </Message>
             }
             {(ids?.length > 0 && ids?.length < pagination.pageSize)
-                && <MessageContainer>Không còn đánh giá nào!</MessageContainer>}
+                && <Message className="warning">Không còn đánh giá nào!</Message>}
         </>
     } else if (isError) {
-        reviewsContent = <MessageContainer>{error?.error}</MessageContainer>
+        reviewsContent = <Message className="error">{error?.error}</Message>
     } else if (isUninitialized && productReviewsCount == 0) {
-        reviewsContent = <MessageContainer>
+        reviewsContent = <Message>
             <StyledEmptyIcon />
             Chưa có đánh giá nào, hãy trở thành người đầu tiên!
-        </MessageContainer>
+        </Message>
     }
 
     mainContent = (
@@ -289,7 +282,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                                 onClick={() => setOpenForm(true)}
                                 startIcon={<EditOutlined />}
                             >
-                                {errorReview?.status == 409 ? 'Mua sản phẩm' : 
+                                {errorReview?.status == 409 ? 'Mua sản phẩm' :
                                     (haveReviews && userReview != null) ? 'Sửa đánh giá' : 'Viết đánh giá'}
                             </Button>
                         </DialogActions>
