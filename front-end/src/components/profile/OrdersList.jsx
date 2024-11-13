@@ -1,15 +1,18 @@
 import styled from "styled-components"
-import { Fragment, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useGetOrdersByUserQuery } from '../../features/orders/ordersApiSlice';
-import { Check, DeliveryDiningOutlined, KeyboardArrowLeft, KeyboardArrowRight, MoreHoriz, Receipt, Storefront } from '@mui/icons-material';
-import { Box, Button, Skeleton } from '@mui/material';
-import { Link } from "react-router-dom";
+import { DeliveryDiningOutlined, KeyboardArrowLeft, KeyboardArrowRight, Receipt, Search, Storefront } from '@mui/icons-material';
+import { Box, Button, CircularProgress, Skeleton, TextField, Typography } from '@mui/material';
+import { Link, useSearchParams } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Title } from "../custom/GlobalComponents";
 import { booksApiSlice } from "../../features/books/booksApiSlice";
+import { CustomTab, CustomTabs } from "../custom/CustomTabs";
+import { orderStatus } from "../../ultils/filters";
+import { getStatus } from '../../ultils/order';
 import { debounce } from "lodash-es";
-import CustomProgress from '../custom/CustomProgress';
 import useCart from '../../hooks/useCart';
+import useDeepEffect from "../../hooks/useDeepEffect";
 
 //#region styled
 const ItemTitle = styled.p`
@@ -65,12 +68,9 @@ const ShopTag = styled.span`
     margin-right: 8px;
 `
 
-const StatusTag = styled.span`
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+const StatusTag = styled(Typography)`
+    text-transform: uppercase;
     font-weight: 450;
-    color: ${props => props.theme.palette.primary.dark};
 
     ${props => props.theme.breakpoints.down("sm")} {
         font-size: 14px;
@@ -213,101 +213,187 @@ const StyledSkeleton = styled(Skeleton)`
 
 const OrdersContainer = styled.div`
 `
+
+const ToggleGroupContainer = styled.div`
+    width: 100%;
+    background-color: ${props => props.theme.palette.background.default};
+    border-bottom: 1px solid ${props => props.theme.palette.divider};
+    white-space: nowrap;
+    padding: 0 10px;
+    position: sticky; 
+    top: ${props => props.theme.mixins.toolbar.minHeight + 16.5}px;
+    z-index: 1;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        top: ${props => props.theme.mixins.toolbar.minHeight + 4.5}px;
+    }
+
+    &:before{
+        content: "";
+        position: absolute;
+        left: 0;
+        top: -16px;
+        width: 100%;
+        height: calc(100% + 16px);
+        background-color: ${props => props.theme.palette.background.default};
+        z-index: -1;
+    }
+
+    &::after{
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: ${props => props.theme.palette.action.hover};
+        z-index: -1;
+    }
+`
+
+const PlaceholderContainer = styled.div`
+    padding: ${props => props.theme.spacing(16)};
+`
+
+const LoadContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: ${props => props.theme.spacing(2)};
+`
 //#endregion
 
 const defaultSize = 5;
 
 function OrderItem({ order, handleAddToCart }) {
+    const detailStatus = getStatus(order?.status);
 
     return (
-        <>
-            {order?.details?.map((detail, index) => {
-                const isCompleted = detail?.items.every(item => item.status == 'COMPLETED');
-
-                return (
-                    <OrderItemContainer key={`order-${detail?.id}-${index}`}>
-                        <HeadContainer>
-                            <Link to={`/store/${detail?.shopId}`}>
-                                <Shop>
-                                    <ShopTag>Đối tác</ShopTag>
-                                    <Storefront />&nbsp;{detail?.shopName}<KeyboardArrowRight fontSize="small" />
-                                </Shop>
-                            </Link>
-                            <Link to={`/profile/order/detail${detail?.id}`}>
-                                <StatusTag>
-                                    {isCompleted ? <><Check />ĐÃ GIAO</> : <><MoreHoriz />ĐANG GIAO</>}
-                                </StatusTag>
-                            </Link>
-                        </HeadContainer>
-                        {detail?.items?.map((item, itemIndex) => (
-                            <Link key={`item-${item?.id}-${itemIndex}`} to={`/product/${item?.bookSlug}`}>
-                                <BodyContainer>
-                                    <StyledLazyImage
-                                        src={`${item?.image}?size=small`}
-                                        alt={`${item?.bookTitle} Order item`}
-                                        placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
-                                    />
-                                    <ContentContainer>
-                                        <ItemTitle>{item?.bookTitle}</ItemTitle>
-                                        <StuffContainer>
-                                            <Amount>Số lượng: <b>{item?.quantity}</b></Amount>
-                                            <PriceContainer>
-                                                <Discount>{item?.discount > 0 ? `${item.price.toLocaleString()}đ` : ''}</Discount>
-                                                <Price>{Math.round(item.price * (1 - (item?.discount || 0))).toLocaleString()}đ</Price>
-                                            </PriceContainer>
-                                        </StuffContainer>
-                                    </ContentContainer>
-                                </BodyContainer>
-                            </Link>
-                        ))}
-                        <BotContainer>
-                            <Link to={`/profile/order/detail${detail?.id}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
-                                <DetailText><DeliveryDiningOutlined />&nbsp;Chi tiết đơn hàng</DetailText>
-                            </Link>
-                            <Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '5px' }}>
-                                    <p style={{ margin: 0 }}>Thành tiền:</p>
-                                    <Price className="total">&nbsp;{(detail?.totalPrice - detail?.totalDiscount).toLocaleString()}đ</Price>
-                                </Box>
-                                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                    <Link to={`/product/${detail?.slug}`}>
-                                    </Link>
-                                    <Button variant="contained" color="primary" onClick={() => handleAddToCart(detail)}>
-                                        Mua lại
-                                    </Button>
-                                    <Link to={`/product/${detail?.items[0]?.bookSlug}?review=true`}>
-                                        <Button variant="outlined" color="secondary" sx={{ marginLeft: '10px' }}>
-                                            Đánh giá
-                                        </Button>
-                                    </Link>
-                                </Box>
-                            </Box>
-                        </BotContainer>
-                    </OrderItemContainer>
-                )
-            }
-            )}
-        </>
-
+        <OrderItemContainer>
+            <HeadContainer>
+                <Link to={`/store/${order?.shopId}`}>
+                    <Shop>
+                        <ShopTag>Đối tác</ShopTag>
+                        <Storefront />&nbsp;{order?.shopName}<KeyboardArrowRight fontSize="small" />
+                    </Shop>
+                </Link>
+                <Link to={`/profile/order/detail${order?.id}`}>
+                    <StatusTag color={detailStatus.color}>{detailStatus.status}</StatusTag>
+                </Link>
+            </HeadContainer>
+            {order?.items?.map((item, itemIndex) => (
+                <Link key={`item-${item?.id}-${itemIndex}`} to={`/product/${item?.bookSlug}`}>
+                    <BodyContainer>
+                        <StyledLazyImage
+                            src={`${item?.image}?size=small`}
+                            alt={`${item?.bookTitle} Order item`}
+                            placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
+                        />
+                        <ContentContainer>
+                            <ItemTitle>{item?.bookTitle}</ItemTitle>
+                            <StuffContainer>
+                                <Amount>Số lượng: <b>{item?.quantity}</b></Amount>
+                                <PriceContainer>
+                                    <Discount>{item?.discount > 0 ? `${item.price.toLocaleString()}đ` : ''}</Discount>
+                                    <Price>{Math.round(item.price * (1 - (item?.discount || 0))).toLocaleString()}đ</Price>
+                                </PriceContainer>
+                            </StuffContainer>
+                        </ContentContainer>
+                    </BodyContainer>
+                </Link>
+            ))}
+            <BotContainer>
+                <Link to={`/profile/order/detail${order?.id}`} style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}>
+                    <DetailText><DeliveryDiningOutlined />&nbsp;Chi tiết đơn hàng</DetailText>
+                </Link>
+                <Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '5px' }}>
+                        <p style={{ margin: 0 }}>Thành tiền:</p>
+                        <Price className="total">&nbsp;{(order?.totalPrice - order?.totalDiscount).toLocaleString()}đ</Price>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Link to={`/product/${order?.slug}`}>
+                        </Link>
+                        <Button variant="contained" color="primary" onClick={() => handleAddToCart(order)}>
+                            Mua lại
+                        </Button>
+                        <Link to={`/product/${order?.items[0]?.bookSlug}?review=true`}>
+                            <Button variant="outlined" color="secondary" sx={{ marginLeft: '10px' }}>
+                                Đánh giá
+                            </Button>
+                        </Link>
+                    </Box>
+                </Box>
+            </BotContainer>
+        </OrderItemContainer>
     )
 }
 
 const OrdersList = () => {
     const { addProduct } = useCart();
+    const scrollRef = useRef(null);
+    const inputRef = useRef(null);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [filters, setFilters] = useState({
+        status: searchParams.get('status') ?? '',
+        keyword: searchParams.get('q') ?? ''
+    })
     const [pagination, setPagination] = useState({
         currPage: 0,
         pageSize: defaultSize,
+        totalPages: 0,
         isMore: true,
     })
 
     //Fetch orders
-    const { data, isLoading, isSuccess, isError, error } = useGetOrdersByUserQuery({
+    const { data, isLoading, isFetching, isSuccess, isError, error } = useGetOrdersByUserQuery({
+        status: filters?.status,
+        keyword: filters?.keyword,
         page: pagination?.currPage,
         size: pagination?.pageSize,
         loadMore: pagination?.isMore
     });
     const [getBought] = booksApiSlice.useLazyGetBooksByIdsQuery();
 
+    useDeepEffect(() => { updatePath(); }, [filters]);
+
+    useEffect(() => {
+        if (data && !isLoading && isSuccess) {
+            setPagination({
+                ...pagination,
+                currPage: data.info.currPage,
+                totalPages: data.info.totalPages
+            });
+        }
+    }, [data])
+
+    const scrollToTop = useCallback(() => { scrollRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, [])
+
+    //Change tab
+    const handleChangeStatus = useCallback((e, newValue) => {
+        setFilters(prev => ({ ...prev, status: newValue }));
+        handleResetPagination();
+    }, []);
+    const handleChangeKeyword = useCallback((e) => {
+        e.preventDefault();
+        if (inputRef) setFilters(prev => ({ ...prev, keyword: inputRef.current.value }));
+        handleResetPagination();
+    }, []);
+
+    const handleResetPagination = useCallback(() => {
+        setPagination(prev => ({ ...prev, currPage: 0 }));
+        scrollToTop();
+    }, [])
+
+    //Search params
+    const updatePath = () => {
+        filters?.status == '' ? searchParams.delete("status") : searchParams.set("status", filters.status);
+        filters?.keyword == '' ? searchParams.delete("q") : searchParams.set("q", filters.keyword);
+        setSearchParams(searchParams);
+    }
+
+    //Rebuy
     const handleAddToCart = async (detail) => {
         const ids = detail?.items?.map(item => item.bookId);
         getBought(ids) //Fetch books with new info
@@ -333,10 +419,10 @@ const OrdersList = () => {
 
     //Show more
     const handleShowMore = () => {
-        let currPage = (pagination?.currPage || 0) + 1;
-        if (data?.info?.totalPages > currPage) {
-            setPagination({ ...pagination, currPage });
-        }
+        if (isFetching || typeof data?.info?.currPage !== 'number') return;
+        if (data?.info?.currPage < pagination?.currPage) return;
+        const nextPage = data?.info?.currPage + 1;
+        if (nextPage < data?.info?.totalPages) setPagination(prev => ({ ...prev, currPage: nextPage }));
     }
 
     const handleScroll = (e) => {
@@ -344,12 +430,19 @@ const OrdersList = () => {
         if (trigger) handleShowMore();
     }
 
-    window.addEventListener("scroll", debounce(handleScroll, 500));
+    const scrollListener = useCallback(debounce(handleScroll, 500), [data]);
+
+    window.addEventListener("scroll", scrollListener);
 
     let ordersContent;
 
-    if (isLoading) {
-        ordersContent = <CustomProgress color="primary" />
+    if (isLoading || (isFetching && pagination.currPage == 0)) {
+        ordersContent =
+            <PlaceholderContainer>
+                <LoadContainer>
+                    <CircularProgress color="primary" />
+                </LoadContainer>
+            </PlaceholderContainer>
     } else if (isSuccess) {
         const { ids, entities } = data;
 
@@ -371,13 +464,38 @@ const OrdersList = () => {
 
     return (
         <>
-            <Title className="primary">
+            <Title ref={scrollRef} className="primary">
                 <Link to={'/profile/detail'}><KeyboardArrowLeft /></Link>
                 <Receipt />&nbsp;ĐƠN HÀNG CỦA BẠN
             </Title>
+            <ToggleGroupContainer>
+                <CustomTabs value={filters.status} onChange={handleChangeStatus} variant="scrollable" scrollButtons={false}>
+                    {orderStatus.map((tab, index) => (
+                        <CustomTab key={`tab-${index}`} label={tab.label} value={tab.value} />
+                    ))}
+                </CustomTabs>
+            </ToggleGroupContainer>
+            <form onSubmit={handleChangeKeyword}>
+                <TextField
+                    placeholder='Tìm kiếm theo mã đơn hàng, Tên Shop hoặc Tên sản phẩm'
+                    autoComplete="order"
+                    id="order"
+                    size="small"
+                    defaultValue={searchParams.get("q")}
+                    inputRef={inputRef}
+                    fullWidth
+                    error={inputRef?.current?.value != filters.keyword}
+                    sx={{ py: { xs: 1, md: 2 } }}
+                    slotProps={{
+                        input: {
+                            startAdornment: (< Search sx={{ marginRight: 1 }} />)
+                        },
+                    }}
+                />
+            </form>
             <OrdersContainer>
                 {ordersContent}
-                {isLoading && <p>FIX</p>}
+                {(pagination.currPage > 0 && isFetching) && <LoadContainer><CircularProgress color="primary" /></LoadContainer>}
             </OrdersContainer>
         </>
     )

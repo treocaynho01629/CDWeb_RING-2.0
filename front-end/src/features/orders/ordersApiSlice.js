@@ -1,6 +1,7 @@
 import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
 import { isEqual } from 'lodash-es';
+import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
 
 const ordersAdapter = createEntityAdapter({});
 const ordersSelector = ordersAdapter.getSelectors();
@@ -15,16 +16,16 @@ const initialState = ordersAdapter.getInitialState({
 
 export const ordersApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
-        getOrder: builder.query({
+        getReceipt: builder.query({
             query: (id) => ({
-                url: `/api/orders/${id}`,
+                url: `/api/orders/receipts/${id}`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError
                 },
             }),
-            providesTags: (result, error, id) => [{ type: 'Order', id }]
+            providesTags: (result, error, id) => [{ type: 'Receipt', id }]
         }),
-        getOrders: builder.query({
+        getReceipts: builder.query({
             query: (args) => {
                 const { page, size, sortBy, sortDir } = args || {};
 
@@ -36,7 +37,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                 if (sortDir) params.append('sortDir', sortDir);
 
                 return {
-                    url: `/api/orders?${params.toString()}`,
+                    url: `/api/orders/receipts?${params.toString()}`,
                     validateStatus: (response, result) => {
                         return response.status === 200 && !result.isError
                     },
@@ -57,18 +58,20 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
                     return [
-                        { type: 'Order', id: 'LIST' },
-                        ...result.ids.map(id => ({ type: 'Order', id }))
+                        { type: 'Receipt', id: 'LIST' },
+                        ...result.ids.map(id => ({ type: 'Receipt', id }))
                     ]
-                } else return [{ type: 'Order', id: 'LIST' }]
+                } else return [{ type: 'Receipt', id: 'LIST' }]
             },
         }),
         getOrdersByUser: builder.query({
             query: (args) => {
-                const { page, size } = args || {};
+                const { status, keyword, page, size } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
+                if (status) params.append('status', status);
+                if (keyword) params.append('keyword', keyword);
                 if (page) params.append('pageNo', page);
                 if (size) params.append('pSize', size);
 
@@ -123,7 +126,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                 )
             },
             forceRefetch: ({ currentArg, previousArg }) => {
-                const isForceRefetch = (currentArg?.loadMore && !isEqual(currentArg, previousArg))
+                const isForceRefetch = (currentArg?.loadMore && !isEqual(currentArg, previousArg) && currentArg?.page > previousArg?.page);
                 return isForceRefetch
             },
             providesTags: (result, error, arg) => {
@@ -199,15 +202,15 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                 body: { ...newOrder }
             }),
             invalidatesTags: [
-                { type: 'Order', id: "LIST" }
+                { type: 'Receipt', id: "LIST" }, { type: 'Order', id: "LIST" }
             ]
         }),
     }),
 })
 
 export const {
-    useGetOrderQuery,
-    useGetOrdersQuery,
+    useGetReceiptQuery,
+    useGetReceiptsQuery,
     useGetOrdersByUserQuery,
     useGetOrdersByBookIdQuery,
     useGetSaleQuery,
@@ -215,16 +218,16 @@ export const {
     useCheckoutMutation,
 } = ordersApiSlice
 
-export const selectOrdersResult = ordersApiSlice.endpoints.getOrders.select()
+export const selectReceiptsResult = ordersApiSlice.endpoints.getReceipts.select()
 
-const selectOrdersData = createSelector(
-    selectOrdersResult,
-    ordersResult => ordersResult.data // normalized state object with ids & entities
+const selectReceiptsData = createSelector(
+    selectReceiptsResult,
+    receiptsResult => receiptsResult.data // normalized state object with ids & entities
 )
 
 export const {
-    selectAll: selectAllOrders,
-    selectById: selectOrderById,
-    selectIds: selectOrderIds,
-    selectEntities: selectOrderEntities
-} = ordersAdapter.getSelectors(state => selectOrdersData(state) ?? initialState)
+    selectAll: selectAllReceipts,
+    selectById: selectReceiptById,
+    selectIds: selectReceiptIds,
+    selectEntities: selectReceiptEntities
+} = ordersAdapter.getSelectors(state => selectReceiptsData(state) ?? initialState)

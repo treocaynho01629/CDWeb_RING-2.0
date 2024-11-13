@@ -1,13 +1,14 @@
 package com.ring.bookstore.controller;
 
 import com.ring.bookstore.dtos.orders.CalculateDTO;
-import com.ring.bookstore.dtos.orders.DetailOrderDTO;
+import com.ring.bookstore.dtos.orders.OrderDetailDTO;
+import com.ring.bookstore.dtos.orders.OrderDTO;
+import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.request.CalculateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ring.bookstore.config.CurrentAccount;
-import com.ring.bookstore.dtos.orders.OrderDTO;
+import com.ring.bookstore.dtos.orders.ReceiptDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.OrderReceipt;
 import com.ring.bookstore.request.OrderRequest;
@@ -51,40 +52,42 @@ public class OrderController {
     }
 	
 	//Get all orders
-	@GetMapping
+	@GetMapping("/receipts")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> getAllOrders(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
     										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
     										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
     										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
         									@CurrentAccount Account currUser){
-        Page<OrderDTO> orders = orderService.getAllOrders(currUser, pageNo, pageSize, sortBy, sortDir);
+        Page<ReceiptDTO> orders = orderService.getAllReceipts(currUser, pageNo, pageSize, sortBy, sortDir);
         return new ResponseEntity< >(orders, HttpStatus.OK);
     }
 	
 	//Get order by {id}
-	@GetMapping("{id}")
+	@GetMapping("/receipts/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> getOrderById(@PathVariable("id") Long id){
-		OrderDTO order = orderService.getOrderById(id);
-        return new ResponseEntity< >(order, HttpStatus.OK);
+    public ResponseEntity<?> getReceipt(@PathVariable("id") Long id){
+		ReceiptDTO receipt = orderService.getReceipt(id);
+        return new ResponseEntity< >(receipt, HttpStatus.OK);
     }
 
     //Get order by {id}
     @GetMapping("/detail/{id}")
     @PreAuthorize("hasAnyRole('USER')")
-    public ResponseEntity<?> getOrderDetailById(@PathVariable("id") Long id){
-        DetailOrderDTO order = orderService.getDetailOrder(id);
+    public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id){
+        OrderDetailDTO order = orderService.getOrderDetail(id);
         return new ResponseEntity< >(order, HttpStatus.OK);
     }
 	
 	//Get orders from user
 	@GetMapping("/user")
 	@PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> getOrdersByUser(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+    public ResponseEntity<?> getOrdersByUser(@RequestParam(value = "status", defaultValue = "") OrderStatus status,
+											@RequestParam(value = "keyword", defaultValue = "") String keyword,
+											@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
     										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
         									@CurrentAccount Account currUser){
-        Page<OrderDTO> orders = orderService.getOrdersByUser(currUser, pageNo, pageSize);
+        Page<OrderDTO> orders = orderService.getOrdersByUser(currUser, status, keyword, pageNo, pageSize);
         return new ResponseEntity< >(orders, HttpStatus.OK);
     }
 	

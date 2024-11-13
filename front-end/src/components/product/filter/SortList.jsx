@@ -2,7 +2,7 @@ import styled from "styled-components"
 import { Suspense, lazy } from "react";
 import { Button, MenuItem, TextField, InputAdornment, IconButton, Badge } from '@mui/material';
 import { Sort, Straight } from '@mui/icons-material';
-import { orderGroup } from "../../../ultils/filters";
+import { sortBy } from "../../../ultils/filters";
 
 const QuickPagination = lazy(() => import("../../custom/QuickPagination"));
 
@@ -148,7 +148,7 @@ const SortList = ({ mobileMode, pagination, onChangeOrder, onChangeDir, onChange
                             select: { IconComponent: () => null }
                         }}
                     >
-                        {orderGroup.map((order, index) => (
+                        {sortBy.map((order, index) => (
                             <MenuItem key={`${order.label}-${index}`} value={order.value}>{order.label}</MenuItem>
                         ))}
                     </StyledInput>
