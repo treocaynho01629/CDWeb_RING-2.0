@@ -6,7 +6,12 @@ import svgr from 'vite-plugin-svgr'
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [
-        react(),
+        react({
+            jsxImportSource: "@emotion/react",
+            babel: {
+                plugins: ["@emotion/babel-plugin"],
+            },
+        }),
         visualizer({
             template: "treemap", // or sunburst
             open: false,
@@ -17,7 +22,7 @@ export default defineConfig({
         svgr({
             svgrOptions: { exportType: 'named', ref: true, svgo: false, titleProp: true },
             include: '**/*.svg',
-        })
+        }),
     ],
     build: {
         rollupOptions: {

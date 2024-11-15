@@ -1,5 +1,5 @@
-import styled from 'styled-components'
-import { styled as muiStyled } from '@mui/material/styles';
+import styled from '@emotion/styled'
+import { styled as muiStyled } from '@mui/material';
 import { useState } from 'react'
 import { ExpandLess, ExpandMore, Category, TrendingUp, AutoStories, Speed, Groups, Star } from '@mui/icons-material';
 import { ListItem, ListItemButton, ListItemIcon, ListItemText, List, Collapse, ListSubheader, Drawer } from '@mui/material';
@@ -37,7 +37,7 @@ const closedMixin = (theme) => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: 'hidden',
-  width: `calc(${theme.spacing(7)} + 1px)`,
+  width: `calc(${props => props.theme.spacing(7)} + 1px)`,
 });
 
 const DrawerHeader = muiStyled('div')(({ theme }) => ({

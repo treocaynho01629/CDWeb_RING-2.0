@@ -1,11 +1,12 @@
 import { Outlet } from "react-router-dom";
-import styled from 'styled-components'
 import Navbar from "../navbar/Navbar";
 import Footer from "./Footer";
 import ScrollToTopButton from "./ScrollToTopButton";
+import styled from "@emotion/styled";
 
 const LayoutWrapper = styled.div`
     position: relative;
+    min-height: 60dvh;
 
     ${props => props.theme.breakpoints.up("sm_md")} {
         padding-right: 15px;

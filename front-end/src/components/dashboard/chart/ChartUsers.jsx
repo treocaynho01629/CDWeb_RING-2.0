@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { BarChart, CartesianGrid, Pie, PieChart, XAxis, YAxis, Tooltip, Legend, Bar, Cell, ResponsiveContainer, LabelList, Label, Sector } from 'recharts'
 import { Avatar, Grid2 as Grid, Paper, useTheme } from '@mui/material'
 import { BarChart as BarChartIcon, PieChart as PieChartIcon } from '@mui/icons-material';

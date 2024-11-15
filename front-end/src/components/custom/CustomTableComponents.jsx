@@ -1,5 +1,5 @@
 import { TableCell, tableCellClasses, TableHead, TableRow } from '@mui/material'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 export const StyledTableCell = styled(TableCell)`
     transition: opacity .2s ease;

@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Add, Check, Close, LocalActivityOutlined, Loyalty } from '@mui/icons-material'
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, useMediaQuery, Box, Skeleton, TextField } from '@mui/material'
+import { Check, Close, LocalActivityOutlined, Loyalty } from '@mui/icons-material'
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button, useMediaQuery, Box, Skeleton, TextField, useTheme } from '@mui/material'
 import { useGetCouponQuery, useGetCouponsQuery } from '../../features/coupons/couponsApiSlice';
-import { useTheme } from '@emotion/react';
 import { getCouponSumary } from '../../ultils/coupon';
 import { Instruction } from '../custom/GlobalComponents';
 import CouponItem from './CouponItem'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 //#region styled
 const TitleContainer = styled.div`

@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from '@emotion/styled';
 import { Facebook, YouTube, LinkedIn, Twitter, QrCode, LocalAtm, SystemSecurityUpdateGood, CreditCard, ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Grid2 as Grid } from "@mui/material";
 import { useState } from "react";

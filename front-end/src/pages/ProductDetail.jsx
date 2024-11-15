@@ -10,7 +10,7 @@ import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 import CustomPlaceholder from '../components/custom/CustomPlaceholder';
 import ProductSimple from '../components/product/ProductSimple';
 
-const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
+const PendingModal = lazy(() => import('../components/layout/PendingModal'));
 const ProductsSlider = lazy(() => import('../components/product/ProductsSlider'));
 const ShopDisplay = lazy(() => import('../components/product/detail/ShopDisplay'));
 const ProductDetailContainer = lazy(() => import('../components/product/detail/ProductDetailContainer'));
@@ -76,7 +76,7 @@ const ProductDetail = () => {
         <>
             {(pending) &&
                 <Suspense fallBack={<></>}>
-                    <PendingIndicator open={pending} message="Đang gửi yêu cầu..." />
+                    <PendingModal open={pending} message="Đang gửi yêu cầu..." />
                 </Suspense>
             }
             <Box display="relative">

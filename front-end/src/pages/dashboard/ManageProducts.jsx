@@ -1,5 +1,5 @@
-import styled from 'styled-components'
-import { styled as muiStyled } from '@mui/material/styles';
+import styled from '@emotion/styled'
+import { styled as muiStyled } from '@mui/material';
 import { useState, useEffect, Suspense, lazy } from "react";
 import { Box, Breadcrumbs, Button, Grid2 as Grid, Paper, Stack, Typography } from '@mui/material';
 import { Add, AutoStories as AutoStoriesIcon, LocalFireDepartment, Star, Style } from '@mui/icons-material';

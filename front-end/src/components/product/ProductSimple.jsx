@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { Link } from "react-router-dom"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Skeleton, Button } from '@mui/material';
@@ -32,7 +32,7 @@ const Info = styled.div`
     z-index: 4;
 `
 
-const Title = styled.h5`
+const Title = styled('h5')`
     width: 100%;
     font-size: 14px;
     margin: 0;

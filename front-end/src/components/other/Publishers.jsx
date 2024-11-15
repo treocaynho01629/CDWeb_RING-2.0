@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from '@emotion/styled'
 import { useRef } from "react"
 import { IconButton, Skeleton } from "@mui/material";
 import { KeyboardArrowRight, KeyboardArrowLeft } from '@mui/icons-material';
@@ -59,8 +59,8 @@ const Wrapper = styled.div`
     &::-webkit-scrollbar {display: none;}
 
     ${props => props.theme.breakpoints.up("md")} {
-        ${ItemContainer}:first-child {margin-left: 20px;}
-        ${ItemContainer}:last-child { margin-right: 40px; }
+        ${ItemContainer}:first-of-type {margin-left: 20px;}
+        ${ItemContainer}:last-of-type { margin-right: 40px; }
     }
 `
 

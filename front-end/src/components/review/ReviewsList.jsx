@@ -4,7 +4,7 @@ import { useGetMyReviewsQuery } from "../../features/reviews/reviewsApiSlice";
 import { Title } from "../custom/GlobalComponents";
 import { Link } from "react-router-dom";
 import ReviewItem from "./ReviewItem";
-import styled from "styled-components";
+import styled from '@emotion/styled';
 import CustomProgress from "../custom/CustomProgress";
 
 //#region styled

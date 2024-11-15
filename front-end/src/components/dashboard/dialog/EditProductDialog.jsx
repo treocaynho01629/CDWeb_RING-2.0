@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { useState, useEffect } from 'react'
 import { Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, FormControl, Button, TextField, TextareaAutosize } from '@mui/material';
 import { Check, Close } from '@mui/icons-material';
@@ -14,7 +14,7 @@ const Instruction = styled.p`
     font-size: 14px;
     font-style: italic;
     color: red;
-    display: ${props => props.display};;
+    display: ${display};;
 `
 
 const bookLanguages = [

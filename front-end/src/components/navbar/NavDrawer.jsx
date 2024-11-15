@@ -1,14 +1,15 @@
-import { styled } from '@mui/material/styles';
+import styled from '@emotion/styled';
 import {
     ShoppingCartOutlined, DeliveryDiningOutlined, LockOutlined, Logout, Speed, NotificationsOutlined,
     Storefront, KeyboardArrowLeft, Brightness3, Brightness7,
+    SettingsBrightness,
 } from '@mui/icons-material';
 import { Avatar, ListItemIcon, Divider, Box, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { LogoImage } from '../custom/GlobalComponents';
 
 //#region styled
-const DrawerLogo = styled('div')`
+const DrawerLogo = styled.div`
     position: relative;
     display: flex;
     align-items: center;
@@ -17,18 +18,18 @@ const DrawerLogo = styled('div')`
     width: 100%;
 `
 
-const DrawerContainer = styled(Box)(({ theme }) => `
-    padding-left: ${theme.spacing(1.5)};
-    padding-right: ${theme.spacing(1.5)};
+const DrawerContainer = styled(Box)`
+    padding-left: ${props => props.theme.spacing(1.5)};
+    padding-right: ${props => props.theme.spacing(1.5)};
     width: auto;    
 
     @media (min-width: 450px) {
         width: 400px;
     }
-`)
+`
 //#endregion
 
-const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, roles, products, logout, theme, colorMode }) => {
+const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, roles, products, logout, mode, toggleMode }) => {
     const role = roles?.length;
 
     return (
@@ -126,14 +127,19 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                                     </ListItem>
                                 </Link>
                             )}
-                            <ListItem disablePadding>
-                                <ListItemButton onClick={colorMode.toggleColorMode}>
-                                    <ListItemIcon>
-                                        {theme.palette.mode === 'dark' ? <Brightness3 fontSize="small" /> : <Brightness7 fontSize="small" />}
-                                    </ListItemIcon>
-                                    <ListItemText primary={theme.palette.mode === 'dark' ? 'Chủ đề tối' : 'Chủ đề mặc định'} />
-                                </ListItemButton>
-                            </ListItem>
+                            {mode &&
+                                <ListItem disablePadding>
+                                    <ListItemButton onClick={toggleMode}>
+                                        <ListItemIcon>
+                                            {mode === 'dark' ? <Brightness3 fontSize="small" />
+                                                : mode === 'light' ? <Brightness7 fontSize="small" />
+                                                    : mode === 'system' ? <SettingsBrightness fontSize="small" /> : ''}                                    </ListItemIcon>
+                                        <ListItemText primary={mode === 'dark' ? 'Chủ đề tối'
+                                            : mode === 'light' ? 'Chủ đề mặc định'
+                                                : mode === 'system' ? 'Theo hệ thống' : ''} />
+                                    </ListItemButton>
+                                </ListItem>
+                            }
                             <ListItem disablePadding>
                                 <ListItemButton onClick={() => logout()}>
                                     <ListItemIcon>

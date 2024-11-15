@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { Check, CreditCard, LocalAtm, Payments, QrCode, Sell, SystemSecurityUpdateGood } from '@mui/icons-material';
 import { Grid2 as Grid, Radio, RadioGroup, FormControlLabel, Box, TextField } from '@mui/material';
 
@@ -10,7 +10,7 @@ const Payout = styled.div`
     width: 100%;
 `
 
-const PayoutTitle = styled.h5`
+const PayoutTitle = styled('h5')`
     margin: 0;
 `
 

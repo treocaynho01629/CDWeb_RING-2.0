@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { KeyboardArrowUp } from "@mui/icons-material";
 import { useLocation } from "react-router-dom";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 
 const ButtonContainer = styled.div`
     position: fixed;

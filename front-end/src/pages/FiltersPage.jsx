@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from '@emotion/styled';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useTheme, useMediaQuery, Grid2 as Grid, Skeleton } from '@mui/material';
 import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router-dom'

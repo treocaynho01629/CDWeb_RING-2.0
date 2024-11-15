@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from '@emotion/styled'
 import { Pagination, PaginationItem, Stack, MenuItem, TextField } from '@mui/material';
 
 //#region styled

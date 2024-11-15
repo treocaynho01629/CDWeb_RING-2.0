@@ -1,4 +1,4 @@
-import { styled as muiStyled } from '@mui/material/styles';
+import { styled as muiStyled } from '@mui/material';
 import { useState } from 'react';
 import { Toolbar, IconButton, Stack, Badge, Tooltip, Avatar, Menu, MenuItem, Divider, ListItemIcon, Box, alpha, Chip, Typography } from '@mui/material';
 import { Menu as MenuIcon, Logout, Home as HomeIcon, NotificationsNone, SettingsOutlined } from '@mui/icons-material';

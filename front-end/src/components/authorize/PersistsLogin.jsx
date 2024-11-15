@@ -3,7 +3,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useRefreshMutation } from "../../features/auth/authApiSlice";
 import { Button } from "@mui/material";
 import useAuth from '../../hooks/useAuth';
-import PendingIndicator from "../../components/layout/PendingIndicator";
+import PendingModal from "../../components/layout/PendingModal";
 import useLogout from "../../hooks/useLogout";
 
 const PersistLogin = () => {
@@ -44,9 +44,9 @@ const PersistLogin = () => {
                 ? <Outlet />
                 : pending
                     ?
-                    <PendingIndicator open={true} message="Đang xác thực đăng nhập ...">
+                    <PendingModal open={true} message="Đang xác thực đăng nhập ...">
                         <Button variant="contained" color="error" onClick={logout}>Đăng xuất?</Button>
-                    </PendingIndicator>
+                    </PendingModal>
                     : isSuccess
                         ? <Outlet />
                         : isError

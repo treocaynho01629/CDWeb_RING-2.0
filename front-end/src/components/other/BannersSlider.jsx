@@ -1,4 +1,5 @@
-import styled, { keyframes } from "styled-components"
+import styled from "@emotion/styled";
+import { keyframes } from "@emotion/react";
 import { Fragment, useState } from "react";
 import { Grid2 as Grid, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';

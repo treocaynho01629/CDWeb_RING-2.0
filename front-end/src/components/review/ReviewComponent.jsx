@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { useEffect, useState, lazy, Suspense, Fragment } from 'react'
 import { useGetReviewByBookIdQuery, useGetReviewsByBookIdQuery } from '../../features/reviews/reviewsApiSlice';
 import { Message, MobileExtendButton, Showmore, Title } from '../custom/GlobalComponents';

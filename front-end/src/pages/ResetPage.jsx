@@ -1,9 +1,9 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { useState, lazy, Suspense } from "react";
 import { useParams } from 'react-router-dom';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 
-const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
+const PendingModal = lazy(() => import('../components/layout/PendingModal'));
 const ForgotTab = lazy(() => import('../components/authorize/ForgotTab'));
 const ResetTab = lazy(() => import('../components/authorize/ResetTab'));
 
@@ -40,7 +40,7 @@ function ResetPage() {
         <Wrapper>
             {pending &&
                 <Suspense fallBack={null}>
-                    <PendingIndicator open={pending} message="Đang gửi yêu cầu..." />
+                    <PendingModal open={pending} message="Đang gửi yêu cầu..." />
                 </Suspense>
             }
             <SimpleNavbar />

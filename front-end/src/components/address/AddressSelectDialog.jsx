@@ -1,7 +1,6 @@
-import { useTheme } from "styled-components"
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { useUpdateProfileMutation } from '../../features/users/usersApiSlice';
-import { Box, Dialog, Button, DialogActions, DialogContent, ListItemIcon, ListItemText, Menu, MenuItem, Radio, styled, useMediaQuery, DialogTitle } from '@mui/material';
+import { Box, Dialog, Button, DialogActions, DialogContent, ListItemIcon, ListItemText, Menu, MenuItem, Radio, styled, useMediaQuery, DialogTitle, useTheme } from '@mui/material';
 import { AddHome, Check, Delete, Home, LocationOn, Close } from '@mui/icons-material';
 import { useLocation, useNavigate } from "react-router-dom";
 import AddressItem from './AddressItem'

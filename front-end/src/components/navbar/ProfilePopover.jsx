@@ -1,8 +1,8 @@
-import { Brightness3, Brightness7, DeliveryDiningOutlined, LockOutlined, Speed } from '@mui/icons-material';
+import { Brightness3, Brightness7, DeliveryDiningOutlined, LockOutlined, SettingsBrightness, Speed } from '@mui/icons-material';
 import { Avatar, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, theme, colorMode }) => {
+const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, mode, toggleMode }) => {
     const role = roles?.length;
 
     return (
@@ -53,7 +53,7 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, the
         >
             <Link to={'/profile/detail'} style={{ color: 'inherit' }}>
                 <MenuItem>
-                    <Avatar src={image ? image + '?size=tiny' : null}/> Thông tin tài khoản
+                    <Avatar src={image ? image + '?size=tiny' : null} /> Thông tin tài khoản
                 </MenuItem>
             </Link>
             <Link to={'/profile/order'} style={{ color: 'inherit' }}>
@@ -75,12 +75,18 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, the
                     </MenuItem>
                 </Link>
             )}
-            <MenuItem aria-label="toggle-mode" onClick={colorMode.toggleColorMode} >
-                <ListItemIcon>
-                    {theme.palette.mode === 'dark' ? <Brightness3 fontSize="small" /> : <Brightness7 fontSize="small" />}
-                </ListItemIcon>
-                {theme.palette.mode === 'dark' ? 'Chủ đề tối' : 'Chủ đề mặc định'}
-            </MenuItem>
+            {mode &&
+                <MenuItem aria-label="toggle-mode" onClick={toggleMode} >
+                    <ListItemIcon>
+                        {mode === 'dark' ? <Brightness3 fontSize="small" />
+                            : mode === 'light' ? <Brightness7 fontSize="small" />
+                                : mode === 'system' ? <SettingsBrightness fontSize="small" /> : ''}
+                    </ListItemIcon>
+                    {mode === 'dark' ? 'Chủ đề tối'
+                        : mode === 'light' ? 'Chủ đề mặc định'
+                            : mode === 'system' ? 'Theo hệ thống' : ''}
+                </MenuItem>
+            }
             <MenuItem onClick={() => logout()}>
                 <ListItemIcon>
                     <LockOutlined fontSize="small" />

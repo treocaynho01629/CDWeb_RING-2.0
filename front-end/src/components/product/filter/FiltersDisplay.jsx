@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { Close, FilterAltOff, Search } from '@mui/icons-material'
 import { isEqual } from 'lodash-es'
 import { memo, useMemo } from 'react'

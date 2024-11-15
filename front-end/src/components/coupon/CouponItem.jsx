@@ -1,5 +1,5 @@
 import { Button, Skeleton, Paper, alpha } from '@mui/material'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 //#region styledc
 const Wrapper = styled.div`

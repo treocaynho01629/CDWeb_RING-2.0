@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { AddShoppingCart } from '@mui/icons-material';
 import { Button, Box, Divider, useTheme, useMediaQuery, Skeleton, SwipeableDrawer } from '@mui/material';
 import { useState } from 'react';
@@ -92,7 +92,7 @@ const ProductAction = ({ book }) => {
     const navigate = useNavigate();
     const tabletMode = useMediaQuery(theme.breakpoints.down('md'));
     const [amountIndex, setAmountIndex] = useState(1); //Amount add to cart
-    const [open, setOpen] = useState(undefined);
+    const [open, setOpen] = useState(false);
     const [openNow, setOpenNow] = useState(false);
     const { addProduct } = useCart();
 

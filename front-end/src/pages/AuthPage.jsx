@@ -1,10 +1,11 @@
-import styled, { keyframes } from 'styled-components'
+import styled from "@emotion/styled";
 import { useState, lazy, Suspense } from "react";
 import { useParams } from 'react-router-dom';
+import { keyframes } from "@emotion/react";
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 import useTitle from '../hooks/useTitle';
 
-const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
+const PendingModal = lazy(() => import('../components/layout/PendingModal'));
 const RegisterTab = lazy(() => import('../components/authorize/RegisterTab'));
 const LoginTab = lazy(() => import('../components/authorize/LoginTab'));
 
@@ -79,21 +80,18 @@ const Wave = styled.span`
     border-radius: 43%;
     top: 0;
     left: 14%;
-    background: #6DE363;
-    opacity: .2;
+    background: hsl(from ${props => props.theme.palette.primary.main}  calc(h - 30) s l / 0.2);
     animation: ${rotate} 32s infinite steps(480, end);
     
-    &:nth-child(2) {
-        background: #63E3D9;
-        opacity: .3;
+    &:nth-of-type(2) {
+        background: hsl(from ${props => props.theme.palette.primary.main}  calc(h + 30) s l / 0.3);
         left: 7%;
         animation-duration: 24s;
         animation-timing-function: steps(330, end);
     }
     
-    &:nth-child(3) {
-        background: #63E399;
-        opacity: .4;
+    &:nth-of-type(3) {
+        background: hsl(from ${props => props.theme.palette.primary.main}  h s l / 0.4);
         left: 0;
         animation-duration: 28s;
         animation-timing-function: steps(420, end);
@@ -120,7 +118,7 @@ function AuthPage() {
         <Wrapper>
             {pending &&
                 <Suspense fallBack={null}>
-                    <PendingIndicator open={pending} message="Đang gửi yêu cầu..." />
+                    <PendingModal open={pending} message="Đang gửi yêu cầu..." />
                 </Suspense>
             }
             <SimpleNavbar />

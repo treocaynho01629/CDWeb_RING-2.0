@@ -1,6 +1,6 @@
-import styled from 'styled-components'
 import { Link } from 'react-router-dom';
 import { Breadcrumbs } from '@mui/material';
+import styled from '@emotion/styled';
 
 const BreadcrumbsContainer = styled.div`
     margin: 20px 10px;
