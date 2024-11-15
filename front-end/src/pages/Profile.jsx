@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from '@emotion/styled'
 import { useState, lazy, Suspense } from 'react'
 import { Dialog, Skeleton } from '@mui/material';
 import { StyledDialogTitle, TabContentContainer } from "../components/custom/ProfileComponents";
@@ -6,7 +6,7 @@ import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import CustomPlaceholder from '../components/custom/CustomPlaceholder';
 import useTitle from '../hooks/useTitle';
 
-const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
+const PendingModal = lazy(() => import('../components/layout/PendingModal'));
 const ProfileDetail = lazy(() => import('../components/profile/ProfileDetail'));
 const AddressComponent = lazy(() => import('../components/address/AddressComponent'));
 const ResetPassComponent = lazy(() => import('../components/profile/ResetPassComponent'));
@@ -60,7 +60,7 @@ const Profile = () => {
         <>
             {pending &&
                 <Suspense fallBack={null}>
-                    <PendingIndicator open={pending} message="Đang gửi yêu cầu..." />
+                    <PendingModal open={pending} message="Đang gửi yêu cầu..." />
                 </Suspense>
             }
             {tabletMode ?

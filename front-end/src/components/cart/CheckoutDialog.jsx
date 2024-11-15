@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { lazy, useState, Suspense } from 'react';
 import { ShoppingCartCheckout, LocalActivityOutlined, KeyboardArrowRight } from '@mui/icons-material';
 import { useMediaQuery, useTheme, Button } from '@mui/material';
@@ -49,7 +49,7 @@ const CheckoutStack = styled.div`
     align-items: center;
     justify-content: space-between;
 
-    &:first-child {
+    &:first-of-type {
         border-bottom: .5px dashed ${props => props.theme.palette.divider};
         margin-bottom: ${props => props.theme.spacing(1)};
         padding-bottom: ${props => props.theme.spacing(1)};
@@ -59,7 +59,7 @@ const CheckoutStack = styled.div`
         width: 100%;
         height: 50px;
 
-        &:first-child {
+        &:first-of-type {
             margin-bottom: 0;
             padding: 0 5px;
         }

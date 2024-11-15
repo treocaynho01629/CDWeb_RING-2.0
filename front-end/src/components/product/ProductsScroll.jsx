@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from '@emotion/styled';
 import CustomProgress from '../custom/CustomProgress';
 import ProductPreview from "./ProductPreview";
 
@@ -35,7 +35,7 @@ const SliderContainer = styled.div`
     -ms-overflow-style: none;
     scrollbar-width: none; 
     display: flex;
-    flex-direction: ${props => props.$direction || 'column'};
+    flex-direction: ${props => props.direction || 'column'};
 
     &::-webkit-scrollbar {display: none;}
     
@@ -84,7 +84,7 @@ const ProductsScroll = ({ data, isError, isLoading, isFetching, isSuccess, isUni
         <Container>
             {/* <MainTitle>Sản phẩm liên quan</MainTitle> */}
             {(loading) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
-            <SliderContainer $direction={direction}>
+            <SliderContainer direction={direction}>
                 {productsScroll}
             </SliderContainer>
         </Container>

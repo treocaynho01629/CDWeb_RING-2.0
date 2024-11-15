@@ -1,5 +1,4 @@
-
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { Fragment, useEffect } from 'react';
 import { MoreHoriz, Storefront, KeyboardArrowRight, LocalActivityOutlined } from '@mui/icons-material';
 import { IconButton, Box, Skeleton } from '@mui/material';

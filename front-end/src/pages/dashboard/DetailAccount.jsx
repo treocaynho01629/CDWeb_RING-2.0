@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { useState, lazy, Suspense, useEffect } from 'react';
 import { Avatar, Box, Card, CardContent, IconButton, Typography, Grid2 as Grid, Divider } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';

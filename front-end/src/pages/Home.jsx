@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { useState, useEffect, lazy, Suspense, useRef } from "react";
 import { alpha, Button } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';

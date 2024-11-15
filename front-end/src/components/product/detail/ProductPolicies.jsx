@@ -1,6 +1,6 @@
 import { AssignmentReturn, KeyboardArrowRight, LocalShipping, VerifiedUser } from '@mui/icons-material'
 import { MobileExtendButton } from '../../custom/GlobalComponents'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 //#region styled
 const PoliciesWrapper = styled.div`

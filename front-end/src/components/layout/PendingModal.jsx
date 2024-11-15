@@ -1,10 +1,10 @@
 import { Backdrop, CircularProgress } from '@mui/material';
 
-const PendingIndicator = (props) => {
+const PendingModal = (props) => {
   const { open, message, children } = props;
 
   return (
-    <Backdrop sx={{ color: 'background.default', display: 'flex', flexDirection: 'column', zIndex: 9999 }} open={open}>
+    <Backdrop sx={{ display: 'flex', flexDirection: 'column', zIndex: 9999 }} open={open}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <CircularProgress
           sx={{ marginRight: '10px' }}
@@ -20,4 +20,4 @@ const PendingIndicator = (props) => {
   )
 }
 
-export default PendingIndicator
+export default PendingModal

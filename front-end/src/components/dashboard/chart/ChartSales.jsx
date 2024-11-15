@@ -1,5 +1,5 @@
-import styled from 'styled-components'
-import { styled as muiStyled } from '@mui/material/styles';
+import styled from '@emotion/styled'
+import { styled as muiStyled } from '@mui/material';
 import { CartesianGrid, LineChart, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Line } from 'recharts'
 import { Box, Grid2 as Grid, Paper, Divider, LinearProgress } from '@mui/material'
 import { Link } from "react-router-dom";

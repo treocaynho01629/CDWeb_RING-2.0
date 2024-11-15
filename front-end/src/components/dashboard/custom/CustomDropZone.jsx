@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { styled } from '@mui/material/styles';
+import { styled } from '@mui/material';
 import { useDropzone } from 'react-dropzone';
 import { Close, PermMedia } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
 
 //#region styled
-const DropZoneContainer = styled('div')`
+const DropZoneContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -15,7 +15,7 @@ const DropZoneContainer = styled('div')`
     cursor: pointer;
 `
 
-const DropZoneContent = styled('div')`
+const DropZoneContent = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -29,7 +29,7 @@ const ThumbContainer = styled('aside')`
     margin: 16px 0px;
 `
 
-const Thumb = styled('div')`
+const Thumb = styled.div`
     display: flex;
     border: .5px solid ${props => props.theme.palette.action.focus};
     height: 80px;
@@ -40,7 +40,7 @@ const Thumb = styled('div')`
     position: relative;
 `
 
-const ThumbInner = styled('div')`
+const ThumbInner = styled.div`
     display: flex;
     min-width: 0;
     overflow: hidden;

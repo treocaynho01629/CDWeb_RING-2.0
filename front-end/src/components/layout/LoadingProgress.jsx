@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigation } from 'react-router-dom';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useLocation, useNavigation } from 'react-router-dom';
 import CustomProgress from '../custom/CustomProgress';
 
 const fillSpeed = 800;
@@ -14,6 +14,7 @@ function clamp(n, min, max) {
 }
 
 const LoadingProgress = () => {
+    const { pathname } = useLocation();
     const navigation = useNavigation();
     const status = useRef(null);
     const [progress, setProgress] = useState(null);
@@ -28,10 +29,14 @@ const LoadingProgress = () => {
         }
     }, [progress])
 
-    useEffect(() => {
+    useLayoutEffect(() => { //Display when loading page's content
         if (navigation.state == "loading" || navigation.state == "submitting") start();
         if (navigation.state == "idle") done();
     }, [navigation.state])
+
+    //Display when changing path
+    useLayoutEffect(() => { start(); }, [pathname]);
+    useEffect(() => { done();  }, [pathname]);
 
     const setValue = useCallback((n) => {
         n = clamp(n, minimum, 100);

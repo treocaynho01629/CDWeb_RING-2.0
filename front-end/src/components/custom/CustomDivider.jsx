@@ -1,5 +1,4 @@
-import Divider from '@mui/material/Divider';
-import { styled } from '@mui/material/styles';
+import { styled, Divider } from '@mui/material';
 
 const StyledDivider = styled(Divider)(({ theme }) => ({
     fontSize: 18,

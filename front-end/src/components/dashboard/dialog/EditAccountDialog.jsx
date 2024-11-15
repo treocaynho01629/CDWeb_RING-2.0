@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
-import styled from 'styled-components'
-import { styled as muiStyled } from '@mui/material/styles';
+import styled from '@emotion/styled'
+import { styled as muiStyled } from '@mui/material';
 
 import { TextField, InputAdornment, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, FormControl } from '@mui/material';
 import { Edit as EditIcon, Close as CloseIcon, VisibilityOff, Visibility, Cached as CachedIcon, LockReset as LockResetIcon } from '@mui/icons-material';
@@ -55,7 +55,7 @@ const Instruction = styled.p`
     font-size: 14px;
     font-style: italic;
     color: red;
-    display: ${props => props.display};;
+    display: ${display};;
 `
 
 const CustomDialog = muiStyled(Dialog)(({ theme }) => ({

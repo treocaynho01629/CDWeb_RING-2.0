@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from '@emotion/styled';
 import CustomProgress from '../custom/CustomProgress';
 import Carousel from "react-multi-carousel";
 import ProductSimple from "./ProductSimple";

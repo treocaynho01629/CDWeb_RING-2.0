@@ -141,9 +141,9 @@ const AddressComponent = ({ pending, setPending }) => {
           onClick={handleOpen}
           endIcon={<AddHome />}
           size="small"
-          sx={{ fontSize: 10 }}
+          sx={{ fontSize: 11 }}
         >
-          Thêm địa chỉ
+          THÊM ĐỊA CHỈ
         </Button>
       </StyledDialogTitle>
       <DialogContent sx={{ p: { xs: 1, sm: 2, md: 0 }, mt: { xs: 1, md: 0 } }}>

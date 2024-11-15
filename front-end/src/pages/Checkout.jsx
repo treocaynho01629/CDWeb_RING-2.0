@@ -1,5 +1,5 @@
-import styled from 'styled-components'
-import { styled as muiStyled } from '@mui/material/styles';
+import styled from '@emotion/styled'
+import { styled as muiStyled } from '@mui/material';
 import { useEffect, useRef, useState, lazy, Suspense } from 'react'
 import { ShoppingCart as ShoppingCartIcon, LocationOn as LocationOnIcon, CreditCard as CreditCardIcon, KeyboardDoubleArrowDown, Person } from '@mui/icons-material';
 import { TextareaAutosize, Button, Table, TableBody, TableContainer, TableHead, TableRow, Stepper, Step, StepLabel, StepContent, Typography, Box, Skeleton, } from '@mui/material';
@@ -15,7 +15,7 @@ import AddressSelectDialog from '../components/address/AddressSelectDialog';
 import useCart from '../hooks/useCart';
 import useTitle from '../hooks/useTitle';
 
-const PendingIndicator = lazy(() => import('../components/layout/PendingIndicator'));
+const PendingModal = lazy(() => import('../components/layout/PendingModal'));
 const FinalCheckoutDialog = lazy(() => import('../components/cart/FinalCheckoutDialog'));
 
 //#region styled
@@ -375,11 +375,10 @@ const Checkout = () => {
     if (products?.length) {
         return (
             <Wrapper>
-                {(isLoading || pending) ?
-                    <Suspense fallBack={<></>}>
-                        <PendingIndicator open={(isLoading || pending)} message="Đang xử lý đơn hàng..." />
+                {(isLoading || pending) &&
+                    <Suspense fallBack={null}>
+                        <PendingModal open={(isLoading || pending)} message="Đang xử lý đơn hàng..." />
                     </Suspense>
-                    : null
                 }
                 <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
                     <NavLink to={`/cart`}>Giỏ hàng</NavLink>

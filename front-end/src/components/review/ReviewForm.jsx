@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { Close, Edit, Star, StarBorder } from '@mui/icons-material';
 import { Rating, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, TextareaAutosize } from '@mui/material';
 import { Link, useLocation } from "react-router-dom";

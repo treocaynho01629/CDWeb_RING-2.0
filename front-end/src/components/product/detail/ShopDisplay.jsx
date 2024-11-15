@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from '@emotion/styled';
 import { Avatar, Box, Button, Grid2 as Grid, Skeleton, Stack } from "@mui/material";
 import { Add, AutoStories, LocalActivity, PersonAddAlt1, Store, Today, Verified as VerifiedIcon } from "@mui/icons-material";
 import { useGetShopQuery } from "../../../features/shops/shopsApiSlice";

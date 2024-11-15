@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { MenuItem, TextField } from '@mui/material'
 import { rateLabels } from '../../ultils/filters';
 import { Star } from '@mui/icons-material';

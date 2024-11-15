@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { KeyboardArrowDown, KeyboardArrowRight, LocalShippingOutlined } from '@mui/icons-material';
 import { Box } from '@mui/material'
 import { MobileExtendButton } from '../custom/GlobalComponents';

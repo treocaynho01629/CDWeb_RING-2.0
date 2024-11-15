@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from "@emotion/styled";
 import { useEffect, useMemo, useState, Suspense, lazy, useCallback } from "react";
 import { Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, Search, ChevronLeft, Sell } from '@mui/icons-material';
 import { Checkbox, Button, Grid2 as Grid, Table, TableBody, TableRow, Box, MenuItem, ListItemText, ListItemIcon } from '@mui/material';

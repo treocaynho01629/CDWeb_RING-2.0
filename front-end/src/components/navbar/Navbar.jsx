@@ -1,17 +1,19 @@
-import styled from 'styled-components';
-import { lazy, Suspense, useContext, useState } from 'react';
-import { styled as muiStyled } from '@mui/material/styles';
+import { lazy, Suspense, useCallback, useState } from 'react';
 import {
     Search, Mail, Phone, Facebook, YouTube, LinkedIn, Twitter, Menu, LockOutlined, Storefront,
     Close, ShoppingCartOutlined, NotificationsOutlined,
 } from '@mui/icons-material';
-import { Stack, Badge, IconButton, Avatar, Box, Grid2 as Grid, TextField, AppBar, useTheme, useMediaQuery, useScrollTrigger } from '@mui/material';
+import {
+    Stack, Badge, IconButton, Avatar, Box, Grid2 as Grid, TextField, AppBar, useMediaQuery, useTheme, useScrollTrigger,
+    useColorScheme
+} from '@mui/material';
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { ColorModeContext } from '../../ThemeContextProvider';
-import { LogoImage, LogoSubtitle } from '../custom/GlobalComponents';
+import { LogoImage } from '../custom/GlobalComponents';
+import { debounce } from 'lodash-es';
 import useLogout from "../../hooks/useLogout";
 import useAuth from "../../hooks/useAuth";
 import useCart from '../../hooks/useCart';
+import styled from '@emotion/styled';
 
 const NavDrawer = lazy(() => import("./NavDrawer"));
 const MiniCart = lazy(() => import("./MiniCart"));
@@ -155,7 +157,7 @@ const NavItem = styled.div`
     margin-left: 15px;
 `
 
-const StyledAppBar = muiStyled(AppBar)(({ theme }) => ({
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
     backgroundColor: theme.palette.background.default,
     borderBottom: '.5px solid',
     borderColor: theme.palette.divider,
@@ -175,7 +177,7 @@ const StyledAppBar = muiStyled(AppBar)(({ theme }) => ({
     }
 }));
 
-const StyledIconButton = muiStyled(IconButton)(({ theme }) => ({
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
     borderRadius: 0,
 
     '&:hover': {
@@ -219,7 +221,7 @@ const StyledSearchForm = styled.form`
     }
 `
 
-const StyledSearchInput = muiStyled(TextField)(({ theme }) => ({
+const StyledSearchInput = styled(TextField)(({ theme }) => ({
     color: 'inherit',
     background: theme.palette.background.default,
 
@@ -244,9 +246,9 @@ const StyledSearchInput = muiStyled(TextField)(({ theme }) => ({
 const Navbar = () => {
     //#region construct
     const { cartProducts } = useCart();
+    const { mode, setMode } = useColorScheme();
     const [searchParams, setSearchParams] = useSearchParams();
     const location = useLocation();
-    const colorMode = useContext(ColorModeContext);
     const theme = useTheme();
     const tabletMode = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -270,19 +272,38 @@ const Navbar = () => {
     const logout = useLogout();
 
     //Anchor for popoever & open state
-    const [anchorEl, setAnchorEl] = useState(undefined);
     const [anchorElCart, setAnchorElCart] = useState(undefined);
-    const open = Boolean(anchorEl);
+    const [anchorEl, setAnchorEl] = useState(undefined);
     const openCart = Boolean(anchorElCart);
+    const open = Boolean(anchorEl);
 
-    const hanldeCartPopover = (e) => { setAnchorElCart(e.currentTarget) };
-    const handleCartClose = () => { setAnchorElCart(null) };
-    const handleProfilePopover = (e) => { setAnchorEl(e.currentTarget) };
-    const handleProfileClose = () => { setAnchorEl(null) };
+    const hanldeCartPopover = (e) => {
+        handleCartClose.cancel();
+        setAnchorElCart(e.currentTarget);
+    };
+    const handleCartClose = useCallback(debounce(() => { setAnchorElCart(null) }, 500), [anchorElCart]);
+    const handleProfilePopover = (e) => {
+        handleProfileClose.cancel();
+        setAnchorEl(e.currentTarget);
+    };
+    const handleProfileClose = useCallback(debounce(() => { setAnchorEl(null) }, 500), [anchorEl]);
 
     //Toggle drawer open state
     const handleToggleDrawer = (value) => { setOpenDrawer(value) };
     const toggleSearch = () => { setToggle(prev => !prev) };
+
+    //Toggle color mode
+    const toggleMode = () => {
+        if (!mode) {
+            return;
+        } else if (mode === 'system') {
+            setMode('light');
+        } else if (mode === 'light') {
+            setMode('dark');
+        } else if (mode === 'dark') {
+            setMode('system');
+        }
+    }
 
     //Confirm search
     const handleNavigateStore = (e, value) => {
@@ -341,7 +362,7 @@ const Navbar = () => {
                                         <Suspense fallback={<></>}>
                                             <NavDrawer {...{
                                                 openDrawer, username, roles, location,
-                                                products: cartProducts, logout, theme, colorMode,
+                                                products: cartProducts, logout, mode, toggleMode,
                                                 handleOpen: () => handleToggleDrawer(true),
                                                 handleClose: () => handleToggleDrawer(false)
                                             }} />
@@ -350,7 +371,7 @@ const Navbar = () => {
                                 }
                                 <Link to={`/`}>
                                     <Logo className={isToggleSearch ? 'active' : ''}>
-                                        <LogoImage src="/full-logo.svg" className="logo" alt="RING! logo" />
+                                        <LogoImage src="/full-logo.svg" alt="RING! logo" />
                                     </Logo>
                                 </Link>
                                 <Box
@@ -445,7 +466,7 @@ const Navbar = () => {
                                                         {anchorEl !== undefined &&
                                                             <ProfilePopover {...{
                                                                 open, anchorEl, handleClose: handleProfileClose,
-                                                                roles, logout, theme, colorMode, image
+                                                                roles, logout, mode, toggleMode, image
                                                             }} />
                                                         }
                                                     </Suspense>

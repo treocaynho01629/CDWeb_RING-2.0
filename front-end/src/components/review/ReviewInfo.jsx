@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import PropTypes from 'prop-types'
 import { Button, LinearProgress, Rating, Skeleton } from '@mui/material';
 import { EditOutlined, Star, StarBorder } from '@mui/icons-material';

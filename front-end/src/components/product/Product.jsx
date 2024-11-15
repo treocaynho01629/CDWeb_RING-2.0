@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { Star as StarIcon, ShoppingCart as ShoppingCartIcon, StarBorder } from '@mui/icons-material';
 import { Divider, Skeleton, Rating } from '@mui/material'
 import { Link } from "react-router-dom"
@@ -51,10 +51,11 @@ const Container = styled.div`
     overflow: hidden;
     transition: all .25s ease;
 
+    
     &:hover {
         border-color: ${props => props.theme.palette.action.focus};
         box-shadow: ${props => props.theme.shadows[1]};
-        ${ImageContainer} { filter: saturate(120%)}
+        ${ImageContainer} { filter: saturate(120%); }
     }
 
     ${props => props.theme.breakpoints.down("sm")} {
@@ -95,7 +96,7 @@ const MainInfo = styled.div`
     justify-content: space-between;
 `
 
-const Title = styled.h5`
+const Title = styled('h5')`
     width: 100%;
     line-height: 1.5;
     font-size: 14px;
@@ -225,7 +226,7 @@ const Product = ({ book, scrollPosition }) => {
                                     src={`${book?.image}?size=small`}
                                     alt={`${book?.title} Thumbnail`}
                                     scrollPosition={scrollPosition}
-                                    placeholder={<StyledSkeleton variant="rectangular" animation={false}/>}
+                                    placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
                                 />
                             </ImageContainer>
                             <Info>

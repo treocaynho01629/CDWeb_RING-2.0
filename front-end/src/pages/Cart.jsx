@@ -1,13 +1,13 @@
-import styled from 'styled-components'
 import { Suspense, lazy } from 'react';
 import { NavLink } from 'react-router-dom';
 import { ChevronLeft } from '@mui/icons-material';
 import { ReactComponent as EmptyIcon } from '../assets/empty.svg';
-import Button from '@mui/material/Button';
+import { Button } from '@mui/material';
+import CustomPlaceholder from '../components/custom/CustomPlaceholder';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
+import styled from '@emotion/styled';
 import useCart from '../hooks/useCart';
 import useTitle from '../hooks/useTitle';
-import CustomPlaceholder from '../components/custom/CustomPlaceholder';
 
 const CartContent = lazy(() => import("../components/cart/CartContent"));
 

@@ -14,7 +14,6 @@
     "@mui/icons-material": "^6.0.1",
     "@mui/lab": "^6.0.0-beta.8",
     "@mui/material": "^6.0.1",
-    "@mui/styled-engine-sc": "^6.0.1",
     "@mui/x-date-pickers": "^7.15.0",
     "@reduxjs/toolkit": "^2.2.6",
     "dayjs": "^1.11.11",
@@ -36,8 +35,7 @@
     "react-router-dom": "^6.24.1",
     "recharts": "^2.12.7",
     "redux-persist": "^6.0.0",
-    "sort-by": "^1.2.0",
-    "styled-components": "^6.1.12"
+    "sort-by": "^1.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

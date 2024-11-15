@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from '@emotion/styled'
 import { Box, Button, Skeleton, Typography } from '@mui/material';
 import { DeliveryDiningOutlined, KeyboardArrowRight, Storefront } from '@mui/icons-material';
 import { LazyLoadImage } from "react-lazy-load-image-component";

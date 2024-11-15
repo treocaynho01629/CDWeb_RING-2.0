@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from '@emotion/styled'
 import { Grid2 as Grid } from "@mui/material";
 import { Link } from "react-router-dom"
 import { suggest } from '../../ultils/suggest';
@@ -18,7 +18,7 @@ const ItemContainer = styled.div`
         border-radius: 5px;
         font-size: 2.6rem;
         color: ${props => props.theme.palette.common.white};
-        background-color: ${props => props.$color};
+        background-color: ${props => props.color};
     }
 
     &:hover {
@@ -65,7 +65,7 @@ const Suggest = () => {
                 <Grid key={`suggest-${index}`} size={{ xs: 2.4, md: 1.2 }} display="flex" justifyContent="center">
                     <ItemWrapper key={`suggest-tab-${index}`}>
                         <Link to={tab.url} title={tab.label}>
-                            <ItemContainer $color={tab.color}>
+                            <ItemContainer color={tab.color}>
                                 {tab.icon}
                                 <ItemName>{tab.label}</ItemName>
                             </ItemContainer>

@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from '@emotion/styled'
 import { useEffect, useState, lazy, Suspense } from "react";
 import { Button, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton, TextField, DialogContent } from "@mui/material";
 import { Check, KeyboardArrowLeft, KeyboardArrowRight, Person } from "@mui/icons-material";

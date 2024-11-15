@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { lazy, Suspense, useState } from 'react'
 import { KeyboardArrowRight, LabelOff} from '@mui/icons-material'
 import { MobileExtendButton } from '../custom/GlobalComponents'

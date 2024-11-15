@@ -1,6 +1,6 @@
 import { Add, Remove } from '@mui/icons-material';
+import styled from "@emotion/styled";
 import InputBase from '@mui/material/InputBase';
-import styled from 'styled-components'
 
 const InputContainer = styled.div`
     display: flex;
@@ -32,8 +32,8 @@ const StyledButton = styled.span`
     align-items: center;
     justify-content: center;
     padding: 0 5px;
-    color: ${props => props.$disabled ? props.theme.palette.text.disabled : props.theme.palette.text.secondary};
-    pointer-events: ${props => props.$disabled ? 'none' : 'all'};
+    color: ${props => props.disabled ? props.theme.palette.text.disabled : props.theme.palette.text.secondary};
+    pointer-events: ${props => props.disabled ? 'none' : 'all'};
 
     &:hover {
         color: ${props => props.theme.palette.text.primary};
@@ -52,7 +52,7 @@ export default function CustomAmountInput(props) {
             <StyledButton
                 aria-label="decrease amount"
                 onClick={handleDecrease}
-                $disabled={disabled}
+                disabled={disabled}
             >
                 <Remove fontSize="small" />
             </StyledButton>

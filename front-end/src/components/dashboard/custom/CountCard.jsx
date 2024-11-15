@@ -1,5 +1,5 @@
 import { Paper } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled } from '@mui/material';
 
 //#region preStyled
 const CountContainer = styled(Paper)(({ theme }) => ({
@@ -9,7 +9,7 @@ const CountContainer = styled(Paper)(({ theme }) => ({
     padding: '20px 15px'
 }));
 
-const CountInfo = styled('div')`
+const CountInfo = styled.div`
     text-align: right;
     white-space: nowrap;
 `

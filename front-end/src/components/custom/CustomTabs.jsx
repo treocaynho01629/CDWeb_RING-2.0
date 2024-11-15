@@ -1,4 +1,4 @@
-import { styled } from '@mui/material/styles';
+import { styled } from '@mui/material';
 import { Tab, Tabs } from '@mui/material';
 
 const StyledTab = styled((props) => <Tab {...props} />)(

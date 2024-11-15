@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { KeyboardArrowRight } from '@mui/icons-material';
 import { Box, Button, IconButton } from '@mui/material'
 

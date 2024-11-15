@@ -1,5 +1,5 @@
 import Slider from '@mui/material/Slider';
-import { styled } from '@mui/material/styles';
+import { styled } from '@mui/material';
 
 const StyledSlider = styled(Slider)(({ theme }) => ({
     color: theme.palette.primary.main,
