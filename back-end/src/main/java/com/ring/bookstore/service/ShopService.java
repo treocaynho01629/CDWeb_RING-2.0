@@ -16,7 +16,11 @@ public interface ShopService {
 
     Page<ShopDTO> getShops(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword, Long ownerId);
 
-    ShopDTO getShopById(Long id);
+    ShopDTO getShopById(Long id, Account user);
+
+    void follow(Long id, Account user);
+
+    void unfollow(Long id, Account user);
 
     Shop addShop(ShopRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException;
 

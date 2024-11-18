@@ -5,12 +5,12 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,14 +19,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -76,14 +71,15 @@ public class Account extends Auditable implements UserDetails {
     		orphanRemoval = true, 
     		mappedBy = "user")
 	@JsonManagedReference
-    private AccountProfile profile;
+    @EqualsAndHashCode.Exclude
+	private AccountProfile profile;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(	name = "user_roles",
+    @JoinTable(	name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonIgnore
-    private Set<Role> roles;
+    private Collection<Role> roles;
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.LAZY)
 	@JsonIgnore
@@ -96,6 +92,11 @@ public class Account extends Auditable implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<OrderReceipt> userOrderReceipts;
+
+	@ManyToMany(mappedBy = "followers")
+	@JsonIgnore
+	@EqualsAndHashCode.Exclude
+	private Set<Shop> following = new HashSet<>();
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -135,7 +136,7 @@ public class Account extends Auditable implements UserDetails {
 	@Override
 	@JsonIgnore
 	public boolean isEnabled() {
-		return true;
+		return this.isActive();
 	}
 	
 	public void removeAllOrders() {
@@ -151,4 +152,12 @@ public class Account extends Auditable implements UserDetails {
 	public void removeAllRoles() {
         this.roles.clear();
     }
+
+	public void followShop(Shop shop) {
+		this.following.add(shop);
+	}
+
+	public void unfollowShop(Shop shop) {
+		this.following.remove(shop);
+	}
 }

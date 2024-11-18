@@ -37,14 +37,16 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	List<Long> findInverseIds(String keyword, Long ownerId, List<Long> ids);
 
 	@Query("""
-	select s.owner.username as ownerUsername, s.owner.id as ownerId, s.id as id, s.name as name, s.description as description,
-	 i.name as image, s.createdDate as joinedDate, count(r.id) as totalReviews, 
-	 count(b.id) as totalProducts, size(s.followers) as totalFollowers 
+	select s.owner.username as ownerUsername, s.owner.id as ownerId,  s.id as id, 
+		s.name as name, s.description as description, i.name as image, s.createdDate as joinedDate, 
+		count(r.id) as totalReviews, count(b.id) as totalProducts, size(s.followers) as totalFollowers,
+		case when f.id is null then false else true end as followed
 	from Shop s left join Image i on i.id = s.image.id
+	left join s.followers f on f.id = :userId
 	left join Book b on s.id = b.shop.id
 	left join Review r on b.id = r.book.id
 	where s.id = :id
-	group by s.id, s.owner.username, s.owner.id, i.id
+	group by s.id, s.owner.username, s.owner.id, i.id, f.id
 	""")
-    Optional<IShopDetail> findShopById(Long id);
+    Optional<IShopDetail> findShopById(Long id, Long userId);
 }

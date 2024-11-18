@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Avatar, Box, Button, Grid2 as Grid, Skeleton, Stack } from "@mui/material";
-import { Add, AutoStories, LocalActivity, PersonAddAlt1, Store, Today, Verified as VerifiedIcon } from "@mui/icons-material";
-import { useGetShopQuery } from "../../../features/shops/shopsApiSlice";
+import { Add, AutoStories, Close, LocalActivity, PersonAddAlt1, Store, Today, Verified as VerifiedIcon } from "@mui/icons-material";
+import { useFollowShopMutation, useGetShopQuery, useUnfollowShopMutation } from "../../../features/shops/shopsApiSlice";
 import { Link } from "react-router-dom";
 
 //#region styled
@@ -75,8 +75,28 @@ const ShopDetail = styled.span`
 const ShopDisplay = ({ id, name }) => {
 
     //Fetch reviews
-    const { data, isLoading, isSuccess } = useGetShopQuery(id, { skip: !id })
+    const { data, isLoading, isSuccess } = useGetShopQuery(id, { skip: !id });
+    const [followShop, { isLoading: following }] = useFollowShopMutation();
+    const [unfollowShop, { isLoading: unfollowing }] = useUnfollowShopMutation();
     let loading = ((!id && !data && !isSuccess) || isLoading);
+
+    const handleClickFollow = () => {
+        if (isLoading || following || unfollowing) return;
+
+        if (data?.followed) {
+            unfollowShop(id)
+                .unwrap()
+                .catch((err) => {
+                    console.error(err);
+                })
+        } else {
+            followShop(id)
+                .unwrap()
+                .catch((err) => {
+                    console.error(err);
+                })
+        }
+    }
 
     return (
         <ShopContainer>
@@ -131,13 +151,15 @@ const ShopDisplay = ({ id, name }) => {
                                         <Verified><VerifiedIcon sx={{ fontSize: '16px', marginRight: 1 }} color="primary" />Đối tác RING!</Verified>
                                     </Box>
                                 </Link>
-                                <Button //FIX
+                                <Button
                                     variant="outlined"
                                     size="small"
                                     sx={{ height: 35, width: { xs: 'auto', md: '100%' } }}
-                                    startIcon={<Add />}
+                                    disabled={isLoading || following || unfollowing}
+                                    onClick={handleClickFollow}
+                                    startIcon={data?.followed ? <Close/> : <Add />}
                                 >
-                                    Theo dõi
+                                    {data?.followed ? 'Bỏ theo dõi' : 'Theo dõi'}
                                 </Button>
                             </Box>
                         </ShopInfo>

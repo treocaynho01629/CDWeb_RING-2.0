@@ -19,21 +19,17 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.List;
 
+import lombok.*;
 import org.hibernate.annotations.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
 @Entity
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @SQLDelete(sql = "UPDATE Book SET active = false WHERE id=?")
 @Where(clause = "active=true")
 @EqualsAndHashCode(callSuper = true)
@@ -59,6 +55,7 @@ public class Book extends Auditable {
             orphanRemoval = true)
     @JoinColumn(name = "image_id", nullable = false)
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Image image;
 
     @Column
@@ -107,6 +104,7 @@ public class Book extends Auditable {
     @OneToOne(cascade = CascadeType.ALL,
             orphanRemoval = true,
             mappedBy = "book")
+    @EqualsAndHashCode.Exclude
     private BookDetail bookDetail;
 
     @OneToMany(cascade = CascadeType.ALL,

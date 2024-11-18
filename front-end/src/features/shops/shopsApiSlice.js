@@ -63,6 +63,50 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
                 } else return [{ type: 'Shop', id: 'LIST' }]
             },
         }),
+        followShop: builder.mutation({
+            query: (id) => ({
+                url: `/api/shops/follow/${id}`,
+                method: 'PUT',
+                credentials: 'include',
+                responseHandler: (response) => response.text(),
+            }),
+            async onQueryStarted(id, { dispatch, queryFulfilled }) {
+                const patchResult = dispatch( //Update cache
+                    shopsApiSlice.util.updateQueryData('getShop', id, (draft) => {
+                        draft.followed = true;
+                        draft.totalFollowers++;
+                    })
+                )
+                try {
+                    await queryFulfilled;
+                } catch (error) { //Undo patch if request failed
+                    patchResult.undo();
+                    console.error(error);
+                }
+            }
+        }),
+        unfollowShop: builder.mutation({
+            query: (id) => ({
+                url: `/api/shops/unfollow/${id}`,
+                method: 'PUT',
+                credentials: 'include',
+                responseHandler: (response) => response.text(),
+            }),
+            async onQueryStarted(id, { dispatch, queryFulfilled }) {
+                const patchResult = dispatch( //Update cache
+                    shopsApiSlice.util.updateQueryData('getShop', id, (draft) => {
+                        draft.followed = false;
+                        draft.totalFollowers--;
+                    })
+                )
+                try {
+                    await queryFulfilled;
+                } catch (error) { //Undo patch if request failed
+                    patchResult.undo();
+                    console.error(error);
+                }
+            }
+        }),
         createShop: builder.mutation({
             query: (newShop) => ({
                 url: '/api/shops',
@@ -120,6 +164,8 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
 export const {
     useGetShopQuery,
     useGetShopsQuery,
+    useFollowShopMutation,
+    useUnfollowShopMutation,
     useCreateShopMutation,
     useUpdateShopMutation,
     useDeleteShopMutation,
