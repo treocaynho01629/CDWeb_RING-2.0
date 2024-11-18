@@ -8,6 +8,7 @@ import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.*;
+import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.repository.ShopRepository;
 import com.ring.bookstore.request.ShopRequest;
 import com.ring.bookstore.service.ImageService;
@@ -32,6 +33,7 @@ import java.util.List;
 public class ShopServiceImpl implements ShopService {
 
     private final ShopRepository shopRepo;
+    private final AccountRepository accountRepo;
     private final ShopMapper shopMapper;
     private final ImageService imageService;
 
@@ -47,12 +49,33 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
-    public ShopDTO getShopById(Long id) {
-        IShopDetail shop = shopRepo.findShopById(id).orElseThrow(() ->
+    public ShopDTO getShopById(Long id, Account user) {
+        Long userId = user != null ? user.getId() : null;
+        IShopDetail shop = shopRepo.findShopById(id, userId).orElseThrow(() ->
                 new ResourceNotFoundException("Shop not found!"));
-
         ShopDTO shopDTO = shopMapper.apply(shop); //Map to DTO
         return shopDTO;
+    }
+
+    @Override
+    public void follow(Long id, Account user) {
+        Shop shop = shopRepo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Shop not found"));
+        Account follower = accountRepo.findById(user.getId()).orElseThrow(() ->
+                new ResourceNotFoundException("User not found"));
+        System.out.println(user.equals(follower));
+        shop.addFollower(follower);
+        shopRepo.save(shop);
+    }
+
+    @Override
+    public void unfollow(Long id, Account user) {
+        Shop shop = shopRepo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Shop not found"));
+        Account follower = accountRepo.findById(user.getId()).orElseThrow(() ->
+                new ResourceNotFoundException("User not found"));
+        shop.removeFollower(follower);
+        shopRepo.save(shop);
     }
 
     //Add shop (SELLER)
@@ -77,7 +100,8 @@ public class ShopServiceImpl implements ShopService {
     @Transactional
     public Shop updateShop(Long id, ShopRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException {
         //Get original shop
-        Shop shop = shopRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
+        Shop shop = shopRepo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Shop not found"));
 
         //Check if correct seller or admin
         if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
@@ -101,7 +125,8 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public Shop deleteShop(Long id, Account user) {
-        Shop shop = shopRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
+        Shop shop = shopRepo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Shop not found"));
         //Check if correct seller or admin
         if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
 
@@ -116,7 +141,8 @@ public class ShopServiceImpl implements ShopService {
 
         //Loop and delete
         for (Long id : listDelete) {
-            Shop shop = shopRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
+            Shop shop = shopRepo.findById(id).orElseThrow(() ->
+                    new ResourceNotFoundException("Shop not found"));
             //Check if correct seller or admin
             if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
             shopRepo.deleteById(id); //Delete from database

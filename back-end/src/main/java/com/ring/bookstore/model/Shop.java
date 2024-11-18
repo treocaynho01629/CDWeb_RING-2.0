@@ -7,10 +7,13 @@ import org.hibernate.annotations.Nationalized;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -51,6 +54,7 @@ public class Shop extends Auditable {
             orphanRemoval = true)
     @JoinColumn(name = "image_id")
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Image image;
 
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
@@ -66,13 +70,13 @@ public class Shop extends Auditable {
     @JsonIgnore
     private List<Coupon> coupons;
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
-            fetch = FetchType.LAZY)
-    @JoinTable(	name = "following",
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @JoinTable(	name = "shops_followers",
             joinColumns = @JoinColumn(name = "shop_id"),
             inverseJoinColumns = @JoinColumn(name = "follower_id"))
     @JsonIgnore
-    private List<Account> followers;
+    @EqualsAndHashCode.Exclude
+    private Set<Account> followers = new HashSet<>();
 
     public Long getImageId() {
         return (this.image != null) ? this.image.getId() : null;
@@ -81,5 +85,13 @@ public class Shop extends Auditable {
     public void removeAllBooks() {
         books.forEach(book -> book.setShop(null));
         this.books.clear();
+    }
+
+    public void addFollower(Account user) {
+        this.followers.add(user);
+    }
+
+    public void removeFollower(Account user) {
+        this.followers.remove(user);
     }
 }

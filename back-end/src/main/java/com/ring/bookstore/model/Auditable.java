@@ -24,5 +24,5 @@ public abstract class Auditable {
 
     @JsonIgnore
     @Column(name = "active", columnDefinition = "boolean default true")
-    private boolean active;
+    private boolean active = true;
 }

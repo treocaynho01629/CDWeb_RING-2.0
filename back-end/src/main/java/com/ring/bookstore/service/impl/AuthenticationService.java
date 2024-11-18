@@ -252,7 +252,7 @@ public class AuthenticationService {
 	//Generate token with avatar
 	protected String generateToken(Account user) {
 		AccountProfile profile = (profile = user.getProfile()) != null ? profile : null;
-		Image image = (image = profile.getImage()) != null ? image : null;
+		Image image = profile != null && (image = profile.getImage()) != null ? image : null;
 		String fileDownloadUri = image != null ? image.getFileDownloadUri() : null;
 
 		Map<String, Object> extraClaims = new HashMap<>();

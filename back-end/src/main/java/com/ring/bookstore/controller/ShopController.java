@@ -38,8 +38,27 @@ public class ShopController {
 
     //Get shop by {id}
     @GetMapping("/{id}")
-    public ResponseEntity<?> getShopById(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(shopService.getShopById(id), HttpStatus.OK);
+    public ResponseEntity<?> getShopById(@PathVariable("id") Long id,
+                                         @CurrentAccount Account currUser) {
+        return new ResponseEntity<>(shopService.getShopById(id, currUser), HttpStatus.OK);
+    }
+
+    //Follow
+    @PutMapping("/follow/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> followShop(@PathVariable("id") Long id,
+                                        @CurrentAccount Account currUser) {
+        shopService.follow(id, currUser);
+        return new ResponseEntity<>("Theo dõi thành công", HttpStatus.CREATED);
+    }
+
+    //Unfollow
+    @PutMapping("/unfollow/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> unfollowShop(@PathVariable("id") Long id,
+                                        @CurrentAccount Account currUser) {
+        shopService.unfollow(id, currUser);
+        return new ResponseEntity<>("Bỏ theo dõi thành công", HttpStatus.CREATED);
     }
 
     //Add shop

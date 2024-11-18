@@ -11,7 +11,8 @@ import org.hibernate.annotations.Nationalized;
 
 
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

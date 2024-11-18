@@ -22,4 +22,6 @@ public interface IShopDetail {
     Integer getTotalFollowers();
 
     LocalDateTime getJoinedDate();
+
+    Boolean getFollowed();
 }

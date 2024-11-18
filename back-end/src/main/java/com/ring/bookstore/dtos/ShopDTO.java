@@ -12,6 +12,7 @@ public record ShopDTO(String ownerUsername,
                       LocalDateTime joinedDate,
                       Integer totalReviews,
                       Integer totalProducts,
-                      Integer totalFollowers) {
+                      Integer totalFollowers,
+                      Boolean followed) {
 
 }

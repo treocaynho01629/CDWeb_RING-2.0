@@ -24,11 +24,11 @@ import lombok.Setter;
 
 
 @Entity
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 @EqualsAndHashCode(callSuper = true)
 public class Review extends Auditable {
 

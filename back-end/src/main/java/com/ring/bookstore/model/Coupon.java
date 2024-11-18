@@ -11,9 +11,9 @@ import org.hibernate.annotations.Where;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @SQLDelete(sql = "UPDATE Coupon SET active = false WHERE id=?")
 @Where(clause = "active=true")
 @EqualsAndHashCode(callSuper = true)

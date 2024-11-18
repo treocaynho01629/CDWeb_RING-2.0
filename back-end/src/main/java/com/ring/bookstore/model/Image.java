@@ -7,20 +7,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.*;
 import org.hibernate.type.SqlTypes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Entity
-@Table(name = "image")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "image")
 public class Image {
     @Id
     @Column(nullable = false, updatable = false)

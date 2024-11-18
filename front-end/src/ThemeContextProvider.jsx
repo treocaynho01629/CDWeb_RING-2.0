@@ -176,7 +176,7 @@ export function ThemeContextProvider({ children }) {
 
     return (
         <StyledEngineProvider injectFirst>
-            <MUIThemeProvider theme={theme} disableTransitionOnChange>
+            <MUIThemeProvider theme={theme} disableTransitionOnChange defaultMode="light">
                 <CssBaseline />
                 {children}
             </MUIThemeProvider>

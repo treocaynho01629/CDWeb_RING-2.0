@@ -28,6 +28,7 @@ public class ShopMapper implements Function<IShopDetail, ShopDTO> {
         		, shop.getJoinedDate()
         		, shop.getTotalReviews()
                 , shop.getTotalProducts()
-        		, shop.getTotalFollowers());
+        		, shop.getTotalFollowers()
+				, shop.getFollowed());
     }
 }
