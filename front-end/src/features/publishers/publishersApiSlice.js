@@ -19,7 +19,7 @@ export const publishersApiSlice = apiSlice.injectEndpoints({
             query: (id) => ({
                 url: `/api/publishers/${id}`,
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             providesTags: (result, error, { id }) => [
@@ -40,7 +40,7 @@ export const publishersApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/publishers?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },

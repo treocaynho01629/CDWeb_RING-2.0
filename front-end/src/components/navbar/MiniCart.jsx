@@ -85,6 +85,7 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
             onClose={handleClose}
             onClick={handleClose}
             disableScrollLock
+            transitionDuration={200}
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             sx={{ pointerEvents: 'none' }}

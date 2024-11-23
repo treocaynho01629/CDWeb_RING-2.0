@@ -3,8 +3,11 @@ package com.ring.bookstore.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.*;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Nationalized;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -46,10 +49,6 @@ public class AccountProfile {
     @Column
     private LocalDate dob;
 
-    @Column(length = 500)
-    @Nationalized 
-    private String address;
-
     @OneToOne(cascade = CascadeType.ALL,
             fetch = FetchType.LAZY,
             orphanRemoval = true)
@@ -63,4 +62,17 @@ public class AccountProfile {
     @JsonBackReference
     @EqualsAndHashCode.Exclude
     private Account user;
+
+    @OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    @JsonIgnore
+    private Address address; //Main address
+
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "profile",
+            fetch = FetchType.LAZY)
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    @JsonIgnore
+    private List<Address> addresses;
 }

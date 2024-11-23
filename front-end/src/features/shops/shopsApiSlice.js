@@ -17,7 +17,7 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
             query: (id) => ({
                 url: `/api/shops/${id}`,
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             providesTags: (result, error, { id }) => [
@@ -38,7 +38,7 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/shops?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },

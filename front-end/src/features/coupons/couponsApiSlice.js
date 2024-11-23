@@ -28,7 +28,7 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/coupons/${code}?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },
@@ -56,7 +56,7 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/coupons?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },
@@ -127,12 +127,12 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/coupons/recommend?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },
             transformResponse: responseData => {
-                return couponsAdapter.setAll(initialState, responseData)
+                return couponsAdapter.setAll(initialState, responseData ?? {})
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {

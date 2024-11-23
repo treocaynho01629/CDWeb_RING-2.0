@@ -442,7 +442,7 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
           colSpan={colSpan()}
           sx={{ height: '40dvh' }}
         >
-          <Box>{error?.error}</Box>
+          <Box>{error?.error || 'Đã xảy ra lỗi'}</Box>
         </TableCell>
       </TableRow>
     )

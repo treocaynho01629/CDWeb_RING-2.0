@@ -2,6 +2,7 @@ import styled from "@emotion/styled"
 
 export const Instruction = styled.p`
     font-size: 14px;
+    margin-top: 0;
     font-style: italic;
     color: ${props => props.theme.palette.error.main};
     display: ${props => props.display};

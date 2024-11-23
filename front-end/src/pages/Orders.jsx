@@ -30,7 +30,6 @@ const Orders = () => {
                     <OrdersList />
                 </TabContentContainer>
             }
-
         </div >
     )
 }

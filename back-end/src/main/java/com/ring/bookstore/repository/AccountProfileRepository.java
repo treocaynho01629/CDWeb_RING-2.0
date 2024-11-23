@@ -7,5 +7,5 @@ import com.ring.bookstore.model.AccountProfile;
 
 @Repository
 public interface AccountProfileRepository extends JpaRepository<AccountProfile, Long>{
-	
+
 }

@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProfileRequest { //Request body for changing profile
+public class ProfileRequest { //Request body for profile
 
 	@Size(max = 150, message = "Tên không quá 150 kí tự")
 	private String name;
@@ -28,7 +28,6 @@ public class ProfileRequest { //Request body for changing profile
 	private LocalDate dob;
 	
 	private String gender;
-	
-	@Size(max = 500, message = "Địa chỉ không quá 500 kí tự")
-	private String address;
+
+	private String image;
 }

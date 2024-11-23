@@ -20,7 +20,7 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
             query: ({ id, slug, include }) => ({
                 url: `/api/categories/${slug ? 'slug/' + slug : id ? id : ''}${include ? `?include=${include}` : ''}`,
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             providesTags: (result, error) => [{ type: 'Category', id: result.id }]
@@ -29,11 +29,11 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
             query: () => ({
                 url: '/api/categories/preview',
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             transformResponse: responseData => {
-                return catesAdapter.setAll(initialState, responseData)
+                return catesAdapter.setAll(initialState, responseData ?? {})
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
@@ -60,7 +60,7 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/categories?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },

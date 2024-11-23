@@ -20,7 +20,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
             query: ({ id, slug }) => ({
                 url: `/api/books/${slug ? 'slug/' + slug : id ? id : ''}`,
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             providesTags: (result, error) => [{ type: 'Book', id: result ? result.id : 'LIST' }]
@@ -51,7 +51,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/books?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },
@@ -120,12 +120,12 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/books/find?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },
             transformResponse: responseData => {
-                return booksAdapter.setAll(initialState, responseData)
+                return booksAdapter.setAll(initialState, responseData ?? {})
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
@@ -143,12 +143,12 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/books/random${amount ? '?amount=' + amount : ''}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },
             transformResponse: responseData => {
-                return booksAdapter.setAll(initialState, responseData)
+                return booksAdapter.setAll(initialState, responseData ?? {})
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {

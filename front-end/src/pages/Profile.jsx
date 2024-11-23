@@ -20,7 +20,7 @@ const PlaceholderContainer = styled.div`
 `
 //#endregion
 
-const tempLoad = ( //FIX temp
+const tempLoad = (
     <>
         <StyledDialogTitle><Skeleton variant="text" sx={{ fontSize: '19px' }} width="50%" /></StyledDialogTitle>
         <PlaceholderContainer><CustomPlaceholder /></PlaceholderContainer>

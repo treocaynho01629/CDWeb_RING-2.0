@@ -2,7 +2,6 @@ import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
 
 const usersAdapter = createEntityAdapter({});
-
 const initialState = usersAdapter.getInitialState({
     info: {
         currPage: 0,
@@ -18,7 +17,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
             query: () => ({
                 url: `/api/accounts/profile`,
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             providesTags: ['Profile'],
@@ -27,7 +26,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
             query: (id) => ({
                 url: `/api/accounts/${id}`,
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             providesTags: (result, error, id) => [{ type: 'User', id }]
@@ -49,7 +48,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/accounts?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },
@@ -78,7 +77,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
             query: () => ({
                 url: '/api/accounts/top-accounts',
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             providesTags: ['Chart'],
@@ -87,7 +86,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
             query: () => ({
                 url: '/api/accounts/top-sellers',
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             providesTags: ['Chart'],
@@ -108,7 +107,8 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 url: '/api/accounts/profile',
                 method: 'PUT',
                 credentials: 'include',
-                body: { ...updatedProfile },
+                body: updatedProfile,
+                formData: true
             }),
             invalidatesTags: ['Profile'],
         }),

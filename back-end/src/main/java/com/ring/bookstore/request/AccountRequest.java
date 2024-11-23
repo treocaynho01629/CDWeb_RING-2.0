@@ -33,15 +33,15 @@ public class AccountRequest { //Request body for account
 	@Email(message = "Sai định dạng email!")
 	private String email;
 	
-	@NotNull(message = "Quyền từ 1 - 3!")
+	@NotNull(message = "Quyền người dùng từ 1-3!")
 	@Min(value = 1)
 	@Max(value = 3)
 	private Integer roles;
 	
-	@Size(max = 250, message = "Tên không quá 500 kí tự")
+	@Size(max = 250, message = "Tên không quá 250 kí tự")
 	private String name;
 	
-	@Size(max = 15, message = "Số điện thoại từ 8-15 kí tự")
+	@Size(max = 15, message = "Số điện thoại không quấ 15 kí tự")
 	private String phone;
 	
 	@Past(message = "Ngày sinh phải trước hôm nay!")
@@ -49,9 +49,6 @@ public class AccountRequest { //Request body for account
 	private LocalDate dob;
 	
 	private String gender;
-	
-	@Size(max = 500, message = "Địa chỉ phải từ 10-500 kí tự")
-	private String address;
 	
 	private boolean keepOldPass;
 }

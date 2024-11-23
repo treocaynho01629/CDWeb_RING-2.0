@@ -40,8 +40,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 							  Boolean byShop, Boolean showExpired, List<Long> ids);
 
 	@Query("""
-		select c 
-		from Coupon c
+		select c from Coupon c
 		join (
 			select c2.id as id, c2.shop.id as shopId, 
 			row_number() over (partition by c2.shop.id order by c2.shop.id) as rn

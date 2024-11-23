@@ -8,9 +8,11 @@ import com.ring.bookstore.dtos.mappers.ChartDataMapper;
 import com.ring.bookstore.dtos.mappers.ProfileMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
+import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.AccountProfile;
+import com.ring.bookstore.model.Image;
 import com.ring.bookstore.model.Role;
 import com.ring.bookstore.repository.AccountProfileRepository;
 import com.ring.bookstore.repository.AccountRepository;
@@ -19,6 +21,7 @@ import com.ring.bookstore.request.ChangePassRequest;
 import com.ring.bookstore.request.ProfileRequest;
 import com.ring.bookstore.service.AccountService;
 import com.ring.bookstore.service.EmailService;
+import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.service.RoleService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +32,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,6 +47,7 @@ public class AccountServiceImpl implements AccountService {
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
     private final EmailService emailService;
+    private final ImageService imageService;
     private final ProfileMapper profileMapper;
     private final AccountDetailMapper detailMapper;
     private final ChartDataMapper chartMapper;
@@ -65,6 +71,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     //Create account (ADMIN)
+    @Transactional
     public Account saveAccount(AccountRequest request) {
 
         //Check if Account with these username and email has exists >> throw exception
@@ -96,7 +103,6 @@ public class AccountServiceImpl implements AccountService {
         var profile = AccountProfile.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
-                .address(request.getAddress())
                 .dob(request.getDob())
                 .gender(request.getGender())
                 .user(savedAccount)
@@ -107,6 +113,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     //Update account (ADMIN)
+    @Transactional
     public Account updateAccount(AccountRequest request, Long id) {
         //Check Account exists?
         Account currUser = accountRepo.findById(id)
@@ -148,7 +155,6 @@ public class AccountServiceImpl implements AccountService {
         //Set new profile info
         profile.setName(request.getName());
         profile.setPhone(request.getPhone());
-        profile.setAddress(request.getAddress());
         profile.setDob(request.getDob());
         profile.setGender(request.getGender());
 
@@ -194,12 +200,14 @@ public class AccountServiceImpl implements AccountService {
 
     //Get account's profile
     public ProfileDTO getProfile(Account user) {
-        return profileMapper.apply(user);
+        Account currUser = accountRepo.findById(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+        return profileMapper.apply(currUser);
     }
 
     //Update account's profile
-    @Override
-    public AccountProfile updateProfile(ProfileRequest request, Account user) {
+    @Transactional
+    public AccountProfile updateProfile(ProfileRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException {
         AccountProfile profile = user.getProfile();
 
         //Create one if not exists
@@ -208,10 +216,19 @@ public class AccountServiceImpl implements AccountService {
             profile.setUser(user);
         }
 
+        //Image upload/replace
+        if (file != null) { //Contain new image >> upload/replace
+            if (profile.getImage() != null) imageService.deleteImage(profile.getImage().getId()); //Delete old image
+            Image savedImage = imageService.upload(file); //Upload new image
+            profile.setImage(savedImage); //Set new image
+        } else if (request.getImage() == null) { //Remove image
+            if (profile.getImage() != null) imageService.deleteImage(profile.getImage().getId()); //Delete old image
+            profile.setImage(null);
+        }
+
         //Set info
         profile.setName(request.getName());
         profile.setPhone(request.getPhone());
-        profile.setAddress(request.getAddress());
         profile.setDob(request.getDob());
         profile.setGender(request.getGender());
 

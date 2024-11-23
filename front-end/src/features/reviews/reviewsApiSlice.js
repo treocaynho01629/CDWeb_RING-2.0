@@ -3,6 +3,7 @@ import { apiSlice } from "../../app/api/apiSlice";
 import { isEqual } from 'lodash-es';
 
 const reviewsAdapter = createEntityAdapter({});
+const reviewsSelector = reviewsAdapter.getSelectors();
 const initialState = reviewsAdapter.getInitialState({
     info: {
         currPage: 0,
@@ -31,7 +32,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/reviews?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },
@@ -60,7 +61,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
             query: (id) => ({
                 url: `/api/reviews/book/${id}`,
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             providesTags: (result, error) => [{ type: 'Review', id: result ? result.id : 'LIST' }]
@@ -80,7 +81,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/reviews/books/${id}?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },
@@ -120,7 +121,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/reviews/user?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },

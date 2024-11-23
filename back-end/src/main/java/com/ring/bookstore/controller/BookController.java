@@ -102,7 +102,6 @@ public class BookController {
                                         @Valid @RequestPart("request") BookRequest request,
                                         @RequestPart(name = "image", required = false) MultipartFile file,
                                         @CurrentAccount Account currUser) throws ImageResizerException, IOException {
-
         return new ResponseEntity<>(bookService.updateBook(id, request, file, currUser), HttpStatus.CREATED);
     }
 

@@ -22,7 +22,7 @@ export const bannersApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/banners?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },

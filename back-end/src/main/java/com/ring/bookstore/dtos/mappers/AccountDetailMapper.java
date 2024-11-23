@@ -3,6 +3,7 @@ package com.ring.bookstore.dtos.mappers;
 import java.time.LocalDate;
 import java.util.function.Function;
 
+import com.ring.bookstore.model.Address;
 import com.ring.bookstore.model.Image;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +21,10 @@ public class AccountDetailMapper implements Function<Account, AccountDetailDTO> 
         String name = "";
         String phone = "";
         String gender = "";
-        String address = "";
         LocalDate dob = LocalDate.of(2000, 1, 1);
 
         AccountProfile profile = (profile = user.getProfile()) != null ? profile : null;
+        Address address = profile != null ? profile.getAddress() : null;
         Image image = profile != null ? profile.getImage() : null;
         String fileDownloadUri = image != null ? image.getFileDownloadUri() : null;
 
@@ -31,7 +32,6 @@ public class AccountDetailMapper implements Function<Account, AccountDetailDTO> 
             name = (name = profile.getName()) != null ? name : "";
             phone = (phone = profile.getPhone()) != null ? phone : "";
             gender = (gender = profile.getGender()) != null ? gender : "";
-            address = (address = profile.getAddress()) != null ? address : "";
             dob = (dob = profile.getDob()) != null ? dob : LocalDate.of(2000, 1, 1);
         }
 
