@@ -105,7 +105,6 @@ const Role = styled.span`
 `
 
 const EditButton = styled.span`
-    display: flex;
     max-width: 100px;
     align-items: center;
     font-weight: 500;
@@ -241,7 +240,7 @@ const NavItem = styled.div`
 `
 //#endregion
 
-const ProfileTabsList = ({ profile, loading, error, tabletMode }) => {
+const ProfileTabsList = ({ profile, tabletMode }) => {
     const { username, image, roles } = useAuth();
     const [open, setOpen] = useState(true);
     const role = roles?.length;
@@ -265,7 +264,7 @@ const ProfileTabsList = ({ profile, loading, error, tabletMode }) => {
                         </Badge>
                         <InfoContainer>
                             <UserContainer>
-                                <Username>{username}<Name>{profile?.name}</Name></Username>
+                                <Username>{username}<Name>{profile?.name || 'Sửa hồ sơ'}</Name></Username>
                                 <Role className={role == 3 ? 'admin' : role == 2 ? 'seller' : ''}>
                                     {role == 3 ? 'Admin' : role == 2 ? 'Đối tác' : 'Thành viên'}
                                 </Role>
@@ -279,10 +278,7 @@ const ProfileTabsList = ({ profile, loading, error, tabletMode }) => {
                             <PersonAddAlt1 color="warning" />Theo dõi:<b>99</b>
                         </Additional>
                         <Additional>
-                            <PersonAddAlt1 color="warning" />Theo dõi:<b>99</b>
-                        </Additional>
-                        <Additional>
-                            <PersonAddAlt1 color="warning" />Theo dõi:<b>99</b>
+                            <PersonAddAlt1 color="warning" />Đánh giá:<b>99</b>
                         </Additional>
                     </AdditionalInfo>
                 }

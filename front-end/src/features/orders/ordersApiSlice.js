@@ -20,7 +20,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             query: (id) => ({
                 url: `/api/orders/receipts/${id}`,
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             providesTags: (result, error, id) => [{ type: 'Receipt', id }]
@@ -39,7 +39,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/orders/receipts?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },
@@ -78,7 +78,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/orders/user?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },
@@ -152,7 +152,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                 return {
                     url: `/api/orders/book/${id}?${params.toString()}`,
                     validateStatus: (response, result) => {
-                        return response.status === 200 && !result.isError
+                        return response.status === 200 && !result?.isError
                     },
                 }
             },
@@ -181,7 +181,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             query: () => ({
                 url: `/api/orders/sale`,
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             providesTags: ['Chart'],

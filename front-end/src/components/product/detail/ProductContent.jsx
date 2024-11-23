@@ -4,10 +4,10 @@ import { Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-mater
 import { Skeleton, Rating, Box, Grid2 as Grid, alpha, Divider, Stack } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { numFormatter } from '../../../ultils/covert';
-import { useGetProfileQuery } from '../../../features/users/usersApiSlice';
 import { lazy, Suspense, useState } from 'react';
 import ProductImages from './ProductImages';
 import ProductAction from './ProductAction';
+import { useGetMyAddressQuery } from '../../../features/addresses/addressesApiSlice';
 
 const CouponPreview = lazy(() => import('../../coupon/CouponPreview'));
 const AddressPreview = lazy(() => import('../../address/AddressPreview'));
@@ -222,12 +222,13 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
     const [addressInfo, setAddressInfo] = useState({
         name: '',
         phone: '',
+        city: '',
         address: ''
     })
     const [openDialog, setOpenDialog] = useState(false);
 
     //Fetch address
-    const { data: profile, isLoading: loadProfile, isSuccess: profileDone } = useGetProfileQuery();
+    const { data: address, isLoading: loadAddress } = useGetMyAddressQuery();
 
     const handleViewReview = (value) => { if (handleToggleReview) handleToggleReview(value) };
     const handleOpenDialog = () => { setOpenDialog(true) }
@@ -358,8 +359,8 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                             <Suspense fallback={addressPlaceholder}>
                                 {book &&
                                     <>
-                                        <AddressPreview {...{ addressInfo, handleOpen: handleOpenDialog, loadProfile }} />
-                                        <AddressSelectDialog {...{ profile, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }} />
+                                        <AddressPreview {...{ addressInfo, handleOpen: handleOpenDialog, loadProfile: loadAddress }} />
+                                        <AddressSelectDialog {...{ profile: address, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }} />
                                     </>
                                 }
                             </Suspense>

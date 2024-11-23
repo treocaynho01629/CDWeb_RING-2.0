@@ -1,13 +1,14 @@
 import styled from '@emotion/styled'
-import { useEffect, useState, lazy, Suspense } from "react";
-import { Button, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton, TextField, DialogContent } from "@mui/material";
-import { Check, KeyboardArrowLeft, KeyboardArrowRight, Person } from "@mui/icons-material";
+import { useEffect, useState, lazy, Suspense, useRef } from "react";
+import { Button, FormControlLabel, Radio, RadioGroup, MenuItem, Skeleton, TextField, DialogContent, Avatar, Badge } from "@mui/material";
+import { Check, Clear, EditOutlined, KeyboardArrowLeft, KeyboardArrowRight, Person } from "@mui/icons-material";
 import { PHONE_REGEX } from "../../ultils/regex";
 import { useUpdateProfileMutation } from "../../features/users/usersApiSlice";
 import { Instruction, MobileExtendButton } from '../custom/GlobalComponents';
 import { Link } from "react-router-dom";
 import { StyledDialogTitle } from "../custom/ProfileComponents";
 import dayjs from 'dayjs';
+import useAuth from '../../hooks/useAuth';
 
 const CustomDatePicker = lazy(() => import('../custom/CustomDatePicker'));
 
@@ -41,8 +42,20 @@ const InfoRow = styled.tr`
     }
 `
 
+const ProfilePic = styled.th`
+    text-align: center;
+    padding-left: 10px;
+`
+
+const ProfilePicContainer = styled.div`
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`
+
 const InfoTitle = styled.td`
-    width: 35%;  
+    width: 27%;  
 `
 
 const InfoStack = styled.td`
@@ -54,16 +67,53 @@ const InfoStackContainer = styled.div`
     height: 52px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
 
     ${props => props.theme.breakpoints.down("sm")} {
         height: 48px;
-        justify-content: space-between;
+    }
+`
+
+const BadgeButton = styled.span`
+    display: flex;
+    max-width: 100px;
+    align-items: center;
+    font-weight: 500;
+    padding: 4px;
+    border-radius: 50%;
+    aspect-ratio: 1/1;
+    font-size: 13px;
+    justify-content: flex-end;
+    color: ${props => props.theme.palette.common.black};
+    background-color: ${props => props.theme.palette.grey[300]};
+    border: 2px solid ${props => props.theme.palette.background.default};
+    cursor: pointer;
+
+    svg {
+        font-size: 16px; 
+        margin-right: 0; 
+    }
+
+    &.edit {
+        &:hover {
+            color: ${props => props.theme.palette.primary.main};
+        }
+    }
+
+    &:hover {
+        color: ${props => props.theme.palette.error.main};
+        background-color: ${props => props.theme.palette.grey[200]};
+        transition: .25s ease;
     }
 `
 //#endregion
 
+const allowedExtensions = ['jpeg', 'jpg', 'png', 'gif', 'svg'], sizeLimit = 2_097_152; //2MB
+
 const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, tabletMode }) => {
     //Initial value
+    const { username } = useAuth();
+    const inputFile = useRef(null);
     const [errMsg, setErrMsg] = useState('');
     const [err, setErr] = useState([]);
     const [name, setName] = useState(profile?.name || '');
@@ -73,6 +123,8 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
     const [validPhone, setValidPhone] = useState(false);
     const [editPhone, setEditPhone] = useState(false);
     const [editDob, setEditDob] = useState(false);
+    const [pic, setPic] = useState(profile?.image || null);
+    const [file, setFile] = useState(null);
 
     //Update profile hook
     const [updateProfile, { isLoading: updating }] = useUpdateProfileMutation();
@@ -84,6 +136,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
             setPhone(profile?.phone);
             setGender(profile?.gender);
             setDob(dayjs(profile?.dob));
+            setPic(profile?.image);
         }
     }, [profile])
 
@@ -91,6 +144,43 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
         const result = PHONE_REGEX.test(phone);
         setValidPhone(result);
     }, [phone])
+
+    const handleChangePic = (e) => {
+        const { name: fileName, size: fileSize } = e.target.files[0];
+        const fileExtension = fileName.split(".").pop();
+        setErrMsg('');
+        setErr([]);
+
+        if (!allowedExtensions.includes(fileExtension)) {
+            setErrMsg(`${fileName} sai định dạng ảnh!`);
+        } else if (fileSize > sizeLimit) {
+            setErrMsg(`${fileName} kích thước quá lớn!`);
+        } else {
+            setPic(URL.createObjectURL(e.target.files[0]));
+            setFile(e.target.files[0]);
+        }
+    }
+
+    const handleRemovePic = () => {
+        setFile(null);
+        if (pic == profile?.image) {
+            setPic(null);
+        } else {
+            setPic(profile?.image);
+        }
+        setErrMsg('');
+        setErr([]);
+    }
+
+    const handleClickBadge = () => {
+        if (!profile?.image && !pic) {
+            handleOpenFile();
+        } else {
+            handleRemovePic();
+        }
+    }
+
+    const handleOpenFile = () => { inputFile.current.click(); }
 
     const handleChangeInfo = async (e) => {
         e.preventDefault();
@@ -103,17 +193,26 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
         setPending(true);
         const { enqueueSnackbar } = await import('notistack');
 
-        updateProfile({
+        //Set data
+        const formData = new FormData();
+        const json = JSON.stringify({
             name,
             phone,
             gender,
             dob: dob.format('YYYY-MM-DD'),
-            address: profile?.address
-        }).unwrap()
+            address: profile?.address,
+            image: file ? null : pic
+        });
+        const blob = new Blob([json], { type: 'application/json' });
+
+        formData.append('request', blob);
+        if (file) formData.append('image', file);
+
+        updateProfile(formData).unwrap()
             .then((data) => {
                 setErrMsg('');
                 setErr([]);
-                enqueueSnackbar('Sửa thông tin thành công!', { variant: 'success' });
+                enqueueSnackbar('Cập nhật hồ sơ thành công!', { variant: 'success' });
                 setPending(false);
             })
             .catch((err) => {
@@ -126,11 +225,12 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                 } else {
                     setErrMsg('Cập nhật hồ sơ thất bại');
                 }
+                enqueueSnackbar('Cập nhật hồ sơ thất bại!', { variant: 'error' });
                 setPending(false);
             })
     }
 
-    return ( //FIX profile pic
+    return (
         <>
             <StyledDialogTitle>
                 <Link to={'/profile/detail'}><KeyboardArrowLeft /></Link>
@@ -140,6 +240,33 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                 <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
                 <TableContainer>
                     <tbody>
+                        {tabletMode &&
+                            <InfoRow>
+                                <ProfilePic colSpan={3}>
+                                    <ProfilePicContainer>
+                                        <Badge
+                                            overlap="circular"
+                                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                            badgeContent={
+                                                <BadgeButton
+                                                    className={(!profile?.image && !pic) ? 'edit' : ''}
+                                                    onClick={handleClickBadge}
+                                                >
+                                                    {(!profile?.image && !pic) ? <EditOutlined /> : <Clear />}
+                                                </BadgeButton>
+                                            }
+                                        >
+                                            <Avatar
+                                                alt={name ?? 'Profile pic'}
+                                                src={pic}
+                                                sx={{ my: 2, width: 120, height: 120, cursor: 'pointer' }}
+                                                onClick={handleOpenFile}
+                                            />
+                                        </Badge>
+                                    </ProfilePicContainer>
+                                </ProfilePic>
+                            </InfoRow>
+                        }
                         <InfoRow>
                             <InfoTitle><InfoText>Tên đăng nhập </InfoText></InfoTitle>
                             <InfoStack><InfoStackContainer>
@@ -147,9 +274,34 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                                     ?
                                     <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
                                     :
-                                    <InfoText>{profile?.username}</InfoText>
+                                    <InfoText>{username}</InfoText>
                                 }
                             </InfoStackContainer></InfoStack>
+                            {!tabletMode &&
+                                <ProfilePic rowSpan={3}>
+                                    <ProfilePicContainer>
+                                        <Badge
+                                            overlap="circular"
+                                            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                                            badgeContent={
+                                                <BadgeButton
+                                                    className={(!profile?.image && !pic) ? 'edit' : ''}
+                                                    onClick={handleClickBadge}
+                                                >
+                                                    {(!profile?.image && !pic) ? <EditOutlined /> : <Clear />}
+                                                </BadgeButton>
+                                            }
+                                        >
+                                            <Avatar
+                                                alt={name ?? 'Profile pic'}
+                                                src={pic}
+                                                sx={{ width: 120, height: 120, cursor: 'pointer' }}
+                                                onClick={handleOpenFile}
+                                            />
+                                        </Badge>
+                                    </ProfilePicContainer>
+                                </ProfilePic>
+                            }
                         </InfoRow>
                         <InfoRow>
                             <InfoTitle><InfoText>Email </InfoText></InfoTitle>
@@ -174,6 +326,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                                         :
                                         <TextField
                                             required
+                                            placeholder="Nhập Họ và Tên"
                                             type="text"
                                             id="name"
                                             onChange={e => setName(e.target.value)}
@@ -189,7 +342,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                         </InfoRow>
                         <InfoRow>
                             <InfoTitle><InfoText>Số điện thoại </InfoText></InfoTitle>
-                            <InfoStack>
+                            <InfoStack colSpan={2}>
                                 <InfoStackContainer>
                                     {editPhone
                                         ?
@@ -209,7 +362,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                                                 ?
                                                 <Skeleton variant="text" sx={{ fontSize: '16px' }} width="25%" />
                                                 :
-                                                <InfoText>{phone.replace(/\d(?=\d{2})/g, '*')}</InfoText>
+                                                <InfoText>{phone ? phone.replace(/\d(?=\d{2})/g, '*') : 'Chưa có'}</InfoText>
                                             }
                                             <InfoText className={`edit ${loading ? 'disabled' : ''}`} onClick={() => setEditPhone(true)}>Thay đổi</InfoText>
                                         </>
@@ -219,7 +372,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                         </InfoRow>
                         <InfoRow>
                             <InfoTitle><InfoText>Ngày sinh </InfoText></InfoTitle>
-                            <InfoStack>
+                            <InfoStack colSpan={2}>
                                 <InfoStackContainer>
                                     {editDob ?
                                         <Suspense fallback={<>
@@ -255,7 +408,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                         </InfoRow>
                         <InfoRow>
                             <InfoTitle><InfoText>Giới tính </InfoText></InfoTitle>
-                            <InfoStack>
+                            <InfoStack colSpan={2}>
                                 <InfoStackContainer>
                                     {tabletMode ?
                                         loading ? <Skeleton variant="rectangular" height={40} width="100%" />
@@ -337,6 +490,14 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                     Lưu thông tin
                 </Button>
             </DialogContent>
+            <input
+                type="file"
+                id="fileInput"
+                accept="image/*"
+                ref={inputFile}
+                style={{ display: "none" }}
+                onChange={handleChangePic}
+            />
         </>
     )
 }

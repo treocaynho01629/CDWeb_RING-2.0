@@ -399,7 +399,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
           colSpan={colSpan()}
           sx={{ height: '40dvh' }}
         >
-          <Box>{error?.error}</Box>
+          <Box>{error?.error || 'Đã xảy ra lỗi'}</Box>
         </TableCell>
       </TableRow>
     )

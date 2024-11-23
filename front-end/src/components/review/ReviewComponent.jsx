@@ -168,7 +168,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                 && <Message className="warning">Không còn đánh giá nào!</Message>}
         </>
     } else if (isError) {
-        reviewsContent = <Message className="error">{error?.error}</Message>
+        reviewsContent = <Message className="error">{error?.error || 'Đã xảy ra lỗi'}</Message>
     } else if (isUninitialized && productReviewsCount == 0) {
         reviewsContent = <Message>
             <StyledEmptyIcon />

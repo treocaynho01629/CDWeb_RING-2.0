@@ -4,7 +4,7 @@ const PendingModal = (props) => {
   const { open, message, children } = props;
 
   return (
-    <Backdrop sx={{ display: 'flex', flexDirection: 'column', zIndex: 9999 }} open={open}>
+    <Backdrop sx={{ display: 'flex', flexDirection: 'column', zIndex: 9999, color: 'text.secondary' }} open={open}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <CircularProgress
           sx={{ marginRight: '10px' }}

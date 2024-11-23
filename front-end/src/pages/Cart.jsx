@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useLayoutEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { ChevronLeft } from '@mui/icons-material';
 import { ReactComponent as EmptyIcon } from '../assets/empty.svg';
@@ -29,12 +29,21 @@ const StyledEmptyIcon = styled(EmptyIcon)`
     height: 250px;
     width: 250px;
     fill: ${props => props.theme.palette.text.icon};
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        width: 200px;
+        height: 200px;
+    }
 `
 //#endregion
 
 const Cart = () => {
     const { cartProducts } = useCart();
     useTitle('Giỏ hàng'); //Set title
+
+    useLayoutEffect(() => {
+        if (cartProducts.length == 0) window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [cartProducts])
 
     return (
         <Wrapper>
@@ -46,6 +55,7 @@ const Cart = () => {
                 <h2>Giỏ hàng của bạn đang trống</h2>
                 <NavLink to={'/'}>
                     <Button
+
                         variant="contained"
                         color="primary"
                         startIcon={<ChevronLeft />}

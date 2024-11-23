@@ -169,6 +169,14 @@ const CartContent = () => {
     const [calculate, { isLoading }] = useCalculateMutation();
 
     //#region construct
+    useEffect(() => {
+        if (!cartProducts?.length || cartProducts.length == 0) {
+            console.log('clear')
+            handleCalculate.cancel(); 
+        
+        }
+    }, [cartProducts])
+
     useDeepEffect(() => {
         handleCartChange();
     }, [selected, cartProducts, shopCoupon, coupon])
@@ -294,7 +302,7 @@ const CartContent = () => {
 
     //Sync cart between client and server
     const syncCart = (cart) => {
-        if (!cartProducts?.length) return;
+        if (!cartProducts?.length || !selected.length) return;
         const details = cart?.details;
 
         details.forEach((detail, index) => {
@@ -471,7 +479,6 @@ const CartContent = () => {
         if (isSelected(id)) handleSelect(id);
         removeProduct(id);
         handleClose();
-        handleCalculate.cancel();
     };
 
     const handleDecrease = (quantity, id) => {
@@ -491,7 +498,6 @@ const CartContent = () => {
             selected.forEach((id) => { removeProduct(id) });
         }
         handleClearSelect();
-        handleCalculate.cancel();
     };
 
     const handleFindSimilar = async () => {

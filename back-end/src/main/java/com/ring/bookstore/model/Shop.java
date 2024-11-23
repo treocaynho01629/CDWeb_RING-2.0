@@ -78,6 +78,11 @@ public class Shop extends Auditable {
     @EqualsAndHashCode.Exclude
     private Set<Account> followers = new HashSet<>();
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    @JsonIgnore
+    private Address address;
+
     public Long getImageId() {
         return (this.image != null) ? this.image.getId() : null;
     }

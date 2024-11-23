@@ -1,27 +1,57 @@
-import { Fragment, useState } from "react";
+import { Fragment, Suspense, useCallback, useState, lazy } from "react";
 import { KeyboardArrowLeft, Try } from "@mui/icons-material";
 import { useGetMyReviewsQuery } from "../../features/reviews/reviewsApiSlice";
-import { Title } from "../custom/GlobalComponents";
+import { Message, Title } from "../custom/GlobalComponents";
 import { Link } from "react-router-dom";
+import { ReactComponent as EmptyIcon } from '../../assets/empty.svg';
+import { CircularProgress, DialogContent } from "@mui/material";
+import { debounce } from "lodash-es";
 import ReviewItem from "./ReviewItem";
 import styled from '@emotion/styled';
-import CustomProgress from "../custom/CustomProgress";
+import useAuth from "../../hooks/useAuth";
+
+const PendingModal = lazy(() => import('../layout/PendingModal'));
+const ReviewForm = lazy(() => import('./ReviewForm'));
 
 //#region styled
 const MessageContainer = styled.span`
-    margin: 20px 0 40px;
+    min-height: 60dvh;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    white-space: wrap;
+`
+
+const ReviewsContainer = styled.div`
+    padding-bottom: ${props => props.theme.spacing(2)};
+`
+
+const PlaceholderContainer = styled.div`
+    padding: ${props => props.theme.spacing(16)};
+`
+
+const LoadContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: ${props => props.theme.spacing(2)};
+`
+
+const StyledEmptyIcon = styled(EmptyIcon)`
+    height: 70px;
+    width: 70px;
+    margin: ${props => props.theme.spacing(1)} 0;
+    fill: ${props => props.theme.palette.text.icon};
 `
 //#endregion
 
 const defaultSize = 5;
 
-const ReviewsList = () => {
+const ReviewsList = ({ mobileMode }) => {
+    const { username } = useAuth();
+    const [pending, setPending] = useState(false);
+    const [openForm, setOpenForm] = useState(undefined);
+    const [contextReview, setContextReview] = useState(null);
     const [pagination, setPagination] = useState({
         currPage: 0,
         pageSize: defaultSize,
@@ -29,16 +59,49 @@ const ReviewsList = () => {
     })
 
     //Fetch orders
-    const { data, isLoading, isSuccess } = useGetMyReviewsQuery({
+    const { data, isLoading, isFetching, isSuccess } = useGetMyReviewsQuery({
         page: pagination?.currPage,
         size: pagination?.pageSize,
         loadMore: pagination?.isMore
     });
 
+    //Show more
+    const handleShowMore = () => {
+        if (isFetching || typeof data?.info?.currPage !== 'number') return;
+        if (data?.info?.currPage < pagination?.currPage) return;
+        const nextPage = data?.info?.currPage + 1;
+        if (nextPage < data?.info?.totalPages) setPagination(prev => ({ ...prev, currPage: nextPage }));
+    }
+
+    const handleOpenEdit = (review) => {
+        setContextReview(review);
+        setOpenForm(true)
+    };
+    const handleCloseForm = () => { setOpenForm(false) };
+
+    const handleWindowScroll = (e) => {
+        const trigger = document.body.scrollHeight - 300 < window.scrollY + window.innerHeight;
+        if (trigger) handleShowMore();
+    }
+
+    const handleScroll = (e) => {
+        const trigger = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
+        if (trigger) handleShowMore();
+    }
+
+    const windowScrollListener = useCallback(debounce(handleWindowScroll, 500), [data]);
+    const scrollListener = useCallback(debounce(handleScroll, 500), [data]);
+
+    window.addEventListener("scroll", windowScrollListener);
+
     let reviewsContent;
 
-    if (isLoading) {
-        reviewsContent = <CustomProgress color="primary" />
+    if (isLoading || (isFetching && pagination.currPage == 0)) {
+        reviewsContent = <PlaceholderContainer>
+            <LoadContainer>
+                <CircularProgress color="primary" />
+            </LoadContainer>
+        </PlaceholderContainer>
     } else if (isSuccess) {
         const { ids, entities } = data;
 
@@ -49,33 +112,51 @@ const ReviewsList = () => {
 
                     return (
                         <Fragment key={`${id}-${index}`}>
-                            <ReviewItem review={review} isPreview={true} />
+                            <ReviewItem review={review} isPreview={true} handleClick={() => handleOpenEdit(review)} />
                         </Fragment>
                     )
                 })
-                : <MessageContainer>Không có đánh giá nào!</MessageContainer>
+                : <MessageContainer>
+                    <Message>
+                        <StyledEmptyIcon />
+                        Chưa có đánh giá nào
+                    </Message>
+                </MessageContainer>
             }
-            {(ids?.length > 0 && ids?.length < pagination.pageSize)
-                && <MessageContainer>Không còn đánh giá nào!</MessageContainer>}
         </>
     } else if (isError) {
-        reviewsContent = <MessageContainer>{error?.error}</MessageContainer>
+        reviewsContent = <MessageContainer>
+            <Message className="error">{error?.error || 'Đã xảy ra lỗi'}</Message>
+        </MessageContainer>
     }
 
     return (
         <>
+            {pending &&
+                <Suspense fallBack={null}>
+                    <PendingModal open={pending} message="Đang gửi yêu cầu..." />
+                </Suspense>
+            }
             <Title className="primary">
                 <Link to={'/profile/detail'}><KeyboardArrowLeft /></Link>
                 <Try />&nbsp;ĐÁNH GIÁ CỦA BẠN
             </Title>
-            {reviewsContent}
-            {/* <div style={{
-                display: more?.last ? 'none' : 'flex',
-                justifyContent: 'center',
-                margin: '20px 0px'
-            }}>
-                <Button onClick={handleShowMore}>Xem thêm</Button>
-            </div> */}
+            <DialogContent sx={{ py: 0, px: { xs: 1, sm: 2, md: 0 } }} onScroll={scrollListener}>
+                <ReviewsContainer>
+                    {reviewsContent}
+                    {(pagination.currPage > 0 && isFetching) && <LoadContainer><CircularProgress size={30} color="primary" /></LoadContainer>}
+                    {(data?.ids?.length > 0 && data?.ids?.length == data?.info?.totalElements)
+                        && <Message className="warning">Không còn đánh giá nào!</Message>}
+                </ReviewsContainer>
+            </DialogContent>
+            {openForm !== undefined &&
+                <Suspense fallback={null}>
+                    <ReviewForm {...{
+                        username, open: openForm, handleClose: handleCloseForm,
+                        mobileMode, pending, setPending, review: contextReview
+                    }} />
+                </Suspense>
+            }
         </>
     )
 }

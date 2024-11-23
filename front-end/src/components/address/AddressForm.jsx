@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { LocationOn as LocationOnIcon, Check, Person as PersonIcon, Phone as PhoneIcon, Home as HomeIcon, Close as CloseIcon, Delete } from '@mui/icons-material';
+import { LocationOn as LocationOnIcon, Check, Person as PersonIcon, Phone as PhoneIcon, Home as HomeIcon, Close as CloseIcon, Delete, Apartment } from '@mui/icons-material';
 import { Checkbox, Button, DialogActions, DialogContent, FormControlLabel, Grid2 as Grid, MenuItem, TextField, DialogTitle } from '@mui/material'
 import { location } from '../../ultils/location'
 import { PHONE_REGEX } from '../../ultils/regex';
@@ -12,16 +12,17 @@ const splitAddress = (addressInfo) => {
 
     if (addressInfo?.address) {
         //Split address
-        let addressSplit = addressInfo?.address.split(', ');
-        address = addressSplit[addressSplit.length - 1];
+        address = addressInfo?.address;
+        let addressSplit = addressInfo?.city.split(', ');
+        ward = addressSplit[addressSplit.length - 1];
         if (addressSplit.length > 1) city = addressSplit[0];
-        if (addressSplit.length > 2) ward = addressSplit[1];
-        if (addressSplit.length > 3) address = addressSplit.slice(2, addressSplit?.length).join(', ')
     }
 
     return {
         id: addressInfo?.id || '',
         name: addressInfo?.name || '',
+        company: addressInfo?.companyName || '',
+        type: addressInfo?.type || '',
         phone: addressInfo?.phone || '',
         city,
         ward,
@@ -29,82 +30,20 @@ const splitAddress = (addressInfo) => {
     }
 }
 
-const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg, getFullAddress, selectedValue,
-    addNewAddress, pending, setPending, handleRemoveAddress, handleUpdateAddress, defaultAddressToStore }) => {
+const AddressForm = ({ handleClose, addressInfo, err, errMsg, setErrMsg, selectedValue, handleConvertAddress,
+    pending, handleSetDefault, handleCreateAddress, handleClickRemove, handleUpdateAddress }) => {
     const [validPhone, setValidPhone] = useState(PHONE_REGEX.test(addressInfo?.phone) || true);
     const [currAddress, setCurrAddress] = useState(splitAddress(addressInfo));
     const [selectDefault, setSelectDefault] = useState(false);
+    const [selectTemp, setSelectTemp] = useState(addressInfo && addressInfo?.isDefault == null);
 
     //Error message reset when reinput stuff
-    useEffect(() => {
-        setErrMsg('');
-    }, [currAddress])
-
-    setPending(false);
+    useEffect(() => { setErrMsg(''); }, [currAddress])
 
     useEffect(() => { //Check phone number
         const result = PHONE_REGEX.test(currAddress.phone);
         setValidPhone(result);
     }, [currAddress.phone])
-
-    const createDefaultAddress = (newAddress) => {
-        if (pending) return;
-
-        setPending(true);
-        try {
-            defaultAddressToStore();
-            handleUpdateAddress(newAddress);
-            setPending(false);
-        } catch (err) {
-            console.error(err);
-            setErr(err);
-            setPending(false);
-        }
-    }
-
-    const updateDefaultAddress = (newAddress) => {
-        if (pending) return;
-
-        setPending(true);
-        try {
-            handleUpdateAddress(newAddress);
-            setPending(false);
-        } catch (err) {
-            console.error(err);
-            setErr(err);
-            setPending(false);
-        }
-    }
-
-    const changeToDefaultAddress = (newAddress) => {
-        if (pending) return;
-
-        setPending(true);
-        try {
-            defaultAddressToStore(); //Move current default address to redux store
-            handleRemoveAddress(addressInfo?.id); //Remove select address from redux store
-            handleUpdateAddress(newAddress); //Update profile's address
-            setPending(false);
-        } catch (err) {
-            console.error(err);
-            setErr(err);
-            setPending(false);
-        }
-    }
-
-    const updateStoreAddress = (newAddress) => {
-        setPending(true);
-        try {
-            addNewAddress(newAddress);
-            handleClose();
-            setPending(false);
-        } catch (err) {
-            console.error(err);
-            setErr(err);
-            handleClose();
-            setPending(false);
-        }
-    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -117,33 +56,30 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
             return;
         }
 
-        const { enqueueSnackbar } = await import('notistack');
-
         const newAddress = {
             id: currAddress.id,
             name: currAddress.name,
+            company: currAddress.company,
             phone: currAddress.phone,
-            address: getFullAddress(currAddress)
+            city: currAddress.city + ', ' + currAddress.ward,
+            address: currAddress.address,
+            type: currAddress.type,
+            isDefault: addressInfo?.isDefault
         }
 
         if (!addressInfo) { //Create
-            selectDefault ? createDefaultAddress(newAddress) : updateStoreAddress(newAddress);
-            //Queue snack
-            enqueueSnackbar('Đã thêm địa chỉ mới!', { variant: 'success' });
+            handleCreateAddress(newAddress, selectDefault, selectTemp);
         } else { //Update
-            if (addressInfo.id == null) { //Default address
-                updateDefaultAddress(newAddress);
-            } else { //Store address
-                selectDefault ? changeToDefaultAddress(newAddress) : updateStoreAddress(newAddress);
-                //Queue snack
-                enqueueSnackbar('Đã cập nhật địa chỉ mới!', { variant: 'success' });
+            if (addressInfo.isDefault != null) { //Saved address
+                selectTemp ? handleConvertAddress(newAddress, selectTemp) : handleUpdateAddress(newAddress, selectDefault);
+            } else { //Stored address
+                selectDefault ? handleSetDefault(newAddress) 
+                    : selectTemp ? handleUpdateAddress(newAddress) : handleConvertAddress(newAddress, selectTemp);
             }
         }
     }
 
-    const selectedCity = location.filter(city => {
-        return city.name == currAddress?.city;
-    });
+    const selectedCity = location.filter(city => { return city.name == currAddress?.city; });
 
     let selectWards;
 
@@ -181,7 +117,6 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
         )
     }
 
-    const isDefault = (addressInfo != null && addressInfo?.id == null);
     const isSelected = (selectedValue != null && selectedValue == addressInfo?.id);
 
     return (
@@ -231,6 +166,40 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                         </Grid>
                         <Grid container size={12} spacing={1}>
                             <Grid size={{ xs: 12, sm: 6 }}>
+                                <TextField label='Tên công ty'
+                                    type="text"
+                                    id="company"
+                                    onChange={(e) => setCurrAddress({ ...currAddress, company: e.target.value })}
+                                    value={currAddress?.company}
+                                    error={err?.data?.errors?.companyName}
+                                    helperText={err?.data?.errors?.companyName}
+                                    size="small"
+                                    fullWidth
+                                    slotProps={{
+                                        input: {
+                                            endAdornment: <Apartment style={{ color: "gray" }} />
+                                        }
+                                    }}
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <TextField label='Loại địa chỉ'
+                                    onChange={(e) => setCurrAddress({ ...currAddress, type: e.target.value })}
+                                    select
+                                    value={currAddress?.type || ''}
+                                    error={err?.data?.errors?.type}
+                                    helperText={err?.data?.errors?.type}
+                                    fullWidth
+                                    size="small"
+                                >
+                                    <MenuItem value=""><em>--Không--</em></MenuItem>
+                                    <MenuItem value="Nhà riêng">Nhà riêng</MenuItem>
+                                    <MenuItem value="Văn phòng">Văn phòng</MenuItem>
+                                </TextField>
+                            </Grid>
+                        </Grid>
+                        <Grid container size={12} spacing={1}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField label='Tỉnh/Thành phố'
                                     required
                                     value={currAddress?.city || ''}
@@ -264,6 +233,8 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                                 helperText={err?.data?.errors?.address}
                                 fullWidth
                                 size="small"
+                                multiline
+                                rows={2}
                                 slotProps={{
                                     input: {
                                         endAdornment: <HomeIcon style={{ color: "gray" }} />
@@ -278,7 +249,7 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                                         <Checkbox
                                             disableRipple
                                             disableFocusRipple
-                                            disabled={isDefault || isSelected}
+                                            disabled={selectTemp || addressInfo?.isDefault || isSelected}
                                             checked={selectDefault}
                                             color="primary"
                                             inputProps={{ 'aria-label': 'select' }}
@@ -287,25 +258,43 @@ const AddressForm = ({ handleClose, addressInfo, err, setErr, errMsg, setErrMsg,
                                     }
                                     label="Chọn làm địa chỉ mặc định" />
                             </Grid>
-                            {(addressInfo && !isDefault && !isSelected)
-                                &&
-                                <Grid size={{ xs: 12, sm: 6 }}>
+                            <Grid size={{ xs: 12, sm: 6 }} sx={{ justifyContent: { xs: 'flex-start', sm: 'flex-end' }, display: 'flex' }}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            disableRipple
+                                            disableFocusRipple
+                                            disabled={selectDefault}
+                                            checked={selectTemp}
+                                            color="primary"
+                                            inputProps={{ 'aria-label': 'select' }}
+                                            onChange={() => setSelectTemp(prev => !prev)}
+                                        />
+                                    }
+                                    label={(addressInfo != null && addressInfo?.isDefault != null) ?
+                                        'Chuyển về đại chỉ tạm thời' : 'Lưu địa chỉ tạm thời'}
+                                />
+                            </Grid>
+                        </Grid>
+                        {(addressInfo && !addressInfo?.isDefault && !isSelected) &&
+                            <Grid container size={12} spacing={1}>
+                                <Grid size={{ xs: 12, sm: 5 }}>
                                     <Button
-                                        disabled={isDefault || isSelected}
+                                        disabled={addressInfo?.isDefault || isSelected}
                                         variant="contained"
                                         color="error"
                                         size="large"
                                         fullWidth
-                                        onClick={() => handleRemoveAddress(addressInfo?.id)}
+                                        onClick={() => handleClickRemove(addressInfo)}
                                     >
                                         Xoá địa chỉ&nbsp;<Delete />
                                     </Button>
                                 </Grid>
-                            }
-                        </Grid>
+                            </Grid>
+                        }
                     </Grid>
                 </form>
-            </DialogContent>
+            </DialogContent >
             <DialogActions>
                 <Button
                     variant="outlined"

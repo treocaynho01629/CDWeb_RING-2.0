@@ -12,8 +12,10 @@ const AddressItemContainer = styled.div`
     width: 100%;
     padding: 20px;
     border: 0.5px solid ${props => props.theme.palette.action.focus};
+    margin-bottom: 5px;
 
     &.active { border-color: ${props => props.theme.palette.primary.main};}
+    &.temp { border-color: ${props => props.theme.palette.info.dark};}
     &.error {border-color: ${props => props.theme.palette.error.main};}
 `
 
@@ -29,6 +31,11 @@ const AddressTag = styled.div`
     border-color: ${props => props.theme.palette.primary.main};
     color: ${props => props.theme.palette.primary.dark};
     pointer-events: none;
+
+    &.temp { 
+        border-color: ${props => props.theme.palette.info.dark};
+        color: ${props => props.theme.palette.info.dark};
+    }
 
     &.error {
         border-color: ${props => props.theme.palette.error.main};
@@ -74,29 +81,26 @@ const UserAddress = styled.span`
 `
 //#endregion
 
-const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue }) => {
+const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue, isTemp }) => {
     const isValid = () => {
         if (!addressInfo) return false;
 
-        const { name, phone } = addressInfo;
-        let addressSplit = addressInfo?.address.split(', ');
-        let address = addressSplit[addressSplit.length - 1];
-        let city = '';
-        let ward = '';
-        if (addressSplit.length > 1) city = addressSplit[0];
-        if (addressSplit.length > 2) ward = addressSplit[1];
-        if (addressSplit.length > 3) address = addressSplit.slice(2, addressSplit.length).join(', ');
+        const { name, phone, address, city } = addressInfo;
+        let addressSplit = city.split(', ');
+        let ward = addressSplit[addressSplit.length - 1];
+        let currCity = '';
+        if (addressSplit.length > 1) currCity = addressSplit[0];
 
-        const result = !(!name || !phone || !address || !city || !ward || !PHONE_REGEX.test(phone));
+        const result = !(!name || !phone || !address || !currCity || !ward || !PHONE_REGEX.test(phone));
         return result;
     }
     const isNotValid = !isValid();
-    const isDefault = (addressInfo != null && addressInfo?.id == null);
     const isSelected = (selectedValue != null && selectedValue == addressInfo?.id);
 
     return (
-        <AddressItemContainer className={`${isNotValid ? 'error' : isDefault ? 'active' : ''}`}>
-            {isDefault && <AddressTag className={`${isNotValid ? 'error' : ''}`}>Mặc định</AddressTag>}
+        <AddressItemContainer className={`${isNotValid ? 'error' : addressInfo?.isDefault ? 'active' : isTemp ? 'temp' : ''}`}>
+            {addressInfo?.isDefault && <AddressTag className={`${isNotValid ? 'error' : ''}`}>Mặc định</AddressTag>}
+            {isTemp && <AddressTag className={`${isNotValid ? 'error' : 'temp'}`}>Tạm lưu</AddressTag>}
             <Box display="flex" flexDirection={'column'}>
                 {!addressInfo ?
                     <>
@@ -105,10 +109,10 @@ const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue }) =>
                     </>
                     :
                     <>
-                        <UserInfo>{addressInfo?.name}&nbsp;
+                        <UserInfo>{addressInfo?.companyName || addressInfo?.name}&nbsp;
                             {addressInfo?.phone && `(+84) ${addressInfo?.phone}`}
                         </UserInfo>
-                        <UserAddress>{addressInfo?.address}</UserAddress>
+                        <UserAddress>{addressInfo?.city}, {addressInfo?.address}</UserAddress>
                     </>
                 }
             </Box>
@@ -116,7 +120,7 @@ const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue }) =>
                 sx={{ display: { xs: 'none', sm: 'flex' }, whiteSpace: 'nowrap', marginTop: 2 }}
                 aria-label="toggle address dialog"
                 variant="outlined"
-                color={isNotValid ? "error" : "primary"}
+                color={isNotValid ? "error" : isTemp ? "info" : "primary"}
                 onClick={() => handleOpen(addressInfo)}
             >
                 Thay đổi
@@ -130,7 +134,7 @@ const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue }) =>
             >
                 <KeyboardArrowRight />
             </IconButton>
-            {(!isDefault && !isSelected) &&
+            {(!addressInfo?.isDefault && !isSelected) &&
                 <IconButton
                     sx={{
                         display: { xs: 'none', sm: 'flex' },

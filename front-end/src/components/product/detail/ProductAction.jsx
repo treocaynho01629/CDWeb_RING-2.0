@@ -155,7 +155,7 @@ const ProductAction = ({ book }) => {
                         disabled={!book || book?.amount == 0}
                         onClick={handleOpenNow}
                     >
-                        {book?.amount == 0 ? 'Hết hàng'
+                        {!book ? 'Đang tải' : book?.amount == 0 ? 'Hết hàng'
                             : `Mua ngay (${(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)`}
                     </BuyButton>
                 </AltFilterContainer>

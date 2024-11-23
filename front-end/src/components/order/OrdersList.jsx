@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useGetOrdersByUserQuery } from '../../features/orders/ordersApiSlice';
 import { KeyboardArrowLeft, Receipt, Search } from '@mui/icons-material';
-import { Box, CircularProgress, DialogContent, TextField } from '@mui/material';
+import { CircularProgress, DialogContent, TextField } from '@mui/material';
 import { StyledDialogTitle } from "../custom/ProfileComponents";
 import { Link, useSearchParams } from "react-router-dom";
 import { booksApiSlice } from "../../features/books/booksApiSlice";
@@ -10,10 +10,10 @@ import { CustomTab, CustomTabs } from "../custom/CustomTabs";
 import { orderStatus } from "../../ultils/filters";
 import { debounce } from "lodash-es";
 import { ReactComponent as EmptyIcon } from '../../assets/empty.svg';
+import { Message } from "../custom/GlobalComponents";
 import useCart from '../../hooks/useCart';
 import useDeepEffect from "../../hooks/useDeepEffect";
 import OrderItem from "./OrderItem";
-import { Message } from "../custom/GlobalComponents";
 
 //#region styled
 const MessageContainer = styled.div`
@@ -230,7 +230,7 @@ const OrdersList = () => {
             </MessageContainer>
     } else if (isError) {
         ordersContent = <MessageContainer>
-            <Message className="error">{error?.error}</Message>
+            <Message className="error">{error?.error || 'Đã xảy ra lỗi'}</Message>
         </MessageContainer>
     }
 
@@ -268,7 +268,7 @@ const OrdersList = () => {
                 </form>
                 <OrdersContainer>
                     {ordersContent}
-                    {(pagination.currPage > 0 && isFetching) && <LoadContainer><CircularProgress color="primary" /></LoadContainer>}
+                    {(pagination.currPage > 0 && isFetching) && <LoadContainer><CircularProgress size={30} color="primary" /></LoadContainer>}
                     {(data?.ids?.length > 0 && data?.ids?.length == data?.info?.totalElements)
                         && <Message className="warning">Không còn đơn hàng nào!</Message>}
                 </OrdersContainer>

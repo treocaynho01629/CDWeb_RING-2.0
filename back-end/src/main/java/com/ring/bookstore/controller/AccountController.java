@@ -1,21 +1,16 @@
 package com.ring.bookstore.controller;
 
+import java.io.IOException;
 import java.util.List;
 
+import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.ring.bookstore.config.CurrentAccount;
 import com.ring.bookstore.dtos.accounts.AccountDetailDTO;
@@ -28,9 +23,11 @@ import com.ring.bookstore.request.ProfileRequest;
 import com.ring.bookstore.service.AccountService;
 
 import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/accounts")
+@Validated
 public class AccountController {
 	
 	private AccountService accountService;
@@ -110,10 +107,12 @@ public class AccountController {
 	}
 	
 	//Update account's profile
-	@PutMapping("/profile")
+	@PutMapping(value = "/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<AccountProfile> updateProfile(@Valid @RequestBody ProfileRequest request, @CurrentAccount Account currUser){
-		AccountProfile profile = accountService.updateProfile(request, currUser);
+	public ResponseEntity<AccountProfile> updateProfile(@Valid @RequestPart ProfileRequest request,
+														@RequestPart(name = "image", required = false) MultipartFile file,
+														@CurrentAccount Account currUser) throws ImageResizerException, IOException {
+		AccountProfile profile = accountService.updateProfile(request, file, currUser);
 		return new ResponseEntity< >(profile, HttpStatus.OK);
 	}
 	

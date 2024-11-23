@@ -14,6 +14,7 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, mod
             onClick={handleClose}
             disableRestoreFocus
             disableScrollLock
+            transitionDuration={200}
             sx={{ pointerEvents: 'none', }}
             slotProps={{
                 paper: {
