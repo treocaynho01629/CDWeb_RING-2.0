@@ -1,13 +1,14 @@
 import styled from '@emotion/styled'
 import { useState } from "react";
-import { List, Collapse, Avatar, ListItemButton, Badge, Divider, alpha } from '@mui/material';
+import { List, Collapse, Avatar, ListItemButton, Badge, Divider, alpha, Skeleton } from '@mui/material';
 import {
     ExpandLess, ExpandMore, EditOutlined, Person as PersonIcon, RateReviewOutlined, KeyboardArrowRight,
     PersonAddAlt1, LocalShippingOutlined, Replay, DomainVerification, PendingOutlined, ReceiptLongOutlined,
-    LocalActivityOutlined
+    LocalActivityOutlined, LocalActivity, Today
 } from '@mui/icons-material';
 import { NavLink } from "react-router-dom";
 import { MobileExtendButton } from "../custom/GlobalComponents";
+import { numFormatter } from '../../ultils/covert';
 import useAuth from "../../hooks/useAuth";
 
 //#region styled
@@ -240,7 +241,7 @@ const NavItem = styled.div`
 `
 //#endregion
 
-const ProfileTabsList = ({ profile, tabletMode }) => {
+const ProfileTabsList = ({ profile, loading, tabletMode }) => {
     const { username, image, roles } = useAuth();
     const [open, setOpen] = useState(true);
     const role = roles?.length;
@@ -264,7 +265,13 @@ const ProfileTabsList = ({ profile, tabletMode }) => {
                         </Badge>
                         <InfoContainer>
                             <UserContainer>
-                                <Username>{username}<Name>{profile?.name || 'Sửa hồ sơ'}</Name></Username>
+                                <Username>{username}
+                                    {loading ?
+                                        <Name><Skeleton variant="text" sx={{ fontSize: 'inherit', width: 95 }} /></Name>
+                                        :
+                                        <Name>{profile?.name || 'Sửa hồ sơ'}</Name>
+                                    }
+                                </Username>
                                 <Role className={role == 3 ? 'admin' : role == 2 ? 'seller' : ''}>
                                     {role == 3 ? 'Admin' : role == 2 ? 'Đối tác' : 'Thành viên'}
                                 </Role>
@@ -272,14 +279,30 @@ const ProfileTabsList = ({ profile, tabletMode }) => {
                         </InfoContainer>
                     </MainProfile>
                 </NavLink>
-                {tabletMode && //FIX Counter
+                {tabletMode &&
                     <AdditionalInfo>
-                        <Additional>
-                            <PersonAddAlt1 color="warning" />Theo dõi:<b>99</b>
-                        </Additional>
-                        <Additional>
-                            <PersonAddAlt1 color="warning" />Đánh giá:<b>99</b>
-                        </Additional>
+                        {loading ? <>
+                            <Additional><Skeleton variant="text" sx={{ fontSize: 'inherit', width: 110 }} /></Additional>
+                            <Additional><Skeleton variant="text" sx={{ fontSize: 'inherit', width: 110 }} /></Additional>
+                            <Additional><Skeleton variant="text" sx={{ fontSize: 'inherit', width: 115 }} /></Additional>
+                        </>
+                            : <>
+                                <Additional>
+                                    <PersonAddAlt1 color="warning" />Theo dõi:<b>{numFormatter(profile?.totalFollows || 0)}</b>
+                                </Additional>
+                                <Additional>
+                                    <LocalActivity color="warning" />Đánh giá:<b>{numFormatter(profile?.totalReviews || 0)}</b>
+                                </Additional>
+                                <Additional>
+                                    <Today color="warning" />Tham gia:<b>
+                                        {new Date(profile?.joinedDate).toLocaleDateString("en-GB", {
+                                            year: "numeric",
+                                            month: "2-digit",
+                                        })}
+                                    </b>
+                                </Additional>
+                            </>
+                        }
                     </AdditionalInfo>
                 }
             </ProfileContainer>

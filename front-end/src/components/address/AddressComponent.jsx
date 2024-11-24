@@ -73,10 +73,10 @@ const AddressComponent = ({ pending, setPending }) => {
     'Xoá địa chỉ khỏi sổ địa chỉ?',
   )
 
-  //Fetch current profile address
+  //Fetch addresses
   const { data, isLoading, isSuccess, isError, error } = useGetMyAddressesQuery();
 
-  //Update profile hook
+  //Update address
   const [createAddress, { isLoading: creating }] = useCreateAddressMutation();
   const [updateAddress, { isLoading: updating }] = useUpdateAddressMutation();
   const [deleteAddress, { isLoading: deleting }] = useDeleteAddressMutation();
@@ -166,7 +166,7 @@ const AddressComponent = ({ pending, setPending }) => {
       } else { //Saved address
         createAddress({
           name: address.name,
-          companyName: address.company,
+          companyName: address.companyName,
           phone: address.phone,
           city: address.city,
           address: address.address,
@@ -229,7 +229,7 @@ const AddressComponent = ({ pending, setPending }) => {
         updateAddress({
           id: address.id, updatedAddress: {
             name: address.name,
-            companyName: address.company,
+            companyName: address.companyName,
             phone: address.phone,
             city: address.city,
             address: address.address,
@@ -290,7 +290,7 @@ const AddressComponent = ({ pending, setPending }) => {
       } else if (isStored && !isTemp) { //Convert stored to saved
         createAddress({
           name: address.name,
-          companyName: address.company,
+          companyName: address.companyName,
           phone: address.phone,
           city: address.city,
           address: address.address,
@@ -346,7 +346,7 @@ const AddressComponent = ({ pending, setPending }) => {
       if (isStored) { //If stored address
         createAddress({
           name: address.name,
-          companyName: address.company,
+          companyName: address.companyName,
           phone: address.phone,
           city: address.city,
           address: address.address,

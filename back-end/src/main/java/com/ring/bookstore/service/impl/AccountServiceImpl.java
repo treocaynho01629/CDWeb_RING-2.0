@@ -6,6 +6,7 @@ import com.ring.bookstore.dtos.accounts.ProfileDTO;
 import com.ring.bookstore.dtos.mappers.AccountDetailMapper;
 import com.ring.bookstore.dtos.mappers.ChartDataMapper;
 import com.ring.bookstore.dtos.mappers.ProfileMapper;
+import com.ring.bookstore.dtos.projections.IProfile;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ImageResizerException;
@@ -200,9 +201,9 @@ public class AccountServiceImpl implements AccountService {
 
     //Get account's profile
     public ProfileDTO getProfile(Account user) {
-        Account currUser = accountRepo.findById(user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
-        return profileMapper.apply(currUser);
+        IProfile currProfile = profileRepo.findProfileByUser(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found!"));
+        return profileMapper.apply(currProfile);
     }
 
     //Update account's profile

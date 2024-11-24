@@ -12,12 +12,13 @@ public class ShopMapper implements Function<IShopDetail, ShopDTO> {
 	
     @Override
     public ShopDTO apply(IShopDetail shop) {
-
-        String fileDownloadUri = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/api/images/")
-                .path(shop.getImage())
-                .toUriString();
+		String fileDownloadUri = shop.getImage() != null ?
+				ServletUriComponentsBuilder
+						.fromCurrentContextPath()
+						.path("/api/images/")
+						.path(shop.getImage())
+						.toUriString()
+				: null;
 
         return new ShopDTO(shop.getOwnerUsername()
 				, shop.getOwnerId()

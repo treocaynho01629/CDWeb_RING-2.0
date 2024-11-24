@@ -27,11 +27,13 @@ public class BookMapper {
 
     public BookDTO displayToBookDTO(IBookDisplay book) {
 
-        String fileDownloadUri = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/api/images/")
-                .path(book.getImage())
-                .toUriString();
+        String fileDownloadUri = book.getImage() != null ?
+                ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/api/images/")
+                        .path(book.getImage())
+                        .toUriString()
+                : null;
 
         Double rating = book.getRating();
         Integer totalOrders = book.getTotalOrders();
@@ -68,11 +70,13 @@ public class BookMapper {
         count.add(5, bookWithDetail.getFive());
 
         //Main thumbnail
-        String fileDownloadUri = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/api/images/")
-                .path(bookWithDetail.getImage())
-                .toUriString();
+        String fileDownloadUri = bookWithDetail.getImage() != null ?
+                ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/api/images/")
+                        .path(bookWithDetail.getImage())
+                        .toUriString()
+                : null;
 
         //Other preview images
         BookDetail detail = book.getBookDetail();

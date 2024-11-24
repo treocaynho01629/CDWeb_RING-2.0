@@ -12,11 +12,13 @@ public class BannerMapper implements Function<IBanner, BannerDTO> {
 
     @Override
     public BannerDTO apply(IBanner banner) {
-        String fileDownloadUri = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/api/images/")
-                .path(banner.getImage())
-                .toUriString();
+        String fileDownloadUri = banner.getImage() != null ?
+                ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/api/images/")
+                        .path(banner.getImage())
+                        .toUriString()
+                : null;
 
         return new BannerDTO(banner.getId(),
                 banner.getShopId(),

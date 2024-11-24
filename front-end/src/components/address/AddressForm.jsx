@@ -21,7 +21,7 @@ const splitAddress = (addressInfo) => {
     return {
         id: addressInfo?.id || '',
         name: addressInfo?.name || '',
-        company: addressInfo?.companyName || '',
+        companyName: addressInfo?.companyName || '',
         type: addressInfo?.type || '',
         phone: addressInfo?.phone || '',
         city,
@@ -59,7 +59,7 @@ const AddressForm = ({ handleClose, addressInfo, err, errMsg, setErrMsg, selecte
         const newAddress = {
             id: currAddress.id,
             name: currAddress.name,
-            company: currAddress.company,
+            companyName: currAddress.companyName,
             phone: currAddress.phone,
             city: currAddress.city + ', ' + currAddress.ward,
             address: currAddress.address,
@@ -169,8 +169,8 @@ const AddressForm = ({ handleClose, addressInfo, err, errMsg, setErrMsg, selecte
                                 <TextField label='Tên công ty'
                                     type="text"
                                     id="company"
-                                    onChange={(e) => setCurrAddress({ ...currAddress, company: e.target.value })}
-                                    value={currAddress?.company}
+                                    onChange={(e) => setCurrAddress({ ...currAddress, companyName: e.target.value })}
+                                    value={currAddress?.companyName}
                                     error={err?.data?.errors?.companyName}
                                     helperText={err?.data?.errors?.companyName}
                                     size="small"
@@ -272,7 +272,7 @@ const AddressForm = ({ handleClose, addressInfo, err, errMsg, setErrMsg, selecte
                                         />
                                     }
                                     label={(addressInfo != null && addressInfo?.isDefault != null) ?
-                                        'Chuyển về đại chỉ tạm thời' : 'Lưu địa chỉ tạm thời'}
+                                        'Chuyển về địa chỉ tạm thời' : 'Lưu địa chỉ tạm thời'}
                                 />
                             </Grid>
                         </Grid>
