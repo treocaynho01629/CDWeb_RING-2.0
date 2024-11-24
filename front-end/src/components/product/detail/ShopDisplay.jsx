@@ -1,8 +1,9 @@
 import styled from '@emotion/styled';
 import { Avatar, Box, Button, Grid2 as Grid, Skeleton, Stack } from "@mui/material";
-import { Add, AutoStories, Close, LocalActivity, PersonAddAlt1, Store, Today, Verified as VerifiedIcon } from "@mui/icons-material";
+import { Add, AutoStories, Check, LocalActivity, PersonAddAlt1, Store, Today, Verified as VerifiedIcon } from "@mui/icons-material";
 import { useFollowShopMutation, useGetShopQuery, useUnfollowShopMutation } from "../../../features/shops/shopsApiSlice";
 import { Link } from "react-router-dom";
+import { numFormatter } from '../../../ultils/covert';
 
 //#region styled
 const ShopContainer = styled.div`
@@ -157,9 +158,10 @@ const ShopDisplay = ({ id, name }) => {
                                     sx={{ height: 35, width: { xs: 'auto', md: '100%' } }}
                                     disabled={isLoading || following || unfollowing}
                                     onClick={handleClickFollow}
-                                    startIcon={data?.followed ? <Close/> : <Add />}
+                                    color={data?.followed ? 'warning' : 'primary'}
+                                    startIcon={data?.followed ? <Check/> : <Add />}
                                 >
-                                    {data?.followed ? 'Bỏ theo dõi' : 'Theo dõi'}
+                                    {data?.followed ? 'Đang theo dõi' : 'Theo dõi'}
                                 </Button>
                             </Box>
                         </ShopInfo>
@@ -187,9 +189,9 @@ const ShopDisplay = ({ id, name }) => {
                             </>
                             :
                             <>
-                                <ShopDetail><LocalActivity color="warning" />Đánh giá:<b>{data?.totalReviews}</b></ShopDetail>
-                                <ShopDetail><AutoStories color="warning" />Sản phẩm:<b>{data?.totalProducts}</b></ShopDetail>
-                                <ShopDetail><PersonAddAlt1 color="warning" />Người theo dõi:<b>{data?.totalFollowers}</b></ShopDetail>
+                                <ShopDetail><LocalActivity color="warning" />Đánh giá:<b>{numFormatter(data?.totalReviews)}</b></ShopDetail>
+                                <ShopDetail><AutoStories color="warning" />Sản phẩm:<b>{numFormatter(data?.totalProducts)}</b></ShopDetail>
+                                <ShopDetail><PersonAddAlt1 color="warning" />Người theo dõi:<b>{numFormatter(data?.totalFollowers)}</b></ShopDetail>
                                 <ShopDetail className="hide-on-mobile">
                                     <Today color="warning" />Tham gia:<b>
                                         {new Date(data?.joinedDate).toLocaleDateString("en-GB", {

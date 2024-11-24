@@ -208,6 +208,28 @@ const StyledRating = styled(Rating)`
     display: flex;
     align-items: center;
 `
+
+const ProductTag = styled.span`
+    position: absolute;
+    top: ${props => props.theme.spacing(1)};
+    left: ${props => props.theme.spacing(1)};
+    padding: ${props => props.theme.spacing(.25)} ${props => props.theme.spacing(1)};
+    background-color: ${props => props.theme.palette.info.light};
+    color: ${props => props.theme.palette.info.dark};
+    font-size: 12px;
+    font-weight: 500px;
+    z-index: 1;
+
+    &.error {
+        background-color: ${props => props.theme.palette.error.light};
+        color: ${props => props.theme.palette.error.dark};
+    }
+
+    &.warning {
+        background-color: ${props => props.theme.palette.warning.light};
+        color: ${props => props.theme.palette.warning.dark};
+    }
+`
 //#endregion
 
 const Product = ({ book, scrollPosition }) => {
@@ -221,6 +243,11 @@ const Product = ({ book, scrollPosition }) => {
                     ?
                     <Link to={`/product/${book.slug}`} style={{ width: '100%', height: '100%' }}>
                         <ItemContainer>
+                            {book?.amount < 30 &&
+                                <ProductTag className={book?.amount <= 0 ? "error" : "warning"}>
+                                    {book?.amount <= 0 ? 'Hết hàng' : 'Cháy hàng'}
+                                </ProductTag>
+                            }
                             <ImageContainer>
                                 <StyledLazyImage
                                     src={`${book?.image}?size=small`}

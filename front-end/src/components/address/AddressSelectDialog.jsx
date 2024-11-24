@@ -1,31 +1,33 @@
-import { useEffect, useState, lazy, Suspense } from 'react'
-import { useUpdateProfileMutation } from '../../features/users/usersApiSlice';
-import { Box, Dialog, Button, DialogActions, DialogContent, ListItemIcon, ListItemText, Menu, MenuItem, Radio, styled, useMediaQuery, DialogTitle, useTheme } from '@mui/material';
+import styled from '@emotion/styled'
+import { useEffect, useState, lazy, Suspense, Fragment } from 'react'
+import { Dialog, Button, DialogActions, DialogContent, ListItemIcon, ListItemText, Menu, MenuItem, useMediaQuery, DialogTitle, useTheme, CircularProgress } from '@mui/material';
 import { AddHome, Check, Delete, Home, LocationOn, Close } from '@mui/icons-material';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useCreateAddressMutation, useDeleteAddressMutation, useGetMyAddressesQuery, useUpdateAddressMutation } from '../../features/addresses/addressesApiSlice';
+import { Message } from '../custom/GlobalComponents';
 import AddressItem from './AddressItem'
 import useCart from '../../hooks/useCart';
+import useConfirm from '../../hooks/useConfirm';
 
 const AddressForm = lazy(() => import('./AddressForm'));
 
-const StyledRadio = styled(Radio)(({ theme }) => ({
-  borderRadius: 0,
-  backgroundColor: theme.palette.action.disabled,
-  transition: 'all .25s ease',
+//#region styled
+const MessageContainer = styled.div`
+    min-height: 60dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`
 
-  '&:hover': {
-    backgroundColor: theme.palette.primary.light,
-    color: theme.palette.primary.contrastText,
-  },
+const PlaceholderContainer = styled.div`
+    min-height: 50dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`
+//#endregion
 
-  '&.Mui-checked': {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-  },
-}));
-
-const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }) => {
-  const { addresses, addNewAddress, removeAddress } = useCart();
+const AddressSelectDialog = ({ address, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }) => {
+  const { addresses: storeAddresses, addNewAddress, removeAddress } = useCart();
   const [openForm, setOpenForm] = useState(false); //Dialog open state
   const [err, setErr] = useState('');
   const [errMsg, setErrMsg] = useState('');
@@ -35,23 +37,26 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
   const openContext = Boolean(anchorEl);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [ConfirmationDialog, confirm] = useConfirm(
+    'Xoá địa chỉ?',
+    'Xoá địa chỉ khỏi sổ địa chỉ?',
+  )
 
-  //Update profile hook
-  const [updateProfile, { isLoading: updating }] = useUpdateProfileMutation();
+  //Fetch addresses
+  const { data, isLoading, isSuccess, isError, error } = useGetMyAddressesQuery();
+
+  //Update address
+  const [createAddress, { isLoading: creating }] = useCreateAddressMutation();
+  const [updateAddress, { isLoading: updating }] = useUpdateAddressMutation();
+  const [deleteAddress, { isLoading: deleting }] = useDeleteAddressMutation();
 
   useEffect(() => {
-    handleSetAddress();
-  }, [profile, addresses])
-
-  const getFullAddress = (addressInfo) => {
-    const tempAddress = [];
-    if (addressInfo?.city) tempAddress.push(addressInfo?.city);
-    if (addressInfo?.ward) tempAddress.push(addressInfo?.ward);
-    if (addressInfo?.address) tempAddress.push(addressInfo?.address);
-    return tempAddress.join(", ");
-  }
+    if (selectedValue == -1) {
+      handleSetAddress(address);
+    } else {
+      handleSetAddress();
+    }
+  }, [address, storeAddresses])
 
   //Dialog
   const handleOpen = (addressInfo) => {
@@ -76,92 +81,309 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
     setContextAddress(null);
   }
 
-  const handleRemoveAddress = (addressId) => {
-    removeAddress(addressId);
-    handleCloseContext();
-    handleClose();
-  }
-
-  //Move current default address to redux store
-  const defaultAddressToStore = () => {
-    if (profile) {
-      const newAddress = {
-        name: profile?.name,
-        phone: profile?.phone,
-        address: profile?.address
-      }
-      addNewAddress(newAddress);
-    } else {
-      navigate('/auth/login', { state: { from: location }, replace: true });
-    }
-  }
-
-  const handleUpdateAddress = (newAddress) => {
-    if (updating) return;
-    if (!profile) { //To login page if anonymous
-      navigate('/auth/login', { state: { from: location }, replace: true });
-      return;
-    }
-
-    updateProfile({
-      name: newAddress.name,
-      phone: newAddress.phone,
-      address: newAddress.address,
-      gender: profile.gender,
-      dob: profile.dob,
-    })
-      .unwrap()
-      .then((data) => {
-        handleClose();
-      })
-      .catch((err) => {
-        console.error(err);
-        setErr(err);
-        if (!err?.status) {
-          setErrMsg('Server không phản hồi');
-        } else if (err?.status === 400) {
-          setErrMsg('Sai định dạng thông tin!');
-        } else {
-          setErrMsg('Cập nhật thất bại');
-        }
-      })
-  }
-
-  const handleSetDefault = (newAddress) => {
-    if (pending) return;
-    if (!profile) { //To login page if anonymous
-      navigate('/auth/login', { state: { from: location }, replace: true });
-      return;
-    }
-
+  const handleRemoveAddress = (address) => {
+    if (pending || creating || updating || deleting) return;
     setPending(true);
-    try {
-      defaultAddressToStore(); //Move current default address to redux store
-      handleRemoveAddress(newAddress?.id); //Remove select address from redux store
-      handleUpdateAddress(newAddress); //Update profile's address
 
-      setErrMsg('');
-      setErr([]);
-      setPending(false);
+    try {
+      let isStored = address?.isDefault == null;
+
+      if (isStored) {
+        removeAddress(address.id);
+        handleClose();
+        handleCloseContext();
+        setPending(false);
+      } else {
+        deleteAddress(address.id)
+          .unwrap()
+          .then((data) => {
+            handleClose();
+            handleCloseContext();
+            setErrMsg('');
+            setErr([]);
+            setPending(false);
+          })
+          .catch((err) => {
+            console.error(err);
+            setErr(err);
+            if (!err?.status) {
+              setErrMsg('Server không phản hồi');
+            } else if (err?.status === 400) {
+              setErrMsg('Sai định dạng thông tin!');
+            } else {
+              setErrMsg('Xoá địa chỉ thất bại');
+            }
+            setPending(false);
+          })
+      }
     } catch (err) {
       console.error(err);
       setErr(err);
-      if (!err?.status) {
-        setErrMsg('Server không phản hồi');
-      } else if (err?.status === 400) {
-        setErrMsg('Sai định dạng thông tin!');
-      } else {
-        setErrMsg('Cập nhật thất bại');
-      }
+      handleClose();
+      handleCloseContext();
       setPending(false);
     }
   }
 
-  const handleSetAddress = () => {
-    if (selectedValue == -1) {
-      if (profile) setAddressInfo(profile);
+  const handleCreateAddress = async (address, isDefault = false, isTemp = false) => {
+    if (pending || creating || updating || deleting) return;
+    setPending(true);
+    const { enqueueSnackbar } = await import('notistack');
+
+    try {
+      if (isTemp) {
+        const { isDefault, ...newAddress } = address; //Remove isDefault
+        addNewAddress(newAddress);
+        handleClose();
+        setErrMsg('');
+        setErr([]);
+        setPending(false);
+        enqueueSnackbar('Thêm địa chỉ thành công!', { variant: 'success' });
+      } else { //Saved address
+        createAddress({
+          name: address.name,
+          companyName: address.company,
+          phone: address.phone,
+          city: address.city,
+          address: address.address,
+          type: address.type,
+          isDefault
+        })
+          .unwrap()
+          .then((data) => {
+            handleClose();
+            handleCloseContext();
+            setErrMsg('');
+            setErr([]);
+            setPending(false);
+            enqueueSnackbar('Thêm địa chỉ thành công!', { variant: 'success' });
+          })
+          .catch((err) => {
+            console.error(err);
+            setErr(err);
+            if (!err?.status) {
+              setErrMsg('Server không phản hồi');
+            } else if (err?.status === 400) {
+              setErrMsg('Sai định dạng thông tin!');
+            } else if (err?.status === 409) {
+              setErrMsg('Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!');
+            } else {
+              setErrMsg('Thêm địa chỉ thất bại');
+            }
+            setPending(false);
+            enqueueSnackbar('Thêm địa chỉ thất bại!', { variant: 'error' });
+          })
+      }
+    } catch (err) { //Redux error
+      console.error(err);
+      setErr(err);
+      handleClose();
+      handleCloseContext();
+      setPending(false);
+      enqueueSnackbar('Thêm địa chỉ thất bại!', { variant: 'error' });
+    }
+  }
+
+  const handleUpdateAddress = async (address, isDefault = false) => {
+    if (pending || creating || updating || deleting) return;
+    setPending(true);
+    const { enqueueSnackbar } = await import('notistack');
+
+    try {
+      let isStored = address?.isDefault == null;
+
+      if (isStored) { //If stored address
+        const { isDefault, ...newAddress } = address; //Remove isDefault
+        addNewAddress({ ...newAddress, id: address?.id });
+        handleClose();
+        handleCloseContext();
+        setErrMsg('');
+        setErr([]);
+        setPending(false);
+        enqueueSnackbar('Cập nhật địa chỉ thành công!', { variant: 'success' });
+      } else { //Saved address
+        updateAddress({
+          id: address.id, updatedAddress: {
+            name: address.name,
+            companyName: address.company,
+            phone: address.phone,
+            city: address.city,
+            address: address.address,
+            type: address.type,
+            isDefault
+          }
+        })
+          .unwrap()
+          .then((data) => {
+            handleClose();
+            handleCloseContext();
+            setErrMsg('');
+            setErr([]);
+            setPending(false);
+            enqueueSnackbar('Cập nhật địa chỉ thành công!', { variant: 'success' });
+          })
+          .catch((err) => {
+            console.error(err);
+            setErr(err);
+            if (!err?.status) {
+              setErrMsg('Server không phản hồi');
+            } else if (err?.status === 400) {
+              setErrMsg('Sai định dạng thông tin!');
+            } else {
+              setErrMsg('Cập nhật thất bại');
+            }
+            setPending(false);
+            enqueueSnackbar('Cập nhật địa chỉ thất bại!', { variant: 'error' });
+          })
+      }
+    } catch (err) { //Redux error
+      console.error(err);
+      setErr(err);
+      handleClose();
+      handleCloseContext();
+      setPending(false);
+      enqueueSnackbar('Cập nhật địa chỉ thất bại!', { variant: 'error' });
+    }
+  }
+
+  const handleConvertAddress = async (address, isTemp) => {
+    if (pending || creating || updating || deleting) return;
+    setPending(true);
+    const { enqueueSnackbar } = await import('notistack');
+
+    try {
+      let isStored = address?.isDefault == null;
+
+      if (!isStored && isTemp) { //Convert saved to stored
+        const { isDefault, ...newAddress } = address; //Remove isDefault
+        handleRemoveAddress(address); //Remove saved address
+        addNewAddress(newAddress); //Add to store
+        handleClose();
+        setErrMsg('');
+        setErr([]);
+        setPending(false);
+        enqueueSnackbar('Cập nhật địa chỉ thành công!', { variant: 'success' });
+      } else if (isStored && !isTemp) { //Convert stored to saved
+        createAddress({
+          name: address.name,
+          companyName: address.company,
+          phone: address.phone,
+          city: address.city,
+          address: address.address,
+          type: address.type,
+        })
+          .unwrap()
+          .then((data) => {
+            handleRemoveAddress(address); //Remove stored address
+
+            //Reset state
+            handleClose();
+            handleCloseContext();
+            setErrMsg('');
+            setErr([]);
+            setPending(false);
+            enqueueSnackbar('Cập nhật địa chỉ thành công!', { variant: 'success' });
+          })
+          .catch((err) => {
+            console.error(err);
+            setErr(err);
+            if (!err?.status) {
+              setErrMsg('Server không phản hồi');
+            } else if (err?.status === 400) {
+              setErrMsg('Sai định dạng thông tin!');
+            } else if (err?.status === 409) {
+              setErrMsg('Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!');
+            } else {
+              setErrMsg('Cập nhật địa chỉ thất bại');
+            }
+            setPending(false);
+            enqueueSnackbar('Cập nhật địa chỉ thất bại!', { variant: 'error' });
+          })
+      }
+
+    } catch (err) { //Redux error
+      console.error(err);
+      setErr(err);
+      handleClose();
+      handleCloseContext();
+      setPending(false);
+      enqueueSnackbar('Thêm địa chỉ thất bại!', { variant: 'error' });
+    }
+  }
+
+  const handleSetDefault = async (address) => {
+    if (pending || creating || updating || deleting) return;
+    setPending(true);
+    const { enqueueSnackbar } = await import('notistack');
+
+    try {
+      let isStored = address?.isDefault == null;
+
+      if (isStored) { //If stored address
+        createAddress({
+          name: address.name,
+          companyName: address.company,
+          phone: address.phone,
+          city: address.city,
+          address: address.address,
+          type: address.type,
+          isDefault: true
+        })
+          .unwrap()
+          .then((data) => {
+            handleRemoveAddress(address); //Remove stored address
+
+            //Reset state
+            handleClose();
+            handleCloseContext();
+            setErrMsg('');
+            setErr([]);
+            setPending(false);
+            enqueueSnackbar('Cập nhật địa chỉ thành công!', { variant: 'success' });
+          })
+          .catch((err) => {
+            console.error(err);
+            setErr(err);
+            if (!err?.status) {
+              setErrMsg('Server không phản hồi');
+            } else if (err?.status === 400) {
+              setErrMsg('Sai định dạng thông tin!');
+            } else if (err?.status === 409) {
+              setErrMsg('Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!');
+            } else {
+              setErrMsg('Thêm địa chỉ thất bại');
+            }
+            setPending(false);
+            enqueueSnackbar('Thêm địa chỉ thất bại!', { variant: 'error' });
+          })
+      } else {
+        handleUpdateAddress(address, true); //Update default address
+      }
+    } catch (err) {
+      console.error(err);
+      setErr(err);
+      handleClose();
+      handleCloseContext();
+      setPending(false);
+    }
+  }
+
+  const handleClickRemove = async (address) => {
+    const confirmation = await confirm();
+    if (confirmation) {
+      handleRemoveAddress(address);
     } else {
-      setAddressInfo(addresses.filter(item => item.id == selectedValue)[0]);
+      console.log('Cancel');
+    }
+  }
+
+  const handleSetAddress = (address) => {
+    if (address) {
+      setAddressInfo(address);
+    } else if (`${selectedValue}`.startsWith('s-')) {
+      setAddressInfo(storeAddresses.filter(item => item.id == selectedValue)[0]);
+    } else if (data?.ids?.length) {
+      setAddressInfo(data?.entities[selectedValue]);
     }
   }
 
@@ -170,46 +392,66 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
     handleCloseDialog();
   }
 
-  const isDefault = (contextAddress != null && contextAddress?.id == null);
-  const isSelected = (selectedValue != null && selectedValue == contextAddress?.id);
+  let addressesContent;
+  let storedContent = storeAddresses?.map((address, index) => (
+    <Fragment key={`stored-${address?.id}-${index}`}>
+      <AddressItem
+        onCheck={(e) => setSelectedValue(e.target.value)}
+        {...{ addressInfo: address, handleOpen, handleClick, selectedValue, isTemp: true }}
+      />
+    </Fragment>
+  ))
+
+  if (isLoading) {
+    addressesContent = <PlaceholderContainer>
+      <CircularProgress color="primary" size={40} thickness={5} />
+    </PlaceholderContainer>
+  } else if (isSuccess) {
+    const { ids, entities } = data;
+
+    addressesContent = <>
+      {ids?.length ?
+        ids?.map((id, index) => {
+          const savedAddress = entities[id];
+          if (savedAddress.isDefault && selectedValue == -1) setSelectedValue(id);
+
+          return (
+            <Fragment key={`saved-${id}-${index}`}>
+              <AddressItem
+                onCheck={(e) => setSelectedValue(e.target.value)}
+                {...{ addressInfo: savedAddress, handleOpen, handleClick, selectedValue }}
+              />
+            </Fragment>
+          )
+        })
+        : null
+      }
+    </>
+  } else if (isError) {
+    addressesContent = <MessageContainer>
+      <Message className="error">{error?.error || 'Đã xảy ra lỗi'}</Message>
+    </MessageContainer>
+  }
+
+  const isSelectedDefault = (contextAddress != null && contextAddress?.isDefault);
 
   return (
     <Dialog open={openDialog} scroll={'paper'} maxWidth={'sm'} fullWidth onClose={handleCloseDialog} fullScreen={fullScreen}>
       {openForm
         ?
-        <Suspense fallBack={<></>}>
+        <Suspense fallBack={null}>
           <AddressForm {...{
-            open: openForm, handleClose, addressInfo: contextAddress, err, setErr, errMsg, setErrMsg, getFullAddress,
-            addNewAddress, pending, setPending, handleRemoveAddress, handleUpdateAddress, defaultAddressToStore, selectedValue
+            open, handleClose, addressInfo: contextAddress, err, errMsg, setErrMsg,
+            addNewAddress, pending, setPending, handleConvertAddress,
+            handleSetDefault, handleCreateAddress, handleClickRemove, handleUpdateAddress
           }} />
         </Suspense>
         :
         <>
           <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><LocationOn />&nbsp;Địa chỉ của bạn</DialogTitle>
           <DialogContent sx={{ padding: { xs: 1, sm: '20px 24px' } }}>
-            <Box display="flex" mb={'5px'}>
-              <StyledRadio
-                checked={selectedValue == -1}
-                disabled={!profile}
-                onChange={(e) => setSelectedValue(e.target.value)}
-                value={-1}
-                name="radio-buttons"
-              />
-              <AddressItem {...{ addressInfo: profile, handleOpen, handleClick, selectedValue }} />
-            </Box>
-            {addresses?.map((address, index) => {
-              return (
-                <Box display="flex" mb={'5px'} key={`${address?.id}-${index}`} >
-                  <StyledRadio
-                    checked={selectedValue == address.id}
-                    onChange={(e) => setSelectedValue(e.target.value)}
-                    value={address.id}
-                    name="radio-buttons"
-                  />
-                  <AddressItem {...{ addressInfo: address, handleOpen, handleClick, selectedValue }} />
-                </Box>
-              )
-            })}
+            {addressesContent}
+            {storedContent}
             <Button
               variant="outlined"
               size="large"
@@ -219,6 +461,14 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
             >
               <AddHome />&nbsp;Thêm địa chỉ
             </Button>
+            {(!isLoading && !isError && !data?.ids?.length && !storeAddresses?.length) &&
+              <MessageContainer>
+                <Message>
+                  <StyledEmptyIcon />
+                  Chưa có địa chỉ nào
+                </Message>
+              </MessageContainer>
+            }
           </DialogContent>
           <DialogActions>
             <Button
@@ -251,19 +501,20 @@ const AddressSelectDialog = ({ profile, pending, setPending, setAddressInfo, ope
               'aria-labelledby': 'basic-button',
             }}
           >
-            <MenuItem disabled={isDefault || isSelected} onClick={() => handleRemoveAddress(contextAddress?.id)}>
+            <MenuItem disabled={isSelectedDefault} onClick={() => handleClickRemove(contextAddress)}>
               <ListItemIcon >
                 <Delete sx={{ color: 'error.main' }} fontSize="small" />
               </ListItemIcon>
               <ListItemText sx={{ color: 'error.main' }}>Xoá địa chỉ</ListItemText>
             </MenuItem>
-            <MenuItem disabled={isDefault || isSelected} onClick={() => handleSetDefault(contextAddress)}>
+            <MenuItem disabled={isSelectedDefault} onClick={() => handleSetDefault(contextAddress)}>
               <ListItemIcon>
                 <Home fontSize="small" />
               </ListItemIcon>
               <ListItemText>Đặt làm mặc định</ListItemText>
             </MenuItem>
           </Menu >
+          <ConfirmationDialog />
         </>
       }
     </Dialog>

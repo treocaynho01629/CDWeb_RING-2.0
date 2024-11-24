@@ -5,9 +5,9 @@ import { Skeleton, Rating, Box, Grid2 as Grid, alpha, Divider, Stack } from '@mu
 import { Link } from 'react-router-dom';
 import { numFormatter } from '../../../ultils/covert';
 import { lazy, Suspense, useState } from 'react';
+import { useGetMyAddressQuery } from '../../../features/addresses/addressesApiSlice';
 import ProductImages from './ProductImages';
 import ProductAction from './ProductAction';
-import { useGetMyAddressQuery } from '../../../features/addresses/addressesApiSlice';
 
 const CouponPreview = lazy(() => import('../../coupon/CouponPreview'));
 const AddressPreview = lazy(() => import('../../address/AddressPreview'));
@@ -359,8 +359,8 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                             <Suspense fallback={addressPlaceholder}>
                                 {book &&
                                     <>
-                                        <AddressPreview {...{ addressInfo, handleOpen: handleOpenDialog, loadProfile: loadAddress }} />
-                                        <AddressSelectDialog {...{ profile: address, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }} />
+                                        <AddressPreview {...{ addressInfo, handleOpen: handleOpenDialog, loadAddress }} />
+                                        <AddressSelectDialog {...{ address, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }} />
                                     </>
                                 }
                             </Suspense>

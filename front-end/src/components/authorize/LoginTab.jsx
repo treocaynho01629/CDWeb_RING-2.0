@@ -73,7 +73,7 @@ const LoginTab = ({ pending, setPending }) => {
                 console.error(err);
                 if (!err?.status) {
                     setErrMsgLogin('Server không phản hồi');
-                } else if (err?.status === 403 || err?.status === 400) {
+                } else if (err?.status === 404 || err?.status === 403 || err?.status === 400) {
                     setErrMsgLogin('Sai tên tài khoản hoặc mật khẩu!');
                 } else if (err?.status === 429) {
                     setErrMsgLogin('Bạn đã thử quá nhiều lần, vui lòng thử lại sau!');

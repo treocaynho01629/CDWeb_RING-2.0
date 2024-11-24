@@ -1,9 +1,14 @@
 import styled from '@emotion/styled'
 import { KeyboardArrowRight, MoreHoriz } from '@mui/icons-material';
-import { Box, Button, IconButton } from '@mui/material'
+import { Box, Button, IconButton, Radio } from '@mui/material'
 import { PHONE_REGEX } from '../../ultils/regex';
 
 //#region styled
+const Wrapper = styled.div`
+    display: flex;
+    margin-bottom: 5px;
+`
+
 const AddressItemContainer = styled.div`
     position: relative;
     display: flex;
@@ -12,7 +17,6 @@ const AddressItemContainer = styled.div`
     width: 100%;
     padding: 20px;
     border: 0.5px solid ${props => props.theme.palette.action.focus};
-    margin-bottom: 5px;
 
     &.active { border-color: ${props => props.theme.palette.primary.main};}
     &.temp { border-color: ${props => props.theme.palette.info.dark};}
@@ -79,9 +83,25 @@ const UserAddress = styled.span`
       -webkit-box-orient: vertical;
     }
 `
+
+const StyledRadio = styled(Radio)(({ theme }) => ({
+    borderRadius: 0,
+    backgroundColor: theme.palette.action.disabled,
+    transition: 'all .25s ease',
+
+    '&:hover': {
+        backgroundColor: theme.palette.primary.light,
+        color: theme.palette.primary.contrastText,
+    },
+
+    '&.Mui-checked': {
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+    },
+}));
 //#endregion
 
-const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue, isTemp }) => {
+const AddressItem = ({ onCheck, addressInfo, handleOpen, handleClick, selectedValue, isTemp }) => {
     const isValid = () => {
         if (!addressInfo) return false;
 
@@ -98,56 +118,67 @@ const AddressItem = ({ addressInfo, handleOpen, handleClick, selectedValue, isTe
     const isSelected = (selectedValue != null && selectedValue == addressInfo?.id);
 
     return (
-        <AddressItemContainer className={`${isNotValid ? 'error' : addressInfo?.isDefault ? 'active' : isTemp ? 'temp' : ''}`}>
-            {addressInfo?.isDefault && <AddressTag className={`${isNotValid ? 'error' : ''}`}>Mặc định</AddressTag>}
-            {isTemp && <AddressTag className={`${isNotValid ? 'error' : 'temp'}`}>Tạm lưu</AddressTag>}
-            <Box display="flex" flexDirection={'column'}>
-                {!addressInfo ?
-                    <>
-                        <UserInfo>Chưa có địa chỉ mặc định</UserInfo>
-                        <UserAddress>Tạo địa chỉ tạm thời?</UserAddress>
-                    </>
-                    :
-                    <>
-                        <UserInfo>{addressInfo?.companyName || addressInfo?.name}&nbsp;
-                            {addressInfo?.phone && `(+84) ${addressInfo?.phone}`}
-                        </UserInfo>
-                        <UserAddress>{addressInfo?.city}, {addressInfo?.address}</UserAddress>
-                    </>
-                }
-            </Box>
-            <Button
-                sx={{ display: { xs: 'none', sm: 'flex' }, whiteSpace: 'nowrap', marginTop: 2 }}
-                aria-label="toggle address dialog"
-                variant="outlined"
-                color={isNotValid ? "error" : isTemp ? "info" : "primary"}
-                onClick={() => handleOpen(addressInfo)}
-            >
-                Thay đổi
-            </Button>
-            <IconButton
-                sx={{ display: { xs: 'block', sm: 'none' } }}
-                aria-label="mobile toggle address dialog"
-                onClick={() => handleOpen(addressInfo)}
-                color={isNotValid ? "error" : "primary"}
-                edge="end"
-            >
-                <KeyboardArrowRight />
-            </IconButton>
-            {(!addressInfo?.isDefault && !isSelected) &&
-                <IconButton
-                    sx={{
-                        display: { xs: 'none', sm: 'flex' },
-                        position: 'absolute',
-                        top: 1,
-                        right: 2
-                    }}
-                    onClick={(e) => handleClick(e, addressInfo)}
-                >
-                    <MoreHoriz />
-                </IconButton>
+        <Wrapper>
+            {onCheck &&
+                <StyledRadio
+                    checked={selectedValue == addressInfo?.id}
+                    onChange={onCheck}
+                    value={addressInfo?.id}
+                    color={isNotValid ? "error" : isTemp ? "info" : "primary"}
+                    name="address-radio-button"
+                />
             }
-        </AddressItemContainer>
+            <AddressItemContainer className={`${isNotValid ? 'error' : addressInfo?.isDefault ? 'active' : isTemp ? 'temp' : ''}`}>
+                {addressInfo?.isDefault && <AddressTag className={`${isNotValid ? 'error' : ''}`}>Mặc định</AddressTag>}
+                {isTemp && <AddressTag className={`${isNotValid ? 'error' : 'temp'}`}>Tạm lưu</AddressTag>}
+                <Box display="flex" flexDirection={'column'}>
+                    {!addressInfo ?
+                        <>
+                            <UserInfo>Chưa có địa chỉ mặc định</UserInfo>
+                            <UserAddress>Tạo địa chỉ tạm thời?</UserAddress>
+                        </>
+                        :
+                        <>
+                            <UserInfo>{addressInfo?.companyName || addressInfo?.name}&nbsp;
+                                {addressInfo?.phone && `(+84) ${addressInfo?.phone}`}
+                            </UserInfo>
+                            <UserAddress>{[addressInfo?.city, addressInfo?.address].join(", ")}</UserAddress>
+                        </>
+                    }
+                </Box>
+                <Button
+                    sx={{ display: { xs: 'none', sm: 'flex' }, whiteSpace: 'nowrap', marginTop: 2 }}
+                    aria-label="toggle address dialog"
+                    variant="outlined"
+                    color={isNotValid ? "error" : isTemp ? "info" : "primary"}
+                    onClick={() => handleOpen(addressInfo)}
+                >
+                    Thay đổi
+                </Button>
+                <IconButton
+                    sx={{ display: { xs: 'block', sm: 'none' } }}
+                    aria-label="mobile toggle address dialog"
+                    onClick={() => handleOpen(addressInfo)}
+                    color={isNotValid ? "error" : "primary"}
+                    edge="end"
+                >
+                    <KeyboardArrowRight />
+                </IconButton>
+                {(!addressInfo?.isDefault && !isSelected) &&
+                    <IconButton
+                        sx={{
+                            display: { xs: 'none', sm: 'flex' },
+                            position: 'absolute',
+                            top: 1,
+                            right: 2
+                        }}
+                        onClick={(e) => handleClick(e, addressInfo)}
+                    >
+                        <MoreHoriz />
+                    </IconButton>
+                }
+            </AddressItemContainer>
+        </Wrapper>
     )
 }
 

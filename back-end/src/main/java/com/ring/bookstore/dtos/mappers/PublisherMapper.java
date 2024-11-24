@@ -14,12 +14,13 @@ public class PublisherMapper implements Function<IPublisher, PublisherDTO> {
     @Override
     public PublisherDTO apply(IPublisher projection) {
 		Publisher publisher = projection.getPublisher();
-
-        String fileDownloadUri = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/api/images/")
-                .path(projection.getImage())
-                .toUriString();
+        String fileDownloadUri = projection.getImage() != null ?
+                ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/api/images/")
+                        .path(projection.getImage())
+                        .toUriString()
+                : null;
 
         return new PublisherDTO(publisher.getId()
 				, publisher.getPubName()

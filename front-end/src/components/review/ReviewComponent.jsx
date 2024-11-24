@@ -91,7 +91,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
     const productReviewsCount = book?.reviewsInfo?.count[0] ?? 0;
     const haveReviews = !(!book || productReviewsCount == 0);
     const { data: userReview, isSuccess: doneReview, error: errorReview } = useGetReviewByBookIdQuery(book?.id, //User's review of this product
-        { skip: !username });
+        { skip: !username || !book });
     const { data, isLoading, isFetching, isSuccess, isUninitialized, isError, error } = useGetReviewsByBookIdQuery({
         id: book?.id,
         page: pagination?.currPage,

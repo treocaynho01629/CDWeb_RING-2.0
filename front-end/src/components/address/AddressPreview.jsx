@@ -1,7 +1,9 @@
 import styled from '@emotion/styled'
 import { KeyboardArrowDown, KeyboardArrowRight, LocalShippingOutlined } from '@mui/icons-material';
 import { Box } from '@mui/material'
+import { useLocation, useNavigate } from "react-router-dom";
 import { MobileExtendButton } from '../custom/GlobalComponents';
+import useAuth from '../../hooks/useAuth';
 
 //#region styled
 const PreviewWrapper = styled.div`
@@ -55,14 +57,26 @@ const AddressInfo = styled.span`
 `
 //#endregion
 
-const AddressPreview = ({ addressInfo, handleOpen, loadProfile }) => {
+const AddressPreview = ({ addressInfo, handleOpen, loadAddress }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { username } = useAuth();
+    const fullAddress = [addressInfo?.city, addressInfo?.address].join(", ");
+
+    const handleClickOpen = () => {
+        if (!username) {
+            navigate('/auth/login', { state: { from: location }, replace: true });
+        } else if (handleOpen) {
+            handleOpen();
+        }
+    }
 
     return (
         <PreviewWrapper>
             <DetailTitle>Vận chuyển:</DetailTitle>
             <PreviewContainer>
                 <Box display="flex" flexDirection={'column'} position="relative" width="100%">
-                    {(!addressInfo && loadProfile)
+                    {(!addressInfo && loadAddress)
                         ?
                         <Box>Đang cập nhật...</Box>
                         :
@@ -71,12 +85,12 @@ const AddressPreview = ({ addressInfo, handleOpen, loadProfile }) => {
                             <Box overflow="hidden">
                                 <AddressInfo
                                     aria-label="toggle address dialog"
-                                    disabled={loadProfile}
-                                    onClick={handleOpen}
+                                    disabled={loadAddress}
+                                    onClick={handleClickOpen}
                                 >
                                     &nbsp;Vận chuyển tới:&emsp;
                                     <Address>
-                                        {addressInfo?.address || 'Không xác định'}
+                                        {fullAddress.length > 2 ? fullAddress : 'Không xác định'}
                                     </Address>
                                     <KeyboardArrowDown sx={{ display: { xs: 'none', md: 'block' } }} />
                                 </AddressInfo>
@@ -85,7 +99,7 @@ const AddressPreview = ({ addressInfo, handleOpen, loadProfile }) => {
                         </Box>
                     }
                 </Box>
-                <MobileExtendButton disabled={loadProfile} onClick={handleOpen}>
+                <MobileExtendButton disabled={loadAddress} onClick={handleOpen}>
                     <KeyboardArrowRight fontSize="small" />
                 </MobileExtendButton>
             </PreviewContainer>
