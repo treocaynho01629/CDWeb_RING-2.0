@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { KeyboardArrowUp } from "@mui/icons-material";
-import { useLocation } from "react-router-dom";
+import { useLocation } from 'react-router';
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import styled from "@emotion/styled";
 

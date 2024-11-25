@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { useEffect, useMemo, useState, Suspense, lazy, useCallback } from "react";
 import { Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, Search, ChevronLeft, Sell } from '@mui/icons-material';
 import { Checkbox, Button, Grid2 as Grid, Table, TableBody, TableRow, Box, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router';
 import { booksApiSlice } from '../../features/books/booksApiSlice';
 import { useCalculateMutation } from '../../features/orders/ordersApiSlice';
 import { ActionTableCell, StyledTableCell, StyledTableHead } from '../custom/CustomTableComponents';
@@ -169,15 +169,10 @@ const CartContent = () => {
     const [calculate, { isLoading }] = useCalculateMutation();
 
     //#region construct
-    useEffect(() => {
-        if (!cartProducts?.length || cartProducts.length == 0) {
-            console.log('clear')
-            handleCalculate.cancel(); 
-        
-        }
-    }, [cartProducts])
-
     useDeepEffect(() => {
+        if (!selected.length || !cartProducts?.length || cartProducts.length == 0) {
+            handleCalculate.cancel();
+        }
         handleCartChange();
     }, [selected, cartProducts, shopCoupon, coupon])
 
@@ -302,7 +297,7 @@ const CartContent = () => {
 
     //Sync cart between client and server
     const syncCart = (cart) => {
-        if (!cartProducts?.length || !selected.length) return;
+        if (!cartProducts?.length) return;
         const details = cart?.details;
 
         details.forEach((detail, index) => {
@@ -379,7 +374,7 @@ const CartContent = () => {
         setOpenDialog(true);
         setContextShop(shopId);
         setContextState(shopId ? checkState?.details[shopId] : { value: checkState?.value, quantity: checkState?.quantity });
-        setContextCoupon(shopId ? shopCoupon[shopId] : coupon)
+        setContextCoupon(shopId ? shopCoupon[shopId] : coupon);
     };
 
     const handleCloseDialog = () => {
@@ -497,6 +492,7 @@ const CartContent = () => {
         } else {
             selected.forEach((id) => { removeProduct(id) });
         }
+        handleCalculate.cancel();
         handleClearSelect();
     };
 
@@ -566,18 +562,18 @@ const CartContent = () => {
                     <Title><Sell />&nbsp;ĐƠN DỰ TÍNH</Title>
                 </TitleContainer>
                 <CheckoutDialog {...{
-                    coupon: coupon, navigate, calculating: isLoading,
-                    calculated, estimated, numSelected: selected.length, handleOpenDialog
+                    coupon, shopCoupon, selected, navigate, calculating: isLoading,
+                    calculated, estimated, handleOpenDialog
                 }} />
             </Grid>
-            <Suspense fallback={<></>}>
+            <Suspense fallback={null}>
                 {openDialog !== undefined
                     && <CouponDialog {...{
-                        openDialog, handleCloseDialog, shopId: contextShop, checkState: contextState,
-                        numSelected: selected.length, selectedCoupon: contextCoupon, selectMode: true, onClickApply: handleChangeCoupon
+                        open: openDialog, handleClose: handleCloseDialog, shopId: contextShop, checkState: contextState,
+                        numSelected: selected.length, selectedCoupon: contextCoupon, selectMode: true, onSubmit: handleChangeCoupon
                     }} />}
             </Suspense>
-            <Suspense fallback={<></>}>
+            <Suspense fallback={null}>
                 {open !== undefined &&
                     <Menu
                         open={open}

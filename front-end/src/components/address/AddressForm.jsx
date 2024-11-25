@@ -4,6 +4,7 @@ import { Checkbox, Button, DialogActions, DialogContent, FormControlLabel, Grid2
 import { location } from '../../ultils/location'
 import { PHONE_REGEX } from '../../ultils/regex';
 import { Instruction } from '../custom/GlobalComponents';
+import { addressItems } from '../../ultils/address';
 
 const splitAddress = (addressInfo) => {
     let city = '';
@@ -193,8 +194,9 @@ const AddressForm = ({ handleClose, addressInfo, err, errMsg, setErrMsg, selecte
                                     size="small"
                                 >
                                     <MenuItem value=""><em>--Không--</em></MenuItem>
-                                    <MenuItem value="Nhà riêng">Nhà riêng</MenuItem>
-                                    <MenuItem value="Văn phòng">Văn phòng</MenuItem>
+                                    {addressItems.map((item, index) => (
+                                        <MenuItem key={index} value={item.value}>{item.label}</MenuItem>
+                                    ))}
                                 </TextField>
                             </Grid>
                         </Grid>

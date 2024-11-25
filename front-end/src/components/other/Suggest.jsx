@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import { Grid2 as Grid } from "@mui/material";
-import { Link } from "react-router-dom"
+import { Link } from 'react-router'
 import { suggest } from '../../ultils/suggest';
 
 //#region styled

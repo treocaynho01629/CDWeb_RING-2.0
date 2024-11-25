@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch, Avatar, Grid2 as Grid, TextField, MenuItem } from '@mui/material';
 import { Delete as DeleteIcon, Search, Star } from '@mui/icons-material';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router';
 import { useDeleteReviewMutation, useDeleteReviewsMutation, useGetReviewsQuery } from '../../../features/reviews/reviewsApiSlice';
 import { FooterLabel, ItemTitle, FooterContainer } from '../custom/ShareComponents';
 import { idFormatter } from '../../../ultils/covert';

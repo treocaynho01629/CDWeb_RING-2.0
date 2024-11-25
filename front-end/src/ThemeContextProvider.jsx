@@ -19,7 +19,6 @@ export function ThemeContextProvider({ children }) {
         },
         success: {
             main: "#6de363",
-            contrastText: "#ffffff",
         },
         secondary: {
             main: "#424242",
@@ -42,6 +41,14 @@ export function ThemeContextProvider({ children }) {
             dark: {
                 palette: {
                     ...myPalette,
+                    primary: {
+                        main: "#63e399",
+                        contrastText: "#3a3a3a",
+                    },
+                    secondary: {
+                        main: "#818181",
+                        contrastText: "#0c0c0c",
+                    },
                     text: {
                         primary: '#f1f1f1',
                     },
@@ -81,7 +88,6 @@ export function ThemeContextProvider({ children }) {
                         '&.MuiButton-contained': {
                             '&:hover': {
                                 backgroundColor: theme.palette.grey[300],
-                                color: theme.palette.text.primary
                             },
 
                             '&:disabled': {

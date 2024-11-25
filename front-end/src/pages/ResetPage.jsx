@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import { useState, lazy, Suspense } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 
 const PendingModal = lazy(() => import('../components/layout/PendingModal'));

@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 import { useRef, Fragment } from "react"
 import { IconButton, Skeleton } from "@mui/material";
 import { KeyboardArrowRight, KeyboardArrowLeft } from '@mui/icons-material';
-import { Link } from "react-router-dom"
+import { Link } from 'react-router'
 import { useGetPreviewCategoriesQuery } from "../../features/categories/categoriesApiSlice";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
@@ -104,7 +104,7 @@ const Wrapper = styled.div`
     }
 `
 
-const ButtonContainer = styled.div`
+const ButtonContainer = styled.div` //FIX
     position: absolute;
     right: 5px;
     padding-left: 20px;

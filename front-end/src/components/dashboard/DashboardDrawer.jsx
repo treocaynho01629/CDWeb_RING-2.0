@@ -3,7 +3,7 @@ import { styled as muiStyled } from '@mui/material';
 import { useState } from 'react'
 import { ExpandLess, ExpandMore, Category, TrendingUp, AutoStories, Speed, Groups, Star } from '@mui/icons-material';
 import { ListItem, ListItemButton, ListItemIcon, ListItemText, List, Collapse, ListSubheader, Drawer } from '@mui/material';
-import { NavLink } from "react-router-dom";
+import { NavLink } from 'react-router';
 import MuiDrawer from '@mui/material/Drawer';
 import useAuth from "../../hooks/useAuth";
 

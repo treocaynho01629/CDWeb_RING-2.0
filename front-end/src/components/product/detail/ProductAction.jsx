@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 import { AddShoppingCart } from '@mui/icons-material';
 import { Button, Box, Divider, useTheme, useMediaQuery, Skeleton, SwipeableDrawer } from '@mui/material';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import CustomAmountInput from '../../custom/CustomAmountInput';
 import useCart from '../../../hooks/useCart';
 

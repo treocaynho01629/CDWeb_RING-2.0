@@ -34,6 +34,34 @@ export const StyledTableCell = styled(TableCell)`
             padding: 0;
         }
     }
+
+    &.preview {
+        &.${tableCellClasses.body} {
+            padding: 12px 16px;
+        }
+
+        &.${tableCellClasses.head} {
+            padding: 4px;
+        }
+
+        &.${tableCellClasses.paddingCheckbox} {
+            padding: 0;
+        }
+
+        ${props => props.theme.breakpoints.down("sm")} {
+            &.${tableCellClasses.body} {
+                padding: 8px 8px 8px 4px;
+            }
+
+            &.${tableCellClasses.head} {
+                padding: 4px;
+            }
+
+            &.${tableCellClasses.paddingCheckbox} {
+                padding: 0;
+            }
+        }
+    }
 `
 
 export const ActionTableCell = styled(TableCell)`
@@ -108,13 +136,15 @@ export const StyledTableRow = styled(TableRow)`
         border: .5px solid ${props => props.theme.palette.action.focus};
         z-index: -1;
 
-        &.shop {
-            border-bottom: none;
-        }
-
         ${props => props.theme.breakpoints.down("sm")} {
             border-left: none;
             border-right: none;
+        }
+    }
+
+    &.shop {
+        &:after{ 
+            border-bottom: none;
         }
     }
 `

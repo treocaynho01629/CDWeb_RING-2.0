@@ -7,7 +7,7 @@ import {
     Stack, Badge, IconButton, Avatar, Box, Grid2 as Grid, TextField, AppBar, useMediaQuery, useTheme, useScrollTrigger,
     useColorScheme
 } from '@mui/material';
-import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { LogoImage } from '../custom/GlobalComponents';
 import { debounce } from 'lodash-es';
 import useLogout from "../../hooks/useLogout";

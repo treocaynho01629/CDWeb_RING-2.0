@@ -1,6 +1,6 @@
 import { Brightness3, Brightness7, DeliveryDiningOutlined, LockOutlined, SettingsBrightness, Speed } from '@mui/icons-material';
 import { Avatar, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, mode, toggleMode }) => {
     const role = roles?.length;

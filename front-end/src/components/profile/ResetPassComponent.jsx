@@ -4,7 +4,7 @@ import { Check, KeyboardArrowLeft, Password } from "@mui/icons-material";
 import { PWD_REGEX } from "../../ultils/regex";
 import { useChangePasswordMutation } from '../../features/users/usersApiSlice';
 import { Instruction } from '../custom/GlobalComponents';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { StyledDialogTitle } from '../custom/ProfileComponents';
 import CustomPasswordInput from "../custom/CustomPasswordInput";
 

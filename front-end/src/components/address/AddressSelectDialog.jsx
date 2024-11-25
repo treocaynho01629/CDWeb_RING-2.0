@@ -3,6 +3,7 @@ import { useEffect, useState, lazy, Suspense, Fragment } from 'react'
 import { Dialog, Button, DialogActions, DialogContent, ListItemIcon, ListItemText, Menu, MenuItem, useMediaQuery, DialogTitle, useTheme, CircularProgress } from '@mui/material';
 import { AddHome, Check, Delete, Home, LocationOn, Close } from '@mui/icons-material';
 import { useCreateAddressMutation, useDeleteAddressMutation, useGetMyAddressesQuery, useUpdateAddressMutation } from '../../features/addresses/addressesApiSlice';
+import { ReactComponent as EmptyIcon } from '../../assets/empty.svg';
 import { Message } from '../custom/GlobalComponents';
 import AddressItem from './AddressItem'
 import useCart from '../../hooks/useCart';
@@ -23,6 +24,13 @@ const PlaceholderContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+`
+
+const StyledEmptyIcon = styled(EmptyIcon)`
+    height: 70px;
+    width: 70px;
+    margin: ${props => props.theme.spacing(1)} 0;
+    fill: ${props => props.theme.palette.text.icon};
 `
 //#endregion
 
@@ -449,7 +457,7 @@ const AddressSelectDialog = ({ address, pending, setPending, setAddressInfo, ope
         :
         <>
           <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><LocationOn />&nbsp;Địa chỉ của bạn</DialogTitle>
-          <DialogContent sx={{ padding: { xs: 1, sm: '20px 24px' } }}>
+          <DialogContent sx={{ padding: { xs: 1, sm: '20px 24px' }, height: '100dvh' }}>
             {addressesContent}
             {storedContent}
             <Button

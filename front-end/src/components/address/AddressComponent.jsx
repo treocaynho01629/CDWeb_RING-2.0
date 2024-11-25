@@ -5,7 +5,7 @@ import { CircularProgress, Dialog, ListItemIcon, ListItemText, Menu, MenuItem, u
 import { AddHome, Delete, Home, KeyboardArrowLeft, LocationOn } from '@mui/icons-material';
 import { StyledDialogTitle } from '../custom/ProfileComponents';
 import { ReactComponent as EmptyIcon } from '../../assets/empty.svg';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Message } from '../custom/GlobalComponents';
 import AddressItem from './AddressItem'
 import AddressForm from './AddressForm'

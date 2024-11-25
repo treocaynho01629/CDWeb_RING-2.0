@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet } from 'react-router';
 import { useRefreshMutation } from "../../features/auth/authApiSlice";
 import { Button } from "@mui/material";
 import useAuth from '../../hooks/useAuth';

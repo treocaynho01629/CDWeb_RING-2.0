@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { RemoveShoppingCart as RemoveShoppingCartIcon } from '@mui/icons-material';
 import { Button, Skeleton, Popover } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 //#region styled

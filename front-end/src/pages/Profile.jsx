@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 import { useState, lazy, Suspense } from 'react'
 import { Dialog, Skeleton } from '@mui/material';
 import { StyledDialogTitle, TabContentContainer } from "../components/custom/ProfileComponents";
-import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { useNavigate, useOutletContext, useParams } from 'react-router';
 import CustomPlaceholder from '../components/custom/CustomPlaceholder';
 import useTitle from '../hooks/useTitle';
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, FormControlLabel, Switch, Avatar, Chip, Grid2 as Grid, TextField, MenuItem, TableFooter, IconButton } from '@mui/material';
 import { Group as GroupIcon, Edit as EditIcon, Delete as DeleteIcon, Search, MoreHoriz } from '@mui/icons-material';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router';
 import { useDeleteUserMutation, useDeleteUsersMutation, useGetUsersQuery } from '../../../features/users/usersApiSlice';
 import { FooterLabel, ItemTitle, FooterContainer } from '../custom/ShareComponents';
 import { idFormatter } from '../../../ultils/covert';

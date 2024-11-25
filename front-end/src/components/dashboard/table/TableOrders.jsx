@@ -1,7 +1,7 @@
 import { useState, useEffect, Fragment } from 'react';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, FormControlLabel, Switch, Collapse, TextField, MenuItem, Avatar, Checkbox, Skeleton, Chip, Badge, Grid2 as Grid, TableFooter } from '@mui/material';
 import { Receipt as ReceiptIcon, KeyboardArrowDown as KeyboardArrowDownIcon, KeyboardArrowUp as KeyboardArrowUpIcon, MoreHoriz } from '@mui/icons-material';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router';
 import { useGetReceiptsQuery } from '../../../features/orders/ordersApiSlice';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { FooterContainer, FooterLabel, ItemTitle } from '../custom/ShareComponents';
@@ -82,7 +82,7 @@ const detailHeadCells = [
 ];
 
 //Item status
-const getStatus = (status) => {
+const getOrderStatus = (status) => {
   switch (status) {
     case 'REFUNDED':
       return { status: 'Hoàn trả', color: 'default' };
@@ -236,7 +236,7 @@ function OrderRow({ isSelected, isOrderSelected, index, id, order, dense,
                   {order?.details.map((temp, tempIndex) => {
                     return (
                       temp?.items.map((detail, index) => {
-                        const itemStatus = getStatus(detail.status);
+                        const itemStatus = getOrderStatus(detail.status);
                         const isDetailSelected = isSelected(detail.id);
                         const detailLabelId = `table-checkbox-${index}`;
 

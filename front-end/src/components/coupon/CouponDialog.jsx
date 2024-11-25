@@ -24,7 +24,6 @@ const DetailTitle = styled.h4`
 `
 
 const CouponContainer = styled.div`
-    /* margin-bottom: ${props => props.theme.spacing(1)}; */
     padding: ${props => props.theme.spacing(1)} ${props => props.theme.spacing(3)};
 
     ${props => props.theme.breakpoints.down("sm")} {
@@ -40,7 +39,7 @@ const CouponsContainer = styled.div`
 `
 //#endregion
 
-const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, openDialog, selectedCoupon, handleCloseDialog, onClickApply }) => {
+const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, open, selectedCoupon, handleClose, onSubmit }) => {
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const inputRef = useRef(null);
@@ -96,8 +95,8 @@ const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, ope
 
     const handleChangeInput = () => { setCouponInput(inputRef?.current?.value) }
     const handleClickApply = (coupon, shopId) => {
-        if (onClickApply) onClickApply(coupon, shopId);
-        handleCloseDialog();
+        if (onSubmit) onSubmit(coupon, shopId);
+        handleClose();
     }
 
     //Display contents
@@ -193,7 +192,7 @@ const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, ope
     }
 
     return (
-        <Dialog open={openDialog} scroll={'paper'} maxWidth={'sm'} fullWidth onClose={handleCloseDialog} fullScreen={fullScreen}>
+        <Dialog open={open} scroll={'paper'} maxWidth={'sm'} fullWidth onClose={handleClose} fullScreen={fullScreen}>
             <DialogTitle>
                 <TitleContainer>
                     <Loyalty />&nbsp;Thông tin ưu đãi
@@ -229,7 +228,7 @@ const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, ope
                 {topCoupon}
             </CouponContainer>
             }
-            <DialogContent sx={{ pt: 0, px: { xs: 1, sm: 3 } }}>
+            <DialogContent sx={{ pt: 0, px: { xs: 1, sm: 3 }, height: '100dvh' }}>
                 <CouponsContainer>
                     {shippingCoupons}
                     {coupons}
@@ -257,7 +256,7 @@ const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, ope
                     size="large"
                     sx={{ marginY: '10px' }}
                     startIcon={<Close />}
-                    onClick={handleCloseDialog}
+                    onClick={handleClose}
                 >
                     Đóng
                 </Button>

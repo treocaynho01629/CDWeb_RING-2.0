@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { useState, lazy, Suspense, useEffect } from 'react';
 import { Avatar, Box, Card, CardContent, IconButton, Typography, Grid2 as Grid, Divider } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 import EditIcon from '@mui/icons-material/Edit';
 import useTitle from '../../hooks/useTitle'
 import { useGetUserQuery } from '../../features/users/usersApiSlice';

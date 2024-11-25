@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import { Grid2 as Grid, Button, Skeleton } from '@mui/material';
-import { Link } from "react-router-dom"
+import { Link } from 'react-router'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useGetRandomBooksQuery } from "../../features/books/booksApiSlice";

@@ -3,7 +3,7 @@ import { Fragment, useEffect } from 'react';
 import { MoreHoriz, Storefront, KeyboardArrowRight, LocalActivityOutlined } from '@mui/icons-material';
 import { IconButton, Box, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { ActionTableCell, StyledItemTableRow, StyledTableRow, SpaceTableRow, StyledTableCell } from '../custom/CustomTableComponents';
 import CustomAmountInput from '../custom/CustomAmountInput';
 
@@ -277,11 +277,7 @@ const CartDetailRow = ({ id, index, shop, coupon, couponDiscount, isSelected, is
     return (
         <Fragment key={`detail-${id}-${index}`}>
             <SpaceTableRow />
-            <StyledTableRow
-                role="shop-checkbox"
-                className="shop"
-                tabIndex={-1}
-            >
+            <StyledTableRow role="shop-checkbox" tabIndex={-1}>
                 <StyledTableCell padding="checkbox">
                     <StyledCheckbox
                         color="primary"

@@ -1,7 +1,7 @@
 import useTitle from '../hooks/useTitle';
 import OrdersList from "../components/order/OrdersList";
 import { Dialog } from "@mui/material";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from 'react-router';
 import { TabContentContainer } from "../components/custom/ProfileComponents";
 
 const Orders = () => {

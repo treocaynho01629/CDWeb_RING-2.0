@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { useState, useEffect, lazy, Suspense, useRef } from "react";
 import { alpha, Button } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
 import { useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import { Category, ExpandMore, GpsNotFixed, KeyboardArrowRight, Replay, ThumbUpAlt } from '@mui/icons-material';

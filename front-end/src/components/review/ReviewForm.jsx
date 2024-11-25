@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { Close, Edit, Star, StarBorder } from '@mui/icons-material';
 import { Rating, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, TextareaAutosize } from '@mui/material';
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from 'react-router';
 import { useCreateReviewMutation, useUpdateReviewMutation } from '../../features/reviews/reviewsApiSlice';
 import { useEffect, useState } from 'react';
 import { rateLabels } from '../../ultils/filters';

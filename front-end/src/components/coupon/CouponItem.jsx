@@ -38,62 +38,6 @@ const CouponEdge = styled(Paper)`
     }
 `
 
-const CouponContainer = styled.div`
-    position: relative;
-    border-radius: 5px;
-    padding: 5px;
-    height: 100%;
-    background-color: ${props => props.theme.palette.background.default};
-    border: .5px solid ${props => props.theme.palette.divider};
-    box-shadow: ${props => props.theme.shadows[1]};
-
-    &.active {
-        background-color: ${props => alpha(props.theme.palette.primary.light, 0.1)};
-        border-color: ${props => props.theme.palette.primary.main};
-
-        ${CouponEdge} {
-            border-color: ${props => props.theme.palette.primary.main};
-        }
-    }
-
-    &.disabled {
-        filter: grayscale(1);
-        pointer-events: none;
-
-        &::after {
-            content: "CHƯA THOẢ ĐIỀU KIỆN";
-            position: absolute;
-            right: 20px;
-            bottom: 20px;
-            width: 120px;
-            height: 56px;
-            font-weight: bold;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            background-color: ${props => props.theme.palette.background.default};
-            color: ${props => props.theme.palette.text.disabled};
-            border: 1px solid ${props => props.theme.palette.divider};
-            border-radius: 6px;
-            transform: rotate(-10deg);
-        }
-    }
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        padding: 5px 2px;
-
-        &.disabled {
-            &::after {
-                right: 10px;
-                bottom: 10px;
-                width: 70px;
-                height: 40px;
-                font-size: 11px;
-            }
-        }
-    }
-`
-
 const CouponContent = styled.div`
     display: flex;
     position: relative;
@@ -239,6 +183,66 @@ const CouponCode = styled.span`
 
     ${props => props.theme.breakpoints.down("sm")} {
         display: none;
+    }
+`
+
+const CouponContainer = styled.div`
+    position: relative;
+    border-radius: 5px;
+    padding: 5px;
+    height: 100%;
+    background-color: ${props => props.theme.palette.background.default};
+    border: .5px solid ${props => props.theme.palette.divider};
+    box-shadow: ${props => props.theme.shadows[1]};
+
+    &.active {
+        background-color: ${props => alpha(props.theme.palette.primary.light, 0.1)};
+        border-color: ${props => props.theme.palette.primary.main};
+
+        ${CouponEdge} {
+            border-color: ${props => props.theme.palette.primary.main};
+        }
+
+        ${CouponIcon} {
+            border-color: transparent;
+        }
+    }
+
+    &.disabled {
+        filter: grayscale(1);
+        pointer-events: none;
+
+        &::after {
+            content: "CHƯA THOẢ ĐIỀU KIỆN";
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            width: 120px;
+            height: 56px;
+            font-weight: bold;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            background-color: ${props => props.theme.palette.background.default};
+            color: ${props => props.theme.palette.text.disabled};
+            border: 1px solid ${props => props.theme.palette.divider};
+            border-radius: 6px;
+            transform: rotate(-10deg);
+        }
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: 5px 2px;
+
+        &.disabled {
+            &::after {
+                right: 10px;
+                bottom: 10px;
+                width: 70px;
+                height: 40px;
+                font-size: 11px;
+            }
+        }
     }
 `
 //#endregion

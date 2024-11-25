@@ -1,6 +1,6 @@
 import { useState, useRef, lazy, Suspense } from 'react'
 import { Box, Skeleton, Stack, useMediaQuery, useTheme } from '@mui/material';
-import { useParams, Navigate, NavLink, useSearchParams } from 'react-router-dom';
+import { useParams, Navigate, NavLink, useSearchParams } from 'react-router';
 import { useGetBookQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import { LazyLoadComponent } from 'react-lazy-load-image-component';
 import useTitle from '../hooks/useTitle';
