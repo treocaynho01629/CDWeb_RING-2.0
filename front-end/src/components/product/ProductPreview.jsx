@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { Link } from "react-router-dom"
+import { Link } from 'react-router'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Skeleton } from '@mui/material';
 

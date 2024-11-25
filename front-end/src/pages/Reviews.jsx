@@ -1,6 +1,6 @@
 import { Dialog } from "@mui/material";
 import { TabContentContainer } from "../components/custom/ProfileComponents";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from 'react-router';
 import ReviewsList from "../components/review/ReviewsList";
 import useTitle from '../hooks/useTitle';
 

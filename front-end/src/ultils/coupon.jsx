@@ -10,3 +10,5 @@ export const getCouponSumary = (type) => {
             return { name: 'Giảm', sumary: 'Khi mua', unit: ' sản phẩm', color: 'warning', icon: <ShoppingBasket /> };
     }
 }
+
+export const getCouponType = ['SHIPPING', 'MIN_VALUE', 'MIN_VALUE'];

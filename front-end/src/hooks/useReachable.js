@@ -2,7 +2,7 @@ const useReachable = async () => { //Fire a snack notification if it take too lo
     const timeout = new Promise((resolve, reject) => {
         setTimeout(reject, 5000, 'Request timed out'); //5s
     });
-    const request = fetch(import.meta.env.VITE_PORT_SOCKET_SPRING);
+    const request = fetch(import.meta.env.VITE_PORT_SOCKET_SPRING + '/api/v1/ping');
     return Promise
         .race([timeout, request])
         .then(response => {

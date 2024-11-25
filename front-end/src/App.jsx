@@ -1,18 +1,22 @@
 import './App.css';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { useEffect } from 'react';
+import { createBrowserRouter } from 'react-router';
+import { RouterProvider } from 'react-router/dom';
 import useReachable from './hooks/useReachable';
 import Layout from './components/layout/Layout';
 import PageLayout from './components/layout/PageLayout';
 import RequireAuth from './components/authorize/RequireAuth';
 import PersistLogin from './components/authorize/PersistsLogin';
+import FallbackLogo from './components/layout/FallbackLogo';
 
 function App() {
-  useReachable(); //Test connection to server
+  useEffect(() => { useReachable() }, []); //Test connection to server
 
   const router = createBrowserRouter([
     {
       path: "/",
       element: <Layout />,
+      hydrateFallbackElement: <FallbackLogo/>,
       children: [
         {
           path: "reset/:token?",

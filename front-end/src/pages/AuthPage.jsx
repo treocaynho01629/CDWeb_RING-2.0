@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { useState, lazy, Suspense } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import { keyframes } from "@emotion/react";
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 import useTitle from '../hooks/useTitle';

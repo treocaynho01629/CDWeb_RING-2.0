@@ -89,30 +89,3 @@ export const rateLabels = {
     4: 'Hài lòng',
     5: 'Cực hài lòng',
 };
-
-export const orderStatus = [
-    {
-        value: '',
-        label: 'Tất cả',
-    },
-    {
-        value: 'PENDING',
-        label: 'Chờ hàng',
-    },
-    {
-        value: 'SHIPPING',
-        label: 'Đang giao',
-    },
-    {
-        value: 'COMPLETED',
-        label: 'Hoàn thành',
-    },
-    {
-        value: 'CANCELED',
-        label: 'Đã huỷ',
-    },
-    {
-        value: 'REFUNDED',
-        label: 'Trả/Hoàn tiền',
-    },
-];

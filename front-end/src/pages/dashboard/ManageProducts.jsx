@@ -3,7 +3,7 @@ import { styled as muiStyled } from '@mui/material';
 import { useState, useEffect, Suspense, lazy } from "react";
 import { Box, Breadcrumbs, Button, Grid2 as Grid, Paper, Stack, Typography } from '@mui/material';
 import { Add, AutoStories as AutoStoriesIcon, LocalFireDepartment, Star, Style } from '@mui/icons-material';
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from 'react-router'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import TableProducts from '../../components/dashboard/table/TableProducts'
 import useAuth from "../../hooks/useAuth"

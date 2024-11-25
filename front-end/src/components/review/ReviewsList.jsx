@@ -2,7 +2,7 @@ import { Fragment, Suspense, useCallback, useState, lazy } from "react";
 import { KeyboardArrowLeft, Try } from "@mui/icons-material";
 import { useGetMyReviewsQuery } from "../../features/reviews/reviewsApiSlice";
 import { Message, Title } from "../custom/GlobalComponents";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router';
 import { ReactComponent as EmptyIcon } from '../../assets/empty.svg';
 import { CircularProgress, DialogContent } from "@mui/material";
 import { debounce } from "lodash-es";

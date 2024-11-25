@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Stack, Button, FormControlLabel, Checkbox, TextField } from '@mui/material';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router';
 import { useCookies } from 'react-cookie';
 import { jwtDecode } from 'jwt-decode';
 import { useDispatch } from 'react-redux';

@@ -1,6 +1,7 @@
 package com.ring.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ring.bookstore.enums.AddressType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Nationalized;
@@ -47,9 +48,9 @@ public class Address {
 	@Nationalized
 	private String address;
 
-	@Column(length = 200)
-	@Nationalized
-	private String type;
+	@Enumerated(EnumType.STRING)
+	@Column(length = 30)
+	private AddressType type;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "profile_id")

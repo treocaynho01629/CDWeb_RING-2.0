@@ -5,7 +5,7 @@ import {
     SettingsBrightness,
 } from '@mui/icons-material';
 import { Avatar, ListItemIcon, Divider, Box, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText, IconButton } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { LogoImage } from '../custom/GlobalComponents';
 
 //#region styled

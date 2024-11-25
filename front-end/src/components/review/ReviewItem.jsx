@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { AccessTime, CalendarMonth, Star, StarBorder, ReportGmailerrorred, BorderColorOutlined } from '@mui/icons-material';
 import { Avatar, Rating, Skeleton } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 //#region styled
 const ReviewContainer = styled.div`

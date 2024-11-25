@@ -4,7 +4,7 @@ import { booksApiSlice } from "../books/booksApiSlice";
 import { reviewsApiSlice } from "../reviews/reviewsApiSlice";
 import { ordersApiSlice } from "../orders/ordersApiSlice";
 import { usersApiSlice } from "../users/usersApiSlice";
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router';
 
 const defaultSize = 8;
 

@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 import { styled as muiStyled } from '@mui/material';
 import { CartesianGrid, LineChart, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Line } from 'recharts'
 import { Box, Grid2 as Grid, Paper, Divider, LinearProgress } from '@mui/material'
-import { Link } from "react-router-dom";
+import { Link } from 'react-router';
 import { TrendingUp, TrendingDown, SsidChart, Sell } from '@mui/icons-material';
 import { useGetSaleQuery } from '../../../features/orders/ordersApiSlice';
 

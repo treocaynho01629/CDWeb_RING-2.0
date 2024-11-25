@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid2";
 import ProfileTabsList from "../profile/ProfileTabsList";
-import { Outlet, useMatch } from "react-router-dom";
+import { Outlet, useMatch } from 'react-router';
 import { useGetProfileQuery } from "../../features/users/usersApiSlice";
 import { useMediaQuery, useTheme } from "@mui/material";
 

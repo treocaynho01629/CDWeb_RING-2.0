@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { Star as StarIcon, ShoppingCart as ShoppingCartIcon, StarBorder } from '@mui/icons-material';
 import { Divider, Skeleton, Rating } from '@mui/material'
-import { Link } from "react-router-dom"
+import { Link } from 'react-router'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { numFormatter } from '../../ultils/covert';
 import useCart from '../../hooks/useCart';

@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useTheme, useMediaQuery, Grid2 as Grid, Skeleton } from '@mui/material';
-import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router'
 import { useGetCategoryQuery } from "../features/categories/categoriesApiSlice";
 import { useGetBooksQuery } from "../features/books/booksApiSlice";
 import { sortBy } from "../ultils/filters";

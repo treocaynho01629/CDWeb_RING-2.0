@@ -1,13 +1,11 @@
 package com.ring.bookstore.request;
 
+import com.ring.bookstore.enums.AddressType;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDate;
 
 @Data
 @Builder
@@ -33,8 +31,7 @@ public class AddressRequest { //Request body for address
 	@Size(max = 300, message = "Địa chỉ không quá 300 kí tự")
 	private String address;
 
-	@Size(max = 200, message = "Loại địa chỉ không quá 200 kí tự")
-	private String type;
+	private AddressType type;
 
 	private Boolean isDefault = false;
 }

@@ -1,106 +1,50 @@
 import styled from '@emotion/styled'
-import { styled as muiStyled } from '@mui/material';
-import { useEffect, useRef, useState, lazy, Suspense } from 'react'
-import { ShoppingCart as ShoppingCartIcon, LocationOn as LocationOnIcon, CreditCard as CreditCardIcon, KeyboardDoubleArrowDown, Person } from '@mui/icons-material';
-import { TextareaAutosize, Button, Table, TableBody, TableContainer, TableHead, TableRow, Stepper, Step, StepLabel, StepContent, Typography, Box, Skeleton, } from '@mui/material';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import { Navigate, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { LazyLoadImage } from 'react-lazy-load-image-component'
-import { useGetProfileQuery } from '../features/users/usersApiSlice';
-import { useCheckoutMutation } from '../features/orders/ordersApiSlice';
+import { useEffect, useRef, useState, lazy, Suspense, useCallback, useMemo } from 'react'
+import { LocationOn, CreditCard, KeyboardDoubleArrowDown, ShoppingCartCheckout, ProductionQuantityLimits, Edit, Search, SystemSecurityUpdateGood, QrCode } from '@mui/icons-material';
+import { TextareaAutosize, Button, Table, TableBody, TableContainer, Stepper, Step, StepLabel, StepContent, Typography, Box, Skeleton, Grid2 as Grid, TextField, RadioGroup, FormControlLabel } from '@mui/material';
+import { Navigate, NavLink, useLocation, useNavigate } from 'react-router';
+import { useGetMyAddressQuery } from '../features/addresses/addressesApiSlice';
+import { useCalculateMutation, useCheckoutMutation } from '../features/orders/ordersApiSlice';
 import { PHONE_REGEX } from '../ultils/regex';
+import { isEqual } from 'lodash-es';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 import AddressDisplay from '../components/address/AddressDisplay';
 import AddressSelectDialog from '../components/address/AddressSelectDialog';
 import useCart from '../hooks/useCart';
 import useTitle from '../hooks/useTitle';
+import PreviewDetailRow from '../components/cart/PreviewDetailRow';
+import FinalCheckoutDialog from '../components/cart/FinalCheckoutDialog';
+import useDeepEffect from '../hooks/useDeepEffect';
 
 const PendingModal = lazy(() => import('../components/layout/PendingModal'));
-const FinalCheckoutDialog = lazy(() => import('../components/cart/FinalCheckoutDialog'));
+const CouponDialog = lazy(() => import('../components/coupon/CouponDialog'));
 
 //#region styled
 const Wrapper = styled.div`
 `
 
-const AltCheckoutContainer = styled.div`
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 50px;
-    z-index: 99;
-    background-color: white;
-    box-shadow: 3px 3px 10px 3px #b7b7b7;
-    align-items: flex-end;
-    justify-content: flex-end;
-    display: none;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        display: flex;
-    }
-`
-
-const PayButton = styled.button`
-    background-color: ${props => props.theme.palette.primary.main};
-    padding: 15px 20px;
-    margin-top: 20px;
-    font-size: 15px;
-    font-weight: bold;
-    width: 100%;
-    height: 50px;
-    font-weight: 500;
-    border-radius: 0;
-    border: none;
-    flex-wrap: wrap;
-    white-space: nowrap;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    transition: all 0.5s ease;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        width: 40%;
-    }
-
-    &:hover {
-        background-color: ${props => props.theme.palette.action.hover};
-        color: black;
-    }
-
-    &:disabled {
-        background-color: gray;
-        color: darkslategray;
-    }
-
-    &:focus {
-        outline: none;
-        border: none;
-    }
-`
-
 const CheckoutContainer = styled.div`
-    display: 'flex';
-    flex-direction: 'column';
+    display: flex;
+    flex-direction: column;
+`
+
+const TitleContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+    flex-grow: 1;
 `
 
 const Title = styled.h3`
-    margin: 20px 0;
+    margin: 0;
+    padding: 20px 0px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     text-align: center;
 
     ${props => props.theme.breakpoints.down("sm")} {
-        margin: 20px 10px;
+        padding: 20px 10px;
     }
-`
-
-const ItemAction = styled.div`
-    justify-content: space-between;
-    align-items: flex-end;
-    display: flex;
 `
 
 const SemiTitle = styled.h4`
@@ -111,114 +55,31 @@ const SemiTitle = styled.h4`
     align-items: center;
     text-align: center;
     color: inherit;
+
+    &.end {
+        text-align: end;
+        direction: rtl;
+
+        ${props => props.theme.breakpoints.down("md_lg")} {
+            display: none;
+        }
+    }
 `
 
 const MiniTitle = styled.h4`
-    font-size: 16px;
-    margin: 15px 0px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
-    color: inherit;
+     margin: ${props => props.theme.spacing(1.5)} ${props => props.theme.spacing(1)};
+     font-weight: 420;
 `
 
-const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.common.white,
-        fontSize: 14,
-        fontWeight: 'bold',
-        paddingTop: 5,
-        paddingBottom: 5
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-    },
-}));
-
-const StyledTableRow = muiStyled(TableRow)(({ theme }) => ({
-    border: '.5px solid',
-    borderColor: theme.palette.action.focus,
-    position: 'relative',
-
-    '&:nth-of-type(odd)': {
-        backgroundColor: theme.palette.action.hover,
-    },
-}));
-
-const ItemContainer = styled.div`
-    display: flex;
-    width: 100%;
-`
-
-const ItemSummary = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    margin-left: 10px;
-    padding-bottom: 10px;
-    width: 100%;
-`
-
-const ItemTitle = styled.p`
-    font-size: 14px;
-    text-overflow: ellipsis;
-	overflow: hidden;
-	white-space: nowrap;
-    margin: 5px 0px;
-	
-	@supports (-webkit-line-clamp: 1) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: initial;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-    }
-`
-
-const Price = styled.p`
-    font-size: 16px;
-    font-weight: bold;
-    color: ${props => props.theme.palette.primary.main};
-    margin: 0;
- 
-    &.total {
-        color: ${props => props.theme.palette.error.main};
-        
-        ${props => props.theme.breakpoints.down("md")} {
-            font-size: 18px;
-            text-align: end;
-        }
-    }
-`
-
-const Amount = styled.p`
-    font-size: 16px;
-    font-weight: 450;
-    margin: 0;
-    text-align: center;
-
-    &.alt {
-        display: none;
-        
-        ${props => props.theme.breakpoints.down("sm")} {
-            display: block;
-            margin: 10px 0 0 10px;
-        }
-    }
-`
-
-const StyledStepper = muiStyled(Stepper)(({ theme }) => ({
-    marginTop: '10px',
+const StyledStepper = styled(Stepper)(({ theme }) => ({
+    marginTop: theme.spacing(1),
     '& .MuiStepLabel-root': {
         [theme.breakpoints.down("sm")]: {
-            marginLeft: '10px',
+            marginLeft: theme.spacing(1),
         }
     },
     '& .MuiStepLabel-root .Mui-completed': {
-        color: theme.palette.primary.main,
+        color: theme.palette.success.main,
     },
     '& .MuiStepLabel-root .Mui-active': {
         color: theme.palette.primary.main,
@@ -230,95 +91,276 @@ const StyledStepper = muiStyled(Stepper)(({ theme }) => ({
     },
     '& .MuiStepLabel-root .Mui-active .MuiStepIcon-text': {
         fill: theme.palette.text.main,
+        fontWeight: 'bold',
     }
 }));
 
-const StyledStepContent = muiStyled(StepContent)(({ theme }) => ({
+const StyledStepContent = styled(StepContent)(({ theme }) => ({
+    paddingRight: 0,
+
     [theme.breakpoints.down("sm")]: {
         padding: 0,
         margin: 0,
         borderLeft: 'none'
     }
 }));
-
-const StyledStepLabel = muiStyled(StepLabel)(({ theme }) => ({
-    margin: '15px 0px',
-}));
-
-const StyledLazyImage = styled(LazyLoadImage)`
-    display: inline-block;
-    height: 90px;
-    width: 90px;
-    border: .5px solid ${props => props.theme.palette.action.focus};
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        height: 80px;
-        width: 80px;
-    }
-`
-
-const StyledSkeleton = styled(Skeleton)`
-    display: inline-block;
-    height: 90px;
-    width: 90px;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        height: 80px;
-        width: 80px;
-    }
-`
 //#endregion
+
+const tempShippingFee = 10000;
 
 const Checkout = () => {
     //#region construct
-    //Products from state
-    const { state: checkState } = useLocation();
-    const { clearCart } = useCart();
-    const products = checkState?.products;
     const checkRef = useRef(null);
-    const [addressInfo, setAddressInfo] = useState({
-        name: '',
-        phone: '',
-        address: ''
-    })
+    const [activeStep, setActiveStep] = useState(0);
+    const [method, setMethod] = useState("CASH");
+
+    const [pending, setPending] = useState(false);
+    const maxSteps = 3;
+
+    //Cart
+    const { cartProducts, replaceProduct, removeProduct, removeShopProduct, clearCart } = useCart();
+    const { state: checkoutState } = useLocation();
+    const selected = checkoutState?.selected;
+
+    //Coupon
+    const [openCoupon, setOpenCoupon] = useState(false);
+    const [contextShop, setContextShop] = useState(null);
+    const [contextState, setContextState] = useState(null);
+    const [contextCoupon, setContextCoupon] = useState(null);
+    const [coupon, setCoupon] = useState(checkoutState?.coupon || '');
+    const [shopCoupon, setShopCoupon] = useState(checkoutState?.shopCoupon || '');
+    const [couponDiscount, setCouponDiscount] = useState(0);
+    const [checkState, setCheckState] = useState(null);
+
+    //Address
+    const [openAddress, setOpenAddress] = useState(false);
+    const [addressInfo, setAddressInfo] = useState(null)
     const [validPhone, setValidPhone] = useState(false);
     const [message, setMessage] = useState('');
     const [errMsg, setErrMsg] = useState('');
     const [err, setErr] = useState([]);
-    const [activeStep, setActiveStep] = useState(0);
-    const [value, setValue] = useState("1");
-    const [openDialog, setOpenDialog] = useState(false);
-    const [pending, setPending] = useState(false);
-    const maxSteps = 3;
+
+    //Price
+    const [estimated, setEstimated] = useState({ deal: 0, subTotal: 0, shipping: 0, total: 0 });
+    const [calculated, setCalculated] = useState(null);
+    const [calculate, { isLoading: calculating, isError }] = useCalculateMutation();
 
     //Checkout hook
     const [checkout, { isLoading }] = useCheckoutMutation();
 
     //Fetch current profile address
-    const { data: profile, isLoading: loadProfile, isSuccess: profileDone } = useGetProfileQuery();
+    const { data: address, isLoading: loadAddress } = useGetMyAddressQuery();
 
     //Other
     const navigate = useNavigate();
     const errRef = useRef();
 
     useEffect(() => { //Check phone number
-        const result = PHONE_REGEX.test(addressInfo.phone);
+        const result = PHONE_REGEX.test(addressInfo?.phone);
         setValidPhone(result);
-    }, [addressInfo.phone])
+    }, [addressInfo?.phone])
+
+    useDeepEffect(() => {
+        handleCartChange();
+    }, [cartProducts, shopCoupon, coupon])
 
     //Set title
     useTitle('Thanh toán');
+
+    const handleCartChange = () => {
+        if (selected.length > 0 && cartProducts.length > 0) {
+            const checkoutCart = getCheckoutCart();
+            handleEstimate(checkoutCart); //Estimate price
+            handleCalculate(checkoutCart); //Calculate price
+        } else { //Reset
+            handleEstimate(null);
+            handleCalculate(null);
+            setCalculated(null);
+        }
+    }
+
+    const getCheckoutCart = () => {
+        if (selected.length > 0 && cartProducts.length > 0) {
+            //Reduce cart
+            const checkoutCart = cartProducts.reduce((result, item) => {
+                const { id, shopId } = item;
+
+                if (selected.indexOf(id) !== -1) { //Get selected items in redux store
+                    //Find or create shop
+                    let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
+
+                    if (!detail) {
+                        detail = { shopId, coupon: shopCoupon[shopId]?.code, items: [] };
+                        result.cart.push(detail);
+                    }
+
+                    //Add items for that shop
+                    detail.items.push(item);
+                }
+
+                return result;
+            }, { coupon: coupon?.code, cart: [] });
+
+            return checkoutCart;
+        } else {
+            return null;
+        }
+    }
+
+    const handleEstimate = (cart) => {
+        let estimate = { deal: 0, subTotal: 0, shipping: 0, total: 0 }; //Initial value
+        let cartDetails = {};
+
+        if (cart?.cart?.length) {
+            let totalDeal = 0;
+            let subTotal = 0;
+            let totalQuantity = 0;
+            const shipping = tempShippingFee * (cart?.cart?.length || 0);
+
+            //Loop & calculate
+            cart?.cart?.forEach((detail) => {
+                let deal = 0;
+                let productTotal = 0;
+                let quantity = 0;
+
+                detail?.items?.forEach((item) => {
+                    const discount = Math.round(item.price * item.discount);
+
+                    //Both deal & total price
+                    deal += item.quantity * discount;
+                    productTotal += item.quantity * item.price;
+                    quantity += item.quantity;
+                })
+
+                //Set value & cart state
+                totalDeal += deal;
+                subTotal += productTotal;
+                totalQuantity += quantity;
+                cartDetails[detail?.shopId] = { value: productTotal - deal, quantity };
+            });
+
+            //Set values
+            estimate = { deal: totalDeal, subTotal, shipping, total: (subTotal + shipping - totalDeal) };
+
+            //Set cart state
+            setCheckState({ value: subTotal - totalDeal, quantity: totalQuantity, details: cartDetails });
+        }
+
+        setEstimated(estimate);
+    }
+
+    //Calculate server side
+    const handleCalculate = useCallback(async (cart) => {
+        if (isLoading || cart == null) return;
+
+        calculate(cart).unwrap()
+            .then((data) => {
+                setCalculated(data);
+                syncCart(data);
+            })
+            .catch((err) => {
+                console.error(err);
+                if (!err?.status) {
+                    console.error('Server không phản hồi!');
+                } else if (err?.status === 409) {
+                    console.error(err?.data?.errors?.errorMessage);
+                } else if (err?.status === 400) {
+                    console.error('Sai định dạng giỏ hàng!');
+                } else {
+                    console.error('Tính trước đơn hàng thất bại!')
+                }
+            })
+    }, []);
+
+    //Sync checkout cart between client and server
+    const syncCart = (cart) => {
+        if (!cartProducts?.length) return;
+        const details = cart?.details;
+
+        details.forEach((detail, index) => {
+            if (detail.shopName != null) { //Replace all items of that shop
+                const items = detail?.items;
+
+                items.forEach((item, index) => {
+                    if (item.title != null) { //Replace old item in cart
+                        const newItem = {
+                            ...item,
+                            shopId: detail.shopId,
+                            shopName: detail.shopName
+                        }
+
+                        replaceProduct(newItem);
+                    } else { //Remove invalid item
+                        removeProduct(item.id);
+                    }
+                })
+
+                //Replace recommend coupon
+                setCouponDiscount((prev) => ({
+                    ...prev,
+                    [detail?.shopId]: detail?.couponDiscount > 0 ? detail?.couponDiscount : detail?.shippingDiscount
+                }));
+                if (detail?.coupon != null
+                    && shopCoupon[detail?.shopId] != null
+                    && !isEqual(detail.coupon, shopCoupon[detail?.shopId]
+                    )) {
+                    setShopCoupon((prev) => ({ ...prev, [detail?.shopId]: detail.coupon }));
+                }
+            } else { //Remove all items of the invalid Shop
+                removeShopProduct(detail.shopId);
+            }
+        })
+
+        //Replace recommend coupon
+        if (cart?.coupon != null && coupon != null && !isEqual(cart?.coupon, coupon)) setCoupon(cart.coupon);
+    }
+
+    //Separate by shop
+    const reduceCart = () => {
+        let resultCart = cartProducts.reduce((result, item) => {
+            if (!result[item.shopId]) { //Check if not exists shop >> Add new one
+                result[item.shopId] = { shopName: item.shopName, products: [] };
+            }
+
+            //Else push
+            result[item.shopId].products.push(item);
+            return result;
+        }, {});
+
+        return resultCart;
+    }
+    const reducedCart = useMemo(() => reduceCart(), [cartProducts]);
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
         if (activeStep == 1) checkRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
+    const backFirstStep = () => { setActiveStep(0); };
 
-    const handleChange = (e) => { setValue(e.target.value) }
-    const handleOpenDialog = () => { setOpenDialog(true) }
-    const handleCloseDialog = () => { setOpenDialog(false) }
+    const handleOpenDialog = () => { setOpenAddress(true); }
+    const handleCloseDialog = () => { setOpenAddress(false); }
+    const handleOpenCouponDialog = (shopId) => {
+        setOpenCoupon(true);
+        setContextShop(shopId);
+        setContextState(shopId ? checkState?.details[shopId] : { value: checkState?.value, quantity: checkState?.quantity });
+        setContextCoupon(shopId ? shopCoupon[shopId] : coupon);
+    }
+    const handleCloseCouponDialog = () => {
+        setOpenCoupon(false);
+        setContextShop(null);
+        setContextState(null);
+        setContextCoupon(null);
+    }
 
-    const validAddressInfo = [addressInfo.name, addressInfo.phone, addressInfo.address, validPhone].every(Boolean);
+    const handleChangeCoupon = (coupon, shopId) => {
+        if (shopId) {
+            setShopCoupon((prev) => ({ ...prev, [shopId]: coupon }));
+        } else {
+            setCoupon(coupon);
+        }
+    };
+
+    const validAddressInfo = [addressInfo?.name, addressInfo?.phone, addressInfo?.city, addressInfo?.address, validPhone].every(Boolean);
 
     //Submit checkout
     const handleSubmit = async (e) => {
@@ -327,13 +369,13 @@ const Checkout = () => {
         setPending(true);
 
         //Validation
-        const valid = PHONE_REGEX.test(addressInfo.phone);
+        const valid = PHONE_REGEX.test(addressInfo?.phone);
 
-        if (!valid && addressInfo.phone) {
+        if (!valid && addressInfo?.phone) {
             setErrMsg("Sai định dạng số điện thoại!");
             errRef.current.focus();
             return;
-        } else if (!addressInfo.name || !addressInfo.phone || !addressInfo.address) {
+        } else if (!addressInfo?.name || !addressInfo?.phone || !addressInfo?.city || !addressInfo?.address) {
             setErrMsg("Vui lòng nhập địa chỉ giao hàng!");
             errRef.current.focus();
             return;
@@ -342,7 +384,7 @@ const Checkout = () => {
         const { enqueueSnackbar } = await import('notistack');
 
         checkout({
-            cart: products,
+            // cart: products, FIX
             name: addressInfo.name,
             phone: addressInfo.phone,
             address: addressInfo.address,
@@ -372,7 +414,7 @@ const Checkout = () => {
     }
     //#endregion
 
-    if (products?.length) {
+    if (selected?.length) {
         return (
             <Wrapper>
                 {(isLoading || pending) &&
@@ -381,143 +423,156 @@ const Checkout = () => {
                     </Suspense>
                 }
                 <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
-                    <NavLink to={`/cart`}>Giỏ hàng</NavLink>
-                    <strong style={{ textDecoration: 'underline' }}>Thanh toán</strong>
+                    <NavLink to={'/cart'}>Giỏ hàng</NavLink>
+                    <NavLink to={'/checkout'}>Thanh toán</NavLink>
                 </CustomBreadcrumbs>
                 <CheckoutContainer>
-                    <Title><Person />&nbsp;XÁC NHẬN ĐẶT HÀNG</Title>
-                    <StyledStepper activeStep={activeStep} orientation="vertical" connector={null}>
-                        <Step key={0} expanded>
-                            <StyledStepLabel ref={errRef}
-                                error={errMsg !== ''}
-                                optional={
-                                    errMsg && (
-                                        <Typography variant="caption" color="error">
-                                            {errMsg}
-                                        </Typography>
-                                    )}>
-                                <SemiTitle><LocationOnIcon />&nbsp;Địa chỉ người nhận</SemiTitle>
-                            </StyledStepLabel>
-                            <StyledStepContent>
-                                <AddressDisplay {...{ addressInfo, isValid: validAddressInfo, handleOpen: handleOpenDialog, loadProfile }} />
-                                <AddressSelectDialog {...{ profile, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }} />
-                            </StyledStepContent>
-                        </Step>
-                        <Step key={1} expanded>
-                            <StyledStepLabel>
-                                <SemiTitle><ShoppingCartIcon />&nbsp;Kiểm tra lại sản phẩm</SemiTitle>
-                            </StyledStepLabel>
-                            <StyledStepContent>
-                                <TableContainer>
-                                    <Table aria-label="checkout-table">
-                                        <TableHead
-                                            sx={{
-                                                backgroundColor: 'primary.main',
-                                                display: { xs: 'none', sm: 'table-header-group' }
-                                            }}
-                                        >
-                                            <TableRow sx={{ padding: 0, border: '.5px solid', borderColor: 'action.focus', backgroundColor: 'primary.main' }}>
-                                                <StyledTableCell sx={{ height: '53px' }}>Sản phẩm ({products?.length ?? 0})</StyledTableCell>
-                                                <StyledTableCell align="left" sx={{ width: '100px', display: { xs: 'none', md: 'table-cell' } }}>Đơn giá</StyledTableCell>
-                                                <StyledTableCell align="center" sx={{ width: '90px', display: { xs: 'none', sm: 'table-cell' } }}>Số lượng</StyledTableCell>
-                                                <StyledTableCell align="center" sx={{ width: '130px', display: { xs: 'none', md: 'table-cell' } }}>Tổng</StyledTableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {products.map((product, index) => {
-                                                return (
-                                                    <StyledTableRow hover key={product.id}>
-                                                        <StyledTableCell>
-                                                            <ItemContainer>
-                                                                <NavLink to={`/product/${product.slug}`}>
-                                                                    <StyledLazyImage
-                                                                        src={`${product.image}?size=small`}
-                                                                        alt={`${product.title} Checkout item`}
-                                                                        placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
-                                                                    />
-                                                                </NavLink>
-                                                                <ItemSummary>
-                                                                    <NavLink to={`/product/${product.slug}`}>
-                                                                        <ItemTitle>{product.title}</ItemTitle>
-                                                                    </NavLink>
-                                                                    <ItemAction>
-                                                                        <Box width={'100%'} display={{ xs: 'flex', md: 'none' }} justifyContent={'space-between'}>
-                                                                            <Box>
-                                                                                <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                                                                                <Box display="flex" alignItems="center" sx={{ fontWeight: 'bold' }}>
-                                                                                    Tổng: &nbsp;&nbsp;
-                                                                                    <Price className="total">{(Math.round(product.price * (1 - (product?.discount || 0))) * product.quantity).toLocaleString()}đ</Price>
-                                                                                </Box>
-                                                                            </Box>
-                                                                            <Amount className="alt">{`x${product.quantity}`}</Amount>
-                                                                        </Box>
-                                                                    </ItemAction>
-                                                                </ItemSummary>
-                                                            </ItemContainer>
-                                                        </StyledTableCell>
-                                                        <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                                            <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                                                        </StyledTableCell>
-                                                        <StyledTableCell align="right" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                                                            <Amount>{`x${product.quantity}`}</Amount>
-                                                        </StyledTableCell>
-                                                        <StyledTableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                                                            <Price className="total">{(Math.round(product.price * (1 - (product?.discount || 0))) * product.quantity).toLocaleString()}đ</Price>
-                                                        </StyledTableCell>
-                                                    </StyledTableRow>
-                                                )
-                                            })}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                                <Box sx={{ marginTop: '20px', marginLeft: '10px' }}>
-                                    <strong style={{ fontSize: '16px' }}>Ghi chú khi giao hàng: </strong>
-                                </Box>
-                                <TextareaAutosize
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    aria-label="note"
-                                    minRows={7}
-                                    placeholder="Nhập ghi chú cho đơn hàng ..."
-                                    style={{
-                                        width: '100%', margin: '10px 0px', backgroundColor: 'white', outline: 'none',
-                                        borderRadius: '0', resize: 'none', color: 'black', fontSize: '16px'
-                                    }}
-                                />
-                                {
-                                    activeStep < 2
-                                    &&
-                                    <Button
-                                        disabled={!validAddressInfo}
-                                        variant="contained"
-                                        color="primary"
-                                        onClick={handleNext}
-                                        sx={{ display: { xs: 'none', sm: 'flex' } }}
-                                        endIcon={<KeyboardDoubleArrowDown />}
+                    <Title><ShoppingCartCheckout />&nbsp;THANH TOÁN</Title>
+                    <Grid container spacing={2} sx={{ position: 'relative', mb: 10, justifyContent: 'flex-end' }}>
+                        <Grid size={{ xs: 12, md_lg: 8 }} position="relative">
+                            <StyledStepper activeStep={activeStep} orientation="vertical" connector={null}>
+                                <Step key={0}>
+                                    <StepLabel ref={errRef}
+                                        error={errMsg !== ''}
+                                        optional={errMsg && <Typography variant="caption" color="error">{errMsg}</Typography>}
                                     >
-                                        Tiếp tục
-                                    </Button>
-                                }
-                            </StyledStepContent>
-                        </Step>
-                        <Step key={2} ref={checkRef}>
-                            <StyledStepLabel>
-                                <MiniTitle><CreditCardIcon />&nbsp;Thanh toán</MiniTitle>
-                            </StyledStepLabel>
-                            <StyledStepContent>
-                                {activeStep == 2 &&
-                                    <Suspense fallBack={<></>}>
-                                        <FinalCheckoutDialog {...{
-                                            MiniTitle, Title, value, handleChange,
-                                            products, handleSubmit, validAddressInfo, AltCheckoutContainer, PayButton
-                                        }} />
-                                    </Suspense>
-                                }
-                            </StyledStepContent>
-                        </Step>
-                    </StyledStepper>
+                                        <TitleContainer>
+                                            <SemiTitle><LocationOn />&nbsp;Địa chỉ người nhận</SemiTitle>
+                                            {activeStep > 0 && <Button
+                                                color="secondary"
+                                                onClick={() => setActiveStep(0)}
+                                                sx={{ display: { xs: 'none', sm: 'flex' } }}
+                                                endIcon={<Edit />}
+                                            >
+                                                Thay đổi
+                                            </Button>}
+                                        </TitleContainer>
+                                    </StepLabel>
+                                    <StyledStepContent>
+                                        <AddressDisplay {...{ addressInfo, isValid: validAddressInfo, handleOpen: handleOpenDialog, loadAddress }} />
+                                        <AddressSelectDialog {...{ address, pending, setPending, setAddressInfo, openDialog: openAddress, handleCloseDialog }} />
+                                        <Button
+                                            disabled={!validAddressInfo}
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={handleNext}
+                                            sx={{ my: 1, display: { xs: 'none', sm: 'flex' } }}
+                                            endIcon={<KeyboardDoubleArrowDown />}
+                                        >
+                                            Vận chuyển đến địa chỉ này
+                                        </Button>
+                                    </StyledStepContent>
+                                </Step>
+                                <Step key={1}>
+                                    <StepLabel>
+                                        <TitleContainer>
+                                            <SemiTitle><ProductionQuantityLimits />&nbsp;Kiểm tra lại sản phẩm</SemiTitle>
+                                            {activeStep > 1 && <Button
+                                                color="secondary"
+                                                onClick={() => setActiveStep(1)}
+                                                sx={{ display: { xs: 'none', sm: 'flex' } }}
+                                                endIcon={<Search />}
+                                            >
+                                                Xem lại
+                                            </Button>}
+                                        </TitleContainer>
+
+                                    </StepLabel>
+                                    <StyledStepContent TransitionProps={{ unmountOnExit: false }}>
+                                        <TableContainer>
+                                            <Table aria-label="checkout-table">
+                                                <TableBody>
+                                                    {Object.keys(reducedCart).map((shopId, index) => {
+                                                        const shop = reducedCart[shopId];
+
+                                                        return (<PreviewDetailRow key={`preview-${shop?.shopId}-${index}`}
+                                                            {...{
+                                                                id: shopId, index, shop, coupon: shopCoupon[shopId],
+                                                                couponDiscount: couponDiscount[shopId], handleOpenDialog: handleOpenCouponDialog
+                                                            }}
+                                                        />)
+                                                    })}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                        <MiniTitle>Ghi chú khi giao hàng: </MiniTitle>
+                                        <TextField
+                                            margin="dense"
+                                            id="message"
+                                            placeholder="Nhập ghi chú cho đơn hàng ..."
+                                            fullWidth
+                                            multiline
+                                            minRows={6}
+                                            slotProps={{
+                                                inputComponent: TextareaAutosize,
+                                                inputProps: {
+                                                    minRows: 6,
+                                                    style: { resize: "auto" }
+                                                }
+                                            }}
+                                            variant="outlined"
+                                            value={message}
+                                            onChange={(e) => setMessage(e.target.value)}
+                                        />
+                                        <Button
+                                            disabled={isError}
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={handleNext}
+                                            sx={{ my: 1, display: { xs: 'none', sm: 'flex' } }}
+                                            endIcon={<KeyboardDoubleArrowDown />}
+                                        >
+                                            Tiếp tục
+                                        </Button>
+                                    </StyledStepContent>
+                                </Step>
+                                <Step key={2} ref={checkRef}>
+                                    <StepLabel>
+                                        <SemiTitle><CreditCard />&nbsp;Thanh toán</SemiTitle>
+                                    </StepLabel>
+                                    <StyledStepContent>
+                                        {/* <RadioGroup spacing={1} row value={value} onChange={handleChange}>
+                                            <FormControlLabel value="1" control={<Radio color="primary" />}
+                                                label={<div style={{ display: 'flex', alignItems: 'center' }}>
+                                                    <LocalAtm sx={{ fontSize: 30 }} />Tiền mặt
+                                                </div>} />
+                                            <FormControlLabel value="2" control={<Radio color="primary" />}
+                                                label={<div style={{ display: 'flex', alignItems: 'center' }}>
+                                                    <CreditCard sx={{ fontSize: 30 }} />Thẻ ATM
+                                                </div>} />
+                                            <FormControlLabel value="3" control={<Radio color="primary" />}
+                                                label={<div style={{ display: 'flex', alignItems: 'center' }}>
+                                                    <SystemSecurityUpdateGood sx={{ fontSize: 30 }} />Internet Banking
+                                                </div>} />
+                                            <FormControlLabel value="4" control={<Radio color="primary" />}
+                                                label={<div style={{ display: 'flex', alignItems: 'center' }}>
+                                                    <QrCode sx={{ fontSize: 30 }} />QR Code
+                                                </div>} />
+                                        </RadioGroup> */}
+                                    </StyledStepContent>
+                                </Step>
+                            </StyledStepper>
+                        </Grid>
+                        <Grid size={{ xs: 12, md_lg: 4 }} position={{ xs: 'sticky', md_lg: 'relative' }} bottom={0}>
+                            <Box py={2}>
+                                <SemiTitle className="end">Tổng quan</SemiTitle>
+                            </Box>
+                            <FinalCheckoutDialog {...{
+                                coupon, shopCoupon, calculating, estimated, calculated,
+                                handleOpenDialog: handleOpenCouponDialog, addressInfo, activeStep, backFirstStep
+                            }} />
+                        </Grid>
+                    </Grid>
                 </CheckoutContainer>
-                {
+                <Suspense fallback={null}>
+                    {openCoupon !== undefined
+                        && <CouponDialog {...{
+                            open: openCoupon, handleClose: handleCloseCouponDialog,
+                            shopId: contextShop, checkState: contextState, selectedCoupon: contextCoupon,
+                            numSelected: selected.length, selectMode: true, onSubmit: handleChangeCoupon
+                        }} />}
+                </Suspense>
+                {/* {
                     activeStep < 2
                     &&
                     <AltCheckoutContainer>
@@ -529,7 +584,7 @@ const Checkout = () => {
                             Tiếp tục<KeyboardDoubleArrowDown />
                         </PayButton>
                     </AltCheckoutContainer>
-                }
+                } */}
             </Wrapper>
         )
     } else {

@@ -4,7 +4,7 @@ import { useRegisterMutation } from '../../features/auth/authApiSlice';
 import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from '../../ultils/regex';
 import { Instruction } from '../custom/GlobalComponents';
 import { AuthForm, AuthHighlight, AuthText, AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import CustomPasswordInput from '../custom/CustomPasswordInput';
 
 const RegisterTab = ({ pending, setPending }) => {

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from 'react-router'
 
 const Unauthorized = () => {
     const navigate = useNavigate();

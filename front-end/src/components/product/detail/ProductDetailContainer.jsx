@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import { lazy, Suspense, useLayoutEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Grid2 as Grid, Skeleton, Box } from '@mui/material';
 import { useGetBooksQuery } from '../../../features/books/booksApiSlice';
 import { MobileExtendButton, Showmore, Title } from '../../custom/GlobalComponents';

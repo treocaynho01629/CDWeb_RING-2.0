@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Box, Breadcrumbs, Grid2 as Grid, Typography } from '@mui/material';
-import { Link } from "react-router-dom"
+import { Link } from 'react-router'
 import { Receipt } from '@mui/icons-material';
 import ChartSales from '../../components/dashboard/chart/ChartSales'
 import TableOrders from "../../components/dashboard/table/TableOrders";

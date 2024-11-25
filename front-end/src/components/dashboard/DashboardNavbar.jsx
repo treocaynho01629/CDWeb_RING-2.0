@@ -2,7 +2,7 @@ import { styled as muiStyled } from '@mui/material';
 import { useState } from 'react';
 import { Toolbar, IconButton, Stack, Badge, Tooltip, Avatar, Menu, MenuItem, Divider, ListItemIcon, Box, alpha, Chip, Typography } from '@mui/material';
 import { Menu as MenuIcon, Logout, Home as HomeIcon, NotificationsNone, SettingsOutlined } from '@mui/icons-material';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router';
 import MuiAppBar from '@mui/material/AppBar';
 import useLogout from "../../hooks/useLogout";
 import useAuth from '../../hooks/useAuth';

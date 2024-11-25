@@ -4,10 +4,10 @@ import { useGetOrdersByUserQuery } from '../../features/orders/ordersApiSlice';
 import { KeyboardArrowLeft, Receipt, Search } from '@mui/icons-material';
 import { CircularProgress, DialogContent, TextField } from '@mui/material';
 import { StyledDialogTitle } from "../custom/ProfileComponents";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from 'react-router';
 import { booksApiSlice } from "../../features/books/booksApiSlice";
 import { CustomTab, CustomTabs } from "../custom/CustomTabs";
-import { orderStatus } from "../../ultils/filters";
+import { orderItems } from "../../ultils/order";
 import { debounce } from "lodash-es";
 import { ReactComponent as EmptyIcon } from '../../assets/empty.svg';
 import { Message } from "../custom/GlobalComponents";
@@ -242,7 +242,7 @@ const OrdersList = () => {
             </StyledDialogTitle>
             <ToggleGroupContainer>
                 <CustomTabs value={filters.status} onChange={handleChangeStatus} variant="scrollable" scrollButtons={false}>
-                    {orderStatus.map((tab, index) => (
+                    {orderItems.map((tab, index) => (
                         <CustomTab key={`tab-${index}`} label={tab.label} value={tab.value} />
                     ))}
                 </CustomTabs>

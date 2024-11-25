@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Avatar, Box, Button, Grid2 as Grid, Skeleton, Stack } from "@mui/material";
 import { Add, AutoStories, Check, LocalActivity, PersonAddAlt1, Store, Today, Verified as VerifiedIcon } from "@mui/icons-material";
 import { useFollowShopMutation, useGetShopQuery, useUnfollowShopMutation } from "../../../features/shops/shopsApiSlice";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router';
 import { numFormatter } from '../../../ultils/covert';
 
 //#region styled

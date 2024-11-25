@@ -6,7 +6,7 @@ import {
     PersonAddAlt1, LocalShippingOutlined, Replay, DomainVerification, PendingOutlined, ReceiptLongOutlined,
     LocalActivityOutlined, LocalActivity, Today
 } from '@mui/icons-material';
-import { NavLink } from "react-router-dom";
+import { NavLink } from 'react-router';
 import { MobileExtendButton } from "../custom/GlobalComponents";
 import { numFormatter } from '../../ultils/covert';
 import useAuth from "../../hooks/useAuth";

@@ -314,7 +314,7 @@ const CouponPreview = ({ shopId }) => {
                 </MobileExtendButton>
             </CouponContainer>
             <Suspense fallback={<></>}>
-                {openDialog !== undefined && <CouponDialog {...{ openDialog, handleCloseDialog, shopId }} />}
+                {openDialog !== undefined && <CouponDialog {...{ open: openDialog, handleClose: handleCloseDialog, shopId }} />}
             </Suspense>
         </CouponWrapper >
     )

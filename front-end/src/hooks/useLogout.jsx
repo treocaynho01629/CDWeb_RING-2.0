@@ -3,7 +3,7 @@ import { useCookies } from 'react-cookie';
 import { logOut } from "../features/auth/authReducer";
 import { apiSlice } from "../app/api/apiSlice";
 import { useSignoutMutation } from "../features/auth/authApiSlice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router';
 
 const useLogout = () => {
     const dispatch = useDispatch();

@@ -5,7 +5,7 @@ import { Check, Clear, EditOutlined, KeyboardArrowLeft, KeyboardArrowRight, Pers
 import { PHONE_REGEX } from "../../ultils/regex";
 import { useUpdateProfileMutation } from "../../features/users/usersApiSlice";
 import { Instruction, MobileExtendButton } from '../custom/GlobalComponents';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router';
 import { StyledDialogTitle } from "../custom/ProfileComponents";
 import dayjs from 'dayjs';
 import useAuth from '../../hooks/useAuth';

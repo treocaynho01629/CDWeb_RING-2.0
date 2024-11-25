@@ -1,5 +1,5 @@
 import { Suspense, lazy, useLayoutEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import { ChevronLeft } from '@mui/icons-material';
 import { ReactComponent as EmptyIcon } from '../assets/empty.svg';
 import { Button } from '@mui/material';
@@ -45,26 +45,29 @@ const Cart = () => {
         if (cartProducts.length == 0) window.scrollTo({ top: 0, behavior: "smooth" });
     }, [cartProducts])
 
+
     return (
         <Wrapper>
             <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
                 <NavLink to={'/cart'}>Giỏ hàng</NavLink>
             </CustomBreadcrumbs>
-            {cartProducts?.length == 0 ? <EmptyWrapper>
-                <StyledEmptyIcon />
-                <h2>Giỏ hàng của bạn đang trống</h2>
-                <NavLink to={'/'}>
-                    <Button
+            {!cartProducts.length ?
+                <EmptyWrapper>
+                    <StyledEmptyIcon />
+                    <h2>Giỏ hàng của bạn đang trống</h2>
+                    <NavLink to={'/'}>
+                        <Button
 
-                        variant="contained"
-                        color="primary"
-                        startIcon={<ChevronLeft />}
-                    >
-                        Tiếp tục mua sắm
-                    </Button>
-                </NavLink>
-            </EmptyWrapper>
-                : <Suspense fallback={<EmptyWrapper><CustomPlaceholder /></EmptyWrapper>}>
+                            variant="contained"
+                            color="primary"
+                            startIcon={<ChevronLeft />}
+                        >
+                            Tiếp tục mua sắm
+                        </Button>
+                    </NavLink>
+                </EmptyWrapper>
+                :
+                <Suspense fallback={<EmptyWrapper><CustomPlaceholder /></EmptyWrapper>}>
                     <CartContent />
                 </Suspense>
             }
