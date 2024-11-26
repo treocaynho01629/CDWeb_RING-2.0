@@ -13,7 +13,9 @@ import java.util.List;
 public class CartDetailRequest {
     @NotNull(message = "Cửa hàng không được bỏ trống!")
     private Long shopId;
+
     private String coupon;
+
     @NotNull(message = "Sản phẩm không được trống!")
     private List<CartItemRequest> items;
 }

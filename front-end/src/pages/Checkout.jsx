@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { useEffect, useRef, useState, lazy, Suspense, useCallback, useMemo } from 'react'
-import { LocationOn, CreditCard, KeyboardDoubleArrowDown, ShoppingCartCheckout, ProductionQuantityLimits, Edit, Search, SystemSecurityUpdateGood, QrCode } from '@mui/icons-material';
-import { TextareaAutosize, Button, Table, TableBody, TableContainer, Stepper, Step, StepLabel, StepContent, Typography, Box, Skeleton, Grid2 as Grid, TextField, RadioGroup, FormControlLabel } from '@mui/material';
+import { LocationOn, CreditCard, KeyboardDoubleArrowDown, ShoppingCartCheckout, ProductionQuantityLimits } from '@mui/icons-material';
+import { TextareaAutosize, Button, Table, TableBody, TableContainer, Stepper, Step, StepLabel, StepContent, Typography, Box, Grid2 as Grid, TextField } from '@mui/material';
 import { Navigate, NavLink, useLocation, useNavigate } from 'react-router';
 import { useGetMyAddressQuery } from '../features/addresses/addressesApiSlice';
 import { useCalculateMutation, useCheckoutMutation } from '../features/orders/ordersApiSlice';
@@ -10,14 +10,15 @@ import { isEqual } from 'lodash-es';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 import AddressDisplay from '../components/address/AddressDisplay';
 import AddressSelectDialog from '../components/address/AddressSelectDialog';
-import useCart from '../hooks/useCart';
-import useTitle from '../hooks/useTitle';
 import PreviewDetailRow from '../components/cart/PreviewDetailRow';
 import FinalCheckoutDialog from '../components/cart/FinalCheckoutDialog';
+import useCart from '../hooks/useCart';
+import useTitle from '../hooks/useTitle';
 import useDeepEffect from '../hooks/useDeepEffect';
 
 const PendingModal = lazy(() => import('../components/layout/PendingModal'));
 const CouponDialog = lazy(() => import('../components/coupon/CouponDialog'));
+const PaymentSelect = lazy(() => import('../components/cart/PaymentSelect'));
 
 //#region styled
 const Wrapper = styled.div`
@@ -26,12 +27,6 @@ const Wrapper = styled.div`
 const CheckoutContainer = styled.div`
     display: flex;
     flex-direction: column;
-`
-
-const TitleContainer = styled.div`
-    display: flex;
-    justify-content: space-between;
-    flex-grow: 1;
 `
 
 const Title = styled.h3`
@@ -110,7 +105,7 @@ const tempShippingFee = 10000;
 
 const Checkout = () => {
     //#region construct
-    const checkRef = useRef(null);
+    const scrollRef = useRef(null);
     const [activeStep, setActiveStep] = useState(0);
     const [method, setMethod] = useState("CASH");
 
@@ -153,16 +148,15 @@ const Checkout = () => {
 
     //Other
     const navigate = useNavigate();
-    const errRef = useRef();
 
     useEffect(() => { //Check phone number
         const result = PHONE_REGEX.test(addressInfo?.phone);
         setValidPhone(result);
     }, [addressInfo?.phone])
 
-    useDeepEffect(() => {
-        handleCartChange();
-    }, [cartProducts, shopCoupon, coupon])
+    useDeepEffect(() => { handleCartChange(); }, [cartProducts, shopCoupon, coupon])
+
+    useEffect(() => { scrollToTop(); }, [activeStep])
 
     //Set title
     useTitle('Thanh toán');
@@ -331,10 +325,8 @@ const Checkout = () => {
     }
     const reducedCart = useMemo(() => reduceCart(), [cartProducts]);
 
-    const handleNext = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-        if (activeStep == 1) checkRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
+    const scrollToTop = useCallback(() => { scrollRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, [])
+    const handleNext = () => { setActiveStep((prevActiveStep) => prevActiveStep + 1); };
     const backFirstStep = () => { setActiveStep(0); };
 
     const handleOpenDialog = () => { setOpenAddress(true); }
@@ -360,6 +352,8 @@ const Checkout = () => {
         }
     };
 
+    const handleChangeMethod = (e) => { setMethod(e.target.value); }
+
     const validAddressInfo = [addressInfo?.name, addressInfo?.phone, addressInfo?.city, addressInfo?.address, validPhone].every(Boolean);
 
     //Submit checkout
@@ -373,11 +367,9 @@ const Checkout = () => {
 
         if (!valid && addressInfo?.phone) {
             setErrMsg("Sai định dạng số điện thoại!");
-            errRef.current.focus();
             return;
         } else if (!addressInfo?.name || !addressInfo?.phone || !addressInfo?.city || !addressInfo?.address) {
             setErrMsg("Vui lòng nhập địa chỉ giao hàng!");
-            errRef.current.focus();
             return;
         }
 
@@ -408,7 +400,6 @@ const Checkout = () => {
                 } else {
                     setErrMsg('Đặt hàng thất bại!')
                 }
-                errRef.current.focus();
                 setPending(false);
             })
     }
@@ -427,26 +418,20 @@ const Checkout = () => {
                     <NavLink to={'/checkout'}>Thanh toán</NavLink>
                 </CustomBreadcrumbs>
                 <CheckoutContainer>
-                    <Title><ShoppingCartCheckout />&nbsp;THANH TOÁN</Title>
+                    <Title ref={scrollRef}><ShoppingCartCheckout />&nbsp;THANH TOÁN</Title>
                     <Grid container spacing={2} sx={{ position: 'relative', mb: 10, justifyContent: 'flex-end' }}>
                         <Grid size={{ xs: 12, md_lg: 8 }} position="relative">
                             <StyledStepper activeStep={activeStep} orientation="vertical" connector={null}>
                                 <Step key={0}>
-                                    <StepLabel ref={errRef}
+                                    <StepLabel
                                         error={errMsg !== ''}
                                         optional={errMsg && <Typography variant="caption" color="error">{errMsg}</Typography>}
                                     >
-                                        <TitleContainer>
-                                            <SemiTitle><LocationOn />&nbsp;Địa chỉ người nhận</SemiTitle>
-                                            {activeStep > 0 && <Button
-                                                color="secondary"
-                                                onClick={() => setActiveStep(0)}
-                                                sx={{ display: { xs: 'none', sm: 'flex' } }}
-                                                endIcon={<Edit />}
-                                            >
-                                                Thay đổi
-                                            </Button>}
-                                        </TitleContainer>
+                                        <SemiTitle onClick={() => {
+                                            if (activeStep > 0) setActiveStep(0);
+                                        }}>
+                                            <LocationOn />&nbsp;Địa chỉ người nhận
+                                        </SemiTitle>
                                     </StepLabel>
                                     <StyledStepContent>
                                         <AddressDisplay {...{ addressInfo, isValid: validAddressInfo, handleOpen: handleOpenDialog, loadAddress }} />
@@ -465,18 +450,11 @@ const Checkout = () => {
                                 </Step>
                                 <Step key={1}>
                                     <StepLabel>
-                                        <TitleContainer>
-                                            <SemiTitle><ProductionQuantityLimits />&nbsp;Kiểm tra lại sản phẩm</SemiTitle>
-                                            {activeStep > 1 && <Button
-                                                color="secondary"
-                                                onClick={() => setActiveStep(1)}
-                                                sx={{ display: { xs: 'none', sm: 'flex' } }}
-                                                endIcon={<Search />}
-                                            >
-                                                Xem lại
-                                            </Button>}
-                                        </TitleContainer>
-
+                                        <SemiTitle onClick={() => {
+                                            if (validAddressInfo && activeStep > 1) setActiveStep(1);
+                                        }}>
+                                            <ProductionQuantityLimits />&nbsp;Kiểm tra lại sản phẩm
+                                        </SemiTitle>
                                     </StepLabel>
                                     <StyledStepContent TransitionProps={{ unmountOnExit: false }}>
                                         <TableContainer>
@@ -526,29 +504,16 @@ const Checkout = () => {
                                         </Button>
                                     </StyledStepContent>
                                 </Step>
-                                <Step key={2} ref={checkRef}>
+                                <Step key={2}>
                                     <StepLabel>
-                                        <SemiTitle><CreditCard />&nbsp;Thanh toán</SemiTitle>
+                                        <SemiTitle><CreditCard />&nbsp;Chọn hình thức thanh toán</SemiTitle>
                                     </StepLabel>
                                     <StyledStepContent>
-                                        {/* <RadioGroup spacing={1} row value={value} onChange={handleChange}>
-                                            <FormControlLabel value="1" control={<Radio color="primary" />}
-                                                label={<div style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <LocalAtm sx={{ fontSize: 30 }} />Tiền mặt
-                                                </div>} />
-                                            <FormControlLabel value="2" control={<Radio color="primary" />}
-                                                label={<div style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <CreditCard sx={{ fontSize: 30 }} />Thẻ ATM
-                                                </div>} />
-                                            <FormControlLabel value="3" control={<Radio color="primary" />}
-                                                label={<div style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <SystemSecurityUpdateGood sx={{ fontSize: 30 }} />Internet Banking
-                                                </div>} />
-                                            <FormControlLabel value="4" control={<Radio color="primary" />}
-                                                label={<div style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <QrCode sx={{ fontSize: 30 }} />QR Code
-                                                </div>} />
-                                        </RadioGroup> */}
+                                        <Suspense fallback={null}>
+                                            {activeStep == 2 &&
+                                                <PaymentSelect {...{ value: method, handleChange: handleChangeMethod }} />
+                                            }
+                                        </Suspense>
                                     </StyledStepContent>
                                 </Step>
                             </StyledStepper>
@@ -558,8 +523,9 @@ const Checkout = () => {
                                 <SemiTitle className="end">Tổng quan</SemiTitle>
                             </Box>
                             <FinalCheckoutDialog {...{
-                                coupon, shopCoupon, calculating, estimated, calculated,
-                                handleOpenDialog: handleOpenCouponDialog, addressInfo, activeStep, backFirstStep
+                                coupon, shopCoupon, calculating, estimated, calculated, isValid: validAddressInfo,
+                                activeStep, maxSteps, handleOpenDialog: handleOpenCouponDialog, addressInfo,
+                                backFirstStep, handleNext
                             }} />
                         </Grid>
                     </Grid>
@@ -572,19 +538,6 @@ const Checkout = () => {
                             numSelected: selected.length, selectMode: true, onSubmit: handleChangeCoupon
                         }} />}
                 </Suspense>
-                {/* {
-                    activeStep < 2
-                    &&
-                    <AltCheckoutContainer>
-                        <Box sx={{ padding: '0px 5px' }}>
-                            <strong>Kiểm tra đơn:</strong>
-                            <Price className="total">{`${activeStep + 1}/${maxSteps}`}</Price>
-                        </Box>
-                        <PayButton disabled={!validAddressInfo} onClick={handleNext}>
-                            Tiếp tục<KeyboardDoubleArrowDown />
-                        </PayButton>
-                    </AltCheckoutContainer>
-                } */}
             </Wrapper>
         )
     } else {

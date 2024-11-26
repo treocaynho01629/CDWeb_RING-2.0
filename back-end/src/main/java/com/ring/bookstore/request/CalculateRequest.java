@@ -1,5 +1,7 @@
 package com.ring.bookstore.request;
 
+import com.ring.bookstore.enums.ShippingType;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,4 +20,9 @@ public class CalculateRequest {
 	private List<CartDetailRequest> cart;
 
 	private String coupon;
+
+	private ShippingType shippingType;
+
+	@Valid
+	private AddressRequest addressRequest;
 }

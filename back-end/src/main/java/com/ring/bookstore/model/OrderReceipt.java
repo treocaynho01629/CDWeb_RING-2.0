@@ -1,5 +1,7 @@
 package com.ring.bookstore.model;
 
+import com.ring.bookstore.enums.PaymentType;
+import com.ring.bookstore.enums.ShippingType;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -82,6 +84,14 @@ public class OrderReceipt {
     @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
     private List<OrderDetail> details;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private ShippingType shippingType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private PaymentType paymentType;
 
     //For mapping result
     @Transient

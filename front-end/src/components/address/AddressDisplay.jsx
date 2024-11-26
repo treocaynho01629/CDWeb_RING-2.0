@@ -1,8 +1,9 @@
 import styled from '@emotion/styled'
-import { KeyboardArrowRight, LocalShippingOutlined, RocketLaunchOutlined, SavingsOutlined } from '@mui/icons-material';
+import { KeyboardArrowRight } from '@mui/icons-material';
 import { alpha, Button, FormControlLabel, IconButton, Radio, RadioGroup } from '@mui/material'
 import { useState } from 'react';
 import { getAddress } from '../../ultils/address';
+import { shippingItems } from '../../ultils/shipping';
 
 //#region styled
 const Title = styled.h4`
@@ -20,6 +21,12 @@ const AddressDisplayContainer = styled.div`
 
     &.error {
         border-color: ${props => props.theme.palette.error.main};
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: ${props => props.theme.spacing(1)};
+        border-left: none;
+        border-right: none;
     }
 `
 
@@ -49,6 +56,11 @@ const StyledForm = styled(FormControlLabel)`
         border-color: ${props => props.theme.palette.primary.main};
         background-color: ${props => alpha(props.theme.palette.primary.light, 0.1)};
     }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        border-left: none;
+        border-right: none;
+    }
 `
 
 const ItemContent = styled.div`
@@ -56,6 +68,13 @@ const ItemContent = styled.div`
     align-items: center;
     justify-content: space-between;
     flex-grow: 1;
+`
+
+const PriceTag = styled.span`
+    font-weight: 450;
+
+    &.success { color: ${props => props.theme.palette.success.dark}; }
+    &.warning { color: ${props => props.theme.palette.warning.dark}; }
 `
 
 const ItemTitle = styled.div`
@@ -107,7 +126,7 @@ const AddressTag = styled.span`
 //#endregion
 
 const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadAddress }) => {
-    const [delivery, setDelivery] = useState('Tiêu chuẩn');
+    const [delivery, setDelivery] = useState(shippingItems[0].value);
     const fullAddress = [addressInfo?.city, addressInfo?.address].join(", ");
 
     const handleChange = (e) => { setDelivery(e.target.value) }
@@ -145,7 +164,7 @@ const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadAddress }) => {
                     Thay đổi
                 </Button>
                 <IconButton
-                    sx={{ display: { xs: 'block', sm: 'none' } }}
+                    sx={{ mr: -1, display: { xs: 'block', sm: 'none' } }}
                     aria-label="mobile toggle address dialog"
                     onClick={handleOpen}
                     color={!isValid ? "error" : "primary"}
@@ -157,30 +176,16 @@ const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadAddress }) => {
             </AddressDisplayContainer>
             <Title>Hình thức giao hàng</Title>
             <RadioGroup value={delivery} onChange={handleChange}>
-                <StyledForm value="Tiết kiệm" control={<Radio />}
-                    label={<FormContent>
-                        <ItemContent>
-                            <ItemTitle><SavingsOutlined />Tiết kiệm</ItemTitle>
-                            <b>10,000đ</b>
-                        </ItemContent>
-                        <Estimate>5-7 ngày</Estimate>
-                    </FormContent>} />
-                <StyledForm value="Tiêu chuẩn" control={<Radio />}
-                    label={<FormContent>
-                        <ItemContent>
-                            <ItemTitle><LocalShippingOutlined />Tiêu chuẩn</ItemTitle>
-                            <b>10,000đ</b>
-                        </ItemContent>
-                        <Estimate>2-4 ngày</Estimate>
-                    </FormContent>} />
-                <StyledForm value="Hoả tốc" control={<Radio />}
-                    label={<FormContent>
-                        <ItemContent>
-                            <ItemTitle><RocketLaunchOutlined />Hoả tốc</ItemTitle>
-                            <b>10,000đ</b>
-                        </ItemContent>
-                        <Estimate>1-2 ngày</Estimate>
-                    </FormContent>} />
+                {shippingItems.map((item, index) => (
+                    <StyledForm key={index} value={item.value} control={<Radio />}
+                        label={<FormContent>
+                            <ItemContent>
+                                <ItemTitle>{item.icon}{item.label}</ItemTitle>
+                                <PriceTag className={item.color}>{item.price}</PriceTag>
+                            </ItemContent>
+                            <Estimate>{item.description}</Estimate>
+                        </FormContent>} />
+                ))}
             </RadioGroup>
         </>
     )

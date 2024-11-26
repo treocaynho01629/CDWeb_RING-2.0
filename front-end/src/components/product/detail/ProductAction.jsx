@@ -241,7 +241,7 @@ const ProductAction = ({ book }) => {
                         }
                     </Box>
                 </Box>
-                <Box position="sticky" height={55} bottom={20} bgcolor={'background.default'}>
+                <Box position="sticky" height={55} bottom={16} bgcolor={'background.default'}>
                     <Box display="flex" alignItems="center" height={47} >
                         <BuyButton
                             variant="contained"

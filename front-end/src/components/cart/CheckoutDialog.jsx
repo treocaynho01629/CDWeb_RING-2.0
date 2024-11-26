@@ -122,25 +122,25 @@ const CheckoutDialog = ({ coupon, shopCoupon, selected, navigate, handleOpenDial
                         ? <>
                             <CheckoutBox className="sticky">
                                 <CheckoutStack>
-                                    <CheckoutRow>
-                                        <Suspense fallback={null}>
-                                            {(coupon && numSelected > 0) && <CouponDisplay coupon={coupon} />}
-                                        </Suspense>
-                                    </CheckoutRow>
                                     <CouponButton onClick={() => handleOpenDialog()}>
                                         <span>
                                             <LocalActivityOutlined color="error" />&nbsp;
                                             Chọn mã giảm giá {coupon && 'khác'}
                                         </span>
-                                        <KeyboardArrowRight fontSize="small" />
+                                        <MiniCouponContainer>
+                                            <Suspense fallback={null}>
+                                                {(coupon && numSelected > 0) && <CouponDisplay coupon={coupon} />}
+                                            </Suspense>
+                                            <KeyboardArrowRight fontSize="small" />
+                                        </MiniCouponContainer>
                                     </CouponButton>
                                 </CheckoutStack>
                                 <CheckoutStack>
                                     <CheckoutPriceContainer>
-                                        <CheckoutText className="bold">
-                                            Tổng thanh toán: ({numSelected} Sản phẩm)&emsp;
+                                        <PriceContainer>
+                                            <CheckoutText>Tổng thanh toán: ({numSelected} Sản phẩm)&emsp;</CheckoutText>
                                             {numSelected && <SubText>(Đã bao gồm VAT)</SubText>}
-                                        </CheckoutText>
+                                        </PriceContainer>
                                         <PriceContainer>
                                             <CheckoutPrice onClick={() => toggleDrawer(true)}>
                                                 {Math.round(displayInfo.total).toLocaleString()}đ

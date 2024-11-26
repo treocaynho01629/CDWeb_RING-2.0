@@ -28,6 +28,8 @@ export const CheckoutBox = styled.div`
         margin-bottom: -0.5px;
         position: sticky;
         top: ${props => props.theme.mixins.toolbar.minHeight + 15}px;
+        bottom: ${props => props.theme.spacing(2)};
+        z-index: 1;
     }
 
     ${props => props.theme.breakpoints.down("md_lg")} {
@@ -60,6 +62,9 @@ export const CheckoutStack = styled.div`
 `
 
 export const CheckoutPriceContainer = styled.div`
+    position: relative;
+    width: 100%;
+    margin-right: ${props => props.theme.spacing(2)};
 `
 
 export const AltCheckoutBox = styled.div`
@@ -94,6 +99,7 @@ export const CheckoutRow = styled.div`
 export const CheckoutText = styled.span`
     font-size: 14px;
     font-weight: 400;
+    white-space: nowrap;
 
     &.error { color: ${props => props.theme.palette.error.main}}
 `
@@ -138,11 +144,14 @@ export const CheckoutPrice = styled.span`
 export const SavePrice = styled.span`
     font-size: 14px;
     font-weight: 450;
+    width: 100%;
+    text-align: right;
     color: ${props => props.theme.palette.success.dark};
 `
 
 export const SubText = styled.span`
     font-size: 12px;
+    width: 100%;
     text-align: right;
     color: ${props => props.theme.palette.text.secondary};
 `
