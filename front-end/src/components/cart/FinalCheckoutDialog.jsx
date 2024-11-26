@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { AltCheckoutBox, CheckoutBox, CheckoutButton, CheckoutContainer, CheckoutPrice, CheckoutPriceContainer, CheckoutRow, CheckoutStack, CheckoutText, CheckoutTitle, CouponButton, DetailContainer, MiniCouponContainer, PriceContainer, SavePrice, SubText } from '../custom/CartComponents';
 import { useMediaQuery, useTheme } from '@mui/material';
-import { Edit, KeyboardArrowRight, LocalActivityOutlined, ShoppingCartCheckout } from '@mui/icons-material';
+import { Edit, KeyboardArrowRight, KeyboardDoubleArrowDown, LocalActivityOutlined } from '@mui/icons-material';
 import { lazy, Suspense, useState } from 'react';
 import { getAddress } from '../../ultils/address';
 import CouponDisplay from '../coupon/CouponDisplay';
@@ -71,10 +71,16 @@ const EditButton = styled.div`
         color: ${props => props.theme.palette.info.light};
     }
 `
+
+const AddressDivider = styled.div`
+    width: 100%;
+    margin: ${props => props.theme.spacing(1)} 0;
+    border-bottom: .5px dashed ${props => props.theme.palette.divider};
+`
 //#endregion
 
-const FinalCheckoutDialog = ({ coupon, productCount, estimated, calculated, calculating, addressInfo,
-    activeStep, backFirstStep, handleOpenDialog }) => {
+const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addressInfo,
+    isValid, handleNext, activeStep, maxSteps, backFirstStep, handleOpenDialog }) => {
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('sm'));
     const tabletMode = useMediaQuery(theme.breakpoints.down('md_lg'));
@@ -155,43 +161,58 @@ const FinalCheckoutDialog = ({ coupon, productCount, estimated, calculated, calc
                         <CheckoutStack>
                             <AltCheckoutBox onClick={() => toggleDrawer(true)}>
                                 <PriceContainer>
-                                    <CheckoutPrice><b>Tổng:</b>{displayInfo.total.toLocaleString()}đ</CheckoutPrice>
+                                    <CheckoutPrice><b>Tổng: ({activeStep + 1}/{maxSteps})</b>{displayInfo.total.toLocaleString()}đ</CheckoutPrice>
                                     {(!calculating && displayInfo.totalDiscount > 0) &&
                                         <SavePrice>Tiết kiệm {Math.round(displayInfo.totalDiscount).toLocaleString()}đ</SavePrice>}
                                 </PriceContainer>
                             </AltCheckoutBox>
-                            <CheckoutButton
-                                variant="contained"
-                                size="large"
-                                fullWidth
-                                sx={{ maxWidth: '42%' }}
-                                disabled={calculating}
-                            >
-                                Đặt hàng
-                            </CheckoutButton>
+                            {activeStep < 2 ?
+                                <CheckoutButton
+                                    variant="contained"
+                                    size="large"
+                                    fullWidth
+                                    sx={{ maxWidth: '42%' }}
+                                    onClick={handleNext}
+                                    disabled={!isValid || calculating}
+                                    endIcon={<KeyboardDoubleArrowDown />}
+                                >
+                                    Tiếp tục
+                                </CheckoutButton>
+                                :
+                                <CheckoutButton
+                                    variant="contained"
+                                    size="large"
+                                    fullWidth
+                                    sx={{ maxWidth: '42%' }}
+                                    disabled={calculating}
+                                >
+                                    Đặt hàng
+                                </CheckoutButton>
+                            }
                         </CheckoutStack>
                     </>
                     : tabletMode
                         ? <>
                             <CheckoutBox className="sticky">
                                 <CheckoutStack>
-                                    <CheckoutRow>
-                                        {coupon && <CouponDisplay coupon={coupon} />}
-                                    </CheckoutRow>
                                     <CouponButton onClick={() => handleOpenDialog()}>
                                         <span>
                                             <LocalActivityOutlined color="error" />&nbsp;
                                             Chọn mã giảm giá {coupon && 'khác'}
                                         </span>
-                                        <KeyboardArrowRight fontSize="small" />
+                                        <MiniCouponContainer>
+                                            <Suspense fallback={null}>
+                                                {coupon && <CouponDisplay coupon={coupon} />}
+                                            </Suspense>
+                                            <KeyboardArrowRight fontSize="small" />
+                                        </MiniCouponContainer>
                                     </CouponButton>
                                 </CheckoutStack>
                                 <CheckoutStack>
                                     <CheckoutPriceContainer>
-                                        <CheckoutText className="bold">
-                                            Tổng thanh toán: ({productCount} Sản phẩm)&emsp;
-                                            <SubText>(Đã bao gồm VAT)</SubText>
-                                        </CheckoutText>
+                                        <PriceContainer>
+                                            <CheckoutText>Tổng thanh toán:</CheckoutText>
+                                        </PriceContainer>
                                         <PriceContainer>
                                             <CheckoutPrice onClick={() => toggleDrawer(true)}>
                                                 {Math.round(displayInfo.total).toLocaleString()}đ
@@ -200,16 +221,29 @@ const FinalCheckoutDialog = ({ coupon, productCount, estimated, calculated, calc
                                                 <SavePrice>Tiết kiệm {Math.round(displayInfo.totalDiscount).toLocaleString()}đ</SavePrice>}
                                         </PriceContainer>
                                     </CheckoutPriceContainer>
-                                    <CheckoutButton
-                                        variant="contained"
-                                        size="large"
-                                        fullWidth
-                                        sx={{ maxWidth: '35%' }}
-                                        disabled={calculating}
-                                        startIcon={<ShoppingCartCheckout />}
-                                    >
-                                        Đặt hàng
-                                    </CheckoutButton>
+                                    {activeStep < 2 ?
+                                        <CheckoutButton
+                                            variant="contained"
+                                            size="large"
+                                            fullWidth
+                                            sx={{ maxWidth: '35%' }}
+                                            onClick={handleNext}
+                                            disabled={!isValid || calculating}
+                                            endIcon={<KeyboardDoubleArrowDown />}
+                                        >
+                                            Tiếp tục ({activeStep + 1}/{maxSteps})
+                                        </CheckoutButton>
+                                        :
+                                        <CheckoutButton
+                                            variant="contained"
+                                            size="large"
+                                            fullWidth
+                                            sx={{ maxWidth: '35%' }}
+                                            disabled={calculating}
+                                        >
+                                            Đặt hàng
+                                        </CheckoutButton>
+                                    }
                                 </CheckoutStack>
                             </CheckoutBox>
                         </>
@@ -253,18 +287,31 @@ const FinalCheckoutDialog = ({ coupon, productCount, estimated, calculated, calc
                                 </CheckoutBox>
                             }
                             <CheckoutBox className="sticky">
-                                <CheckoutTitle>THANH TOÁN</CheckoutTitle>
+                                <CheckoutTitle>ĐƠN HÀNG</CheckoutTitle>
                                 {checkoutDetail}
-                                <CheckoutButton
-                                    variant="contained"
-                                    size="large"
-                                    fullWidth
-                                    sx={{ padding: '11px', mt: 1 }}
-                                    disabled={calculating}
-                                    startIcon={<ShoppingCartCheckout />}
-                                >
-                                    Đặt hàng
-                                </CheckoutButton>
+                                {activeStep < 2 ?
+                                    <CheckoutButton
+                                        variant="contained"
+                                        size="large"
+                                        fullWidth
+                                        sx={{ padding: '11px', mt: 1 }}
+                                        onClick={handleNext}
+                                        disabled={!isValid || calculating}
+                                        endIcon={<KeyboardDoubleArrowDown />}
+                                    >
+                                        Tiếp tục ({activeStep + 1}/{maxSteps})
+                                    </CheckoutButton>
+                                    :
+                                    <CheckoutButton
+                                        variant="contained"
+                                        size="large"
+                                        fullWidth
+                                        sx={{ padding: '11px', mt: 1 }}
+                                        disabled={calculating}
+                                    >
+                                        Đặt hàng
+                                    </CheckoutButton>
+                                }
                             </CheckoutBox>
                         </ >
                 }
@@ -280,6 +327,31 @@ const FinalCheckoutDialog = ({ coupon, productCount, estimated, calculated, calc
                         disabled={calculating}
                     >
                         <CheckoutBox>
+                            {(activeStep > 0 && addressInfo) &&
+                                <>
+                                    <CheckoutTitle>
+                                        GIAO TỚI
+                                        {coupon && <EditButton onClick={() => {
+                                            backFirstStep();
+                                            toggleDrawer(false);
+                                        }
+                                        }><Edit /> Thay đổi</EditButton>}
+                                    </CheckoutTitle>
+                                    <CheckoutRow>
+                                        <AddressContainer>
+                                            <AddressContent>
+                                                <UserInfo>{addressInfo?.companyName ?? addressInfo?.name}&nbsp;</UserInfo>
+                                                {addressInfo?.phone && <UserInfo>{`(+84) ${addressInfo.phone}`}</UserInfo>}
+                                            </AddressContent>
+                                            <Address>
+                                                {address && <AddressTag className={address.color}>{address.label}</AddressTag>}
+                                                {fullAddress.length > 2 ? fullAddress : 'Không xác định'}
+                                            </Address>
+                                        </AddressContainer>
+                                    </CheckoutRow>
+                                    <AddressDivider />
+                                </>
+                            }
                             <CheckoutTitle>ĐẶT HÀNG</CheckoutTitle>
                             {checkoutDetail}
                         </CheckoutBox>

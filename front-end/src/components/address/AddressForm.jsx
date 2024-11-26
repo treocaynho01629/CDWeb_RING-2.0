@@ -23,7 +23,7 @@ const splitAddress = (addressInfo) => {
         id: addressInfo?.id || '',
         name: addressInfo?.name || '',
         companyName: addressInfo?.companyName || '',
-        type: addressInfo?.type || '',
+        type: addressInfo?.type || null,
         phone: addressInfo?.phone || '',
         city,
         ward,
@@ -193,7 +193,7 @@ const AddressForm = ({ handleClose, addressInfo, err, errMsg, setErrMsg, selecte
                                     fullWidth
                                     size="small"
                                 >
-                                    <MenuItem value=""><em>--Không--</em></MenuItem>
+                                    <MenuItem value={null}><em>--Không--</em></MenuItem>
                                     {addressItems.map((item, index) => (
                                         <MenuItem key={index} value={item.value}>{item.label}</MenuItem>
                                     ))}

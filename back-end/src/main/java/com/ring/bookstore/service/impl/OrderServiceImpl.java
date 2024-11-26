@@ -259,11 +259,11 @@ public class OrderServiceImpl implements OrderService {
 
         //Create new receipt
         var orderReceipt = OrderReceipt.builder()
-                .fullName(request.getName())
-                .email(user.getEmail())
-                .phone(request.getPhone())
-                .orderAddress(request.getAddress())
-                .orderMessage(request.getMessage())
+//                .fullName(request.getName())
+//                .email(user.getEmail())
+//                .phone(request.getPhone())
+//                .orderAddress(request.getAddress())
+//                .orderMessage(request.getMessage())
                 .user(user)
                 .build();
 
@@ -317,10 +317,10 @@ public class OrderServiceImpl implements OrderService {
                 + "Đơn hàng của bạn đã được xác nhận!\r\n"
                 + "</h2>\n"
                 + "<h3>Chi tiết đơn hàng:</h3>\n"
-                + "<p><b>Tên người nhận: </b>" + request.getName() + "</p>\n"
-                + "<p><b>SĐT người nhận: </b>" + request.getPhone() + "</p>\n"
-                + "<p><b>Địa chỉ: </b>" + request.getAddress() + "</p>\n"
-                + "<br><p>Lời nhắn cho shipper: <b>" + request.getMessage() + "</b></p>\n"
+//                + "<p><b>Tên người nhận: </b>" + request.getName() + "</p>\n"
+//                + "<p><b>SĐT người nhận: </b>" + request.getPhone() + "</p>\n"
+//                + "<p><b>Địa chỉ: </b>" + request.getAddress() + "</p>\n"
+//                + "<br><p>Lời nhắn cho shipper: <b>" + request.getMessage() + "</b></p>\n"
                 + "<br><br><h3>Chi tiết sản phẩm:</h3>\n"
                 + cartContent
                 + "<br><br><h3>Tổng đơn giá: <b style=\"color: red\">" + total + "đ</b></h3>";

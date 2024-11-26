@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite'
-import { visualizer } from 'rollup-plugin-visualizer';
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
 
@@ -11,13 +10,6 @@ export default defineConfig({
             babel: {
                 plugins: ["@emotion/babel-plugin"],
             },
-        }),
-        visualizer({
-            template: "treemap", // or sunburst
-            open: false,
-            gzipSize: true,
-            brotliSize: true,
-            filename: "analyse.html", // will be saved in project's root
         }),
         svgr({
             svgrOptions: { exportType: 'named', ref: true, svgo: false, titleProp: true },

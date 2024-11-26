@@ -1,5 +1,7 @@
 package com.ring.bookstore.request;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,4 +20,7 @@ public class ShopRequest {
 	@Size(max = 500, message = "Mô tả không quá 500 kí tự")
 	private String description;
 
+    @Valid
+    @NotNull(groups = AddressRequest.class)
+    private AddressRequest addressRequest;
 }
