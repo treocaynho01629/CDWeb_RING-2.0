@@ -4,7 +4,7 @@ import { KeyboardArrowRight, LabelOff} from '@mui/icons-material'
 import { MobileExtendButton } from '../custom/GlobalComponents'
 import { useGetCouponsQuery } from '../../features/coupons/couponsApiSlice'
 import { Skeleton } from '@mui/material'
-import { getCouponSumary } from '../../ultils/coupon'
+import { getCouponSummary } from '../../ultils/coupon'
 
 const Popover = lazy(() => import('@mui/material/Popover'));
 const CouponItem = lazy(() => import('./CouponItem'));
@@ -205,18 +205,18 @@ const CouponPreview = ({ shopId }) => {
     const { data, isLoading, isSuccess, isError } = useGetCouponsQuery({ shop: shopId, size: 4 }, { skip: !shopId });
     const [anchorEl, setAnchorEl] = useState(undefined);
     const [contextCoupon, setContextCoupon] = useState(null);
-    const [contextSumary, setContextSumary] = useState(null);
+    const [contextSummary, setContextSummary] = useState(null);
     const [openDialog, setOpenDialog] = useState(undefined);
 
-    const handlePopover = (e, coupon, sumary) => {
+    const handlePopover = (e, coupon, summary) => {
         setAnchorEl(e.currentTarget);
         setContextCoupon(coupon);
-        setContextSumary(sumary);
+        setContextSummary(summary);
     };
     const handleClose = () => {
         setAnchorEl(null);
         setContextCoupon(null);
-        setContextSumary(null);
+        setContextSummary(null);
     };
     const handleOpenDialog = () => { setOpenDialog(true) }
     const handleCloseDialog = () => { setOpenDialog(false) }
@@ -246,18 +246,18 @@ const CouponPreview = ({ shopId }) => {
         coupons = ids?.length
             ? ids?.map((id, index) => {
                 const coupon = entities[id];
-                const couponSumary = getCouponSumary(coupon.detail.type);
+                const summary = getCouponSummary(coupon.type);
 
                 return (
                     <Coupon
                         key={`coupon-${id}-${index}`}
                         aria-owns={open ? 'mouse-over-popover' : undefined}
                         aria-haspopup="true"
-                        onMouseEnter={(e) => handlePopover(e, coupon, couponSumary)}
+                        onMouseEnter={(e) => handlePopover(e, coupon, summary)}
                     >
-                        <CouponIcon className={couponSumary.color}>{couponSumary.icon}</CouponIcon>
+                        <CouponIcon className={summary.color}>{summary.icon}</CouponIcon>
                         <CouponContent>
-                            <CouponTitle>{`${couponSumary.name} ${coupon.detail.discount * 100}%`}</CouponTitle>
+                            <CouponTitle>{coupon?.summary}</CouponTitle>
                         </CouponContent>
                     </Coupon>
                 )
@@ -303,7 +303,7 @@ const CouponPreview = ({ shopId }) => {
                                     }}
                                     anchorOrigin={{ vertical: 'bottom', horizontal: 'left', }}
                                 >
-                                    <CouponItem coupon={contextCoupon} sumary={contextSumary} />
+                                    <CouponItem coupon={contextCoupon} summary={contextSummary} />
                                 </Popover>
                             }
                         </Suspense>

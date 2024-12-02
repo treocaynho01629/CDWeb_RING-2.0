@@ -54,20 +54,19 @@ public class AuthenticationService {
 	private static final long EXPIRE_TOKEN_AFTER_MINUTES = 30;
 	
 	@Value("${ring.client-url}")
-	private String frontUrl;
+	private String clientUrl;
 	
 	//Register
 	public AuthenticationResponse register(RegisterRequest request) {
 
 		//Check if user with this username already exists
 		if (accountRepo.existsByUsername(request.getUsername())) {
-			throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Người dùng với tên đăng nhập này đã tồn tại!");
+			throw new HttpResponseException(HttpStatus.CONFLICT, "Người dùng với tên đăng nhập này đã tồn tại!");
 		} else {
-			
 			//Set role for USER
 			Set<Role> roles = new HashSet<>();
 			roles.add(roleService.findByRoleName(RoleName.ROLE_USER)
-					.orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "No roles has been set")));
+					.orElseThrow(() -> new ResourceNotFoundException("No roles has been set!")));
 			
 			//Create and set new Account info
 			var acc = Account.builder().username(request.getUsername()).pass(passwordEncoder.encode(request.getPass()))
@@ -100,7 +99,7 @@ public class AuthenticationService {
 
 	//Authenticate
 	public AuthenticationResponse authenticate(AuthenticationRequest request) throws ResourceNotFoundException {
-        if (loginProtectionService.isBlocked(request.getUsername())) {
+        if (loginProtectionService.isBlocked()) {
 			throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "Authentication blocked due to too many failed login attempts!");
 		}
 
@@ -115,17 +114,12 @@ public class AuthenticationService {
 
 			SecurityContextHolder.getContext().setAuthentication(authentication); //All good >> security context
 		} catch (Exception e) {
-			// Record failed login attempt
-			loginProtectionService.loginFailed(request.getUsername());
 			throw new BadCredentialsException("Invalid Username or Password!");
 		}
 
 		//Generate new JWT & refresh token
 		var jwtToken = generateToken(user);
 		var refreshToken = jwtService.generateRefreshToken(user);
-
-		// Record successful login
-		loginProtectionService.loginSucceeded(request.getUsername());
 
 		//Return authentication response
 		return AuthenticationResponse
@@ -136,17 +130,9 @@ public class AuthenticationService {
 	}
 
 	//Refresh JWT
-	public void refreshToken(HttpServletRequest request, HttpServletResponse response)
-			throws StreamWriteException, DatabindException, IOException {
-		//Get request JWT from Header
-		final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-		final String refreshToken;
-		final String username;
-
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) { return; } //Not valid Bearer header
-
-		refreshToken = authHeader.substring(7); //After "Bearer "
-		username = jwtService.extractRefreshUsername(refreshToken); //Get username from token
+	public void refreshToken(HttpServletResponse response, String refreshToken)
+			throws IOException {
+		String username = jwtService.extractRefreshUsername(refreshToken); //Get username from token
 
 		if (username != null) { //Check if this username exists
 			var user = this.accountRepo.findByUsername(username)
@@ -177,7 +163,7 @@ public class AuthenticationService {
 		//Loop through all and send email
 		for (Account a : accounts) {
 			String token = updateResetToken(a); //Generate reset password token
-			String url = frontUrl + "/reset-password?token=" + token; //Put url + parameter with reset token
+			String url = clientUrl + "/reset-password?token=" + token; //Put url + parameter with reset token
 			
 			//Put in email content
 			resetContent += 
@@ -221,11 +207,15 @@ public class AuthenticationService {
 	public Account resetPassword(ResetPassRequest request) {
 		//Check if user with username exists
 		var user = accountRepo.findByResetPassToken(request.getToken())
-				.orElseThrow(() -> new ResourceNotFoundException("User with this token does not exist!"));
+				.orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 		//Check token expiration
-		if (isTokenExpired(user.getTokenCreationDate())) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Token hết hạn!");
+		if (isTokenExpired(user.getTokenCreationDate())) throw new BadCredentialsException("Token expired!");
         //Validate new password
-        if (!request.getNewPass().equals(request.getNewPassRe())) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Mật khẩu không trùng khớp!");
+        if (!request.getNewPass().equals(request.getNewPassRe())) throw new HttpResponseException(
+				HttpStatus.BAD_REQUEST,
+				"Re input password does not match!",
+				"Mật khẩu không trùng khớp!"
+		);
         
         //Change password and save to database
         user.setPass(passwordEncoder.encode(request.getNewPass()));

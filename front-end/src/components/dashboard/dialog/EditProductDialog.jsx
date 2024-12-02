@@ -220,7 +220,7 @@ const EditProductDialog = ({ id, open, handleClose }) => {
 
         return (
           <MenuItem key={`Cate:${id}-${index}`} value={id}>
-            {cate.categoryName}
+            {cate.name}
           </MenuItem>
         )
       })

@@ -1,7 +1,6 @@
 import styled from '@emotion/styled'
 import { KeyboardArrowRight } from '@mui/icons-material';
 import { alpha, Button, FormControlLabel, IconButton, Radio, RadioGroup } from '@mui/material'
-import { useState } from 'react';
 import { getAddress } from '../../ultils/address';
 import { shippingItems } from '../../ultils/shipping';
 
@@ -125,11 +124,9 @@ const AddressTag = styled.span`
 `
 //#endregion
 
-const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadAddress }) => {
-    const [delivery, setDelivery] = useState(shippingItems[0].value);
+const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadAddress, value, handleChange }) => {
     const fullAddress = [addressInfo?.city, addressInfo?.address].join(", ");
 
-    const handleChange = (e) => { setDelivery(e.target.value) }
     const address = addressInfo?.type ? getAddress(addressInfo.type) : null;
 
     return (
@@ -175,7 +172,7 @@ const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadAddress }) => {
                 </IconButton>
             </AddressDisplayContainer>
             <Title>Hình thức giao hàng</Title>
-            <RadioGroup value={delivery} onChange={handleChange}>
+            <RadioGroup value={value} onChange={handleChange}>
                 {shippingItems.map((item, index) => (
                     <StyledForm key={index} value={item.value} control={<Radio />}
                         label={<FormContent>

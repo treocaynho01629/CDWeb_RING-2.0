@@ -99,8 +99,8 @@ const OrdersList = () => {
         keyword: searchParams.get('q') ?? ''
     })
     const [pagination, setPagination] = useState({
-        currPage: 0,
-        pageSize: defaultSize,
+        number: 0,
+        size: defaultSize,
         totalPages: 0,
         isMore: true,
     })
@@ -109,8 +109,8 @@ const OrdersList = () => {
     const { data, isLoading, isFetching, isSuccess, isError, error } = useGetOrdersByUserQuery({
         status: filters?.status,
         keyword: filters?.keyword,
-        page: pagination?.currPage,
-        size: pagination?.pageSize,
+        page: pagination?.number,
+        size: pagination?.size,
         loadMore: pagination?.isMore
     });
     const [getBought] = booksApiSlice.useLazyGetBooksByIdsQuery();
@@ -121,8 +121,8 @@ const OrdersList = () => {
         if (data && !isLoading && isSuccess) {
             setPagination({
                 ...pagination,
-                currPage: data.info.currPage,
-                totalPages: data.info.totalPages
+                number: data.page.number,
+                totalPages: data.page.totalPages
             });
         }
     }, [data])
@@ -141,7 +141,7 @@ const OrdersList = () => {
     }, []);
 
     const handleResetPagination = useCallback(() => {
-        setPagination(prev => ({ ...prev, currPage: 0 }));
+        setPagination(prev => ({ ...prev, number: 0 }));
         scrollToTop();
     }, [])
 
@@ -178,10 +178,10 @@ const OrdersList = () => {
 
     //Show more
     const handleShowMore = () => {
-        if (isFetching || typeof data?.info?.currPage !== 'number') return;
-        if (data?.info?.currPage < pagination?.currPage) return;
-        const nextPage = data?.info?.currPage + 1;
-        if (nextPage < data?.info?.totalPages) setPagination(prev => ({ ...prev, currPage: nextPage }));
+        if (isFetching || typeof data?.page?.number !== 'number') return;
+        if (data?.page?.number < pagination?.number) return;
+        const nextPage = data?.page?.number + 1;
+        if (nextPage < data?.page?.totalPages) setPagination(prev => ({ ...prev, number: nextPage }));
     }
 
     const handleWindowScroll = (e) => {
@@ -201,7 +201,7 @@ const OrdersList = () => {
 
     let ordersContent;
 
-    if (isLoading || (isFetching && pagination.currPage == 0)) {
+    if (isLoading || (isFetching && pagination.number == 0)) {
         ordersContent =
             <PlaceholderContainer>
                 <LoadContainer>
@@ -268,8 +268,8 @@ const OrdersList = () => {
                 </form>
                 <OrdersContainer>
                     {ordersContent}
-                    {(pagination.currPage > 0 && isFetching) && <LoadContainer><CircularProgress size={30} color="primary" /></LoadContainer>}
-                    {(data?.ids?.length > 0 && data?.ids?.length == data?.info?.totalElements)
+                    {(pagination.number > 0 && isFetching) && <LoadContainer><CircularProgress size={30} color="primary" /></LoadContainer>}
+                    {(data?.ids?.length > 0 && data?.ids?.length == data?.page?.totalElements)
                         && <Message className="warning">Không còn đơn hàng nào!</Message>}
                 </OrdersContainer>
             </DialogContent>

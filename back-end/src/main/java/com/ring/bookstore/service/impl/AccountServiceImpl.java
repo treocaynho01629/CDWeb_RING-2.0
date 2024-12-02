@@ -6,7 +6,7 @@ import com.ring.bookstore.dtos.accounts.ProfileDTO;
 import com.ring.bookstore.dtos.mappers.AccountDetailMapper;
 import com.ring.bookstore.dtos.mappers.ChartDataMapper;
 import com.ring.bookstore.dtos.mappers.ProfileMapper;
-import com.ring.bookstore.dtos.projections.IProfile;
+import com.ring.bookstore.dtos.accounts.IProfile;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ImageResizerException;
@@ -67,7 +67,8 @@ public class AccountServiceImpl implements AccountService {
 
     //Get account by {id}
     public AccountDetailDTO getAccountById(Long id) {
-        Account account = accountRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+        Account account = accountRepo.findById(id).orElseThrow(()
+                -> new ResourceNotFoundException("User not found!"));
         return detailMapper.apply(account);
     }
 
@@ -77,17 +78,24 @@ public class AccountServiceImpl implements AccountService {
 
         //Check if Account with these username and email has exists >> throw exception
         if (!accountRepo.findByUsername(request.getUsername()).isEmpty()) {
-            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Người dùng với tên đăng nhập này đã tồn tại!");
+            throw new HttpResponseException(
+                    HttpStatus.CONFLICT,
+                    "User already existed!",
+                    "Người dùng với tên đăng nhập này đã tồn tại!"
+            );
         }
 
         //Set roles: 1 USER, 2 SELLER, 3 ADMIN
         Set<Role> roles = new HashSet<>();
-        roles.add(roleService.findByRoleName(RoleName.ROLE_USER).orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "No roles has been set")));
+        roles.add(roleService.findByRoleName(RoleName.ROLE_USER).orElseThrow(
+                () -> new ResourceNotFoundException("No roles has been set!")));
 
         if (request.getRoles() >= 2) {
-            roles.add(roleService.findByRoleName(RoleName.ROLE_SELLER).orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "Role not found")));
+            roles.add(roleService.findByRoleName(RoleName.ROLE_SELLER).orElseThrow(
+                    () -> new ResourceNotFoundException("Role not found!")));
         } else if (request.getRoles() >= 3) {
-            roles.add(roleService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "Role not found")));
+            roles.add(roleService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(
+                    () -> new ResourceNotFoundException("Role not found!")));
         }
 
         //Create account
@@ -127,13 +135,16 @@ public class AccountServiceImpl implements AccountService {
 
         //Set roles: 1 USER, 2 SELLER, 3 ADMIN
         Set<Role> roles = new HashSet<>();
-        roles.add(roleService.findByRoleName(RoleName.ROLE_USER).orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "No roles has been set")));
+        roles.add(roleService.findByRoleName(RoleName.ROLE_USER).orElseThrow(
+                () -> new ResourceNotFoundException("No roles has been set!")));
 
         if (request.getRoles() >= 2) {
-            roles.add(roleService.findByRoleName(RoleName.ROLE_SELLER).orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "Role not found")));
+            roles.add(roleService.findByRoleName(RoleName.ROLE_SELLER).orElseThrow(
+                    () -> new ResourceNotFoundException("Role not found!")));
         }
         if (request.getRoles() >= 3) {
-            roles.add(roleService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(() -> new HttpResponseException(HttpStatus.NOT_FOUND, "Role not found")));
+            roles.add(roleService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(
+                    () -> new ResourceNotFoundException("Role not found!")));
         }
 
         //Set new info
@@ -164,9 +175,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     //Delete account (ADMIN)
+    @Transactional
     public void deleteAccount(Long id) {
         //Check if account exists?
-        Account account = accountRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+        Account account = accountRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("User not found!"));
 
         //Remove relationship with related Table
         account.removeAllOrders();
@@ -182,7 +195,8 @@ public class AccountServiceImpl implements AccountService {
     public void deleteAccounts(List<Long> ids) {
         //Loop through and delete from lists
         for (Long id : ids) {
-            Account account = accountRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+            Account account = accountRepo.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException("User not found!"));
 
             //Remove relationship
             account.removeAllOrders();
@@ -242,10 +256,18 @@ public class AccountServiceImpl implements AccountService {
     public Account changePassword(ChangePassRequest request, Account user) {
         //Check current password
         if (!passwordEncoder.matches(request.getPass(), user.getPass()))
-            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Mật khẩu hiện tại không đúng!");
+            throw new HttpResponseException(
+                    HttpStatus.BAD_REQUEST,
+                    "Password not correct!",
+                    "Mật khẩu hiện tại không đúng!"
+            );
         //Check matching new password
         if (!request.getNewPass().equals(request.getNewPassRe()))
-            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Mật khẩu không trùng khớp!");
+            throw new HttpResponseException(
+                    HttpStatus.BAD_REQUEST,
+                    "Re input password does not match!",
+                    "Mật khẩu không trùng khớp!"
+            );
 
         //Change password and save to database
         user.setPass(passwordEncoder.encode(request.getNewPass()));
@@ -267,15 +289,17 @@ public class AccountServiceImpl implements AccountService {
         return savedAccount; //Return updated account
     }
 
-    //Get top users
+    //Get top users FIX
     public List<ChartDTO> getTopAccount() {
-        List<Map<String,Object>> result = accountRepo.getTopUser();
-        return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
+//        List<Map<String,Object>> result = accountRepo.getTopUser();
+//        return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
+        return null;
     }
 
     //Get top sellers
     public List<ChartDTO> getTopSeller() {
-        List<Map<String,Object>> result = accountRepo.getTopSeller();
-        return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
+//        List<Map<String,Object>> result = accountRepo.getTopSeller();
+//        return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
+        return null;
     }
 }

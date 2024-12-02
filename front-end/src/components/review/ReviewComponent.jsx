@@ -81,21 +81,21 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
     //Pagination & filter
     const [filterBy, setFilterBy] = useState('all');
     const [pagination, setPagination] = useState({
-        currPage: 0,
-        pageSize: 8,
+        number: 0,
+        size: 8,
         totalPages: 0,
         sortBy: 'createdDate',
     });
 
     //Fetch reviews
-    const productReviewsCount = book?.reviewsInfo?.count[0] ?? 0;
+    const productReviewsCount = book?.reviewsInfo?.total;
     const haveReviews = !(!book || productReviewsCount == 0);
     const { data: userReview, isSuccess: doneReview, error: errorReview } = useGetReviewByBookIdQuery(book?.id, //User's review of this product
         { skip: !username || !book });
     const { data, isLoading, isFetching, isSuccess, isUninitialized, isError, error } = useGetReviewsByBookIdQuery({
         id: book?.id,
-        page: pagination?.currPage,
-        size: pagination?.pageSize,
+        page: pagination?.number,
+        size: pagination?.size,
         sortBy: pagination?.sortBy,
         sortDir: 'desc',
         rating: filterBy === 'all' ? null : filterBy
@@ -107,16 +107,16 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
         if (!isLoading && isSuccess && data) {
             setPagination({
                 ...pagination,
-                totalPages: data?.info?.totalPages,
-                currPage: data?.info?.currPage,
-                pageSize: data?.info?.pageSize,
+                totalPages: data?.page?.totalPages,
+                number: data?.page?.number,
+                size: data?.page?.size,
             });
         }
     }, [data])
 
     //Change page
     const handlePageChange = (page) => {
-        setPagination({ ...pagination, currPage: page - 1 });
+        setPagination({ ...pagination, number: page - 1 });
         scrollIntoTab();
     };
 
@@ -126,7 +126,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
     }
 
     const handleChangeFilter = (e) => { setFilterBy(e.target.value) };
-    const handleChangeSize = (newValue) => { setPagination({ ...pagination, pageSize: newValue, currPage: 0 }) };
+    const handleChangeSize = (newValue) => { setPagination({ ...pagination, size: newValue, number: 0 }) };
     const handleOpenForm = () => { setOpenForm(true) };
     const handleCloseForm = () => { setOpenForm(false) };
 
@@ -136,7 +136,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
     if (isLoading && !isUninitialized) {
         reviewsContent = <>
             {(loading) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
-            {[...Array(productReviewsCount > pagination?.pageSize ? pagination?.pageSize : productReviewsCount)].map((item, index) =>
+            {[...Array(productReviewsCount > pagination?.size ? pagination?.size : productReviewsCount)].map((item, index) =>
                 <Fragment key={`temp-review-${index}`}>
                     <ReviewItem />
                 </Fragment>
@@ -164,7 +164,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                     Chưa có đánh giá nào, hãy trở thành người đầu tiên!
                 </Message>
             }
-            {(ids?.length > 0 && ids?.length < pagination.pageSize)
+            {(ids?.length > 0 && ids?.length < pagination.size)
                 && <Message className="warning">Không còn đánh giá nào!</Message>}
         </>
     } else if (isError) {
@@ -178,7 +178,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
 
     mainContent = (
         <>
-            {book?.reviewsInfo?.count[0] > 0 &&
+            {book?.reviewsInfo?.total > 0 &&
                 <Suspense fallback={<Box display="flex">
                     <Skeleton variant="text" sx={{ mr: 2, fontSize: '16px', display: { xs: 'none', md: 'block' } }} width={64} />
                     <Skeleton variant="rectangular" sx={{ mr: 1, height: 40, width: 178 }} />
@@ -186,12 +186,12 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                 </Box>}>
                     <ReviewSort {...{
                         sortBy: pagination?.sortBy, handleChangeOrder,
-                        filterBy, handleChangeFilter, count: book?.reviewsInfo?.count
+                        filterBy, handleChangeFilter, count: book?.reviewsInfo?.rates
                     }} />
                 </Suspense>
             }
             {reviewsContent}
-            {book?.reviewsInfo?.count[0] > pagination.pageSize &&
+            {book?.reviewsInfo?.total > pagination.size &&
                 <Suspense fallback={null}>
                     <AppPagination pagination={pagination}
                         onPageChange={handlePageChange}
@@ -231,7 +231,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                         <Suspense fallback={<CustomPlaceholder sx={{ height: { xs: 131, md: 140 } }} />}>
                             <ReviewInfo {...{
                                 handleClick: handleOpenForm, book,
-                                disabled: errorReview?.status == 409, editable: (haveReviews && userReview != null)
+                                disabled: errorReview?.status == 403, editable: (haveReviews && userReview != null)
                             }} />
                         </Suspense>
                     }
@@ -247,7 +247,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
             <ReviewsContainer>
                 {mobileMode ? reviewsContent : mainContent}
             </ReviewsContainer>
-            {(mobileMode && book?.reviewsInfo?.count[0] > 0) && //View all
+            {(mobileMode && book?.reviewsInfo?.total > 0) && //View all
                 <Showmore onClick={() => handleToggleReview(true)}>
                     <Label>Xem tất cả ({numFormatter(productReviewsCount)} đánh giá) <KeyboardArrowRight fontSize="small" /></Label>
                 </Showmore>
@@ -278,11 +278,11 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                                 size="large"
                                 fullWidth
                                 sx={{ marginY: '10px' }}
-                                disabled={!book || errorReview?.status == 409}
+                                disabled={!book || errorReview?.status == 403}
                                 onClick={() => setOpenForm(true)}
                                 startIcon={<EditOutlined />}
                             >
-                                {errorReview?.status == 409 ? 'Mua sản phẩm' :
+                                {errorReview?.status == 403 ? 'Mua sản phẩm' :
                                     (haveReviews && userReview != null) ? 'Sửa đánh giá' : 'Viết đánh giá'}
                             </Button>
                         </DialogActions>

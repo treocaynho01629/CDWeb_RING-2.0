@@ -4,14 +4,18 @@ import com.ring.bookstore.dtos.orders.CalculateDTO;
 import com.ring.bookstore.dtos.orders.CalculateDetailDTO;
 import com.ring.bookstore.dtos.orders.CalculateItemDTO;
 import com.ring.bookstore.model.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class CalculateMapper {
+    private final CouponMapper couponMapper;
+
     public CalculateDetailDTO detailToDetailDTO(OrderDetail detail) {
         List<OrderItem> orderItems = detail.getItems();
         List<CalculateItemDTO> itemDTOS = orderItems.stream().map(this::itemToItemDTO).collect(Collectors.toList());
@@ -27,14 +31,14 @@ public class CalculateMapper {
                 detail.getCouponDiscount(),
                 detail.getShippingFee(),
                 detail.getShippingDiscount(),
-                detail.getCoupon(),
+                couponMapper.apply(detail.getCoupon()),
                 itemDTOS);
     }
 
     public CalculateItemDTO itemToItemDTO(OrderItem item) {
         Book book = item.getBook();
         double price = (price = book.getPrice()) != 0.0 ? price : -1.0;
-        short amount = (amount = book.getAmount()) != 0 ? amount : 0;
+        short amount = book.getAmount();
         BigDecimal discount = (discount = book.getDiscount()) != null ? discount : null;
         String title = (title = book.getTitle()) != null ? title : null;
         String slug = (slug = book.getSlug()) != null ? slug : null;
@@ -59,7 +63,7 @@ public class CalculateMapper {
                 order.getDealDiscount(),
                 order.getCouponDiscount(),
                 order.getShippingDiscount(),
-                order.getCoupon(),
+                couponMapper.apply(order.getCoupon()),
                 detailDTOS
         );
     }

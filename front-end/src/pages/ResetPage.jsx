@@ -45,7 +45,7 @@ function ResetPage() {
             }
             <SimpleNavbar />
             <Container>
-                {token ? <ResetTab /> : <ForgotTab token={token} />}
+                {token ? <ResetTab {...{ pending, setPending }} /> : <ForgotTab token={token} {...{ pending, setPending }} />}
             </Container>
         </Wrapper>
     )

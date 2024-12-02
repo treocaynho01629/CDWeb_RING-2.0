@@ -3,11 +3,10 @@ package com.ring.bookstore.dtos.mappers;
 import java.time.LocalDate;
 import java.util.function.Function;
 
-import com.ring.bookstore.dtos.projections.IProfile;
+import com.ring.bookstore.dtos.accounts.IProfile;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.dtos.accounts.ProfileDTO;
-import com.ring.bookstore.model.AccountProfile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Service

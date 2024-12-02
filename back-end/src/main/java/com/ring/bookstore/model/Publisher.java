@@ -1,6 +1,5 @@
 package com.ring.bookstore.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -34,17 +33,19 @@ public class Publisher {
 
     @Column(length = 200)
     @Nationalized 
-    private String pubName;
+    private String name;
 
-    @OneToOne(cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY,
+            orphanRemoval = true,
+            cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id")
     @JsonIgnore
     private Image image;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "publisher", fetch = FetchType.LAZY)
-    @JsonBackReference
+    @OneToMany(cascade = CascadeType.ALL,
+            mappedBy = "publisher",
+            fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Book> publisherBooks;
 
     public Long getImageId() {

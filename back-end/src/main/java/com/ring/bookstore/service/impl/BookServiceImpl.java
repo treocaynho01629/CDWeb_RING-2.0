@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import com.github.slugify.Slugify;
 import com.ring.bookstore.dtos.books.BookResponseDTO;
-import com.ring.bookstore.dtos.projections.IBookDetail;
+import com.ring.bookstore.dtos.books.IBookDetail;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.*;
@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ring.bookstore.dtos.books.BookDTO;
 import com.ring.bookstore.dtos.books.BookDetailDTO;
-import com.ring.bookstore.dtos.projections.IBookDisplay;
+import com.ring.bookstore.dtos.books.IBookDisplay;
 import com.ring.bookstore.dtos.mappers.BookMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
@@ -51,14 +51,14 @@ public class BookServiceImpl implements BookService {
     //Get random books
     public List<BookDTO> getRandomBooks(Integer amount) {
         List<IBookDisplay> booksList = bookRepo.findRandomBooks(amount);
-        List<BookDTO> bookDtos = booksList.stream().map(bookMapper::displayToBookDTO).collect(Collectors.toList()); //Return books
-        return bookDtos;
+        List<BookDTO> bookDTOS = booksList.stream().map(bookMapper::displayToBookDTO).collect(Collectors.toList()); //Return books
+        return bookDTOS;
     }
 
-    public List<BookDTO> getBooksByIds(List<Long> ids) {
-        List<IBookDisplay> booksList = bookRepo.findBooksByIds(ids);
-        List<BookDTO> bookDtos = booksList.stream().map(bookMapper::displayToBookDTO).collect(Collectors.toList()); //Return books
-        return bookDtos;
+    public List<BookDTO> getBooksInIds(List<Long> ids) {
+        List<IBookDisplay> booksList = bookRepo.findBooksDisplayInIds(ids);
+        List<BookDTO> bookDTOS = booksList.stream().map(bookMapper::displayToBookDTO).collect(Collectors.toList()); //Return books
+        return bookDTOS;
     }
 
     //Get books with filter
@@ -70,13 +70,13 @@ public class BookServiceImpl implements BookService {
         //Fetch from database
         Page<IBookDisplay> booksList = bookRepo.findBooksWithFilter(keyword, cateId, pubIds, types,
                 shopId, fromRange, toRange, rating, amount, pageable);
-        Page<BookDTO> bookDtos = booksList.map(bookMapper::displayToBookDTO);
-        return bookDtos;
+        Page<BookDTO> bookDTOS = booksList.map(bookMapper::displayToBookDTO);
+        return bookDTOS;
     }
 
     //Get book with detail
     public BookDetailDTO getBookDetail(Long id, String slug) {
-        IBookDetail book = bookRepo.findBookDetail(id, slug).orElseThrow(() ->
+        IBookDetail book = detailRepo.findBookDetail(id, slug).orElseThrow(() ->
                 new ResourceNotFoundException("Product not found!"));
         BookDetailDTO bookDetailDTO = bookMapper.detailToDetailDTO(book); //Map to DTO
         return bookDetailDTO;
@@ -89,7 +89,7 @@ public class BookServiceImpl implements BookService {
         Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
         Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
-        if (!Objects.equals(shop.getOwner().getId(), seller.getId())) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid owner!");
+        if (!Objects.equals(shop.getOwner().getId(), seller.getId())) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid owner!");
 
         //Image upload
         Image savedImage = imageService.upload(file);
@@ -126,7 +126,7 @@ public class BookServiceImpl implements BookService {
         BookDetail addedDetail = detailRepo.save(bookDetail); //Save details to database
 
         //Return added book
-        addedBook.setBookDetail(addedDetail);
+        addedBook.setDetail(addedDetail);
         return bookMapper.bookToResponseDTO(addedBook);
     }
 
@@ -139,8 +139,9 @@ public class BookServiceImpl implements BookService {
         Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
 
         //Check if correct seller or admin
-        if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+        if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
+        //FIX
 //        if (remove != null) {
 //            if (hasThumbnail && file == null) throw new;
 //            //loop + remove
@@ -160,7 +161,7 @@ public class BookServiceImpl implements BookService {
 //        }
 
         //Set new details info
-        BookDetail currDetail = book.getBookDetail();
+        BookDetail currDetail = book.getDetail();
         currDetail.setBWeight(request.getWeight());
         currDetail.setSize(request.getSize());
         currDetail.setPages(request.getPages());
@@ -192,7 +193,7 @@ public class BookServiceImpl implements BookService {
     public BookResponseDTO deleteBook(Long id, Account seller) {
         Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         //Check if correct seller or admin
-        if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+        if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
         bookRepo.deleteById(id); //Delete from database
         return bookMapper.bookToResponseDTO(book);
@@ -205,7 +206,7 @@ public class BookServiceImpl implements BookService {
         for (Long id : ids) {
             Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
             //Check if correct seller or admin
-            if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+            if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
             bookRepo.deleteById(id); //Delete from database
         }
     }

@@ -33,7 +33,7 @@ const StyledPageItem = styled(PaginationItem)`
 
 const AppPagination = ({ mobileMode, pagination, onPageChange, onSizeChange }) => {
     //Initial value
-    const currPage = pagination?.currPage + 1;
+    const currPage = pagination?.number + 1;
     const totalPages = pagination?.totalPages;
 
     //Change current page
@@ -59,7 +59,7 @@ const AppPagination = ({ mobileMode, pagination, onPageChange, onSizeChange }) =
             <TextField
                 size="small"
                 select
-                value={pagination?.pageSize}
+                value={pagination?.size}
                 onChange={handleChangeSize}
                 sx={{ display: { xs: 'none', sm: 'block' } }}
             >

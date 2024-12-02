@@ -1,18 +1,13 @@
 package com.ring.bookstore.service.impl;
 
 import com.ring.bookstore.dtos.accounts.AddressDTO;
-import com.ring.bookstore.dtos.books.BookDTO;
-import com.ring.bookstore.dtos.books.BookDetailDTO;
 import com.ring.bookstore.dtos.mappers.AddressMapper;
-import com.ring.bookstore.dtos.projections.IAddress;
-import com.ring.bookstore.dtos.projections.IBookDetail;
-import com.ring.bookstore.dtos.projections.IBookDisplay;
+import com.ring.bookstore.dtos.accounts.IAddress;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.AccountProfile;
 import com.ring.bookstore.model.Address;
-import com.ring.bookstore.model.Book;
 import com.ring.bookstore.repository.AccountProfileRepository;
 import com.ring.bookstore.repository.AddressRepository;
 import com.ring.bookstore.request.AddressRequest;
@@ -23,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -105,7 +99,7 @@ public class AddressServiceImpl implements AddressService {
                 new ResourceNotFoundException("Address not found!"));
         AccountProfile profile = user.getProfile();
         if (profile == null || !address.getProfile().getId().equals(profile.getId())) {
-            throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid user!");
+            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid user!");
         }
 
         //Update
@@ -138,7 +132,7 @@ public class AddressServiceImpl implements AddressService {
         AccountProfile profile = user.getProfile();
 
         if (profile == null || !address.getProfile().getId().equals(profile.getId())) {
-            throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid user!");
+            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid user!");
         }
 
         addressRepo.deleteById(id); //Delete from database

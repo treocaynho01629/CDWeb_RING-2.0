@@ -27,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //JWT authen
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final RequestMatcher ignoredPaths = new AntPathRequestMatcher("/api/v1/auth/**");
+    private final RequestMatcher ignoredPaths = new AntPathRequestMatcher("/api/auth/**");
 
     @Override
     protected void doFilterInternal(

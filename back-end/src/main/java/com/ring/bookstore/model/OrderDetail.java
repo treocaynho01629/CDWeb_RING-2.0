@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ring.bookstore.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import java.util.List;
 
@@ -68,7 +66,6 @@ public class OrderDetail {
             orphanRemoval = true,
             mappedBy = "detail",
             fetch = FetchType.LAZY)
-    @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
     private List<OrderItem> items;
 

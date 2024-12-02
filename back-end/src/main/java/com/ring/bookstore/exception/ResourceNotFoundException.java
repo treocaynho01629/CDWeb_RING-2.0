@@ -1,21 +1,26 @@
 package com.ring.bookstore.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.HashMap;
 
+@Getter
 @ResponseStatus(code = HttpStatus.NOT_FOUND)
 public class ResourceNotFoundException extends RuntimeException{
 	
-    private ExceptionMessage exceptionMessage;
+    private final String error;
+    private String message;
 
-    public ResourceNotFoundException(String message) {
-        super(message);
-        this.exceptionMessage = new ExceptionMessage(HttpStatus.NOT_FOUND.value(), message, new HashMap<>());
+    public ResourceNotFoundException(String error) {
+        super();
+        this.error = error;
     }
 
-    public ExceptionMessage getExceptionMessage() {
-        return exceptionMessage;
+    public ResourceNotFoundException(String error, String message) {
+        super();
+        this.error = error;
+        this.message = message;
     }
 }

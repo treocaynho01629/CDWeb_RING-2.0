@@ -13,7 +13,7 @@ export const getOrderStatus = (type) => {
     }
 }
 
-export const getOrderType = ['COMPLETED', 'PENDING', 'SHIPPING', 'CANCELED', 'REFUNDED'];
+export const orderType = ['COMPLETED', 'PENDING', 'SHIPPING', 'CANCELED', 'REFUNDED'];
 
 export const orderItems = [
     {

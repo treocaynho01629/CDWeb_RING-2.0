@@ -55,9 +55,9 @@ public class SetupDataLoader implements
         Role role = roleRepo.findByRoleName(roleName).orElse(null);
         if (role == null) {
             role = new Role();
+            role.setRoleName(roleName);
+            roleRepo.save(role);
         }
-        role.setRoleName(roleName);
-        roleRepo.save(role);
         return role;
     }
 
@@ -73,9 +73,9 @@ public class SetupDataLoader implements
             user.setEmail(email);
             user.setPass(passwordEncoder.encode(password));
             user.setActive(true);
+            user.setRoles(roles);
+            user = accountRepo.save(user);
         }
-        user.setRoles(roles);
-        user = accountRepo.save(user);
         return user;
     }
 }

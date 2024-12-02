@@ -496,7 +496,7 @@ const ProductFormDialog = ({ open, handleClose }) => {
             >
               {/* {dataCate?.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
-                  {option.categoryName}
+                  {option.name}
                 </MenuItem>
               ))} */}
             </CustomInput>

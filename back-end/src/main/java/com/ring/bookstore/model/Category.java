@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import lombok.*;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Nationalized;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -27,7 +25,7 @@ public class Category {
 
     @Column(length = 200)
     @Nationalized 
-    private String categoryName;
+    private String name;
 
     @Column(length = 500)
     @Nationalized
@@ -51,7 +49,6 @@ public class Category {
             orphanRemoval = true,
             mappedBy = "parent",
             fetch = FetchType.LAZY)
-    @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
     private List<Category> subCates;
 

@@ -2,20 +2,12 @@ package com.ring.bookstore.controller;
 
 import java.io.IOException;
 
+import com.ring.bookstore.service.CaptchaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.core.exc.StreamWriteException;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.request.AuthenticationRequest;
 import com.ring.bookstore.request.RegisterRequest;
@@ -23,22 +15,23 @@ import com.ring.bookstore.request.ResetPassRequest;
 import com.ring.bookstore.response.AuthenticationResponse;
 import com.ring.bookstore.service.impl.AuthenticationService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-	@Autowired
 	private final AuthenticationService authService;
+	private final CaptchaService captchaService;
 
 	//Register
 	@PostMapping("/register")
 	public ResponseEntity<AuthenticationResponse> register(@RequestBody @Valid RegisterRequest request) {
+//		String response = request.getParameter("response");
+//		captchaService.processResponse(response, CaptchaService.REGISTER_ACTION);
 		return ResponseEntity.ok(authService.register(request));
 	}
 
@@ -50,9 +43,10 @@ public class AuthenticationController {
 
 	//Refresh JWT token
 	@GetMapping("/refresh-token")
-	public void refreshToken(HttpServletRequest request, HttpServletResponse response)
-			throws StreamWriteException, DatabindException, IOException {
-		authService.refreshToken(request, response);
+	public void refreshToken(HttpServletResponse response,
+							 @CookieValue(value = "refreshToken") String refreshToken)
+			throws IOException {
+		authService.refreshToken(response, refreshToken);
 	}
 	
 	//Send forgot password email

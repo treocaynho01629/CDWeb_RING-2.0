@@ -1,4 +1,4 @@
-package com.ring.bookstore.dtos.projections;
+package com.ring.bookstore.dtos.banners;
 
 public interface IBanner {
     Integer getId();

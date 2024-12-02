@@ -4,7 +4,7 @@ package com.ring.bookstore.dtos.categories;
 public record PreviewCategoryDTO(Integer id,
                                  String slug,
                                  Integer parentId,
-                                 String categoryName,
+                                 String name,
                                  String image) {
 
 }

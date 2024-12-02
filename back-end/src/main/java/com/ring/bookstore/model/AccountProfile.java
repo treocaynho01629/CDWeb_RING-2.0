@@ -49,9 +49,9 @@ public class AccountProfile {
     @Column
     private LocalDate dob;
 
-    @OneToOne(cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY,
+            orphanRemoval = true,
+            cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id")
     @JsonIgnore
     @EqualsAndHashCode.Exclude
@@ -63,16 +63,18 @@ public class AccountProfile {
     @EqualsAndHashCode.Exclude
     private Account user;
 
-    @OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = false, fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY,
+            orphanRemoval = true,
+            cascade = CascadeType.PERSIST)
     @JoinColumn(name = "address_id")
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Address address; //Main address
 
     @OneToMany(cascade = CascadeType.ALL,
             orphanRemoval = true,
             mappedBy = "profile",
             fetch = FetchType.LAZY)
-    @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
     private List<Address> addresses;
 }

@@ -5,14 +5,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         authenticate: builder.mutation({
             query: credentials => ({
-                url: '/api/v1/auth/authenticate',
+                url: '/api/auth/authenticate',
                 method: 'POST',
                 body: { ...credentials }
             })
         }),
         refresh: builder.mutation({
             query: () => ({
-                url: '/api/v1/auth/refresh-token',
+                url: '/api/auth/refresh-token',
                 method: 'GET',
             }),
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
@@ -26,12 +26,13 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 }
             }
         }),
-        register: builder.mutation({
-            query: initialUser => ({
-                url: '/api/v1/auth/register',
+        register: builder.mutation({ //FIX
+            query: ({ token, initialUser }) => ({
+                url: '/api/auth/register',
                 method: 'POST',
                 body: {
-                    ...initialUser,
+                    token,
+                    request: initialUser,
                 }
             }),
             invalidatesTags: [
@@ -40,14 +41,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
         }),
         forgot: builder.mutation({
             query: (email) => ({
-                url: `/api/v1/auth/forgot-password?email=${email}`,
+                url: `/api/auth/forgot-password?email=${email}`,
                 method: 'POST',
                 responseHandler: "text",
             }),
         }),
         reset: builder.mutation({
             query: resetBody => ({
-                url: '/api/v1/auth/reset-password',
+                url: '/api/auth/reset-password',
                 method: 'PUT',
                 body: {
                     ...resetBody,
@@ -59,7 +60,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
         }),
         signout: builder.mutation({
             query: () => ({
-                url: '/api/v1/auth/logout',
+                url: '/api/auth/logout',
                 method: 'DELETE',
             }),
         }),

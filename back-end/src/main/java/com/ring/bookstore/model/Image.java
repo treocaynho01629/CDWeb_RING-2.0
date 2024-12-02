@@ -1,6 +1,7 @@
 package com.ring.bookstore.model;
 
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -34,44 +35,27 @@ public class Image {
     )
     private Long id;
 
-    @Column(name = "name")
+    @Column(unique = true, name = "name")
     private String name;
 
     @Column(name = "type")
     private String type;
 
     @Lob
+    @Basic(fetch = FetchType.LAZY)
     @Column(name = "image")
     @JdbcTypeCode(SqlTypes.BINARY)
     @JsonIgnore
     private byte[] image;
 
     //Image relation
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
-            fetch = FetchType.LAZY,
-            mappedBy = "image")
-    @JsonIgnore
-    private Book book;
-
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
-            fetch = FetchType.LAZY,
-            mappedBy = "image")
-    @JsonIgnore
-    private AccountProfile profile;
-
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
-            fetch = FetchType.LAZY,
-            mappedBy = "image")
-    @JsonIgnore
-    private Publisher publisher;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "detail_id")
     @JsonIgnore
     private BookDetail detail;
 
     //Sub resized images
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinColumn(name = "parent_id")
     @JsonIgnore
     private Image parent;
@@ -80,9 +64,13 @@ public class Image {
             orphanRemoval = true,
             mappedBy = "parent",
             fetch = FetchType.LAZY)
-    @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
     private List<Image> subImages;
+
+    public Image(byte[] image, String type) {
+        this.image = image;
+        this.type = type;
+    }
 
     public String getFileDownloadUri() {
         return ServletUriComponentsBuilder

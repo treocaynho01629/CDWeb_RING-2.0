@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NoArgsConstructor
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE Product SET active = false WHERE id=?")
-@Where(clause = "active=true")
+@SQLRestriction("active=true")
 @EqualsAndHashCode(callSuper = true)
 public class Account extends Auditable implements UserDetails {
 
@@ -74,7 +74,7 @@ public class Account extends Auditable implements UserDetails {
     @EqualsAndHashCode.Exclude
 	private AccountProfile profile;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(	name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))

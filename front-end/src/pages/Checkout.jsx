@@ -7,6 +7,8 @@ import { useGetMyAddressQuery } from '../features/addresses/addressesApiSlice';
 import { useCalculateMutation, useCheckoutMutation } from '../features/orders/ordersApiSlice';
 import { PHONE_REGEX } from '../ultils/regex';
 import { isEqual } from 'lodash-es';
+import { paymentType } from '../ultils/payment';
+import { shippingType } from '../ultils/shipping';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 import AddressDisplay from '../components/address/AddressDisplay';
 import AddressSelectDialog from '../components/address/AddressSelectDialog';
@@ -107,7 +109,8 @@ const Checkout = () => {
     //#region construct
     const scrollRef = useRef(null);
     const [activeStep, setActiveStep] = useState(0);
-    const [method, setMethod] = useState("CASH");
+    const [delivery, setDelivery] = useState(shippingType[0]);
+    const [payment, setPayment] = useState(paymentType[0]);
 
     const [pending, setPending] = useState(false);
     const maxSteps = 3;
@@ -154,7 +157,7 @@ const Checkout = () => {
         setValidPhone(result);
     }, [addressInfo?.phone])
 
-    useDeepEffect(() => { handleCartChange(); }, [cartProducts, shopCoupon, coupon])
+    useDeepEffect(() => { handleCartChange(); }, [cartProducts, shopCoupon, coupon, addressInfo, delivery])
 
     useEffect(() => { scrollToTop(); }, [activeStep])
 
@@ -163,7 +166,7 @@ const Checkout = () => {
 
     const handleCartChange = () => {
         if (selected.length > 0 && cartProducts.length > 0) {
-            const checkoutCart = getCheckoutCart();
+            const checkoutCart = getCheckoutCart(); //Include address, shipping method, payment method ...
             handleEstimate(checkoutCart); //Estimate price
             handleCalculate(checkoutCart); //Calculate price
         } else { //Reset
@@ -193,7 +196,17 @@ const Checkout = () => {
                 }
 
                 return result;
-            }, { coupon: coupon?.code, cart: [] });
+            }, {
+                address: addressInfo ? {
+                    name: addressInfo.name,
+                    companyName: addressInfo.companyName,
+                    phone: addressInfo.phone,
+                    city: addressInfo.city + ', ' + addressInfo.ward,
+                    address: addressInfo.address,
+                    type: addressInfo.type,
+                } : null,
+                paymentMethod: payment, shippingType: delivery, coupon: coupon?.code, cart: []
+            });
 
             return checkoutCart;
         } else {
@@ -352,14 +365,16 @@ const Checkout = () => {
         }
     };
 
-    const handleChangeMethod = (e) => { setMethod(e.target.value); }
+    const handleChangeMethod = (e) => { setPayment(e.target.value); }
+
+    const handleChangeShipping = (e) => { setDelivery(e.target.value); }
 
     const validAddressInfo = [addressInfo?.name, addressInfo?.phone, addressInfo?.city, addressInfo?.address, validPhone].every(Boolean);
 
     //Submit checkout
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (isLoading || pending) return;
+        if (isLoading || calculating || pending) return;
         setPending(true);
 
         //Validation
@@ -374,18 +389,13 @@ const Checkout = () => {
         }
 
         const { enqueueSnackbar } = await import('notistack');
+        const checkoutCart = getCheckoutCart();
 
-        checkout({
-            // cart: products, FIX
-            name: addressInfo.name,
-            phone: addressInfo.phone,
-            address: addressInfo.address,
-            message: message
-        }).unwrap()
+        checkout(checkoutCart).unwrap()
             .then((data) => {
-                clearCart();
                 enqueueSnackbar('Đặt hàng thành công!', { variant: 'success' });
-                navigate('/cart');
+                // clearCart();
+                // navigate('/cart');
                 setPending(false);
             })
             .catch((err) => {
@@ -434,7 +444,10 @@ const Checkout = () => {
                                         </SemiTitle>
                                     </StepLabel>
                                     <StyledStepContent>
-                                        <AddressDisplay {...{ addressInfo, isValid: validAddressInfo, handleOpen: handleOpenDialog, loadAddress }} />
+                                        <AddressDisplay {...{
+                                            addressInfo, isValid: validAddressInfo, handleOpen: handleOpenDialog,
+                                            loadAddress, value: delivery, handleChange: handleChangeShipping
+                                        }} />
                                         <AddressSelectDialog {...{ address, pending, setPending, setAddressInfo, openDialog: openAddress, handleCloseDialog }} />
                                         <Button
                                             disabled={!validAddressInfo}
@@ -511,7 +524,7 @@ const Checkout = () => {
                                     <StyledStepContent>
                                         <Suspense fallback={null}>
                                             {activeStep == 2 &&
-                                                <PaymentSelect {...{ value: method, handleChange: handleChangeMethod }} />
+                                                <PaymentSelect {...{ value: payment, handleChange: handleChangeMethod }} />
                                             }
                                         </Suspense>
                                     </StyledStepContent>
@@ -525,7 +538,7 @@ const Checkout = () => {
                             <FinalCheckoutDialog {...{
                                 coupon, shopCoupon, calculating, estimated, calculated, isValid: validAddressInfo,
                                 activeStep, maxSteps, handleOpenDialog: handleOpenCouponDialog, addressInfo,
-                                backFirstStep, handleNext
+                                backFirstStep, handleNext, handleSubmit
                             }} />
                         </Grid>
                     </Grid>

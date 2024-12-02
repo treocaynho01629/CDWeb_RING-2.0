@@ -18,12 +18,12 @@ import lombok.RequiredArgsConstructor;
 public class EmailServiceImpl implements EmailService {
 	
     private final JavaMailSender emailSender;
-    
-    @Value("${spring.mail.username}") //Get username from application.properties
+
+    @Value("${spring.mail.username}")
     private String sender;
 
     //Normal email
-    public String sendSimpleMessage(String to, String subject, String text) {
+    public boolean sendSimpleMessage(String to, String subject, String text) {
     	
         try {
         	//Create
@@ -34,15 +34,15 @@ public class EmailServiceImpl implements EmailService {
             message.setText(text);
 
             emailSender.send(message); //Send
-            return "Gửi email thành công";
+            return true;
         } catch (MailException e) {
             e.printStackTrace();
-            return "Gửi email thất bại";
+            return false;
         }
     }
 
     //Mail with HTML
-    public String sendHtmlMessage(String to, String subject, String htmlBody) {
+    public boolean sendHtmlMessage(String to, String subject, String htmlBody) {
     	
         try {
         	//Create
@@ -55,10 +55,10 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(htmlBody, true);
             
             emailSender.send(message); //Send
-            return "Gửi email thành công";
+            return true;
         } catch (MessagingException e) {
         	e.printStackTrace();
-            return "Gửi email thất bại";
+            return false;
         }
     }
 }

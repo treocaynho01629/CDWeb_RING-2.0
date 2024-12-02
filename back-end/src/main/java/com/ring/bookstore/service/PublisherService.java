@@ -3,7 +3,7 @@ package com.ring.bookstore.service;
 import java.io.IOException;
 import java.util.List;
 
-import com.ring.bookstore.dtos.PublisherDTO;
+import com.ring.bookstore.dtos.publishers.PublisherDTO;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.model.Publisher;
 import org.springframework.data.domain.Page;

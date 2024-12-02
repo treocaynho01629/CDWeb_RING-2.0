@@ -1,14 +1,14 @@
 import { LocalActivity, LocalShipping, ShoppingBasket } from "@mui/icons-material";
 
-export const getCouponSumary = (type) => {
+export const getCouponSummary = (type) => {
     switch (type) {
         case 'SHIPPING':
-            return { name: 'Giảm phí vận chuyển', sumary: 'Cho đơn hàng từ', unit: 'đ', color: 'primary', icon: <LocalShipping /> };
+            return { color: 'primary', icon: <LocalShipping /> };
         case 'MIN_VALUE':
-            return { name: 'Giảm', sumary: 'Cho đơn hàng từ', unit: 'đ', color: 'error', icon: <LocalActivity /> };
+            return { color: 'error', icon: <LocalActivity /> };
         case 'MIN_AMOUNT':
-            return { name: 'Giảm', sumary: 'Khi mua', unit: ' sản phẩm', color: 'warning', icon: <ShoppingBasket /> };
+            return { color: 'warning', icon: <ShoppingBasket /> };
     }
 }
 
-export const getCouponType = ['SHIPPING', 'MIN_VALUE', 'MIN_VALUE'];
+export const couponType = ['SHIPPING', 'MIN_VALUE', 'MIN_VALUE'];

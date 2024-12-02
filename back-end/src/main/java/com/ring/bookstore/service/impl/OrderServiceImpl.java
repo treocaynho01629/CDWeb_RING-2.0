@@ -1,33 +1,29 @@
 package com.ring.bookstore.service.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.ring.bookstore.dtos.CouponDiscountDTO;
-import com.ring.bookstore.dtos.orders.CalculateDTO;
+import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
+import com.ring.bookstore.dtos.mappers.CouponMapper;
+import com.ring.bookstore.dtos.orders.*;
 import com.ring.bookstore.dtos.ChartDTO;
 import com.ring.bookstore.dtos.mappers.CalculateMapper;
 import com.ring.bookstore.dtos.mappers.ChartDataMapper;
-import com.ring.bookstore.dtos.orders.OrderDetailDTO;
-import com.ring.bookstore.dtos.orders.OrderDTO;
 import com.ring.bookstore.enums.OrderStatus;
+import com.ring.bookstore.enums.ShippingType;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.*;
 import com.ring.bookstore.request.*;
 import com.ring.bookstore.service.CouponService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.orders.ReceiptDTO;
 import com.ring.bookstore.dtos.mappers.OrderMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
@@ -44,9 +40,11 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderReceiptRepository orderRepo;
     private final OrderDetailRepository detailRepo;
+    private final OrderItemRepository itemRepo;
     private final BookRepository bookRepo;
     private final ShopRepository shopRepo;
     private final CouponRepository couponRepo;
+    private final AddressRepository addressRepo;
 
     private final CouponService couponService;
     private final EmailService emailService;
@@ -57,10 +55,7 @@ public class OrderServiceImpl implements OrderService {
 
     //Calculate
     public CalculateDTO calculate(CalculateRequest request) {
-        //Info validation
         List<CartDetailRequest> cart = request.getCart();
-        if (cart != null && cart.isEmpty())
-            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Cart cannot be empty!");
 
         //Create receipt
         var orderReceipt = OrderReceipt.builder().details(new ArrayList<>()).build();
@@ -68,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
         //Calculate
         double totalPrice = 0.0; //Total price (exclude discount)
         double totalShippingFee = 0.0;
-        double totalDiscount = 0.0;
+        double totalDiscount;
 
         //For result
         double totalDealDiscount = 0.0; //From deal (% discount in Book)
@@ -76,10 +71,31 @@ public class OrderServiceImpl implements OrderService {
         double totalShippingDiscount = 0.0;
         int totalQuantity = 0;
 
+        //Prefetch Stuff
+        List<Long> bookIds = new ArrayList<>();
+        List<Long> shopIds = new ArrayList<>();
+        List<String> couponCodes = new ArrayList<>();
+        couponCodes.add(request.getCoupon());
+
+        for (CartDetailRequest detail : cart) {
+            shopIds.add(detail.getShopId());
+            couponCodes.add(detail.getCoupon());
+
+            for (CartItemRequest item : detail.getItems()) {
+                bookIds.add(item.getId());
+            }
+        }
+        Map<Long, Shop> shops = shopRepo.findShopsInIds(shopIds).stream()
+                .collect(Collectors.toMap(Shop::getId, Function.identity()));
+        Map<Long, Book> books = bookRepo.findBooksInIds(bookIds).stream()
+                .collect(Collectors.toMap(Book::getId, Function.identity()));
+        Map<String, Coupon> coupons = couponRepo.findCouponInCodes(couponCodes).stream()
+                .collect(Collectors.toMap(Coupon::getCode, Function.identity()));
+
         //Create order details
         for (CartDetailRequest detail : cart) {
             //Validation
-            Shop shop = shopRepo.findById(detail.getShopId()).orElse(null);
+            Shop shop = shops.get(detail.getShopId());
             List<CartItemRequest> items = detail.getItems();
 
             if (shop == null || (items != null && items.isEmpty())) {
@@ -105,6 +121,28 @@ public class OrderServiceImpl implements OrderService {
                 double discountShipping = 0.0; //Shipping discount of detail
                 int detailQuantity = 0; //Total amount of Books in detail
 
+                //Address stuff
+                if (request.getAddress() != null) {
+                    AddressRequest addressRequest = request.getAddress();
+                    ShippingType type = request.getShippingType();
+                    var origin = Address.builder()
+                            .name(addressRequest.getName())
+                            .companyName(addressRequest.getCompanyName())
+                            .phone(addressRequest.getPhone())
+                            .city(addressRequest.getCity())
+                            .address(addressRequest.getAddress())
+                            .type(addressRequest.getType())
+                            .build();
+                    Address destination = shop.getAddress();
+                    shippingFee = distanceCalculation(origin, destination);
+
+                    //Shipping type stuff
+                    if (type != null) {
+                        if (type.equals(ShippingType.ECONOMY)) shippingFee *= 0.2;
+                        if (type.equals(ShippingType.EXPRESS)) shippingFee *= 1.5;
+                    }
+                }
+
                 //Create detail
                 var orderDetail = OrderDetail.builder()
                         .shop(shop)
@@ -113,7 +151,7 @@ public class OrderServiceImpl implements OrderService {
                 //Loop items
                 for (CartItemRequest item : items) {
                     //Validation
-                    Book book = bookRepo.findById(item.getId()).orElse(null);
+                    Book book = books.get(item.getId());
 
                     if (book == null || !book.getShopId().equals(shop.getId())) {
                         //Create temp item
@@ -124,7 +162,7 @@ public class OrderServiceImpl implements OrderService {
                         orderDetail.addOrderItem(orderItem);
                     } else {
                         short quantity = item.getQuantity();
-                        if (!(quantity < 1 && quantity > book.getAmount())) {
+                        if (!(quantity < 1 || quantity > book.getAmount())) {
                             //Calculate + info
                             double deal = book.getPrice() * book.getDiscount().doubleValue();
                             detailQuantity += quantity;
@@ -143,15 +181,21 @@ public class OrderServiceImpl implements OrderService {
                 }
 
                 //Coupon
-                Coupon shopCoupon = detail.getCoupon() == null ? null : couponRepo.findByCode(detail.getCoupon())
-                    .orElse(couponRepo.recommendCoupon(shop.getId(),detailTotal - discountDeal, detailQuantity)
-                            .orElse(null));
+                Coupon shopCoupon = detail.getCoupon() == null ? null //Not select any
+                        : coupons.containsKey(detail.getCoupon()) ? coupons.get(detail.getCoupon())
+                        : (couponRepo.recommendCoupon(shop.getId(), detailTotal - discountDeal, detailQuantity)
+                        .orElse(null));
                 if (shopCoupon != null
                         && shopCoupon.getShopId().equals(shop.getId())
-                            && !couponService.isExpired(shopCoupon)) {
+                        && !couponService.isExpired(shopCoupon)) {
                     //Apply coupon (must use price with deal discount)
                     CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(shopCoupon,
-                        new CartStateRequest(detailTotal - discountDeal, shippingFee, detailQuantity));
+                            new CartStateRequest(
+                                    detailTotal - discountDeal,
+                                    shippingFee,
+                                    detailQuantity
+                            )
+                    );
 
                     if (discountFromCoupon != null) {
                         shopCoupon.setIsUsable(true);
@@ -188,8 +232,9 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //Main coupon
-        Coupon coupon = request.getCoupon() == null ? null : couponRepo.findByCode(request.getCoupon())
-            .orElse(couponRepo.recommendCoupon(null, totalPrice - totalDealDiscount, totalQuantity)
+        Coupon coupon = request.getCoupon() == null ? null //Not select any
+                : coupons.containsKey(request.getCoupon()) ? coupons.get(request.getCoupon())
+                : (couponRepo.recommendCoupon(null, totalPrice - totalDealDiscount, totalQuantity)
                 .orElse(null));
 
         if (coupon != null && coupon.getShop() == null && !couponService.isExpired(coupon)) {
@@ -198,7 +243,11 @@ public class OrderServiceImpl implements OrderService {
 
             //Apply coupon (must use price with deal discount)
             CouponDiscountDTO discountAll = couponService.applyCoupon(coupon,
-                    new CartStateRequest((totalPrice - totalDealDiscount), totalShippingFee, totalQuantity));
+                    new CartStateRequest(
+                            totalPrice - totalDealDiscount,
+                            totalShippingFee,
+                            totalQuantity)
+            );
 
             if (discountAll != null) {
                 coupon.setIsUsable(true);
@@ -245,88 +294,280 @@ public class OrderServiceImpl implements OrderService {
         return calculateMapper.orderToCalculate(orderReceipt);
     }
 
-    //Commit order //FIX
+    //Commit order
     @Transactional
-    public OrderReceipt checkout(OrderRequest request, Account user) {
+    public ReceiptDTO checkout(OrderRequest request, Account user) {
+        List<CartDetailRequest> cart = request.getCart();
+        String cartContent = ""; //Email content
 
-        //Info validation
-        String cartContent = ""; //For email
-        double total = 0.0; //Total price
+        //Create address
+        AddressRequest addressRequest = request.getAddress();
+        var address = Address.builder()
+                .name(addressRequest.getName())
+                .companyName(addressRequest.getCompanyName())
+                .phone(addressRequest.getPhone())
+                .city(addressRequest.getCity())
+                .address(addressRequest.getAddress())
+                .type(addressRequest.getType())
+                .build();
+        Address savedAddress = addressRepo.save(address);
 
-        //Get cart from request
-        if (request.getCart() != null && request.getCart().isEmpty())
-            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Cart cannot be empty!");
-
-        //Create new receipt
+        //Create receipt
         var orderReceipt = OrderReceipt.builder()
-//                .fullName(request.getName())
-//                .email(user.getEmail())
-//                .phone(request.getPhone())
-//                .orderAddress(request.getAddress())
-//                .orderMessage(request.getMessage())
+                .email(user.getEmail())
+                .address(savedAddress)
+                .orderMessage(request.getMessage())
+                .details(new ArrayList<>())
                 .user(user)
+                .shippingType(request.getShippingType())
+                .paymentType(request.getPaymentMethod())
                 .build();
 
-        OrderReceipt savedOrder = orderRepo.save(orderReceipt); //Save receipt to database
+        //Calculate
+        double totalPrice = 0.0; //Total price (exclude discount)
+        double totalShippingFee = 0.0;
+        double totalDiscount;
+
+        //For result
+        double totalDealDiscount = 0.0; //From deal (% discount in Book)
+        double totalCouponDiscount = 0.0; //From coupon
+        double totalShippingDiscount = 0.0;
+        int totalQuantity = 0;
+
+        //Prefetch Stuff
+        List<Long> bookIds = new ArrayList<>();
+        List<Long> shopIds = new ArrayList<>();
+        List<String> couponCodes = new ArrayList<>();
+        couponCodes.add(request.getCoupon());
+
+        for (CartDetailRequest detail : cart) {
+            shopIds.add(detail.getShopId());
+            couponCodes.add(detail.getCoupon());
+
+            for (CartItemRequest item : detail.getItems()) {
+                bookIds.add(item.getId());
+            }
+        }
+        Map<Long, Shop> shops = shopRepo.findShopsInIds(shopIds).stream()
+                .collect(Collectors.toMap(Shop::getId, Function.identity()));
+        Map<Long, Book> books = bookRepo.findBooksInIds(bookIds).stream()
+                .collect(Collectors.toMap(Book::getId, Function.identity()));
+        Map<String, Coupon> coupons = couponRepo.findCouponInCodes(couponCodes).stream()
+                .collect(Collectors.toMap(Coupon::getCode, Function.identity()));
 
         //Create order details
-        for (CartItemRequest item : request.getCart()) {
-            //Book validation
-            Book book = bookRepo.findById(item.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Product not found!"));
-            if (book.getAmount() < item.getQuantity()) throw new ResourceNotFoundException("Product is out of stock!");
+        for (CartDetailRequest detail : cart) {
+            //Validation
+            Shop shop = shops.get(detail.getShopId());
+            List<CartItemRequest> items = detail.getItems();
 
-            //Calculate
-            double shippingFee = 10000.0;
-            double productPrice = book.getPrice() * (BigDecimal.valueOf(1).subtract(book.getDiscount())).doubleValue();
-            double totalPrice = (item.getQuantity() * productPrice) + shippingFee;
-            total += totalPrice; //Add to total price
+            if (shop == null || (items != null && items.isEmpty())) {
+                throw new ResourceNotFoundException("Shop not found!");
+            } else {
+                //Calculate
+                double shippingFee;
+                double detailTotal = 0.0; //Total price of Books in detail (exclude discount)
+                double discountDeal = 0.0; //Total discount from deal (% discount in Book)
+                double discountCoupon = 0.0; //Total discount from coupon
+                double discountValue = 0.0; //Total discount of detail (exclude shipping discount)
+                double discountShipping = 0.0; //Shipping discount of detail
+                int detailQuantity = 0; //Total amount of Books in detail
 
-            //Add to email content
-            cartContent +=
-                    "<div style=\"display: flex; padding: 5px 15px; border: 0.5px solid lightgray;\">\r\n"
-                            + "	   <div style=\"margin-left: 15px;\">\r\n"
-                            + "      <h3>" + book.getTitle() + "</h3>\r\n"
-                            + "      <p style=\"font-size: 14px;\">x" + item.getQuantity() + "</p>\r\n"
-                            + "      <p style=\"font-size: 16px; color: green;\"><b style=\"color: black;\">Thành tiền: </b>" + totalPrice + "đ</p>\r\n"
-                            + "    </div>\r\n"
-                            + "</div><br><br>";
+                //Address stuff
+                ShippingType type = request.getShippingType();
+                Address destination = shop.getAddress();
+                shippingFee = distanceCalculation(savedAddress, destination);
 
-//			//Create details
-//			var orderDetail = OrderDetail.builder()
-//					.amount(item.getQuantity())
-//					.price(productPrice)
-//					.book(book)
-//					.order(savedOrder)
-//					.status(OrderStatus.PENDING)
-//					.build();
+                //Shipping type stuff
+                if (type != null) {
+                    if (type.equals(ShippingType.ECONOMY)) shippingFee *= 0.2;
+                    if (type.equals(ShippingType.EXPRESS)) shippingFee *= 1.5;
+                }
 
-            //Decrease product amount
-            book.setAmount((short) (book.getAmount() - item.getQuantity()));
+                //Create detail
+                var orderDetail = OrderDetail.builder()
+                        .status(OrderStatus.PENDING)
+                        .shop(shop)
+                        .items(new ArrayList<>()).build();
 
-            bookRepo.save(book); //Save after decrement
-//			detailRepo.save(orderDetail); //Save details to database
+                //Loop items
+                for (CartItemRequest item : items) {
+                    //Validation
+                    Book book = books.get(item.getId());
+
+                    if (book == null || !book.getShopId().equals(shop.getId())) {
+                        throw new ResourceNotFoundException("Book not found!");
+                    } else {
+                        short quantity = item.getQuantity();
+
+                        if (!(quantity < 1 || quantity > book.getAmount())) {
+                            //Calculate + info
+                            double deal = book.getPrice() * book.getDiscount().doubleValue();
+                            detailQuantity += quantity;
+                            detailTotal += book.getPrice() * quantity; //Not include the deal discount
+                            discountDeal += deal * quantity;
+
+                            //Decrease stock
+                            bookRepo.decreaseStock(book.getId(), quantity);
+                        } else {
+                            throw new HttpResponseException(
+                                    HttpStatus.CONFLICT,
+                                    "Product out of stock!",
+                                    "Sản phẩm " + book.getTitle() + " không đủ số lượng hàng yêu cầu!"
+                            );
+                        }
+
+                        //Add item
+                        var orderItem = OrderItem.builder()
+                                .book(book)
+                                .price(book.getPrice())
+                                .discount(book.getDiscount())
+                                .quantity(quantity)
+                                .build();
+
+                        orderDetail.addOrderItem(orderItem);
+
+                        //Add to email content
+                        cartContent +=
+                                "<div style=\"display: flex; padding: 5px 15px; border: 0.5px solid lightgray;\">\r\n"
+                                        + "	   <div style=\"margin-left: 15px;\">\r\n"
+                                        + "      <h3>" + book.getTitle() + "</h3>\r\n"
+                                        + "      <p style=\"font-size: 14px;\">x" + item.getQuantity() + "</p>\r\n"
+                                        + "      <p style=\"font-size: 16px; color: green;\"><b style=\"color: black;\">Thành tiền: </b>" + "FIX" + "đ</p>\r\n"
+                                        + "    </div>\r\n"
+                                        + "</div><br><br>";
+                    }
+                }
+
+                //Coupon
+                Coupon shopCoupon = coupons.get(detail.getCoupon());
+                if (shopCoupon == null) throw new ResourceNotFoundException("Coupon not found!");
+
+                if (shopCoupon != null
+                        && shopCoupon.getShopId().equals(shop.getId())
+                        && !couponService.isExpired(shopCoupon)) {
+                    //Apply coupon (must use price with deal discount)
+                    CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(shopCoupon,
+                            new CartStateRequest(
+                                    detailTotal - discountDeal,
+                                    shippingFee,
+                                    detailQuantity
+                            )
+                    );
+
+                    if (discountFromCoupon != null) {
+                        couponRepo.decreaseUsage(shopCoupon.getId()); //Decrease usage
+                        discountCoupon = discountFromCoupon.discountValue();
+                        discountShipping = discountFromCoupon.discountShipping();
+                    } else {
+                        throw new HttpResponseException(
+                                HttpStatus.CONFLICT,
+                                "Coupon expired!",
+                                "Không thể sử dụng mã coupon " + detail.getCoupon() + "!"
+                        );
+                    }
+                }
+
+                //Add discount deal & discount coupon
+                discountValue += (discountDeal + discountCoupon);
+
+                //Add to receipt total
+                totalPrice += detailTotal;
+                totalQuantity += detailQuantity;
+                totalShippingFee += shippingFee;
+                totalCouponDiscount += discountCoupon;
+                totalDealDiscount += discountDeal;
+
+                //Set more detail
+                orderDetail.setTotalPrice(detailTotal);
+                orderDetail.setDiscount(discountValue);
+                orderDetail.setShippingFee(shippingFee);
+                orderDetail.setShippingDiscount(discountShipping);
+                orderDetail.setCoupon(shopCoupon);
+                orderDetail.setTotalPrice(detailTotal);
+                orderDetail.setShippingFee(shippingFee);
+
+                //Add to receipt
+                orderReceipt.addOrderDetail(orderDetail);
+            }
         }
 
-        savedOrder.setTotal(total);
+        //Main coupon
+        Coupon coupon = coupons.get(request.getCoupon());
+        if (coupon == null) throw new ResourceNotFoundException("Coupon not found!");
 
-        //Create and send email
-        String subject = "RING! - BOOKSTORE: Đặt hàng thành công! ";
-        String content = "<h1><b style=\"color: #63e399;\">RING!</b> - BOOKSTORE</h1>\n"
-                + "<h2 style=\"background-color: #63e399; padding: 10px; color: white;\" >\r\n"
-                + "Đơn hàng của bạn đã được xác nhận!\r\n"
-                + "</h2>\n"
-                + "<h3>Chi tiết đơn hàng:</h3>\n"
+        if (coupon != null && coupon.getShop() == null && !couponService.isExpired(coupon)) {
+            double discountValue = 0.0;
+            double shippingDiscount = 0.0;
+
+            //Apply coupon (must use price - deal discount)
+            CouponDiscountDTO discountAll = couponService.applyCoupon(coupon,
+                    new CartStateRequest(
+                            totalPrice - totalDealDiscount,
+                            totalShippingFee,
+                            totalQuantity
+                    )
+            );
+
+            if (discountAll != null) {
+                couponRepo.decreaseUsage(coupon.getId());
+                discountValue = discountAll.discountValue();
+                shippingDiscount = discountAll.discountShipping();
+            } else {
+                throw new HttpResponseException(
+                        HttpStatus.CONFLICT,
+                        "Coupon expired!",
+                        "Không thể sử dụng mã coupon " + request.getCoupon() + "!"
+                );
+            }
+
+            //Split discount for each detail
+            int totalDetail = orderReceipt.getDetails().size();
+            double applyDiscount = discountValue / totalDetail;
+            double applyShippingDiscount = shippingDiscount / totalDetail;
+
+            for (OrderDetail detail : orderReceipt.getDetails()) {
+                detail.setDiscount((detail.getDiscount() == null ? 0
+                        : detail.getDiscount()) + applyDiscount);
+                detail.setShippingDiscount((detail.getShippingDiscount() == null ? 0
+                        : detail.getShippingDiscount()) + applyShippingDiscount);
+            }
+
+            //Add to total
+            totalCouponDiscount += discountValue;
+            totalShippingDiscount += shippingDiscount;
+        }
+
+        //Free
+        if (totalCouponDiscount >= totalPrice) totalCouponDiscount = totalPrice;
+        if (totalShippingDiscount >= totalShippingFee) totalShippingDiscount = totalShippingFee;
+
+        //Total discount
+        totalDiscount = totalCouponDiscount + totalDealDiscount + totalShippingDiscount;
+
+        //Set value for receipt & return
+        orderReceipt.setCoupon(coupon);
+        orderReceipt.setTotal(totalPrice + totalShippingFee);
+        orderReceipt.setTotalDiscount(totalDiscount);
+
+//        //Create and send email
+//        String subject = "RING! - BOOKSTORE: Đặt hàng thành công! ";
+//        String content = "<h1><b style=\"color: #63e399;\">RING!</b> - BOOKSTORE</h1>\n"
+//                + "<h2 style=\"background-color: #63e399; padding: 10px; color: white;\" >\r\n"
+//                + "Đơn hàng của bạn đã được xác nhận!\r\n"
+//                + "</h2>\n"
+//                + "<h3>Chi tiết đơn hàng:</h3>\n"
 //                + "<p><b>Tên người nhận: </b>" + request.getName() + "</p>\n"
 //                + "<p><b>SĐT người nhận: </b>" + request.getPhone() + "</p>\n"
 //                + "<p><b>Địa chỉ: </b>" + request.getAddress() + "</p>\n"
 //                + "<br><p>Lời nhắn cho shipper: <b>" + request.getMessage() + "</b></p>\n"
-                + "<br><br><h3>Chi tiết sản phẩm:</h3>\n"
-                + cartContent
-                + "<br><br><h3>Tổng đơn giá: <b style=\"color: red\">" + total + "đ</b></h3>";
-        emailService.sendHtmlMessage(user.getEmail(), subject, content); //Send
+//                + "<br><br><h3>Chi tiết sản phẩm:</h3>\n"
+//                + cartContent
+//                + "<br><br><h3>Tổng đơn giá: <b style=\"color: red\">" + total + "đ</b></h3>";
+//        emailService.sendHtmlMessage(user.getEmail(), subject, content); //Send
 
-        return orderRepo.save(savedOrder); //Save to database
+        OrderReceipt savedOrder = orderRepo.save(orderReceipt);
+        return orderMapper.orderToOrderDTO(savedOrder);
     }
 
     //Get all orders
@@ -348,23 +589,39 @@ public class OrderServiceImpl implements OrderService {
         return ordersDTO;
     }
 
-    //Get order with book's {id}
+    //Get order with book's {id} FIX
     @Override
     public Page<OrderDTO> getOrdersByBookId(Long id, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
-        Page<OrderDetail> ordersList = detailRepo.findAllByBookId(id, pageable); //Fetch from database
-        Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::detailToDetailDTO);
+        //Same as getOrdersByUser
+        Page<Long> orderIds = detailRepo.findAllIdsByBookId(id, pageable);
+        List<IOrderItem> itemsList = itemRepo.findAllWithDetailIds(orderIds.getContent());
+        List<OrderDTO> ordersList = orderMapper.itemsToDetailDTO(itemsList);
+        Page<OrderDTO> ordersDTO = new PageImpl<OrderDTO>(
+                ordersList,
+                pageable,
+                orderIds.getTotalElements()
+        );
         return ordersDTO;
     }
 
     //Get current user's orders
-    @Override
+    @Transactional
     public Page<OrderDTO> getOrdersByUser(Account user, OrderStatus status, String keyword, Integer pageNo, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize); //Pagination
-        Page<OrderDetail> ordersList = detailRepo.findAllByUserId(user.getId(), status, keyword, pageable); //Fetch from database
-        Page<OrderDTO> ordersDTO = ordersList.map(orderMapper::detailToDetailDTO);
+
+        //Get list ids with pagination (avoid applying in memory warning from Fetch Join)
+        //Find items then map back to details list using Map (the other way around cost more memory if used projection)
+        Page<Long> orderIds = detailRepo.findAllIdsByUserId(user.getId(), status, keyword, pageable); //Fetch from database
+        List<IOrderItem> itemsList = itemRepo.findAllWithDetailIds(orderIds.getContent());
+        List<OrderDTO> ordersList = orderMapper.itemsToDetailDTO(itemsList);
+        Page<OrderDTO> ordersDTO = new PageImpl<OrderDTO>(
+                ordersList,
+                pageable,
+                orderIds.getTotalElements()
+        );
         return ordersDTO;
     }
 
@@ -384,7 +641,7 @@ public class OrderServiceImpl implements OrderService {
         return detailDTO;
     }
 
-    //Get monthly sales
+    //Get monthly sales FIX
     @Override
     public List<ChartDTO> getMonthlySale(Account user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -396,5 +653,10 @@ public class OrderServiceImpl implements OrderService {
             result = orderRepo.getMonthlySaleBySeller(user.getId()); //If seller only get their
         }
         return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
+    }
+
+    //Return fixed amount of shipping fee for now :<
+    private double distanceCalculation(Address origin, Address destination) {
+        return 10000.0;
     }
 }

@@ -10,15 +10,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-
 @Component
 @RequiredArgsConstructor
-
 public class ChainExceptionHandlerFilter extends OncePerRequestFilter {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -28,13 +24,13 @@ public class ChainExceptionHandlerFilter extends OncePerRequestFilter {
     private HandlerExceptionResolver resolver;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) {
         try {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            log.error("Exception in filter", e);
+            log.error("Exception in filter: ", e);
             resolver.resolveException(request, response, null, e);
         }
     }

@@ -100,8 +100,8 @@ export default function TableUsers({ setUserCount, mini = false }) {
     sortDir: "asc",
   })
   const { isLoading, isSuccess, isError, error, data } = useGetUsersQuery({
-    page: pagination.currPage,
-    size: pagination.pageSize,
+    page: pagination.number,
+    size: pagination.size,
     sortBy: pagination.sortBy,
     sortDir: pagination.sortDir,
     isEmployees: isEmployees
@@ -116,11 +116,11 @@ export default function TableUsers({ setUserCount, mini = false }) {
     if (!isLoading && isSuccess && data) {
       setPagination({
         ...pagination,
-        totalPages: data?.info?.totalPages,
-        currPage: data?.info?.currPage,
-        pageSize: data?.info?.pageSize
+        totalPages: data?.page?.totalPages,
+        currPage: data?.page?.number,
+        pageSize: data?.page?.size
       });
-      if (setUserCount) setUserCount(data?.info?.totalElements);
+      if (setUserCount) setUserCount(data?.page?.totalElements);
     }
   }, [data])
 
@@ -162,7 +162,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
       }
 
       setDeseletected(newDeselected);
-      if (newDeselected.length == data?.info?.totalElements) {
+      if (newDeselected.length == data?.page?.totalElements) {
         setDeseletected([]);
         setSelectedAll(false);
       }
@@ -185,7 +185,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
       }
 
       setSelected(newSelected);
-      if (newSelected.length == data?.info?.totalElements) {
+      if (newSelected.length == data?.page?.totalElements) {
         setSelectedAll(true);
         setSelected([]);
       }
@@ -288,7 +288,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
   };
 
   const isSelected = (id) => (selected?.indexOf(id) !== -1 || (selectedAll && deselected?.indexOf(id) === -1));
-  const numSelected = () => (selectedAll ? data?.info?.totalElements - deselected?.length : selected?.length);
+  const numSelected = () => (selectedAll ? data?.page?.totalElements - deselected?.length : selected?.length);
   const colSpan = () => (mini ? headCells.filter((h) => !h.hideOnMinimize).length : headCells.length + 1);
   //#endregion
 
@@ -448,7 +448,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
           pagination={pagination}
           onPageChange={handleChangePage}
           onSizeChange={handleChangeRowsPerPage}
-          count={data?.info?.totalElements ?? 0}
+          count={data?.page?.totalElements ?? 0}
         />
       </FooterContainer>
       <Suspense fallback={<></>}>

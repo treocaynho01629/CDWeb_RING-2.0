@@ -5,8 +5,8 @@ import java.util.List;
 
 //Order detail
 public record OrderDetailDTO(Long orderId,
-                             String fullName,
                              String email,
+                             String name,
                              String phone,
                              String address,
                              String message,

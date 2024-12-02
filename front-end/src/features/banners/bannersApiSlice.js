@@ -27,15 +27,10 @@ export const bannersApiSlice = apiSlice.injectEndpoints({
                 }
             },
             transformResponse: responseData => {
-                const { number, size, totalElements, totalPages, content } = responseData;
+                const { content, page } = responseData;
                 return bannersAdapter.setAll({
-                    ...initialState,
-                    info: {
-                        currPage: number,
-                        pageSize: size,
-                        totalElements,
-                        totalPages
-                    }
+                        ...initialState,
+                    page
                 }, content)
             },
             providesTags: (result, error, arg) => {

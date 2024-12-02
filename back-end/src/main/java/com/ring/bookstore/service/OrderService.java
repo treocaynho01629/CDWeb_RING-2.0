@@ -23,6 +23,6 @@ public interface OrderService {
 	ReceiptDTO getReceipt(Long id);
 	OrderDetailDTO getOrderDetail(Long id);
 	CalculateDTO calculate(CalculateRequest request);
-	OrderReceipt checkout(OrderRequest request, Account user);
+	ReceiptDTO checkout(OrderRequest request, Account user);
 	List<ChartDTO> getMonthlySale(Account user);
 }

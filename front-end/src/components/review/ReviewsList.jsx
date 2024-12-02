@@ -53,24 +53,24 @@ const ReviewsList = ({ mobileMode }) => {
     const [openForm, setOpenForm] = useState(undefined);
     const [contextReview, setContextReview] = useState(null);
     const [pagination, setPagination] = useState({
-        currPage: 0,
-        pageSize: defaultSize,
+        number: 0,
+        size: defaultSize,
         isMore: true,
     })
 
     //Fetch orders
-    const { data, isLoading, isFetching, isSuccess } = useGetMyReviewsQuery({
-        page: pagination?.currPage,
-        size: pagination?.pageSize,
+    const { data, isLoading, isFetching, isSuccess, isError, error } = useGetMyReviewsQuery({
+        page: pagination?.number,
+        size: pagination?.size,
         loadMore: pagination?.isMore
     });
 
     //Show more
     const handleShowMore = () => {
-        if (isFetching || typeof data?.info?.currPage !== 'number') return;
-        if (data?.info?.currPage < pagination?.currPage) return;
-        const nextPage = data?.info?.currPage + 1;
-        if (nextPage < data?.info?.totalPages) setPagination(prev => ({ ...prev, currPage: nextPage }));
+        if (isFetching || typeof data?.page?.number !== 'number') return;
+        if (data?.page?.number < pagination?.number) return;
+        const nextPage = data?.page?.number + 1;
+        if (nextPage < data?.page?.totalPages) setPagination(prev => ({ ...prev, number: nextPage }));
     }
 
     const handleOpenEdit = (review) => {
@@ -96,7 +96,7 @@ const ReviewsList = ({ mobileMode }) => {
 
     let reviewsContent;
 
-    if (isLoading || (isFetching && pagination.currPage == 0)) {
+    if (isLoading || (isFetching && pagination.number == 0)) {
         reviewsContent = <PlaceholderContainer>
             <LoadContainer>
                 <CircularProgress color="primary" />
@@ -144,8 +144,8 @@ const ReviewsList = ({ mobileMode }) => {
             <DialogContent sx={{ py: 0, px: { xs: 1, sm: 2, md: 0 } }} onScroll={scrollListener}>
                 <ReviewsContainer>
                     {reviewsContent}
-                    {(pagination.currPage > 0 && isFetching) && <LoadContainer><CircularProgress size={30} color="primary" /></LoadContainer>}
-                    {(data?.ids?.length > 0 && data?.ids?.length == data?.info?.totalElements)
+                    {(pagination.number > 0 && isFetching) && <LoadContainer><CircularProgress size={30} color="primary" /></LoadContainer>}
+                    {(data?.ids?.length > 0 && data?.ids?.length == data?.page?.totalElements)
                         && <Message className="warning">Không còn đánh giá nào!</Message>}
                 </ReviewsContainer>
             </DialogContent>

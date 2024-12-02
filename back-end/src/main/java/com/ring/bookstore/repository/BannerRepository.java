@@ -1,6 +1,6 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.projections.IBanner;
+import com.ring.bookstore.dtos.banners.IBanner;
 import com.ring.bookstore.model.Banner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

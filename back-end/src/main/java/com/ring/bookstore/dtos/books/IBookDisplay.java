@@ -1,4 +1,4 @@
-package com.ring.bookstore.dtos.projections;
+package com.ring.bookstore.dtos.books;
 
 import java.math.BigDecimal;
 

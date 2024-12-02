@@ -123,10 +123,10 @@ const Publishers = () => {
 
                 return (
                     <ItemContainer key={`pub-${pubId}-${index}`}>
-                        <Link to={`/store?pubs=${pubId}`} title={pub?.pubName}>
+                        <Link to={`/store?pubs=${pubId}`} title={pub?.name}>
                             <StyledLazyImage
                                 src={`${pub?.image}?size=small`}
-                                alt={`Publisher: ${pub?.pubName}`}
+                                alt={`Publisher: ${pub?.name}`}
                                 placeholder={<Skeleton width={65} height={65} variant="rectangular" animation={false} />}
                             />
                         </Link>

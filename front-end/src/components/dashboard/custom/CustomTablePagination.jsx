@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 const CustomTablePagination = (props) => {
     const { pagination, onPageChange, onSizeChange, ...otherProps } = props;
     //Initial value
-    const [page, setPage] = useState(pagination?.currPage ?? 0);
-    const [size, setSize] = useState(pagination?.pageSize ?? 10);
+    const [page, setPage] = useState(pagination?.number ?? 0);
+    const [size, setSize] = useState(pagination?.size ?? 10);
 
     //Update value
     useEffect(() => {
-        setPage(pagination?.currPage);
-        setSize(pagination?.pageSize);
+        setPage(pagination?.number);
+        setSize(pagination?.size);
     }, [pagination])
 
     //Change current page 

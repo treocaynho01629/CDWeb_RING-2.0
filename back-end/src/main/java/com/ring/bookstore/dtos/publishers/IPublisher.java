@@ -1,4 +1,4 @@
-package com.ring.bookstore.dtos.projections;
+package com.ring.bookstore.dtos.publishers;
 
 import com.ring.bookstore.model.Publisher;
 

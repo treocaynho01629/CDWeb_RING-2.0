@@ -1,4 +1,4 @@
-package com.ring.bookstore.dtos.projections;
+package com.ring.bookstore.dtos.accounts;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

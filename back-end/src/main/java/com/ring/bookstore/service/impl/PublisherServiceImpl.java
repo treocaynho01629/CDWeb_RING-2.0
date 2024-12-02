@@ -3,9 +3,9 @@ package com.ring.bookstore.service.impl;
 import java.io.IOException;
 import java.util.List;
 
-import com.ring.bookstore.dtos.PublisherDTO;
+import com.ring.bookstore.dtos.publishers.PublisherDTO;
 import com.ring.bookstore.dtos.mappers.PublisherMapper;
-import com.ring.bookstore.dtos.projections.IPublisher;
+import com.ring.bookstore.dtos.publishers.IPublisher;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.model.Image;
 import com.ring.bookstore.model.Publisher;
@@ -39,8 +39,8 @@ public class PublisherServiceImpl implements PublisherService {
 
         //Fetch from database
         Page<IPublisher> pubsList = pubRepo.findPublishers(pageable);
-        Page<PublisherDTO> pubDtos = pubsList.map(pubMapper::apply);
-        return pubDtos;
+        Page<PublisherDTO> pubDTOS = pubsList.map(pubMapper::apply);
+        return pubDTOS;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class PublisherServiceImpl implements PublisherService {
 
         //Create new publisher
         var publisher = Publisher.builder()
-                .pubName(name)
+                .name(name)
                 .image(image)
                 .build();
         Publisher addedPub = pubRepo.save(publisher); //Save to database
@@ -82,7 +82,7 @@ public class PublisherServiceImpl implements PublisherService {
             publisher.setImage(savedImage); //Set new image
         }
 
-        publisher.setPubName(name);
+        publisher.setName(name);
 
         //Update
         Publisher updatedPub = pubRepo.save(publisher);

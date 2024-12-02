@@ -1,44 +1,59 @@
 package com.ring.bookstore.service.impl;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 @Service
 public class LoginProtectionService {
-    private static final int MAX_ATTEMPT = 5;
-    private static final long LOCK_TIME = TimeUnit.MINUTES.toMillis(15);
+    public static final int MAX_ATTEMPT = 10;
+    private LoadingCache<String, Integer> attemptsCache;
 
-    private final Map<String, Integer> attemptsCache = new ConcurrentHashMap<>();
-    private final Map<String, Long> lockCache = new ConcurrentHashMap<>();
+    @Autowired
+    private HttpServletRequest request;
 
-    public void loginSucceeded(String key) {
-        attemptsCache.remove(key); // Clear failed attempts on successful login
-        lockCache.remove(key); // Unlock user on successful login
+    public LoginProtectionService() {
+        super();
+        attemptsCache = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.MINUTES).build(new CacheLoader<String, Integer>() {
+            @Override
+            public Integer load(final String key) {
+                return 0;
+            }
+        });
     }
 
-    public void loginFailed(String key) {
-        int attempts = attemptsCache.getOrDefault(key, 0);
+    public void loginFailed(final String key) {
+        int attempts;
+        try {
+            attempts = attemptsCache.get(key);
+        } catch (final ExecutionException e) {
+            attempts = 0;
+        }
         attempts++;
         attemptsCache.put(key, attempts);
-        if (attempts >= MAX_ATTEMPT) {
-            lockCache.put(key, System.currentTimeMillis()); // Lock user if max attempts exceeded
+    }
+
+    public boolean isBlocked() {
+        try {
+            return attemptsCache.get(getClientIP()) >= MAX_ATTEMPT;
+        } catch (final ExecutionException e) {
+            return false;
         }
     }
 
-    public boolean isBlocked(String key) {
-        if (!lockCache.containsKey(key)) {
-            return false;
+    private String getClientIP() {
+        final String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader != null) {
+            return xfHeader.split(",")[0];
         }
-
-        long lockTime = lockCache.get(key);
-        if (System.currentTimeMillis() - lockTime > LOCK_TIME) {
-            lockCache.remove(key); // Remove lock if lock time has expired
-            return false;
-        }
-
-        return true; // User is still locked
+        return request.getRemoteAddr();
     }
 }

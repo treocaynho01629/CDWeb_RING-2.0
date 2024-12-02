@@ -242,8 +242,7 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
             position="relative"
         >
             <Grid size={{ xs: 12, md: 5.5, lg: 5 }} position="relative">
-                {!book ? <ProductImages />
-                    : <ProductImages book={book} />}
+                {!book ? <ProductImages /> : <ProductImages book={book} />}
             </Grid>
             <Grid size={{ xs: 12, md: 6.5, lg: 7 }}>
                 <InfoContainer>
@@ -266,7 +265,7 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                             >
                                 <Box display="flex" justifyContent="space-between" width="100%">
                                     <Detail>
-                                        {book ? <>Nhà xuất bản:&nbsp;<Link to={`/store?pubs=${book?.publisher?.id}`}>{book?.publisher?.pubName}</Link></>
+                                        {book ? <>Nhà xuất bản:&nbsp;<Link to={`/store?pubs=${book?.publisher?.id}`}>{book?.publisher?.name}</Link></>
                                             : <Skeleton variant="text" sx={{ fontSize: '14px' }} width="90%" />}
                                     </Detail>
                                     <Detail>
@@ -307,8 +306,8 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                                             }
                                             <Divider orientation="vertical" sx={{ mx: { xs: 0.7, md: 1 } }} flexItem />
                                             <UserInfoText className="rate">
-                                                {book?.reviewsInfo?.count[0] > 0 ?
-                                                    `(${numFormatter(book?.reviewsInfo?.count[0])}) Đánh giá`
+                                                {book?.reviewsInfo?.total > 0 ?
+                                                    `(${numFormatter(book?.reviewsInfo?.total)}) Đánh giá`
                                                     : 'Chưa có đánh giá'}
                                             </UserInfoText>
                                         </UserInfoContainer>

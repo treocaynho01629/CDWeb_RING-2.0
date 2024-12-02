@@ -1,7 +1,7 @@
 package com.ring.bookstore.dtos.mappers;
 
 import com.ring.bookstore.dtos.accounts.AddressDTO;
-import com.ring.bookstore.dtos.projections.IAddress;
+import com.ring.bookstore.dtos.accounts.IAddress;
 import com.ring.bookstore.model.Address;
 import org.springframework.stereotype.Service;
 

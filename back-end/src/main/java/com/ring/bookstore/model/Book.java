@@ -1,24 +1,12 @@
 package com.ring.bookstore.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
-
 import java.math.BigDecimal;
 import java.util.List;
 
+import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.*;
 
@@ -31,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NoArgsConstructor
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE Book SET active = false WHERE id=?")
-@Where(clause = "active=true")
+@SQLRestriction("active=true")
 @EqualsAndHashCode(callSuper = true)
 @Table(indexes = @Index(columnList = "title"))
 public class Book extends Auditable {
@@ -50,9 +38,10 @@ public class Book extends Auditable {
     )
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY,
+            orphanRemoval = true,
+            cascade = CascadeType.ALL,
+            optional = false)
     @JoinColumn(name = "image_id", nullable = false)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
@@ -91,34 +80,36 @@ public class Book extends Auditable {
     @JsonIgnore
     private Shop shop;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "publisher_id")
-    @JsonManagedReference
+    @JsonIgnore
     private Publisher publisher;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cate_id")
-    @JsonManagedReference
+    @JsonIgnore
     private Category cate;
 
     @OneToOne(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "book",
             orphanRemoval = true,
-            mappedBy = "book")
+            optional = false)
+    @PrimaryKeyJoinColumn
+    @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private BookDetail bookDetail;
+    private BookDetail detail;
 
     @OneToMany(cascade = CascadeType.ALL,
             orphanRemoval = true,
             mappedBy = "book",
             fetch = FetchType.LAZY)
-    @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
     private List<Review> bookReviews;
 
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             mappedBy = "book",
             fetch = FetchType.LAZY)
-    @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
     private List<OrderItem> orderItems;
 

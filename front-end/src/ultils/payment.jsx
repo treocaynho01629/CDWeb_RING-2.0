@@ -140,7 +140,7 @@ export const getPaymentContent = (method) => {
     }
 }
 
-export const getPaymentType = ['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'ONLINE_PAYMENT'];
+export const paymentType = ['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'ONLINE_PAYMENT'];
 
 export const paymentItems = [
     {

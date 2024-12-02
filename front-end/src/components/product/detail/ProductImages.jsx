@@ -228,7 +228,7 @@ const CustomButtonGroup = ({ book, images, goToSlide, carouselState }) => {
 
 const ProductImages = ({ book }) => {
     const [slideIndex, setSlideIndex] = useState(1);
-    let images = [].concat(book?.previewImages, book?.image);
+    let images = book?.previews ? [].concat(book?.image, book.previews) : [].concat(book?.image);
 
     return (
         <ImgContainer>

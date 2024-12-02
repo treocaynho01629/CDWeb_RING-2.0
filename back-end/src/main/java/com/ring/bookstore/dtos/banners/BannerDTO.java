@@ -1,4 +1,4 @@
-package com.ring.bookstore.dtos;
+package com.ring.bookstore.dtos.banners;
 
 public record BannerDTO(Integer id,
                         Long shopId,

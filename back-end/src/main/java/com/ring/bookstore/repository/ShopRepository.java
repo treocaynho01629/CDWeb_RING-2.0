@@ -1,6 +1,6 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.projections.IShopDetail;
+import com.ring.bookstore.dtos.shops.IShopDetail;
 import com.ring.bookstore.model.Shop;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +26,12 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	group by s.id, s.owner.username, s.owner.id, i.id
 	""")
     Page<IShopDetail> findShopByFilter(String keyword, Long ownerId, Pageable pageable);
+
+	@Query("""
+		select s from Shop s
+        where s.id in :ids
+	""")
+	List<Shop> findShopsInIds(List<Long> ids);
 
 	@Query("""
 	select s.id from Shop s

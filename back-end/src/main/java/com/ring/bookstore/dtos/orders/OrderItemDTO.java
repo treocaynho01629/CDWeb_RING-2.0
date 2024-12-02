@@ -1,10 +1,11 @@
 package com.ring.bookstore.dtos.orders;
 
-import com.ring.bookstore.enums.OrderStatus;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
 //Order item
+@Builder
 public record OrderItemDTO(Long id,
                            Double price,
                            BigDecimal discount,

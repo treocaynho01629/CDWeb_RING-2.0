@@ -46,7 +46,7 @@ const ReviewSort = ({ sortBy, handleChangeOrder, filterBy, handleChangeFilter, c
             >
                 <MenuItem value={'all'} selected>Tất cả</MenuItem>
                 {Object.entries(rateLabels).map(([value, label]) => (
-                    <MenuItem key={`filter-item=${value}`} value={value}>{value} ({label} - {count[value]})</MenuItem>
+                    <MenuItem key={`filter-item=${value}`} value={value}>{value} ({label} - {count[value - 1]})</MenuItem>
                 ))}
             </TextField>
         </SortContainer>

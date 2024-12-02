@@ -8,16 +8,13 @@ import com.ring.bookstore.dtos.categories.CategoryDTO;
 import com.ring.bookstore.dtos.categories.CategoryDetailDTO;
 import com.ring.bookstore.dtos.categories.PreviewCategoryDTO;
 import com.ring.bookstore.dtos.mappers.CategoryMapper;
-import com.ring.bookstore.dtos.projections.ICategory;
-import com.ring.bookstore.exception.HttpResponseException;
-import com.ring.bookstore.model.Coupon;
+import com.ring.bookstore.dtos.categories.ICategory;
 import com.ring.bookstore.request.CategoryRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.exception.ResourceNotFoundException;
@@ -40,19 +37,19 @@ public class CategoryServiceImpl implements CategoryService {
                                            String include, Integer parentId) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
-        Page<CategoryDTO> cateDtos = null;
+        Page<CategoryDTO> cateDTOS = null;
 
         if (include != null && include.equalsIgnoreCase("children")) {
             Page<Category> catesList = cateRepo.findCatesWithChildren(parentId, pageable);
-            cateDtos = catesList.map(category -> cateMapper.cateToCateDTO(category, "children"));
+            cateDTOS = catesList.map(category -> cateMapper.cateToCateDTO(category, "children"));
         } else if (include != null && include.equalsIgnoreCase("parent")) {
             Page<Category> catesList = cateRepo.findCatesWithParent(parentId, pageable);
-            cateDtos = catesList.map(category -> cateMapper.cateToCateDTO(category, "parent"));
+            cateDTOS = catesList.map(category -> cateMapper.cateToCateDTO(category, "parent"));
         } else {
             Page<Category> catesList = cateRepo.findCates(parentId, pageable);
-            cateDtos = catesList.map(cateMapper::cateToCateDTO);
+            cateDTOS = catesList.map(cateMapper::cateToCateDTO);
         }
-        return cateDtos;
+        return cateDTOS;
     }
 
     @Override
@@ -90,7 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
         //Create new category
         var category = Category.builder()
                 .slug(slug)
-                .categoryName(request.getName())
+                .name(request.getName())
                 .description(request.getDescription())
                 .build();
 
@@ -116,7 +113,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         //Update
         category.setSlug(slug);
-        category.setCategoryName(request.getName());
+        category.setName(request.getName());
         category.setDescription(request.getDescription());
 
         //Parent

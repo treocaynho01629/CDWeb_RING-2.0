@@ -80,7 +80,7 @@ const AddressDivider = styled.div`
 //#endregion
 
 const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addressInfo,
-    isValid, handleNext, activeStep, maxSteps, backFirstStep, handleOpenDialog }) => {
+    isValid, handleNext, activeStep, maxSteps, backFirstStep, handleOpenDialog, handleSubmit }) => {
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('sm'));
     const tabletMode = useMediaQuery(theme.breakpoints.down('md_lg'));
@@ -185,6 +185,7 @@ const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addre
                                     fullWidth
                                     sx={{ maxWidth: '42%' }}
                                     disabled={calculating}
+                                    onClick={handleSubmit}
                                 >
                                     Đặt hàng
                                 </CheckoutButton>
@@ -240,6 +241,7 @@ const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addre
                                             fullWidth
                                             sx={{ maxWidth: '35%' }}
                                             disabled={calculating}
+                                            onClick={handleSubmit}
                                         >
                                             Đặt hàng
                                         </CheckoutButton>
@@ -308,6 +310,7 @@ const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addre
                                         fullWidth
                                         sx={{ padding: '11px', mt: 1 }}
                                         disabled={calculating}
+                                        onClick={handleSubmit}
                                     >
                                         Đặt hàng
                                     </CheckoutButton>

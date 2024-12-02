@@ -143,7 +143,7 @@ const cateToTabs = (cate) => {
   return (cate?.children?.flatMap(function (child, index) {
     return {
       filters: { cateId: child?.id },
-      label: child?.categoryName,
+      label: child?.name,
       slug: child?.slug
     }
   }))
@@ -269,8 +269,8 @@ const Home = () => {
   const [cates, setCates] = useState([]);
   const [pubs, setPubs] = useState([]);
   const [pagination, setPagination] = useState({
-    currPage: 0,
-    pageSize: defaultSize,
+    number: 0,
+    size: defaultSize,
     isMore: true,
   })
 
@@ -278,8 +278,8 @@ const Home = () => {
   const { data: categories, isLoading: loadCates, isSuccess: doneCates } = useGetCategoriesQuery({ include: 'children' });
   const { data: publishers, isLoading: loadPubs, isSuccess: donePubs } = useGetPublishersQuery();
   const { data, isLoading, isSuccess, isError } = useGetBooksQuery({
-    page: pagination?.currPage,
-    size: pagination?.pageSize,
+    page: pagination?.number,
+    size: pagination?.size,
     loadMore: pagination?.isMore
   });
 
@@ -306,7 +306,7 @@ const Home = () => {
       const { entities, ids } = publishers;
       let pubsList = ids?.map((id, index) => {
         const pub = entities[id];
-        return ({ filters: { pubId: [id + ''] }, label: pub?.pubName });
+        return ({ filters: { pubId: [id + ''] }, label: pub?.name });
       })
       setPubs(pubsList);
     }
@@ -317,11 +317,11 @@ const Home = () => {
 
   //Show more
   const handleShowMore = () => {
-    if (pagination?.currPage >= 5) {
+    if (pagination?.number >= 5) {
       navigate('/store');
     } else {
       const nextPage = (data?.ids?.length / defaultMore);
-      if (nextPage >= 1 && nextPage % 1 != 0) setPagination({ ...pagination, currPage: nextPage, pageSize: defaultMore });
+      if (nextPage >= 1 && nextPage % 1 != 0) setPagination({ ...pagination, number: nextPage, size: defaultMore });
     }
   }
 
@@ -389,7 +389,7 @@ const Home = () => {
       </Loadable>
       <p>TOP STUFF</p>
       <Loadable key={'categories'}>
-        <ProductsList key={'categories'} {...{ value: { cateId: cates[0]?.id }, title: cates[0]?.categoryName }} />
+        <ProductsList key={'categories'} {...{ value: { cateId: cates[0]?.id }, title: cates[0]?.name }} />
       </Loadable>
       <Loadable key={'publishers'}>
         <ProductsList key={'publishers'} {...{ tabs: pubs.slice(0, 4) || [], title: 'Thương hiệu nổi bật' }} />
@@ -408,7 +408,7 @@ const Home = () => {
       {catesWithChilds.map((cate, index) => {
         if (index < catesWithChilds?.length - 1) {
           const tabs = cateToTabs(catesWithChilds[index]);
-          const title = catesWithChilds[index]?.categoryName;
+          const title = catesWithChilds[index]?.name;
 
           return (
             <Loadable key={`cate-${index}`}>
@@ -426,7 +426,7 @@ const Home = () => {
       <Loadable key={'categories3'}>
         <ProductsList key={'categories3'} {...{
           tabs: cateToTabs(catesWithChilds[catesWithChilds.length - 1]),
-          title: catesWithChilds[catesWithChilds.length - 1]?.categoryName
+          title: catesWithChilds[catesWithChilds.length - 1]?.name
         }} />
       </Loadable>
       <Loadable key={'random'} >

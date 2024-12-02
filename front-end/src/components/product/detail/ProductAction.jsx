@@ -204,7 +204,8 @@ const ProductAction = ({ book }) => {
                             sx={{ margin: '5px' }}
                             onClick={() => handleBuyNow(book)}
                         >
-                            Mua ngay ({(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)
+                            {!book ? 'Đang tải' : book?.amount == 0 ? 'Hết hàng'
+                                : `Mua ngay (${(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)`}
                         </BuyButton>
                         :
                         <BuyButton
@@ -214,7 +215,8 @@ const ProductAction = ({ book }) => {
                             sx={{ margin: '5px' }}
                             onClick={() => handleAddToCart(book)}
                         >
-                            Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)
+                            {!book ? 'Đang tải' : book?.amount == 0 ? 'Hết hàng'
+                                : `Thêm vào giỏ (${(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)`}
                         </BuyButton>
                     }
                 </SwipeableDrawer>
@@ -262,7 +264,8 @@ const ProductAction = ({ book }) => {
                             onClick={() => handleAddToCart(book)}
                             startIcon={<AddShoppingCart fontSize="small" />}
                         >
-                            Thêm vào giỏ ({(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)
+                            {!book ? 'Đang tải' : book?.amount == 0 ? 'Hết hàng'
+                                : `Thêm vào giỏ (${(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)`}
                         </BuyButton>
                     </Box>
                 </Box>

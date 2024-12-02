@@ -7,7 +7,7 @@ export const getAddress = (type) => {
     }
 }
 
-export const getAddressType = ['HOME', 'OFFICE'];
+export const addressType = ['HOME', 'OFFICE'];
 
 export const addressItems = [
     {

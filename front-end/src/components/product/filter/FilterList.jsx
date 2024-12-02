@@ -97,14 +97,14 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
   const childContainedRef = useRef(null);
   const [pagination, setPagination] = useState({
     isMore: true, //Merge new data
-    currPage: 0,
+    number: 0,
     totalPages: 0,
     totalElements: 0,
   })
 
   const { data, isLoading, isSuccess, isError } = useGetCategoriesQuery({
     include: 'children',
-    page: pagination?.currPage,
+    page: pagination?.number,
     loadMore: pagination?.isMore
   });
 
@@ -112,9 +112,9 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
     if (data && !isLoading && isSuccess) {
       setPagination({
         ...pagination,
-        currPage: data.info.currPage,
-        totalPages: data.info.totalPages,
-        totalElements: data.info.totalElements,
+        number: data.page.number,
+        totalPages: data.page.totalPages,
+        totalElements: data.page.totalElements,
       });
     }
   }, [data]);
@@ -129,16 +129,16 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
   }
 
   const handleShowmore = () => {
-    let currPage = (pagination?.currPage || 0) + 1;
+    let currPage = (pagination?.number || 0) + 1;
     if (pagination?.totalPages <= currPage) {
       setShowmore(prev => !prev);
     } else {
-      setPagination({ ...pagination, currPage });
+      setPagination({ ...pagination, number: currPage });
       setShowmore(true);
     }
   }
 
-  let isMore = pagination?.totalPages > (pagination?.currPage || 0) + 1;
+  let isMore = pagination?.totalPages > (pagination?.number || 0) + 1;
   let isCollapsable = pagination?.totalElements > LIMIT_CATES;
   let containedSelected = () => {
     let checkId = childContainedRef.current || cateId;
@@ -175,7 +175,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
               selected={cateId == id}
               onClick={() => handleCateChange(cate)}
             >
-              <FilterText>{cate?.categoryName}</FilterText>
+              <FilterText>{cate?.name}</FilterText>
               {cate.children?.length ? open[id] ? <ExpandLess onClick={(e) => handleClick(e, id)} />
                 : <Badge color="primary" variant="dot" invisible={!containedSelected}>
                   <ExpandMore onClick={(e) => handleClick(e, id)} />
@@ -191,7 +191,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
                       selected={cateId == child?.id}
                       onClick={() => handleCateChange(child)}
                     >
-                      <FilterText>{child?.categoryName}</FilterText>
+                      <FilterText>{child?.name}</FilterText>
                     </StyledListItemButton>
                   </List>
                 ))}
@@ -249,13 +249,13 @@ const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
   const [showmore, setShowmore] = useState(false);
   const [pagination, setPagination] = useState({
     isMore: true, //Merge new data
-    currPage: 0,
+    number: 0,
     totalPages: 0,
     totalElements: 0,
   })
 
   const { data, isLoading, isSuccess, isError } = useGetPublishersQuery({
-    page: pagination?.currPage,
+    page: pagination?.number,
     loadMore: pagination?.isMore,
   });
 
@@ -265,9 +265,9 @@ const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
     if (data && !isLoading && isSuccess) {
       setPagination({
         ...pagination,
-        currPage: data.info.currPage,
-        totalPages: data.info.totalPages,
-        totalElements: data.info.totalElements,
+        number: data.page.number,
+        totalPages: data.page.totalPages,
+        totalElements: data.page.totalElements,
       });
     }
   }, [data]);
@@ -297,17 +297,17 @@ const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
   const handleUpdatePubs = (newSelected) => { if (onChangePub) onChangePub(newSelected) };
 
   const handleShowmore = () => {
-    let currPage = (pagination?.currPage || 0) + 1;
+    let currPage = (pagination?.number || 0) + 1;
     if (pagination?.totalPages <= currPage) {
       setShowmore(prev => !prev);
     } else {
-      setPagination({ ...pagination, currPage });
+      setPagination({ ...pagination, number: currPage });
       setShowmore(true);
     }
   }
 
   const isSelected = (id) => selectedPub.indexOf(id) !== -1;
-  let isMore = pagination?.totalPages > (pagination?.currPage || 0) + 1;
+  let isMore = pagination?.totalPages > (pagination?.number || 0) + 1;
   let isCollapsable = pagination?.totalElements > LIMIT_PUBS;
   let containedSelected = false;
   let isContained = (id) => {
@@ -343,12 +343,12 @@ const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
                 checked={isItemSelected}
                 onChange={handleChangePub}
                 disableRipple
-                name={pub?.pubName}
+                name={pub?.name}
                 color="primary"
                 size="small" />
             }
             sx={{ fontSize: '14px', width: '100%', marginRight: 0 }}
-            label={<LabelText>{pub?.pubName}</LabelText>}
+            label={<LabelText>{pub?.name}</LabelText>}
           />
         )
 

@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ring.bookstore.enums.CouponType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
 
 @Entity
 @Getter
@@ -21,21 +19,14 @@ public class CouponDetail {
 
     @Id
     @Column(nullable = false, updatable = false)
-    @SequenceGenerator(
-            name = "primary_sequence",
-            sequenceName = "primary_sequence",
-            allocationSize = 1,
-            initialValue = 10000
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "primary_sequence"
-    )
+    @JsonIgnore
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id", nullable = false)
-    @JsonBackReference
+    @MapsId
+    @JoinColumn(name = "id")
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Coupon coupon;
 
     @Enumerated(EnumType.STRING)
