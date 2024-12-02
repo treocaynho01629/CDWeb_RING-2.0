@@ -15,8 +15,6 @@ import java.util.List;
 @Service
 public interface ImageService {
 
-    Image get(String name);
-
     String deleteImage(Long id);
 
     boolean existsImage(String name);

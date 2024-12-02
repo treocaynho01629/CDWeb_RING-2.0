@@ -311,8 +311,8 @@ const CartDetailRow = ({ id, index, shop, coupon, couponDiscount, isSelected, is
                                 ? couponDiscount
                                     ? isGroupSelected
                                         ? `Đã giảm ${couponDiscount.toLocaleString()}đ`
-                                        : `Mua thêm để giảm ${coupon?.detail.discount * 100}% - giảm tối đa ${coupon?.detail.maxDiscount.toLocaleString()}đ`
-                                    : `Mua thêm để giảm ${coupon?.detail.discount * 100}% - giảm tối đa ${coupon?.detail.maxDiscount.toLocaleString()}đ`
+                                        : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
+                                    : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
                                 : 'Thêm mã giảm giá'
                             }
                         </span>

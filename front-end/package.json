@@ -27,6 +27,7 @@
     "react-cookie": "^7.1.4",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.2.3",
+    "react-google-recaptcha-v3": "^1.10.1",
     "react-lazy-load-image-component": "^1.6.2",
     "react-lazyload": "^3.2.1",
     "react-multi-carousel": "^2.8.5",

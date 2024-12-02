@@ -6,12 +6,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import lombok.*;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Nationalized;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 @Entity
 @Getter
@@ -23,16 +20,6 @@ public class BookDetail {
 
     @Id
     @Column(nullable = false, updatable = false)
-    @SequenceGenerator(
-            name = "primary_sequence",
-            sequenceName = "primary_sequence",
-            allocationSize = 1,
-            initialValue = 10000
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "primary_sequence"
-    )
     @JsonIgnore
     private Long id;
 
@@ -53,7 +40,8 @@ public class BookDetail {
     private String bLanguage;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
+    @MapsId
+    @JoinColumn(name = "id")
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Book book;
@@ -62,7 +50,6 @@ public class BookDetail {
             orphanRemoval = true,
             mappedBy = "detail",
             fetch = FetchType.LAZY)
-    @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
     private List<Image> previewImages;
 }

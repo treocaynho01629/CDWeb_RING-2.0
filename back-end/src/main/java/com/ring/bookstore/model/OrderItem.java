@@ -32,9 +32,6 @@ public class OrderItem {
     @Column
     private Short quantity;
 
-    @Transient
-    private Short amount; //From book's stock
-
     @Column
     private Double price;
 
@@ -50,4 +47,7 @@ public class OrderItem {
     @JoinColumn(name = "book_id")
     @JsonIgnore
     private Book book;
+
+    @Transient
+    private Short amount; //From book's stock
 }

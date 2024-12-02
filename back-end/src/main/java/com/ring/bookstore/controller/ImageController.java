@@ -117,7 +117,6 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.valueOf(image.getType()))
                 .body(image.getImage()); //Return image
-
     }
 
     //Delete image by {id}

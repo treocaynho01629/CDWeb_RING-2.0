@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { Stack, Button, TextField } from '@mui/material';
+import { Stack, TextField } from '@mui/material';
 import { useRegisterMutation } from '../../features/auth/authApiSlice';
 import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from '../../ultils/regex';
 import { Instruction } from '../custom/GlobalComponents';
 import { AuthForm, AuthHighlight, AuthText, AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
 import { Link } from 'react-router';
+import { GoogleReCaptcha, GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import CustomPasswordInput from '../custom/CustomPasswordInput';
 
 const RegisterTab = ({ pending, setPending }) => {
@@ -28,6 +29,10 @@ const RegisterTab = ({ pending, setPending }) => {
     const [email, setEmail] = useState('');
     const [validEmail, setValidEmail] = useState(false);
     const [emailFocus, setEmailFocus] = useState(false);
+
+    //Recaptcha
+    const [token, setToken] = useState('');
+    const [refreshReCaptcha, setRefreshReCaptcha] = useState(false);
 
     //Error and success message
     const [errMsg, setErrMsg] = useState('');
@@ -63,6 +68,11 @@ const RegisterTab = ({ pending, setPending }) => {
     useEffect(() => {
         setErrMsg('');
     }, [username, email, password, matchPass])
+
+    //Recaptcha token
+    const setTokenFunc = (getToken) => {
+        setToken(getToken);
+    };
 
     //Register
     const handleSubmit = async (e) => {
@@ -101,6 +111,7 @@ const RegisterTab = ({ pending, setPending }) => {
                 setPending(false);
             })
             .catch((err) => {
+                setRefreshReCaptcha(!refreshReCaptcha);
                 console.error(err);
                 setErr(err);
                 if (!err?.status) {
@@ -198,6 +209,13 @@ const RegisterTab = ({ pending, setPending }) => {
                     <AuthHighlight>Đăng nhập</AuthHighlight>
                 </Link>
             </AuthText>
+            <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}>
+                <GoogleReCaptcha
+                    className="google-recaptcha-custom-class"
+                    onVerify={setTokenFunc}
+                    refreshReCaptcha={refreshReCaptcha}
+                />
+            </GoogleReCaptchaProvider>
         </AuthForm>
     )
 }

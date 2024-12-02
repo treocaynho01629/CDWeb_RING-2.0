@@ -1,6 +1,6 @@
 package com.ring.bookstore.dtos.mappers;
 
-import com.ring.bookstore.dtos.projections.IReview;
+import com.ring.bookstore.dtos.reviews.IReview;
 import com.ring.bookstore.model.*;
 import org.springframework.stereotype.Service;
 

@@ -6,9 +6,9 @@ import { isEqual } from 'lodash-es';
 const booksAdapter = createEntityAdapter({});
 const booksSelector = booksAdapter.getSelectors();
 const initialState = booksAdapter.getInitialState({
-    info: {
-        currPage: 0,
-        pageSize: 0,
+  page: {
+        number: 0,
+        size: 0,
         totalElements: 0,
         totalPages: 0,
     },
@@ -56,15 +56,10 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 }
             },
             transformResponse: responseData => {
-                const { number, size, totalElements, totalPages, content } = responseData;
+                const { content, page } = responseData;
                 return booksAdapter.setAll({
                     ...initialState,
-                    info: {
-                        currPage: number,
-                        pageSize: size,
-                        totalElements,
-                        totalPages: totalPages
-                    }
+                    page
                 }, content)
             },
             serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {

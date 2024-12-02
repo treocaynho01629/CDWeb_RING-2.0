@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Check, Close, LocalActivityOutlined, Loyalty } from '@mui/icons-material'
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, useMediaQuery, Box, Skeleton, TextField, useTheme } from '@mui/material'
 import { useGetCouponQuery, useGetCouponsQuery } from '../../features/coupons/couponsApiSlice';
-import { getCouponSumary } from '../../ultils/coupon';
+import { getCouponSummary } from '../../ultils/coupon';
 import { Instruction } from '../custom/GlobalComponents';
 import CouponItem from './CouponItem'
 import styled from '@emotion/styled'
@@ -126,13 +126,12 @@ const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, ope
             <DetailTitle>Mã vận chuyển</DetailTitle>
             {ids?.map((id, index) => {
                 const coupon = entities[id];
-                const type = coupon.detail.type;
-                const sumary = getCouponSumary(type);
+                const summary = getCouponSummary(coupon?.type);
                 const isDisabled = selectMode && !coupon.isUsable;
                 const isSelected = tempCoupon?.id == id;
 
                 return (<CouponItem key={`coupon-${id}-${index}`}
-                    {...{ coupon, sumary, selectMode, isDisabled, isSelected, onClickApply: setTempCoupon }} />)
+                    {...{ coupon, summary, selectMode, isDisabled, isSelected, onClickApply: setTempCoupon }} />)
             })}
         </> : null;
     }
@@ -169,25 +168,23 @@ const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, ope
             <DetailTitle>Mã giảm giá</DetailTitle>
             {ids?.map((id, index) => {
                 const coupon = entities[id];
-                const type = coupon.detail.type;
-                const sumary = getCouponSumary(type);
+                const summary = getCouponSummary(coupon.type);
                 const isDisabled = selectMode && !coupon.isUsable;
                 const isSelected = tempCoupon?.id == id;
 
                 return (<CouponItem key={`coupon-${id}-${index}`}
-                    {...{ coupon, sumary, selectMode, isDisabled, isSelected, onClickApply: setTempCoupon }} />)
+                    {...{ coupon, summary, selectMode, isDisabled, isSelected, onClickApply: setTempCoupon }} />)
             })}
         </> : null;
     }
 
     if (currCoupon) {
-        const type = currCoupon?.detail?.type;
-        const sumary = getCouponSumary(type);
+        const summary = getCouponSummary(currCoupon?.type);
         const isDisabled = selectMode && (!currCoupon?.isUsable || currCoupon?.shopId != shopId);
         const isSelected = tempCoupon?.id == currCoupon?.id;
 
         topCoupon = <CouponItem key={`top-coupon-${currCoupon?.id}`}
-            {...{ coupon: currCoupon, sumary, selectMode, isDisabled, isSelected, onClickApply: setTempCoupon }}
+            {...{ coupon: currCoupon, summary, selectMode, isDisabled, isSelected, onClickApply: setTempCoupon }}
         />;
     }
 

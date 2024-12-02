@@ -164,14 +164,14 @@ const Categories = () => {
                 return (
                     <Fragment key={`main-${cateId}-${index}`}>
                         <ItemWrapper key={`cate-${cateId}-${index}`}>
-                            <Link to={`/store/${cate?.slug}?cate=${cateId}`} title={cate?.categoryName}>
+                            <Link to={`/store/${cate?.slug}?cate=${cateId}`} title={cate?.name}>
                                 <ItemContainer>
                                     <StyledLazyImage
                                         src={`${cate?.image}?size=tiny`}
-                                        alt={`Category item: ${cate?.categoryName}`}
+                                        alt={`Category item: ${cate?.name}`}
                                         placeholder={<Skeleton width={65} height={65} variant="rectangular" animation={false}/>}
                                     />
-                                    <ItemName>{cate?.categoryName}</ItemName>
+                                    <ItemName>{cate?.name}</ItemName>
                                 </ItemContainer>
                             </Link>
                         </ItemWrapper>

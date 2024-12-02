@@ -2,20 +2,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.5</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>3.4.0</version>
+		<relativePath/>
 	</parent>
+
 	<groupId>com.ring.bookstore</groupId>
 	<artifactId>bookstore</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ProjectRINGSpring</name>
-	<description>ECommerce Bookstore Project</description>
+	<name>Project RING</name>
+	<description>E-Commerce Bookstore Project</description>
+
 	<properties>
 		<java.version>17</java.version>
+<!--		<blaze-persistence.version>1.6.14</blaze-persistence.version>-->
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -28,16 +33,48 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.blazebit</groupId>-->
+<!--			<artifactId>blaze-persistence-core-api-jakarta</artifactId>-->
+<!--			<version>${blaze-persistence.version}</version>-->
+<!--			<scope>compile</scope>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.blazebit</groupId>-->
+<!--			<artifactId>blaze-persistence-core-impl-jakarta</artifactId>-->
+<!--			<version>${blaze-persistence.version}</version>-->
+<!--			<scope>runtime</scope>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.blazebit</groupId>-->
+<!--			<artifactId>blaze-persistence-integration-hibernate-6.2</artifactId>-->
+<!--			<version>${blaze-persistence.version}</version>-->
+<!--			<scope>runtime</scope>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.blazebit</groupId>-->
+<!--			<artifactId>blaze-persistence-entity-view-api-jakarta</artifactId>-->
+<!--			<version>${blaze-persistence.version}</version>-->
+<!--			<scope>compile</scope>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.blazebit</groupId>-->
+<!--			<artifactId>blaze-persistence-entity-view-impl-jakarta</artifactId>-->
+<!--			<version>${blaze-persistence.version}</version>-->
+<!--			<scope>runtime</scope>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.blazebit</groupId>-->
+<!--			<artifactId>blaze-persistence-entity-view-processor-jakarta</artifactId>-->
+<!--			<version>${blaze-persistence.version}</version>-->
+<!--			<scope>provided</scope>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -46,7 +83,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.5.0</version>
+			<version>2.7.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -88,7 +125,6 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.11.5</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
@@ -101,6 +137,11 @@
 			<groupId>org.imgscalr</groupId>
 			<artifactId>imgscalr-lib</artifactId>
 			<version>4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>33.3.1-jre</version>
 		</dependency>
 	</dependencies>
 

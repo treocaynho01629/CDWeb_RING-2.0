@@ -141,7 +141,7 @@ const ProductDetailContainer = ({ loading, book, mobileMode }) => {
             <InfoTitle><InfoText className="secondary">Nhà xuất bản: </InfoText></InfoTitle>
             <InfoStack>
               <Link to={`/store?pubs=${book?.publisher?.id}`}>
-                <InfoText>{book?.publisher?.pubName}</InfoText>
+                <InfoText>{book?.publisher?.name}</InfoText>
               </Link>
             </InfoStack>
           </tr>

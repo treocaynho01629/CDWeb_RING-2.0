@@ -4,17 +4,13 @@ import com.ring.bookstore.enums.PaymentType;
 import com.ring.bookstore.enums.ShippingType;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import lombok.*;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.Nationalized;
+import org.hibernate.annotations.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Getter
@@ -22,8 +18,10 @@ import org.springframework.data.annotation.CreatedDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-public class OrderReceipt {
+@SQLDelete(sql = "UPDATE Coupon SET active = false WHERE id=?")
+@SQLRestriction("active=true")
+@EqualsAndHashCode(callSuper = true)
+public class OrderReceipt extends Auditable {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -40,26 +38,18 @@ public class OrderReceipt {
     private Long id;
 
     @Column(length = 200)
-    @Nationalized 
-    private String fullName;
-
-    @Column(length = 1000)
     private String email;
 
-    @Column(length = 15)
-    private String phone;
-
-    @Column(length = 1000)
-    @Nationalized 
-    private String orderAddress;
+    @OneToOne(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    @JsonIgnore
+    private Address address;
 
     @Column(length = 1000)
     @Nationalized 
     private String orderMessage;
-
-    @Column(name="order_date", nullable = false, updatable = false)
-    @CreatedDate
-    private LocalDateTime orderDate;
 
     @Column
     private Double total;
@@ -81,7 +71,6 @@ public class OrderReceipt {
     		orphanRemoval = true,  
     		mappedBy = "order", 
     		fetch = FetchType.LAZY)
-    @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
     private List<OrderDetail> details;
 

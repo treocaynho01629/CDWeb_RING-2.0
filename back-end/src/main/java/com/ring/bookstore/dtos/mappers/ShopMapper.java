@@ -1,7 +1,7 @@
 package com.ring.bookstore.dtos.mappers;
 
-import com.ring.bookstore.dtos.ShopDTO;
-import com.ring.bookstore.dtos.projections.IShopDetail;
+import com.ring.bookstore.dtos.shops.ShopDTO;
+import com.ring.bookstore.dtos.shops.IShopDetail;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 

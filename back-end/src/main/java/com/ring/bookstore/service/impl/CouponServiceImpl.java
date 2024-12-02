@@ -1,6 +1,9 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.CouponDiscountDTO;
+import com.ring.bookstore.dtos.books.BookDTO;
+import com.ring.bookstore.dtos.coupons.CouponDTO;
+import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
+import com.ring.bookstore.dtos.mappers.CouponMapper;
 import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -35,42 +39,51 @@ public class CouponServiceImpl implements CouponService {
     private final CouponDetailRepository couponDetailRepo;
     private final ShopRepository shopRepo;
 
+    private final CouponMapper couponMapper;
+
     @Override
-    public Page<Coupon> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                                   List<CouponType> types, String keyword, Long shopId, Boolean byShop, Boolean showExpired,
-                                   Double cValue, Integer cQuantity) {
+    public Page<CouponDTO> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
+                                      List<CouponType> types, String keyword, Long shopId, Boolean byShop, Boolean showExpired,
+                                      Double cValue, Integer cQuantity) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
         //Fetch from database
         Page<Coupon> couponsList = couponRepo.findCouponByFilter(types, keyword, shopId,
                 byShop, showExpired, pageable);
+
+        //Check usable
         if (cValue != null || cQuantity != null) {
             CartStateRequest request = CartStateRequest.builder().value(cValue).quantity(cQuantity).build();
             couponsList = couponsList.map(coupon -> markUsable(coupon, request));
         }
-        return couponsList;
+
+        Page<CouponDTO> couponDTOS = couponsList.map(couponMapper::apply);
+        return couponDTOS;
     }
 
     @Override
-    public Coupon getCouponByCode(String code, Double cValue, Integer cQuantity) {
-        Coupon coupon = couponRepo.findByCode(code).orElseThrow(() ->
+    public CouponDTO getCouponByCode(String code, Double cValue, Integer cQuantity) {
+        Coupon coupon = couponRepo.findCouponByCode(code).orElseThrow(() ->
                 new ResourceNotFoundException("Coupon not found!"));
         if (cValue != null || cQuantity != null) {
             CartStateRequest request = CartStateRequest.builder().value(cValue).quantity(cQuantity).build();
             coupon = markUsable(coupon, request);
         }
-        return coupon;
+        return couponMapper.apply(coupon);
     }
 
-    public List<Coupon> recommendCoupons(List<Long> shopIds) {
+    public List<CouponDTO> recommendCoupons(List<Long> shopIds) {
         List<Coupon> couponsList = couponRepo.recommendCoupons(shopIds);
-        return couponsList;
+        List<CouponDTO> couponDTOS = couponsList.stream().map(couponMapper::apply).collect(Collectors.toList()); //Return books
+        return couponDTOS;
     }
 
     @Override
-    public Coupon recommendCoupon(Long shopId, CartStateRequest state) {
-        return couponRepo.recommendCoupon(shopId, state.getValue(), state.getQuantity()).orElse(null);
+    public CouponDTO recommendCoupon(Long shopId, CartStateRequest state) {
+        Coupon coupon = couponRepo.recommendCoupon(shopId, state.getValue(), state.getQuantity()).orElse(null);
+        if (coupon == null) return null;
+        return couponMapper.apply(coupon);
     }
 
     //Add coupon (SELLER)
@@ -87,7 +100,7 @@ public class CouponServiceImpl implements CouponService {
             if (isOwnerValid(shop, user)) {
                 coupon.setShop(shop);
             } else {
-                throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+                throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
             }
         } else {
             if (!isAuthAdmin()) {
@@ -115,11 +128,11 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public Coupon updateCoupon(Long id, CouponRequest request, Account user) {
         //Get original coupon
-        Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
+        Coupon coupon = couponRepo.findCouponById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
 
         //Check if correct seller or admin
         if (!isOwnerValid(coupon.getShop(), user))
-            throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
         //Shop validation + set
         if (request.getShopId() != null) {
@@ -127,7 +140,7 @@ public class CouponServiceImpl implements CouponService {
             if (isOwnerValid(shop, user)) {
                 coupon.setShop(shop);
             } else {
-                throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+                throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
             }
         } else {
             if (!isAuthAdmin()) {
@@ -157,7 +170,7 @@ public class CouponServiceImpl implements CouponService {
         Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
         //Check if correct seller or admin
         if (!isOwnerValid(coupon.getShop(), user))
-            throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
         couponRepo.deleteById(id); //Delete from database
         return coupon;
@@ -174,7 +187,7 @@ public class CouponServiceImpl implements CouponService {
             Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
             //Check if correct seller or admin
             if (!isOwnerValid(coupon.getShop(), user))
-                throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+                throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
             couponRepo.deleteById(id); //Delete from database
         }
     }
@@ -226,7 +239,7 @@ public class CouponServiceImpl implements CouponService {
         return (couponDetail.getUsage() <= 0 || couponDetail.getExpDate().isBefore(LocalDate.now()));
     }
 
-    protected Coupon markUsable(Coupon coupon, CartStateRequest request) {
+    public Coupon markUsable(Coupon coupon, CartStateRequest request) {
         CouponDetail couponDetail = coupon.getDetail();
         CouponType type = couponDetail.getType();
         double attribute = couponDetail.getAttribute();

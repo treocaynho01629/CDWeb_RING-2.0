@@ -3,9 +3,9 @@ import { apiSlice } from "../../app/api/apiSlice";
 
 const usersAdapter = createEntityAdapter({});
 const initialState = usersAdapter.getInitialState({
-    info: {
-        currPage: 0,
-        pageSize: 0,
+  page: {
+        number: 0,
+        size: 0,
         totalElements: 0,
         totalPages: 0,
     },
@@ -53,15 +53,10 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 }
             },
             transformResponse: responseData => {
-                const { number, size, totalElements, totalPages, content } = responseData;
+                const { content, page } = responseData;
                 return usersAdapter.setAll({
-                    ...initialState,
-                    info: {
-                        currPage: number,
-                        pageSize: size,
-                        totalElements,
-                        totalPages
-                    }
+                        ...initialState,
+                    page
                 }, content)
             },
             providesTags: (result, error, arg) => {

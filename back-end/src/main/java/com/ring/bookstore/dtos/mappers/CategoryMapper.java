@@ -3,7 +3,7 @@ package com.ring.bookstore.dtos.mappers;
 import com.ring.bookstore.dtos.categories.CategoryDTO;
 import com.ring.bookstore.dtos.categories.CategoryDetailDTO;
 import com.ring.bookstore.dtos.categories.PreviewCategoryDTO;
-import com.ring.bookstore.dtos.projections.ICategory;
+import com.ring.bookstore.dtos.categories.ICategory;
 import com.ring.bookstore.model.Category;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -18,10 +18,8 @@ public class CategoryMapper {
     public CategoryDTO cateToCateDTO(Category category) {
         return new CategoryDTO(category.getId(),
                 category.getSlug(),
-                category.getParentId(),
-                category.getCategoryName(),
-                null,
-                null);
+                category.getName(),
+                category.getParentId());
     }
 
     public CategoryDTO cateToCateDTO(Category category, String include) {
@@ -42,8 +40,8 @@ public class CategoryMapper {
 
         return new CategoryDTO(category.getId(),
                 category.getSlug(),
+                category.getName(),
                 category.getParentId(),
-                category.getCategoryName(),
                 parent,
                 children);
     }
@@ -51,11 +49,9 @@ public class CategoryMapper {
     public CategoryDetailDTO cateToDetailDTO(Category category) {
         return new CategoryDetailDTO(category.getId(),
                 category.getSlug(),
-                category.getParentId(),
-                category.getCategoryName(),
+                category.getName(),
                 category.getDescription(),
-                null,
-                null);
+                category.getParentId());
     }
 
     public CategoryDetailDTO cateToDetailDTO(Category category, String include) {
@@ -76,9 +72,9 @@ public class CategoryMapper {
 
         return new CategoryDetailDTO(category.getId(),
                 category.getSlug(),
-                category.getParentId(),
-                category.getCategoryName(),
+                category.getName(),
                 category.getDescription(),
+                category.getParentId(),
                 parent,
                 children);
     }
@@ -86,16 +82,18 @@ public class CategoryMapper {
     public PreviewCategoryDTO projectionToPreview(ICategory projection) {
         Category category = projection.getCategory();
 
-        String fileDownloadUri = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/api/images/")
-                .path(projection.getImage())
-                .toUriString();
+        String fileDownloadUri = projection.getImage() != null ?
+                ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/api/images/")
+                        .path(projection.getImage())
+                        .toUriString()
+                : null;
 
         return new PreviewCategoryDTO(category.getId(),
                 category.getSlug(),
                 category.getParentId(),
-                category.getCategoryName(),
+                category.getName(),
                 fileDownloadUri);
     }
 }

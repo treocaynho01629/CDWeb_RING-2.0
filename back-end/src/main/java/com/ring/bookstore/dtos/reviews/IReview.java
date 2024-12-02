@@ -1,4 +1,4 @@
-package com.ring.bookstore.dtos.projections;
+package com.ring.bookstore.dtos.reviews;
 
 import com.ring.bookstore.model.Book;
 import com.ring.bookstore.model.Review;

@@ -247,8 +247,8 @@ const CouponContainer = styled.div`
 `
 //#endregion
 
-const CouponItem = ({ coupon, sumary, isDisabled, isSelected, selectMode, onClickApply }) => {
-    const date = new Date(coupon?.detail.expDate);
+const CouponItem = ({ coupon, summary, isDisabled, isSelected, selectMode, onClickApply }) => {
+    const date = new Date(coupon?.expDate);
     const warnDate = new Date();
     warnDate.setDate(warnDate.getDate() + 2);
 
@@ -261,12 +261,12 @@ const CouponItem = ({ coupon, sumary, isDisabled, isSelected, selectMode, onClic
                     <CouponEdge elevation={24} className="left" />
                     <CouponEdge elevation={24} className="right" />
                     <CouponContent>
-                        <CouponIcon className={sumary?.color}>
-                            {sumary?.icon}
+                        <CouponIcon className={summary?.color}>
+                            {summary?.icon}
                         </CouponIcon>
                         <CouponMain>
-                            <h2>{`${sumary?.name} ${coupon?.detail.discount * 100}% - giảm tối đa ${coupon?.detail.maxDiscount.toLocaleString()}đ`}</h2>
-                            <p>{`${sumary?.sumary} ${coupon?.detail.attribute.toLocaleString()}${sumary?.unit}`}</p>
+                            <h2>{coupon?.summary}</h2>
+                            <p>{coupon?.condition}</p>
                             <Expire>
                                 <ExpText className={date <= warnDate ? 'date error' : 'date'}>&nbsp;
                                     {date.toLocaleDateString("en-GB", {
@@ -275,8 +275,8 @@ const CouponItem = ({ coupon, sumary, isDisabled, isSelected, selectMode, onClic
                                         day: "2-digit",
                                     })}
                                 </ExpText>
-                                {coupon?.detail.usage < 100
-                                    && <ExpText className="error">&nbsp;{coupon?.detail.usage} lượt</ExpText>}
+                                {coupon?.usage < 100
+                                    && <ExpText className="error">&nbsp;{coupon?.usage} lượt</ExpText>}
                             </Expire>
                         </CouponMain>
                     </CouponContent>

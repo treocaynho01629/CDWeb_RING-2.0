@@ -1,15 +1,17 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.ShopDTO;
+import com.ring.bookstore.dtos.shops.ShopDTO;
 import com.ring.bookstore.dtos.mappers.ShopMapper;
-import com.ring.bookstore.dtos.projections.IShopDetail;
+import com.ring.bookstore.dtos.shops.IShopDetail;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.AccountRepository;
+import com.ring.bookstore.repository.AddressRepository;
 import com.ring.bookstore.repository.ShopRepository;
+import com.ring.bookstore.request.AddressRequest;
 import com.ring.bookstore.request.ShopRequest;
 import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.service.ShopService;
@@ -34,6 +36,7 @@ public class ShopServiceImpl implements ShopService {
 
     private final ShopRepository shopRepo;
     private final AccountRepository accountRepo;
+    private final AddressRepository addressRepo;
     private final ShopMapper shopMapper;
     private final ImageService imageService;
 
@@ -44,8 +47,8 @@ public class ShopServiceImpl implements ShopService {
 
         //Fetch from database
         Page<IShopDetail> shopsList = shopRepo.findShopByFilter(keyword, ownerId, pageable);
-        Page<ShopDTO> shopDtos = shopsList.map(shopMapper::apply);
-        return shopDtos;
+        Page<ShopDTO> shopDTOS = shopsList.map(shopMapper::apply);
+        return shopDTOS;
     }
 
     @Override
@@ -86,12 +89,26 @@ public class ShopServiceImpl implements ShopService {
         //Image upload
         if (file != null) image = imageService.upload(file);
 
+        //Create address
+        AddressRequest addressRequest = request.getAddressRequest();
+        var address = Address.builder()
+                .name(addressRequest.getName())
+                .companyName(addressRequest.getCompanyName())
+                .phone(addressRequest.getPhone())
+                .city(addressRequest.getCity())
+                .address(addressRequest.getAddress())
+                .type(addressRequest.getType())
+                .build();
+
+        Address savedAddress = addressRepo.save(address); //Save address
+
         //Create new shop
         var shop = Shop.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .image(image)
                 .owner(user)
+                .address(savedAddress)
                 .build();
         Shop addedShop = shopRepo.save(shop); //Save to database
         return addedShop;
@@ -104,7 +121,7 @@ public class ShopServiceImpl implements ShopService {
                 new ResourceNotFoundException("Shop not found"));
 
         //Check if correct seller or admin
-        if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+        if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
         //Image upload/replace
         if (file != null) { //Contain new image >> upload/replace
@@ -115,6 +132,20 @@ public class ShopServiceImpl implements ShopService {
             shop.setImage(savedImage); //Set new image
         }
 
+        //Update address
+        AddressRequest addressRequest = request.getAddressRequest();
+        Address address = shop.getAddress();
+
+        address.setName(addressRequest.getName());
+        address.setCompanyName(addressRequest.getCompanyName());
+        address.setPhone(addressRequest.getPhone());
+        address.setCity(addressRequest.getCity());
+        address.setAddress(addressRequest.getAddress());
+        address.setType(addressRequest.getType());
+
+        Address updatedAddress = addressRepo.save(address); //Save address
+
+        shop.setAddress(updatedAddress);
         shop.setName(request.getName());
         shop.setDescription(request.getDescription());
 
@@ -128,7 +159,7 @@ public class ShopServiceImpl implements ShopService {
         Shop shop = shopRepo.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Shop not found"));
         //Check if correct seller or admin
-        if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+        if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
         shopRepo.deleteById(id); //Delete from database
         return shop;
@@ -144,7 +175,7 @@ public class ShopServiceImpl implements ShopService {
             Shop shop = shopRepo.findById(id).orElseThrow(() ->
                     new ResourceNotFoundException("Shop not found"));
             //Check if correct seller or admin
-            if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+            if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
             shopRepo.deleteById(id); //Delete from database
         }
     }

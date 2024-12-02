@@ -1,6 +1,7 @@
 package com.ring.bookstore.service;
 
-import com.ring.bookstore.dtos.CouponDiscountDTO;
+import com.ring.bookstore.dtos.coupons.CouponDTO;
+import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
 import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.Coupon;
@@ -14,15 +15,15 @@ import java.util.List;
 @Service
 public interface CouponService {
 
-    Page<Coupon> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                            List<CouponType> types, String keyword, Long shopId, Boolean byShop,
-                            Boolean showExpired, Double cValue, Integer cQuantity);
+    Page<CouponDTO> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
+                               List<CouponType> types, String keyword, Long shopId, Boolean byShop,
+                               Boolean showExpired, Double cValue, Integer cQuantity);
 
-    Coupon getCouponByCode(String code, Double cValue, Integer cQuantity);
+    CouponDTO getCouponByCode(String code, Double cValue, Integer cQuantity);
 
-    List<Coupon> recommendCoupons(List<Long> shopIds);
+    List<CouponDTO> recommendCoupons(List<Long> shopIds);
 
-    Coupon recommendCoupon(Long shopId, CartStateRequest state);
+    CouponDTO recommendCoupon(Long shopId, CartStateRequest state);
 
     Coupon addCoupon(CouponRequest request, Account user);
 
@@ -31,6 +32,8 @@ public interface CouponService {
     Coupon deleteCoupon(Long id, Account user);
 
     CouponDiscountDTO applyCoupon(Coupon coupon, CartStateRequest request);
+
+    Coupon markUsable(Coupon coupon, CartStateRequest request);
 
     boolean isExpired(Coupon coupon);
 

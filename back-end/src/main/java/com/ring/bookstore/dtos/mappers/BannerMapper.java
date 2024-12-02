@@ -1,7 +1,7 @@
 package com.ring.bookstore.dtos.mappers;
 
-import com.ring.bookstore.dtos.BannerDTO;
-import com.ring.bookstore.dtos.projections.IBanner;
+import com.ring.bookstore.dtos.banners.BannerDTO;
+import com.ring.bookstore.dtos.banners.IBanner;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 

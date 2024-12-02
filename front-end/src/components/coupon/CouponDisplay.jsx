@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { getCouponSumary } from '../../ultils/coupon'
+import { getCouponSummary } from '../../ultils/coupon'
 
 //#region styled
 const CouponContainer = styled.div`
@@ -148,15 +148,15 @@ const CouponDesc = styled.b`
 //#endregion
 
 const CouponDisplay = ({ coupon }) => {
-    const sumary = getCouponSumary(coupon?.detail?.type);
+    const summary = getCouponSummary(coupon?.type);
 
     return (
         <CouponContainer>
-            <CouponIcon className={sumary?.color}>
-                {sumary?.icon}
+            <CouponIcon className={summary?.color}>
+                {summary?.icon}
             </CouponIcon>
             <CouponDesc>
-                {`${sumary?.name} ${coupon?.detail?.discount * 100}% - giảm tối đa ${coupon?.detail?.maxDiscount.toLocaleString()} đ`}
+                {coupon?.summary}
             </CouponDesc>
         </CouponContainer>
     )

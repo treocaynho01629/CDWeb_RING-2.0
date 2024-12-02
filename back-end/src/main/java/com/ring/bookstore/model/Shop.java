@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Nationalized;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE Shop SET active = false WHERE id=?")
-@Where(clause = "active=true")
+@SQLRestriction("active=true")
 @EqualsAndHashCode(callSuper = true)
 public class Shop extends Auditable {
 	@Id

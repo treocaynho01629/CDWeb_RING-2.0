@@ -108,7 +108,7 @@ const DetailProduct = () => {
                                     {data?.cateName}
                                 </Typography>
                                 <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
-                                    {data?.publisher?.pubName}
+                                    {data?.publisher?.name}
                                 </Typography>
                                 <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
                                     {data?.author}

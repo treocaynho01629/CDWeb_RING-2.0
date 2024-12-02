@@ -5,9 +5,9 @@ import { isEqual } from 'lodash-es';
 const pubsAdapter = createEntityAdapter({});
 const pubsSelector = pubsAdapter.getSelectors();
 const initialState = pubsAdapter.getInitialState({
-    info: {
-        currPage: 0,
-        pageSize: 0,
+  page: {
+        number: 0,
+        size: 0,
         totalElements: 0,
         totalPages: 0,
     },
@@ -45,15 +45,10 @@ export const publishersApiSlice = apiSlice.injectEndpoints({
                 }
             },
             transformResponse: responseData => {
-                const { number, size, totalElements, totalPages, content } = responseData;
+                const { content, page } = responseData;
                 return pubsAdapter.setAll({
-                    ...initialState,
-                    info: {
-                        currPage: number,
-                        pageSize: size,
-                        totalElements,
-                        totalPages
-                    }
+                        ...initialState,
+                    page
                 }, content)
             },
             serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {

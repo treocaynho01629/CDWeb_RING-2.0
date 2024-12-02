@@ -115,7 +115,7 @@ LinearProgressWithLabel.propTypes = {
 
 const ReviewInfo = ({ handleClick, book, disabled, editable }) => {
     const reviewPercent = (value) => {
-        const total = book?.reviewsInfo?.count[0] ?? 0;
+        const total = book?.reviewsInfo?.total;
         const result = (value == 0 || total == 0) ? 0 : (value / total) * 100;
         return result;
     }
@@ -133,7 +133,7 @@ const ReviewInfo = ({ handleClick, book, disabled, editable }) => {
                         icon={<Star fontSize="inherit" />}
                         emptyIcon={<StarBorder fontSize="inherit" />}
                     />
-                    <TotalLabel>({numFormatter(book?.reviewsInfo?.count[0])} đánh giá)</TotalLabel>
+                    <TotalLabel>({numFormatter(book?.reviewsInfo?.total)} đánh giá)</TotalLabel>
                 </>
                     : <>
                         <Score><Skeleton variant="text" sx={{ fontSize: 'inherit', width: { xs: 60, md: 100 } }} /></Score>
@@ -148,7 +148,7 @@ const ReviewInfo = ({ handleClick, book, disabled, editable }) => {
                         <LinearProgressWithLabel
                             key={`progress-${index + 1}`}
                             label={`${index + 1} sao`}
-                            value={reviewPercent(book?.reviewsInfo?.count[index + 1] ?? 0)}
+                            value={reviewPercent(book?.reviewsInfo?.rates[index])}
                         />
                         : <Skeleton
                             key={`temp-${index + 1}`}

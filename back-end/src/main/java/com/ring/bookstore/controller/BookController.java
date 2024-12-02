@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ring.bookstore.config.CurrentAccount;
 import com.ring.bookstore.dtos.books.BookDTO;
 import com.ring.bookstore.model.Account;
-import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.request.BookRequest;
 import com.ring.bookstore.service.BookService;
 
@@ -49,8 +47,8 @@ public class BookController {
 
     //Get books by ids
     @GetMapping("/find")
-    public ResponseEntity<?> getBooksByIds(@RequestParam(value = "ids") List<Long> ids) {
-        List<BookDTO> books = bookService.getBooksByIds(ids);
+    public ResponseEntity<?> getBooksInIds(@RequestParam(value = "ids") List<Long> ids) {
+        List<BookDTO> books = bookService.getBooksInIds(ids);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 

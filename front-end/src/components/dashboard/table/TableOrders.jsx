@@ -320,8 +320,8 @@ export default function TableOrders({ setOrderCount, mini = false }) {
 
   //Fetch receipts
   const { data, isLoading, isSuccess, isError, error } = useGetReceiptsQuery({
-    page: pagination?.currPage,
-    size: pagination?.pageSize,
+    page: pagination?.number,
+    size: pagination?.size,
     sortBy: pagination?.sortBy,
     sortDir: pagination?.sortDir,
   });
@@ -331,11 +331,11 @@ export default function TableOrders({ setOrderCount, mini = false }) {
     if (!isLoading && isSuccess && data) {
       setPagination({
         ...pagination,
-        totalPages: data?.info?.totalPages,
-        currPage: data?.info?.currPage,
-        pageSize: data?.info?.pageSize
+        totalPages: data?.page?.totalPages,
+        currPage: data?.page?.number,
+        pageSize: data?.page?.size
       });
-      if (setOrderCount) setOrderCount(data?.info?.totalElements);
+      if (setOrderCount) setOrderCount(data?.page?.totalElements);
     }
   }, [data])
 
@@ -471,7 +471,7 @@ export default function TableOrders({ setOrderCount, mini = false }) {
       }
 
       setDeselectedOrder(newDeselected);
-      if (newDeselected.length == data?.info?.totalElements) {
+      if (newDeselected.length == data?.page?.totalElements) {
         setDeselectedOrder([]);
         setSelectedAll(false);
       }
@@ -501,7 +501,7 @@ export default function TableOrders({ setOrderCount, mini = false }) {
       }
 
       setSelectedOrder(newSelected);
-      if (newSelected.length == data?.info?.totalElements) {
+      if (newSelected.length == data?.page?.totalElements) {
         setSelectedOrder(true);
         setSelected([]);
       }
@@ -524,7 +524,7 @@ export default function TableOrders({ setOrderCount, mini = false }) {
 
   const isSelected = (id) => (selected?.indexOf(id) !== -1 || (selectedAll && deselected?.indexOf(id) === -1));
   const isOrderSelected = (orderId) => (selectedOrder?.indexOf(orderId) !== -1 || (selectedAll && deselectedOrder?.indexOf(orderId) === -1));
-  const numSelected = () => (selectedAll ? data?.info?.totalElements - [...new Set(deselectedOrder)]?.length : [...new Set(selectedOrder)]?.length);
+  const numSelected = () => (selectedAll ? data?.page?.totalElements - [...new Set(deselectedOrder)]?.length : [...new Set(selectedOrder)]?.length);
   const colSpan = () => (mini ? headCells.filter((h) => !h.hideOnMinimize).length : headCells.length + 1);
   //#endregion
 
@@ -630,7 +630,7 @@ export default function TableOrders({ setOrderCount, mini = false }) {
           pagination={pagination}
           onPageChange={handleChangePage}
           onSizeChange={handleChangeRowsPerPage}
-          count={data?.info?.totalElements ?? 0}
+          count={data?.page?.totalElements ?? 0}
         />
       </FooterContainer>
     </TableContainer>

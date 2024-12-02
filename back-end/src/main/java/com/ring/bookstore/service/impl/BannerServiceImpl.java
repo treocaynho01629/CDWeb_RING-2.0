@@ -1,8 +1,8 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.BannerDTO;
+import com.ring.bookstore.dtos.banners.BannerDTO;
 import com.ring.bookstore.dtos.mappers.BannerMapper;
-import com.ring.bookstore.dtos.projections.IBanner;
+import com.ring.bookstore.dtos.banners.IBanner;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.Banner;

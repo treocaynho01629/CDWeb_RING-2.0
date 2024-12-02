@@ -1,6 +1,6 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.projections.IPublisher;
+import com.ring.bookstore.dtos.publishers.IPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,6 +1,6 @@
 package com.ring.bookstore.service;
 
-import com.ring.bookstore.dtos.BannerDTO;
+import com.ring.bookstore.dtos.banners.BannerDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.Banner;
 import com.ring.bookstore.request.BannerRequest;

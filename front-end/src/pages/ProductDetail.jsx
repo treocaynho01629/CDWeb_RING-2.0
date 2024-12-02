@@ -21,7 +21,7 @@ const createCrumbs = (cate) => {
         return ([
             createCrumbs(cate?.parent),
             <NavLink to={`/store/${cate?.slug}?cate=${cate?.id}`} end key={`crumb-${cate?.id}`}>
-                {cate?.categoryName}
+                {cate?.name}
             </NavLink>
         ])
     }
@@ -88,7 +88,7 @@ const ProductDetail = () => {
                             </NavLink>,
                             createCrumbs(data?.category),
                             <NavLink to={`/store?pubs=${data?.publisher?.id}`} key={'publisher'}>
-                                {data?.publisher?.pubName}
+                                {data?.publisher?.name}
                             </NavLink>,
                             <NavLink to="#" key={'book-title'}>{data?.title}</NavLink>
                         ]

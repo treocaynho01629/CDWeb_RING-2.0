@@ -113,8 +113,8 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
     sortDir: "asc",
   })
   const { data, isLoading, isSuccess, isError, error } = useGetReviewsQuery({
-    page: pagination.currPage,
-    size: pagination.pageSize,
+    page: pagination.number,
+    size: pagination.size,
     sortBy: pagination.sortBy,
     sortDir: pagination.sortDir,
     bookId: bookId,
@@ -131,11 +131,11 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
     if (!isLoading && isSuccess && data) {
       setPagination({
         ...pagination,
-        totalPages: data?.info?.totalPages,
-        currPage: data?.info?.currPage,
-        pageSize: data?.info?.pageSize
+        totalPages: data?.page?.totalPages,
+        currPage: data?.page?.number,
+        pageSize: data?.page?.size
       });
-      if (setReviewCount) setReviewCount(data?.info?.totalElements);
+      if (setReviewCount) setReviewCount(data?.page?.totalElements);
     }
   }, [data])
 
@@ -177,7 +177,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
       }
 
       setDeseletected(newDeselected);
-      if (newDeselected.length == data?.info?.totalElements) {
+      if (newDeselected.length == data?.page?.totalElements) {
         setDeseletected([]);
         setSelectedAll(false);
       }
@@ -200,7 +200,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
       }
 
       setSelected(newSelected);
-      if (newSelected.length == data?.info?.totalElements) {
+      if (newSelected.length == data?.page?.totalElements) {
         setSelectedAll(true);
         setSelected([]);
       }
@@ -289,7 +289,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
   };
 
   const isSelected = (id) => (selected?.indexOf(id) !== -1 || (selectedAll && deselected?.indexOf(id) === -1));
-  const numSelected = () => (selectedAll ? data?.info?.totalElements - deselected?.length : selected?.length);
+  const numSelected = () => (selectedAll ? data?.page?.totalElements - deselected?.length : selected?.length);
   const colSpan = () => (mini ? headCells.filter((h) => !h.hideOnMinimize).length : headCells.length + 1);
   //#endregion
 
@@ -451,7 +451,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
           pagination={pagination}
           onPageChange={handleChangePage}
           onSizeChange={handleChangeRowsPerPage}
-          count={data?.info?.totalElements ?? 0}
+          count={data?.page?.totalElements ?? 0}
         />
       </FooterContainer>
     </TableContainer>

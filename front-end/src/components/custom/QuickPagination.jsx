@@ -25,7 +25,7 @@ const Count = styled.span`
 //#endregion
 
 const QuickPagination = ({ pagination, onPageChange }) => {
-    const currPage = pagination?.currPage;
+    const currPage = pagination?.number;
     const totalPages = pagination?.totalPages;
 
     const handlePageChange = (page) => { if (onPageChange) onPageChange(page) }

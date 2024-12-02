@@ -2,7 +2,7 @@ package com.ring.bookstore.service.impl;
 
 import java.util.List;
 
-import com.ring.bookstore.dtos.projections.IReview;
+import com.ring.bookstore.dtos.reviews.IReview;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.model.*;
 import org.springframework.data.domain.Page;
@@ -42,9 +42,17 @@ public class ReviewServiceImpl implements ReviewService {
 		Book book = bookRepo.findById(id).orElseThrow(()
 				-> new ResourceNotFoundException("Book not found"));
 		//Check if user had bought it yet
-		if (!orderRepo.existsByUserBuyBook(id, user.getUsername())) throw new HttpResponseException(HttpStatus.NO_CONTENT, "Hãy mua sản phẩm để có thể đánh giá!");
+		if (!orderRepo.existsByUserBuyBook(id, user.getUsername())) throw new HttpResponseException(
+				HttpStatus.FORBIDDEN,
+				"User have not bought the product!",
+				"Hãy mua sản phẩm để có thể đánh giá!"
+		);
 		//Check if user had reviewed it yet
-		if (reviewRepo.findByBook_IdAndUser_Id(id, user.getId()).isPresent()) throw new HttpResponseException(HttpStatus.ALREADY_REPORTED, "Bạn đã đánh giá sản phẩm rồi!");
+		if (reviewRepo.findByBook_IdAndUser_Id(id, user.getId()).isPresent()) throw new HttpResponseException(
+				HttpStatus.CONFLICT,
+				"User have already reviewed this product!",
+				"Bạn đã đánh giá sản phẩm rồi!"
+		);
 
 		//Create review
         var review = Review.builder()
@@ -63,8 +71,8 @@ public class ReviewServiceImpl implements ReviewService {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
 		Page<IReview> reviewsList = reviewRepo.findReviewsByFilter(bookId, userId, rating, pageable); //Fetch from database
-		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::projectionToDTO);
-		return reviewDtos;
+		Page<ReviewDTO> reviewDTOS = reviewsList.map(reviewMapper::projectionToDTO);
+		return reviewDTOS;
 	}
 
 	//Get reviews from book's {id}
@@ -72,8 +80,8 @@ public class ReviewServiceImpl implements ReviewService {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
 		Page<IReview> reviewsList = reviewRepo.findReviewsByBookId(id, rating, pageable); //Fetch from database
-		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::projectionToDTO);
-		return reviewDtos;
+		Page<ReviewDTO> reviewDTOS = reviewsList.map(reviewMapper::projectionToDTO);
+		return reviewDTOS;
 	}
 
 	//Get current user's reviews
@@ -81,16 +89,20 @@ public class ReviewServiceImpl implements ReviewService {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
 		Page<IReview> reviewsList = reviewRepo.findUserReviews(user.getId(), rating, pageable); //Fetch from database
-		Page<ReviewDTO> reviewDtos = reviewsList.map(reviewMapper::projectionToDTO);
-		return reviewDtos;
+		Page<ReviewDTO> reviewDTOS = reviewsList.map(reviewMapper::projectionToDTO);
+		return reviewDTOS;
 	}
 
 	//Get review by book
 	public ReviewDTO getReviewByBook(Long id, Account user) {
 		if (!orderRepo.existsByUserBuyBook(id, user.getUsername()))
-			throw new HttpResponseException(HttpStatus.NO_CONTENT, "Hãy mua sản phẩm để có thể đánh giá!");
+			throw new HttpResponseException(
+					HttpStatus.FORBIDDEN,
+					"User have not bought the product!",
+					"Hãy mua sản phẩm để có thể đánh giá!"
+			);
 		Review review = reviewRepo.findByBook_IdAndUser_Id(id, user.getId()).orElseThrow(()
-				-> new ResourceNotFoundException("You have not review this product!"));
+				-> new ResourceNotFoundException("Review not found", "Người dùng chưa đánh giá sản phẩm này!"));
 		return reviewMapper.reviewToDTO(review);
 	}
 
@@ -101,7 +113,7 @@ public class ReviewServiceImpl implements ReviewService {
 		Review review = reviewRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Review not found"));
 
 		//Check if correct user or admin
-		if (!isUserValid(review, user)) throw new HttpResponseException(HttpStatus.UNAUTHORIZED, "Invalid role!");
+		if (!isUserValid(review, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
 		//Set new review content
 		review.setRating(request.getRating());

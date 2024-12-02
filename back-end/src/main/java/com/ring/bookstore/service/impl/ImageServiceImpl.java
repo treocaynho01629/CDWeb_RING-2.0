@@ -1,14 +1,14 @@
 package com.ring.bookstore.service.impl;
 
+import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.dtos.images.ImageInfoDTO;
-import com.ring.bookstore.dtos.projections.IImageInfo;
+import com.ring.bookstore.dtos.images.IImageInfo;
 import com.ring.bookstore.enums.ImageSize;
 import com.ring.bookstore.exception.ImageResizerException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,7 +73,7 @@ public class ImageServiceImpl implements ImageService {
                 Scalr.Mode.AUTOMATIC, //Keep dimension
                 originalImage.getWidth()); //Keep original size
 
-        Image savedImage = save(compressImage, fileName, file.getContentType());
+        Image savedImage = this.save(compressImage, fileName, file.getContentType());
         return savedImage;
     }
 
@@ -90,15 +90,15 @@ public class ImageServiceImpl implements ImageService {
                 Scalr.Mode.AUTOMATIC, //Keep dimension
                 originalImage.getWidth()); //Keep original size
 
-        Image savedImage = save(compressImage, fileName, file.getContentType());
+        Image savedImage = this.save(compressImage, fileName, file.getContentType());
         return savedImage;
     }
 
     //Get all images
     public List<ImageInfoDTO> getAllImages() {
         List<IImageInfo> imagesList = imageRepo.findAllWithoutData();
-        List<ImageInfoDTO> imageDtos = imagesList.stream().map(imageMapper::infoToDTO).collect(Collectors.toList()); //Map to DTO
-        return imageDtos;
+        List<ImageInfoDTO> imageDTOS = imagesList.stream().map(imageMapper::infoToDTO).collect(Collectors.toList()); //Map to DTO
+        return imageDTOS;
     }
 
     //Delete image by {id}
@@ -117,31 +117,40 @@ public class ImageServiceImpl implements ImageService {
     }
 
     //Get image by {name}
-    public Image get(String name) {
-        return imageRepo.findByName(name)
+    private Image get(String name) {
+        Image imageData = imageRepo.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
+
+        return new Image(imageData.getImage(), imageData.getType());
+    }
+
+    private Image getImageData(String name) {
+        IImage imageData = imageRepo.findImageByName(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
+
+        return new Image(imageData.getImage(), imageData.getType());
     }
 
     //Save image to database
     @Transactional
     public Image save(BufferedImage bufferedImage, String fileName, String contentType) throws ImageResizerException {
         try {
-            Image image = imageRepo.findByName(fileName).orElse( //Create image row if not already exists
+            Image image = imageRepo.findByName(fileName).orElse( //Create new image if not already exists
                     Image.builder()
                             .name(fileName)
                             .type(contentType)
                             .image(null)
-                            .build());
+                            .build()
+            );
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(bufferedImage, contentType.split("/")[1], baos);
             byte[] bytes = baos.toByteArray();
 
             image.setImage(bytes); //Set image data
-            imageRepo.save(image); //Save to database
-            return image;
+            return imageRepo.save(image); //Save to database
         } catch (IOException e) {
-            throw new ImageResizerException(HttpStatus.EXPECTATION_FAILED, "Resized image could not be saved.");
+            throw new ImageResizerException("Resized image could not be saved!", e);
         }
     }
 
@@ -151,17 +160,17 @@ public class ImageServiceImpl implements ImageService {
         if (!type.equalsIgnoreCase(ImageSize.ORIGINAL.toString())) {
             try {
                 // Get image from database if it is already resized.
-                return get(getResizedFileName(reference, type));
-            } catch (ResourceNotFoundException exception) {
+                return getImageData(getResizedFileName(reference, type));
+            } catch (ResourceNotFoundException e) {
                 // Resize image, store it and return it.
                 return resizeAndSave(reference, type);
             }
         } else {
             try {
                 // Return original.
-                return get(reference);
-            } catch (ResourceNotFoundException exception) {
-                throw new ImageResizerException(HttpStatus.NOT_FOUND, "The original image could not be found.");
+                return getImageData(reference);
+            } catch (ResourceNotFoundException e) {
+                throw new ImageResizerException("The original image could not be found!", e);
             }
         }
     }
@@ -172,15 +181,16 @@ public class ImageServiceImpl implements ImageService {
             Image image = get(reference); //Get original image
             BufferedImage resizedBi = getResizedImage(image.getImage(), type); //Resize it
 
-            Image resizedImage = save(resizedBi, getResizedFileName(reference, type), image.getType()); //Store in database
+            //Save to database
+            Image resizedImage = this.save(resizedBi, getResizedFileName(reference, type), image.getType());
 
             //Set parent image for cascade
             resizedImage.setParent(image);
             imageRepo.save(resizedImage);
 
             return resizedImage;
-        } catch (ResourceNotFoundException exception) {
-            throw new ImageResizerException(HttpStatus.NOT_FOUND, "The original image could not be found.");
+        } catch (ResourceNotFoundException e) {
+            throw new ImageResizerException("The original image could not be found!", e);
         }
     }
 
@@ -193,7 +203,7 @@ public class ImageServiceImpl implements ImageService {
         } else if (type.equalsIgnoreCase(ImageSize.MEDIUM.toString())) {
             size = medSize;
         } else {
-            throw new ImageResizerException(HttpStatus.INTERNAL_SERVER_ERROR, "Configuration is not available: " + type);
+            throw new ImageResizerException("Configuration is not available: " + type);
         }
 
         try {
@@ -202,7 +212,7 @@ public class ImageServiceImpl implements ImageService {
                     Scalr.Mode.AUTOMATIC,
                     size); // Size base on type
         } catch (Exception e) {
-            throw new ImageResizerException(HttpStatus.EXPECTATION_FAILED, "Image could not be resized to type: " + e.getMessage());
+            throw new ImageResizerException("Image could not be resized to type: " + e.getMessage(), e);
         }
     }
 
@@ -215,7 +225,7 @@ public class ImageServiceImpl implements ImageService {
             BufferedImage resizedImage = resize(bufferedImage, type);
             return resizedImage;
         } catch (IOException e) {
-            throw new ImageResizerException(HttpStatus.BAD_REQUEST, "Could not read the original image!");
+            throw new ImageResizerException("Could not read the original image!" + e.getMessage(), e);
         }
     }
 

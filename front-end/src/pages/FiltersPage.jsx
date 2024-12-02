@@ -51,8 +51,8 @@ const DEFAULT_FILTERS = {
     rating: 0,
 }
 const DEFAULT_PAGINATION = {
-    currPage: 0,
-    pageSize: 24,
+    number: 0,
+    size: 24,
     totalPages: 0,
     sortBy: sortBy[0].value,
     sortDir: "desc",
@@ -64,7 +64,7 @@ const createCrumbs = (cate) => {
         return ([
             createCrumbs(cate?.parent),
             <NavLink to={`/store/${cate?.slug}?cate=${cate?.id}`} end key={`crumb-${cate?.id}`}>
-                {cate?.categoryName}
+                {cate?.name}
             </NavLink>
         ])
     }
@@ -99,8 +99,8 @@ const FiltersPage = () => {
         rating: searchParams.get("rating") ?? DEFAULT_FILTERS.rating,
     })
     const [pagination, setPagination] = useState({
-        currPage: searchParams.get("pNo") ? searchParams.get("pNo") - 1 : DEFAULT_PAGINATION.currPage,
-        pageSize: searchParams.get("pSize") ?? DEFAULT_PAGINATION.pageSize,
+        number: searchParams.get("pNo") ? searchParams.get("pNo") - 1 : DEFAULT_PAGINATION.number,
+        size: searchParams.get("pSize") ?? DEFAULT_PAGINATION.size,
         totalPages: DEFAULT_PAGINATION.totalPages,
         sortBy: searchParams.get("sort") ?? DEFAULT_PAGINATION.sortBy,
         sortDir: searchParams.get("dir") ?? DEFAULT_PAGINATION.sortDir,
@@ -113,8 +113,8 @@ const FiltersPage = () => {
         { skip: (!filters.cate.id || !filters.cate.slug) }
     );
     const { data, isLoading, isFetching, isUninitialized, isSuccess, isError, error } = useGetBooksQuery({ //Books
-        page: pagination.currPage,
-        size: pagination.pageSize,
+        page: pagination.number,
+        size: pagination.size,
         sortBy: pagination.sortBy,
         sortDir: pagination.sortDir,
         amount: pagination.amount,
@@ -135,9 +135,9 @@ const FiltersPage = () => {
         if (data && !isLoading && isSuccess) {
             setPagination({
                 ...pagination,
-                currPage: data.info.currPage,
-                pageSize: data.info.pageSize,
-                totalPages: data.info.totalPages
+                number: data.page.number,
+                size: data.page.size,
+                totalPages: data.page.totalPages
             });
         }
     }, [data])
@@ -155,12 +155,12 @@ const FiltersPage = () => {
     //Handle change
     const scrollToTop = useCallback(() => { scrollRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, [])
     const handleChangePage = useCallback((page) => {
-        setPagination(prev => ({ ...prev, currPage: page - 1 }));
+        setPagination(prev => ({ ...prev, number: page - 1 }));
         scrollToTop();
     }, [])
     const handleChangeOrder = useCallback((newValue) => { setPagination(prev => ({ ...prev, sortBy: newValue })); }, [])
     const handleChangeDir = useCallback((newValue) => { setPagination(prev => ({ ...prev, sortDir: newValue })); }, [])
-    const handleChangeSize = useCallback((newValue) => { setPagination(prev => ({ ...prev, pageSize: newValue })); }, [])
+    const handleChangeSize = useCallback((newValue) => { setPagination(prev => ({ ...prev, size: newValue })); }, [])
     const handleChangeAmount = useCallback((newValue) => { setPagination(prev => ({ ...prev, amount: newValue })); }, [])
 
     //Search params
@@ -175,8 +175,8 @@ const FiltersPage = () => {
         filters.rating == DEFAULT_FILTERS.rating ? searchParams.delete("rating") : searchParams.set("rating", filters.rating);
 
         //Pagination
-        pagination.currPage == DEFAULT_PAGINATION.currPage ? searchParams.delete("pNo") : searchParams.set("pNo", pagination.currPage + 1);
-        pagination.pageSize == DEFAULT_PAGINATION.pageSize ? searchParams.delete("pSize") : searchParams.set("pSize", pagination.pageSize);
+        pagination.number == DEFAULT_PAGINATION.number ? searchParams.delete("pNo") : searchParams.set("pNo", pagination.number + 1);
+        pagination.size == DEFAULT_PAGINATION.size ? searchParams.delete("pSize") : searchParams.set("pSize", pagination.size);
         pagination.sortBy == DEFAULT_PAGINATION.sortBy ? searchParams.delete("sort") : searchParams.set("sort", pagination.sortBy);
         pagination.sortDir == DEFAULT_PAGINATION.sortDir ? searchParams.delete("dir") : searchParams.set("dir", pagination.sortDir);
         pagination.amount == DEFAULT_PAGINATION.amount ? searchParams.delete("amount") : searchParams.set("amount", pagination.amount);

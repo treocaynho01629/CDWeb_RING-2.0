@@ -5,9 +5,9 @@ import { isEqual } from 'lodash-es';
 const reviewsAdapter = createEntityAdapter({});
 const reviewsSelector = reviewsAdapter.getSelectors();
 const initialState = reviewsAdapter.getInitialState({
-    info: {
-        currPage: 0,
-        pageSize: 0,
+  page: {
+        number: 0,
+        size: 0,
         totalElements: 0,
         totalPages: 0,
     },
@@ -37,15 +37,10 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 }
             },
             transformResponse: responseData => {
-                const { number, size, totalElements, totalPages, content } = responseData;
+                const { content, page } = responseData;
                 return reviewsAdapter.setAll({
-                    ...initialState,
-                    info: {
-                        currPage: number,
-                        pageSize: size,
-                        totalElements,
-                        totalPages
-                    }
+                        ...initialState,
+                    page
                 }, content)
             },
             providesTags: (result, error, arg) => {
@@ -86,15 +81,10 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 }
             },
             transformResponse: responseData => {
-                const { number, size, totalElements, totalPages, content } = responseData;
+                const { content, page } = responseData;
                 return reviewsAdapter.setAll({
-                    ...initialState,
-                    info: {
-                        currPage: number,
-                        pageSize: size,
-                        totalElements,
-                        totalPages
-                    }
+                        ...initialState,
+                    page
                 }, content)
             },
             providesTags: (result, error, arg) => {
@@ -126,15 +116,10 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 }
             },
             transformResponse: responseData => {
-                const { number, size, totalElements, totalPages, content } = responseData;
+                const { content, page } = responseData;
                 return reviewsAdapter.setAll({
-                    ...initialState,
-                    info: {
-                        currPage: number,
-                        pageSize: size,
-                        totalElements,
-                        totalPages
-                    }
+                        ...initialState,
+                    page
                 }, content)
             },
             serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {

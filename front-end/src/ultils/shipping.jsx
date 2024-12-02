@@ -1,16 +1,8 @@
 import { LocalShippingOutlined, RocketLaunchOutlined, SavingsOutlined } from "@mui/icons-material";
 
-export const getShippingType = ['ECONOMY', 'STANDARD', 'EXPRESS'];
+export const shippingType = ['STANDARD', 'ECONOMY', 'EXPRESS'];
 
 export const shippingItems = [
-    {
-        value: 'ECONOMY',
-        label: 'Nhà riêng',
-        description: '5-7 ngày giao hàng',
-        price: '-8,000đ',
-        color: 'success',
-        icon: <SavingsOutlined/>
-    },
     {
         value: 'STANDARD',
         label: 'Tiêu chuẩn',
@@ -18,6 +10,14 @@ export const shippingItems = [
         price: '10,000đ',
         color: '',
         icon: <LocalShippingOutlined/>
+    },
+    {
+        value: 'ECONOMY',
+        label: 'Tiết kiệm',
+        description: '5-7 ngày giao hàng',
+        price: '-8,000đ',
+        color: 'success',
+        icon: <SavingsOutlined/>
     },
     {
         value: 'EXPRESS',

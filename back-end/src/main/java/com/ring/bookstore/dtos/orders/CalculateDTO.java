@@ -1,6 +1,6 @@
 package com.ring.bookstore.dtos.orders;
 
-import com.ring.bookstore.model.Coupon;
+import com.ring.bookstore.dtos.coupons.CouponDTO;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ public record CalculateDTO(Double total,
                            Double dealDiscount,
                            Double couponDiscount,
                            Double shippingDiscount,
-                           Coupon coupon,
+                           CouponDTO coupon,
                            List<CalculateDetailDTO> details) {
 
 }

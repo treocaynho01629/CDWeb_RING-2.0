@@ -219,7 +219,7 @@ const PreviewDetailRow = ({ id, index, shop, coupon, couponDiscount, handleOpenD
                             {coupon
                                 ? couponDiscount
                                     ? `Đã giảm ${couponDiscount.toLocaleString()}đ`
-                                    : `Mua thêm để giảm ${coupon?.detail.discount * 100}% - giảm tối đa ${coupon?.detail.maxDiscount.toLocaleString()}đ`
+                                    : `Mua thêm để giảm ${coupon?.discount * 100}% - giảm tối đa ${coupon?.maxDiscount.toLocaleString()}đ`
                                 : 'Thêm mã giảm giá'
                             }
                         </span>

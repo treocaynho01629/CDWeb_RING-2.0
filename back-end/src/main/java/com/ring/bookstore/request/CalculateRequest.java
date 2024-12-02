@@ -2,6 +2,7 @@ package com.ring.bookstore.request;
 
 import com.ring.bookstore.enums.ShippingType;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ import java.util.List;
 public class CalculateRequest {
 	
 	@NotNull(message = "Giỏ hàng không được trống!")
+	@NotEmpty(message = "Giỏ hàng không được trống!")
 	private List<CartDetailRequest> cart;
 
 	private String coupon;
@@ -24,5 +26,5 @@ public class CalculateRequest {
 	private ShippingType shippingType;
 
 	@Valid
-	private AddressRequest addressRequest;
+	private AddressRequest address;
 }

@@ -5,7 +5,7 @@ import { EMAIL_REGEX } from '../../ultils/regex';
 import { Instruction } from '../custom/GlobalComponents';
 import { AuthForm, AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
 
-const ForgotTab = () => {
+const ForgotTab = ({ pending, setPending }) => {
     //Initial value
     const [email, setEmail] = useState('');
     const [validEmail, setValidEmail] = useState(false);
