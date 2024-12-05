@@ -1,11 +1,12 @@
 import { apiSlice } from "../../app/api/apiSlice";
-import { setAuth, logOut } from "./authReducer";
+import { setAuth, clearAuth } from "./authReducer";
+import { Cookies } from 'react-cookie';
 
 export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         authenticate: builder.mutation({
-            query: credentials => ({
-                url: '/api/auth/authenticate',
+            query: ({ credentials, persist }) => ({
+                url: `/api/auth/authenticate?persist=${persist}`,
                 method: 'POST',
                 body: { ...credentials }
             })
@@ -20,9 +21,8 @@ export const authApiSlice = apiSlice.injectEndpoints({
                     const { data } = await queryFulfilled;
                     const { token } = data;
                     if (token) dispatch(setAuth({ token })) //Reauth
-                } catch (err) {
-                    dispatch(logOut());
-                    console.error(err)
+                } catch (error) {
+                    console.error(error);
                 }
             }
         }),
@@ -58,18 +58,29 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 { type: 'User', id: "LIST" }
             ]
         }),
-        signout: builder.mutation({
+        signOut: builder.mutation({
             query: () => ({
                 url: '/api/auth/logout',
                 method: 'DELETE',
             }),
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                try { //To delete cookie
+                    await queryFulfilled;
+                    console.log('Logged out');
+                } catch (error) {
+                    console.error(error);
+                } finally { //Clear auth anyway to prevent refresh loop
+                    dispatch(clearAuth()); //Reset auth state
+                    dispatch(apiSlice.util.resetApiState()); //Reset redux
+                }
+            }
         }),
     })
 })
 
 export const {
     useAuthenticateMutation,
-    useSignoutMutation,
+    useSignOutMutation,
     useRegisterMutation,
     useForgotMutation,
     useResetMutation,

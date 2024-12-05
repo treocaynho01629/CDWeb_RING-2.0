@@ -1,7 +1,6 @@
 package com.ring.bookstore.repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -17,15 +16,14 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	
 	boolean existsByUsername(String username); //Check exists Account by {username}
 
-	//FIX later (too much columns)
 	@Query("""
-		select a from Account a left join fetch a.profile p join fetch a.roles r
+		select a from Account a join fetch a.roles r
 		where a.username = :username
 	""")
 	Optional<Account> findByUsername(String username); //Get Account by {username}
-	
+
 	List<Account> findByEmail(String email); //Get Account by {email}
-	
+
 	Optional<Account> findByResetPassToken(String resetPassToken); //Get Account by {resetPassToken}
 	
 	@Query("""

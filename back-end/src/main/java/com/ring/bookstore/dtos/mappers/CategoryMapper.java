@@ -19,18 +19,18 @@ public class CategoryMapper {
         return new CategoryDTO(category.getId(),
                 category.getSlug(),
                 category.getName(),
-                category.getParentId());
+                category.getParent().getId());
     }
 
     public CategoryDTO cateToCateDTO(Category category, String include) {
         List<CategoryDTO> children = null;
         CategoryDTO parent = null;
+        Category parentCate = category.getParent();
 
         //Include?
         if (include == null) return this.cateToCateDTO(category);
         if (include.equalsIgnoreCase("parent")){
-            Category parentCate = category.getParent();
-            parent = parentCate != null ? this.cateToCateDTO(category.getParent(), "parent") : null;
+            parent = parentCate != null ? this.cateToCateDTO(parentCate, "parent") : null;
         } else if (include.equalsIgnoreCase("children")) {
             children = category.getSubCates()
                     .stream()
@@ -41,7 +41,7 @@ public class CategoryMapper {
         return new CategoryDTO(category.getId(),
                 category.getSlug(),
                 category.getName(),
-                category.getParentId(),
+                parentCate != null ? parentCate.getId() : null,
                 parent,
                 children);
     }
@@ -51,18 +51,18 @@ public class CategoryMapper {
                 category.getSlug(),
                 category.getName(),
                 category.getDescription(),
-                category.getParentId());
+                category.getParent() != null ? category.getParent().getId() : null);
     }
 
     public CategoryDetailDTO cateToDetailDTO(Category category, String include) {
         List<CategoryDTO> children = null;
         CategoryDTO parent = null;
+        Category parentCate = category.getParent();
 
         //Include?
         if (include == null) return this.cateToDetailDTO(category);
         if (include.equalsIgnoreCase("parent")){
-            Category parentCate = category.getParent();
-            parent = parentCate != null ? this.cateToCateDTO(category.getParent(), "parent") : null;
+            parent = parentCate != null ? this.cateToCateDTO(parentCate, "parent") : null;
         } else if (include.equalsIgnoreCase("children")) {
             children = category.getSubCates()
                     .stream()
@@ -74,7 +74,7 @@ public class CategoryMapper {
                 category.getSlug(),
                 category.getName(),
                 category.getDescription(),
-                category.getParentId(),
+                parentCate != null ? parentCate.getId() : null,
                 parent,
                 children);
     }
@@ -92,7 +92,7 @@ public class CategoryMapper {
 
         return new PreviewCategoryDTO(category.getId(),
                 category.getSlug(),
-                category.getParentId(),
+                category.getParent() != null ? category.getParent().getId() : null,
                 category.getName(),
                 fileDownloadUri);
     }

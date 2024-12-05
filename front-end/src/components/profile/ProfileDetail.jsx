@@ -272,7 +272,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                             <InfoStack><InfoStackContainer>
                                 {loading
                                     ?
-                                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width="30%" />
+                                    <Skeleton variant="text" sx={{ fontSize: '16px' }} width={120} />
                                     :
                                     <InfoText>{username}</InfoText>
                                 }
@@ -309,7 +309,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                                 <InfoStackContainer>
                                     {loading
                                         ?
-                                        <Skeleton variant="text" sx={{ fontSize: '16px' }} width="40%" />
+                                        <Skeleton variant="text" sx={{ fontSize: '16px' }} width={110} />
                                         :
                                         <InfoText>{profile?.email.replace(/(\w{3})[\w.-]+@([\w.]+\w)/, "$1***@$2")}</InfoText>
                                     }
@@ -322,7 +322,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                                 <InfoStackContainer>
                                     {loading
                                         ?
-                                        <Skeleton variant="rectangular" height={40} width={'100%'} />
+                                        <Skeleton variant="rectangular" height={40} width="100%" />
                                         :
                                         <TextField
                                             required

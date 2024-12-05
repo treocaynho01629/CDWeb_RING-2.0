@@ -2,6 +2,7 @@ package com.ring.bookstore.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,15 +24,17 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfig { //Security config
 	
 	private final JwtAuthenticationFilter jwtAuthFilter;
-	private final LogoutHandler logoutHandler;
 	private final ChainExceptionHandlerFilter chainExceptionHandlerFilter;
 	private final CorsConfigurationSource corsConfigurationSource;
+	private final LogoutHandler logoutHandler;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable)
 			.cors(corsConfig -> corsConfig.configurationSource(corsConfigurationSource))
 	        .authorizeHttpRequests(authorize -> authorize
+					.requestMatchers(HttpMethod.GET)
+					.permitAll()
 					.requestMatchers(
 							"/api/auth/**",
 							"/api/v1/**",
@@ -63,11 +66,11 @@ public class SecurityConfig { //Security config
 	        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 	        .addFilterBefore(chainExceptionHandlerFilter, JwtAuthenticationFilter.class)
 	        .logout(logout -> logout
+					.logoutRequestMatcher(new AntPathRequestMatcher("/api/auth/logout"))
+					.addLogoutHandler(logoutHandler)
 					.invalidateHttpSession(true)
 					.clearAuthentication(true)
-					.logoutRequestMatcher(new AntPathRequestMatcher("/api/auth/logout"))
 					.deleteCookies("refreshToken")
-					.addLogoutHandler(logoutHandler)
 					.logoutSuccessHandler((request, response, authentication)
 							-> SecurityContextHolder.clearContext())
 					.permitAll()

@@ -1,5 +1,4 @@
 import './App.css';
-import { useEffect } from 'react';
 import { createBrowserRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import useReachable from './hooks/useReachable';
@@ -10,13 +9,13 @@ import PersistLogin from './components/authorize/PersistsLogin';
 import FallbackLogo from './components/layout/FallbackLogo';
 
 function App() {
-  useEffect(() => { useReachable() }, []); //Test connection to server
+  useReachable(); //Test connection to server
 
   const router = createBrowserRouter([
     {
       path: "/",
       element: <Layout />,
-      hydrateFallbackElement: <FallbackLogo/>,
+      hydrateFallbackElement: <FallbackLogo />,
       children: [
         {
           path: "reset/:token?",
@@ -40,15 +39,15 @@ function App() {
           },
         },
         {
+          path: "auth/:tab",
+          lazy: async () => {
+            let AuthPage = await import("./pages/AuthPage")
+            return { Component: AuthPage.default }
+          },
+        },
+        {
           element: <PersistLogin />,
           children: [
-            {
-              path: "auth/:tab",
-              lazy: async () => {
-                let AuthPage = await import("./pages/AuthPage")
-                return { Component: AuthPage.default }
-              },
-            },
             {
               element: <PageLayout />,
               children: [

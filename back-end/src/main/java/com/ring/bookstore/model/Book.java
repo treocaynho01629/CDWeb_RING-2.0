@@ -113,13 +113,6 @@ public class Book extends Auditable {
     @JsonIgnore
     private List<OrderItem> orderItems;
 
-    public Long getImageId() {
-        return (this.image != null) ? this.image.getId() : null;
-    }
-    public Long getShopId() {
-        return (this.shop != null) ? this.shop.getId() : null;
-    }
-
     public void addReview(Review review) {
         bookReviews.add(review);
         review.setBook(this);

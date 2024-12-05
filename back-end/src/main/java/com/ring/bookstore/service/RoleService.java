@@ -12,5 +12,4 @@ public interface RoleService {
 	
     Optional<Role> findByRoleName(RoleName roleName);
     void save(Role role);
-    long count();
 }

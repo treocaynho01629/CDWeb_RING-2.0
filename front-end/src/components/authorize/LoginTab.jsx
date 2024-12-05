@@ -1,8 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Stack, Button, FormControlLabel, Checkbox, TextField } from '@mui/material';
 import { useNavigate, useLocation, Link } from 'react-router';
-import { useCookies } from 'react-cookie';
-import { jwtDecode } from 'jwt-decode';
 import { useDispatch } from 'react-redux';
 import { setAuth, setPersist } from '../../features/auth/authReducer';
 import { useAuthenticateMutation } from '../../features/auth/authApiSlice';
@@ -16,28 +14,22 @@ import useLogout from '../../hooks/useLogout';
 const LoginTab = ({ pending, setPending }) => {
     const dispatch = useDispatch();
     const { persist, username: loginedUser } = useAuth(); //Is user logged in
-    const [authenticate, { isLoading }] = useAuthenticateMutation();
-    const logout = useLogout();
+    const [authenticate, { isLoading, isSuccess, isUninitialized }] = useAuthenticateMutation();
+    const signOut = useLogout();
 
     //Router
     const navigate = useNavigate();
     const location = useLocation();
-    const from = location.state?.from?.pathname || "/";
+    const from = location.state?.from?.pathname || '/';
     const errRef = useRef();
 
     //Login value
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [currPersist, setCurrPersist] = useState(false);
-    const [cookies, setCookie] = useCookies(['refreshToken']);
+    const [currPersist, setCurrPersist] = useState(true);
 
     //Error
-    const [errMsgLogin, setErrMsgLogin] = useState(location.state?.errorMsg ?? '');
-
-    //Error message reset when reinput stuff
-    useEffect(() => {
-        setErrMsgLogin('');
-    }, [username, password])
+    const [errMsg, setErrMsg] = useState(location.state?.errorMsg || '');
 
     const togglePersist = () => { setCurrPersist(prev => !prev) } //Toggle persist
 
@@ -49,19 +41,18 @@ const LoginTab = ({ pending, setPending }) => {
         setPending(true);
         const { enqueueSnackbar } = await import('notistack');
 
-        authenticate({ username, pass: password }).unwrap()
+        authenticate({
+            persist: currPersist,
+            credentials: { username, pass: password }
+        }).unwrap()
             .then((data) => {
-                const { token, refreshToken } = data;
+                const { token } = data;
 
                 //Store access token to auth
                 dispatch(setAuth({ token }));
 
-                if (currPersist) { //Set refresh token on cookie
-                    dispatch(setPersist({ persist: true })); //Set persist in state
-                    const refreshTokenData = jwtDecode(refreshToken);
-                    const expires = new Date(0);
-                    expires.setUTCSeconds(refreshTokenData.exp);
-                    setCookie('refreshToken', refreshToken, { path: '/', expires });
+                if (currPersist) { //Set persist in state to refresh token
+                    dispatch(setPersist({ persist: true }));
                 }
 
                 //Queue snack
@@ -72,13 +63,13 @@ const LoginTab = ({ pending, setPending }) => {
             .catch((err) => {
                 console.error(err);
                 if (!err?.status) {
-                    setErrMsgLogin('Server không phản hồi');
+                    setErrMsg('Server không phản hồi');
                 } else if (err?.status === 404 || err?.status === 403 || err?.status === 400) {
-                    setErrMsgLogin('Sai tên tài khoản hoặc mật khẩu!');
+                    setErrMsg('Sai tên tài khoản hoặc mật khẩu!');
                 } else if (err?.status === 429) {
-                    setErrMsgLogin('Bạn đã thử quá nhiều lần, vui lòng thử lại sau!');
+                    setErrMsg('Bạn đã thử quá nhiều lần, vui lòng thử lại sau!');
                 } else {
-                    setErrMsgLogin('Đăng nhập thất bại');
+                    setErrMsg('Đăng nhập thất bại');
                 }
                 errRef.current.focus();
                 setPending(false);
@@ -86,13 +77,13 @@ const LoginTab = ({ pending, setPending }) => {
     }
 
     return (
-        (persist || loginedUser) ?
+        (isUninitialized && (persist || loginedUser)) ?
             <div>
                 <AuthTitle>Xin chào {loginedUser}</AuthTitle>
                 <Button
                     color="error"
                     size="large"
-                    onClick={logout}
+                    onClick={() => signOut()}
                     startIcon={<Logout />}
                 >
                     Kết thúc phiên đăng nhập?
@@ -104,9 +95,10 @@ const LoginTab = ({ pending, setPending }) => {
                     <AuthTitle>Đăng nhập tài khoản</AuthTitle>
                     <Stack spacing={1.5} direction="column">
                         <Instruction ref={errRef}
-                            display={errMsgLogin ? "block" : "none"}
-                            aria-live="assertive">
-                            {errMsgLogin}
+                            display={errMsg ? "block" : "none"}
+                            aria-live="assertive"
+                        >
+                            {errMsg}
                         </Instruction>
                         <TextField
                             label="Tên đăng nhập"
@@ -139,7 +131,7 @@ const LoginTab = ({ pending, setPending }) => {
                             </Link>
                         </AuthActionContainer>
                         <ConfirmButton
-                            disabled={isLoading}
+                            disabled={isLoading || isSuccess}
                             variant="contained"
                             color="primary"
                             size="large"

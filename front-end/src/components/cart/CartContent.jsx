@@ -170,7 +170,7 @@ const CartContent = () => {
 
     //#region construct
     useDeepEffect(() => {
-        if (!selected.length || !cartProducts?.length || cartProducts.length == 0) {
+        if (isLoading || !selected.length || !cartProducts?.length || cartProducts.length == 0) {
             handleCalculate.cancel();
         }
         handleCartChange();

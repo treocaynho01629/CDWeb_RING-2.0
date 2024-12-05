@@ -47,8 +47,4 @@ public class Publisher {
             fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Book> publisherBooks;
-
-    public Long getImageId() {
-        return (this.image != null) ? this.image.getId() : null;
-    }
 }

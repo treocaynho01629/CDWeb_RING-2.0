@@ -153,7 +153,7 @@ public class OrderServiceImpl implements OrderService {
                     //Validation
                     Book book = books.get(item.getId());
 
-                    if (book == null || !book.getShopId().equals(shop.getId())) {
+                    if (book == null || !book.getShop().getId().equals(shop.getId())) {
                         //Create temp item
                         var orderItem = OrderItem.builder()
                                 .book(Book.builder().id(item.getId()).build())
@@ -186,7 +186,7 @@ public class OrderServiceImpl implements OrderService {
                         : (couponRepo.recommendCoupon(shop.getId(), detailTotal - discountDeal, detailQuantity)
                         .orElse(null));
                 if (shopCoupon != null
-                        && shopCoupon.getShopId().equals(shop.getId())
+                        && shopCoupon.getShop().getId().equals(shop.getId())
                         && !couponService.isExpired(shopCoupon)) {
                     //Apply coupon (must use price with deal discount)
                     CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(shopCoupon,
@@ -395,7 +395,7 @@ public class OrderServiceImpl implements OrderService {
                     //Validation
                     Book book = books.get(item.getId());
 
-                    if (book == null || !book.getShopId().equals(shop.getId())) {
+                    if (book == null || !book.getShop().getId().equals(shop.getId())) {
                         throw new ResourceNotFoundException("Book not found!");
                     } else {
                         short quantity = item.getQuantity();
@@ -444,7 +444,7 @@ public class OrderServiceImpl implements OrderService {
                 if (shopCoupon == null) throw new ResourceNotFoundException("Coupon not found!");
 
                 if (shopCoupon != null
-                        && shopCoupon.getShopId().equals(shop.getId())
+                        && shopCoupon.getShop().getId().equals(shop.getId())
                         && !couponService.isExpired(shopCoupon)) {
                     //Apply coupon (must use price with deal discount)
                     CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(shopCoupon,

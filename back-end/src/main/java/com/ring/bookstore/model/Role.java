@@ -28,4 +28,14 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles")
     private Collection<Account> users;
+
+    public void addUser(Account user) {
+        this.users.add(user);
+        user.getRoles().add(this);
+    }
+
+    public void removeUser(Account user) {
+        this.users.add(user);
+        user.getRoles().remove(this);
+    }
 }

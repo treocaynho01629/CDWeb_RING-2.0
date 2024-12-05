@@ -16,7 +16,6 @@ public class AccountDetailMapper implements Function<Account, AccountDetailDTO> 
 
     @Override
     public AccountDetailDTO apply(Account user) {
-
         //Initial
         String name = "";
         String phone = "";

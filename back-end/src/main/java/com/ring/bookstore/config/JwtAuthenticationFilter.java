@@ -11,6 +11,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ring.bookstore.service.impl.JwtService;
@@ -23,11 +24,13 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter { //JWT authen
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final RequestMatcher ignoredPaths = new AntPathRequestMatcher("/api/auth/**");
+    private final RequestMatcher ignoredPaths = new AntPathRequestMatcher(
+            "/api/auth/**"
+    );
 
     @Override
     protected void doFilterInternal(
@@ -35,25 +38,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //JWT authen
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        //Ignore some paths
-        if (this.ignoredPaths.matches(request)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         //Get bearer authentication from HttpRequest
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String username;
+        final String jwt = parseJwt(request);
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) { //Null || not Bearer >> cancel
+        //Ignore some paths or no token
+        if (jwt == null || this.ignoredPaths.matches(request)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwt = authHeader.substring(7); //After "Bearer "
+        //Parse & return error
         try {
-            username = jwtService.extractUsername(jwt); //Extract username from JWT
+            jwtService.validateToken(jwt);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); //Not exists >> throw error
             response.getWriter().write(e.getMessage());
@@ -61,7 +58,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //JWT authen
             return;
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) { //Check user exists or not & their roles
+        //Set authentication
+        final String username = jwtService.extractUsername(jwt);
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
             if (jwtService.isTokenValid(jwt, userDetails)) { //Check valid JWT
@@ -81,4 +81,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //JWT authen
         filterChain.doFilter(request, response);
     }
 
+    private String parseJwt(HttpServletRequest request) {
+        String headerAuth = request.getHeader("Authorization");
+        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+            return headerAuth.substring(7, headerAuth.length());
+        }
+        return null;
+    }
 }

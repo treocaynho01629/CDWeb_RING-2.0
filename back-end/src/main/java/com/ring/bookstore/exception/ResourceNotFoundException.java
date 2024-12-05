@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 @Getter
 @ResponseStatus(code = HttpStatus.NOT_FOUND)
-public class ResourceNotFoundException extends RuntimeException{
+public class ResourceNotFoundException extends RuntimeException {
 	
     private final String error;
     private String message;

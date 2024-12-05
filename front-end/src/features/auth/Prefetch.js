@@ -10,12 +10,12 @@ const defaultSize = 8;
 
 const Prefetch = () => {
 
-    useEffect(() => {
-        store.dispatch(usersApiSlice.util.prefetch("getUsers", { 
-            page: 1, 
-            size: defaultSize
-        }, { force: true }));
-    }, [])
+    // useEffect(() => {
+    //     store.dispatch(usersApiSlice.util.prefetch("getUsers", { 
+    //         page: 1, 
+    //         size: defaultSize
+    //     }, { force: true }));
+    // }, [])
 
     return <Outlet />
 }

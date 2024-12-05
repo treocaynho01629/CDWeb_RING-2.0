@@ -36,6 +36,6 @@ public class CouponMapper implements Function<Coupon, CouponDTO> {
                 condition,
                 detail.getUsage(),
                 detail.getExpDate(),
-                coupon.getShopId());
+                coupon.getShop() != null ? coupon.getShop().getId() : null);
     }
 }

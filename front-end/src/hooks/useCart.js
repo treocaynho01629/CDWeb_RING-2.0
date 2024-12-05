@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { addAddress, addToCart, changeQuantity, decreaseQuantity, increaseQuantity, 
     removeItem, resetCart, selectAddresses, selectCartProducts, removeStateAddress, 
-    replaceInCart,
-    removeShopItem} from '../features/cart/cartReducer';
+    replaceInCart, removeShopItem
+} from '../features/cart/cartReducer';
 
 const useCart = () => {
     const dispatch = useDispatch();
