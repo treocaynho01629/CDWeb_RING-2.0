@@ -36,7 +36,7 @@ const LoadingProgress = () => {
 
     //Display when changing path
     useLayoutEffect(() => { start(); }, [pathname]);
-    useEffect(() => { done();  }, [pathname]);
+    useEffect(() => { done(); }, [pathname]);
 
     const setValue = useCallback((n) => {
         n = clamp(n, minimum, 100);
@@ -68,7 +68,7 @@ const LoadingProgress = () => {
 
     const done = useCallback((force) => {
         if (!force && !status.current) return this;
-        increase(30 + 50 * Math.random() * 100); //Quickly fill up then 100
+        increase(30 + 50 * Math.random() * 100); //Quickly fill up to 100
         return setValue(100);
     }, []);
 
@@ -79,16 +79,16 @@ const LoadingProgress = () => {
             return start();
         } else if (n > 100) {
             return;
-        } else { //Progressively faster
+        } else { //Progressively slower
             if (amount == null) {
                 if (n >= 0 && n < 20) { amount = 10; }
                 else if (n >= 20 && n < 50) { amount = 4; }
-                else if (n >= 50 && n < 80) { amount = 2; }
-                else if (n >= 80 && n < 99) { amount = 0.5; }
+                else if (n >= 50 && n < 74) { amount = 2; }
+                else if (n >= 74 && n < 84) { amount = 0.5; }
                 else { amount = 0; }
             }
 
-            n = clamp(n + amount, 0, 99.4); //Cap at 99.4
+            n = clamp(n + amount, 0, 84.4); //Cap at 99.4
             return setValue(n);
         }
     }, [])

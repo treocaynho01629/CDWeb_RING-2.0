@@ -29,10 +29,4 @@ public class RoleServiceImpl implements RoleService {
         roleRepo.save(role);
     }
 
-    //Count roles
-    @Override
-    public long count() {
-        return roleRepo.count();
-    }
-
 }

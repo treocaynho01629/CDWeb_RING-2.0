@@ -51,8 +51,4 @@ public class Coupon extends Auditable {
 
     @Transient
     private Boolean isUsable = false;
-
-    public Long getShopId() {
-        return (this.shop != null) ? this.shop.getId() : null;
-    }
 }

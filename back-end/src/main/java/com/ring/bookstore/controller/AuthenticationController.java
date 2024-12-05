@@ -2,9 +2,13 @@ package com.ring.bookstore.controller;
 
 import java.io.IOException;
 
+import com.ring.bookstore.model.AccountToken;
 import com.ring.bookstore.service.CaptchaService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +19,6 @@ import com.ring.bookstore.request.ResetPassRequest;
 import com.ring.bookstore.response.AuthenticationResponse;
 import com.ring.bookstore.service.impl.AuthenticationService;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -29,24 +32,43 @@ public class AuthenticationController {
 
 	//Register
 	@PostMapping("/register")
-	public ResponseEntity<AuthenticationResponse> register(@RequestBody @Valid RegisterRequest request) {
+	public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request) {
 //		String response = request.getParameter("response");
 //		captchaService.processResponse(response, CaptchaService.REGISTER_ACTION);
-		return ResponseEntity.ok(authService.register(request));
+		Account newUser = authService.register(request);
+		return ResponseEntity.ok("Đăng ký thành công!");
 	}
 
 	//Authenticate sign in
 	@PostMapping("/authenticate")
-	public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request) {
-		return ResponseEntity.ok(authService.authenticate(request));
+	public ResponseEntity<AuthenticationResponse> authenticate(
+			@RequestParam(value = "persist", defaultValue = "true") Boolean persist,
+			@RequestBody @Valid AuthenticationRequest request) {
+		//Generate new JWT & refresh token
+		Account auth = authService.authenticate(request);
+		String jwtToken = authService.generateToken(auth);
+
+		//Set refresh token
+		ResponseCookie refreshCookie;
+		if (persist) {
+			refreshCookie = authService.generateRefreshCookie(auth);
+		} else {
+			refreshCookie = authService.clearRefreshCookie();
+		}
+
+		return ResponseEntity.ok()
+				.header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+				.body(new AuthenticationResponse(jwtToken));
 	}
 
 	//Refresh JWT token
 	@GetMapping("/refresh-token")
-	public void refreshToken(HttpServletResponse response,
-							 @CookieValue(value = "refreshToken") String refreshToken)
-			throws IOException {
-		authService.refreshToken(response, refreshToken);
+	public ResponseEntity<AuthenticationResponse> refreshToken(HttpServletRequest request) {
+		//Generate new token
+		Account auth = authService.refreshToken(request);
+		String jwtToken = authService.generateToken(auth);
+
+		return ResponseEntity.ok().body(new AuthenticationResponse(jwtToken));
 	}
 	
 	//Send forgot password email

@@ -35,7 +35,7 @@ export default function DashboardNavbar({ open, setOpen }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const openProfile = Boolean(anchorEl);
   const navigate = useNavigate();
-  const logout = useLogout();
+  const signOut = useLogout();
 
   const handleClick = (event) => { setAnchorEl(event.currentTarget) };
   const handleClose = () => { setAnchorEl(null) };
@@ -131,7 +131,7 @@ export default function DashboardNavbar({ open, setOpen }) {
             </ListItemIcon>
             Trang chủ
           </MenuItem>
-          <MenuItem onClick={logout}>
+          <MenuItem onClick={() => signOut()}>
             <ListItemIcon>
               <Logout fontSize="small" />
             </ListItemIcon>

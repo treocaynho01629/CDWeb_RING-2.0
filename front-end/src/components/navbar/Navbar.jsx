@@ -269,7 +269,7 @@ const Navbar = () => {
     //Other
     const { username, image, roles } = useAuth();
     const navigate = useNavigate();
-    const logout = useLogout();
+    const signOut = useLogout();
 
     //Anchor for popoever & open state
     const [anchorElCart, setAnchorElCart] = useState(undefined);
@@ -362,7 +362,7 @@ const Navbar = () => {
                                         <Suspense fallback={<></>}>
                                             <NavDrawer {...{
                                                 openDrawer, username, roles, location,
-                                                products: cartProducts, logout, mode, toggleMode,
+                                                products: cartProducts, signOut, mode, toggleMode,
                                                 handleOpen: () => handleToggleDrawer(true),
                                                 handleClose: () => handleToggleDrawer(false)
                                             }} />
@@ -466,7 +466,7 @@ const Navbar = () => {
                                                         {anchorEl !== undefined &&
                                                             <ProfilePopover {...{
                                                                 open, anchorEl, handleClose: handleProfileClose,
-                                                                roles, logout, mode, toggleMode, image
+                                                                roles, signOut, mode, toggleMode, image
                                                             }} />
                                                         }
                                                     </Suspense>

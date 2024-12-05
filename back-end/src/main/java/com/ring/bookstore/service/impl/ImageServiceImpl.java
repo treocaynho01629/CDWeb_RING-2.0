@@ -96,7 +96,7 @@ public class ImageServiceImpl implements ImageService {
 
     //Get all images
     public List<ImageInfoDTO> getAllImages() {
-        List<IImageInfo> imagesList = imageRepo.findAllWithoutData();
+        List<IImageInfo> imagesList = imageRepo.findAllInfo();
         List<ImageInfoDTO> imageDTOS = imagesList.stream().map(imageMapper::infoToDTO).collect(Collectors.toList()); //Map to DTO
         return imageDTOS;
     }
@@ -125,7 +125,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     private Image getImageData(String name) {
-        IImage imageData = imageRepo.findImageByName(name)
+        IImage imageData = imageRepo.findDataByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
 
         return new Image(imageData.getImage(), imageData.getType());

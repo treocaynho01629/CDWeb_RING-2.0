@@ -106,7 +106,7 @@ const AddressItem = ({ onCheck, addressInfo, handleOpen, handleClick, selectedVa
         if (!addressInfo) return false;
 
         const { name, phone, address, city } = addressInfo;
-        let addressSplit = city.split(', ');
+        let addressSplit = city?.split(', ');
         let ward = addressSplit[addressSplit.length - 1];
         let currCity = '';
         if (addressSplit.length > 1) currCity = addressSplit[0];

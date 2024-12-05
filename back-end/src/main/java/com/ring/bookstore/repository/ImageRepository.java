@@ -18,12 +18,19 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
         select i.name as name, i.type as type from Image i
         where i.parent is null
     """)
-    List<IImageInfo> findAllWithoutData();
+    List<IImageInfo> findAllInfo();
+
+    @Query("""
+        select i.name as name, i.type as type from AccountProfile p
+        join p.image i
+        where p.id = :id
+    """)
+    Optional<IImageInfo> findInfoByProfileId(Long id);
 
     @Query("""
         select i.image as image, i.type as type from Image i where i.name = :name
     """)
-    Optional<IImage> findImageByName(String name); //Get image data by {name}
+    Optional<IImage> findDataByName(String name); //Get image data by {name}
 
     Optional<Image> findByName(String name); //Get image by {name}
 

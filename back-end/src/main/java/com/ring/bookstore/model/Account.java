@@ -1,6 +1,5 @@
 package com.ring.bookstore.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -67,10 +66,13 @@ public class Account extends Auditable implements UserDetails {
     @JsonIgnore
 	private LocalDateTime tokenCreationDate;
 
-    @OneToOne(cascade = CascadeType.ALL, 
-    		orphanRemoval = true, 
-    		mappedBy = "user")
-	@JsonManagedReference
+    @OneToOne(cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY,
+    		mappedBy = "user",
+    		orphanRemoval = true,
+			optional = false)
+	@PrimaryKeyJoinColumn
+	@JsonIgnore
     @EqualsAndHashCode.Exclude
 	private AccountProfile profile;
 
@@ -138,7 +140,7 @@ public class Account extends Auditable implements UserDetails {
 	public boolean isEnabled() {
 		return this.isActive();
 	}
-	
+
 	public void removeAllOrders() {
 		userOrderReceipts.forEach(order -> order.setUser(null));
         this.userOrderReceipts.clear();
@@ -148,6 +150,16 @@ public class Account extends Auditable implements UserDetails {
         userReviews.forEach(review -> review.setUser(null));
         this.userReviews.clear();
     }
+
+	public void addRole(Role role) {
+		this.roles.add(role);
+		role.getUsers().add(this);
+	}
+
+	public void removeRole(Role role) {
+		this.roles.add(role);
+		role.getUsers().remove(this);
+	}
 
 	public void removeAllRoles() {
         this.roles.clear();

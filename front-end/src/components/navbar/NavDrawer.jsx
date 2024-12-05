@@ -29,7 +29,7 @@ const DrawerContainer = styled(Box)`
 `
 //#endregion
 
-const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, roles, products, logout, mode, toggleMode }) => {
+const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, roles, products, signOut, mode, toggleMode }) => {
     const role = roles?.length;
 
     return (
@@ -141,7 +141,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                                 </ListItem>
                             }
                             <ListItem disablePadding>
-                                <ListItemButton onClick={() => logout()}>
+                                <ListItemButton onClick={() => signOut()}>
                                     <ListItemIcon>
                                         <Logout />
                                     </ListItemIcon>

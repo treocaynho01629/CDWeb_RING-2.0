@@ -158,12 +158,6 @@ public class AccountServiceImpl implements AccountService {
         //Get current profile
         AccountProfile profile = updatedAccount.getProfile();
 
-        //Create one if not exist
-        if (profile == null) {
-            profile = new AccountProfile();
-            profile.setUser(updatedAccount);
-        }
-
         //Set new profile info
         profile.setName(request.getName());
         profile.setPhone(request.getPhone());
@@ -223,13 +217,8 @@ public class AccountServiceImpl implements AccountService {
     //Update account's profile
     @Transactional
     public AccountProfile updateProfile(ProfileRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException {
-        AccountProfile profile = user.getProfile();
-
-        //Create one if not exists
-        if (profile == null) {
-            profile = new AccountProfile();
-            profile.setUser(user);
-        }
+        AccountProfile profile = profileRepo.findById(user.getProfile().getId()).orElseThrow(()
+            -> new ResourceNotFoundException("Profile not found!"));
 
         //Image upload/replace
         if (file != null) { //Contain new image >> upload/replace

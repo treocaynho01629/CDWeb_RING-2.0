@@ -75,7 +75,7 @@ public class PublisherServiceImpl implements PublisherService {
 
         //Image upload/replace
         if (file != null) { //Contain new image >> upload/replace
-            Long imageId = publisher.getImageId();
+            Long imageId = publisher.getImage().getId();
             if (imageId != null) imageService.deleteImage(imageId); //Delete old image
 
             Image savedImage = imageService.upload(file); //Upload new image

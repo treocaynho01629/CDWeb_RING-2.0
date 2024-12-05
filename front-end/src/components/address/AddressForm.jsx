@@ -14,7 +14,7 @@ const splitAddress = (addressInfo) => {
     if (addressInfo?.address) {
         //Split address
         address = addressInfo?.address;
-        let addressSplit = addressInfo?.city.split(', ');
+        let addressSplit = addressInfo?.city?.split(', ');
         ward = addressSplit[addressSplit.length - 1];
         if (addressSplit.length > 1) city = addressSplit[0];
     }

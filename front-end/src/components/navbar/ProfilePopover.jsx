@@ -2,7 +2,7 @@ import { Brightness3, Brightness7, DeliveryDiningOutlined, LockOutlined, Setting
 import { Avatar, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
 import { Link } from 'react-router';
 
-const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, mode, toggleMode }) => {
+const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mode, toggleMode }) => {
     const role = roles?.length;
 
     return (
@@ -88,7 +88,7 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, logout, mod
                             : mode === 'system' ? 'Theo hệ thống' : ''}
                 </MenuItem>
             }
-            <MenuItem onClick={() => logout()}>
+            <MenuItem onClick={() => signOut()}>
                 <ListItemIcon>
                     <LockOutlined fontSize="small" />
                 </ListItemIcon>

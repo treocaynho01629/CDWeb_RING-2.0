@@ -29,20 +29,14 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public List<AddressDTO> getMyAddresses(Account user) {
-        AccountProfile profile = user.getProfile();
-        if (profile == null) return null;
-
-        List<IAddress> addresses = addressRepo.findAddressesByProfile(profile.getId());
+        List<IAddress> addresses = addressRepo.findAddressesByProfile(user.getProfile().getId());
         List<AddressDTO> addressDTOS = addresses.stream().map(addressMapper::apply).toList();
         return addressDTOS;
     }
 
     @Override
     public AddressDTO getMyAddress(Account user) {
-        AccountProfile profile = user.getProfile();
-        if (profile == null) return null;
-
-        IAddress address = addressRepo.findAddressByProfile(profile.getId());
+        IAddress address = addressRepo.findAddressByProfile(user.getProfile().getId());
         return addressMapper.apply(address);
     }
 
@@ -55,16 +49,8 @@ public class AddressServiceImpl implements AddressService {
 
     @Transactional
     public Address addAddress(AddressRequest request, Account user) {
-        AccountProfile profile = user.getProfile();
-
-        //Create one if not exists
-        if (profile == null) {
-            profile = new AccountProfile();
-            profile.setUser(user);
-        } else {
-            profile = profileRepo.findById(profile.getId()).orElseThrow(() ->
-                    new ResourceNotFoundException("Profile not found!"));
-        }
+        AccountProfile profile = profileRepo.findById(user.getProfile().getId()).orElseThrow(()
+                -> new ResourceNotFoundException("Profile not found!"));
 
         //Limit size
         int MAX_SIZE = 5;
@@ -129,9 +115,8 @@ public class AddressServiceImpl implements AddressService {
     public Address deleteAddress(Long id, Account user) {
         Address address = addressRepo.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Address not found!"));
-        AccountProfile profile = user.getProfile();
 
-        if (profile == null || !address.getProfile().getId().equals(profile.getId())) {
+        if (!address.getProfile().getId().equals(user.getProfile().getId())) {
             throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid user!");
         }
 

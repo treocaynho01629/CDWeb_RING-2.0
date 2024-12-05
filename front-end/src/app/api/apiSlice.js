@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { logOut, setAuth } from '../../features/auth/authReducer';
+import { clearAuth, setAuth } from '../../features/auth/authReducer';
 
 const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_PORT_SOCKET_SPRING,
@@ -12,19 +12,25 @@ const baseQuery = fetchBaseQuery({
 })
 
 const baseQueryWithRefresh = async (args, api, extraOptions) => {
-    let result = await baseQuery(args, api, extraOptions)
+    let result = await baseQuery(args, api, extraOptions);
 
     if (result?.meta?.response?.status === 401) { //Token expired
-        const { data } = await baseQuery("/api/auth/refresh-token", api, extraOptions); //Refresh
-        const { token, code, errors } = data;
+        const refreshResult = await baseQuery("/api/auth/refresh-token", api, extraOptions); //Auto refresh
+        const { data, error } = refreshResult;
 
-        if (token) {
+        if (data) {
+            const { token } = data;
             api.dispatch(setAuth({ token })) //Re-auth
             result = await baseQuery(args, api, extraOptions) //Refetch
-        } else {
-            if (code === 500) console.error(errors?.errorMessage ?? 'Your token is not valid');
-            api.dispatch(logOut());
-            return data;
+        } else if (error) {
+            console.error(error);
+            
+            //Logout
+            await baseQuery("/api/auth/logout", api, extraOptions); 
+            api.dispatch(clearAuth());
+            api.dispatch(apiSlice.util.resetApiState());
+
+            return refreshResult;
         }
     }
 
@@ -33,6 +39,7 @@ const baseQueryWithRefresh = async (args, api, extraOptions) => {
 
 export const apiSlice = createApi({
     baseQuery: baseQueryWithRefresh,
-    tagTypes: ['Book', 'User', 'Profile', 'Address', 'Category', 'Publisher', 'Shop', 'Coupon', 'Review', 'Receipt', 'Order', 'Banner', 'Chart'],
+    tagTypes: ['Book', 'User', 'Profile', 'Address', 'Category', 'Publisher', 'Shop', 'Coupon', 
+        'Review', 'Receipt', 'Order', 'Banner', 'Chart'],
     endpoints: builder => ({})
 })

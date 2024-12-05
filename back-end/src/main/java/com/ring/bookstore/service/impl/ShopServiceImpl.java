@@ -125,7 +125,7 @@ public class ShopServiceImpl implements ShopService {
 
         //Image upload/replace
         if (file != null) { //Contain new image >> upload/replace
-            Long imageId = shop.getImageId();
+            Long imageId = shop.getImage().getId();
             if (imageId != null) imageService.deleteImage(imageId); //Delete old image
 
             Image savedImage = imageService.upload(file); //Upload new image

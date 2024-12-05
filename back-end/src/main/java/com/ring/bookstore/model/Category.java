@@ -62,10 +62,6 @@ public class Category {
         subCate.setParent(null);
     }
 
-    public Integer getParentId() {
-        return (this.parent != null) ? this.parent.getId() : null;
-    }
-
     @PreRemove
     private void updateOrRemoveBooks() {
         for (Book b : this.cateBooks) {

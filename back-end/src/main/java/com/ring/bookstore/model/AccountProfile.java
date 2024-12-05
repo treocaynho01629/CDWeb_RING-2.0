@@ -1,13 +1,10 @@
 package com.ring.bookstore.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
 import lombok.*;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Nationalized;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -58,8 +55,9 @@ public class AccountProfile {
     private Image image;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonBackReference
+    @MapsId
+    @JoinColumn(name = "id")
+    @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Account user;
 

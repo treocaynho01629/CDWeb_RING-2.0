@@ -1,21 +1,18 @@
 package com.ring.bookstore.exception.advice;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.ring.bookstore.exception.ImageResizerException;
+import com.ring.bookstore.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
-
-import com.ring.bookstore.exception.ExceptionResponse;
-import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.exception.HttpResponseException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -58,6 +55,16 @@ public class ApplicationExceptionHandler{
                 HttpStatus.BAD_REQUEST.value(),
                 "Invalid argument",
                 errorsMap,
+                e.getLocalizedMessage()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public ExceptionResponse handleMissingCookie(MissingRequestCookieException e) {
+        return new ExceptionResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Missing cookie request!",
                 e.getLocalizedMessage()
         );
     }
@@ -119,6 +126,16 @@ public class ApplicationExceptionHandler{
                 HttpStatus.UNAUTHORIZED.value() ,
                 "Invalid user!",
                 e.getLocalizedMessage()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(TokenRefreshException.class)
+    public ExceptionResponse handleTokenRefreshException(TokenRefreshException e) {
+        return new ExceptionResponse(
+                HttpStatus.FORBIDDEN.value() ,
+                "Refresh token failed!",
+                e.getMessage()
         );
     }
 
