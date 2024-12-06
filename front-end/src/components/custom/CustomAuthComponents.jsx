@@ -3,7 +3,7 @@ import { Button } from '@mui/material'
 
 export const AuthForm = styled.form`
     width: 90%;
-    max-width: 420px;
+    max-width: 350px;
 `
 
 export const AuthTitle = styled.h1`
@@ -41,6 +41,6 @@ export const AuthActionContainer = styled.div`
 `
 
 export const ConfirmButton = styled(Button)`
-    height: 48px;
+    height: 44px;
     font-size: 16px;
 `

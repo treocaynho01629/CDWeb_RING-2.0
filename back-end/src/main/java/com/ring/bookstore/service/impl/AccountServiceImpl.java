@@ -130,7 +130,11 @@ public class AccountServiceImpl implements AccountService {
 
         //Check if Account with these username and email has exists >> throw exception
         if (!request.getUsername().equals(currUser.getUsername()) && !accountRepo.findByUsername(request.getUsername()).isEmpty()) {
-            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Người dùng với tên đăng nhập này đã tồn tại!");
+            throw new HttpResponseException(
+                    HttpStatus.CONFLICT,
+                    "User already existed!",
+                    "Người dùng với tên đăng nhập này đã tồn tại!"
+            );
         }
 
         //Set roles: 1 USER, 2 SELLER, 3 ADMIN

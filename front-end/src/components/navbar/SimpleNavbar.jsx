@@ -31,7 +31,7 @@ const SupportButton = styled.div`
     }
 
     &:hover {
-        color: ${props => props.theme.palette.primary.dark};
+        color: ${props => props.theme.palette.info.main};
     }
 
     ${props => props.theme.breakpoints.down("md")} {
@@ -48,7 +48,7 @@ const Logo = styled.img`
 const SimpleNavbar = () => {
     return (
         <Container>
-            <Link to={`/`}>
+            <Link to="/" tabIndex="-1">
                 <Logo src="/full-logo.svg" alt="RING! Logo" />
             </Link>
             <Link>

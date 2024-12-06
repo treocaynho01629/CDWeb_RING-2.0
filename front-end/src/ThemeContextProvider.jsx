@@ -120,7 +120,7 @@ export function ThemeContextProvider({ children }) {
                             color: theme.palette.primary.dark,
                         },
                         '& .MuiFormHelperText-root': {
-                            whiteSpace: 'nowrap'
+                            whiteSpace: 'nowrap',
                         },
                     }),
                 },

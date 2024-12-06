@@ -50,7 +50,7 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public void clearUserRefreshToken(String username) {
-        refreshRepo.clearUserRefreshToken(username);
+    public void clearRefreshToken(String token) {
+        refreshRepo.clearRefreshToken(token);
     }
 }

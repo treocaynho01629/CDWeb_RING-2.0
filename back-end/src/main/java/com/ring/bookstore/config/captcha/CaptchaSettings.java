@@ -1,4 +1,4 @@
-package com.ring.bookstore.config;
+package com.ring.bookstore.config.captcha;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,13 +8,10 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "google.recaptcha.key")
+@ConfigurationProperties(prefix = "google.recaptcha")
 public class CaptchaSettings {
 
-    //reCAPTCHA V3
     private String secret;
+    private String url;
     private float threshold;
-
-    public CaptchaSettings() {
-    }
 }

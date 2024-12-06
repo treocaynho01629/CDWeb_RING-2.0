@@ -1,11 +1,6 @@
 package com.ring.bookstore.controller;
 
-import java.io.IOException;
-
-import com.ring.bookstore.model.AccountToken;
-import com.ring.bookstore.service.CaptchaService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -28,14 +23,13 @@ import lombok.RequiredArgsConstructor;
 public class AuthenticationController {
 
 	private final AuthenticationService authService;
-	private final CaptchaService captchaService;
 
 	//Register
 	@PostMapping("/register")
-	public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request) {
-//		String response = request.getParameter("response");
-//		captchaService.processResponse(response, CaptchaService.REGISTER_ACTION);
-		Account newUser = authService.register(request);
+	public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest,
+									  HttpServletRequest request) {
+		final String recaptchaToken = request.getHeader("response");
+		Account newUser = authService.register(registerRequest, recaptchaToken);
 		return ResponseEntity.ok("Đăng ký thành công!");
 	}
 

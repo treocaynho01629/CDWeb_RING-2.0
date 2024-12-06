@@ -4,10 +4,10 @@ import com.ring.bookstore.dtos.images.IImageInfo;
 import com.ring.bookstore.exception.TokenRefreshException;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.ImageRepository;
+import com.ring.bookstore.service.CaptchaService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -26,7 +26,6 @@ import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.request.AuthenticationRequest;
 import com.ring.bookstore.request.RegisterRequest;
 import com.ring.bookstore.request.ResetPassRequest;
-import com.ring.bookstore.response.AuthenticationResponse;
 import com.ring.bookstore.service.EmailService;
 import com.ring.bookstore.service.RoleService;
 
@@ -49,6 +48,7 @@ public class AuthenticationService {
 	private final JwtService jwtService;
 	private final RefreshTokenService refreshService;
 	private final LoginProtectionService loginProtectionService;
+	private final CaptchaService captchaService;
 
 	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
@@ -58,10 +58,17 @@ public class AuthenticationService {
 	private String clientUrl;
 
 	//Register
-	public Account register(RegisterRequest request) {
+	public Account register(RegisterRequest registerRequest, String recaptchaToken) {
+		//Recaptcha
+		captchaService.validate(recaptchaToken, CaptchaServiceImpl.REGISTER_ACTION);
+
 		//Check if user with this username already exists
-		if (accountRepo.existsByUsername(request.getUsername())) {
-			throw new HttpResponseException(HttpStatus.CONFLICT, "Người dùng với tên đăng nhập này đã tồn tại!");
+		if (accountRepo.existsByUsername(registerRequest.getUsername())) {
+			throw new HttpResponseException(
+					HttpStatus.CONFLICT,
+					"User already existed!",
+					"Người dùng với tên đăng nhập này đã tồn tại!"
+			);
 		} else {
 			//Set role for USER
 			Set<Role> roles = new HashSet<>();
@@ -70,9 +77,9 @@ public class AuthenticationService {
 
 			//Create and set new Account info
 			var user = Account.builder()
-					.username(request.getUsername())
-					.pass(passwordEncoder.encode(request.getPass()))
-					.email(request.getEmail())
+					.username(registerRequest.getUsername())
+					.pass(passwordEncoder.encode(registerRequest.getPass()))
+					.email(registerRequest.getEmail())
 					.roles(roles)
 					.profile(new AccountProfile())
 					.build();
@@ -86,11 +93,11 @@ public class AuthenticationService {
 					+ "Tài khoản của bạn đã được đăng ký thành công!\r\n"
 					+ "</h2>\n"
 					+ "<h3>Tài khoản RING!:</h3>\n"
-					+ "<p><b>- Tên đăng nhập: </b>" + request.getUsername() + " đã đăng ký thành công</p>\n"
+					+ "<p><b>- Tên đăng nhập: </b>" + registerRequest.getUsername() + " đã đăng ký thành công</p>\n"
 					+ "<p>- Chúc bạn có trả nghiệm vui vẻ khi mua sách tại RING! - BOOKSTORE</p>\n"
 					+ "<br><p>Liên hệ hỗ trợ khi cần thiết: <b>ringbookstore@ring.email</b></p>\n"
 					+ "<br><br><h3>Cảm ơn đã tham gia!</h3>\n";
-			emailService.sendHtmlMessage(request.getEmail(), subject, content); //Send
+			emailService.sendHtmlMessage(registerRequest.getEmail(), subject, content); //Send
 
 			return user;
 		}

@@ -93,7 +93,7 @@ const LoginTab = ({ pending, setPending }) => {
             <>
                 <AuthForm onSubmit={handleSubmitLogin}>
                     <AuthTitle>Đăng nhập tài khoản</AuthTitle>
-                    <Stack spacing={1.5} direction="column">
+                    <Stack spacing={2.5} direction="column">
                         <Instruction ref={errRef}
                             display={errMsg ? "block" : "none"}
                             aria-live="assertive"
@@ -105,12 +105,15 @@ const LoginTab = ({ pending, setPending }) => {
                             type="text"
                             id="username"
                             autoComplete="username"
+                            size="small"
                             onChange={(e) => setUsername(e.target.value)}
                             value={username}
                         />
                         <CustomPasswordInput
                             label="Mật khẩu"
                             autoComplete="password"
+                            size="small"
+
                             onChange={(e) => setPassword(e.target.value)}
                             value={password}
                         />
@@ -134,7 +137,6 @@ const LoginTab = ({ pending, setPending }) => {
                             disabled={isLoading || isSuccess}
                             variant="contained"
                             color="primary"
-                            size="large"
                             type="submit"
                             aria-label="submit login"
                         >

@@ -21,9 +21,10 @@ const flowIn = keyframes`
 `
 
 const Wrapper = styled.div`
+    position: relative;
     display: flex;
-    height: 100dvh;
     overflow: hidden;
+    height: 100dvh;
 
     ${props => props.theme.breakpoints.down("md")} {
         flex-direction: column-reverse;
@@ -35,41 +36,11 @@ const Container = styled.div`
     align-items: center;
     justify-content: center;
     height: 100%;
-    width: 100%;
-    
-    ${props => props.theme.breakpoints.down("md")} {
-        align-items: flex-start;
-        margin-top: -${props => props.theme.spacing(8)};
-    }
-`
-
-const Background = styled.div`
-    position: relative;
     width: 70%;
-    height: 100%;
-    z-index: -1;
-    transform-origin: 110% 55%;
-    animation: ${flowIn} 1s ${props => props.theme.transitions.easing.easOut} 1;
 
     ${props => props.theme.breakpoints.down("md")} {
         width: 100%;
-        height: 25%;
-        transform-origin: 50% -150%;
-    }
-`
-
-const WaveContainer = styled.section`
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transform: scale(1.2);
-    transform-origin: left;
-
-    ${props => props.theme.breakpoints.down("md")} {
-        transform: scale(1.8);
-        transform-origin: bottom;
+        margin-top: -${props => props.theme.spacing(8)};
     }
 `
 
@@ -105,6 +76,45 @@ const Wave = styled.span`
         bottom: 0;
     }
 `
+
+const WaveContainer = styled.section`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: scale(1.2);
+    transform-origin: left;
+
+    ${props => props.theme.breakpoints.down("md")} {
+        transform: scale(1.8);
+        transform-origin: bottom;
+    }
+`
+
+const Background = styled.div`
+    position: absolute;
+    height: 100%;
+    width: 35%;
+    right: 0;
+    z-index: -1;
+    transform-origin: 132.5% 50%;
+    animation: ${flowIn} 1s ${props => props.theme.transitions.easing.easOut};
+
+    &.reverse {
+        ${Wave} {
+            animation-direction: reverse;
+        }
+    }
+
+    ${props => props.theme.breakpoints.down("md")} {
+        width: 100%;
+        height: 25%;
+        transform-origin: 50% -100%;
+        right: auto;
+        top: -7.5%;
+    }
+`
 //#endregion
 
 function AuthPage() {
@@ -129,7 +139,7 @@ function AuthPage() {
                         <RegisterTab {...{ pending, setPending }} />
                         : null}
             </Container>
-            <Background>
+            <Background className={tab == 'login' ? '' : 'reverse'}>
                 <WaveContainer>
                     <Wave></Wave>
                     <Wave></Wave>

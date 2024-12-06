@@ -1,4 +1,4 @@
-package com.ring.bookstore.config;
+package com.ring.bookstore.config.auditor;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
