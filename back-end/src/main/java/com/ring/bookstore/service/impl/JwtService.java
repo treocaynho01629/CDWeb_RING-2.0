@@ -139,7 +139,7 @@ public class JwtService {
     public ResponseCookie generateRefreshCookie(String value) {
         return ResponseCookie
                 .from("refreshToken", value)
-                .path("/api/auth/refresh-token")
+                .path("/api/auth")
                 .maxAge(refreshExpirationTime)
                 .httpOnly(true)
                 .build();
@@ -159,7 +159,7 @@ public class JwtService {
     public ResponseCookie clearRefreshCookie() {
         return ResponseCookie
                 .from("refreshToken", null)
-                .path("/api/auth/refresh-token")
+                .path("/api/auth")
                 .build();
     }
 

@@ -5,7 +5,7 @@ import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from '../../ultils/regex';
 import { Instruction } from '../custom/GlobalComponents';
 import { AuthForm, AuthHighlight, AuthText, AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
 import { Link } from 'react-router';
-import { GoogleReCaptcha, GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import useReCaptcha from '../../hooks/useReCaptcha';
 import CustomPasswordInput from '../custom/CustomPasswordInput';
 
 const RegisterTab = ({ pending, setPending }) => {
@@ -25,14 +25,13 @@ const RegisterTab = ({ pending, setPending }) => {
     const [matchPass, setMatchPass] = useState('');
     const [validMatch, setValidMatch] = useState(false);
 
-    //Email vlidation
+    //Email validation
     const [email, setEmail] = useState('');
     const [validEmail, setValidEmail] = useState(false);
     const [emailFocus, setEmailFocus] = useState(false);
 
     //Recaptcha
-    const [token, setToken] = useState('');
-    const [refreshReCaptcha, setRefreshReCaptcha] = useState(false);
+    const { reCaptchaLoaded, generateReCaptchaToken } = useReCaptcha();
 
     //Error and success message
     const [errMsg, setErrMsg] = useState('');
@@ -69,17 +68,12 @@ const RegisterTab = ({ pending, setPending }) => {
         setErrMsg('');
     }, [username, email, password, matchPass])
 
-    //Recaptcha token
-    const setTokenFunc = (getToken) => {
-        setToken(getToken);
-    };
-
     //Register
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (pending) return;
 
-        //Validation
+        // //Validation
         const v1 = USER_REGEX.test(username);
         const v2 = PWD_REGEX.test(password);
         const v3 = EMAIL_REGEX.test(email);
@@ -92,10 +86,13 @@ const RegisterTab = ({ pending, setPending }) => {
 
         const { enqueueSnackbar } = await import('notistack');
 
+        const token = await generateReCaptchaToken('register');
         register({
-            username,
-            pass: password,
-            email
+            token, user: {
+                username,
+                pass: password,
+                email
+            }
         }).unwrap()
             .then((data) => {
                 //Reset input
@@ -111,17 +108,18 @@ const RegisterTab = ({ pending, setPending }) => {
                 setPending(false);
             })
             .catch((err) => {
-                setRefreshReCaptcha(!refreshReCaptcha);
                 console.error(err);
                 setErr(err);
                 if (!err?.status) {
                     setErrMsg('Server không phản hồi');
                 } else if (err?.status === 409) {
-                    setErrMsg(err?.data?.errors?.errorMessage);
+                    setErrMsg(err?.data?.message);
                 } else if (err?.status === 400) {
-                    setErrMsg('Sai định dạng thông tin!');
+                    setErrMsg(err?.data?.message ?? 'Sai định dạng thông tin!');
+                } else if (err?.status === 403) {
+                    setErrMsg('Lỗi xác thực!');
                 } else {
-                    setErrMsg('Đăng ký thất bại!')
+                    setErrMsg('Đăng ký thất bại!');
                 }
                 errRef.current.focus();
                 setPending(false);
@@ -133,7 +131,7 @@ const RegisterTab = ({ pending, setPending }) => {
     return (
         <AuthForm onSubmit={handleSubmit}>
             <AuthTitle>Đăng ký tài khoản mới</AuthTitle>
-            <Stack spacing={1.5} direction="column">
+            <Stack spacing={{ xs: .75, md: 1.5 }} direction="column">
                 <Instruction ref={errRef}
                     display={errMsg ? "block" : "none"}
                     aria-live="assertive">
@@ -144,62 +142,63 @@ const RegisterTab = ({ pending, setPending }) => {
                     type="text"
                     id="new-username"
                     autoComplete="username"
+                    size="small"
                     ref={userRef}
                     onChange={(e) => setUsername(e.target.value)}
                     value={username}
                     aria-invalid={validName ? "false" : "true"}
                     onFocus={() => setUserFocus(true)}
                     onBlur={() => setUserFocus(false)}
-                    error={(userFocus && username && !validName) || err?.data?.errors?.username}
+                    error={(userFocus && username && !validName) || err?.data?.errors?.username != null}
                     helperText={userFocus && username && !validName ? "4 đến 24 kí tự." : err?.data?.errors?.username}
                 />
                 <TextField
-                    label='Địa chỉ email'
+                    label="Địa chỉ email"
                     type="email"
                     id="email"
                     autoComplete="off"
+                    size="small"
                     onChange={(e) => setEmail(e.target.value)}
                     value={email}
                     aria-invalid={validEmail ? "false" : "true"}
-                    aria-describedby="uidnote"
                     onFocus={() => setEmailFocus(true)}
                     onBlur={() => setEmailFocus(false)}
-                    error={(emailFocus && email && !validEmail) || err?.data?.errors?.email}
-                    helperText={emailFocus && email && !validEmail ? "Sai định dạng email." : err?.data?.errors?.email}
+                    error={(emailFocus && email && !validEmail) || err?.data?.errors?.email != null}
+                    helperText={(emailFocus && email && !validEmail) ? "Sai định dạng email." : err?.data?.errors?.email}
                 />
                 <CustomPasswordInput
-                    label='Mật khẩu'
+                    label="Mật khẩu"
+                    size="small"
                     onChange={(e) => setPassword(e.target.value)}
                     value={password}
                     aria-invalid={validPass ? "false" : "true"}
                     aria-describedby="new password"
                     onFocus={() => setPassFocus(true)}
                     onBlur={() => setPassFocus(false)}
-                    error={(password && !validPass) || err?.data?.errors?.pass}
+                    error={(password && !validPass) || err?.data?.errors?.pass != null}
                     helperText={passFocus && password && !validPass ? "8 đến 24 kí tự. Phải bao gồm chữ in hoa và ký tự đặc biệt."
                         : err?.data?.errors?.pass}
                 />
                 <CustomPasswordInput
-                    label='Nhập lại mật khẩu'
+                    label="Nhập lại mật khẩu"
+                    size="small"
                     onChange={(e) => setMatchPass(e.target.value)}
                     value={matchPass}
                     aria-invalid={validMatch ? "false" : "true"}
                     aria-describedby="confirm new password"
-                    error={(matchPass && !validMatch) || err?.data?.errors?.pass}
-                    helperText={matchPass && !validMatch ? "Không trùng mật khẩu."
-                        : err?.data?.errors?.pass}
+                    error={(matchPass && !validMatch) || err?.data?.errors?.pass != null}
+                    helperText={matchPass && !validMatch ? "Không trùng mật khẩu." : ""}
                 />
-                <p style={{ textAlign: 'center' }}>Bằng việc đăng kí, bạn đã đồng ý với <br />
+                <p style={{ textAlign: 'center', margin: '8px 0' }}>Bằng việc đăng kí, bạn đã đồng ý với <br />
                     <AuthHighlight className="warning">Điều khoản dịch vụ</AuthHighlight>&nbsp;&&nbsp;
                     <AuthHighlight className="warning">Chính sách bảo mật</AuthHighlight>
                 </p>
                 <ConfirmButton
                     variant="contained"
                     color="primary"
-                    size="large"
                     type="submit"
                     aria-label="submit register"
-                    disabled={!validRegister || isLoading}
+                    disabled={!validRegister || isLoading || !reCaptchaLoaded}
                 >
                     Đăng ký
                 </ConfirmButton>
@@ -209,13 +208,6 @@ const RegisterTab = ({ pending, setPending }) => {
                     <AuthHighlight>Đăng nhập</AuthHighlight>
                 </Link>
             </AuthText>
-            <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}>
-                <GoogleReCaptcha
-                    className="google-recaptcha-custom-class"
-                    onVerify={setTokenFunc}
-                    refreshReCaptcha={refreshReCaptcha}
-                />
-            </GoogleReCaptchaProvider>
         </AuthForm>
     )
 }

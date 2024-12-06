@@ -1,5 +1,6 @@
-package com.ring.bookstore.config;
+package com.ring.bookstore.config.security;
 
+import com.ring.bookstore.config.ChainExceptionHandlerFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

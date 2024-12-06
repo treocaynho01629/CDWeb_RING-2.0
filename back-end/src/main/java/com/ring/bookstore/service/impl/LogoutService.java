@@ -26,19 +26,9 @@ public class LogoutService implements LogoutHandler { //Logout from security con
             HttpServletResponse response,
             Authentication authentication
     ) {
-        //Get current JWT from request header
-        final String jwt = parseJwt(request);
-
-        //If token not valid (expired,. ..)
-        if (jwt != null) {
-            try { //Invalidate refresh token in DB
-                String loggedUser = jwtService.extractUsername(jwt);
-                if (loggedUser != null) refreshService.clearUserRefreshToken(loggedUser);
-            } catch (Exception ignored) { //Invalid token >> ignore
-            }
-        }
-
-        //Overwrite refresh cookie
+        //Overwrite refresh cookie + invalidate refresh token
+        String refreshToken = jwtService.getRefreshTokenFromCookie(request);
+        if (refreshToken != null) refreshService.clearRefreshToken(refreshToken);
         response.setHeader(HttpHeaders.SET_COOKIE, jwtService.clearRefreshCookie().toString());
 
         SecurityContext context = SecurityContextHolder.getContext(); //Delete context

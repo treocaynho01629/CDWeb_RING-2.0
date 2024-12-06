@@ -31,7 +31,7 @@ public interface RefreshTokenRepository extends JpaRepository<AccountToken, Long
     @Query("""
         update AccountToken t
         set t.refreshToken = ''
-        where t.user.username = :username
+        where t.refreshToken = :token
     """)
-    void clearUserRefreshToken(String username);
+    void clearRefreshToken(String token);
 }

@@ -1,4 +1,4 @@
-package com.ring.bookstore.config;
+package com.ring.bookstore.config.auditor;
 
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;

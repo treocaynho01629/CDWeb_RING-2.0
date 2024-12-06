@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service("captchaProtectionService")
 public class CaptchaProtectionService {
-    private final int MAX_ATTEMPT = 4;
+    private final int MAX_ATTEMPT = 5;
     private LoadingCache<String, Integer> attemptsCache;
 
     public CaptchaProtectionService() {

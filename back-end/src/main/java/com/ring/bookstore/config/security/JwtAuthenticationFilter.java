@@ -1,4 +1,4 @@
-package com.ring.bookstore.config;
+package com.ring.bookstore.config.security;
 
 import java.io.IOException;
 

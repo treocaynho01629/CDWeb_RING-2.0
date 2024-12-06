@@ -27,12 +27,12 @@ export const authApiSlice = apiSlice.injectEndpoints({
             }
         }),
         register: builder.mutation({ //FIX
-            query: ({ token, initialUser }) => ({
+            query: ({ token, user }) => ({
                 url: '/api/auth/register',
                 method: 'POST',
+                headers: { response: token },
                 body: {
-                    token,
-                    request: initialUser,
+                    ...user,
                 }
             }),
             invalidatesTags: [

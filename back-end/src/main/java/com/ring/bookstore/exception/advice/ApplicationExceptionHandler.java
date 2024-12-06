@@ -55,7 +55,7 @@ public class ApplicationExceptionHandler{
                 HttpStatus.BAD_REQUEST.value(),
                 "Invalid argument",
                 errorsMap,
-                e.getLocalizedMessage()
+                "Sai định dạng thông tin!"
         );
     }
 
@@ -135,6 +135,16 @@ public class ApplicationExceptionHandler{
         return new ExceptionResponse(
                 HttpStatus.FORBIDDEN.value() ,
                 "Refresh token failed!",
+                e.getMessage()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ReCaptchaInvalidException.class)
+    public ExceptionResponse handleInvalidReCaptchaException(ReCaptchaInvalidException e) {
+        return new ExceptionResponse(
+                HttpStatus.FORBIDDEN.value() ,
+                "reCaptcha failed!",
                 e.getMessage()
         );
     }

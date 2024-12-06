@@ -1,75 +1,80 @@
 package com.ring.bookstore.service.impl;
 
-import java.net.URI;
-import java.util.regex.Pattern;
-
-import com.ring.bookstore.config.CaptchaSettings;
+import com.ring.bookstore.config.captcha.CaptchaSettings;
 import com.ring.bookstore.exception.ReCaptchaInvalidException;
+import com.ring.bookstore.response.RecaptchaResponse;
 import com.ring.bookstore.service.CaptchaService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestOperations;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
 @Service
 public class CaptchaServiceImpl implements CaptchaService {
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
     protected final HttpServletRequest request;
     protected final CaptchaSettings captchaSettings;
-    protected final CaptchaProtectionService captchaAttemptService;
-    protected final RestOperations restTemplate;
+    protected final CaptchaProtectionService captchaProtectionService;
+    protected final RestTemplate restTemplate;
 
-    protected static final Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
+    public static final String LOGIN_ACTION = "login";
+    public static final String REGISTER_ACTION = "register";
+    public static final String FORGOT_ACTION = "forgot";
+    public static final String RESET_ACTION = "reset";
 
-    @Value("${google.recaptcha.secret}")
-    private String secretKey;
-
-    @Value("${google.recaptcha.url}")
-    private String verifyUrl;
-
-//    public void processResponse(String response, final String action) throws ReCaptchaInvalidException {
-//        securityCheck(response);
-//
-//        final URI verifyUri = URI.create(String.format(RECAPTCHA_URL_TEMPLATE, getReCaptchaSecret(), response, getClientIP()));
-//        try {
-//            final GoogleResponse googleResponse = restTemplate.getForObject(verifyUri, GoogleResponse.class);
-//            LOGGER.debug("Google's response: {} ", googleResponse.toString());
-//
-//            if (!googleResponse.isSuccess() || !googleResponse.getAction().equals(action) || googleResponse.getScore() < captchaSettings.getThreshold()) {
-//                if (googleResponse.hasClientError()) {
-//                    reCaptchaAttemptService.reCaptchaFailed(getClientIP());
-//                }
-//                throw new ReCaptchaInvalidException("reCaptcha was not successfully validated");
-//            }
-//        } catch (RestClientException rce) {
-//            throw new ReCaptchaUnavailableException("Registration unavailable at this time.  Please try again later.", rce);
-//        }
-//        reCaptchaAttemptService.reCaptchaSucceeded(getClientIP());
-//    }
-
-    @Override
-    public String getReCaptchaSecret() {
-        return captchaSettings.getSecret();
-    }
-
-    protected void securityCheck(final String response) {
-        if (captchaAttemptService.isBlocked(getClientIP())) {
+    public void validate(String recaptchaToken, final String action) throws ReCaptchaInvalidException {
+        if (captchaProtectionService.isBlocked(getClientIP())) {
             throw new ReCaptchaInvalidException("Client exceeded maximum number of failed attempts!");
         }
 
-        if (!responseSanityCheck(response)) {
-            throw new ReCaptchaInvalidException("Response contains invalid characters!");
-        }
-    }
+        //Validate
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("secret", captchaSettings.getSecret());
+        map.add("response", recaptchaToken);
 
-    protected boolean responseSanityCheck(final String response) {
-        return StringUtils.hasLength(response) && RESPONSE_PATTERN.matcher(response).matches();
+        ResponseEntity<RecaptchaResponse> responseEntity = null;
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
+
+        try {
+            responseEntity = restTemplate.exchange(
+                    captchaSettings.getUrl(),
+                    HttpMethod.POST,
+                    httpEntity,
+                    RecaptchaResponse.class
+            );
+
+            RecaptchaResponse recaptchaResponse = responseEntity.getBody();
+            log.debug("reCaptcha response: {} ", recaptchaResponse.toString());
+
+            if (!recaptchaResponse.isSuccess() || !recaptchaResponse.getAction().equals(action)
+                    || recaptchaResponse.getScore() < captchaSettings.getThreshold()) {
+                if (recaptchaResponse.hasClientError()) { //Protect against bad request attempts
+                    captchaProtectionService.captchaFailed(getClientIP());
+                }
+                throw new ReCaptchaInvalidException("reCaptcha detected unusual behavior!");
+            }
+        } catch (HttpClientErrorException e) {
+            log.error(e.getMessage());
+            throw new ReCaptchaInvalidException("Service unavailable at this time.  Please try again later!", e);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ReCaptchaInvalidException("reCaptcha was not successfully validated!", e);
+        }
+
+        captchaProtectionService.captchaSucceeded(getClientIP());
     }
 
     protected String getClientIP() {

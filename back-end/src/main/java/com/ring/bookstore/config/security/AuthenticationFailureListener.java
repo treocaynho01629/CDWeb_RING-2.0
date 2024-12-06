@@ -1,4 +1,4 @@
-package com.ring.bookstore.config;
+package com.ring.bookstore.config.security;
 
 import com.ring.bookstore.service.impl.LoginProtectionService;
 import jakarta.servlet.http.HttpServletRequest;
