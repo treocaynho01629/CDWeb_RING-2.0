@@ -11,6 +11,7 @@ const PendingModal = (props) => {
           color="primary"
           size={40}
           thickness={5}
+          disableShrink 
         />
         <b>{message}</b>
       </div>

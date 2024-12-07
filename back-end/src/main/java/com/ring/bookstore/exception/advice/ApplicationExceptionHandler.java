@@ -149,6 +149,16 @@ public class ApplicationExceptionHandler{
         );
     }
 
+    @ResponseStatus(HttpStatus.PRECONDITION_FAILED)
+    @ExceptionHandler(ReCaptchaSuspiciousException.class)
+    public ExceptionResponse handleSuspiciousReCaptchaException(ReCaptchaSuspiciousException e) {
+        return new ExceptionResponse(
+                HttpStatus.PRECONDITION_FAILED.value() ,
+                "reCaptcha marked suspicious!",
+                e.getMessage()
+        );
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ExceptionResponse handleValidationException(HttpMessageNotReadableException e) {

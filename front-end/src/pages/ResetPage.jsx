@@ -30,6 +30,12 @@ const Container = styled.div`
         margin-top: -${props => props.theme.spacing(8)};
     }
 `
+
+const ContentContainer = styled.div`
+    position: relative;
+    width: 90%;
+    max-width: 350px;
+`
 //#endregion
 
 function ResetPage() {
@@ -45,7 +51,11 @@ function ResetPage() {
             }
             <SimpleNavbar />
             <Container>
-                {token ? <ResetTab {...{ pending, setPending }} /> : <ForgotTab token={token} {...{ pending, setPending }} />}
+                <Suspense fallback={null}>
+                    <ContentContainer>
+                        {token ? <ResetTab {...{ pending, setPending }} /> : <ForgotTab token={token} {...{ pending, setPending }} />}
+                    </ContentContainer>
+                </Suspense>
             </Container>
         </Wrapper>
     )

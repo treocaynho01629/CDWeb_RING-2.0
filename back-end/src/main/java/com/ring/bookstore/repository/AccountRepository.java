@@ -14,7 +14,7 @@ import com.ring.bookstore.model.Account;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long>{
 	
-	boolean existsByUsername(String username); //Check exists Account by {username}
+	boolean existsByUsernameOrEmail(String username, String email);
 
 	@Query("""
 		select a from Account a join fetch a.roles r

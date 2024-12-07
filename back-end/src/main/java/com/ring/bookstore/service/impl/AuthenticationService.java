@@ -58,16 +58,18 @@ public class AuthenticationService {
 	private String clientUrl;
 
 	//Register
-	public Account register(RegisterRequest registerRequest, String recaptchaToken) {
+	public Account register(RegisterRequest registerRequest, HttpServletRequest request) {
 		//Recaptcha
-		captchaService.validate(recaptchaToken, CaptchaServiceImpl.REGISTER_ACTION);
+		final String recaptchaToken = request.getHeader("response");
+		final String source = request.getHeader("source");
+		captchaService.validate(recaptchaToken, source, CaptchaServiceImpl.REGISTER_ACTION);
 
 		//Check if user with this username already exists
-		if (accountRepo.existsByUsername(registerRequest.getUsername())) {
+		if (accountRepo.existsByUsernameOrEmail(registerRequest.getUsername(), registerRequest.getEmail())) {
 			throw new HttpResponseException(
 					HttpStatus.CONFLICT,
 					"User already existed!",
-					"Người dùng với tên đăng nhập này đã tồn tại!"
+					"Người dùng với tên đăng nhập hoặc email này đã tồn tại!"
 			);
 		} else {
 			//Set role for USER
@@ -104,7 +106,12 @@ public class AuthenticationService {
 	}
 
 	//Authenticate
-	public Account authenticate(AuthenticationRequest request) throws ResourceNotFoundException {
+	public Account authenticate(AuthenticationRequest authRequest, HttpServletRequest request) throws ResourceNotFoundException {
+		//Recaptcha
+		final String recaptchaToken = request.getHeader("response");
+		final String source = request.getHeader("source");
+		captchaService.validate(recaptchaToken, source, CaptchaServiceImpl.LOGIN_ACTION);
+
 		if (loginProtectionService.isBlocked()) {
 			throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "Authentication blocked due to too many failed login attempts!");
 		}
@@ -114,7 +121,10 @@ public class AuthenticationService {
 
 		try {
 			Authentication authentication = authenticationManager
-					.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPass()));
+					.authenticate(new UsernamePasswordAuthenticationToken(
+							authRequest.getUsername(),
+							authRequest.getPass())
+					);
 			SecurityContextHolder.getContext().setAuthentication(authentication); //All good >> security context
 			user = (Account) authentication.getPrincipal();
 		} catch (Exception e) {
@@ -142,7 +152,11 @@ public class AuthenticationService {
 	}
 
 	//Forgot password
-	public void forgotPassword(String email) {
+	public void forgotPassword(String email, HttpServletRequest request) {
+		//Recaptcha
+		final String recaptchaToken = request.getHeader("response");
+		final String source = request.getHeader("source");
+		captchaService.validate(recaptchaToken, source, CaptchaServiceImpl.FORGOT_ACTION);
 
 		//Get all accounts with this email
 		List<Account> accounts = accountRepo.findByEmail(email);
@@ -180,21 +194,26 @@ public class AuthenticationService {
 	}
 
 	//Change password with {resetToken}
-	public Account resetPassword(ResetPassRequest request) {
+	public Account resetPassword(ResetPassRequest resetRequest, HttpServletRequest request) {
+		//Recaptcha
+		final String recaptchaToken = request.getHeader("response");
+		final String source = request.getHeader("source");
+		captchaService.validate(recaptchaToken, source, CaptchaServiceImpl.RESET_ACTION);
+
 		//Check if user with username exists
-		var user = accountRepo.findByResetPassToken(request.getToken())
+		var user = accountRepo.findByResetPassToken(resetRequest.getToken())
 				.orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 		//Check token expiration
 		if (isTokenExpired(user.getTokenCreationDate())) throw new BadCredentialsException("Token expired!");
 		//Validate new password
-		if (!request.getNewPass().equals(request.getNewPassRe())) throw new HttpResponseException(
+		if (!resetRequest.getNewPass().equals(resetRequest.getNewPassRe())) throw new HttpResponseException(
 				HttpStatus.BAD_REQUEST,
 				"Re input password does not match!",
 				"Mật khẩu không trùng khớp!"
 		);
 
 		//Change password and save to database
-		user.setPass(passwordEncoder.encode(request.getNewPass()));
+		user.setPass(passwordEncoder.encode(resetRequest.getNewPass()));
 		user.setTokenCreationDate(null);
 		user.setResetPassToken(null);
 		Account savedAccount = accountRepo.save(user);

@@ -2,8 +2,11 @@ import styled from "@emotion/styled";
 import { useState, lazy, Suspense } from "react";
 import { useParams } from 'react-router';
 import { keyframes } from "@emotion/react";
+import { Grow } from "@mui/material";
+import { TransitionGroup } from 'react-transition-group';
 import SimpleNavbar from "../components/navbar/SimpleNavbar";
 import useTitle from '../hooks/useTitle';
+import useReCaptchaV3 from "../hooks/useReCaptchaV3";
 
 const PendingModal = lazy(() => import('../components/layout/PendingModal'));
 const RegisterTab = lazy(() => import('../components/authorize/RegisterTab'));
@@ -32,6 +35,7 @@ const Wrapper = styled.div`
 `
 
 const Container = styled.div`
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -44,6 +48,12 @@ const Container = styled.div`
     }
 `
 
+const ContentContainer = styled.div`
+    position: relative;
+    width: 90%;
+    max-width: 350px;
+`
+
 const Wave = styled.span`
     position: absolute;
     height: 100vh;
@@ -53,10 +63,12 @@ const Wave = styled.span`
     left: 14%;
     background: hsl(from ${props => props.theme.palette.primary.main}  calc(h - 30) s l / 0.2);
     animation: ${rotate} 32s infinite steps(480, end);
+    transition: all .2s ease;
     
     &:nth-of-type(2) {
         background: hsl(from ${props => props.theme.palette.primary.main}  calc(h + 30) s l / 0.3);
         left: 7%;
+        animation-delay: -8s;
         animation-duration: 24s;
         animation-timing-function: steps(330, end);
     }
@@ -64,6 +76,7 @@ const Wave = styled.span`
     &:nth-of-type(3) {
         background: hsl(from ${props => props.theme.palette.primary.main}  h s l / 0.4);
         left: 0;
+        animation-delay: -3s;
         animation-duration: 28s;
         animation-timing-function: steps(420, end);
     }
@@ -93,7 +106,7 @@ const WaveContainer = styled.section`
 `
 
 const Background = styled.div`
-    position: absolute;
+    position: fixed;
     height: 100%;
     width: 35%;
     right: 0;
@@ -101,16 +114,10 @@ const Background = styled.div`
     transform-origin: 132.5% 50%;
     animation: ${flowIn} 1s ${props => props.theme.transitions.easing.easOut};
 
-    &.reverse {
-        ${Wave} {
-            animation-direction: reverse;
-        }
-    }
-
     ${props => props.theme.breakpoints.down("md")} {
         width: 100%;
         height: 25%;
-        transform-origin: 50% -100%;
+        transform-origin: 50% -350%;
         right: auto;
         top: -7.5%;
     }
@@ -120,6 +127,9 @@ const Background = styled.div`
 function AuthPage() {
     const { tab } = useParams();
     const [pending, setPending] = useState(false);
+
+    //Recaptcha
+    const { reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge } = useReCaptchaV3();
 
     //Set title
     useTitle('RING! - Chào mừng');
@@ -133,13 +143,25 @@ function AuthPage() {
             }
             <SimpleNavbar />
             <Container>
-                {tab == 'login' ?
-                    <LoginTab {...{ pending, setPending }} />
-                    : tab == 'register' ?
-                        <RegisterTab {...{ pending, setPending }} />
-                        : null}
+                <TransitionGroup component={null}>
+                    <Suspense fallback={null}>
+                        {tab == 'login' ?
+                            <Grow key={'login'} in={tab == 'login'}>
+                                <ContentContainer>
+                                    <LoginTab {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge }} />
+                                </ContentContainer>
+                            </Grow>
+                            : tab == 'register' ?
+                                <Grow key={'register'} in={tab == 'register'}>
+                                    <ContentContainer>
+                                        <RegisterTab {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge }} />
+                                    </ContentContainer>
+                                </Grow>
+                                : null}
+                    </Suspense>
+                </TransitionGroup>
             </Container>
-            <Background className={tab == 'login' ? '' : 'reverse'}>
+            <Background>
                 <WaveContainer>
                     <Wave></Wave>
                     <Wave></Wave>
