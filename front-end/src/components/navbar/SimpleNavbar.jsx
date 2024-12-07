@@ -13,6 +13,7 @@ const Container = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    z-index: ${props => props.theme.zIndex.appBar};
 
     ${props => props.theme.breakpoints.down("md")} {
         justify-content: center;
@@ -48,7 +49,7 @@ const Logo = styled.img`
 const SimpleNavbar = () => {
     return (
         <Container>
-            <Link to="/" tabIndex="-1">
+            <Link to="/" tabIndex={-1}>
                 <Logo src="/full-logo.svg" alt="RING! Logo" />
             </Link>
             <Link>

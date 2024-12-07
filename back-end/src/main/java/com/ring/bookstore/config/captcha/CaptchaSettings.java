@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 public class CaptchaSettings {
 
     private String secret;
+    private String v3Secret;
     private String url;
     private float threshold;
+    private float suspicious;
 }

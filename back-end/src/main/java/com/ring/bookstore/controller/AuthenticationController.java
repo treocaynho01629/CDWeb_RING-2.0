@@ -28,8 +28,7 @@ public class AuthenticationController {
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest,
 									  HttpServletRequest request) {
-		final String recaptchaToken = request.getHeader("response");
-		Account newUser = authService.register(registerRequest, recaptchaToken);
+		Account newUser = authService.register(registerRequest, request);
 		return ResponseEntity.ok("Đăng ký thành công!");
 	}
 
@@ -37,9 +36,10 @@ public class AuthenticationController {
 	@PostMapping("/authenticate")
 	public ResponseEntity<AuthenticationResponse> authenticate(
 			@RequestParam(value = "persist", defaultValue = "true") Boolean persist,
-			@RequestBody @Valid AuthenticationRequest request) {
+			@RequestBody @Valid AuthenticationRequest authRequest,
+			HttpServletRequest request) {
 		//Generate new JWT & refresh token
-		Account auth = authService.authenticate(request);
+		Account auth = authService.authenticate(authRequest, request);
 		String jwtToken = authService.generateToken(auth);
 
 		//Set refresh token
@@ -67,15 +67,17 @@ public class AuthenticationController {
 	
 	//Send forgot password email
 	@PostMapping("/forgot-password")
-	public ResponseEntity<?> forgotPassword(@RequestParam(value="email") String email){
-		authService.forgotPassword(email);
+	public ResponseEntity<?> forgotPassword(@RequestParam(value="email") String email,
+											HttpServletRequest request){
+		authService.forgotPassword(email, request);
 		return new ResponseEntity< >("Đã gửi email khôi phục mật khẩu", HttpStatus.OK);
 	}
 	
 	//Reset password
 	@PutMapping("/reset-password")
-	public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPassRequest request){
-		Account account = authService.resetPassword(request);
+	public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPassRequest resetRequest,
+												HttpServletRequest request){
+		Account account = authService.resetPassword(resetRequest, request);
 		String result = "Đổi mật khẩu thất bại";
 		if (account != null) result = "Thay đổi mật khẩu thành công!";
 		return new ResponseEntity< >(result, HttpStatus.OK);

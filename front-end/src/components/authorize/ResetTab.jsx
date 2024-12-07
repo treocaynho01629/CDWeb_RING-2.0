@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router';
-import { AuthForm, AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
+import { AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
 import { Stack } from '@mui/material';
 import { Instruction } from '../custom/GlobalComponents';
 import { PWD_REGEX } from '../../ultils/regex';
@@ -94,7 +94,7 @@ const ResetTab = ({ token }) => {
     }
 
     return (
-        <AuthForm onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
             <AuthTitle>Khôi phục mật khẩu</AuthTitle>
             <Stack spacing={2} direction="column">
                 <Instruction ref={errRef}
@@ -132,7 +132,7 @@ const ResetTab = ({ token }) => {
                     Khôi phục
                 </ConfirmButton>
             </Stack>
-        </AuthForm>
+        </form>
     )
 }
 

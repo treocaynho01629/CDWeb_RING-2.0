@@ -1,14 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense, lazy } from 'react';
 import { Stack, TextField } from '@mui/material';
 import { useRegisterMutation } from '../../features/auth/authApiSlice';
 import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from '../../ultils/regex';
 import { Instruction } from '../custom/GlobalComponents';
-import { AuthForm, AuthHighlight, AuthText, AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
+import { AuthHighlight, AuthText, AuthTitle, ConfirmButton, TermText } from '../custom/CustomAuthComponents';
 import { Link } from 'react-router';
-import useReCaptcha from '../../hooks/useReCaptcha';
 import CustomPasswordInput from '../custom/CustomPasswordInput';
 
-const RegisterTab = ({ pending, setPending }) => {
+const ReCaptcha = lazy(() => import('./ReCaptcha'));
+
+const RegisterTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge }) => {
     const userRef = useRef();
     const errRef = useRef();
 
@@ -30,12 +31,13 @@ const RegisterTab = ({ pending, setPending }) => {
     const [validEmail, setValidEmail] = useState(false);
     const [emailFocus, setEmailFocus] = useState(false);
 
-    //Recaptcha
-    const { reCaptchaLoaded, generateReCaptchaToken } = useReCaptcha();
-
     //Error and success message
     const [errMsg, setErrMsg] = useState('');
     const [err, setErr] = useState([]);
+
+    //Recaptcha v2
+    const [challenge, setChallenge] = useState(false); //Toggle if marked suspicious by v3
+    const [token, setToken] = useState('');
 
     //Register mutation
     const [register, { isLoading }] = useRegisterMutation();
@@ -102,6 +104,8 @@ const RegisterTab = ({ pending, setPending }) => {
                 setEmail('');
                 setErr([]);
                 setErrMsg('');
+                setChallenge(false);
+                showBadge();
 
                 //Queue snack
                 enqueueSnackbar('Đăng ký thành công!', { variant: 'success' });
@@ -118,6 +122,10 @@ const RegisterTab = ({ pending, setPending }) => {
                     setErrMsg(err?.data?.message ?? 'Sai định dạng thông tin!');
                 } else if (err?.status === 403) {
                     setErrMsg('Lỗi xác thực!');
+                } else if (err?.status === 412) {
+                    setChallenge(true);
+                    hideBadge();
+                    setErrMsg('Tài khoản của bạn cần xác thực lại!');
                 } else {
                     setErrMsg('Đăng ký thất bại!');
                 }
@@ -129,7 +137,7 @@ const RegisterTab = ({ pending, setPending }) => {
     const validRegister = [validName, validPass, validMatch, validEmail].every(Boolean);
 
     return (
-        <AuthForm onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
             <AuthTitle>Đăng ký tài khoản mới</AuthTitle>
             <Stack spacing={{ xs: .75, md: 1.5 }} direction="column">
                 <Instruction ref={errRef}
@@ -189,10 +197,21 @@ const RegisterTab = ({ pending, setPending }) => {
                     error={(matchPass && !validMatch) || err?.data?.errors?.pass != null}
                     helperText={matchPass && !validMatch ? "Không trùng mật khẩu." : ""}
                 />
-                <p style={{ textAlign: 'center', margin: '8px 0' }}>Bằng việc đăng kí, bạn đã đồng ý với <br />
-                    <AuthHighlight className="warning">Điều khoản dịch vụ</AuthHighlight>&nbsp;&&nbsp;
-                    <AuthHighlight className="warning">Chính sách bảo mật</AuthHighlight>
-                </p>
+                {(reCaptchaLoaded && challenge) &&
+                    <Suspense fallback={null}>
+                        <div style={{ margin: '16px 0' }}>
+                            <ReCaptcha onVerify={(token) => setToken(token)} />
+                        </div>
+                    </Suspense>
+                }
+                <TermText>Được bảo vệ bởi reCAPTCHA và Google thông qua<br />
+                    <a href="https://policies.google.com/terms">
+                        <AuthHighlight className="warning">Điều khoản dịch vụ</AuthHighlight>
+                    </a>&nbsp;&&nbsp;
+                    <a href="https://policies.google.com/privacy">
+                        <AuthHighlight className="warning">Chính sách bảo mật</AuthHighlight>
+                    </a>
+                </TermText>
                 <ConfirmButton
                     variant="contained"
                     color="primary"
@@ -208,7 +227,7 @@ const RegisterTab = ({ pending, setPending }) => {
                     <AuthHighlight>Đăng nhập</AuthHighlight>
                 </Link>
             </AuthText>
-        </AuthForm>
+        </form>
     )
 }
 

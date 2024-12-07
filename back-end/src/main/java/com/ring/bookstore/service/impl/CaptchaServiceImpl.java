@@ -2,6 +2,7 @@ package com.ring.bookstore.service.impl;
 
 import com.ring.bookstore.config.captcha.CaptchaSettings;
 import com.ring.bookstore.exception.ReCaptchaInvalidException;
+import com.ring.bookstore.exception.ReCaptchaSuspiciousException;
 import com.ring.bookstore.response.RecaptchaResponse;
 import com.ring.bookstore.service.CaptchaService;
 
@@ -32,8 +33,9 @@ public class CaptchaServiceImpl implements CaptchaService {
     public static final String REGISTER_ACTION = "register";
     public static final String FORGOT_ACTION = "forgot";
     public static final String RESET_ACTION = "reset";
+    public static final String CHECKOUT_ACTION = "checkout";
 
-    public void validate(String recaptchaToken, final String action) throws ReCaptchaInvalidException {
+    public void validate(String recaptchaToken, String source, final String action) throws ReCaptchaInvalidException {
         if (captchaProtectionService.isBlocked(getClientIP())) {
             throw new ReCaptchaInvalidException("Client exceeded maximum number of failed attempts!");
         }
@@ -42,7 +44,9 @@ public class CaptchaServiceImpl implements CaptchaService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("secret", captchaSettings.getSecret());
+        String secretKey = source.equals("v2") ? captchaSettings.getSecret()
+                : captchaSettings.getV3Secret();
+        map.add("secret", secretKey);
         map.add("response", recaptchaToken);
 
         ResponseEntity<RecaptchaResponse> responseEntity = null;
@@ -59,22 +63,41 @@ public class CaptchaServiceImpl implements CaptchaService {
             RecaptchaResponse recaptchaResponse = responseEntity.getBody();
             log.debug("reCaptcha response: {} ", recaptchaResponse.toString());
 
-            if (!recaptchaResponse.isSuccess() || !recaptchaResponse.getAction().equals(action)
-                    || recaptchaResponse.getScore() < captchaSettings.getThreshold()) {
-                if (recaptchaResponse.hasClientError()) { //Protect against bad request attempts
-                    captchaProtectionService.captchaFailed(getClientIP());
-                }
-                throw new ReCaptchaInvalidException("reCaptcha detected unusual behavior!");
+            //Version check
+            if (source.equals("v3")) {
+                verifyV3(recaptchaResponse, action);
+            } else if (source.equals("v2")) {
+                verifyV2(recaptchaResponse);
             }
         } catch (HttpClientErrorException e) {
             log.error(e.getMessage());
-            throw new ReCaptchaInvalidException("Service unavailable at this time.  Please try again later!", e);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ReCaptchaInvalidException("reCaptcha was not successfully validated!", e);
+            throw new ReCaptchaInvalidException("Service unavailable at this time. Please try again later!", e);
         }
 
         captchaProtectionService.captchaSucceeded(getClientIP());
+    }
+
+    protected void verifyV3(RecaptchaResponse response, final String action) {
+        if (!response.isSuccess() || !response.getAction().equals(action)
+                || response.getScore() < captchaSettings.getThreshold()) {
+            if (response.hasClientError()) { //Protect against bad request attempts
+                captchaProtectionService.captchaFailed(getClientIP());
+            }
+            throw new ReCaptchaInvalidException("reCaptcha detected unusual behavior!");
+        } else if (response.getScore() > captchaSettings.getThreshold()
+            && response.getScore() < captchaSettings.getSuspicious()) {
+            throw new ReCaptchaSuspiciousException("reCaptcha requires further verification!");
+        }
+    }
+
+    protected void verifyV2(RecaptchaResponse response) {
+        System.out.println(response.toString());
+        if (!response.isSuccess()) {
+            if (response.hasClientError()) {
+                captchaProtectionService.captchaFailed(getClientIP());
+            }
+            throw new ReCaptchaInvalidException("reCaptcha detected unusual behavior!");
+        }
     }
 
     protected String getClientIP() {

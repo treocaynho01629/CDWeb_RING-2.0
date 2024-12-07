@@ -8,6 +8,7 @@ import com.ring.bookstore.dtos.orders.OrderDetailDTO;
 import com.ring.bookstore.dtos.orders.OrderDTO;
 import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.request.CalculateRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 
 import com.ring.bookstore.dtos.orders.ReceiptDTO;
@@ -23,6 +24,6 @@ public interface OrderService {
 	ReceiptDTO getReceipt(Long id);
 	OrderDetailDTO getOrderDetail(Long id);
 	CalculateDTO calculate(CalculateRequest request);
-	ReceiptDTO checkout(OrderRequest request, Account user);
+	ReceiptDTO checkout(OrderRequest checkRequest, HttpServletRequest request, Account user);
 	List<ChartDTO> getMonthlySale(Account user);
 }

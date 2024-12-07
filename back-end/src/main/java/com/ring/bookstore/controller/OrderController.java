@@ -6,6 +6,7 @@ import com.ring.bookstore.dtos.orders.OrderDTO;
 import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.request.CalculateRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,11 +48,12 @@ public class OrderController {
 	//Commit order
 	@PostMapping
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<ReceiptDTO> checkout(@RequestBody @Valid OrderRequest request,
+	public ResponseEntity<ReceiptDTO> checkout(@RequestBody @Valid OrderRequest checkRequest,
+											   	HttpServletRequest request,
 												@CurrentAccount Account currUser
     ) {
-		ReceiptDTO result = orderService.checkout(request, currUser);
-          return new ResponseEntity< >(result, HttpStatus.CREATED);
+		ReceiptDTO result = orderService.checkout(checkRequest, request, currUser);
+          return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 	
 	//Get all orders
@@ -63,7 +65,7 @@ public class OrderController {
     										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
         									@CurrentAccount Account currUser){
         Page<ReceiptDTO> orders = orderService.getAllReceipts(currUser, pageNo, pageSize, sortBy, sortDir);
-        return new ResponseEntity< >(orders, HttpStatus.OK);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 	
 	//Get order by {id}

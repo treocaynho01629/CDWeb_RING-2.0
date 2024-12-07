@@ -1,13 +1,13 @@
 import { apiSlice } from "../../app/api/apiSlice";
 import { setAuth, clearAuth } from "./authReducer";
-import { Cookies } from 'react-cookie';
 
 export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         authenticate: builder.mutation({
-            query: ({ credentials, persist }) => ({
+            query: ({ token, source, credentials, persist }) => ({
                 url: `/api/auth/authenticate?persist=${persist}`,
                 method: 'POST',
+                headers: { response: token, source },
                 body: { ...credentials }
             })
         }),
@@ -26,11 +26,11 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 }
             }
         }),
-        register: builder.mutation({ //FIX
-            query: ({ token, user }) => ({
+        register: builder.mutation({
+            query: ({ token, source, user }) => ({
                 url: '/api/auth/register',
                 method: 'POST',
-                headers: { response: token },
+                headers: { response: token, source },
                 body: {
                     ...user,
                 }
@@ -40,18 +40,20 @@ export const authApiSlice = apiSlice.injectEndpoints({
             ]
         }),
         forgot: builder.mutation({
-            query: (email) => ({
+            query: ({ token, source, email }) => ({
                 url: `/api/auth/forgot-password?email=${email}`,
                 method: 'POST',
+                headers: { response: token, source },
                 responseHandler: "text",
             }),
         }),
         reset: builder.mutation({
-            query: resetBody => ({
+            query: ({ token, source, user }) => ({
                 url: '/api/auth/reset-password',
                 method: 'PUT',
+                headers: { response: token, source },
                 body: {
-                    ...resetBody,
+                    ...user,
                 }
             }),
             invalidatesTags: [

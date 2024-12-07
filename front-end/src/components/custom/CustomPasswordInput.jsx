@@ -17,7 +17,7 @@ export default function CustomPasswordInput(props) {
                 onClick={handleClickShowPassword}
                 onMouseDown={handleMouseDownPassword}
                 edge="end"
-                tabIndex="-1"
+                tabIndex={-1}
             >
                 {showPassword ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
             </IconButton>

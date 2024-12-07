@@ -17,7 +17,9 @@ import com.ring.bookstore.enums.ShippingType;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.*;
 import com.ring.bookstore.request.*;
+import com.ring.bookstore.service.CaptchaService;
 import com.ring.bookstore.service.CouponService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -48,6 +50,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final CouponService couponService;
     private final EmailService emailService;
+    private final CaptchaService captchaService;
 
     private final OrderMapper orderMapper;
     private final CalculateMapper calculateMapper;
@@ -296,12 +299,17 @@ public class OrderServiceImpl implements OrderService {
 
     //Commit order
     @Transactional
-    public ReceiptDTO checkout(OrderRequest request, Account user) {
-        List<CartDetailRequest> cart = request.getCart();
+    public ReceiptDTO checkout(OrderRequest checkRequest, HttpServletRequest request, Account user) {
+        //Recaptcha
+        final String recaptchaToken = request.getHeader("response");
+        final String source = request.getHeader("source");
+        captchaService.validate(recaptchaToken, source, CaptchaServiceImpl.CHECKOUT_ACTION);
+
+        List<CartDetailRequest> cart = checkRequest.getCart();
         String cartContent = ""; //Email content
 
         //Create address
-        AddressRequest addressRequest = request.getAddress();
+        AddressRequest addressRequest = checkRequest.getAddress();
         var address = Address.builder()
                 .name(addressRequest.getName())
                 .companyName(addressRequest.getCompanyName())
@@ -316,11 +324,11 @@ public class OrderServiceImpl implements OrderService {
         var orderReceipt = OrderReceipt.builder()
                 .email(user.getEmail())
                 .address(savedAddress)
-                .orderMessage(request.getMessage())
+                .orderMessage(checkRequest.getMessage())
                 .details(new ArrayList<>())
                 .user(user)
-                .shippingType(request.getShippingType())
-                .paymentType(request.getPaymentMethod())
+                .shippingType(checkRequest.getShippingType())
+                .paymentType(checkRequest.getPaymentMethod())
                 .build();
 
         //Calculate
@@ -338,7 +346,7 @@ public class OrderServiceImpl implements OrderService {
         List<Long> bookIds = new ArrayList<>();
         List<Long> shopIds = new ArrayList<>();
         List<String> couponCodes = new ArrayList<>();
-        couponCodes.add(request.getCoupon());
+        couponCodes.add(checkRequest.getCoupon());
 
         for (CartDetailRequest detail : cart) {
             shopIds.add(detail.getShopId());
@@ -374,7 +382,7 @@ public class OrderServiceImpl implements OrderService {
                 int detailQuantity = 0; //Total amount of Books in detail
 
                 //Address stuff
-                ShippingType type = request.getShippingType();
+                ShippingType type = checkRequest.getShippingType();
                 Address destination = shop.getAddress();
                 shippingFee = distanceCalculation(savedAddress, destination);
 
@@ -493,7 +501,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //Main coupon
-        Coupon coupon = coupons.get(request.getCoupon());
+        Coupon coupon = coupons.get(checkRequest.getCoupon());
         if (coupon == null) throw new ResourceNotFoundException("Coupon not found!");
 
         if (coupon != null && coupon.getShop() == null && !couponService.isExpired(coupon)) {
@@ -517,7 +525,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new HttpResponseException(
                         HttpStatus.CONFLICT,
                         "Coupon expired!",
-                        "Không thể sử dụng mã coupon " + request.getCoupon() + "!"
+                        "Không thể sử dụng mã coupon " + checkRequest.getCoupon() + "!"
                 );
             }
 

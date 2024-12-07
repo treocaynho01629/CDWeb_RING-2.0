@@ -3,12 +3,61 @@ import { useEffect, useState } from 'react';
 import { useForgotMutation } from '../../features/auth/authApiSlice';
 import { EMAIL_REGEX } from '../../ultils/regex';
 import { Instruction } from '../custom/GlobalComponents';
-import { AuthForm, AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
+import { AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
+import { MarkEmailReadOutlined } from '@mui/icons-material';
+import { keyframes } from "@emotion/react";
+import styled from "@emotion/styled";
+
+//#region styled
+const expand = keyframes`
+    from { 
+        height: 0;
+        transform: scaleY(0) translateZ(0); 
+    }
+    to { 
+        height: 'auto';
+        transform: scaleY(1) translateZ(0); 
+    }
+`
+
+const NotificationContent = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: .5px solid ${props => props.theme.palette.primary.main};
+    padding: ${props => props.theme.spacing(1)};
+    animation: ${expand} .5s ease;
+    overflow: hidden;
+
+    svg {
+        font-size: 80px;
+        color: ${props => props.theme.palette.primary.main};
+    }
+
+    b {
+        margin: ${props => props.theme.spacing(2)};
+    }
+
+    p {
+        margin: 0;
+        margin-bottom: ${props => props.theme.spacing(1)};
+        color: ${props => props.theme.palette.text.secondary};
+        font-size: 14px;
+    }
+`
+
+const ButtonContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+`
+//#endregion
 
 const ForgotTab = ({ pending, setPending }) => {
     //Initial value
     const [email, setEmail] = useState('');
     const [validEmail, setValidEmail] = useState(false);
+    const [sended, setSended] = useState(false);
 
     //Error
     const [err, setErr] = useState([]);
@@ -44,6 +93,7 @@ const ForgotTab = ({ pending, setPending }) => {
                 setEmail('');
                 setErr([]);
                 setErrMsg('');
+                setSended(true);
 
                 //Queue snack
                 enqueueSnackbar('Đã gửi yêu cầu về email!', { variant: 'success' });
@@ -55,7 +105,7 @@ const ForgotTab = ({ pending, setPending }) => {
                 if (!err?.status) {
                     setErrMsg('Server không phản hồi');
                 } else if (err?.status === 404) {
-                    setErrMsg('Tài khoản với email không tồn tại!');
+                    setErrMsg('Tài khoản với email này không tồn tại!');
                 } else if (err?.status === 400) {
                     setErrMsg('Sai định dạng thông tin!');
                 } else {
@@ -66,14 +116,21 @@ const ForgotTab = ({ pending, setPending }) => {
     }
 
     return (
-        <AuthForm onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
             <AuthTitle>Khôi phục mật khẩu</AuthTitle>
-            <Stack spacing={2} direction="column">
+            <Stack spacing={1} direction="column">
                 <Instruction
                     display={errMsg ? "block" : "none"}
                     aria-live="assertive">
                     {errMsg}
                 </Instruction>
+                {sended &&
+                    <NotificationContent>
+                        <MarkEmailReadOutlined />
+                        <b>Email khôi phục đã được gửi</b>
+                        <p>Vui lòng kiểm tra email của bạn</p>
+                    </NotificationContent>
+                }
                 <TextField
                     placeholder='Nhập email tài khoản cần khôi phục'
                     id="email"
@@ -86,17 +143,30 @@ const ForgotTab = ({ pending, setPending }) => {
                     size="small"
                 />
                 <br />
-                <ConfirmButton
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    type="submit"
-                    disabled={!email || !validEmail || sending} 
-                >
-                    Gửi email khôi phục
-                </ConfirmButton>
+                <ButtonContainer>
+                    <ConfirmButton
+                        variant="outlined"
+                        color="error"
+                        size="large"
+                        type="submit"
+                        fullWidth
+                        sx={{ mr: 1 }}
+                    >
+                        Quay lại
+                    </ConfirmButton>
+                    <ConfirmButton
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        type="submit"
+                        fullWidth
+                        disabled={!email || !validEmail || sending}
+                    >
+                        Gửi email
+                    </ConfirmButton>
+                </ButtonContainer>
             </Stack>
-        </AuthForm>
+        </form>
 
 
     )
