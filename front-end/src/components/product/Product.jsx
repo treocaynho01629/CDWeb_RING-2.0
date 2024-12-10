@@ -3,7 +3,7 @@ import { Star as StarIcon, ShoppingCart as ShoppingCartIcon, StarBorder } from '
 import { Divider, Skeleton, Rating } from '@mui/material'
 import { Link } from 'react-router'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { numFormatter } from '../../ultils/covert';
+import { currencyFormat, numFormatter } from '../../ultils/covert';
 import useCart from '../../hooks/useCart';
 
 //#region styled
@@ -48,6 +48,7 @@ const Container = styled.div`
     justify-content: space-between;
     position: relative;
     border: .5px solid ${props => props.theme.palette.action.hover};
+    background-color: ${props => props.theme.palette.background.paper};
     overflow: hidden;
     transition: all .25s ease;
 
@@ -261,14 +262,14 @@ const Product = ({ book, scrollPosition }) => {
                                     <ProductInfo>
                                         <Title>{book.title}</Title>
                                         <PriceContainer>
-                                            <Price>{Math.round(book.price * (1 - book.discount)).toLocaleString()}đ</Price>
+                                            <Price>{currencyFormat.format(book.price * (1 - book.discount))}</Price>
                                             <DiscountContainer>
                                                 {book.discount > 0
                                                     ? <>
-                                                        <Discount>{book.price.toLocaleString()}đ</Discount>
+                                                        <Discount>{currencyFormat.format(book.price)}</Discount>
                                                         <Percentage>-{book.discount * 100}%</Percentage>
                                                     </>
-                                                    : <br />
+                                                    : <span>&nbsp;</span>
                                                 }
                                             </DiscountContainer>
                                         </PriceContainer>

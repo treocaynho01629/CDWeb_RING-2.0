@@ -6,7 +6,7 @@ import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
 const ordersAdapter = createEntityAdapter({});
 const ordersSelector = ordersAdapter.getSelectors();
 const initialState = ordersAdapter.getInitialState({
-  page: {
+    page: {
         number: 0,
         size: 0,
         totalElements: 0,
@@ -46,7 +46,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             transformResponse: responseData => {
                 const { content, page } = responseData;
                 return ordersAdapter.setAll({
-                        ...initialState,
+                    ...initialState,
                     page
                 }, content)
             },
@@ -80,7 +80,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             transformResponse: responseData => {
                 const { content, page } = responseData;
                 return ordersAdapter.setAll({
-                        ...initialState,
+                    ...initialState,
                     page
                 }, content)
             },
@@ -149,7 +149,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             transformResponse: responseData => {
                 const { content, page } = responseData;
                 return ordersAdapter.setAll({
-                        ...initialState,
+                    ...initialState,
                     page
                 }, content)
             },
@@ -180,11 +180,12 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             }),
         }),
         checkout: builder.mutation({
-            query: (newOrder) => ({
+            query: ({ token, source, cart }) => ({
                 url: '/api/orders',
                 method: 'POST',
                 credentials: 'include',
-                body: { ...newOrder }
+                headers: { response: token, source },
+                body: { ...cart }
             }),
             invalidatesTags: [
                 { type: 'Receipt', id: "LIST" }, { type: 'Order', id: "LIST" }

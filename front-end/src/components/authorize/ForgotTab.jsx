@@ -1,5 +1,5 @@
 import { Stack, TextField } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import { useForgotMutation } from '../../features/auth/authApiSlice';
 import { EMAIL_REGEX } from '../../ultils/regex';
 import { Instruction } from '../custom/GlobalComponents';
@@ -7,6 +7,8 @@ import { AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
 import { MarkEmailReadOutlined } from '@mui/icons-material';
 import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
+
+const ReCaptcha = lazy(() => import('./ReCaptcha'));
 
 //#region styled
 const expand = keyframes`
@@ -50,10 +52,11 @@ const NotificationContent = styled.div`
 const ButtonContainer = styled.div`
     display: flex;
     justify-content: space-between;
+    padding-top: ${props => props.theme.spacing(2)};
 `
 //#endregion
 
-const ForgotTab = ({ pending, setPending }) => {
+const ForgotTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge }) => {
     //Initial value
     const [email, setEmail] = useState('');
     const [validEmail, setValidEmail] = useState(false);
@@ -62,6 +65,10 @@ const ForgotTab = ({ pending, setPending }) => {
     //Error
     const [err, setErr] = useState([]);
     const [errMsg, setErrMsg] = useState('');
+
+    //Recaptcha v2
+    const [challenge, setChallenge] = useState(false); //Toggle if marked suspicious by v3
+    const [token, setToken] = useState('');
 
     const [sendForgot, { isLoading: sending }] = useForgotMutation(); //Request forgot hook
 
@@ -87,13 +94,20 @@ const ForgotTab = ({ pending, setPending }) => {
         const { enqueueSnackbar } = await import('notistack');
 
         //Send mutation
-        sendForgot(email).unwrap()
+        const recaptchaToken = challenge ? token : await generateReCaptchaToken('forgot');
+        sendForgot({
+            token: recaptchaToken,
+            source: challenge ? 'v2' : 'v3',
+            email
+        }).unwrap()
             .then((data) => {
                 //Reset input
                 setEmail('');
                 setErr([]);
                 setErrMsg('');
                 setSended(true);
+                setChallenge(false);
+                showBadge();
 
                 //Queue snack
                 enqueueSnackbar('Đã gửi yêu cầu về email!', { variant: 'success' });
@@ -106,8 +120,16 @@ const ForgotTab = ({ pending, setPending }) => {
                     setErrMsg('Server không phản hồi');
                 } else if (err?.status === 404) {
                     setErrMsg('Tài khoản với email này không tồn tại!');
+                } else if (err?.status === 409) {
+                    setErrMsg(err?.data?.message);
                 } else if (err?.status === 400) {
-                    setErrMsg('Sai định dạng thông tin!');
+                    setErrMsg(err?.data?.message ?? 'Sai định dạng thông tin!');
+                } else if (err?.status === 403) {
+                    setErrMsg('Lỗi xác thực!');
+                } else if (err?.status === 412) {
+                    setChallenge(true);
+                    hideBadge();
+                    setErrMsg('Yêu cầu của bạn cần xác thực lại!');
                 } else {
                     setErrMsg('Gửi yêu cầu thất bại');
                 }
@@ -138,11 +160,16 @@ const ForgotTab = ({ pending, setPending }) => {
                     onChange={(e) => setEmail(e.target.value)}
                     value={email}
                     fullWidth
+                    size="small"
+                    style={{ margin: '8px 0' }}
                     error={(email && !validEmail) || err?.data?.errors?.email}
                     helperText={email && !validEmail ? "Email không hợp lệ!" : err?.data?.errors?.email}
-                    size="small"
                 />
-                <br />
+                {(reCaptchaLoaded && challenge) &&
+                    <Suspense fallback={null}>
+                        <ReCaptcha onVerify={(token) => setToken(token)} />
+                    </Suspense>
+                }
                 <ButtonContainer>
                     <ConfirmButton
                         variant="outlined"
@@ -160,7 +187,7 @@ const ForgotTab = ({ pending, setPending }) => {
                         size="large"
                         type="submit"
                         fullWidth
-                        disabled={!email || !validEmail || sending}
+                        disabled={!email || !validEmail || sending || !reCaptchaLoaded}
                     >
                         Gửi email
                     </ConfirmButton>

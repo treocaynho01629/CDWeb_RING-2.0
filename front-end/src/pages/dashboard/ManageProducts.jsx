@@ -90,7 +90,7 @@ const ManageProducts = () => {
   return (
     <>
       <h2>Quản lý sản phẩm</h2>
-      <Box display="flex" justifyContent={'space-between'}>
+      <Box display="flex" justifyContent="space-between" mb={1}>
         <Breadcrumbs aria-label="breadcrumb">
           <Link style={{ color: 'inherit' }} to={'/dashboard'}>Dashboard</Link>
           <Typography color="text.secondary">Quản lý sản phẩm</Typography>
@@ -99,7 +99,6 @@ const ManageProducts = () => {
           Thêm sản phẩm mới
         </Button>
       </Box>
-      <br />
       <Grid container spacing={3} mb={'20px'}>
         <Grid size={{ sm: 6, md: 4 }}>
           <CountCard

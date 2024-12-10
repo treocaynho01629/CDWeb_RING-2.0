@@ -4,6 +4,7 @@ import { KeyboardArrowRight, LocalActivityOutlined, Inventory } from '@mui/icons
 import { Box, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { StyledItemTableRow, StyledTableRow, SpaceTableRow, StyledTableCell } from '../custom/CustomTableComponents';
+import { currencyFormat } from '../../ultils/covert';
 
 //#region styled
 const ItemContainer = styled.div`
@@ -174,8 +175,8 @@ function ItemRow({ product, index }) {
                         <ItemTitle className={isDisabled ? 'error' : ''}>{product.title}</ItemTitle>
                         <ItemAction>
                             <Box display={{ xs: 'flex', md: 'none', md_lg: 'flex', lg: 'none' }}>
-                                <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                                <Discount>{product?.discount > 0 ? `${product.price.toLocaleString()}đ` : ''}</Discount>
+                                <Price>{currencyFormat.format(product.price * (1 - (product?.discount || 0)))}</Price>
+                                <Discount>{product?.discount > 0 ? currencyFormat.format(product.price) : ''}</Discount>
                             </Box>
                             <Box display={{ xs: 'flex', sm: 'none' }}>
                                 x{product.quantity}
@@ -185,14 +186,14 @@ function ItemRow({ product, index }) {
                 </ItemContainer>
             </StyledTableCell>
             <StyledTableCell className="preview" align="right" sx={{ display: { xs: 'none', md: 'table-cell', md_lg: 'none', lg: 'table-cell' } }}>
-                <Price>{Math.round(product.price * (1 - (product?.discount || 0))).toLocaleString()}đ</Price>
-                {product?.discount > 0 && <Discount>{product.price.toLocaleString()}đ</Discount>}
+                <Price>{currencyFormat.format(product.price * (1 - (product?.discount || 0)))}</Price>
+                {product?.discount > 0 && <Discount>{currencyFormat.format(product.price)}</Discount>}
             </StyledTableCell>
             <StyledTableCell className="preview" align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                 <Amount>SL: {product.quantity}</Amount>
             </StyledTableCell>
             <StyledTableCell className="preview" align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                <Price className="total">{(Math.round(product.price * (1 - (product?.discount || 0))) * product.quantity).toLocaleString()}đ</Price>
+                <Price className="total">{currencyFormat.format(product.price * (1 - (product?.discount || 0)) * product.quantity)}</Price>
             </StyledTableCell>
         </StyledItemTableRow>
     )
@@ -218,8 +219,8 @@ const PreviewDetailRow = ({ id, index, shop, coupon, couponDiscount, handleOpenD
                             <LocalActivityOutlined color="error" />&nbsp;
                             {coupon
                                 ? couponDiscount
-                                    ? `Đã giảm ${couponDiscount.toLocaleString()}đ`
-                                    : `Mua thêm để giảm ${coupon?.discount * 100}% - giảm tối đa ${coupon?.maxDiscount.toLocaleString()}đ`
+                                    ? `Đã giảm ${currencyFormat.format(couponDiscount)}`
+                                    : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
                                 : 'Thêm mã giảm giá'
                             }
                         </span>

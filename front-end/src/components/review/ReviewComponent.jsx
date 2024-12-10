@@ -23,6 +23,7 @@ const ReviewsWrapper = styled.div`
     position: relative;
     padding: ${props => props.theme.spacing(1)} ${props => props.theme.spacing(2.5)};
     border: .5px solid ${props => props.theme.palette.divider};
+    background-color: ${props => props.theme.palette.background.paper};
 
     ${props => props.theme.breakpoints.down("md")} {
         padding: 0 ${props => props.theme.spacing(1.5)};
@@ -221,7 +222,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                                     emptyIcon={<StarBorder sx={{ fontSize: 16 }} />}
                                 />
                                 <Label>{(book?.reviewsInfo?.rating ?? 0).toFixed(1)}/5</Label>
-                                <Label className="secondary">({numFormatter(productReviewsCount)} đánh giá)</Label>
+                                <Label className="secondary">({numFormatter(productReviewsCount ?? 0)} đánh giá)</Label>
                             </>
                                 : <Skeleton variant="text" sx={{ fontSize: '16px' }} width={200} />
                             }
@@ -249,7 +250,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
             </ReviewsContainer>
             {(mobileMode && book?.reviewsInfo?.total > 0) && //View all
                 <Showmore onClick={() => handleToggleReview(true)}>
-                    <Label>Xem tất cả ({numFormatter(productReviewsCount)} đánh giá) <KeyboardArrowRight fontSize="small" /></Label>
+                    <Label>Xem tất cả ({numFormatter(productReviewsCount ?? 0)} đánh giá) <KeyboardArrowRight fontSize="small" /></Label>
                 </Showmore>
             }
             {(isReview !== undefined && mobileMode) && //Mobile component

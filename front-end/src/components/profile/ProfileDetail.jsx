@@ -86,7 +86,7 @@ const BadgeButton = styled.span`
     justify-content: flex-end;
     color: ${props => props.theme.palette.common.black};
     background-color: ${props => props.theme.palette.grey[300]};
-    border: 2px solid ${props => props.theme.palette.background.default};
+    border: 2px solid ${props => props.theme.palette.background.paper};
     cursor: pointer;
 
     svg {

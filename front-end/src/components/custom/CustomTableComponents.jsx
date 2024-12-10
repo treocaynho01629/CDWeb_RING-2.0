@@ -134,6 +134,7 @@ export const StyledTableRow = styled(TableRow)`
         width: 100%;
         height: 100%;
         border: .5px solid ${props => props.theme.palette.action.focus};
+        background-color: ${props => props.theme.palette.background.paper};
         z-index: -1;
 
         ${props => props.theme.breakpoints.down("sm")} {
@@ -162,6 +163,7 @@ export const StyledItemTableRow = styled(TableRow)`
         border: .5px solid ${props => props.theme.palette.action.focus};
         border-top: none;
         border-bottom: none;
+        background-color: ${props => props.theme.palette.background.paper};
         z-index: -1;
 
         ${props => props.theme.breakpoints.down("sm")} {

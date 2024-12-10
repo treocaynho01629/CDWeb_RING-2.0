@@ -29,7 +29,7 @@ const OrdersContainer = styled.div`
 
 const ToggleGroupContainer = styled.div`
     width: 100%;
-    background-color: ${props => props.theme.palette.background.default};
+    background-color: ${props => props.theme.palette.background.paper};
     border-bottom: 1px solid ${props => props.theme.palette.divider};
     white-space: nowrap;
     position: sticky; 
@@ -51,7 +51,7 @@ const ToggleGroupContainer = styled.div`
         top: -16px;
         width: 100%;
         height: calc(100% + 16px);
-        background-color: ${props => props.theme.palette.background.default};
+        background-color: ${props => props.theme.palette.background.paper};
         z-index: -1;
     }
 

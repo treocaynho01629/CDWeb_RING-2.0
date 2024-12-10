@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
 import { Link } from 'react-router';
-import { ContactSupportOutlined } from '@mui/icons-material';
+import { ContactSupportOutlined, ContrastOutlined, LightModeOutlined, NightlightOutlined } from '@mui/icons-material';
+import { useColorScheme } from '@mui/material';
 
 //#region styled
 const Container = styled.div`
@@ -8,22 +9,22 @@ const Container = styled.div`
     top: 0;
     left: 0;
     width: 100%;
-    padding: 10px 25px;
+    padding: ${props => props.theme.spacing(1)} ${props => props.theme.spacing(3)};
     margin: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     z-index: ${props => props.theme.zIndex.appBar};
 
     ${props => props.theme.breakpoints.down("md")} {
-        justify-content: center;
+        text-align: center;
+        padding: ${props => props.theme.spacing(1)} ${props => props.theme.spacing(1.5)};
     }
 `
 
-const SupportButton = styled.div`
+const SimpleButton = styled.span`
+    height: 46px;
     display: flex;
     align-items: center;
     color: ${props => props.theme.palette.text.secondary};
+    float: right;
     cursor: pointer;
 
     p {
@@ -32,11 +33,12 @@ const SupportButton = styled.div`
     }
 
     &:hover {
-        color: ${props => props.theme.palette.info.main};
+        color: ${props => props.theme.palette.text.primary};
     }
 
     ${props => props.theme.breakpoints.down("md")} {
-       display: none;
+        p { display: none; }
+        &:last-of-type {  float: left; }
     }
 `
 
@@ -47,17 +49,38 @@ const Logo = styled.img`
 //#endregion
 
 const SimpleNavbar = () => {
+    const { mode, setMode } = useColorScheme();
+
+    //Toggle color mode
+    const toggleMode = () => {
+        if (!mode) {
+            return;
+        } else if (mode === 'system') {
+            setMode('light');
+        } else if (mode === 'light') {
+            setMode('dark');
+        } else if (mode === 'dark') {
+            setMode('system');
+        }
+    }
+
     return (
         <Container>
             <Link to="/" tabIndex={-1}>
                 <Logo src="/full-logo.svg" alt="RING! Logo" />
             </Link>
-            <Link>
-                <SupportButton>
-                    <ContactSupportOutlined />
-                    <p>Trợ giúp</p>
-                </SupportButton>
-            </Link>
+            <SimpleButton>
+                <ContactSupportOutlined />
+                <p>Trợ giúp</p>
+            </SimpleButton>
+            {mode &&
+                <SimpleButton aria-label="toggle-mode" onClick={toggleMode}>
+                    {mode === 'dark' ? <NightlightOutlined />
+                        : mode === 'light' ? <LightModeOutlined />
+                            : mode === 'system' ? <ContrastOutlined /> : ''}
+                    &nbsp;
+                </SimpleButton>
+            }
         </Container>
     )
 }

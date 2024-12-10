@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
 import { RemoveShoppingCart as RemoveShoppingCartIcon } from '@mui/icons-material';
-import { Button, Skeleton, Popover } from '@mui/material';
+import { Button, Skeleton, Popover, Paper } from '@mui/material';
 import { Link } from 'react-router';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { currencyFormat } from "../../ultils/covert";
 
 //#region styled
 const MiniCartContainer = styled.div`
@@ -91,32 +92,30 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
             sx={{ pointerEvents: 'none' }}
             slotProps={{
                 paper: {
-                    elevation: 0,
                     sx: {
                         overflow: 'visible',
                         filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                        bgcolor: 'background.elevate',
+                        bgcolor: 'background.paper',
                         mt: 1.5,
                         borderRadius: 0,
                         pointerEvents: 'auto',
-
-                        '&:before': {
-                            content: '""',
-                            display: 'block',
-                            position: 'absolute',
-                            top: 0,
-                            right: 14,
-                            width: 10,
-                            height: 10,
-                            bgcolor: 'background.elevate',
-                            transform: 'translateY(-50%) rotate(45deg)',
-                            zIndex: 0,
-                        },
                     },
                     onMouseLeave: handleClose
                 }
             }}
         >
+            <Paper elevation={7} sx={{
+                display: 'block',
+                position: 'absolute',
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: 'background.paper',
+                transform: 'translateY(-50%) rotate(45deg)',
+                boxShadow: 'none',
+                zIndex: 0,
+            }} />
             <MiniCartContainer>
                 <CartTitleContainer><b>Sản phẩm trong giỏ hàng</b></CartTitleContainer>
                 {products?.length == 0 ?
@@ -138,7 +137,7 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
                                 />
                                 <ItemInfo>
                                     <ProductTitle>{product?.title}</ProductTitle>
-                                    <ProductPrice>{product?.price?.toLocaleString()}đ</ProductPrice>
+                                    <ProductPrice>{currencyFormat.format(product?.price)}</ProductPrice>
                                 </ItemInfo>
                             </ItemContainer>
                         ))}

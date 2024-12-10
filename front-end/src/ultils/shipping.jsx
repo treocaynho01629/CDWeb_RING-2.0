@@ -7,7 +7,7 @@ export const shippingItems = [
         value: 'STANDARD',
         label: 'Tiêu chuẩn',
         description: '2-4 ngày giao hàng',
-        price: '10,000đ',
+        price: 10000,
         color: '',
         icon: <LocalShippingOutlined/>
     },
@@ -15,7 +15,7 @@ export const shippingItems = [
         value: 'ECONOMY',
         label: 'Tiết kiệm',
         description: '5-7 ngày giao hàng',
-        price: '-8,000đ',
+        price: 2000,
         color: 'success',
         icon: <SavingsOutlined/>
     },
@@ -23,7 +23,7 @@ export const shippingItems = [
         value: 'EXPRESS',
         label: 'Hoả tốc',
         description: '1-2 ngày giao hàng',
-        price: '+5,000đ',
+        price: 15000,
         color: 'warning',
         icon: <RocketLaunchOutlined/>
     },

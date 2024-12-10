@@ -9,6 +9,7 @@ import { numFormatter } from '../../../ultils/covert';
 const ShopContainer = styled.div`
     padding: 20px;
     border: .5px solid ${props => props.theme.palette.divider};
+    background-color: ${props => props.theme.palette.background.paper};
     display: flex;
     flex-wrap: wrap;
 

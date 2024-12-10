@@ -133,7 +133,7 @@ const ReviewInfo = ({ handleClick, book, disabled, editable }) => {
                         icon={<Star fontSize="inherit" />}
                         emptyIcon={<StarBorder fontSize="inherit" />}
                     />
-                    <TotalLabel>({numFormatter(book?.reviewsInfo?.total)} đánh giá)</TotalLabel>
+                    <TotalLabel>({numFormatter(book?.reviewsInfo?.total ?? 0)} đánh giá)</TotalLabel>
                 </>
                     : <>
                         <Score><Skeleton variant="text" sx={{ fontSize: 'inherit', width: { xs: 60, md: 100 } }} /></Score>

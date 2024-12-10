@@ -1,5 +1,5 @@
-import { Brightness3, Brightness7, DeliveryDiningOutlined, LockOutlined, SettingsBrightness, Speed } from '@mui/icons-material';
-import { Avatar, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
+import { NightlightOutlined, LightModeOutlined, DeliveryDiningOutlined, LockOutlined, ContrastOutlined, Speed } from '@mui/icons-material';
+import { Avatar, Menu, MenuItem, ListItemIcon, Divider, Paper } from '@mui/material';
 import { Link } from 'react-router';
 
 const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mode, toggleMode }) => {
@@ -18,11 +18,10 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mo
             sx={{ pointerEvents: 'none', }}
             slotProps={{
                 paper: {
-                    elevation: 0,
                     sx: {
                         overflow: 'visible',
                         filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                        bgcolor: 'background.elevate',
+                        bgcolor: 'background.paper',
                         mt: 1.5,
                         borderRadius: 0,
                         pointerEvents: 'auto',
@@ -33,18 +32,6 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mo
                             ml: -0.5,
                             mr: 1,
                         },
-                        '&:before': {
-                            content: '""',
-                            display: 'block',
-                            position: 'absolute',
-                            top: 0,
-                            right: 14,
-                            width: 10,
-                            height: 10,
-                            bgcolor: 'background.elevate',
-                            transform: 'translateY(-50%) rotate(45deg)',
-                            zIndex: 0,
-                        },
                     },
                     onMouseLeave: handleClose
                 }
@@ -52,6 +39,18 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mo
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
+            <Paper elevation={7} sx={{
+                display: 'block',
+                position: 'absolute',
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: 'background.paper',
+                transform: 'translateY(-50%) rotate(45deg)',
+                boxShadow: 'none',
+                zIndex: 0,
+            }} />
             <Link to={'/profile/detail'} style={{ color: 'inherit' }}>
                 <MenuItem>
                     <Avatar src={image ? image + '?size=tiny' : null} /> Thông tin tài khoản
@@ -79,9 +78,9 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mo
             {mode &&
                 <MenuItem aria-label="toggle-mode" onClick={toggleMode} >
                     <ListItemIcon>
-                        {mode === 'dark' ? <Brightness3 fontSize="small" />
-                            : mode === 'light' ? <Brightness7 fontSize="small" />
-                                : mode === 'system' ? <SettingsBrightness fontSize="small" /> : ''}
+                        {mode === 'dark' ? <NightlightOutlined fontSize="small" />
+                            : mode === 'light' ? <LightModeOutlined fontSize="small" />
+                                : mode === 'system' ? <ContrastOutlined fontSize="small" /> : ''}
                     </ListItemIcon>
                     {mode === 'dark' ? 'Chủ đề tối'
                         : mode === 'light' ? 'Chủ đề mặc định'

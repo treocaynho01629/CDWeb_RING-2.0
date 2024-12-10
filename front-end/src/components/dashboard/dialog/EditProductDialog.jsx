@@ -171,7 +171,7 @@ const EditProductDialog = ({ id, open, handleClose }) => {
           if (!err?.status) {
             setErrMsg('Server không phản hồi');
           } else if (err?.status === 409) {
-            setErrMsg(err?.data?.errors?.errorMessage);
+            setErrMsg(err?.data?.message);
           } else if (err?.status === 400) {
             setErrMsg('Sai định dạng thông tin!');
           } else {
@@ -195,7 +195,7 @@ const EditProductDialog = ({ id, open, handleClose }) => {
           if (!err?.status) {
             setErrMsg('Server không phản hồi');
           } else if (err?.status === 409) {
-            setErrMsg(err?.data?.errors?.errorMessage);
+            setErrMsg(err?.data?.message);
           } else if (err?.status === 400) {
             setErrMsg('Sai định dạng thông tin!');
           } else {

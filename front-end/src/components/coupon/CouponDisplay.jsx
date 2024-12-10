@@ -7,7 +7,7 @@ const CouponContainer = styled.div`
     border-radius: 5px;
     height: 100%;
     width: 100%;
-    background-color: ${props => props.theme.palette.background.default};
+    background-color: ${props => props.theme.palette.background.paper};
     border: .5px solid ${props => props.theme.palette.divider};
     box-shadow: ${props => props.theme.shadows[1]};
     display: flex;
@@ -17,7 +17,7 @@ const CouponContainer = styled.div`
     &::before, &::after {
         content: "";
         position: absolute;
-        background-color: ${props => props.theme.palette.background.default};
+        background-color: ${props => props.theme.palette.background.paper};
         border: .5px solid ${props => props.theme.palette.divider};
         background-image: ${props => props.theme.shadows[3]};
         border-left: none;
@@ -63,7 +63,7 @@ const CouponIcon = styled.div`
     aspect-ratio: 1/1;
     background-color: ${props => props.theme.palette.primary.light};
     color: ${props => props.theme.palette.primary.contrastText};
-    border-right: 5px dotted ${props => props.theme.palette.background.default};
+    border-right: 5px dotted ${props => props.theme.palette.background.paper};
     display: flex;
     align-items: center;
     justify-content: center;

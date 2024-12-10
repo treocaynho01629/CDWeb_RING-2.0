@@ -1,10 +1,17 @@
 import styled from '@emotion/styled'
-import { AltCheckoutBox, CheckoutBox, CheckoutButton, CheckoutContainer, CheckoutPrice, CheckoutPriceContainer, CheckoutRow, CheckoutStack, CheckoutText, CheckoutTitle, CouponButton, DetailContainer, MiniCouponContainer, PriceContainer, SavePrice, SubText } from '../custom/CartComponents';
+import {
+    AltCheckoutBox, CheckoutBox, CheckoutButton, CheckoutContainer, CheckoutPrice,
+    CheckoutPriceContainer, CheckoutRow, CheckoutStack, CheckoutText, CheckoutTitle,
+    CouponButton, MiniCouponContainer, PriceContainer, SavePrice, SubText
+} from '../custom/CartComponents';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { Edit, KeyboardArrowRight, KeyboardDoubleArrowDown, LocalActivityOutlined } from '@mui/icons-material';
 import { lazy, Suspense, useState } from 'react';
 import { getAddress } from '../../ultils/address';
+import { currencyFormat } from '../../ultils/covert';
 import CouponDisplay from '../coupon/CouponDisplay';
+import PriceDisplay from './PriceDisplay';
+import NumberFlow from '@number-flow/react';
 
 const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
 
@@ -80,7 +87,7 @@ const AddressDivider = styled.div`
 //#endregion
 
 const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addressInfo,
-    isValid, handleNext, activeStep, maxSteps, backFirstStep, handleOpenDialog, handleSubmit }) => {
+    isValid, handleNext, activeStep, maxSteps, backFirstStep, handleOpenDialog, handleSubmit, reCaptchaLoaded }) => {
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('sm'));
     const tabletMode = useMediaQuery(theme.breakpoints.down('md_lg'));
@@ -103,39 +110,22 @@ const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addre
 
     //Component stuff
     let checkoutDetail = <>
-        <DetailContainer>
-            <CheckoutRow>
-                <CheckoutText>Tiền hàng:</CheckoutText>
-                <CheckoutText>{(displayInfo.subTotal).toLocaleString()}đ</CheckoutText>
-            </CheckoutRow>
-            <CheckoutRow>
-                <CheckoutText>Phí vận chuyển:</CheckoutText>
-                <CheckoutText>{displayInfo.shipping.toLocaleString()}đ</CheckoutText>
-            </CheckoutRow>
-            {(!calculating && displayInfo.shippingDiscount > 0) &&
-                <CheckoutRow>
-                    <CheckoutText>Khuyến mãi vận chuyển:</CheckoutText>
-                    <CheckoutText>-{displayInfo.shippingDiscount.toLocaleString()}đ</CheckoutText>
-                </CheckoutRow>
-            }
-            {displayInfo.deal > 0 &&
-                <CheckoutRow>
-                    <CheckoutText>Giảm giá sản phẩm:</CheckoutText>
-                    <CheckoutText>-{displayInfo.deal.toLocaleString()}đ</CheckoutText>
-                </CheckoutRow>
-            }
-            {(!calculating && displayInfo.couponDiscount > 0) &&
-                <CheckoutRow>
-                    <CheckoutText>Giảm giá từ coupon:</CheckoutText>
-                    <CheckoutText>-{displayInfo.couponDiscount.toLocaleString()}đ</CheckoutText>
-                </CheckoutRow>
-            }
-        </DetailContainer>
+        <PriceDisplay displayInfo={displayInfo} />
         <CheckoutRow>
             <PriceContainer>
-                <CheckoutPrice><b>Tổng:</b>{displayInfo.total.toLocaleString()}đ</CheckoutPrice>
+                <CheckoutPrice>
+                    <b>Tổng:</b>
+                    <NumberFlow
+                        value={displayInfo.total}
+                        format={{ style: 'currency', currency: 'VND' }}
+                        locales={'vi-VN'}
+                        aria-hidden="true"
+                        respectMotionPreference={false}
+                        willChange
+                    />
+                </CheckoutPrice>
                 {(!calculating && displayInfo.totalDiscount > 0) &&
-                    <SavePrice>Tiết kiệm {Math.round(displayInfo.totalDiscount).toLocaleString()}đ</SavePrice>}
+                    <SavePrice>Tiết kiệm {currencyFormat.format(displayInfo.totalDiscount)}</SavePrice>}
                 <SubText>(Giá này đã bao gồm thuế GTGT, phí đóng gói, phí vận chuyển và các chi phí phát sinh khác)</SubText>
             </PriceContainer>
         </CheckoutRow>
@@ -161,9 +151,9 @@ const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addre
                         <CheckoutStack>
                             <AltCheckoutBox onClick={() => toggleDrawer(true)}>
                                 <PriceContainer>
-                                    <CheckoutPrice><b>Tổng: ({activeStep + 1}/{maxSteps})</b>{displayInfo.total.toLocaleString()}đ</CheckoutPrice>
+                                    <CheckoutPrice><b>Tổng: ({activeStep + 1}/{maxSteps})</b>{currencyFormat.format(displayInfo.total)}</CheckoutPrice>
                                     {(!calculating && displayInfo.totalDiscount > 0) &&
-                                        <SavePrice>Tiết kiệm {Math.round(displayInfo.totalDiscount).toLocaleString()}đ</SavePrice>}
+                                        <SavePrice>Tiết kiệm {currencyFormat.format(displayInfo.totalDiscount)}</SavePrice>}
                                 </PriceContainer>
                             </AltCheckoutBox>
                             {activeStep < 2 ?
@@ -184,7 +174,7 @@ const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addre
                                     size="large"
                                     fullWidth
                                     sx={{ maxWidth: '42%' }}
-                                    disabled={calculating}
+                                    disabled={calculating || !reCaptchaLoaded}
                                     onClick={handleSubmit}
                                 >
                                     Đặt hàng
@@ -216,10 +206,10 @@ const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addre
                                         </PriceContainer>
                                         <PriceContainer>
                                             <CheckoutPrice onClick={() => toggleDrawer(true)}>
-                                                {Math.round(displayInfo.total).toLocaleString()}đ
+                                                {currencyFormat.format(displayInfo.total)}
                                             </CheckoutPrice>&emsp;
                                             {(!calculating && displayInfo.totalDiscount > 0) &&
-                                                <SavePrice>Tiết kiệm {Math.round(displayInfo.totalDiscount).toLocaleString()}đ</SavePrice>}
+                                                <SavePrice>Tiết kiệm {currencyFormat.format(displayInfo.totalDiscount)}</SavePrice>}
                                         </PriceContainer>
                                     </CheckoutPriceContainer>
                                     {activeStep < 2 ?
@@ -240,7 +230,7 @@ const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addre
                                             size="large"
                                             fullWidth
                                             sx={{ maxWidth: '35%' }}
-                                            disabled={calculating}
+                                            disabled={calculating || !reCaptchaLoaded}
                                             onClick={handleSubmit}
                                         >
                                             Đặt hàng
@@ -309,7 +299,7 @@ const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addre
                                         size="large"
                                         fullWidth
                                         sx={{ padding: '11px', mt: 1 }}
-                                        disabled={calculating}
+                                        disabled={calculating || !reCaptchaLoaded}
                                         onClick={handleSubmit}
                                     >
                                         Đặt hàng

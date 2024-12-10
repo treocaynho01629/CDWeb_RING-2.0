@@ -11,6 +11,7 @@ import "react-multi-carousel/lib/styles.css";
 const ImgContainer = styled.div`
     text-align: center;
     border: .5px solid ${props => props.theme.palette.divider};
+    background-color: ${props => props.theme.palette.background.paper};
     border-bottom: none;
     
     ${props => props.theme.breakpoints.up("md")} {

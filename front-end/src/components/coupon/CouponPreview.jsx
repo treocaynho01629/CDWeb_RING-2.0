@@ -291,7 +291,7 @@ const CouponPreview = ({ shopId }) => {
                                             sx: {
                                                 overflow: 'visible',
                                                 filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.32))',
-                                                backgroundColor: 'background.default',
+                                                backgroundColor: 'background.paper',
                                                 mt: .5,
                                                 padding: 1,
                                                 borderRadius: 0,

@@ -240,7 +240,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
         if (!err?.status) {
           enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
         } else if (err?.status === 409) {
-          enqueueSnackbar(err?.data?.errors?.errorMessage, { variant: 'error' });
+          enqueueSnackbar(err?.data?.message, { variant: 'error' });
         } else if (err?.status === 400) {
           enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
         } else {
@@ -277,7 +277,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
     //     if (!err?.status) {
     //       enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
     //     } else if (err?.status === 409) {
-    //       enqueueSnackbar(err?.data?.errors?.errorMessage, { variant: 'error' });
+    //       enqueueSnackbar(err?.data?.message, { variant: 'error' });
     //     } else if (err?.status === 400) {
     //       enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
     //     } else {

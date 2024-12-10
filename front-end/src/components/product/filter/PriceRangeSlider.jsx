@@ -1,19 +1,25 @@
 import PropTypes from 'prop-types';
 import { Button, TextField, Box } from '@mui/material';
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
-import { NumericFormat } from 'react-number-format';
+import { NumberFormatBase, NumericFormat } from 'react-number-format';
 import { marks } from "../../../ultils/filters";
+import { currencyFormat } from '../../../ultils/covert';
 import CustomSlider from '../../custom/CustomSlider';
 
 const NumericFormatCustom = forwardRef(
     function NumericFormatCustom(props, ref) {
         const { onChange, ...other } = props;
 
+        const format = (numStr) => {
+            if (numStr === '') return '';
+            return currencyFormat.format(numStr);
+        };
+
         return (
-            <NumericFormat
+            <NumberFormatBase
                 {...other}
                 getInputRef={ref}
-                onValueChange={(values) => {
+                onValueChange={(values, sourceInfo) => {
                     onChange({
                         target: { value: values.value },
                     });
@@ -22,9 +28,7 @@ const NumericFormatCustom = forwardRef(
                     const { floatValue } = values;
                     return floatValue >= 0 && floatValue <= 10000000;
                 }}
-                thousandSeparator
-                valueIsNumericString
-                suffix="đ"
+                format={format}
             />
         );
     },
@@ -58,7 +62,7 @@ function valuetext(value) {
     if (scaledValue >= 10000000) {
         scaledValue = 10000000;
     }
-    return `${scaledValue.toLocaleString()}đ`;
+    return currencyFormat.format(scaledValue);
 }
 
 const PriceRangeSlider = ({ value, onChange, disabledLabel }) => {
@@ -73,8 +77,8 @@ const PriceRangeSlider = ({ value, onChange, disabledLabel }) => {
     }, [value]);
 
     //Change range functions
-    const handleChangeRange = (e, newValue) => { 
-        setRangeValue(newValue); 
+    const handleChangeRange = (e, newValue) => {
+        setRangeValue(newValue);
         const firstInput = calculateValue(newValue[0]);
         const secondInput = calculateValue(newValue[1]);
         const newInputValue = [firstInput, secondInput];
@@ -103,7 +107,7 @@ const PriceRangeSlider = ({ value, onChange, disabledLabel }) => {
 
     const handleInputToChange = (e) => {
         //Input
-        let newValue = inputValue.current;
+        let newValue = [...inputValue.current];
         let newInputTo = e.target.value === '' ? '' : Number(e.target.value);
 
         //Threshold
@@ -120,9 +124,9 @@ const PriceRangeSlider = ({ value, onChange, disabledLabel }) => {
         inputValue.current = newValue;
     };
 
-    const handleChange = () => { if(onChange) onChange(inputValue.current); };
+    const handleChange = () => { if (onChange) onChange(inputValue.current); };
 
-    const handleReset = () => { 
+    const handleReset = () => {
         const defaultValue = [0, 10000000];
         inputValue.current = defaultValue;
         onChange(defaultValue);
@@ -136,6 +140,7 @@ const PriceRangeSlider = ({ value, onChange, disabledLabel }) => {
                     onBlur={handleChange}
                     value={inputValue.current[0]}
                     size="small"
+                    sx={{ backgroundColor: 'background.paper' }}
                     slotProps={{
                         input: { sx: { fontSize: 14, 'input': { textAlign: 'center' } }, inputComponent: NumericFormatCustom }
                     }}
@@ -146,6 +151,7 @@ const PriceRangeSlider = ({ value, onChange, disabledLabel }) => {
                     onBlur={handleChange}
                     value={inputValue.current[1]}
                     size="small"
+                    sx={{ backgroundColor: 'background.paper' }}
                     slotProps={{
                         input: { sx: { fontSize: 14, 'input': { textAlign: 'center' } }, inputComponent: NumericFormatCustom }
                     }}

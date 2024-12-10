@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import CustomAmountInput from '../../custom/CustomAmountInput';
 import useCart from '../../../hooks/useCart';
+import { currencyFormat } from '../../../ultils/covert';
 
 //#region styled
 const AmountCount = styled.span`
@@ -39,7 +40,7 @@ const AltFilterContainer = styled.div`
     height: 50px;
     z-index: ${props => props.theme.zIndex.appBar};
     box-shadow: ${props => props.theme.shadows[12]};
-    background-color: ${props => props.theme.palette.background.default};
+    background-color: ${props => props.theme.palette.background.paper};
     align-items: flex-end;
     display: none;
 
@@ -156,12 +157,13 @@ const ProductAction = ({ book }) => {
                         onClick={handleOpenNow}
                     >
                         {!book ? 'Đang tải' : book?.amount == 0 ? 'Hết hàng'
-                            : `Mua ngay (${(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)`}
+                            : `Mua ngay (${currencyFormat.format(book?.price * (1 - book?.discount) * amountIndex)})`}
                     </BuyButton>
                 </AltFilterContainer>
                 <SwipeableDrawer
                     anchor="bottom"
-                    open={open || openNow}
+                    open={(open || openNow)}
+                    onOpen={handleOpen}
                     onClose={handleClose}
                     disableBackdropTransition
                     disableSwipeToOpen={true}
@@ -174,8 +176,8 @@ const ProductAction = ({ book }) => {
                         />
                         <Box>
                             <Box display="flex">
-                                <Price>{Math.round(book?.price * (1 - book?.discount)).toLocaleString()}đ</Price>
-                                {book?.discount > 0 && <Discount>{book?.price.toLocaleString()}đ</Discount>}
+                                <Price>{currencyFormat.format(book?.price * (1 - book?.discount))}</Price>
+                                {book?.discount > 0 && <Discount>{currencyFormat.format(book?.price)}</Discount>}
                             </Box>
                             <AmountCount className={book?.amount > 0 ? '' : 'error'}>
                                 {book?.amount > 0 ? `(${book?.amount}) sản phẩm còn lại` : 'Tạm thời hết hàng'}
@@ -205,7 +207,7 @@ const ProductAction = ({ book }) => {
                             onClick={() => handleBuyNow(book)}
                         >
                             {!book ? 'Đang tải' : book?.amount == 0 ? 'Hết hàng'
-                                : `Mua ngay (${(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)`}
+                                : `Mua ngay (${currencyFormat.format(book?.price * (1 - book?.discount) * amountIndex)})`}
                         </BuyButton>
                         :
                         <BuyButton
@@ -216,7 +218,7 @@ const ProductAction = ({ book }) => {
                             onClick={() => handleAddToCart(book)}
                         >
                             {!book ? 'Đang tải' : book?.amount == 0 ? 'Hết hàng'
-                                : `Thêm vào giỏ (${(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)`}
+                                : `Thêm vào giỏ (${currencyFormat.format(book?.price * (1 - book?.discount) * amountIndex)})`}
                         </BuyButton>
                     }
                 </SwipeableDrawer>
@@ -243,7 +245,7 @@ const ProductAction = ({ book }) => {
                         }
                     </Box>
                 </Box>
-                <Box position="sticky" height={55} bottom={16} bgcolor={'background.default'}>
+                <Box position="sticky" height={55} bottom={16} bgcolor={'background.paper'}>
                     <Box display="flex" alignItems="center" height={47} >
                         <BuyButton
                             variant="contained"
@@ -265,7 +267,7 @@ const ProductAction = ({ book }) => {
                             startIcon={<AddShoppingCart fontSize="small" />}
                         >
                             {!book ? 'Đang tải' : book?.amount == 0 ? 'Hết hàng'
-                                : `Thêm vào giỏ (${(Math.round(book?.price * (1 - book?.discount)) * amountIndex).toLocaleString()}đ)`}
+                                : `Thêm vào giỏ (${currencyFormat.format(book?.price * (1 - book?.discount) * amountIndex)})`}
                         </BuyButton>
                     </Box>
                 </Box>

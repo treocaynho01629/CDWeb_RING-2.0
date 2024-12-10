@@ -2,6 +2,7 @@ import styled from '@emotion/styled'
 import { Link } from 'react-router'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Skeleton, Button } from '@mui/material';
+import { currencyFormat } from '../../ultils/covert';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import useCart from '../../hooks/useCart';
 
@@ -18,7 +19,7 @@ const Container = styled.div`
     position: relative;
     overflow: hidden;
     border: .5px solid ${props => props.theme.palette.action.hover};
-    background-color: ${props => props.theme.palette.background.default};
+    background-color: ${props => props.theme.palette.background.paper};
     margin: 0 ${props => props.theme.spacing(.1)};
 
     &:hover {
@@ -125,7 +126,7 @@ const ProductSimple = ({ book, scrollPosition }) => {
                         }
                     />
                     <Info>
-                        <Price>{book.price.toLocaleString()}đ
+                        <Price>{currencyFormat.format(book.price)}
                             {book.discount > 0 && <Percentage>-{book.discount * 100}%</Percentage>}
                         </Price>
                         <Title>{book.title}</Title>

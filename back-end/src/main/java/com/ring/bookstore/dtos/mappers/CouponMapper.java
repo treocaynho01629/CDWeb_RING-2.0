@@ -19,14 +19,15 @@ public class CouponMapper implements Function<Coupon, CouponDTO> {
 
         //Detail stuff
         NumberFormat percentFormat = NumberFormat.getPercentInstance();
-        NumberFormat unitFormat = NumberFormat.getNumberInstance(Locale.US);
+        NumberFormat unitFormat = NumberFormat.getCurrencyInstance(
+                new Locale.Builder().setLanguage("vi").setRegion("VN").build()
+        );
         unitFormat.setMaximumFractionDigits(0);
         String summary = "Giảm " + (detail.getType().equals(CouponType.SHIPPING) ? "phí vận chuyển " : "") +
-                percentFormat.format(detail.getDiscount()) +
-                " - giảm tối đa " + unitFormat.format(detail.getMaxDiscount()) + "đ";
+                percentFormat.format(detail.getDiscount()) + " - giảm tối đa " + unitFormat.format(detail.getMaxDiscount());
 
         String condition = (detail.getType().equals(CouponType.MIN_AMOUNT) ? "Khi mua " : "Cho đơn hàng từ ") +
-                unitFormat.format(detail.getAttribute()) + (detail.getType().equals(CouponType.SHIPPING) ? " sản phẩm" : "đ");
+                unitFormat.format(detail.getAttribute()) + (detail.getType().equals(CouponType.SHIPPING) ? " sản phẩm" : "");
 
         return new CouponDTO(coupon.getId(),
                 coupon.getCode(),

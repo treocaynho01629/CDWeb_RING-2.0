@@ -2,6 +2,7 @@ import styled from '@emotion/styled'
 import { Link } from 'react-router'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Skeleton } from '@mui/material';
+import { currencyFormat } from '../../ultils/covert';
 
 //#region styled
 const Container = styled.div`
@@ -15,7 +16,7 @@ const Container = styled.div`
     align-items: center;
     position: relative;
     overflow: hidden;
-    border: .5px solid ${props => props.theme.palette.background.default};
+    border: .5px solid ${props => props.theme.palette.background.paper};
     margin: ${props => props.theme.spacing(.1)} 0;
 
     &:hover {
@@ -129,7 +130,7 @@ const ProductPreview = ({ book, scrollPosition }) => {
                     />
                     <Info>
                         <Title>{book.title}</Title>
-                        <Price>{book.price.toLocaleString()}đ
+                        <Price>{currencyFormat.format(book.price)}
                             {book.discount > 0 && <Percentage>-{book.discount * 100}%</Percentage>}
                         </Price>
                     </Info>

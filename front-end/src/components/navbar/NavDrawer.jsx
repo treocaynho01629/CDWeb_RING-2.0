@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import {
     ShoppingCartOutlined, DeliveryDiningOutlined, LockOutlined, Logout, Speed, NotificationsOutlined,
-    Storefront, KeyboardArrowLeft, Brightness3, Brightness7,
-    SettingsBrightness,
+    Storefront, KeyboardArrowLeft, NightlightOutlined, LightModeOutlined,
+    ContrastOutlined,
 } from '@mui/icons-material';
 import { Avatar, ListItemIcon, Divider, Box, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText, IconButton } from '@mui/material';
 import { Link } from 'react-router';
@@ -131,9 +131,9 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                                 <ListItem disablePadding>
                                     <ListItemButton onClick={toggleMode}>
                                         <ListItemIcon>
-                                            {mode === 'dark' ? <Brightness3 fontSize="small" />
-                                                : mode === 'light' ? <Brightness7 fontSize="small" />
-                                                    : mode === 'system' ? <SettingsBrightness fontSize="small" /> : ''}                                    </ListItemIcon>
+                                            {mode === 'dark' ? <NightlightOutlined fontSize="small" />
+                                                : mode === 'light' ? <LightModeOutlined fontSize="small" />
+                                                    : mode === 'system' ? <ContrastOutlined fontSize="small" /> : ''}                                    </ListItemIcon>
                                         <ListItemText primary={mode === 'dark' ? 'Chủ đề tối'
                                             : mode === 'light' ? 'Chủ đề mặc định'
                                                 : mode === 'system' ? 'Theo hệ thống' : ''} />

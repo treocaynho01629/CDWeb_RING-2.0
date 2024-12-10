@@ -4,6 +4,7 @@ import { DeliveryDiningOutlined, KeyboardArrowRight, Storefront } from '@mui/ico
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { getOrderStatus } from "../../ultils/order"
 import { Link } from 'react-router';
+import { currencyFormat } from '../../ultils/covert'
 
 //#region styled
 const ItemTitle = styled.p`
@@ -232,8 +233,8 @@ const OrderItem = ({ order, handleAddToCart }) => {
                             <StuffContainer>
                                 <Amount>Số lượng: <b>{item?.quantity}</b></Amount>
                                 <PriceContainer>
-                                    <Discount>{item?.discount > 0 ? `${item.price.toLocaleString()}đ` : ''}</Discount>
-                                    <Price>{Math.round(item.price * (1 - (item?.discount || 0))).toLocaleString()}đ</Price>
+                                    <Discount>{item?.discount > 0 ? currencyFormat.format(item.price) : ''}</Discount>
+                                    <Price>{currencyFormat.format(item.price * (1 - (item?.discount || 0)))}</Price>
                                 </PriceContainer>
                             </StuffContainer>
                         </ContentContainer>
@@ -247,7 +248,7 @@ const OrderItem = ({ order, handleAddToCart }) => {
                 <Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '5px' }}>
                         <p style={{ margin: 0 }}>Thành tiền:</p>
-                        <Price className="total">&nbsp;{(order?.totalPrice - order?.totalDiscount).toLocaleString()}đ</Price>
+                        <Price className="total">&nbsp;{currencyFormat.format(order?.totalPrice - order?.totalDiscount)}</Price>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <Link to={`/product/${order?.slug}`}>

@@ -42,7 +42,7 @@ const LoginTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken
     //Login
     const handleSubmitLogin = async (e) => {
         e.preventDefault();
-        if (pending) return;
+        if (pending || !reCaptchaLoaded) return;
 
         setPending(true);
         const { enqueueSnackbar } = await import('notistack');
@@ -87,7 +87,7 @@ const LoginTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken
                 } else if (err?.status === 412) {
                     setChallenge(true);
                     hideBadge();
-                    setErrMsg('Tài khoản của bạn cần xác thực lại!');
+                    setErrMsg('Yêu cầu của bạn cần xác thực lại!');
                 } else if (err?.status === 429) {
                     setErrMsg('Bạn đã thử quá nhiều lần, vui lòng thử lại sau!');
                 } else {

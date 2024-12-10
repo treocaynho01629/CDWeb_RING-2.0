@@ -7,24 +7,10 @@ const Container = styled.div`
     position: relative;
     max-height: 100%;
     width: 200px;
-    /* border: .5px solid ${props => props.theme.palette.divider}; */
+    background-color: ${props => props.theme.palette.background.paper};
 
     ${props => props.theme.breakpoints.down("md")} {
         width: auto;
-    }
-`
-
-const MainTitle = styled.p`
-    font-weight: 500;
-    padding: 8px 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    text-transform: uppercase;
-
-    ${props => props.theme.breakpoints.down("md")} {
-        padding: 0 12px;
-        text-transform: none;
     }
 `
 
@@ -82,7 +68,6 @@ const ProductsScroll = ({ data, isError, isLoading, isFetching, isSuccess, isUni
 
     return (
         <Container>
-            {/* <MainTitle>Sản phẩm liên quan</MainTitle> */}
             {(loading) && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
             <SliderContainer direction={direction}>
                 {productsScroll}

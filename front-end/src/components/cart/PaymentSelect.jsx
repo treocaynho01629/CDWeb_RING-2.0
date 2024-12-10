@@ -42,6 +42,7 @@ const PaymentContainer = styled.div`
     padding: ${props => props.theme.spacing(2)};
     margin-top: ${props => props.theme.spacing(1)};
     border: .5px solid ${props => props.theme.palette.divider};
+    background-color: ${props => props.theme.palette.background.paper};
 
     ${props => props.theme.breakpoints.down("sm")} {
         padding: ${props => props.theme.spacing(1)};

@@ -16,13 +16,12 @@ const ManageOrders = () => {
   return (
     <>
       <h2>Quản lý doanh thu</h2>
-      <Box display="flex" justifyContent={'space-between'}>
+      <Box display="flex" justifyContent="space-between" mb={1}>
         <Breadcrumbs aria-label="breadcrumb">
           <Link style={{ color: 'inherit' }} to={'/dashboard'}>Dashboard</Link>
           <Typography color="text.secondary">Quản lý đơn hàng</Typography>
         </Breadcrumbs>
       </Box>
-      <br />
       <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
         <Grid item sm={6} md={4}>
           <CountCard

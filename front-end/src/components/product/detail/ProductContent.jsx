@@ -3,7 +3,7 @@ import { styled as muiStyled } from '@mui/material';
 import { Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
 import { Skeleton, Rating, Box, Grid2 as Grid, alpha, Divider, Stack } from '@mui/material';
 import { Link } from 'react-router';
-import { numFormatter } from '../../../ultils/covert';
+import { currencyFormat, numFormatter } from '../../../ultils/covert';
 import { lazy, Suspense, useState } from 'react';
 import { useGetMyAddressQuery } from '../../../features/addresses/addressesApiSlice';
 import ProductImages from './ProductImages';
@@ -21,6 +21,7 @@ const InfoContainer = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    background-color: ${props => props.theme.palette.background.paper};
     border: 0.5px solid ${props => props.theme.palette.divider};
 
     a {color: ${props => props.theme.palette.info.main}};
@@ -326,11 +327,11 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                             <PriceContainer>
                                 {book ?
                                     <>
-                                        <Price>{Math.round(book.price * (1 - book.discount)).toLocaleString()}đ</Price>
+                                        <Price>{currencyFormat.format(book.price * (1 - book.discount))}</Price>
                                         {book?.discount > 0
                                             &&
                                             <>
-                                                <Discount>{book.price.toLocaleString()}đ</Discount>
+                                                <Discount>{currencyFormat.format(book.price)}</Discount>
                                                 <Percentage>-{book.discount * 100}%</Percentage>
                                             </>
                                         }

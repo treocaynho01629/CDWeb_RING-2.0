@@ -18,7 +18,7 @@ export const LogoTitle = styled.span`
     text-transform: uppercase;
     font-weight: 500;
     color: ${props => props.theme.palette.primary.main};
-    text-shadow: 1.5px 1.5px ${props => props.theme.palette.background.default};
+    text-shadow: 1.5px 1.5px ${props => props.theme.palette.background.paper};
     margin-left: 10px;
     white-space: nowrap;
     transition: width .25s ease;
@@ -31,14 +31,14 @@ export const LogoSubtitle = styled(LogoTitle)`
 
 export const MobileExtendButton = styled.div`
     position: absolute;
-    left: 0;
+    right: -1%;
     top: 0;
     bottom: 0;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     margin: auto;
-    width: 100%;
+    width: 102%;
     height: 100%;
     max-height: 30px;
     font-size: 14px;
@@ -52,13 +52,13 @@ export const MobileExtendButton = styled.div`
         content: "";
         position: absolute;
         top: -2%;
-        left: 0;
-        width: 101%;
+        right: 0;
+        width: 100%;
         height: 104%;
         background-image: linear-gradient(
             to left, 
-            ${props => props.theme.palette.background.default}, 
-            ${props => props.theme.palette.background.default} 5%, 
+            ${props => props.theme.palette.background.paper}, 
+            ${props => props.theme.palette.background.paper} 5%, 
             transparent 15%,
             transparent 100%);
         z-index: -1;
@@ -126,7 +126,7 @@ export const Showmore = styled.div`
         background-image: linear-gradient(180deg, 
         transparent, 
         transparent 60%,
-        ${props => props.theme.palette.background.default} 100%);
+        ${props => props.theme.palette.background.paper} 100%);
     }
 
     &.expand {

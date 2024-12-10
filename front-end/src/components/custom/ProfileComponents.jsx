@@ -33,7 +33,8 @@ export const StyledDialogTitle = styled(DialogTitle)`
 export const TabContentContainer = styled.div`
     position: relative;
     padding: 0 ${props => props.theme.spacing(2)};
-    border: 0.5px solid ${props => props.theme.palette.action.focus};
+    border: 0.5px solid ${props => props.theme.palette.divider};
+    background-color: ${props => props.theme.palette.background.paper};
     min-height: 60dvh;
 
     ${props => props.theme.breakpoints.down("md")} {
