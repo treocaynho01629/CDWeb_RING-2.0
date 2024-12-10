@@ -3,6 +3,7 @@ import { KeyboardArrowRight } from '@mui/icons-material';
 import { alpha, Button, FormControlLabel, IconButton, Radio, RadioGroup } from '@mui/material'
 import { getAddress } from '../../ultils/address';
 import { shippingItems } from '../../ultils/shipping';
+import { currencyFormat } from '../../ultils/covert';
 
 //#region styled
 const Title = styled.h4`
@@ -16,6 +17,7 @@ const AddressDisplayContainer = styled.div`
     align-items: center;
     justify-content: space-between;
     border: 0.5px solid ${props => props.theme.palette.action.focus};
+    background-color: ${props => props.theme.palette.background.paper};
     padding: 20px;
 
     &.error {
@@ -43,6 +45,7 @@ const StyledForm = styled(FormControlLabel)`
     padding: ${props => props.theme.spacing(1.5)} ${props => props.theme.spacing(2)};
     padding-left: 0;
     border: .5px solid ${props => props.theme.palette.divider};
+    background-color: ${props => props.theme.palette.background.paper};
     min-width: 50%;
     margin: ${props => props.theme.spacing(.5)} 0;
 
@@ -178,10 +181,11 @@ const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadAddress, value, 
                         label={<FormContent>
                             <ItemContent>
                                 <ItemTitle>{item.icon}{item.label}</ItemTitle>
-                                <PriceTag className={item.color}>{item.price}</PriceTag>
+                                <PriceTag className={item.color}>{currencyFormat.format(item.price)}</PriceTag>
                             </ItemContent>
                             <Estimate>{item.description}</Estimate>
-                        </FormContent>} />
+                        </FormContent>}
+                    />
                 ))}
             </RadioGroup>
         </>

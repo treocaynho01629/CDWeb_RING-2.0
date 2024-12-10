@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Box, Stack, Button, DialogContent } from '@mui/material';
 import { Check, KeyboardArrowLeft, Password } from "@mui/icons-material";
-import { PWD_REGEX } from "../../ultils/regex";
 import { useChangePasswordMutation } from '../../features/users/usersApiSlice';
 import { Instruction } from '../custom/GlobalComponents';
 import { Link } from 'react-router';
 import { StyledDialogTitle } from '../custom/ProfileComponents';
 import CustomPasswordInput from "../custom/CustomPasswordInput";
+import PasswordEvaluate from '../custom/PasswordEvaluate';
 
 const ResetPassComponent = ({ pending, setPending }) => {
     const [err, setErr] = useState([]);
@@ -25,9 +25,6 @@ const ResetPassComponent = ({ pending, setPending }) => {
     const handleChangePassword = async (e) => {
         e.preventDefault();
         if (pending || changing) return;
-
-        //Validation
-        const validPass = PWD_REGEX.test(newPass);
 
         if (!validPass) {
             setErrMsg("Sai định dạng thông tin!");
@@ -57,12 +54,14 @@ const ResetPassComponent = ({ pending, setPending }) => {
             newPassRe
         }).unwrap()
             .then((data) => {
-                enqueueSnackbar('Đổi mật khẩu thành công!', { variant: 'success' });
                 setErr([]);
                 setErrMsg("");
                 setPass("");
                 setNewPass("");
                 setNewPassRe("");
+
+                //Queue snack
+                enqueueSnackbar('Đổi mật khẩu thành công!', { variant: 'success' });
                 setPending(false);
             })
             .catch((err) => {
@@ -71,7 +70,7 @@ const ResetPassComponent = ({ pending, setPending }) => {
                 if (!err?.status) {
                     setErrMsg('Server không phản hồi');
                 } else if (err?.status === 409) {
-                    setErrMsg(err?.data?.errors?.errorMessage);
+                    setErrMsg(err?.data?.message);
                 } else if (err?.status === 400) {
                     setErrMsg('Sai định dạng thông tin!');
                 } else {
@@ -83,11 +82,9 @@ const ResetPassComponent = ({ pending, setPending }) => {
 
     //Validation
     useEffect(() => {
-        const result = PWD_REGEX.test(newPass);
-        setValidNewPass(result);
         const match = newPass === newPassRe;
         setValidNewPassRe(match);
-    }, [newPass, newPassRe])
+    }, [newPassRe])
 
     useEffect(() => {
         setErrMsg('');
@@ -104,16 +101,19 @@ const ResetPassComponent = ({ pending, setPending }) => {
             <DialogContent sx={{ p: { xs: 1, sm: 2, md: 0 }, mt: { xs: 1, md: 0 } }}>
                 <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
                 <form onSubmit={handleChangePassword}>
-                    <Stack mt={2} spacing={2} direction="column" alignItems={{ xs: 'center', md: 'start' }} minHeight={'70dvh'}>
+                    <Stack mt={2} spacing={1.5}
+                        direction="column" a
+                        lignItems={{ xs: 'center', md: 'start' }}
+                        minHeight={'70dvh'}
+                        maxWidth={380}
+                    >
                         <CustomPasswordInput
                             label='Nhập mật khẩu hiện tại'
                             onChange={e => setPass(e.target.value)}
                             value={pass}
                             error={err?.data?.errors?.password}
                             helperText={err?.data?.errors?.password}
-                            fullWidth
                             size="small"
-                            sx={{ width: { xs: '100%', sm: '80%' } }}
                         />
                         <CustomPasswordInput
                             label='Nhập mật khẩu mới'
@@ -128,9 +128,7 @@ const ResetPassComponent = ({ pending, setPending }) => {
                                 !validNewPass ?
                                 "8 đến 24 kí tự. Bao gồm chữ in hoa và ký tự đặc biệt."
                                 : err?.data?.errors?.newPass}
-                            fullWidth
                             size="small"
-                            sx={{ width: { xs: '100%', sm: '80%' } }}
                         />
                         <CustomPasswordInput
                             label='Nhập lại mật khẩu mới'
@@ -144,11 +142,10 @@ const ResetPassComponent = ({ pending, setPending }) => {
                                 !validNewPassRe ?
                                 "Không trùng mật khẩu." :
                                 err?.data?.errors?.newPassRe}
-                            fullWidth
                             size="small"
-                            sx={{ width: { xs: '100%', sm: '80%' } }}
                         />
-                        <Box sx={{ width: { xs: '100%', sm: '80%' } }}>
+                        <PasswordEvaluate {...{ password: newPass, onValid: (value) => setValidNewPass(value) }} />
+                        <Box>
                             <Button
                                 variant="contained"
                                 color="primary"

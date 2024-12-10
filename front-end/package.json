@@ -15,6 +15,7 @@
     "@mui/lab": "^6.0.0-beta.8",
     "@mui/material": "^6.0.1",
     "@mui/x-date-pickers": "^7.15.0",
+    "@number-flow/react": "^0.4.2",
     "@reduxjs/toolkit": "^2.4.0",
     "dayjs": "^1.11.11",
     "history": "^5.3.0",

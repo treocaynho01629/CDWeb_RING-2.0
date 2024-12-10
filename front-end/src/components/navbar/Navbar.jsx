@@ -137,7 +137,7 @@ const Logo = styled.h2`
     margin: 5px 10px 5px 15px;
     white-space: nowrap;
     overflow: hidden;
-    transition: all .25s ease;
+    transition: width .25s ease;
 
     &.active {
         ${props => props.theme.breakpoints.down("md")} {
@@ -157,25 +157,29 @@ const NavItem = styled.div`
     margin-left: 15px;
 `
 
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
-    backgroundColor: theme.palette.background.default,
-    borderBottom: '.5px solid',
-    borderColor: theme.palette.divider,
-    top: '-0.5px',
-    marginBottom: 2,
-    boxShadow: 'none',
-    position: 'sticky',
-    transition: 'all .15s ease',
+const StyledAppBar = styled(AppBar)`
+    position: sticky;
+    top: -.5px;
+    margin-bottom: 2px;
+    background-color: ${props => props.theme.palette.background.paper};
+    border-bottom: .5px solid ${props => props.theme.palette.divider};
+    box-shadow: none;
+    transition: all .15s ease;
 
-    [theme.breakpoints.down('md')]: {
-        marginBottom: 0,
-    },
+    &.top {
+        background-color: transparent;
+        border-color: transparent;
 
-    '&.top': {
-        backgroundColor: 'transparent',
-        borderColor: 'transparent',
+        ${Logo} {
+            filter: drop-shadow(0px -1000px 0 ${props => props.theme.palette.text.primary});
+            transform: translateY(1000px);
+        }
     }
-}));
+
+    ${props => props.theme.breakpoints.down("md")} {
+        margin-bottom: 0;
+    }
+`
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
     borderRadius: 0,
@@ -223,13 +227,13 @@ const StyledSearchForm = styled.form`
 
 const StyledSearchInput = styled(TextField)(({ theme }) => ({
     color: 'inherit',
-    background: theme.palette.background.default,
+    background: theme.palette.background.paper,
 
     [theme.breakpoints.down('md')]: {
         width: '100%',
     },
     '& .MuiInputBase-input': {
-        background: theme.palette.background.default,
+        background: theme.palette.background.paper,
         transition: theme.transitions.create('width'),
         width: '100%',
 

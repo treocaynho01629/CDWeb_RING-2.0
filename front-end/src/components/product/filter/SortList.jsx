@@ -75,6 +75,7 @@ const FilterTitle = styled.span`
 
 const StyledInput = styled(TextField)`
     margin-right: ${props => props.theme.spacing(1)};
+    background-color: ${props => props.theme.palette.background.paper};
 
     &.sort {
         .MuiSelect-select {

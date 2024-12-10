@@ -14,7 +14,7 @@ export const CheckoutContainer = styled.div`
         z-index: ${props => props.theme.zIndex.appBar};
         border-top: .5px solid ${props => props.theme.palette.divider};
         box-shadow: ${props => props.theme.shadows[12]};
-        background-color: ${props => props.theme.palette.background.default};
+        background-color: ${props => props.theme.palette.background.paper};
     }
 `
 
@@ -22,7 +22,7 @@ export const CheckoutBox = styled.div`
     border: .5px solid ${props => props.theme.palette.action.focus};
     padding: 20px 16px;
     margin-bottom: ${props => props.theme.spacing(2)};
-    background-color: ${props => props.theme.palette.background.default};
+    background-color: ${props => props.theme.palette.background.paper};
 
     &.sticky {
         margin-bottom: -0.5px;

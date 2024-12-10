@@ -3,6 +3,7 @@ import { Close, FilterAltOff, Search } from '@mui/icons-material'
 import { isEqual } from 'lodash-es'
 import { memo, useMemo } from 'react'
 import { alpha } from '@mui/material'
+import { currencyFormat } from '../../../ultils/covert'
 
 //#region styled
 const DisplayContainer = styled.div`
@@ -101,7 +102,7 @@ const FiltersDisplay = memo(({ filters, setFilters, defaultFilters, resetFilter,
             }
             if (!isEqual(filters.value, defaultFilters.value)) {
                 content.push(<FilterChip key={'chip-value'} onClick={scrollToValue}>
-                    Giá: {`${filters.value[0].toLocaleString()}đ - ${filters.value[1].toLocaleString()}đ`}
+                    Giá: {`${currencyFormat.format(filters.value[0])} - ${currencyFormat.format(filters.value[1])}`}
                     <Close onClick={handleRemoveValue} />
                 </FilterChip>);
             }

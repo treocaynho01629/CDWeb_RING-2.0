@@ -34,6 +34,8 @@ const PubContainer = styled.div`
     display: flex;
     justify-content: space-between;
     overflow: hidden;
+    background-color: ${props => props.theme.palette.background.paper};
+    border: .5px solid ${props => props.theme.palette.divider};
 
     &:hover {
         .button-container {
@@ -66,13 +68,13 @@ const Wrapper = styled.div`
 
 const ButtonContainer = styled.div`
     position: absolute;
-    right: 5px;
+    right: 0;
     padding-left: 20px;
     height: 100%;
     background-image: linear-gradient(
         to left, 
-        ${props => props.theme.palette.background.default}, 
-        ${props => props.theme.palette.background.default} 80%,
+        ${props => props.theme.palette.background.paper}, 
+        ${props => props.theme.palette.background.paper} 80%,
         transparent 100%);
     display: flex;
     align-items: center;

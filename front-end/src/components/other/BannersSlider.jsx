@@ -14,27 +14,30 @@ const fadeIn = keyframes`
   to {opacity: 1}
 `
 
-const CustomDotButton = styled.span`
-    width: 8px;
-    height: 8px;
-    margin: 0 4px 15px;
-    border-radius: 50%;
-    border: .5px solid ${props => props.theme.palette.divider};
-    background-color: ${props => props.theme.palette.grey[200]};
-    opacity: .8;
-    cursor: pointer;
-    transition: all .2s ease;
+const CustomDotButton = styled('span')(({ theme }) => ({
+    width: 8,
+    height: 8,
+    margin: '0 4px 15px',
+    borderRadius: '50%',
+    border: '.5px solid',
+    cursor: 'pointer',
+    transition: 'width .1s ease',
+    borderColor: theme.palette.action.focus,
+    backgroundColor: theme.palette.grey[400],
+    ...theme.applyStyles('dark', {
+        backgroundColor: theme.palette.grey[700],
+    }),
 
-    &.active {
-        width: 20px;
-        height: 6px;
-        margin-top: 2px;
-        opacity: 1;
-        border-radius: 5px;
-        border-color: ${props => props.theme.palette.primary.dark};
-        background-color: ${props => props.theme.palette.primary.main};
-    }
-`
+    '&.active': {
+        width: 20,
+        height: 6,
+        marginTop: 2,
+        opacity: 1,
+        borderRadius: 5,
+        borderColor: theme.palette.primary.dark,
+        backgroundColor: theme.palette.primary.main
+    },
+}));
 
 const CustomArrowButton = styled.button`
   border-radius: 0;

@@ -30,7 +30,7 @@ const Wrapper = styled.div`
 
 const ToggleGroupContainer = styled.div`
   width: 100%;
-  background-color: ${props => props.theme.palette.background.default};
+  background-color: ${props => props.theme.palette.background.paper};
   border-bottom: 1px solid ${props => props.theme.palette.divider};
   white-space: nowrap;
   padding: 0 10px;
@@ -61,7 +61,14 @@ const ToggleGroupContainer = styled.div`
       width: 100%;
       height: 100%;
       background-color: ${props => props.theme.palette.action.hover};
+      border: .5px solid ${props => props.theme.palette.action.focus};
       z-index: -1;
+
+      ${props => props.theme.breakpoints.down("sm")} {
+          border-left: none;
+          border-right: none;
+          border-top: none;
+      }
   }
 `
 
@@ -70,19 +77,28 @@ const TitleContainer = styled.div`
   width: 100%;
   font-size: 18px;
   font-weight: 450;
-  background-color: ${props => props.theme.palette.background.default};
+  background-color: ${props => props.theme.palette.background.paper};
+  border: .5px solid ${props => props.theme.palette.divider};
   display: flex;
   align-items: center;
   justify-content: space-between;
   white-space: nowrap;
   padding: 10px 15px;
   margin-bottom: 5px;
+  z-index: 2;
+
+  
+  ${props => props.theme.breakpoints.down("sm")} {
+    border-left: none;
+    border-right: none;
+    margin-bottom: 0px;
+  }
 `
 
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin: ${props => props.theme.spacing(2.5)} 0;
 `
 
 const MoreButton = styled.span`
@@ -115,6 +131,9 @@ const Container = styled.div`
   margin: 10px 0;
 `
 
+const ProductContainer = styled.div`
+`
+
 const SaleContainer = styled.div`
   position: relative;
   padding: 20px 0;
@@ -128,8 +147,11 @@ const SaleContainer = styled.div`
     width: 99vw;
     height: 100%;
     transform: translateX(-50%);
-    border: 1px solid ${props => props.theme.palette.primary.light};
-    background-color: ${props => alpha(props.theme.palette.primary.light, 0.1)};
+    border: 1px solid ${props => props.theme.palette.success.light};
+    background-image: repeating-linear-gradient(45deg, ${props => alpha(props.theme.palette.primary.main, 0.2)} 0, 
+      ${props => alpha(props.theme.palette.primary.main, 0.2)} 10px, transparent 0, transparent 50%);
+    background-size: 4em 4em;
+    background-color: ${props => alpha(props.theme.palette.success.light, 0.1)};
     border-left: none;
     border-right: none;
   }
@@ -151,7 +173,7 @@ const cateToTabs = (cate) => {
 
 const Loadable = ({ children }) => (
   <LazyLoad height={200} offset={100}>
-    <Suspense fallback={<CustomPlaceholder sx={{ height: '300px' }} />}>
+    <Suspense fallback={<CustomPlaceholder sx={{ height: 300 }} />}>
       {children}
     </Suspense>
   </LazyLoad>
@@ -190,7 +212,7 @@ const ProductsList = ({ tabs, value, title }) => {
   }
 
   return (
-    <>
+    <ProductContainer>
       <TitleContainer ref={listRef}>
         {title}
         {isError ?
@@ -223,7 +245,7 @@ const ProductsList = ({ tabs, value, title }) => {
         </ToggleGroupContainer>
       }
       <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
-    </>
+    </ProductContainer>
   )
 }
 
@@ -239,7 +261,7 @@ const RandomList = () => {
             variant="outlined"
             color="error"
             size="medium"
-            sx={{ width: '200px' }}
+            sx={{ width: 200 }}
             endIcon={<Replay sx={{ marginRight: '-10px' }} />}
             onClick={() => refetch()}
           >
@@ -250,7 +272,7 @@ const RandomList = () => {
             variant="contained"
             color="primary"
             size="medium"
-            sx={{ width: '200px' }}
+            sx={{ width: 200 }}
             endIcon={<Replay sx={{ marginRight: '-10px' }} />}
             onClick={() => refetch()}
           >
@@ -282,7 +304,6 @@ const Home = () => {
     size: pagination?.size,
     loadMore: pagination?.isMore
   });
-
 
   //Load
   useEffect(() => {
@@ -321,7 +342,7 @@ const Home = () => {
       navigate('/store');
     } else {
       const nextPage = (data?.ids?.length / defaultMore);
-      if (nextPage >= 1 && nextPage % 1 != 0) setPagination({ ...pagination, number: nextPage, size: defaultMore });
+      if (nextPage >= 1) setPagination({ ...pagination, number: nextPage, size: defaultMore });
     }
   }
 
@@ -363,7 +384,7 @@ const Home = () => {
                 variant="outlined"
                 color="error"
                 size="medium"
-                sx={{ width: '200px' }}
+                sx={{ width: 200 }}
                 endIcon={<Replay sx={{ marginRight: '-10px' }} />}
                 onClick={() => refetch()}
               >
@@ -374,7 +395,7 @@ const Home = () => {
                 variant="contained"
                 color="primary"
                 size="medium"
-                sx={{ width: '200px' }}
+                sx={{ width: 200 }}
                 onClick={handleShowMore}
                 endIcon={<ExpandMore sx={{ marginRight: '-10px' }} />}
               >

@@ -286,7 +286,7 @@ const CartContent = () => {
                 if (!err?.status) {
                     console.error('Server không phản hồi!');
                 } else if (err?.status === 409) {
-                    console.error(err?.data?.errors?.errorMessage);
+                    console.error(err?.data?.message);
                 } else if (err?.status === 400) {
                     console.error('Sai định dạng giỏ hàng!');
                 } else {
@@ -544,8 +544,7 @@ const CartContent = () => {
                         })}
                     </TableBody>
                 </Table>
-                <br />
-                <Box display="flex">
+                <Box mt={1} display="flex">
                     <Link to={'/'}>
                         <Button
                             variant="outlined"

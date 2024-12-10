@@ -25,9 +25,9 @@ const StyledLazyImage = styled(LazyLoadImage)`
 `
 
 const ItemContainer = styled.div`
-    padding: 4px 0;
+    padding-top: 4px;
     width: 100px;
-    height: 115px;
+    height: 100%;
     font-size: 14px;
     display: flex;
     flex-direction: column;
@@ -62,6 +62,8 @@ const CateContainer = styled.div`
     display: flex;
     justify-content: space-between;
     overflow: hidden;
+    background-color: ${props => props.theme.palette.background.paper};
+    border: .5px solid ${props => props.theme.palette.divider};
 
     &:hover {
         .button-container {
@@ -73,6 +75,7 @@ const CateContainer = styled.div`
 
 const ItemWrapper = styled.div`
     display: flex;
+    height: 100%;
 `
 
 const ItemName = styled.span`
@@ -104,15 +107,15 @@ const Wrapper = styled.div`
     }
 `
 
-const ButtonContainer = styled.div` //FIX
+const ButtonContainer = styled.div`
     position: absolute;
-    right: 5px;
+    right: 0;
     padding-left: 20px;
     height: 100%;
     background-image: linear-gradient(
         to left, 
-        ${props => props.theme.palette.background.default}, 
-        ${props => props.theme.palette.background.default} 80%,
+        ${props => props.theme.palette.background.paper}, 
+        ${props => props.theme.palette.background.paper} 80%,
         transparent 100%);
     display: flex;
     align-items: center;

@@ -223,12 +223,10 @@ function Item({ book, index }) {
                             </InfoContainer>
                             :
                             <InfoContainer>
-                                <Skeleton variant="text" sx={{ fontSize: '30px' }} />
-                                <br />
+                                <Skeleton variant="text" sx={{ fontSize: '30px', marginBottom: 1 }} />
                                 <Skeleton variant="text" sx={{ fontSize: '18px' }} />
                                 <Skeleton variant="text" sx={{ fontSize: '18px' }} />
-                                <Skeleton variant="text" sx={{ fontSize: '18px' }} width={'50%'} />
-                                <br />
+                                <Skeleton variant="text" sx={{ fontSize: '18px', marginBottom: 1  }} width={'50%'} />
                                 <Button
                                     disabled
                                     variant="contained"

@@ -47,6 +47,7 @@ const ItemContainer = styled.div`
 
 const ItemWrapper = styled.div`
     display: flex;
+    background-color: ${props => props.theme.palette.background.paper};
 `
 
 const ItemName = styled.span`
@@ -56,24 +57,51 @@ const ItemName = styled.span`
     width: 100%;
     text-align: center;
 `
+
+const Wrapper = styled.div`
+    position: relative;
+    padding: ${props => props.theme.spacing(1)} 0;
+    margin-top: ${props => props.theme.spacing(2)};
+    background-color: ${props => props.theme.palette.background.paper};
+    border: .5px solid ${props => props.theme.palette.divider};
+
+    ${props => props.theme.breakpoints.down("md")} {
+        margin-top: 0;
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        border-left: none;
+        border-right: none;
+    }
+`
 //#endregion
 
 const Suggest = () => {
     return (
-        <Grid container spacing={.5} size={12} mt={{ xs: 0, md: 3}} position="relative" zIndex={2} justifyContent="center">
-            {suggest?.map((tab, index) => (
-                <Grid key={`suggest-${index}`} size={{ xs: 2.4, md: 1.2 }} display="flex" justifyContent="center">
-                    <ItemWrapper key={`suggest-tab-${index}`}>
-                        <Link to={tab.url} title={tab.label}>
-                            <ItemContainer color={tab.color}>
-                                {tab.icon}
-                                <ItemName>{tab.label}</ItemName>
-                            </ItemContainer>
-                        </Link>
-                    </ItemWrapper>
-                </Grid>
-            ))}
-        </Grid>
+        <Wrapper>
+            <Grid
+                container
+                spacing={.5}
+                size={12}
+                zIndex={2}
+                position="relative"
+                justifyContent="center"
+                bgcolor={'background.paper'}
+            >
+                {suggest?.map((tab, index) => (
+                    <Grid key={`suggest-${index}`} size={{ xs: 2.4, md: 1.2 }} display="flex" justifyContent="center">
+                        <ItemWrapper key={`suggest-tab-${index}`}>
+                            <Link to={tab.url} title={tab.label}>
+                                <ItemContainer color={tab.color}>
+                                    {tab.icon}
+                                    <ItemName>{tab.label}</ItemName>
+                                </ItemContainer>
+                            </Link>
+                        </ItemWrapper>
+                    </Grid>
+                ))}
+            </Grid>
+        </Wrapper>
     )
 }
 

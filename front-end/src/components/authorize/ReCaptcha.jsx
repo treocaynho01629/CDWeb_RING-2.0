@@ -1,4 +1,5 @@
 import { useTheme } from '@emotion/react';
+import { Box } from '@mui/material';
 import { useEffect, useRef } from 'react';
 
 //ReCaptcha v2
@@ -8,21 +9,26 @@ const ReCaptcha = ({ onVerify, onExpire }) => {
     const recaptchaId = useRef(null);
     const containerRef = useRef(null);
     const theme = useTheme();
+    const mode = theme.palette.mode;
     const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
     // Render the reCAPTCHA widget
     useEffect(() => {
         if (effectRan.current) return;
         if (window.grecaptcha && containerRef.current && !recaptchaId.current) {
-            recaptchaId.current = window.grecaptcha.render(containerRef.current, {
-                sitekey: RECAPTCHA_SITE_KEY,
-                theme: theme.palette.mode,
-                callback: onVerify,
-                'expired-callback': onExpire,
-            });
+            render();
         }
         return () => effectRan.current = true;
     }, [onVerify, onExpire]);
+
+    const render = () => {
+        recaptchaId.current = window.grecaptcha.render(containerRef.current, {
+            sitekey: RECAPTCHA_SITE_KEY,
+            theme: mode,
+            callback: onVerify,
+            'expired-callback': onExpire,
+        });
+    }
 
     //Reset widget
     const reset = () => {
@@ -32,7 +38,10 @@ const ReCaptcha = ({ onVerify, onExpire }) => {
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center' }} ref={containerRef}></div>
+        <Box display="flex" justifyContent="center" my={2}>
+            <Box bgcolor="white" p={.1} sx={{ borderRadius: '3px', overflow: 'hidden' }} ref={containerRef}>
+            </Box>
+        </Box>
     );
 };
 

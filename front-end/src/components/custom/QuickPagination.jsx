@@ -12,6 +12,7 @@ const StyledButton = styled(IconButton)`
     border-radius: 0;
     padding: ${props => props.theme.spacing(.8)};
     border: .5px solid ${props => props.theme.palette.divider};
+    background-color: ${props => props.theme.palette.background.paper};
     
     &:last-child { border-left: none};
 `

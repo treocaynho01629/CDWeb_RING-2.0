@@ -13,7 +13,8 @@ export const TermText = styled.p`
     color: ${props => props.theme.palette.text.secondary};
 `
 
-export const AuthText = styled.div`
+export const AuthText = styled.p`
+    margin: 0;
     margin-top: ${props => props.theme.spacing(8)};
     text-align: center;
 `

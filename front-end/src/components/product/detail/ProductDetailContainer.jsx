@@ -15,6 +15,7 @@ const DetailContainer = styled.div`
   height: 100%;
   padding: 10px 20px;
   border: .5px solid ${props => props.theme.palette.divider};
+  background-color: ${props => props.theme.palette.background.paper};
 
   ${props => props.theme.breakpoints.down("md")} {
     padding: 0 12px;
@@ -23,6 +24,7 @@ const DetailContainer = styled.div`
 
 const ProductsContainer = styled.div`
   border: .5px solid ${props => props.theme.palette.divider};
+  background-color: ${props => props.theme.palette.background.paper};
 `
 
 const DescriptionContainer = styled.div`

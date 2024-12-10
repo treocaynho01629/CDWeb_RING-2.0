@@ -5,3 +5,5 @@ export function numFormatter(num) {
 export function idFormatter(id) {
     return '#' + ('00000' + id).slice(-5);
 }
+
+export const currencyFormat = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', currencyDisplay: 'narrowSymbol' })

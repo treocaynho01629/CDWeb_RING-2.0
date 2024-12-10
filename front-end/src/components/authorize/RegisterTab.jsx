@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect, Suspense, lazy } from 'react';
-import { Stack, TextField } from '@mui/material';
+import { Grow, Paper, Stack, TextField } from '@mui/material';
 import { useRegisterMutation } from '../../features/auth/authApiSlice';
-import { USER_REGEX, PWD_REGEX, EMAIL_REGEX } from '../../ultils/regex';
+import { USER_REGEX, EMAIL_REGEX } from '../../ultils/regex';
 import { Instruction } from '../custom/GlobalComponents';
 import { AuthHighlight, AuthText, AuthTitle, ConfirmButton, TermText } from '../custom/CustomAuthComponents';
 import { Link } from 'react-router';
 import CustomPasswordInput from '../custom/CustomPasswordInput';
+import PasswordEvaluate from '../custom/PasswordEvaluate';
 
 const ReCaptcha = lazy(() => import('./ReCaptcha'));
 
@@ -53,11 +54,9 @@ const RegisterTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaTo
 
     //Password
     useEffect(() => {
-        const result = PWD_REGEX.test(password);
-        setValidPass(result);
         const match = password === matchPass;
         setValidMatch(match);
-    }, [password, matchPass])
+    }, [matchPass])
 
     //Email
     useEffect(() => {
@@ -73,14 +72,13 @@ const RegisterTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaTo
     //Register
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (pending) return;
+        if (pending || !reCaptchaLoaded) return;
 
         // //Validation
         const v1 = USER_REGEX.test(username);
-        const v2 = PWD_REGEX.test(password);
-        const v3 = EMAIL_REGEX.test(email);
+        const v2 = EMAIL_REGEX.test(email);
 
-        if (!v1 || !v2 || !v3) {
+        if (!v1 || !v2) {
             setErrMsg("Sai định dạng thông tin!");
             return;
         }
@@ -88,9 +86,11 @@ const RegisterTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaTo
 
         const { enqueueSnackbar } = await import('notistack');
 
-        const token = await generateReCaptchaToken('register');
+        const recaptchaToken = challenge ? token : await generateReCaptchaToken('register');
         register({
-            token, user: {
+            token: recaptchaToken,
+            source: challenge ? 'v2' : 'v3',
+            user: {
                 username,
                 pass: password,
                 email
@@ -125,7 +125,7 @@ const RegisterTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaTo
                 } else if (err?.status === 412) {
                     setChallenge(true);
                     hideBadge();
-                    setErrMsg('Tài khoản của bạn cần xác thực lại!');
+                    setErrMsg('Yêu cầu của bạn cần xác thực lại!');
                 } else {
                     setErrMsg('Đăng ký thất bại!');
                 }
@@ -137,7 +137,7 @@ const RegisterTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaTo
     const validRegister = [validName, validPass, validMatch, validEmail].every(Boolean);
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form style={{ maxHeight: 560 }} onSubmit={handleSubmit}>
             <AuthTitle>Đăng ký tài khoản mới</AuthTitle>
             <Stack spacing={{ xs: .75, md: 1.5 }} direction="column">
                 <Instruction ref={errRef}
@@ -174,34 +174,51 @@ const RegisterTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaTo
                     error={(emailFocus && email && !validEmail) || err?.data?.errors?.email != null}
                     helperText={(emailFocus && email && !validEmail) ? "Sai định dạng email." : err?.data?.errors?.email}
                 />
-                <CustomPasswordInput
-                    label="Mật khẩu"
-                    size="small"
-                    onChange={(e) => setPassword(e.target.value)}
-                    value={password}
-                    aria-invalid={validPass ? "false" : "true"}
-                    aria-describedby="new password"
-                    onFocus={() => setPassFocus(true)}
-                    onBlur={() => setPassFocus(false)}
-                    error={(password && !validPass) || err?.data?.errors?.pass != null}
-                    helperText={passFocus && password && !validPass ? "8 đến 24 kí tự. Phải bao gồm chữ in hoa và ký tự đặc biệt."
-                        : err?.data?.errors?.pass}
-                />
-                <CustomPasswordInput
-                    label="Nhập lại mật khẩu"
-                    size="small"
-                    onChange={(e) => setMatchPass(e.target.value)}
-                    value={matchPass}
-                    aria-invalid={validMatch ? "false" : "true"}
-                    aria-describedby="confirm new password"
-                    error={(matchPass && !validMatch) || err?.data?.errors?.pass != null}
-                    helperText={matchPass && !validMatch ? "Không trùng mật khẩu." : ""}
-                />
+                <Stack spacing={{ xs: .75, md: 1.5 }} direction={challenge ? 'row' : 'column'} position="relative">
+                    <div style={{ width: '100%s' }}>
+                        <CustomPasswordInput
+                            label="Mật khẩu"
+                            size="small"
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={password}
+                            aria-describedby="new password"
+                            onFocus={() => setPassFocus(true)}
+                            onBlur={() => setPassFocus(false)}
+                            fullWidth
+                            error={err?.data?.errors?.pass != null}
+                            helperText={err?.data?.errors?.pass}
+                        />
+                        <Grow in={passFocus} style={{ transformOrigin: '0 100%' }}>
+                            <Paper
+                                elevation={16}
+                                sx={{
+                                    position: 'absolute',
+                                    bgcolor: 'background.paper',
+                                    padding: 1,
+                                    marginBottom: 1,
+                                    left: 0,
+                                    bottom: '100%',
+                                    zIndex: 1
+                                }}
+                            >
+                                <PasswordEvaluate {...{ password, onValid: (value) => setValidPass(value) }} />
+                            </Paper>
+                        </Grow>
+                    </div>
+                    <CustomPasswordInput
+                        label="Nhập lại mật khẩu"
+                        size="small"
+                        onChange={(e) => setMatchPass(e.target.value)}
+                        value={matchPass}
+                        aria-invalid={validMatch ? "false" : "true"}
+                        aria-describedby="confirm new password"
+                        error={(matchPass && !validMatch) || err?.data?.errors?.pass != null}
+                        helperText={matchPass && !validMatch ? "Không trùng mật khẩu." : ""}
+                    />
+                </Stack>
                 {(reCaptchaLoaded && challenge) &&
                     <Suspense fallback={null}>
-                        <div style={{ margin: '16px 0' }}>
-                            <ReCaptcha onVerify={(token) => setToken(token)} />
-                        </div>
+                        <ReCaptcha onVerify={(token) => setToken(token)} />
                     </Suspense>
                 }
                 <TermText>Được bảo vệ bởi reCAPTCHA và Google thông qua<br />

@@ -92,7 +92,7 @@ const ReviewForm = ({ username, bookId, review, open, handleClose, mobileMode, h
                     } else if (err?.status === 400) {
                         setErrMsg(err.data.errors.content);
                     } else if (err?.status === 409) {
-                        setErrMsg(err.data.errors.errorMessage);
+                        setErrMsg(err.data.message);
                     } else {
                         setErrMsg("Chỉnh sửa thất bại!");
                     }
@@ -135,7 +135,7 @@ const ReviewForm = ({ username, bookId, review, open, handleClose, mobileMode, h
     }
 
     return (
-        <Dialog open={open} scroll={'paper'} maxWidth={'md'} fullWidth onClose={handleClose} fullScreen={mobileMode}>
+        <Dialog open={open ?? false} scroll={'paper'} maxWidth={'md'} fullWidth onClose={handleClose} fullScreen={mobileMode}>
             <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><Edit />&nbsp;
                 {review?.content ? 'Chỉnh sửa đánh giá' : 'Đánh giá sản phẩm'}
             </DialogTitle>

@@ -61,12 +61,12 @@ const Wave = styled.span`
     border-radius: 43%;
     top: 0;
     left: 14%;
-    background: hsl(from ${props => props.theme.palette.primary.main}  calc(h - 30) s l / 0.2);
+    background: hsl(from ${props => props.theme.palette.primary.main} calc(h - 30) s l / 0.2);
     animation: ${rotate} 32s infinite steps(480, end);
     transition: all .2s ease;
     
     &:nth-of-type(2) {
-        background: hsl(from ${props => props.theme.palette.primary.main}  calc(h + 30) s l / 0.3);
+        background: hsl(from ${props => props.theme.palette.primary.main} calc(h + 30) s l / 0.3);
         left: 7%;
         animation-delay: -8s;
         animation-duration: 24s;
@@ -74,7 +74,7 @@ const Wave = styled.span`
     }
     
     &:nth-of-type(3) {
-        background: hsl(from ${props => props.theme.palette.primary.main}  h s l / 0.4);
+        background: hsl(from ${props => props.theme.palette.primary.main} h s l / 0.4);
         left: 0;
         animation-delay: -3s;
         animation-duration: 28s;

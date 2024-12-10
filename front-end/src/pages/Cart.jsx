@@ -45,7 +45,6 @@ const Cart = () => {
         if (cartProducts.length == 0) window.scrollTo({ top: 0, behavior: "smooth" });
     }, [cartProducts])
 
-
     return (
         <Wrapper>
             <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
@@ -57,7 +56,6 @@ const Cart = () => {
                     <h2>Giỏ hàng của bạn đang trống</h2>
                     <NavLink to={'/'}>
                         <Button
-
                             variant="contained"
                             color="primary"
                             startIcon={<ChevronLeft />}

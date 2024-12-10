@@ -25,7 +25,7 @@ export function ThemeContextProvider({ children }) {
             contrastText: "#ffffffb3",
         },
         background: {
-            elevate: '#fff',
+            default: '#f9f9fb',
         },
     }
 
@@ -55,7 +55,6 @@ export function ThemeContextProvider({ children }) {
                     background: {
                         default: '#080d08',
                         paper: '#080d08',
-                        elevate: '#1e1e1e',
                     },
                 },
             },
@@ -69,7 +68,7 @@ export function ThemeContextProvider({ children }) {
                     html: {
                         ...darkScrollbar(
                             theme.palette.mode === 'light' ? {
-                                track: theme.palette.background.default,
+                                track: theme.palette.background.paper,
                                 thumb: theme.palette.action.disabled,
                                 active: theme.palette.text.primary,
                             } : undefined

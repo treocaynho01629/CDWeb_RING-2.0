@@ -24,6 +24,10 @@ const CustomInput = styled(InputBase)`
         margin: 0;
         opacity: 1;
     };
+
+    input[type=number]{
+        -moz-appearance: textfield;
+    }
 `
 
 const StyledButton = styled.span`

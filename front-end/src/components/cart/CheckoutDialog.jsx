@@ -1,7 +1,14 @@
 import { lazy, useState, Suspense } from 'react';
-import { AltCheckoutBox, CheckoutBox, CheckoutButton, CheckoutContainer, CheckoutPrice, CheckoutPriceContainer, CheckoutRow, CheckoutStack, CheckoutText, CheckoutTitle, CouponButton, DetailContainer, MiniCouponContainer, PriceContainer, SavePrice, SubText } from '../custom/CartComponents';
+import {
+    AltCheckoutBox, CheckoutBox, CheckoutButton, CheckoutContainer, CheckoutPrice,
+    CheckoutPriceContainer, CheckoutRow, CheckoutStack, CheckoutText, CheckoutTitle,
+    CouponButton, MiniCouponContainer, PriceContainer, SavePrice, SubText
+} from '../custom/CartComponents';
 import { ShoppingCartCheckout, LocalActivityOutlined, KeyboardArrowRight } from '@mui/icons-material';
 import { useMediaQuery, useTheme } from '@mui/material';
+import { currencyFormat } from '../../ultils/covert';
+import NumberFlow from '@number-flow/react';
+import PriceDisplay from './PriceDisplay';
 import useAuth from "../../hooks/useAuth";
 
 const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
@@ -35,41 +42,24 @@ const CheckoutDialog = ({ coupon, shopCoupon, selected, navigate, handleOpenDial
 
     //Component stuff
     let checkoutDetail = <>
-        <DetailContainer>
-            <CheckoutRow>
-                <CheckoutText>Tiền hàng:</CheckoutText>
-                <CheckoutText>{(displayInfo.subTotal).toLocaleString()}đ</CheckoutText>
-            </CheckoutRow>
-            <CheckoutRow>
-                <CheckoutText>Phí vận chuyển:</CheckoutText>
-                <CheckoutText>{displayInfo.shipping.toLocaleString()}đ</CheckoutText>
-            </CheckoutRow>
-            {(!calculating && displayInfo.shippingDiscount > 0) &&
-                <CheckoutRow>
-                    <CheckoutText>Khuyến mãi vận chuyển:</CheckoutText>
-                    <CheckoutText>-{displayInfo.shippingDiscount.toLocaleString()}đ</CheckoutText>
-                </CheckoutRow>
-            }
-            {displayInfo.deal > 0 &&
-                <CheckoutRow>
-                    <CheckoutText>Giảm giá sản phẩm:</CheckoutText>
-                    <CheckoutText>-{displayInfo.deal.toLocaleString()}đ</CheckoutText>
-                </CheckoutRow>
-            }
-            {(!calculating && displayInfo.couponDiscount > 0) &&
-                <CheckoutRow>
-                    <CheckoutText>Giảm giá từ coupon:</CheckoutText>
-                    <CheckoutText>-{displayInfo.couponDiscount.toLocaleString()}đ</CheckoutText>
-                </CheckoutRow>
-            }
-        </DetailContainer>
+        <PriceDisplay displayInfo={displayInfo} />
         <CheckoutRow>
             {!numSelected ?
                 <CheckoutText className="error">Vui lòng chọn sản phẩm</CheckoutText>
                 : <PriceContainer>
-                    <CheckoutPrice><b>Tổng:</b>{displayInfo.total.toLocaleString()}đ</CheckoutPrice>
+                    <CheckoutPrice>
+                        <b>Tổng:</b>
+                        <NumberFlow
+                            value={displayInfo.total}
+                            format={{ style: 'currency', currency: 'VND' }}
+                            locales={'vi-VN'}
+                            aria-hidden="true"
+                            respectMotionPreference={false}
+                            willChange
+                        />
+                    </CheckoutPrice>
                     {(!calculating && displayInfo.totalDiscount > 0) &&
-                        <SavePrice>Tiết kiệm {Math.round(displayInfo.totalDiscount).toLocaleString()}đ</SavePrice>}
+                        <SavePrice>Tiết kiệm {currencyFormat.format(displayInfo.totalDiscount)}</SavePrice>}
                     <SubText>(Đã bao gồm VAT nếu có)</SubText>
                 </PriceContainer>
             }
@@ -100,9 +90,9 @@ const CheckoutDialog = ({ coupon, shopCoupon, selected, navigate, handleOpenDial
                                 {!numSelected ?
                                     <CheckoutText className="error">Vui lòng chọn sản phẩm</CheckoutText>
                                     : <PriceContainer>
-                                        <CheckoutPrice><b>Tổng:</b>{displayInfo.total.toLocaleString()}đ</CheckoutPrice>
+                                        <CheckoutPrice><b>Tổng:</b>{displayInfo.total}</CheckoutPrice>
                                         {(!calculating && displayInfo.totalDiscount > 0) &&
-                                            <SavePrice>Tiết kiệm {Math.round(displayInfo.totalDiscount).toLocaleString()}đ</SavePrice>}
+                                            <SavePrice>Tiết kiệm {currencyFormat.format(displayInfo.totalDiscount)}</SavePrice>}
                                     </PriceContainer>
                                 }
                             </AltCheckoutBox>
@@ -143,10 +133,10 @@ const CheckoutDialog = ({ coupon, shopCoupon, selected, navigate, handleOpenDial
                                         </PriceContainer>
                                         <PriceContainer>
                                             <CheckoutPrice onClick={() => toggleDrawer(true)}>
-                                                {Math.round(displayInfo.total).toLocaleString()}đ
+                                                {currencyFormat.format(displayInfo.total)}
                                             </CheckoutPrice>&emsp;
                                             {(!calculating && displayInfo.totalDiscount > 0) &&
-                                                <SavePrice>Tiết kiệm {Math.round(displayInfo.totalDiscount).toLocaleString()}đ</SavePrice>}
+                                                <SavePrice>Tiết kiệm {currencyFormat.format(displayInfo.totalDiscount)}</SavePrice>}
                                         </PriceContainer>
                                     </CheckoutPriceContainer>
                                     <CheckoutButton

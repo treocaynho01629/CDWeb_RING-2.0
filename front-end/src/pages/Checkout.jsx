@@ -15,12 +15,14 @@ import AddressSelectDialog from '../components/address/AddressSelectDialog';
 import PreviewDetailRow from '../components/cart/PreviewDetailRow';
 import FinalCheckoutDialog from '../components/cart/FinalCheckoutDialog';
 import useCart from '../hooks/useCart';
+import useReCaptchaV3 from '../hooks/useReCaptchaV3';
 import useTitle from '../hooks/useTitle';
 import useDeepEffect from '../hooks/useDeepEffect';
 
 const PendingModal = lazy(() => import('../components/layout/PendingModal'));
 const CouponDialog = lazy(() => import('../components/coupon/CouponDialog'));
 const PaymentSelect = lazy(() => import('../components/cart/PaymentSelect'));
+const ReCaptcha = lazy(() => import('../components/authorize/ReCaptcha'));
 
 //#region styled
 const Wrapper = styled.div`
@@ -142,6 +144,13 @@ const Checkout = () => {
     const [estimated, setEstimated] = useState({ deal: 0, subTotal: 0, shipping: 0, total: 0 });
     const [calculated, setCalculated] = useState(null);
     const [calculate, { isLoading: calculating, isError }] = useCalculateMutation();
+
+    //Recaptcha v2
+    const [challenge, setChallenge] = useState(false); //Toggle if marked suspicious by v3
+    const [token, setToken] = useState('');
+
+    //Recaptcha
+    const { reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge } = useReCaptchaV3();
 
     //Checkout hook
     const [checkout, { isLoading }] = useCheckoutMutation();
@@ -270,7 +279,7 @@ const Checkout = () => {
                 if (!err?.status) {
                     console.error('Server không phản hồi!');
                 } else if (err?.status === 409) {
-                    console.error(err?.data?.errors?.errorMessage);
+                    console.error(err?.data?.message);
                 } else if (err?.status === 400) {
                     console.error('Sai định dạng giỏ hàng!');
                 } else {
@@ -391,11 +400,18 @@ const Checkout = () => {
         const { enqueueSnackbar } = await import('notistack');
         const checkoutCart = getCheckoutCart();
 
-        checkout(checkoutCart).unwrap()
+        const recaptchaToken = challenge ? token : await generateReCaptchaToken('checkout');
+        checkout({
+            token: recaptchaToken,
+            source: challenge ? 'v2' : 'v3',
+            cart: checkoutCart
+        }).unwrap()
             .then((data) => {
                 enqueueSnackbar('Đặt hàng thành công!', { variant: 'success' });
                 // clearCart();
                 // navigate('/cart');
+                setChallenge(false);
+                showBadge();
                 setPending(false);
             })
             .catch((err) => {
@@ -404,7 +420,13 @@ const Checkout = () => {
                 if (!err?.status) {
                     setErrMsg('Server không phản hồi!');
                 } else if (err?.status === 409) {
-                    setErrMsg(err?.data?.errors?.errorMessage);
+                    setErrMsg(err?.data?.message);
+                } else if (err?.status === 403) {
+                    setErrMsg('Lỗi xác thực!');
+                } else if (err?.status === 412) {
+                    setChallenge(true);
+                    hideBadge();
+                    setErrMsg('Yêu cầu của bạn cần xác thực lại!');
                 } else if (err?.status === 400) {
                     setErrMsg('Sai định dạng thông tin!');
                 } else {
@@ -494,6 +516,7 @@ const Checkout = () => {
                                             fullWidth
                                             multiline
                                             minRows={6}
+                                            sx={{ bgcolor: 'background.paper' }}
                                             slotProps={{
                                                 inputComponent: TextareaAutosize,
                                                 inputProps: {
@@ -527,6 +550,11 @@ const Checkout = () => {
                                                 <PaymentSelect {...{ value: payment, handleChange: handleChangeMethod }} />
                                             }
                                         </Suspense>
+                                        {(reCaptchaLoaded && challenge) &&
+                                            <Suspense fallback={null}>
+                                                <ReCaptcha onVerify={(token) => setToken(token)} />
+                                            </Suspense>
+                                        }
                                     </StyledStepContent>
                                 </Step>
                             </StyledStepper>
@@ -538,7 +566,7 @@ const Checkout = () => {
                             <FinalCheckoutDialog {...{
                                 coupon, shopCoupon, calculating, estimated, calculated, isValid: validAddressInfo,
                                 activeStep, maxSteps, handleOpenDialog: handleOpenCouponDialog, addressInfo,
-                                backFirstStep, handleNext, handleSubmit
+                                backFirstStep, handleNext, handleSubmit, reCaptchaLoaded
                             }} />
                         </Grid>
                     </Grid>

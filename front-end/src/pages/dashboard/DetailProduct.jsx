@@ -2,11 +2,12 @@ import styled from '@emotion/styled'
 import { useState, lazy, Suspense, useEffect } from 'react';
 import { TextareaAutosize, Box, Card, CardContent, CardMedia, IconButton, Typography, Grid2 as Grid, Divider } from '@mui/material';
 import { useNavigate, useParams } from 'react-router';
+import { useGetBookQuery } from '../../features/books/booksApiSlice';
+import { currencyFormat } from '../../ultils/covert';
 import TableReviews from "../../components/dashboard/table/TableReviews";
 import TableOrders from "../../components/dashboard/table/TableOrders";
 import EditIcon from '@mui/icons-material/Edit';
 import useTitle from '../../hooks/useTitle'
-import { useGetBookQuery } from '../../features/books/booksApiSlice';
 
 const EditProductDialog = lazy(() => import('../../components/dashboard/dialog/EditProductDialog'));
 
@@ -83,7 +84,7 @@ const DetailProduct = () => {
                     <CardContent sx={{ padding: '50px' }}>
                         <Title>{data?.title}</Title>
                         <Typography my={2} component="div" variant="h6" sx={{ fontWeight: 'bold' }}>
-                            Giá: {data?.price.toLocaleString()} đ
+                            Giá: {currencyFormat.format(data?.price)}
                         </Typography>
                         <Grid container spacing={3} sx={{ maxWidth: '600px' }}>
                             <Grid item xs={5}>

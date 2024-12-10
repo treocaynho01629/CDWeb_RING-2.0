@@ -3,6 +3,7 @@ import { KeyboardArrowDown, KeyboardArrowRight, LocalShippingOutlined } from '@m
 import { Box } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router';
 import { MobileExtendButton } from '../custom/GlobalComponents';
+import { currencyFormat } from '../../ultils/covert';
 import useAuth from '../../hooks/useAuth';
 
 //#region styled
@@ -94,7 +95,10 @@ const AddressPreview = ({ addressInfo, handleOpen, loadAddress }) => {
                                     </Address>
                                     <KeyboardArrowDown sx={{ display: { xs: 'none', md: 'block' } }} />
                                 </AddressInfo>
-                                <AddressInfo className="hide-on-mobile">&nbsp;Phí vận chuyển:&emsp;<Address>10,000đ</Address></AddressInfo>
+                                <AddressInfo className="hide-on-mobile">
+                                    &nbsp;Phí vận chuyển:&emsp;
+                                    <Address>{currencyFormat.format(10000)}</Address>
+                                </AddressInfo>
                             </Box>
                         </Box>
                     }
