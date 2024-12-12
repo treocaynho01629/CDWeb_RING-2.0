@@ -5,6 +5,7 @@ import ProductSimple from "./ProductSimple";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { trackWindowScroll } from "react-lazy-load-image-component";
 import "react-multi-carousel/lib/styles.css";
+import { Message } from '../custom/GlobalComponents';
 
 //#region styled
 const Container = styled.div`
@@ -21,6 +22,20 @@ const Container = styled.div`
 const ProductContainer = styled.div`
     display: flex;
     height: 100%;
+
+    &.hidden {
+      visibility: hidden;
+    }
+`
+
+const MessageContainer = styled.div`
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 
 const CustomArrowButton = styled.button`
@@ -74,7 +89,7 @@ const responsive = {
 
 const CustomArrow = ({ onClick, className, children }) => (
   <CustomArrowButton className={className} onClick={() => onClick()}>
-      {children}
+    {children}
   </CustomArrowButton>
 );
 
@@ -107,7 +122,10 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
             </ProductContainer>
           )
         })
-      ] : <p>TEMP</p>
+      ] :
+      <ProductContainer className="hidden">
+        <ProductSimple />
+      </ProductContainer>
   } else {
     productsCarousel = tempItems;
   }
@@ -117,8 +135,8 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
       {loading && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
       <Carousel
         responsive={responsive}
-        customLeftArrow={<CustomArrow className="custom-left-arrow"><KeyboardArrowLeft/></CustomArrow>}
-        customRightArrow={<CustomArrow className="custom-right-arrow"><KeyboardArrowRight/></CustomArrow>}
+        customLeftArrow={<CustomArrow className="custom-left-arrow"><KeyboardArrowLeft /></CustomArrow>}
+        customRightArrow={<CustomArrow className="custom-right-arrow"><KeyboardArrowRight /></CustomArrow>}
         removeArrowOnDeviceType={["mobile"]}
         pauseOnHover
         keyBoardControl
@@ -126,6 +144,11 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
       >
         {productsCarousel}
       </Carousel>
+      {(isSuccess && !data?.ids?.length) &&
+        <MessageContainer>
+          <Message className="warning">Không có sản phẩm nào</Message>
+        </MessageContainer>
+      }
     </Container>
   )
 }

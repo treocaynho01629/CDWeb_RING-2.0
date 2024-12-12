@@ -78,7 +78,7 @@ const Percentage = styled.span`
 
 const StyledLazyImage = styled(LazyLoadImage)`
     aspect-ratio: 1/1;
-    max-height: 160px;
+    height: 160px;
     z-index: -3;
     object-fit: contain;
     margin: 5px 0;
@@ -91,7 +91,6 @@ const StyledLazyImage = styled(LazyLoadImage)`
 const SkeletonContainer = styled.div`
     width: 100%;
     max-height: 160px;
-    margin: 5px 0;
     aspect-ratio: 1/1;
     display: flex;
     align-items: center;
@@ -100,6 +99,7 @@ const SkeletonContainer = styled.div`
 
 const StyledSkeleton = styled(Skeleton)`
     height: 100%;
+    margin: 5px 0;
     aspect-ratio: 1/1;
 `
 //#endregion
@@ -120,8 +120,8 @@ const ProductSimple = ({ book, scrollPosition }) => {
                         width={'100%'}
                         scrollPosition={scrollPosition}
                         placeholder={
-                            <SkeletonContainer>
-                                <StyledSkeleton variant="rectangular" animation={false}/>
+                            <SkeletonContainer style={{ margin: '5px 0' }}>
+                                <StyledSkeleton variant="rectangular" animation={false} />
                             </SkeletonContainer>
                         }
                     />
@@ -135,12 +135,16 @@ const ProductSimple = ({ book, scrollPosition }) => {
                 :
                 <>
                     <SkeletonContainer>
-                        <StyledSkeleton variant="rectangular"/>
+                        <StyledSkeleton variant="rectangular" />
                     </SkeletonContainer>
                     <Info>
-                        <Skeleton variant="text" sx={{ fontSize: '20px' }} width="60%" />
-                        <Skeleton variant="text" sx={{ fontSize: '16px' }} width="100%" />
-                        <Skeleton variant="text" sx={{ fontSize: '16px' }} width="50%" />
+                        <Price>
+                            <Skeleton variant="text" width="60%" />
+                        </Price>
+                        <Title>
+                            <Skeleton variant="text" width="100%" />
+                            <Skeleton variant="text" width="50%" />
+                        </Title>
                     </Info>
                 </>
             }
