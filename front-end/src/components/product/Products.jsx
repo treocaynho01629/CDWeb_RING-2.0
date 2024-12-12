@@ -35,7 +35,7 @@ const Products = ({ data, isError, isLoading, isSuccess, scrollPosition }) => {
   }
 
   return (
-    <div style={{ padding: 0, width: '100%', position: 'relative' }}>
+    <div style={{ padding: 0, width: '100%', position: 'relative', padding: '5px 0' }}>
       {(isLoading || isError) && <CustomProgress color={`${isError ? 'error' : 'primary'}`} />}
       <Grid container spacing={.2} size="grow">
         {productsContent}

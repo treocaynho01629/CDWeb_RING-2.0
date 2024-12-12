@@ -177,6 +177,11 @@ const AddToCart = styled.p`
     margin: 9px 0;
     cursor: pointer;
 
+    &.disabled {
+        pointer-events: none;
+        color: ${props => props.theme.palette.text.disabled};
+    }
+
     &:hover {color: ${props => props.theme.palette.primary.main} }
     &:after {content: " THÊM VÀO GIỎ";}
 `
@@ -296,24 +301,35 @@ const Product = ({ book, scrollPosition }) => {
                             <StyledSkeleton variant="rectangular" />
                         </ImageContainer>
                         <Info>
-                            <Skeleton variant="text" sx={{ fontSize: '16px' }} />
-                            <Skeleton variant="text" sx={{ fontSize: '16px' }} width="60%" />
-                            <Skeleton
-                                variant="text"
-                                sx={{
-                                    fontSize: '20px',
-                                    width: { xs: '90%', sm: '40%' }
-                                }}
-                            />
-                            <Skeleton variant="text" sx={{ fontSize: '16px', display: { xs: 'none', sm: 'block' } }} />
-                            <Skeleton variant="text" sx={{ fontSize: '14px' }} width="60%" />
+                            <MainInfo>
+                                <ProductInfo>
+                                    <Title>
+                                        <Skeleton variant="text" />
+                                        <Skeleton variant="text" width="60%" />
+                                    </Title>
+                                    <PriceContainer>
+                                        <Price>
+                                            <Skeleton
+                                                variant="text"
+                                                sx={{ width: { xs: '90%', sm: '40%' } }}
+                                            />
+                                        </Price>
+                                        <DiscountContainer>
+                                            <Skeleton variant="text" width="60%" />
+                                        </DiscountContainer>
+                                    </PriceContainer>
+                                </ProductInfo>
+                                <MoreInfo>
+                                    <Skeleton variant="text" width="70%" />
+                                </MoreInfo>
+                            </MainInfo>
                         </Info>
                     </>
                 }
             </Wrapper>
             <Info className="extra">
                 <Divider />
-                <AddToCart onClick={() => handleAddToCart(book)} disabled={!book}>
+                <AddToCart onClick={() => handleAddToCart(book)} className={book ? '' : 'disabled'}>
                     <ShoppingCartIcon style={{ fontSize: 14 }} />&nbsp;
                 </AddToCart>
             </Info>

@@ -2,13 +2,13 @@ import { useState, useRef, lazy, Suspense } from 'react'
 import { Box, Skeleton, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { useParams, Navigate, NavLink, useSearchParams } from 'react-router';
 import { useGetBookQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
-import { LazyLoadComponent } from 'react-lazy-load-image-component';
 import useTitle from '../hooks/useTitle';
 import CustomDivider from '../components/custom/CustomDivider';
 import ProductContent from '../components/product/detail/ProductContent';
 import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 import CustomPlaceholder from '../components/custom/CustomPlaceholder';
 import ProductSimple from '../components/product/ProductSimple';
+import LazyLoad from 'react-lazyload';
 
 const PendingModal = lazy(() => import('../components/layout/PendingModal'));
 const ProductsSlider = lazy(() => import('../components/product/ProductsSlider'));
@@ -99,65 +99,70 @@ const ProductDetail = () => {
                 {product}
                 <Stack my={1} spacing={1} direction={{ xs: 'column-reverse', md: 'column' }}>
                     <Stack spacing={1}>
-                        <LazyLoadComponent>
-                            <Suspense fallback={<CustomPlaceholder sx={{
+                        <LazyLoad offset={50} placeholder={
+                            <CustomPlaceholder sx={{
                                 width: '100%',
                                 border: '.5px solid',
                                 borderColor: 'divider',
                                 height: { xs: 98, md: 133 }
                             }}
-                            />}>
+                            />
+                        }>
+                            <Suspense fallback={null}>
                                 <ShopDisplay id={data?.shopId} name={data?.shopName} />
                             </Suspense>
-                        </LazyLoadComponent>
-                        <LazyLoadComponent>
-                            <Suspense fallback={<CustomPlaceholder sx={{
+                        </LazyLoad>
+                        <LazyLoad offset={50} placeholder={
+                            <CustomPlaceholder sx={{
                                 width: '100%',
                                 border: '.5px solid',
                                 borderColor: 'divider',
                                 height: { xs: 610, md: 980 }
                             }}
-                            />}>
+                            />
+                        }>
+                            <Suspense fallback={null}>
                                 <ProductDetailContainer {...{
                                     loading: (isLoading || isFetching), book: data,
                                     reviewRef, scrollIntoTab, mobileMode: tabletMode, pending, setPending
                                 }} />
                             </Suspense>
-                        </LazyLoadComponent>
+                        </LazyLoad>
                     </Stack>
                     <Box ref={reviewRef} sx={{ scrollMargin: theme.mixins.toolbar.minHeight }}>
-                        <LazyLoadComponent>
-                            <Suspense fallback={<CustomPlaceholder sx={{
+                        <LazyLoad offset={50} placeholder={
+                            <CustomPlaceholder sx={{
                                 width: '100%',
                                 border: '.5px solid',
                                 borderColor: 'divider',
                                 height: { xs: 310, md: 410 }
                             }}
-                            />}>
+                            />
+                        }>
+                            <Suspense fallback={null}>
                                 <ReviewComponent {...{
                                     book: data, scrollIntoTab, mobileMode: tabletMode,
                                     pending, setPending, isReview, handleToggleReview
                                 }} />
                             </Suspense>
-                        </LazyLoadComponent>
+                        </LazyLoad>
                     </Box>
                 </Stack>
                 <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
-                <LazyLoadComponent>
-                    <Suspense fallback={
-                        <CustomPlaceholder sx={{
-                            height: 'auto',
-                            border: '.5px solid',
-                            borderColor: 'action.hover',
-                        }}
-                        >
-                            <ProductSimple />
-                        </CustomPlaceholder>
-                    }
+                <LazyLoad offset={50} placeholder={
+                    <CustomPlaceholder sx={{
+                        height: 'auto',
+                        border: '.5px solid',
+                        borderColor: 'action.hover',
+                    }}
                     >
+                        <ProductSimple />
+                    </CustomPlaceholder>
+                }>
+                    <Suspense fallback={null}>
                         <ProductsSlider {...{ loading: loadRandom, data: randomBooks, isSuccess: doneRandom, isError: errorRandom }} />
                     </Suspense>
-                </LazyLoadComponent>
+                </LazyLoad>
             </Box>
         </>
     )

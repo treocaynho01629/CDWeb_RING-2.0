@@ -4,7 +4,7 @@ import { alpha, Button } from '@mui/material';
 import { Link, useNavigate } from 'react-router';
 import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
 import { useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
-import { Category, ExpandMore, GpsNotFixed, KeyboardArrowRight, Replay, ThumbUpAlt } from '@mui/icons-material';
+import { Book, Bookmarks, Category, ExpandMore, GpsNotFixed, ImportContacts, KeyboardArrowRight, Replay, TableChart, ThumbUpAlt, TrendingUp } from '@mui/icons-material';
 import { CustomTab, CustomTabs } from '../components/custom/CustomTabs';
 import { useGetPublishersQuery } from '../features/publishers/publishersApiSlice';
 import { orderTabs } from '../ultils/suggest';
@@ -36,7 +36,13 @@ const ToggleGroupContainer = styled.div`
   padding: 0 10px;
   position: sticky; 
   top: ${props => props.theme.mixins.toolbar.minHeight + 16.5}px;
-  z-index: 1;
+  z-index: 2;
+
+  &.border {
+    &::after {
+      border-top: .5px solid ${props => props.theme.palette.divider};
+    }
+  }
 
   ${props => props.theme.breakpoints.down("sm")} {
       top: ${props => props.theme.mixins.toolbar.minHeight + 4.5}px;
@@ -61,7 +67,6 @@ const ToggleGroupContainer = styled.div`
       width: 100%;
       height: 100%;
       background-color: ${props => props.theme.palette.action.hover};
-      border: .5px solid ${props => props.theme.palette.action.focus};
       z-index: -1;
 
       ${props => props.theme.breakpoints.down("sm")} {
@@ -83,15 +88,15 @@ const TitleContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   white-space: nowrap;
-  padding: 10px 15px;
-  margin-bottom: 5px;
-  z-index: 2;
+  padding: ${props => props.theme.spacing(1.25)} ${props => props.theme.spacing(2)};
+  z-index: 3;
 
   
   ${props => props.theme.breakpoints.down("sm")} {
     border-left: none;
     border-right: none;
     margin-bottom: 0px;
+    font-size: 16px;
   }
 `
 
@@ -119,25 +124,35 @@ const ContainerTitle = styled.span`
   font-weight: 450;
   display: flex;
   align-items: center;
-  color: ${props => props.theme.palette.primary.dark};
 
   &.error {
     color: ${props => props.theme.palette.error.main};
+
+    svg {
+      color: ${props => props.theme.palette.error.main};
+    }
+  }
+
+  ${props => props.theme.breakpoints.down("sm")} {
+    font-size: 16px;
   }
 `
 
 const Container = styled.div`
-  position: relative;
-  margin: 10px 0;
-`
+  margin: ${props => props.theme.spacing(2)} 0;
+  border: .5px solid ${props => props.theme.palette.divider};
+  background-color: ${props => props.theme.palette.background.paper};
 
-const ProductContainer = styled.div`
+  ${TitleContainer} {
+    border: none;
+  }
 `
 
 const SaleContainer = styled.div`
   position: relative;
-  padding: 20px 0;
-  margin: 10px 0;
+  padding: ${props => props.theme.spacing(2.5)} 0;
+  margin: ${props => props.theme.spacing(1)} 0;
+  margin-bottom: ${props => props.theme.spacing(4)};
 
   &::before {
     content: "";
@@ -172,17 +187,42 @@ const cateToTabs = (cate) => {
 }
 
 const Loadable = ({ children }) => (
-  <LazyLoad height={200} offset={100}>
-    <Suspense fallback={<CustomPlaceholder sx={{ height: 300 }} />}>
+  <LazyLoad offset={100} placeholder={<CustomPlaceholder sx={{ height: 300 }} />}>
+    <Suspense fallback={null}>
       {children}
     </Suspense>
   </LazyLoad>
 )
 
+const SaleList = () => {
+  const { data, isLoading, isFetching, isSuccess, isError, refetch } = useGetBooksQuery({ sortBy: 'discount', sortDir: 'desc' });
+
+  return (
+    <>
+      <TitleContainer>
+        <ContainerTitle className="error"><ThumbUpAlt />&nbsp;Top Khuyến Mãi</ContainerTitle>
+        {isError ?
+          <MoreButton className="error" onClick={() => refetch()}>
+            Tải lại <Replay />
+          </MoreButton>
+          :
+          <Link to={'/store?sortBy=discount&sortBy=desc'}>
+            <MoreButton>
+              Xem tất cả <KeyboardArrowRight />
+            </MoreButton>
+          </Link>
+        }
+      </TitleContainer>
+      <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
+    </>
+  )
+}
+
 const ProductsList = ({ tabs, value, title }) => {
   const listRef = useRef(null); //Scroll ref
-  const [tabValue, setTabValue] = useState(0);
-  const slug = tabs ? tabs[tabValue]?.slug : null;
+  const [tabValue, setTabValue] = useState(0); //Tab
+
+  //Products
   const filters = tabs ? { ...tabs[tabValue]?.filters, sortDir: 'desc' } : value || {};
   const { data, isLoading, isFetching, isSuccess, isError, refetch } = useGetBooksQuery(
     tabs || value ? filters : {},
@@ -196,7 +236,7 @@ const ProductsList = ({ tabs, value, title }) => {
     }
   };
   const getParams = () => {
-    const { sortBy, keyword, cateId, rating, amount, pubId, type, shopId, sellerId } = filters || {};
+    const { sortBy, keyword, cateId, rating, amount, pubIds, type, shopId, sellerId } = filters || {};
 
     const params = new URLSearchParams();
     if (sortBy) params.append('sort', sortBy);
@@ -207,29 +247,32 @@ const ProductsList = ({ tabs, value, title }) => {
     if (type) params.append('type', type);
     if (shopId) params.append('shop', shopId);
     if (sellerId) params.append('sellerId', sellerId);
-    if (pubId) params.append('pubs', pubId);
+    if (pubIds) params.append('pubs', pubIds);
     return params.toString();
   }
 
+  const slug = tabs ? tabs[tabValue]?.slug : null;
+
   return (
-    <ProductContainer>
-      <TitleContainer ref={listRef}>
-        {title}
-        {isError ?
-          <MoreButton className="error" onClick={() => refetch()}>
-            Tải lại <Replay />
-          </MoreButton>
-          :
-          <Link to={`/store${slug ? `/${slug}` : ''}?${getParams()}`}>
-            <MoreButton>
-              Xem tất cả <KeyboardArrowRight />
+    <Container>
+      {title &&
+        <TitleContainer ref={listRef}>
+          {title}
+          {isError ?
+            <MoreButton className="error" onClick={() => refetch()}>
+              Tải lại <Replay />
             </MoreButton>
-          </Link>
-        }
-      </TitleContainer>
-      {
-        tabs &&
-        <ToggleGroupContainer>
+            :
+            <Link to={`/store${slug ? `/${slug}` : ''}?${getParams()}`}>
+              <MoreButton>
+                Xem tất cả <KeyboardArrowRight />
+              </MoreButton>
+            </Link>
+          }
+        </TitleContainer>
+      }
+      {tabs &&
+        <ToggleGroupContainer className={title ? '' : 'border'}>
           <CustomTabs
             value={tabValue}
             onChange={handleChangeValue}
@@ -245,15 +288,14 @@ const ProductsList = ({ tabs, value, title }) => {
         </ToggleGroupContainer>
       }
       <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
-    </ProductContainer>
+    </Container>
   )
 }
 
 const RandomList = () => {
   const { data, isLoading, isFetching, isSuccess, isError, refetch } = useGetRandomBooksQuery({ amount: 10 });
   return (
-    <>
-      <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
+    <Container>
       <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
       <ButtonContainer>
         {isError ?
@@ -280,7 +322,7 @@ const RandomList = () => {
           </Button>
         }
       </ButtonContainer>
-    </>
+    </Container>
   )
 }
 
@@ -327,7 +369,7 @@ const Home = () => {
       const { entities, ids } = publishers;
       let pubsList = ids?.map((id, index) => {
         const pub = entities[id];
-        return ({ filters: { pubId: [id + ''] }, label: pub?.name });
+        return ({ filters: { pubIds: [id + ''] }, label: pub?.name });
       })
       setPubs(pubsList);
     }
@@ -353,22 +395,18 @@ const Home = () => {
       <CustomDivider>TIÊU ĐIỂM</CustomDivider>
       <SaleContainer>
         <Loadable key={'top'}>
-          <ProductsList key={'top'}
-            {...{
-              value: { sortBy: 'discount', sortDir: 'desc' },
-              title: <ContainerTitle className="error"><ThumbUpAlt />&nbsp;Top Khuyến Mãi</ContainerTitle>
-            }} />
+          <SaleList />
         </Loadable>
       </SaleContainer>
       <Loadable key={'toriyama'}>
         <ProductsList {...{
           value: { keyword: 'toriyama' },
-          title: <ContainerTitle><GpsNotFixed />&nbsp;Akira Toriyama</ContainerTitle>
+          title: <ContainerTitle><GpsNotFixed color="primary"/>&nbsp;Akira Toriyama</ContainerTitle>
         }} />
       </Loadable>
       <Container>
         <TitleContainer>
-          <ContainerTitle><Category />&nbsp;Danh mục sản phẩm</ContainerTitle>
+          <ContainerTitle><Category color="warning"/>&nbsp;Danh mục sản phẩm</ContainerTitle>
         </TitleContainer>
         <Loadable key={'cates'}>
           <Categories />
@@ -376,7 +414,7 @@ const Home = () => {
       </Container>
       <CustomDivider>Sản phẩm mới nhất</CustomDivider>
       <Loadable key={'hot'}>
-        <>
+        <Container>
           <Products {...{ isLoading, data, isSuccess, isError }} />
           <ButtonContainer>
             {isError ?
@@ -403,24 +441,36 @@ const Home = () => {
               </Button>
             }
           </ButtonContainer>
-        </>
+        </Container>
       </Loadable>
       <Loadable key={'trending'}>
-        <ProductsList key={'trending'} {...{ tabs: orderTabs, title: 'Trending' }} />
+        <ProductsList key={'trending'} {...{
+          tabs: orderTabs,
+          title: <ContainerTitle><TrendingUp color="success"/>&nbsp;Trending</ContainerTitle>
+        }}
+        />
       </Loadable>
       <p>TOP STUFF</p>
       <Loadable key={'categories'}>
-        <ProductsList key={'categories'} {...{ value: { cateId: cates[0]?.id }, title: cates[0]?.name }} />
+        <ProductsList key={'categories'} {...{
+          value: { cateId: cates[0]?.id },
+          title: <ContainerTitle><Book color="primary"/>&nbsp;{cates[0]?.name}</ContainerTitle>
+        }}
+        />
       </Loadable>
       <Loadable key={'publishers'}>
-        <ProductsList key={'publishers'} {...{ tabs: pubs.slice(0, 4) || [], title: 'Thương hiệu nổi bật' }} />
+        <ProductsList key={'publishers'} {...{
+          tabs: pubs.slice(0, 4) || [],
+          title: <ContainerTitle><TableChart color="warning"/>&nbsp;Thương hiệu nổi bật</ContainerTitle>
+        }}
+        />
       </Loadable>
       <Loadable key={'publishers2'}>
         <ProductsList key={'publishers2'} {...{ tabs: pubs.slice(5, 9) || [] }} />
       </Loadable>
       <Container>
         <TitleContainer>
-          <ContainerTitle><Category />&nbsp;Nhà xuất bản</ContainerTitle>
+          <ContainerTitle><Category color="info"/>&nbsp;Nhà xuất bản</ContainerTitle>
         </TitleContainer>
         <Loadable key={'pubs'}>
           <Publishers />
@@ -428,12 +478,18 @@ const Home = () => {
       </Container>
       {catesWithChilds.map((cate, index) => {
         if (index < catesWithChilds?.length - 1) {
-          const tabs = cateToTabs(catesWithChilds[index]);
-          const title = catesWithChilds[index]?.name;
+          const tabs = cateToTabs(cate);
+          const title = cate.name;
 
           return (
             <Loadable key={`cate-${index}`}>
-              <ProductsList key={`cate-${index}`} {...{ tabs, title }} />
+              <ProductsList key={`cate-${index}`} {...{
+                tabs,
+                title: <ContainerTitle>
+                  <Bookmarks color={index % 2 == 0 ? 'primary' : 'info'} />&nbsp;{title}
+                </ContainerTitle>
+              }}
+              />
             </Loadable>
           )
         }
@@ -442,14 +498,20 @@ const Home = () => {
         <BigProductsSlider />
       </Loadable>
       <Loadable key={'categories2'} >
-        <ProductsList key={'categories2'} {...{ tabs: orderTabs, title: 'Other Cate' }} />
+        <ProductsList key={'categories2'} {...{
+          tabs: orderTabs,
+          title: 'Other Cate'
+        }} />
       </Loadable>
       <Loadable key={'categories3'}>
         <ProductsList key={'categories3'} {...{
           tabs: cateToTabs(catesWithChilds[catesWithChilds.length - 1]),
-          title: catesWithChilds[catesWithChilds.length - 1]?.name
+          title: <ContainerTitle>
+            <ImportContacts color="success" />&nbsp;{catesWithChilds[catesWithChilds.length - 1]?.name}
+          </ContainerTitle>
         }} />
       </Loadable>
+      <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
       <Loadable key={'random'} >
         <RandomList />
       </Loadable>

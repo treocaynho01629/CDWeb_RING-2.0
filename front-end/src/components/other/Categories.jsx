@@ -63,7 +63,6 @@ const CateContainer = styled.div`
     justify-content: space-between;
     overflow: hidden;
     background-color: ${props => props.theme.palette.background.paper};
-    border: .5px solid ${props => props.theme.palette.divider};
 
     &:hover {
         .button-container {
