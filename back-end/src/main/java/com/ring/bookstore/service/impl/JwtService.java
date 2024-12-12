@@ -142,6 +142,8 @@ public class JwtService {
                 .path("/api/auth")
                 .maxAge(refreshExpirationTime)
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .build();
     }
 
