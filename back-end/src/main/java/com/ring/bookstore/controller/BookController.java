@@ -40,8 +40,9 @@ public class BookController {
 
     //Get random books
     @GetMapping("/random")
-    public ResponseEntity<?> getRandomBooks(@RequestParam(value = "amount", defaultValue = "5") Integer amount) {
-        List<BookDTO> books = bookService.getRandomBooks(amount);
+    public ResponseEntity<?> getRandomBooks(@RequestParam(value = "amount", defaultValue = "5") Integer amount,
+                                            @RequestParam(value = "withDesc", defaultValue = "false") Boolean withDesc) {
+        List<BookDTO> books = bookService.getRandomBooks(amount, withDesc);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
@@ -53,7 +54,7 @@ public class BookController {
     }
 
     //Get books with filtering
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<?> getBooks(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
                                       @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                       @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
@@ -66,9 +67,23 @@ public class BookController {
                                       @RequestParam(value = "fromRange", defaultValue = "0") Double fromRange,
                                       @RequestParam(value = "toRange", defaultValue = "100000000") Double toRange,
                                       @RequestParam(value = "rating", defaultValue = "0") Integer rating,
-                                      @RequestParam(value = "amount", defaultValue = "1") Integer amount) {
-        Page<BookDTO> books = bookService.getBooks(pageNo, pageSize, sortBy, sortDir, keyword,
-                rating, amount, cateId, pubIds, shopId, types, fromRange, toRange);
+                                      @RequestParam(value = "amount", defaultValue = "1") Integer amount,
+                                      @RequestParam(value = "withDesc", defaultValue = "false") Boolean withDesc) {
+        Page<BookDTO> books = bookService.getBooks(
+                pageNo,
+                pageSize,
+                sortBy,
+                sortDir,
+                keyword,
+                rating,
+                amount,
+                cateId,
+                pubIds,
+                shopId,
+                types,
+                fromRange,
+                toRange,
+                withDesc);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 

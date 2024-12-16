@@ -15,6 +15,7 @@ import com.google.common.cache.LoadingCache;
 @Service
 public class LoginProtectionService {
     public static final int MAX_ATTEMPT = 10;
+    public static final int VALID_ATTEMPT = 5;
     private LoadingCache<String, Integer> attemptsCache;
 
     @Autowired
@@ -25,7 +26,7 @@ public class LoginProtectionService {
         attemptsCache = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.MINUTES).build(new CacheLoader<String, Integer>() {
             @Override
             public Integer load(final String key) {
-                return 0;
+            return 0;
             }
         });
     }
@@ -39,6 +40,14 @@ public class LoginProtectionService {
         }
         attempts++;
         attemptsCache.put(key, attempts);
+    }
+
+    public boolean isSuspicious() {
+        try {
+            return attemptsCache.get(getClientIP()) >= VALID_ATTEMPT;
+        } catch (final ExecutionException e) {
+            return false;
+        }
     }
 
     public boolean isBlocked() {

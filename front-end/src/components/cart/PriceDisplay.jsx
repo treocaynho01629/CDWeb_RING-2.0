@@ -3,7 +3,7 @@ import { TransitionGroup } from 'react-transition-group';
 import { CheckoutRow, CheckoutText, DetailContainer } from '../custom/CartComponents'
 import { currencyFormat } from '../../ultils/covert';
 
-const PriceDisplay = ({ displayInfo }) => {
+const PriceDisplay = ({ displayInfo, loggedIn }) => {
     return (
         <DetailContainer>
             <CheckoutRow>
@@ -36,6 +36,14 @@ const PriceDisplay = ({ displayInfo }) => {
                         <CheckoutRow>
                             <CheckoutText>Giảm giá từ coupon:</CheckoutText>
                             <CheckoutText>-{currencyFormat.format(displayInfo.couponDiscount)}</CheckoutText>
+                        </CheckoutRow>
+                    </Collapse>
+                }
+                {(!loggedIn && displayInfo.subTotal > 0) &&
+                    <Collapse key={'disclaimer'}>
+                        <CheckoutRow>
+                            <CheckoutText></CheckoutText>
+                            <CheckoutText className="warning">&nbsp;<br/>Đăng nhập để có thể áp dụng mã</CheckoutText>
                         </CheckoutRow>
                     </Collapse>
                 }

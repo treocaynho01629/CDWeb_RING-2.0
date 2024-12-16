@@ -196,7 +196,12 @@ const Checkout = () => {
                     let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
 
                     if (!detail) {
-                        detail = { shopId, coupon: shopCoupon[shopId]?.code, items: [] };
+                        const coupon =  shopCoupon[shopId];
+                        detail = { 
+                            shopId, 
+                            items: [],
+                            // coupon: coupon?.isUsable ? coupon?.code : null, 
+                        };
                         result.cart.push(detail);
                     }
 
@@ -346,6 +351,15 @@ const Checkout = () => {
         return resultCart;
     }
     const reducedCart = useMemo(() => reduceCart(), [cartProducts]);
+    const displayInfo = {
+        deal: (calculating || !calculated) ? estimated?.deal : calculated?.dealDiscount,
+        subTotal: (calculating || !calculated) ? estimated?.subTotal : calculated?.productsTotal,
+        shipping: (calculating || !calculated) ? estimated?.shipping : calculated?.shippingFee,
+        couponDiscount: calculated?.couponDiscount || 0,
+        totalDiscount: calculated?.totalDiscount || 0,
+        shippingDiscount: calculated?.shippingDiscount || 0,
+        total: (calculating || !calculated) ? estimated?.total : calculated?.total - calculated?.totalDiscount
+    }
 
     const scrollToTop = useCallback(() => { scrollRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, [])
     const handleNext = () => { setActiveStep((prevActiveStep) => prevActiveStep + 1); };
@@ -408,8 +422,8 @@ const Checkout = () => {
         }).unwrap()
             .then((data) => {
                 enqueueSnackbar('Đặt hàng thành công!', { variant: 'success' });
-                // clearCart();
-                // navigate('/cart');
+                clearCart();
+                navigate('/cart');
                 setChallenge(false);
                 showBadge();
                 setPending(false);
@@ -456,8 +470,8 @@ const Checkout = () => {
                             <StyledStepper activeStep={activeStep} orientation="vertical" connector={null}>
                                 <Step key={0}>
                                     <StepLabel
-                                        error={errMsg !== ''}
-                                        optional={errMsg && <Typography variant="caption" color="error">{errMsg}</Typography>}
+                                        error={errMsg !== '' && !err?.status}
+                                        optional={(errMsg !== '' && !err?.status) && <Typography variant="caption" color="error">{errMsg}</Typography>}
                                     >
                                         <SemiTitle onClick={() => {
                                             if (activeStep > 0) setActiveStep(0);
@@ -484,7 +498,11 @@ const Checkout = () => {
                                     </StyledStepContent>
                                 </Step>
                                 <Step key={1}>
-                                    <StepLabel>
+                                    <StepLabel
+                                        error={errMsg !== '' && (err?.status == 409 || err?.status == 404)}
+                                        optional={(errMsg !== '' && (err?.status == 409 || err?.status == 404))
+                                            && <Typography variant="caption" color="error">{errMsg}</Typography>}
+                                    >
                                         <SemiTitle onClick={() => {
                                             if (validAddressInfo && activeStep > 1) setActiveStep(1);
                                         }}>
@@ -500,8 +518,8 @@ const Checkout = () => {
 
                                                         return (<PreviewDetailRow key={`preview-${shop?.shopId}-${index}`}
                                                             {...{
-                                                                id: shopId, index, shop, coupon: shopCoupon[shopId],
-                                                                couponDiscount: couponDiscount[shopId], handleOpenDialog: handleOpenCouponDialog
+                                                                shop, coupon: shopCoupon[shopId], discount: couponDiscount[shopId], 
+                                                                handleOpenDialog: handleOpenCouponDialog
                                                             }}
                                                         />)
                                                     })}
@@ -541,7 +559,11 @@ const Checkout = () => {
                                     </StyledStepContent>
                                 </Step>
                                 <Step key={2}>
-                                    <StepLabel>
+                                    <StepLabel
+                                        error={errMsg !== '' && (err?.status == 412 || err?.status == 403)}
+                                        optional={(errMsg !== '' && (err?.status == 412 || err?.status == 404))
+                                            && <Typography variant="caption" color="error">{errMsg}</Typography>}
+                                    >
                                         <SemiTitle><CreditCard />&nbsp;Chọn hình thức thanh toán</SemiTitle>
                                     </StepLabel>
                                     <StyledStepContent>
@@ -564,7 +586,7 @@ const Checkout = () => {
                                 <SemiTitle className="end">Tổng quan</SemiTitle>
                             </Box>
                             <FinalCheckoutDialog {...{
-                                coupon, shopCoupon, calculating, estimated, calculated, isValid: validAddressInfo,
+                                coupon, shopCoupon, calculating, displayInfo, isValid: validAddressInfo,
                                 activeStep, maxSteps, handleOpenDialog: handleOpenCouponDialog, addressInfo,
                                 backFirstStep, handleNext, handleSubmit, reCaptchaLoaded
                             }} />

@@ -118,7 +118,7 @@ export const getPaymentContent = (method) => {
                     <Title>THANH TOÁN THẺ ATM</Title>
                     <Message>Chọn thẻ</Message>
                     <Grid container size="grow" sx={{ my: 1 }} spacing={1}>
-                        {Array.from(new Array(12)).map((item, index) => (
+                        {[...Array(12)].map((item, index) => (
                             <Grid key={index} size={{ xs: 6, md: 4 }}>
                                 <CardContainer>
                                     <CardTitle>Ngân hàng: ABC<CreditCard /></CardTitle>

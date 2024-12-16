@@ -4,15 +4,19 @@ import Carousel from "react-multi-carousel";
 import ProductSimple from "./ProductSimple";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { trackWindowScroll } from "react-lazy-load-image-component";
-import "react-multi-carousel/lib/styles.css";
 import { Message } from '../custom/GlobalComponents';
+import { Fragment } from 'react';
 
 //#region styled
 const Container = styled.div`
     position: relative;
     min-height: 302px;
     max-height: 380px;
-    padding: 5px 0;
+    padding: ${props => props.theme.spacing(.25)} 0;
+
+    .react-multi-carousel-list{
+      position: unset !important;
+    }
 
     ${props => props.theme.breakpoints.down("sm_md")} {
       padding: 5px;
@@ -20,9 +24,6 @@ const Container = styled.div`
 `
 
 const ProductContainer = styled.div`
-    display: flex;
-    height: 100%;
-
     &.hidden {
       visibility: hidden;
     }
@@ -38,29 +39,35 @@ const MessageContainer = styled.div`
   align-items: center;
 `
 
-const CustomArrowButton = styled.button`
-  border-radius: 0;
-  background-color: #0000005e;
-  border: none;
-  outline: none;
-  height: 35px;
-  width: 35px;
+const CustomArrowButton = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  background-color: ${props => props.theme.palette.background.paper};
+  border: .5px solid ${props => props.theme.palette.divider};
+  border-radius: 50%;
+  height: 30px;
+  width: 30px;
+  font-size: 1.75em;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: absolute;
-  opacity: .5;
+  transition: all .2s ease;
   cursor: pointer;
-  transition: all .25s ease;
+  opacity: .8;
+  z-index: 1;
 
   &:hover {
-    opacity: .7;
-    background-color: ${props => props.theme.palette.primary.main};
+    opacity: 1;
+    transform: scale(1.1);
+    background-color: ${props => props.theme.palette.background.default};
   }
 
-  svg {font-size: 2em;}
-  &.custom-left-arrow { left: 0; }
-  &.custom-right-arrow { right: 0; }
+  &.left { left: -10px; }
+  &.right { right: -10px; }
+
+  svg { font-size: inherit; }
 `
 //#endregion
 
@@ -87,9 +94,9 @@ const responsive = {
   }
 };
 
-const CustomArrow = ({ onClick, className, children }) => (
-  <CustomArrowButton className={className} onClick={() => onClick()}>
-    {children}
+const CustomArrow = ({ onClick, className, direction }) => (
+  <CustomArrowButton className={`${className} ${direction}`} onClick={onClick}>
+      {direction == 'left' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
   </CustomArrowButton>
 );
 
@@ -110,16 +117,15 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    productsCarousel = ids?.length
-      ?
+    productsCarousel = ids?.length ?
       [
         ids?.map((id, index) => {
           const book = entities[id];
 
           return (
-            <ProductContainer key={`${id}-${index}`}>
+            <Fragment key={`${id}-${index}`}>
               <ProductSimple {...{ book, scrollPosition }} />
-            </ProductContainer>
+            </Fragment>
           )
         })
       ] :
@@ -135,11 +141,10 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
       {loading && <CustomProgress color={`${isError || isUninitialized ? 'error' : 'primary'}`} />}
       <Carousel
         responsive={responsive}
-        customLeftArrow={<CustomArrow className="custom-left-arrow"><KeyboardArrowLeft /></CustomArrow>}
-        customRightArrow={<CustomArrow className="custom-right-arrow"><KeyboardArrowRight /></CustomArrow>}
+        customLeftArrow={<CustomArrow direction="left"/>}
+        customRightArrow={<CustomArrow direction="right"/>}
         removeArrowOnDeviceType={["mobile"]}
-        pauseOnHover
-        keyBoardControl
+        transitionDuration={200}
         minimumTouchDrag={80}
       >
         {productsCarousel}

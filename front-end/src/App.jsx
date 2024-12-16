@@ -7,6 +7,7 @@ import PageLayout from './components/layout/PageLayout';
 import RequireAuth from './components/authorize/RequireAuth';
 import PersistLogin from './components/authorize/PersistsLogin';
 import FallbackLogo from './components/layout/FallbackLogo';
+import "react-multi-carousel/lib/styles.css";
 
 function App() {
   useReachable(); //Test connection to server

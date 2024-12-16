@@ -8,7 +8,7 @@ const Products = ({ data, isError, isLoading, isSuccess, scrollPosition }) => {
 
   if (isLoading || isError) {
     productsContent = (
-      Array.from(new Array(15)).map((item, index) => (
+      [...Array(15)].map((item, index) => (
         <Grid key={index} size={{ xs: 6, sm: 4, md: 3, lg: 2.4 }}>
           <Product />
         </Grid>
@@ -27,7 +27,7 @@ const Products = ({ data, isError, isLoading, isSuccess, scrollPosition }) => {
           </Grid>
         )
       })
-      : Array.from(new Array(15)).map((item, index) => (
+      : [...Array(15)].map((item, index) => (
         <Grid key={index} size={{ xs: 6, sm: 4, sm_md: 3, md_lg: 2.4 }}>
           <Product />
         </Grid>
@@ -35,7 +35,7 @@ const Products = ({ data, isError, isLoading, isSuccess, scrollPosition }) => {
   }
 
   return (
-    <div style={{ padding: 0, width: '100%', position: 'relative', padding: '5px 0' }}>
+    <div style={{ width: '100%', position: 'relative', padding: '5px 0' }}>
       {(isLoading || isError) && <CustomProgress color={`${isError ? 'error' : 'primary'}`} />}
       <Grid container spacing={.2} size="grow">
         {productsContent}

@@ -12,6 +12,8 @@ public interface IBookDisplay {
 
     String getImage();
 
+    String getDescription();
+
     Double getPrice();
 
     BigDecimal getDiscount();

@@ -1,12 +1,11 @@
 import styled from '@emotion/styled'
-import { Grid2 as Grid, Button, Skeleton } from '@mui/material';
+import { Grid2 as Grid, Button, Skeleton, alpha } from '@mui/material';
 import { Link } from 'react-router'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useGetRandomBooksQuery } from "../../features/books/booksApiSlice";
 import Carousel from "react-multi-carousel";
 import useCart from "../../hooks/useCart";
-import "react-multi-carousel/lib/styles.css";
 
 //#region styled
 const ImgContainer = styled.div`
@@ -25,11 +24,7 @@ const InfoWrapper = styled.div`
     ${props => props.theme.breakpoints.down("md")} {
         position: absolute;
         bottom: 0;
-        background-image: linear-gradient(
-            to right, 
-            ${props => props.theme.palette.background.default}, 
-            transparent, 
-            ${props => props.theme.palette.background.default});
+        background-color: ${props => alpha(props.theme.palette.background.default, .5)};
     }
 `
 
@@ -44,10 +39,8 @@ const InfoContainer = styled.div`
 `
 
 const Title = styled.h2`
-    min-height: 74px;
     font-size: 30px;
     margin: 25px 0px;
-    min-width: auto;
     line-height: normal;
     text-overflow: ellipsis;
 	overflow: hidden;
@@ -64,7 +57,10 @@ const Title = styled.h2`
 
     ${props => props.theme.breakpoints.down("md")} {
         margin: 0;
-        text-shadow: 2px 2px ${props => props.theme.palette.background.default};
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        font-size: 22px;
     }
 `
 
@@ -85,43 +81,40 @@ const Description = styled.p`
       -webkit-box-orient: vertical;
     }
 
-    ${props => props.theme.breakpoints.down("md")} {
-        text-shadow: 2px 2px ${props => props.theme.palette.background.default};
+    ${props => props.theme.breakpoints.down("sm")} {
+        font-size: 16px;
     }
 `
 
-const CustomArrow = styled.button`
-  border-radius: 0;
-  background-color: transparent;
-  color: inherit;
-  border: none;
-  outline: none;
-  height: 55px;
-  width: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  opacity: .8;
-  transition: all .25s ease;
-  cursor: pointer;
+const CustomArrowButton = styled.div`
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    background-color: ${props => props.theme.palette.background.paper};
+    border: .5px solid ${props => props.theme.palette.divider};
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    font-size: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s ease;
+    cursor: pointer;
+    opacity: .8;
+    z-index: 1;
 
-  &:hover {
-    opacity: 1;
-    background-color: ${props => props.theme.palette.primary.main};
-  }
+    &:hover {
+        opacity: 1;
+        transform: scale(1.1);
+        background-color: ${props => props.theme.palette.background.default};
+    }
 
-  svg {
-    font-size: 2em;
-  }
+    &.left { left: 10px; }
+    &.right { right: 10px; }
 
-  &.custom-left-arrow {
-    left: 1%;
-  }
-
-  &.custom-right-arrow {
-    right: 1%;
-  }
+    svg { font-size: inherit; }
 `
 
 const SlideItemContainer = styled.div`
@@ -153,18 +146,16 @@ const responsive = {
     }
 };
 
-const CustomLeftArrow = ({ onClick }) => (
-    <CustomArrow className="custom-left-arrow" onClick={() => onClick()}><KeyboardArrowLeft /></CustomArrow>
-);
-
-const CustomRightArrow = ({ onClick }) => (
-    <CustomArrow className="custom-right-arrow" onClick={() => onClick()}><KeyboardArrowRight /></CustomArrow>
+const CustomArrow = ({ onClick, className, direction }) => (
+    <CustomArrowButton className={`${className} ${direction}`} onClick={onClick}>
+        {direction == 'left' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+    </CustomArrowButton>
 );
 
 function Item({ book, index }) {
     const { addProduct } = useCart();
 
-    const handleAddToCart = (book) => {addProduct(book, 1)};
+    const handleAddToCart = (book) => { addProduct(book, 1) };
 
     return (
         <SlideItemContainer>
@@ -210,7 +201,7 @@ function Item({ book, index }) {
                             <InfoContainer>
                                 <Link to={`/product/${book.slug}`} style={{ color: 'inherit' }}>
                                     <Title>{book.title}</Title>
-                                    {/* <Description>{book.description}</Description> */}
+                                    <Description>{book.description}</Description>
                                 </Link>
                                 <Button
                                     variant="contained"
@@ -226,7 +217,7 @@ function Item({ book, index }) {
                                 <Skeleton variant="text" sx={{ fontSize: '30px', marginBottom: 1 }} />
                                 <Skeleton variant="text" sx={{ fontSize: '18px' }} />
                                 <Skeleton variant="text" sx={{ fontSize: '18px' }} />
-                                <Skeleton variant="text" sx={{ fontSize: '18px', marginBottom: 1  }} width={'50%'} />
+                                <Skeleton variant="text" sx={{ fontSize: '18px', marginBottom: 1 }} width={'50%'} />
                                 <Button
                                     disabled
                                     variant="contained"
@@ -245,7 +236,7 @@ function Item({ book, index }) {
 }
 
 const BigProductsSlider = () => {
-    const { data, isLoading, isSuccess, isError } = useGetRandomBooksQuery({ amount: 5 });
+    const { data, isLoading, isSuccess, isError } = useGetRandomBooksQuery({ amount: 5, withDesc: true });
 
     let productsCarousel;
 
@@ -262,8 +253,8 @@ const BigProductsSlider = () => {
                     infinite={true}
                     autoPlay={true}
                     autoPlaySpeed={15000}
-                    customLeftArrow={<CustomLeftArrow />}
-                    customRightArrow={<CustomRightArrow />}
+                    customLeftArrow={<CustomArrow direction="left" />}
+                    customRightArrow={<CustomArrow direction="right" />}
                     removeArrowOnDeviceType={["mobile"]}
                     pauseOnHover
                     keyBoardControl

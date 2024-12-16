@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import CustomProgress from '../custom/CustomProgress';
 import ProductPreview from "./ProductPreview";
+import { trackWindowScroll } from 'react-lazy-load-image-component';
 
 //#region styled
 const Container = styled.div`
@@ -76,4 +77,4 @@ const ProductsScroll = ({ data, isError, isLoading, isFetching, isSuccess, isUni
     )
 }
 
-export default ProductsScroll
+export default trackWindowScroll(ProductsScroll)

@@ -49,8 +49,8 @@ public class BookServiceImpl implements BookService {
     private final Slugify slg = Slugify.builder().lowerCase(false).build();
 
     //Get random books
-    public List<BookDTO> getRandomBooks(Integer amount) {
-        List<IBookDisplay> booksList = bookRepo.findRandomBooks(amount);
+    public List<BookDTO> getRandomBooks(Integer amount, Boolean withDesc) {
+        List<IBookDisplay> booksList = bookRepo.findRandomBooks(amount, withDesc);
         List<BookDTO> bookDTOS = booksList.stream().map(bookMapper::displayToBookDTO).collect(Collectors.toList()); //Return books
         return bookDTOS;
     }
@@ -62,14 +62,36 @@ public class BookServiceImpl implements BookService {
     }
 
     //Get books with filter
-    public Page<BookDTO> getBooks(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword, Integer rating, Integer amount,
-                                  Integer cateId, List<Integer> pubIds, Long shopId, List<String> types, Double fromRange, Double toRange) {
+    public Page<BookDTO> getBooks(Integer pageNo,
+                                  Integer pageSize,
+                                  String sortBy,
+                                  String sortDir,
+                                  String keyword,
+                                  Integer rating,
+                                  Integer amount,
+                                  Integer cateId,
+                                  List<Integer> pubIds,
+                                  Long shopId,
+                                  List<String> types,
+                                  Double fromRange,
+                                  Double toRange,
+                                  Boolean withDesc) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<IBookDisplay> booksList = bookRepo.findBooksWithFilter(keyword, cateId, pubIds, types,
-                shopId, fromRange, toRange, rating, amount, pageable);
+        Page<IBookDisplay> booksList = bookRepo.findBooksWithFilter(
+                keyword,
+                cateId,
+                pubIds,
+                types,
+                shopId,
+                fromRange,
+                toRange,
+                withDesc,
+                rating,
+                amount,
+                pageable);
         Page<BookDTO> bookDTOS = booksList.map(bookMapper::displayToBookDTO);
         return bookDTOS;
     }

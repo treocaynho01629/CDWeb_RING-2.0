@@ -11,7 +11,11 @@ public interface AddressService {
 	List<AddressDTO> getMyAddresses(Account user);
 	AddressDTO getMyAddress(Account user);
 	Address getAddress(Long id);
-	Address addAddress(AddressRequest request, Account user);
-	Address updateAddress(AddressRequest request, Long id, Account user);
-	Address deleteAddress(Long id, Account user);
+	Address addAddress(AddressRequest request,
+					   Account user);
+	Address updateAddress(AddressRequest request,
+						  Long id,
+						  Account user);
+	Address deleteAddress(Long id,
+						  Account user);
 }

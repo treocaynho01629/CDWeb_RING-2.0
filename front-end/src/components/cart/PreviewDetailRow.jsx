@@ -1,5 +1,4 @@
 import styled from '@emotion/styled'
-import { Fragment } from 'react';
 import { KeyboardArrowRight, LocalActivityOutlined, Inventory } from '@mui/icons-material';
 import { Box, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
@@ -199,10 +198,10 @@ function ItemRow({ product, index }) {
     )
 }
 
-const PreviewDetailRow = ({ id, index, shop, coupon, couponDiscount, handleOpenDialog }) => {
+const PreviewDetailRow = ({ shop, coupon, discount, handleOpenDialog }) => {
 
     return (
-        <Fragment key={`detail-${id}-${index}`}>
+        <>
             <SpaceTableRow />
             <StyledTableRow className="shop" tabIndex={-1}>
                 <StyledTableCell className="preview" align="left" colSpan={5} component="th" scope="row">
@@ -214,12 +213,12 @@ const PreviewDetailRow = ({ id, index, shop, coupon, couponDiscount, handleOpenD
             ))}
             <StyledTableRow role="coupon-row">
                 <StyledTableCell align="left" colSpan={6}>
-                    <CouponButton onClick={() => handleOpenDialog(id)}>
+                    <CouponButton onClick={() => handleOpenDialog(shop.id)}>
                         <span>
                             <LocalActivityOutlined color="error" />&nbsp;
                             {coupon
-                                ? couponDiscount
-                                    ? `Đã giảm ${currencyFormat.format(couponDiscount)}`
+                                ? discount
+                                    ? `Đã giảm ${currencyFormat.format(discount)}`
                                     : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
                                 : 'Thêm mã giảm giá'
                             }
@@ -228,7 +227,7 @@ const PreviewDetailRow = ({ id, index, shop, coupon, couponDiscount, handleOpenD
                     </CouponButton>
                 </StyledTableCell>
             </StyledTableRow>
-        </Fragment>
+        </>
     )
 }
 

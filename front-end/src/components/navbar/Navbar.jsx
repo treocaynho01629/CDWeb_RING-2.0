@@ -476,7 +476,7 @@ const Navbar = () => {
                                                     </Suspense>
                                                 </Box>
                                             ) : (
-                                                <Link to={'/auth/login'} state={{ from: location }} replace title="Đăng nhập">
+                                                <Link to={'/auth/login'} state={{ from: location }} title="Đăng nhập">
                                                     <StyledIconButton className="nav" aria-label="login">
                                                         <LockOutlined />
                                                         <IconText className="username">Đăng nhập</IconText>

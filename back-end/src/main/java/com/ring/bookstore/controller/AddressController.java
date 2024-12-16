@@ -32,7 +32,7 @@ public class AddressController {
     private final AddressService addressService;
 
     //Get current user's main address
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<?> getAddress(@CurrentAccount Account currUser) {
         AddressDTO address = addressService.getMyAddress(currUser);
         return new ResponseEntity<>(address, HttpStatus.OK);

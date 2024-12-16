@@ -38,16 +38,6 @@ public class SecurityConfig { //Security config
 					.permitAll()
 					.requestMatchers(
 							"/api/auth/**",
-							"/api/v1/**",
-							"/api/books/**",
-							"/api/categories/**",
-							"/api/publishers/**",
-							"/api/reviews/**",
-							"/api/shops/**",
-							"/api/coupons/**",
-							"/api/banners/**",
-							"/api/images/**",
-							"/api/orders/calculate",
 							"/v2/api-docs",
 							"/v3/api-docs",
 							"/v3/api-docs/**",

@@ -60,24 +60,19 @@ public class ShopServiceImpl implements ShopService {
         return shopDTO;
     }
 
-    @Override
+    @Transactional
     public void follow(Long id, Account user) {
         Shop shop = shopRepo.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Shop not found"));
-        Account follower = accountRepo.findById(user.getId()).orElseThrow(() ->
-                new ResourceNotFoundException("User not found"));
-        System.out.println(user.equals(follower));
-        shop.addFollower(follower);
+        shop.addFollower(user);
         shopRepo.save(shop);
     }
 
-    @Override
+    @Transactional
     public void unfollow(Long id, Account user) {
         Shop shop = shopRepo.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Shop not found"));
-        Account follower = accountRepo.findById(user.getId()).orElseThrow(() ->
-                new ResourceNotFoundException("User not found"));
-        shop.removeFollower(follower);
+        shop.removeFollower(user);
         shopRepo.save(shop);
     }
 
@@ -166,7 +161,7 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Transactional
-    public void deleteShops(String keyword, Long ownerId, List<Long> ids, boolean isInverse, Account user) {
+    public void deleteShops(String keyword, Long ownerId, List<Long> ids, Boolean isInverse, Account user) {
         List<Long> listDelete = ids;
         if (isInverse) listDelete = shopRepo.findInverseIds(keyword, ownerId, ids);
 

@@ -6,7 +6,6 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useGetBannersQuery } from "../../features/banners/bannersApiSlice";
 import Carousel from "react-multi-carousel";
-import "react-multi-carousel/lib/styles.css";
 
 //#region styled
 const fadeIn = keyframes`
@@ -39,33 +38,35 @@ const CustomDotButton = styled('span')(({ theme }) => ({
     },
 }));
 
-const CustomArrowButton = styled.button`
-  border-radius: 0;
-  background-color: transparent;
-  color: inherit;
-  border: none;
-  outline: none;
-  height: 55px;
-  width: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  opacity: .8;
-  transition: all .25s ease;
-  cursor: pointer;
+const CustomArrowButton = styled.div`
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    background-color: ${props => props.theme.palette.background.paper};
+    border: .5px solid ${props => props.theme.palette.divider};
+    border-radius: 50%;
+    height: 24px;
+    width: 24px;
+    font-size: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s ease;
+    cursor: pointer;
+    opacity: .8;
+    z-index: 1;
 
-  svg {
-    font-size: 2em;
-  }
+    &:hover {
+        opacity: 1;
+        transform: scale(1.1);
+        background-color: ${props => props.theme.palette.background.default};
+    }
 
-  &.custom-left-arrow {
-    left: 1%;
-  }
+    &.left { left: 6px; }
+    &.right { right: 6px; }
 
-  &.custom-right-arrow {
-    right: 1%;
-  }
+    svg { font-size: inherit; }
 `
 
 const BackdropContainer = styled.div`
@@ -73,13 +74,13 @@ const BackdropContainer = styled.div`
     top: 0;
     width: 100%;
     height: 70%;
-    overflow: hidden;
     opacity: .9;
     display: none;
     z-index: -1;
 
     ${props => props.theme.breakpoints.down("sm")} {
         display: block;
+        overflow: hidden;
     }
 `
 
@@ -163,18 +164,15 @@ const responsive = {
     }
 };
 
-const CustomArrow = ({ onClick, className, children }) => (
-    <CustomArrowButton className={className} onClick={() => onClick()}>
-        {children}
+const CustomArrow = ({ onClick, className, direction }) => (
+    <CustomArrowButton className={`${className} ${direction}`} onClick={onClick}>
+        {direction == 'left' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
     </CustomArrowButton>
 );
 
-const CustomDot = ({ index, onClick, active }) => {
+const CustomDot = ({ onClick, active }) => {
     return (
-        <CustomDotButton
-            className={active ? 'active' : ''}
-            onClick={e => onClick()}
-        />
+        <CustomDotButton className={active ? 'active' : ''} onClick={onClick} />
     );
 };
 
@@ -182,24 +180,26 @@ function Item({ banner, index }) {
 
     return (
         <SlideItemContainer key={`banner-${banner?.id}-${index}`}>
-            {banner ? <>
-                <BackdropContainer >
-                    <BackdropImage
-                        aria-hidden
-                        src={`${banner?.image}?size=tiny`}
+            {banner ?
+                <>
+                    <BackdropContainer >
+                        <BackdropImage
+                            aria-hidden
+                            src={`${banner?.image}?size=tiny`}
+                            visibleByDefault={index == 0}
+                            placeholder={<BackdropPlaceholder variant="rectangular" animation={false} />}
+                        />
+                    </BackdropContainer>
+                    <StyledLazyImage
+                        src={banner?.image}
+                        srcSet={`${banner?.image}?size=medium 350w, ${banner?.image} 600w`}
+                        alt={banner?.name}
                         visibleByDefault={index == 0}
-                        placeholder={<BackdropPlaceholder variant="rectangular" animation={false} />}
+                        placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
                     />
-                </BackdropContainer>
-                <StyledLazyImage
-                    src={banner?.image}
-                    srcSet={`${banner?.image}?size=medium 350w, ${banner?.image} 600w`}
-                    alt={banner?.name}
-                    visibleByDefault={index == 0}
-                    placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
-                />
-            </>
-                : <>
+                </>
+                :
+                <>
                     <BackdropContainer>
                         <BackdropPlaceholder variant="rectangular" />
                     </BackdropContainer>
@@ -272,13 +272,13 @@ const BannersSlider = () => {
                     autoPlay
                     infinite
                     autoPlaySpeed={15000}
-                    customLeftArrow={<CustomArrow className="custom-left-arrow"><KeyboardArrowLeft /></CustomArrow>}
-                    customRightArrow={<CustomArrow className="custom-right-arrow"><KeyboardArrowRight /></CustomArrow>}
+                    customLeftArrow={<CustomArrow direction="left" />}
+                    customRightArrow={<CustomArrow direction="right" />}
+                    removeArrowOnDeviceType={["mobile"]}
                     customDot={<CustomDot />}
                     beforeChange={(nextSlide) => {
                         setSlideIndex(nextSlide > 5 ? nextSlide - 6 : nextSlide < 2 ? nextSlide + 2 : nextSlide - 2);
                     }}
-                    removeArrowOnDeviceType={["mobile"]}
                     pauseOnHover
                     keyBoardControl
                     showDots

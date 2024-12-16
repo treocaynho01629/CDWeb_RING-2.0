@@ -129,7 +129,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 	//Delete multiples reviews (ADMIN)
 	@Transactional
-	public void deleteReviews(Long bookId, Long userId, Integer rating, List<Long> ids, boolean isInverse) {
+	public void deleteReviews(Long bookId, Long userId, Integer rating, List<Long> ids, Boolean isInverse) {
 		List<Long> listDelete = ids;
 		if (isInverse) listDelete = reviewRepo.findInverseIds(bookId, userId, rating, ids);
 

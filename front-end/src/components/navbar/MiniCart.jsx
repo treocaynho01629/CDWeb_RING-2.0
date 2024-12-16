@@ -23,10 +23,10 @@ const EmptyCartContainer = styled.div`
     height: 250px;
 `
 
-const ProductTitle = styled.h5`
+const ProductTitle = styled.span`
     width: 100%;
     font-size: 14px;
-    margin: 0;
+    font-weight: 450;
     text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;

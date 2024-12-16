@@ -152,7 +152,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                     </Box>
                     :
                     <List>
-                        <Link to={'/auth/login'} state={{ from: location }} replace title="Đăng nhập">
+                        <Link to={'/auth/login'} state={{ from: location }} title="Đăng nhập">
                             <ListItem disablePadding onClick={handleClose}>
                                 <ListItemButton>
                                     <ListItemIcon>
