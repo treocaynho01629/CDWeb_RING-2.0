@@ -183,6 +183,10 @@ const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, ope
         const isDisabled = selectMode && (!currCoupon?.isUsable || currCoupon?.shopId != shopId);
         const isSelected = tempCoupon?.id == currCoupon?.id;
 
+        // console.log(currCoupon)
+
+        // console.log(selectMode && (!currCoupon?.isUsable || currCoupon?.shopId != shopId))
+
         topCoupon = <CouponItem key={`top-coupon-${currCoupon?.id}`}
             {...{ coupon: currCoupon, summary, selectMode, isDisabled, isSelected, onClickApply: setTempCoupon }}
         />;

@@ -5,7 +5,7 @@ export const suggest = [
         icon: <Whatshot />,
         color: '#d07165',
         label: 'Hot',
-        url: '/store?sortBy=totalOrders'
+        url: '/store?sort=totalOrders'
     },
     {
         icon: <LocalMall />,
@@ -23,7 +23,7 @@ export const suggest = [
         icon: <NewReleases />,
         color: '#ddb067',
         label: 'Sản phẩm mới',
-        url: '/store?sortBy=createdDate'
+        url: '/store?sort=createdDate'
     },
     {
         icon: <Store />,
@@ -47,7 +47,7 @@ export const suggest = [
         icon: <ThumbUp />,
         color: '#e6eb62 ',
         label: 'Yêu thích',
-        url: '/store?sortBy=rating'
+        url: '/store?sort=rating'
     },
     {
         icon: <InsertEmoticon />,

@@ -79,7 +79,6 @@ const Percentage = styled.span`
 const StyledLazyImage = styled(LazyLoadImage)`
     aspect-ratio: 1/1;
     height: 160px;
-    z-index: -3;
     object-fit: contain;
     margin: 5px 0;
 
@@ -88,7 +87,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
     }
 `
 
-const SkeletonContainer = styled.div`
+const ImgContainer = styled.div`
     width: 100%;
     max-height: 160px;
     aspect-ratio: 1/1;
@@ -99,8 +98,8 @@ const SkeletonContainer = styled.div`
 
 const StyledSkeleton = styled(Skeleton)`
     height: 100%;
-    margin: 5px 0;
     aspect-ratio: 1/1;
+    margin: 5px 0;
 `
 //#endregion
 
@@ -114,17 +113,15 @@ const ProductSimple = ({ book, scrollPosition }) => {
             {book
                 ?
                 <Link to={`/product/${book?.slug}`} style={{ width: '100%' }}>
-                    <StyledLazyImage
-                        src={`${book?.image}?size=small`}
-                        alt={`${book?.title} Thumbnail`}
-                        width={'100%'}
-                        scrollPosition={scrollPosition}
-                        placeholder={
-                            <SkeletonContainer style={{ margin: '5px 0' }}>
-                                <StyledSkeleton variant="rectangular" animation={false} />
-                            </SkeletonContainer>
-                        }
-                    />
+                    <ImgContainer>
+                        <StyledLazyImage
+                            src={`${book?.image}?size=small`}
+                            alt={`${book?.title} Thumbnail`}
+                            width={'100%'}
+                            scrollPosition={scrollPosition}
+                            placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
+                        />
+                    </ImgContainer>
                     <Info>
                         <Price>{currencyFormat.format(book.price)}
                             {book.discount > 0 && <Percentage>-{book.discount * 100}%</Percentage>}
@@ -133,10 +130,10 @@ const ProductSimple = ({ book, scrollPosition }) => {
                     </Info>
                 </Link>
                 :
-                <>
-                    <SkeletonContainer>
+                <div style={{ width: '100%' }}>
+                    <ImgContainer>
                         <StyledSkeleton variant="rectangular" />
-                    </SkeletonContainer>
+                    </ImgContainer>
                     <Info>
                         <Price>
                             <Skeleton variant="text" width="60%" />
@@ -146,7 +143,7 @@ const ProductSimple = ({ book, scrollPosition }) => {
                             <Skeleton variant="text" width="50%" />
                         </Title>
                     </Info>
-                </>
+                </div>
             }
             <Button
                 disabled={!book}

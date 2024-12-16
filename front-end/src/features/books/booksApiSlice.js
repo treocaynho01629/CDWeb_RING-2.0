@@ -6,7 +6,7 @@ import { isEqual } from 'lodash-es';
 const booksAdapter = createEntityAdapter({});
 const booksSelector = booksAdapter.getSelectors();
 const initialState = booksAdapter.getInitialState({
-  page: {
+    page: {
         number: 0,
         size: 0,
         totalElements: 0,
@@ -28,7 +28,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         getBooks: builder.query({
             query: (args) => {
                 const { page, size, sortBy, sortDir, keyword, cateId, rating,
-                    amount, pubIds, types, shopId, value } = args || {};
+                    amount, pubIds, types, shopId, value, withDesc } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
@@ -42,6 +42,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 if (amount != null) params.append('amount', amount);
                 if (types?.length) params.append('types', types);
                 if (shopId) params.append('shopId', shopId);
+                if (withDesc) params.append('withDesc', withDesc);
                 if (pubIds?.length) params.append('pubIds', pubIds);
                 if (value) {
                     if (value[0] != 0) params.append('fromRange', value[0]);
@@ -133,10 +134,15 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         }),
         getRandomBooks: builder.query({
             query: (args) => {
-                const { amount } = args || {};
+                const { amount, withDesc } = args || {};
+
+                //Params
+                const params = new URLSearchParams();
+                if (amount) params.append('amount', amount);
+                if (withDesc) params.append('withDesc', withDesc);
 
                 return {
-                    url: `/api/books/random${amount ? '?amount=' + amount : ''}`,
+                    url: `/api/books/random?${params.toString()}`,
                     validateStatus: (response, result) => {
                         return response.status === 200 && !result?.isError
                     },

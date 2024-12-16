@@ -12,17 +12,30 @@ import java.util.List;
 @Service
 public interface BannerService {
 
-    Page<BannerDTO> getBanners(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                               String keyword, Long shopId, Boolean byShop);
+    Page<BannerDTO> getBanners(Integer pageNo,
+                               Integer pageSize,
+                               String sortBy,
+                               String sortDir,
+                               String keyword,
+                               Long shopId,
+                               Boolean byShop);
 
-    Banner addBanner(BannerRequest request, Account user);
+    Banner addBanner(BannerRequest request,
+                     Account user);
 
-    Banner updateBanner(Long id, BannerRequest request, Account user);
+    Banner updateBanner(Long id,
+                        BannerRequest request,
+                        Account user);
 
-    Banner deleteBanner(Long id, Account user);
+    Banner deleteBanner(Long id,
+                        Account user);
 
-    void deleteBanners(String keyword, Long shopId, Boolean byShop,
-                       List<Long> ids, boolean isInverse, Account user);
+    void deleteBanners(String keyword,
+                       Long shopId,
+                       Boolean byShop,
+                       List<Long> ids,
+                       boolean isInverse,
+                       Account user);
 
     void deleteAllBanners();
 }

@@ -178,7 +178,7 @@ public class CouponServiceImpl implements CouponService {
 
     @Transactional
     public void deleteCoupons(List<CouponType> types, String keyword, Long shopId, Boolean byShop,
-                              Boolean showExpired, List<Long> ids, boolean isInverse, Account user) {
+                              Boolean showExpired, List<Long> ids, Boolean isInverse, Account user) {
         List<Long> listDelete = ids;
         if (isInverse) listDelete = couponRepo.findInverseIds(types, keyword, shopId, byShop, showExpired, ids);
 

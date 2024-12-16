@@ -15,30 +15,53 @@ import java.util.List;
 @Service
 public interface CouponService {
 
-    Page<CouponDTO> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                               List<CouponType> types, String keyword, Long shopId, Boolean byShop,
-                               Boolean showExpired, Double cValue, Integer cQuantity);
+    Page<CouponDTO> getCoupons(Integer pageNo,
+                               Integer pageSize,
+                               String sortBy,
+                               String sortDir,
+                               List<CouponType> types,
+                               String keyword,
+                               Long shopId,
+                               Boolean byShop,
+                               Boolean showExpired,
+                               Double cValue,
+                               Integer cQuantity);
 
-    CouponDTO getCouponByCode(String code, Double cValue, Integer cQuantity);
+    CouponDTO getCouponByCode(String code,
+                              Double cValue,
+                              Integer cQuantity);
 
     List<CouponDTO> recommendCoupons(List<Long> shopIds);
 
-    CouponDTO recommendCoupon(Long shopId, CartStateRequest state);
+    CouponDTO recommendCoupon(Long shopId,
+                              CartStateRequest state);
 
-    Coupon addCoupon(CouponRequest request, Account user);
+    Coupon addCoupon(CouponRequest request,
+                     Account user);
 
-    Coupon updateCoupon(Long id, CouponRequest request, Account user);
+    Coupon updateCoupon(Long id,
+                        CouponRequest request,
+                        Account user);
 
-    Coupon deleteCoupon(Long id, Account user);
+    Coupon deleteCoupon(Long id,
+                        Account user);
 
-    CouponDiscountDTO applyCoupon(Coupon coupon, CartStateRequest request);
+    CouponDiscountDTO applyCoupon(Coupon coupon,
+                                  CartStateRequest request);
 
-    Coupon markUsable(Coupon coupon, CartStateRequest request);
+    Coupon markUsable(Coupon coupon,
+                      CartStateRequest request);
 
     boolean isExpired(Coupon coupon);
 
-    void deleteCoupons(List<CouponType> types, String keyword, Long shopId, Boolean byShop,
-                       Boolean showExpired, List<Long> ids, boolean isInverse, Account user);
+    void deleteCoupons(List<CouponType> types,
+                       String keyword,
+                       Long shopId,
+                       Boolean byShop,
+                       Boolean showExpired,
+                       List<Long> ids,
+                       Boolean isInverse,
+                       Account user);
 
     void deleteAllCoupons();
 }

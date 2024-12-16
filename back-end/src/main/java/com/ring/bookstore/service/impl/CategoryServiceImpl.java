@@ -134,7 +134,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Transactional
-    public void deleteCategories(Integer parentId, List<Integer> ids, boolean isInverse) {
+    public void deleteCategories(Integer parentId, List<Integer> ids, Boolean isInverse) {
         List<Integer> listDelete = ids;
         if (isInverse) listDelete = cateRepo.findInverseIds(parentId, ids);
         cateRepo.deleteByIdIsIn(listDelete);

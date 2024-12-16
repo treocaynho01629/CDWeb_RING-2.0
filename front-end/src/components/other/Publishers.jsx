@@ -14,13 +14,19 @@ const StyledLazyImage = styled(LazyLoadImage)`
     object-fit: contain;
 
     ${props => props.theme.breakpoints.down("md_lg")} {
-        height: 55px;
-        width: 55px;
+        height: 80px;
+        width: 80px;
     }
+`
 
-    ${props => props.theme.breakpoints.down("sm")} {
-        height: 45px;
-        width: 45px;
+const StyledSkeleton = styled(Skeleton)`
+    aspect-ratio: 1/1;
+    height: 100px;
+    width: 100px;
+
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        height: 80px;
+        width: 80px;
     }
 `
 
@@ -104,14 +110,9 @@ const Publishers = () => {
 
     if (isLoading || isError) {
         pubsContent = (
-            Array.from(new Array(15)).map((item, index) => (
+            [...Array(15)].map((item, index) => (
                 <ItemContainer key={`pub-${index}`}>
-                    <Skeleton
-                        variant="rectangular"
-                        height={40}
-                        width={100}
-                        sx={{ mx: '3px' }}
-                    />
+                    <StyledSkeleton variant="rectangular" animation={false} />
                 </ItemContainer>
             ))
         )
@@ -128,7 +129,7 @@ const Publishers = () => {
                             <StyledLazyImage
                                 src={`${pub?.image}?size=small`}
                                 alt={`Publisher: ${pub?.name}`}
-                                placeholder={<Skeleton width={65} height={65} variant="rectangular" animation={false} />}
+                                placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
                             />
                         </Link>
                     </ItemContainer>

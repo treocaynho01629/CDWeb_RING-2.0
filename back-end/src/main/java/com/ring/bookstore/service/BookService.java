@@ -15,22 +15,43 @@ import com.ring.bookstore.request.BookRequest;
 
 public interface BookService {
 
-    List<BookDTO> getRandomBooks(Integer amount);
-
     List<BookDTO> getBooksInIds(List<Long> ids);
 
-    Page<BookDTO> getBooks(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword, Integer amount, Integer rating,
-                           Integer cateId, List<Integer> pubIds, Long shopId, List<String> types, Double fromRange, Double toRange);
+    Page<BookDTO> getBooks(Integer pageNo,
+                           Integer pageSize,
+                           String sortBy,
+                           String sortDir,
+                           String keyword,
+                           Integer amount,
+                           Integer rating,
+                           Integer cateId,
+                           List<Integer> pubIds,
+                           Long shopId,
+                           List<String> types,
+                           Double fromRange,
+                           Double toRange,
+                           Boolean withDesc);
 
-    BookDetailDTO getBookDetail(Long id, String slug);
+    List<BookDTO> getRandomBooks(Integer amount,
+                                 Boolean withDesc);
 
-    BookResponseDTO addBook(BookRequest request, MultipartFile file, Account seller) throws IOException, ImageResizerException;
+    BookDetailDTO getBookDetail(Long id,
+                                String slug);
 
-    BookResponseDTO updateBook(Long id, BookRequest request, MultipartFile file, Account seller) throws IOException, ImageResizerException;
+    BookResponseDTO addBook(BookRequest request,
+                            MultipartFile file,
+                            Account seller) throws IOException, ImageResizerException;
 
-    BookResponseDTO deleteBook(Long id, Account seller);
+    BookResponseDTO updateBook(Long id,
+                               BookRequest request,
+                               MultipartFile file,
+                               Account seller) throws IOException, ImageResizerException;
 
-    void deleteBooks(List<Long> ids, Account seller);
+    BookResponseDTO deleteBook(Long id,
+                               Account seller);
+
+    void deleteBooks(List<Long> ids,
+                     Account seller);
 
     void deleteAllBooks(Account seller);
 }

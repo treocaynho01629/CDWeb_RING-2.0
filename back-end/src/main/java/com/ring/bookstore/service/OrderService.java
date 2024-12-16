@@ -18,12 +18,26 @@ import com.ring.bookstore.request.OrderRequest;
 
 public interface OrderService {
 	
-	Page<ReceiptDTO> getAllReceipts(Account user, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
-	Page<OrderDTO> getOrdersByBookId(Long id, Integer pageNo, Integer pageSize, String sortBy, String sortDir);
-	Page<OrderDTO> getOrdersByUser(Account user, OrderStatus status, String keyword, Integer pageNo, Integer pageSize);
+	Page<ReceiptDTO> getAllReceipts(Account user,
+									Integer pageNo,
+									Integer pageSize,
+									String sortBy,
+									String sortDir);
+	Page<OrderDTO> getOrdersByBookId(Long id,
+									 Integer pageNo,
+									 Integer pageSize,
+									 String sortBy,
+									 String sortDir);
+	Page<OrderDTO> getOrdersByUser(Account user,
+								   OrderStatus status,
+								   String keyword,
+								   Integer pageNo,
+								   Integer pageSize);
 	ReceiptDTO getReceipt(Long id);
 	OrderDetailDTO getOrderDetail(Long id);
 	CalculateDTO calculate(CalculateRequest request);
-	ReceiptDTO checkout(OrderRequest checkRequest, HttpServletRequest request, Account user);
+	ReceiptDTO checkout(OrderRequest checkRequest,
+						HttpServletRequest request,
+						Account user);
 	List<ChartDTO> getMonthlySale(Account user);
 }

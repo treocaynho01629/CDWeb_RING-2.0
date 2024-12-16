@@ -29,9 +29,13 @@ public interface ImageService {
 
     ImageDTO replaceAndMap(MultipartFile file) throws ImageResizerException, IOException;
 
-    Image save(BufferedImage bufferedImage, String fileName, String contentType) throws ImageResizerException;
+    Image save(BufferedImage bufferedImage,
+               String fileName,
+               String contentType) throws ImageResizerException;
 
-    Image resolve(String type, String reference) throws ImageResizerException;
+    Image resolve(String type,
+                  String reference) throws ImageResizerException;
 
-    Image resizeAndSave(String reference, String type) throws ImageResizerException;
+    Image resizeAndSave(String reference,
+                        String type) throws ImageResizerException;
 }

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { Button } from '@mui/material'
+import { Button, Checkbox } from '@mui/material'
 
 export const CheckoutContainer = styled.div`
     position: relative;
@@ -102,6 +102,7 @@ export const CheckoutText = styled.span`
     white-space: nowrap;
 
     &.error { color: ${props => props.theme.palette.error.main}}
+    &.warning { color: ${props => props.theme.palette.warning.main}}
 `
 
 export const PriceContainer = styled.div`
@@ -191,4 +192,12 @@ export const MiniCouponContainer = styled.div`
 export const CheckoutButton = styled(Button)`
     height: 100%;
     line-height: 1.5;
+`
+
+export const StyledCheckbox = styled(Checkbox)`
+    margin-left: 8px;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        margin-left: 0
+    }
 `

@@ -227,7 +227,7 @@ const CouponPreview = ({ shopId }) => {
 
     if (isLoading || isError) {
         coupons = (
-            Array.from(new Array(3)).map((item, index) => (
+            [...Array(3)].map((item, index) => (
                 <Skeleton
                     key={`cate-${index}`}
                     variant="rectangular"

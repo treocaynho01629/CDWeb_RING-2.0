@@ -1,45 +1,47 @@
 import styled from '@emotion/styled'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { Close } from '@mui/icons-material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { Skeleton } from '@mui/material';
+import { Backdrop, Modal, Skeleton } from '@mui/material';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import Carousel from 'react-multi-carousel';
-import "react-multi-carousel/lib/styles.css";
 
 //#region styled
 const ImgContainer = styled.div`
     text-align: center;
-    border: .5px solid ${props => props.theme.palette.divider};
     background-color: ${props => props.theme.palette.background.paper};
-    border-bottom: none;
+    border: none;
+
+    .react-multi-carousel-list{
+      position: unset !important;
+    }
     
     ${props => props.theme.breakpoints.up("md")} {
         width: 100%;
         position: sticky;
         top: ${props => props.theme.mixins.toolbar.minHeight + 15}px;
-        border-bottom: .5px solid ${props => props.theme.palette.divider};
+        border: .5px solid ${props => props.theme.palette.divider};
     }
 `
 
-const ImageNumber = styled.p`
-    font-size: 16px;
-    font-weight: bold;
-    padding: 2px 10px;
+const ImageNumber = styled.span`
+    font-size: 14px;
+    font-weight: 420;
+    padding: 2px 8px;
     position: absolute;
-    color: ${props => props.theme.palette.primary.contrastText};
-    background-color: ${props => props.theme.palette.primary.main};
+    color: white;
+    background-color: rgba(0, 0, 0, .5);
     border-radius: 50px;
-    top: 2%;
-    left: 5%;
+    top: ${props => props.theme.spacing(3)};
+    left: ${props => props.theme.spacing(3)};
     opacity: .9;
     z-index: 5;
     pointer-events: none;
-    white-space: nowrap;
 
     ${props => props.theme.breakpoints.down("md")} {
-        bottom: 20%;
-        right: 5%;
+        bottom: ${props => props.theme.spacing(3)};
+        right: ${props => props.theme.spacing(3)};
         top: auto;
         left: auto;
     }
@@ -57,12 +59,13 @@ const SmallImageSlide = styled.div`
     display: flex;
     border: .5px solid ${props => props.theme.palette.divider};
     opacity: .5;
-    margin-right: 4px;
+    aspect-ratio: 1/1;
+    margin-right: ${props => props.theme.spacing(.5)};
     cursor: pointer;
-    transition: all .25s ease;
+    transition: opacity .25s ease;
 
     &.active {
-        border: 1px solid ${props => props.theme.palette.primary.main};
+        border: 3px solid ${props => props.theme.palette.primary.main};
         opacity: 1;
     }
 
@@ -72,42 +75,46 @@ const SmallImageSlide = styled.div`
     }
 `
 
-const CustomArrowButton = styled.button`
-    border-radius: 0;
-    background-color: #0000005e;
-    border: none;
-    outline: none;
-    height: 35px;
-    width: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    opacity: .5;
-    cursor: pointer;
-    transition: all .25s ease;
+const CustomArrowButton = styled.div`
+  position: absolute;
+  background-color: ${props => props.theme.palette.background.paper};
+  border: .5px solid ${props => props.theme.palette.divider};
+  border-radius: 50%;
+  height: 30px;
+  width: 30px;
+  font-size: 1.75em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s ease;
+  cursor: pointer;
+  opacity: .8;
+  z-index: 1;
 
-    &:hover {
-        opacity: .7;
-        background-color: ${props => props.theme.palette.primary.main};
-    }
+  &:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
 
-    svg {font-size: 2em;}
-    &.custom-left-arrow {left: 0;}
-    &.custom-right-arrow {right: 0; }
+  &.left { left: -10px; }
+  &.right { right: -10px; }
+
+  svg { font-size: inherit; }
 `
 
 const ImageSlide = styled.div`
-    padding: 15px 10px;
+    padding: 10px;
+    padding-bottom: 0;
     position: relative;
     width: 100%;
+    height: 100%;
     max-height: 450px;
     aspect-ratio: 1/1;
-    display: grid;
     background-clip: content-box;
 
     ${props => props.theme.breakpoints.down("md")} {
-        padding: 5px 0 0 0;
+        padding: 0;
+        border: none;
     }
 `
 
@@ -115,8 +122,15 @@ const StyledLazyImage = styled(LazyLoadImage)`
     object-fit: contain;
     width: 100%;
     max-height: 450px;
+    aspect-ratio: 1/1;
+    cursor: pointer;
+`
 
-    &.hidden {display: none;}
+const StyledSkeleton = styled(Skeleton)`
+    width: 100%;
+    height: 100%;
+    max-height: 450px;
+    aspect-ratio: 1/1;
 `
 
 const StyledSmallLazyImage = styled(LazyLoadImage)`
@@ -127,18 +141,139 @@ const StyledSmallLazyImage = styled(LazyLoadImage)`
     background-color: ${props => props.theme.palette.action.disabledBackground};
 `
 
-const StyledSkeleton = styled(Skeleton)`
-    width: 100%;
-    height: 100%;
-    max-height: 450px;
-    aspect-ratio: 1/1;
-`
-
 const StyledSmallSkeleton = styled(Skeleton)`
     display: inline-block;
     width: 100%;
     height: 100%;
     aspect-ratio: 1/1;
+`
+
+const CloseButton = styled.button`
+    position: absolute;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    right: ${props => props.theme.spacing(4)};
+    top: ${props => props.theme.spacing(4)};
+    text-align: center;
+    opacity: .8;
+    cursor: pointer;
+    transition: all .2s ease;
+    z-index: 1;
+
+    svg { font-size: 40px; }
+
+    &:hover {
+        opacity: 1;
+    }
+
+    &:after {
+        content: "Đóng";
+    }
+
+    ${props => props.theme.breakpoints.down("md")} {
+        color: ${props => props.theme.palette.text.primary};
+        right: ${props => props.theme.spacing(1.5)};
+        top: ${props => props.theme.spacing(1.5)};
+
+        &:after { display: none; }
+    }
+`
+
+const FullscreenBackdrop = styled(Backdrop)`
+    background-color: rgba(0, 0, 0, .95);
+    z-index: -1;
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        background-color: ${props => props.theme.palette.background.paper};
+    }
+`
+
+const TopContainer = styled.div`
+    position: relative;
+
+    ${CustomArrowButton} {
+        display: none;
+    }
+`
+
+const SubContainer = styled.div`
+    width: 100%;
+
+    p {
+        color: ${props => props.theme.palette.primary.dark};
+        font-weight: 450;
+        font-size: 18px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid ${props => props.theme.palette.primary.main};
+    }
+`
+
+const FullscreenContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    padding: ${props => props.theme.spacing(2.5)};
+
+    .react-multi-carousel-track{
+      height: 100% !important;
+    }
+
+    ${StyledLazyImage} {
+        max-height: 550px;
+        height: 100%;
+    }
+
+    ${StyledSkeleton} {
+        max-height: 550px;
+        height: 100%;
+    }
+
+    ${MoreImageContainer} {
+        max-width: 950px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0;
+    }
+
+    ${StyledSmallLazyImage} {
+        max-height: 75px;
+    }
+
+    ${StyledSmallSkeleton} {
+        max-height: 75px;
+    }
+
+    ${SmallImageSlide} {
+        filter: grayscale(1);
+        opacity: 1;
+        max-height: 75px;
+
+        &.active {
+            filter: none;
+            border: 3px solid ${props => props.theme.palette.primary.main};
+            opacity: 1;
+        }
+    }
+
+    ${CustomArrowButton} {
+        width: 50px;
+        height: 50px;
+        font-size: 3.25em;
+        background-color: transparent;
+        color: white;
+        border-color: white;
+
+        &.left { left: 10%; }
+        &.right { right: 10%; }
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        padding: ${props => props.theme.spacing(2)} 0;
+    }
 `
 //#endregion
 
@@ -146,7 +281,7 @@ const responsive = {
     default: {
         breakpoint: {
             max: 3000,
-            min: 900
+            min: 900,
         },
         items: 1,
     },
@@ -159,7 +294,7 @@ const responsive = {
     }
 };
 
-const responsiveMini = {
+const responsiveGroup = {
     default: {
         breakpoint: {
             max: 3000,
@@ -180,28 +315,45 @@ const responsiveMini = {
     }
 };
 
+const responsiveFullscreen = {
+    default: {
+        breakpoint: {
+            max: 3000,
+            min: 900
+        },
+        items: 12,
+        slidesToSlide: 3,
+        partialVisibilityGutter: 5
+    },
+    mobile: {
+        breakpoint: {
+            max: 900,
+            min: 0
+        },
+        items: 6,
+        slidesToSlide: 3,
+        partialVisibilityGutter: 5
+    }
+};
+
 //Custom stuff
-const CustomArrow = ({ onClick, className, children }) => (
-    <CustomArrowButton className={className} onClick={() => onClick()}>
-        {children}
+const CustomArrow = ({ onClick, className, direction }) => (
+    <CustomArrowButton className={`${className} ${direction}`} onClick={onClick}>
+        {direction == 'left' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
     </CustomArrowButton>
 );
 
-const CustomButtonGroup = ({ book, images, goToSlide, carouselState }) => {
-    const { currentSlide } = carouselState;
-
+const ButtonGroup = ({ book, images, goToSlide, currentSlide, responsive }) => {
     return (
         <MoreImageContainer>
             <Carousel
-                responsive={responsiveMini}
+                responsive={responsive}
                 autoPlay={false}
-                customLeftArrow={<CustomArrow className="custom-left-arrow"><KeyboardArrowLeft /></CustomArrow>}
-                customRightArrow={<CustomArrow className="custom-right-arrow"><KeyboardArrowRight /></CustomArrow>}
+                customLeftArrow={<CustomArrow direction="left" />}
+                customRightArrow={<CustomArrow direction="right" />}
                 removeArrowOnDeviceType={["mobile"]}
                 minimumTouchDrag={80}
-                focusOnSelect={true}
                 partialVisible
-                draggable
             >
                 {book ? images.map((image, index) => (
                     <SmallImageSlide
@@ -211,11 +363,11 @@ const CustomButtonGroup = ({ book, images, goToSlide, carouselState }) => {
                     >
                         <StyledSmallLazyImage
                             src={`${image}?size=small`}
-                            placeholder={<StyledSmallSkeleton variant="rectangular" animation={false}/>}
+                            placeholder={<StyledSmallSkeleton variant="rectangular" animation={false} />}
                         />
                     </SmallImageSlide>
                 ))
-                    : Array.from(new Array(4)).map((item, index) => (
+                    : [...Array(4)].map((item, index) => (
                         <SmallImageSlide key={index}>
                             <StyledSmallSkeleton variant="rectangular" />
                         </SmallImageSlide>
@@ -226,49 +378,79 @@ const CustomButtonGroup = ({ book, images, goToSlide, carouselState }) => {
     );
 };
 
-
 const ProductImages = ({ book }) => {
+    let sliderRef = useRef();
     const [slideIndex, setSlideIndex] = useState(1);
+    const [open, setOpen] = useState(false);
     let images = book?.previews ? [].concat(book?.image, book.previews) : [].concat(book?.image);
 
+    const goToSlide = (index) => { if (sliderRef?.goToSlide) sliderRef.goToSlide(index) }
+    const handleOpen = () => { setOpen(true); }
+    const handleClose = () => { setOpen(false); }
+
+    let carousel = (
+        <Carousel
+            ref={e => sliderRef = e}
+            responsive={responsive}
+            autoPlay={!open}
+            customLeftArrow={<CustomArrow direction="left" />}
+            customRightArrow={<CustomArrow direction="right" />}
+            removeArrowOnDeviceType={["mobile"]}
+            pauseOnHover={true}
+            arrows={open}
+            rewindWithAnimation={true}
+            autoPlaySpeed={15000}
+            transitionDuration={200}
+            beforeChange={(nextSlide) => { setSlideIndex(nextSlide) }}
+            rewind
+        >
+            {book ? images.map((image, index) => (
+                <ImageSlide key={index} onClick={handleOpen}>
+                    <StyledLazyImage
+                        src={image}
+                        srcSet={`${image}?size=medium 350w, ${image} 600w`}
+                        alt={`${book?.title} preview image #${index}`}
+                        visibleByDefault={index == 0}
+                        placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
+                    />
+                </ImageSlide>
+            ))
+                :
+                <ImageSlide>
+                    <StyledSkeleton variant="rectangular" />
+                </ImageSlide>
+            }
+        </Carousel>
+    )
+
     return (
-        <ImgContainer>
-            {book ? <ImageNumber>{slideIndex}/{images.length}</ImageNumber>
-                : <ImageNumber>Đang tải</ImageNumber>}
-            <Carousel
-                renderButtonGroupOutside
-                responsive={responsive}
-                autoPlay={true}
-                pauseOnHover={true}
-                arrows={false}
-                rewindWithAnimation={true}
-                autoPlaySpeed={15000}
-                beforeChange={(nextSlide) => { setSlideIndex(nextSlide + 1) }}
-                rewind
-                keyBoardControl
-                draggable
-                customButtonGroup={<CustomButtonGroup {...{ setSlideIndex, images, book }} />}
-                minimumTouchDrag={80}
+        <>
+            <ImgContainer>
+                <TopContainer>
+                    {book ? <ImageNumber>{slideIndex + 1}/{images.length}</ImageNumber>
+                        : <ImageNumber>Đang tải...</ImageNumber>}
+                    {carousel}
+                </TopContainer>
+                <ButtonGroup {...{ images, book, goToSlide, currentSlide: slideIndex, responsive: responsiveGroup }} />
+            </ImgContainer>
+            <Modal
+                open={open}
+                onClose={handleClose}
+                disableScrollLock={false}
+                slots={{ backdrop: FullscreenBackdrop }}
+                aria-labelledby="fullscreen-images-carousel"
+                aria-describedby="Views images"
             >
-                {book ? images.map((image, index) => (
-                    <ImageSlide key={index}>
-                        <StyledLazyImage
-                            src={image}
-                            srcSet={`${image}?size=medium 350w, ${image} 600w`}
-                            alt={`${book?.title} preview image #${index}`}
-                            sizes="400px"
-                            visibleByDefault={index == 0}
-                            placeholder={<StyledSmallSkeleton variant="rectangular" animation={false}/>}
-                        />
-                    </ImageSlide>
-                ))
-                    :
-                    <ImageSlide>
-                        <StyledSkeleton variant="rectangular" />
-                    </ImageSlide>
-                }
-            </Carousel>
-        </ImgContainer >
+                <FullscreenContainer>
+                    <CloseButton onClick={handleClose}><Close /><br /></CloseButton>
+                    {carousel}
+                    <SubContainer>
+                        <p>Hình ảnh từ RING! ({images.length})</p>
+                        <ButtonGroup {...{ images, book, goToSlide, currentSlide: slideIndex, responsive: responsiveFullscreen }} />
+                    </SubContainer>
+                </FullscreenContainer>
+            </Modal >
+        </>
     )
 }
 

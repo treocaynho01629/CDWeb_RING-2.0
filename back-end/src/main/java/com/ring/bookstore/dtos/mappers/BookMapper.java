@@ -42,6 +42,7 @@ public class BookMapper {
                 book.getSlug(),
                 book.getTitle(),
                 fileDownloadUri,
+                book.getDescription(),
                 book.getPrice(),
                 book.getDiscount(),
                 book.getAmount(),

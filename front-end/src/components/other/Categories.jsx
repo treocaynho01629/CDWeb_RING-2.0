@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { useRef, Fragment } from "react"
+import { useRef } from "react"
 import { IconButton, Skeleton } from "@mui/material";
 import { KeyboardArrowRight, KeyboardArrowLeft } from '@mui/icons-material';
 import { Link } from 'react-router'
@@ -12,6 +12,22 @@ const StyledLazyImage = styled(LazyLoadImage)`
     height: 65px;
     width: 65px;
     object-fit: contain;
+
+    ${props => props.theme.breakpoints.down("md_lg")} {
+        height: 55px;
+        width: 55px;
+    }
+
+    ${props => props.theme.breakpoints.down("sm")} {
+        height: 45px;
+        width: 45px;
+    }
+`
+
+const StyledSkeleton = styled(Skeleton)`
+    aspect-ratio: 1/1;
+    height: 65px;
+    width: 65px;
 
     ${props => props.theme.breakpoints.down("md_lg")} {
         height: 55px;
@@ -145,14 +161,15 @@ const Categories = () => {
 
     if (isLoading || isError) {
         catesContent = (
-            Array.from(new Array(15)).map((item, index) => (
+            [...Array(15)].map((item, index) => (
                 <ItemWrapper key={`cate-${index}`}>
-                    <Skeleton
-                        variant="rectangular"
-                        height={40}
-                        width={100}
-                        sx={{ mx: '3px' }}
-                    />
+                    <ItemContainer>
+                        <StyledSkeleton variant="rectangular" animation={false} />
+                        <ItemName>
+                            <Skeleton variant="text" width="100%"/>
+                            &nbsp;
+                        </ItemName>
+                    </ItemContainer>
                 </ItemWrapper>
             ))
         )
@@ -164,20 +181,18 @@ const Categories = () => {
                 const cate = entities[cateId];
 
                 return (
-                    <Fragment key={`main-${cateId}-${index}`}>
-                        <ItemWrapper key={`cate-${cateId}-${index}`}>
-                            <Link to={`/store/${cate?.slug}?cate=${cateId}`} title={cate?.name}>
-                                <ItemContainer>
-                                    <StyledLazyImage
-                                        src={`${cate?.image}?size=tiny`}
-                                        alt={`Category item: ${cate?.name}`}
-                                        placeholder={<Skeleton width={65} height={65} variant="rectangular" animation={false}/>}
-                                    />
-                                    <ItemName>{cate?.name}</ItemName>
-                                </ItemContainer>
-                            </Link>
-                        </ItemWrapper>
-                    </Fragment>
+                    <ItemWrapper key={`cate-${cateId}-${index}`}>
+                        <Link to={`/store/${cate?.slug}?cate=${cateId}`} title={cate?.name}>
+                            <ItemContainer>
+                                <StyledLazyImage
+                                    src={`${cate?.image}?size=tiny`}
+                                    alt={`Category item: ${cate?.name}`}
+                                    placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
+                                />
+                                <ItemName>{cate?.name}</ItemName>
+                            </ItemContainer>
+                        </Link>
+                    </ItemWrapper>
                 )
             })
             : null

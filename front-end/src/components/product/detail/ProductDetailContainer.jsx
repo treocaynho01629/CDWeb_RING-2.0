@@ -89,7 +89,7 @@ const DescTitle = styled.h4`
 
 //#endregion
 
-const ProductDetailContainer = ({ loading, book, mobileMode }) => {
+const ProductDetailContainer = ({ loading, book, tabletMode }) => {
   const descRef = useRef(null);
   const [overflowed, setOverflowed] = useState(false);
   const [minimize, setMinimize] = useState(true);
@@ -210,7 +210,7 @@ const ProductDetailContainer = ({ loading, book, mobileMode }) => {
 
             </MobileExtendButton>
           </Box>
-          {mobileMode
+          {tabletMode
             ?
             <Suspense fallback={<></>}>
               {openDetail !== undefined &&

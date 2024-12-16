@@ -86,31 +86,20 @@ const AddressDivider = styled.div`
 `
 //#endregion
 
-const FinalCheckoutDialog = ({ coupon, estimated, calculated, calculating, addressInfo,
+const FinalCheckoutDialog = ({ coupon, displayInfo, calculating, addressInfo,
     isValid, handleNext, activeStep, maxSteps, backFirstStep, handleOpenDialog, handleSubmit, reCaptchaLoaded }) => {
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('sm'));
     const tabletMode = useMediaQuery(theme.breakpoints.down('md_lg'));
-    const [open, setOpen] = useState(undefined);
     const fullAddress = [addressInfo?.city, addressInfo?.address].join(", ");
+    const [open, setOpen] = useState(undefined);
 
     const toggleDrawer = (newOpen) => { setOpen(newOpen) };
     const address = addressInfo?.type ? getAddress(addressInfo.type) : null;
 
-    //Info
-    const displayInfo = {
-        deal: (calculating || !calculated) ? estimated?.deal : calculated?.dealDiscount,
-        subTotal: (calculating || !calculated) ? estimated?.subTotal : calculated?.productsTotal,
-        shipping: (calculating || !calculated) ? estimated?.shipping : calculated?.shippingFee,
-        couponDiscount: calculated?.couponDiscount || 0,
-        totalDiscount: calculated?.totalDiscount || 0,
-        shippingDiscount: calculated?.shippingDiscount || 0,
-        total: (calculating || !calculated) ? estimated?.total : calculated?.total - calculated?.totalDiscount
-    }
-
     //Component stuff
     let checkoutDetail = <>
-        <PriceDisplay displayInfo={displayInfo} />
+        <PriceDisplay displayInfo={displayInfo} loggedIn={true}/>
         <CheckoutRow>
             <PriceContainer>
                 <CheckoutPrice>

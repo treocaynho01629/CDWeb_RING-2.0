@@ -107,10 +107,12 @@ public class AuthenticationService {
 
 	//Authenticate
 	public Account authenticate(AuthenticationRequest authRequest, HttpServletRequest request) throws ResourceNotFoundException {
-		//Recaptcha
-		final String recaptchaToken = request.getHeader("response");
-		final String source = request.getHeader("source");
-		captchaService.validate(recaptchaToken, source, CaptchaServiceImpl.LOGIN_ACTION);
+		//Recaptcha (only after x amount of failed attempts)
+		if (loginProtectionService.isSuspicious()) {
+			final String recaptchaToken = request.getHeader("response");
+			final String source = request.getHeader("source");
+			captchaService.validate(recaptchaToken, source, CaptchaServiceImpl.LOGIN_ACTION);
+		}
 
 		if (loginProtectionService.isBlocked()) {
 			throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "Authentication blocked due to too many failed login attempts!");

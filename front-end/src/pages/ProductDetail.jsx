@@ -124,7 +124,7 @@ const ProductDetail = () => {
                             <Suspense fallback={null}>
                                 <ProductDetailContainer {...{
                                     loading: (isLoading || isFetching), book: data,
-                                    reviewRef, scrollIntoTab, mobileMode: tabletMode, pending, setPending
+                                    reviewRef, scrollIntoTab, tabletMode, pending, setPending
                                 }} />
                             </Suspense>
                         </LazyLoad>
@@ -141,7 +141,7 @@ const ProductDetail = () => {
                         }>
                             <Suspense fallback={null}>
                                 <ReviewComponent {...{
-                                    book: data, scrollIntoTab, mobileMode: tabletMode,
+                                    book: data, scrollIntoTab, tabletMode,
                                     pending, setPending, isReview, handleToggleReview
                                 }} />
                             </Suspense>

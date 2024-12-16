@@ -4,7 +4,10 @@ import { alpha, Button } from '@mui/material';
 import { Link, useNavigate } from 'react-router';
 import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
 import { useGetBooksQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
-import { Book, Bookmarks, Category, ExpandMore, GpsNotFixed, ImportContacts, KeyboardArrowRight, Replay, TableChart, ThumbUpAlt, TrendingUp } from '@mui/icons-material';
+import {
+  BarChart, Book, Bookmarks, Category, ExpandMore, GpsNotFixed, ImportContacts, KeyboardArrowRight,
+  Replay, TableChart, ThumbUpAlt, TrendingUp
+} from '@mui/icons-material';
 import { CustomTab, CustomTabs } from '../components/custom/CustomTabs';
 import { useGetPublishersQuery } from '../features/publishers/publishersApiSlice';
 import { orderTabs } from '../ultils/suggest';
@@ -20,6 +23,7 @@ const BigProductsSlider = lazy(() => import('../components/product/BigProductsSl
 const Products = lazy(() => import('../components/product/Products'));
 const Publishers = lazy(() => import('../components/other/Publishers'));
 const Categories = lazy(() => import('../components/other/Categories'));
+const ProductsTop = lazy(() => import('../components/product/ProductsTop'));
 
 //#region styled
 const Wrapper = styled.div`
@@ -128,9 +132,13 @@ const ContainerTitle = styled.span`
   &.error {
     color: ${props => props.theme.palette.error.main};
 
-    svg {
-      color: ${props => props.theme.palette.error.main};
-    }
+    svg {  color: inherit; }
+  }
+
+  &.success {
+    color: ${props => props.theme.palette.success.main};
+
+    svg {  color: inherit; }
   }
 
   ${props => props.theme.breakpoints.down("sm")} {
@@ -145,6 +153,11 @@ const Container = styled.div`
 
   ${TitleContainer} {
     border: none;
+  }
+
+  ${props => props.theme.breakpoints.down("sm")} {
+    border-left: none;
+    border-right: none;
   }
 `
 
@@ -206,7 +219,7 @@ const SaleList = () => {
             Tải lại <Replay />
           </MoreButton>
           :
-          <Link to={'/store?sortBy=discount&sortBy=desc'}>
+          <Link to={'/store?sort=discount&dir=desc'}>
             <MoreButton>
               Xem tất cả <KeyboardArrowRight />
             </MoreButton>
@@ -277,7 +290,7 @@ const ProductsList = ({ tabs, value, title }) => {
             value={tabValue}
             onChange={handleChangeValue}
           >
-            {(!tabs?.length ? Array.from(new Array(1)) : tabs)?.map((tab, index) => (
+            {(!tabs?.length ? [...Array(1)] : tabs)?.map((tab, index) => (
               <CustomTab
                 key={`${title}-tabs-${tab?.label}-${index}`}
                 label={tab?.label ?? 'Đang cập nhật'}
@@ -287,7 +300,8 @@ const ProductsList = ({ tabs, value, title }) => {
           </CustomTabs>
         </ToggleGroupContainer>
       }
-      <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
+      <ProductsSlider key={tabValue} {...{ isLoading, isFetching, data, isSuccess, isError }} />
+      {/* <ProductsSliderTest {...{ isLoading, isFetching, data, isSuccess, isError }} /> */}
     </Container>
   )
 }
@@ -322,6 +336,80 @@ const RandomList = () => {
           </Button>
         }
       </ButtonContainer>
+    </Container>
+  )
+}
+
+const TopList = ({ categories }) => {
+  const listSize = 5;
+  const listRef = useRef(null); //Scroll ref
+  const [tabValue, setTabValue] = useState(categories?.ids[0] ?? null); //Tab
+
+  //Products
+  const { data, isLoading, isFetching, isSuccess, isError, refetch } = useGetBooksQuery({
+    cateId: tabValue,
+    size: listSize,
+    withDesc: true,
+    sortBy: 'totalOrders',
+    sortDir: 'desc'
+  }, { skip: (!categories) });
+
+  useEffect(() => { setTabValue(categories?.ids[0] ?? null); }, [categories])
+
+  const handleChangeValue = (e, newValue) => {
+    if (newValue !== null) {
+      setTabValue(newValue);
+      listRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  };
+
+  let tabs;
+
+  if (categories) {
+    const { ids, entities } = categories;
+
+    tabs = ids?.length
+      ? ids?.map((id, index) => {
+        const cate = entities[id];
+
+        return <CustomTab
+          key={`top-tab-${id}-${index}`}
+          label={cate?.name ?? 'Đang cập nhật'}
+          value={id ?? ''}
+        />
+      })
+      : <CustomTab label={'Đang cập nhật'} value={''} />
+  } else {
+    tabs = <CustomTab label={'Đang cập nhật'} value={''} />
+  }
+
+  return (
+    <Container>
+      <TitleContainer ref={listRef}>
+        <ContainerTitle className="success"><BarChart />&nbsp;Top bán chạy</ContainerTitle>
+        {isError ?
+          <MoreButton className="error" onClick={() => refetch()}>
+            Tải lại <Replay />
+          </MoreButton>
+          :
+          <Link to={`/store`}>
+            <MoreButton>
+              Xem tất cả <KeyboardArrowRight />
+            </MoreButton>
+          </Link>
+        }
+      </TitleContainer>
+      {categories &&
+        <ToggleGroupContainer>
+          <CustomTabs
+            value={tabValue}
+            onChange={handleChangeValue}
+          >
+            {tabs}
+          </CustomTabs>
+        </ToggleGroupContainer>
+      }
+      <ProductsTop {...{ isLoading, isFetching, data, isSuccess, isError, size: listSize }} />
     </Container>
   )
 }
@@ -401,12 +489,12 @@ const Home = () => {
       <Loadable key={'toriyama'}>
         <ProductsList {...{
           value: { keyword: 'toriyama' },
-          title: <ContainerTitle><GpsNotFixed color="primary"/>&nbsp;Akira Toriyama</ContainerTitle>
+          title: <ContainerTitle><GpsNotFixed color="primary" />&nbsp;Akira Toriyama</ContainerTitle>
         }} />
       </Loadable>
       <Container>
         <TitleContainer>
-          <ContainerTitle><Category color="warning"/>&nbsp;Danh mục sản phẩm</ContainerTitle>
+          <ContainerTitle><Category color="warning" />&nbsp;Danh mục sản phẩm</ContainerTitle>
         </TitleContainer>
         <Loadable key={'cates'}>
           <Categories />
@@ -446,22 +534,24 @@ const Home = () => {
       <Loadable key={'trending'}>
         <ProductsList key={'trending'} {...{
           tabs: orderTabs,
-          title: <ContainerTitle><TrendingUp color="success"/>&nbsp;Trending</ContainerTitle>
+          title: <ContainerTitle><TrendingUp color="success" />&nbsp;Trending</ContainerTitle>
         }}
         />
       </Loadable>
-      <p>TOP STUFF</p>
+      <Loadable key={'top'}>
+        <TopList categories={categories} />
+      </Loadable>
       <Loadable key={'categories'}>
         <ProductsList key={'categories'} {...{
           value: { cateId: cates[0]?.id },
-          title: <ContainerTitle><Book color="primary"/>&nbsp;{cates[0]?.name}</ContainerTitle>
+          title: <ContainerTitle><Book color="primary" />&nbsp;{cates[0]?.name}</ContainerTitle>
         }}
         />
       </Loadable>
       <Loadable key={'publishers'}>
         <ProductsList key={'publishers'} {...{
           tabs: pubs.slice(0, 4) || [],
-          title: <ContainerTitle><TableChart color="warning"/>&nbsp;Thương hiệu nổi bật</ContainerTitle>
+          title: <ContainerTitle><TableChart color="warning" />&nbsp;Thương hiệu nổi bật</ContainerTitle>
         }}
         />
       </Loadable>
@@ -470,7 +560,7 @@ const Home = () => {
       </Loadable>
       <Container>
         <TitleContainer>
-          <ContainerTitle><Category color="info"/>&nbsp;Nhà xuất bản</ContainerTitle>
+          <ContainerTitle><Category color="info" />&nbsp;Nhà xuất bản</ContainerTitle>
         </TitleContainer>
         <Loadable key={'pubs'}>
           <Publishers />
@@ -494,14 +584,9 @@ const Home = () => {
           )
         }
       })}
+      <CustomDivider>Sản phẩm nổi bật</CustomDivider>
       <Loadable key={'products'}>
         <BigProductsSlider />
-      </Loadable>
-      <Loadable key={'categories2'} >
-        <ProductsList key={'categories2'} {...{
-          tabs: orderTabs,
-          title: 'Other Cate'
-        }} />
       </Loadable>
       <Loadable key={'categories3'}>
         <ProductsList key={'categories3'} {...{

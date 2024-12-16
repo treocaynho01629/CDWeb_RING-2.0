@@ -13,21 +13,39 @@ import java.util.List;
 
 public interface ShopService {
 
-    Page<ShopDTO> getShops(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword, Long ownerId);
+    Page<ShopDTO> getShops(Integer pageNo,
+                           Integer pageSize,
+                           String sortBy,
+                           String sortDir,
+                           String keyword,
+                           Long ownerId);
 
-    ShopDTO getShopById(Long id, Account user);
+    ShopDTO getShopById(Long id,
+                        Account user);
 
-    void follow(Long id, Account user);
+    void follow(Long id,
+                Account user);
 
-    void unfollow(Long id, Account user);
+    void unfollow(Long id,
+                  Account user);
 
-    Shop addShop(ShopRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException;
+    Shop addShop(ShopRequest request,
+                 MultipartFile file,
+                 Account user) throws IOException, ImageResizerException;
 
-    Shop updateShop(Long id, ShopRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException;
+    Shop updateShop(Long id,
+                    ShopRequest request,
+                    MultipartFile file,
+                    Account user) throws IOException, ImageResizerException;
 
-    Shop deleteShop(Long id, Account user);
+    Shop deleteShop(Long id,
+                    Account user);
 
-    void deleteShops(String keyword, Long ownerId, List<Long> ids, boolean isInverse, Account user);
+    void deleteShops(String keyword,
+                     Long ownerId,
+                     List<Long> ids,
+                     Boolean isInverse,
+                     Account user);
 
     void deleteAllShops();
 }

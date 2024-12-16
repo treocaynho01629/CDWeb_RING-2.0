@@ -149,7 +149,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
 
   if (isLoading || isError) {
     catesContent = (
-      Array.from(new Array(LIMIT_CATES)).map((item, index) => (
+      [...Array(LIMIT_CATES)].map((item, index) => (
         <Fragment key={`temp-cate-${index}`}>
           <ListItemButton>
             <Skeleton variant="text" sx={{ fontSize: '14px' }} width="70%" />
@@ -214,7 +214,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
         </Collapse>
       </>
     } else {
-      catesContent = Array.from(new Array(LIMIT_CATES)).map((item, index) => (
+      catesContent = [...Array(LIMIT_CATES)].map((item, index) => (
         <Fragment key={`cate-${index}`}>
           <ListItemButton>
             <Skeleton variant="text" sx={{ fontSize: '16px' }} width="70%" animation={false} />
@@ -318,7 +318,7 @@ const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
 
   if (isLoading || isError) {
     pubsContent = (
-      Array.from(new Array(LIMIT_PUBS)).map((item, index) => (
+      [...Array(LIMIT_PUBS)].map((item, index) => (
         <CheckPlaceholder key={`pub-temp-${index}`}>
           <Skeleton variant="text" sx={{ fontSize: '14px' }} width={200} />
         </CheckPlaceholder>
@@ -366,7 +366,7 @@ const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
         </Collapse>
       </>
     } else {
-      pubsContent = Array.from(new Array(LIMIT_PUBS)).map((item, index) => (
+      pubsContent = [...Array(LIMIT_PUBS)].map((item, index) => (
         <CheckPlaceholder key={`pub-temp-${index}`}>
           <Skeleton variant="text" sx={{ fontSize: '14px' }} width={200} />
         </CheckPlaceholder>
@@ -518,7 +518,7 @@ const RateFilter = memo(({ rating, onChangeRate, rateRef }) => {
         <FilterText>Đánh giá</FilterText>
       </TitleContainer>
       <FormGroup sx={{ padding: 0, width: '100%', mb: 1 }}>
-        {Array.from(new Array(5)).map((item, index) => {
+        {[...Array(5)].map((item, index) => {
           const isItemSelected = (index + 1) == rating;
 
           return (
@@ -534,10 +534,10 @@ const RateFilter = memo(({ rating, onChangeRate, rateRef }) => {
               }
               sx={{ fontSize: '14px', width: '100%', marginRight: 0 }}
               label={<LabelText>
-                {Array.from(new Array(index + 1)).map((item, i) => (
+                {[...Array(index + 1)].map((item, i) => (
                   <Star key={`s-${index}-${i}`} />
                 ))}
-                {Array.from(new Array(5 - (index + 1))).map((item, j) => (
+                {[...Array(5 - (index + 1))].map((item, j) => (
                   <StarBorder key={`sb-${index}-${j}`} />
                 ))}
                 {index < 4 && <>&nbsp;trở lên</>}

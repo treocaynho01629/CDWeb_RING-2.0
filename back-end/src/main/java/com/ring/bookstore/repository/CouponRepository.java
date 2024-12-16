@@ -19,7 +19,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 		and (coalesce(:keyword) is null or c.code = :keyword)
 		and (coalesce(:types) is null or cd.type in :types)
 		and (coalesce(:shopId) is null or c.shop.id = :shopId)
-		and (coalesce(:byShop) is null or case when :byShop = true 
+		and (coalesce(:byShop) is null or case when :byShop = true
 			then c.shop.id is not null else c.shop.id is null end)
 		group by c.id, cd.id
 	""")

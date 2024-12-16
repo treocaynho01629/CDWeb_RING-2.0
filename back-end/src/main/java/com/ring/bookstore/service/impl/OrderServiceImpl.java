@@ -7,7 +7,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
-import com.ring.bookstore.dtos.mappers.CouponMapper;
 import com.ring.bookstore.dtos.orders.*;
 import com.ring.bookstore.dtos.ChartDTO;
 import com.ring.bookstore.dtos.mappers.CalculateMapper;
@@ -449,7 +448,7 @@ public class OrderServiceImpl implements OrderService {
 
                 //Coupon
                 Coupon shopCoupon = coupons.get(detail.getCoupon());
-                if (shopCoupon == null) throw new ResourceNotFoundException("Coupon not found!");
+                if (detail.getCoupon() != null && shopCoupon == null) throw new ResourceNotFoundException("Coupon not found!");
 
                 if (shopCoupon != null
                         && shopCoupon.getShop().getId().equals(shop.getId())
@@ -502,7 +501,7 @@ public class OrderServiceImpl implements OrderService {
 
         //Main coupon
         Coupon coupon = coupons.get(checkRequest.getCoupon());
-        if (coupon == null) throw new ResourceNotFoundException("Coupon not found!");
+        if (checkRequest.getCoupon() != null && coupon == null) throw new ResourceNotFoundException("Coupon not found!");
 
         if (coupon != null && coupon.getShop() == null && !couponService.isExpired(coupon)) {
             double discountValue = 0.0;

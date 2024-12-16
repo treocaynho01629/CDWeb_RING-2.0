@@ -9,13 +9,11 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import { currencyFormat } from '../../ultils/covert';
 import NumberFlow from '@number-flow/react';
 import PriceDisplay from './PriceDisplay';
-import useAuth from "../../hooks/useAuth";
 
 const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
 const CouponDisplay = lazy(() => import('../coupon/CouponDisplay'));
 
-const CheckoutDialog = ({ coupon, shopCoupon, selected, navigate, handleOpenDialog, calculating, estimated, calculated }) => {
-    const { token } = useAuth();
+const CheckoutDialog = ({ coupon, shopCoupon, discount, selected, navigate, handleOpenDialog, calculating, displayInfo, loggedIn }) => {
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('sm'));
     const tabletMode = useMediaQuery(theme.breakpoints.down('md_lg'));
@@ -29,20 +27,9 @@ const CheckoutDialog = ({ coupon, shopCoupon, selected, navigate, handleOpenDial
 
     const toggleDrawer = (newOpen) => { setOpen(newOpen) };
 
-    //Info
-    const displayInfo = {
-        deal: (calculating || !calculated) ? estimated?.deal : calculated?.dealDiscount,
-        subTotal: (calculating || !calculated) ? estimated?.subTotal : calculated?.productsTotal,
-        shipping: (calculating || !calculated) ? estimated?.shipping : calculated?.shippingFee,
-        couponDiscount: calculated?.couponDiscount || 0,
-        totalDiscount: calculated?.totalDiscount || 0,
-        shippingDiscount: calculated?.shippingDiscount || 0,
-        total: (calculating || !calculated) ? estimated?.total : calculated?.total - calculated?.totalDiscount
-    }
-
     //Component stuff
     let checkoutDetail = <>
-        <PriceDisplay displayInfo={displayInfo} />
+        <PriceDisplay displayInfo={displayInfo} loggedIn={loggedIn}/>
         <CheckoutRow>
             {!numSelected ?
                 <CheckoutText className="error">Vui lòng chọn sản phẩm</CheckoutText>
@@ -75,7 +62,7 @@ const CheckoutDialog = ({ coupon, shopCoupon, selected, navigate, handleOpenDial
                             <CouponButton onClick={() => handleOpenDialog()}>
                                 <span>
                                     <LocalActivityOutlined color="error" />&nbsp;
-                                    Chọn mã giảm giá {coupon && 'khác'}
+                                    {discount ? `Đã giảm ${currencyFormat.format(discount)}` : `Chọn mã giảm giá ${coupon && 'khác'}`}
                                 </span>
                                 <MiniCouponContainer>
                                     <Suspense fallback={null}>
@@ -104,7 +91,7 @@ const CheckoutDialog = ({ coupon, shopCoupon, selected, navigate, handleOpenDial
                                 disabled={!numSelected || calculating}
                                 onClick={() => navigate('/checkout', { state: checkoutCart })}
                             >
-                                {token ? `Thanh toán (${numSelected})` : 'Đăng nhập'}
+                                {loggedIn ? `Thanh toán (${numSelected})` : 'Đăng nhập'}
                             </CheckoutButton>
                         </CheckoutStack>
                     </>
@@ -115,7 +102,7 @@ const CheckoutDialog = ({ coupon, shopCoupon, selected, navigate, handleOpenDial
                                     <CouponButton onClick={() => handleOpenDialog()}>
                                         <span>
                                             <LocalActivityOutlined color="error" />&nbsp;
-                                            Chọn mã giảm giá {coupon && 'khác'}
+                                            {discount ? `Đã giảm ${currencyFormat.format(discount)}` : `Chọn mã giảm giá ${coupon && 'khác'}`}
                                         </span>
                                         <MiniCouponContainer>
                                             <Suspense fallback={null}>
@@ -148,7 +135,7 @@ const CheckoutDialog = ({ coupon, shopCoupon, selected, navigate, handleOpenDial
                                         onClick={() => navigate('/checkout', { state: checkoutCart })}
                                         startIcon={<ShoppingCartCheckout />}
                                     >
-                                        {token ? 'Thanh toán' : 'Đăng nhập'}
+                                        {loggedIn ? 'Thanh toán' : 'Đăng nhập'}
                                     </CheckoutButton>
                                 </CheckoutStack>
                             </CheckoutBox>
@@ -167,7 +154,7 @@ const CheckoutDialog = ({ coupon, shopCoupon, selected, navigate, handleOpenDial
                                 <CouponButton onClick={() => handleOpenDialog()}>
                                     <span>
                                         <LocalActivityOutlined color="error" />&nbsp;
-                                        Chọn mã giảm giá {coupon && 'khác'}
+                                        {discount ? `Đã giảm ${currencyFormat.format(discount)}` : `Chọn mã giảm giá ${coupon && 'khác'}`}
                                     </span>
                                     <KeyboardArrowRight fontSize="small" />
                                 </CouponButton>
@@ -184,7 +171,7 @@ const CheckoutDialog = ({ coupon, shopCoupon, selected, navigate, handleOpenDial
                                     onClick={() => navigate('/checkout', { state: checkoutCart })}
                                     startIcon={<ShoppingCartCheckout />}
                                 >
-                                    {token ? `Thanh toán (${numSelected})` : 'Đăng nhập để Thanh toán'}
+                                    {loggedIn ? `Thanh toán (${numSelected})` : 'Đăng nhập để Thanh toán'}
                                 </CheckoutButton>
                             </CheckoutBox>
                         </ >

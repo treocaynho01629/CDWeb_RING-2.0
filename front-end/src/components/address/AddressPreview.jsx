@@ -66,7 +66,7 @@ const AddressPreview = ({ addressInfo, handleOpen, loadAddress }) => {
 
     const handleClickOpen = () => {
         if (!username) {
-            navigate('/auth/login', { state: { from: location }, replace: true });
+            navigate('/auth/login', { state: { from: location } });
         } else if (handleOpen) {
             handleOpen();
         }

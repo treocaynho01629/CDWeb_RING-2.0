@@ -8,6 +8,7 @@ import { lazy, Suspense, useState } from 'react';
 import { useGetMyAddressQuery } from '../../../features/addresses/addressesApiSlice';
 import ProductImages from './ProductImages';
 import ProductAction from './ProductAction';
+import useAuth from '../../../hooks/useAuth';
 
 const CouponPreview = lazy(() => import('../../coupon/CouponPreview'));
 const AddressPreview = lazy(() => import('../../address/AddressPreview'));
@@ -220,6 +221,7 @@ const policiesPlaceholder = (
 //#endregion
 
 const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
+    const { username } = useAuth();
     const [addressInfo, setAddressInfo] = useState({
         name: '',
         phone: '',
@@ -229,7 +231,7 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
     const [openDialog, setOpenDialog] = useState(false);
 
     //Fetch address
-    const { data: address, isLoading: loadAddress } = useGetMyAddressQuery();
+    const { data: address, isLoading: loadAddress } = useGetMyAddressQuery({}, { skip: !username });
 
     const handleViewReview = (value) => { if (handleToggleReview) handleToggleReview(value) };
     const handleOpenDialog = () => { setOpenDialog(true) }
@@ -360,7 +362,7 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                                 {book &&
                                     <>
                                         <AddressPreview {...{ addressInfo, handleOpen: handleOpenDialog, loadAddress }} />
-                                        <AddressSelectDialog {...{ address, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }} />
+                                        <AddressSelectDialog {...{ address, loggedIn: username != null, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }} />
                                     </>
                                 }
                             </Suspense>

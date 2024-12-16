@@ -34,7 +34,7 @@ const StyledEmptyIcon = styled(EmptyIcon)`
 `
 //#endregion
 
-const AddressSelectDialog = ({ address, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }) => {
+const AddressSelectDialog = ({ address, loggedIn = true, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }) => {
   const { addresses: storeAddresses, addNewAddress, removeAddress } = useCart();
   const [openForm, setOpenForm] = useState(false); //Dialog open state
   const [err, setErr] = useState('');
@@ -51,7 +51,7 @@ const AddressSelectDialog = ({ address, pending, setPending, setAddressInfo, ope
   )
 
   //Fetch addresses
-  const { data, isLoading, isSuccess, isError, error } = useGetMyAddressesQuery();
+  const { data, isLoading, isSuccess, isError, error } = useGetMyAddressesQuery({}, { skip: !loggedIn });
 
   //Update address
   const [createAddress, { isLoading: creating }] = useCreateAddressMutation();

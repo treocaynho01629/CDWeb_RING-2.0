@@ -31,7 +31,7 @@ public class CalculateMapper {
                 detail.getCouponDiscount(),
                 detail.getShippingFee(),
                 detail.getShippingDiscount(),
-                couponMapper.apply(detail.getCoupon()),
+                detail.getCoupon() != null ? couponMapper.apply(detail.getCoupon()) : null,
                 itemDTOS);
     }
 
@@ -63,7 +63,7 @@ public class CalculateMapper {
                 order.getDealDiscount(),
                 order.getCouponDiscount(),
                 order.getShippingDiscount(),
-                couponMapper.apply(order.getCoupon()),
+                order.getCoupon() != null ? couponMapper.apply(order.getCoupon()) : null,
                 detailDTOS
         );
     }

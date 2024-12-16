@@ -199,7 +199,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
 
   if (isLoading || isError) {
     catesContent = (
-      Array.from(new Array(LIMIT_CATES)).map((item, index) => (
+      [...Array(LIMIT_CATES)].map((item, index) => (
         <Fragment key={`temp-cate-${index}`}>
           <Skeleton variant="rectangular" height={38} width="48%" />
         </Fragment>
@@ -271,7 +271,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
         </Collapse>
       </>
     } else {
-      catesContent = Array.from(new Array(LIMIT_CATES)).map((item, index) => (
+      catesContent = [...Array(LIMIT_CATES)].map((item, index) => (
         <Fragment key={`temp-cate-${index}`}>
           <Skeleton variant="rectangular" height={38} width="48%" />
         </Fragment>
@@ -373,7 +373,7 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
 
   if (isLoading || isError) {
     pubsContent = (
-      Array.from(new Array(LIMIT_PUBS)).map((item, index) => (
+      [...Array(LIMIT_PUBS)].map((item, index) => (
         <Fragment key={`pub-temp-${index}`}>
           <Skeleton variant="rectangular" height={38} width="48%" />
         </Fragment>
@@ -421,7 +421,7 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
         </Collapse>
       </>
     } else {
-      pubsContent = Array.from(new Array(LIMIT_PUBS)).map((item, index) => (
+      pubsContent = [...Array(LIMIT_PUBS)].map((item, index) => (
         <Fragment key={`temp-pub-${index}`}>
           <Skeleton variant="rectangular" height={38} width="48%" />
         </Fragment>
@@ -545,7 +545,7 @@ const RateFilter = memo(({ rating, onChangeRate }) => {
     <Filter>
       <TitleContainer><FilterText>Đánh giá</FilterText> </TitleContainer>
       <Stack spacing={{ xs: 1 }} direction="row" useFlexGap flexWrap="wrap">
-        {Array.from(new Array(5)).map((item, index) => {
+        {[...Array(5)].map((item, index) => {
           const isItemSelected = (index + 1) == rating;
 
           return (

@@ -32,7 +32,7 @@ const RandomShape = styled.span`
         height: 100dvh;
         width: 100%;
         background: hsl(from ${props => props.theme.palette.primary.main} calc(h + 30) s l / 0.3);
-        transform: translate(-100%, -55%) rotate(85deg);
+        transform: translate(-80%, -60%) rotate(85deg);
     }
 
     &:before {

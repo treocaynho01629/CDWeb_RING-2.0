@@ -18,17 +18,26 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface AccountService {
 	
-	Page<Account> getAllAccounts(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-								 Boolean isEmployee, String keyword, Integer role);
+	Page<Account> getAllAccounts(Integer pageNo,
+								 Integer pageSize,
+								 String sortBy,
+								 String sortDir,
+								 Boolean isEmployee,
+								 String keyword,
+								 Integer role);
 	AccountDetailDTO getAccountById(Long id);
 	Account saveAccount(AccountRequest request);
-	Account updateAccount(AccountRequest request, Long id);
+	Account updateAccount(AccountRequest request,
+						  Long id);
 	void deleteAccount(Long id);
 	void deleteAccounts(List<Long> ids);
 	void deleteAllAccounts();
 	ProfileDTO getProfile(Account user);
-	AccountProfile updateProfile(ProfileRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException;
-	Account changePassword(ChangePassRequest request, Account user);
+	AccountProfile updateProfile(ProfileRequest request,
+								 MultipartFile file,
+								 Account user) throws IOException, ImageResizerException;
+	Account changePassword(ChangePassRequest request,
+						   Account user);
 	List<ChartDTO> getTopAccount();
 	List<ChartDTO> getTopSeller();
 }

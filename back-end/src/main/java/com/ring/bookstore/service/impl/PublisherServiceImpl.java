@@ -95,7 +95,7 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Transactional
-    public void deletePublishers(List<Integer> ids, boolean isInverse) {
+    public void deletePublishers(List<Integer> ids, Boolean isInverse) {
         List<Integer> listDelete = ids;
         if (isInverse) listDelete = pubRepo.findInverseIds(ids);
         pubRepo.deleteAllByIdInBatch(listDelete);

@@ -8,24 +8,18 @@ import { useCalculateMutation } from '../../features/orders/ordersApiSlice';
 import { ActionTableCell, StyledTableCell, StyledTableHead } from '../custom/CustomTableComponents';
 import { debounce, isEqual } from 'lodash-es';
 import { useGetRecommendCouponsQuery } from '../../features/coupons/couponsApiSlice';
+import { StyledCheckbox } from '../custom/CartComponents';
 import useCart from '../../hooks/useCart';
 import CheckoutDialog from './CheckoutDialog';
 import PropTypes from 'prop-types';
 import CartDetailRow from './CartDetailRow';
 import useDeepEffect from '../../hooks/useDeepEffect';
+import useAuth from "../../hooks/useAuth";
 
 const Menu = lazy(() => import('@mui/material/Menu'));
 const CouponDialog = lazy(() => import('../coupon/CouponDialog'));
 
 //#region styled
-const StyledCheckbox = styled(Checkbox)`
-    margin-left: 8px;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        margin-left: 0
-    }
-`
-
 const TitleContainer = styled.div`
     position: relative;
     padding: 20px 0px;
@@ -69,7 +63,7 @@ const StyledDeleteButton = styled(Button)`
 
 const tempShippingFee = 10000;
 
-function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, handleDeleteMultiple }) {
+function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, handleDeleteMultiple, disabled }) {
     let isIndeterminate = numSelected > 0 && numSelected < rowCount;
     let isSelectedAll = rowCount > 0 && numSelected === rowCount;
 
@@ -122,6 +116,7 @@ function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, handleDele
                         endIcon={<DeleteIcon />}
                         disableRipple
                         onClick={handleDeleteMultiple}
+                        disabled={disabled}
                     >
                         Xoá
                     </StyledDeleteButton>
@@ -134,17 +129,21 @@ function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, handleDele
 EnhancedTableHead.propTypes = {
     numSelected: PropTypes.number.isRequired,
     onSelectAllClick: PropTypes.func.isRequired,
+    handleDeleteMultiple: PropTypes.func.isRequired,
     rowCount: PropTypes.number.isRequired,
+    disabled: PropTypes.bool,
 };
 
 const CartContent = () => {
     const { cartProducts, replaceProduct, removeProduct, removeShopProduct, clearCart,
         decreaseAmount, increaseAmount, changeAmount } = useCart();
+    const { username } = useAuth();
     const [selected, setSelected] = useState([]);
     const [shopIds, setShopIds] = useState([]);
     const [coupon, setCoupon] = useState('');
     const [shopCoupon, setShopCoupon] = useState('');
-    const [couponDiscount, setCouponDiscount] = useState(0);
+    const [discount, setDiscount] = useState(0);
+    const [shopDiscount, setShopDiscount] = useState([]);
     const [checkState, setCheckState] = useState(null);
 
     //Dialog/Menu
@@ -166,11 +165,11 @@ const CartContent = () => {
     //Estimate/calculate price
     const [estimated, setEstimated] = useState({ deal: 0, subTotal: 0, shipping: 0, total: 0 });
     const [calculated, setCalculated] = useState(null);
-    const [calculate, { isLoading }] = useCalculateMutation();
+    const [calculate, { isLoading: calculating }] = useCalculateMutation();
 
     //#region construct
     useDeepEffect(() => {
-        if (isLoading || !selected.length || !cartProducts?.length || cartProducts.length == 0) {
+        if (calculating || !selected.length || !cartProducts?.length || cartProducts.length == 0) {
             handleCalculate.cancel();
         }
         handleCartChange();
@@ -274,7 +273,7 @@ const CartContent = () => {
 
     //Calculate server side
     const handleCalculate = useCallback(debounce(async (cart) => {
-        if (isLoading || cart == null) return;
+        if (calculating || cart == null || !username) return;
 
         calculate(cart).unwrap()
             .then((data) => {
@@ -319,16 +318,17 @@ const CartContent = () => {
                     }
                 })
 
-                //Replace recommend coupon
-                setCouponDiscount((prev) => ({
+                //Replace recommended coupons
+                const discountValue = detail?.couponDiscount + detail?.shippingDiscount;
+                setShopDiscount((prev) => ({
                     ...prev,
-                    [detail?.shopId]: detail?.couponDiscount > 0 ? detail?.couponDiscount : detail?.shippingDiscount
+                    [detail?.shopId]: discountValue
                 }));
                 if (detail?.coupon != null
                     && shopCoupon[detail?.shopId] != null
-                    && !isEqual(detail.coupon, shopCoupon[detail?.shopId]
-                    )) {
-                    setShopCoupon((prev) => ({ ...prev, [detail?.shopId]: detail.coupon }));
+                    && !isEqual(detail.coupon, shopCoupon[detail?.shopId])
+                ) {
+                    setShopCoupon((prev) => ({ ...prev, [detail?.shopId]: { ...detail.coupon, isUsable: discountValue > 0 } }));
                 }
             } else { //Remove all items of the invalid Shop
                 handleClearSelect();
@@ -337,7 +337,11 @@ const CartContent = () => {
         })
 
         //Replace recommend coupon
-        if (cart?.coupon != null && coupon != null && !isEqual(cart?.coupon, coupon)) setCoupon(cart.coupon);
+        const discountValue = cart?.couponDiscount + cart?.shippingDiscount;
+        setDiscount(discountValue);
+        if (cart?.coupon != null && coupon != null && !isEqual(cart?.coupon, coupon)) {
+            setCoupon({ ...cart.coupon, isUsable: discountValue > 0 });
+        }
     }
 
     //Separate by shop
@@ -358,6 +362,15 @@ const CartContent = () => {
         return resultCart;
     }
     const reducedCart = useMemo(() => reduceCart(), [cartProducts]);
+    const displayInfo = {
+        deal: (calculating || !calculated) ? estimated?.deal : calculated?.dealDiscount,
+        subTotal: (calculating || !calculated) ? estimated?.subTotal : calculated?.productsTotal,
+        shipping: (calculating || !calculated) ? estimated?.shipping : calculated?.shippingFee,
+        couponDiscount: calculated?.couponDiscount || 0,
+        totalDiscount: calculated?.totalDiscount || 0,
+        shippingDiscount: calculated?.shippingDiscount || 0,
+        total: (calculating || !calculated) ? estimated?.total : calculated?.total - calculated?.totalDiscount
+    }
 
     //Open context menu
     const handleClick = (e, product) => {
@@ -526,19 +539,18 @@ const CartContent = () => {
                         onSelectAllClick={handleSelectAllClick}
                         handleDeleteMultiple={handleDeleteMultiple}
                         rowCount={cartProducts?.length}
+                        disabled={calculating}
                     />
                     <TableBody>
                         {Object.keys(reducedCart).map((shopId, index) => {
-                            const shop = reducedCart[shopId];
+                            const shop = { ...reducedCart[shopId], id: shopId };
+                            const isGroupSelected = isShopSelected(shop);
 
                             return (<CartDetailRow key={`detail-${shopId}-${index}`}
                                 {...{
-                                    StyledCheckbox,
-                                    id: shopId, index, shop, isSelected, isShopSelected,
-                                    handleSelect, handleDeselect, handleSelectShop,
-                                    coupon: shopCoupon[shopId], couponDiscount: couponDiscount[shopId],
-                                    handleDecrease, increaseAmount, handleChangeQuantity,
-                                    handleClick, handleOpenDialog
+                                    shop, isSelected, isGroupSelected, handleSelect, handleDeselect, handleSelectShop,
+                                    coupon: shopCoupon[shopId], discount: shopDiscount[shopId], handleDecrease,
+                                    increaseAmount, handleChangeQuantity, handleClick, handleOpenDialog
                                 }}
                             />)
                         })}
@@ -561,8 +573,8 @@ const CartContent = () => {
                     <Title><Sell />&nbsp;ĐƠN DỰ TÍNH</Title>
                 </TitleContainer>
                 <CheckoutDialog {...{
-                    coupon, shopCoupon, selected, navigate, calculating: isLoading,
-                    calculated, estimated, handleOpenDialog
+                    coupon, shopCoupon, selected, discount, navigate, calculating,
+                    displayInfo, handleOpenDialog, loggedIn: username != null
                 }} />
             </Grid>
             <Suspense fallback={null}>

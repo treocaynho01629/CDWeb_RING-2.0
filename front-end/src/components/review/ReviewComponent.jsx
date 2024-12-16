@@ -74,7 +74,7 @@ const StyledEmptyIcon = styled(EmptyIcon)`
 `
 //#endregion
 
-const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending, isReview, handleToggleReview }) => {
+const ReviewComponent = ({ book, scrollIntoTab, tabletMode, pending, setPending, isReview, handleToggleReview }) => {
     //#region construct
     const { username } = useAuth();
     const [openForm, setOpenForm] = useState(undefined);
@@ -210,7 +210,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                     {book ? 'Đánh giá sản phẩm'
                         : <Skeleton variant="text" sx={{ fontSize: 'inherit' }} width="40%" />
                     }
-                    {mobileMode ?
+                    {tabletMode ?
                         <ReviewSummary>
                             {book ? <>
                                 <Rating
@@ -237,7 +237,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                         </Suspense>
                     }
                 </TitleContainer>
-                {mobileMode &&
+                {tabletMode &&
                     <MobileExtendButton disabled={!book} onClick={() => handleToggleReview(true)}>
                         {book ? <Label>Xem tất cả <KeyboardArrowRight fontSize="small" /></Label>
                             : <Label><Skeleton variant="text" sx={{ fontSize: 'inherit' }} width={80} /></Label>
@@ -246,14 +246,14 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                 }
             </Title>
             <ReviewsContainer>
-                {mobileMode ? reviewsContent : mainContent}
+                {tabletMode ? reviewsContent : mainContent}
             </ReviewsContainer>
-            {(mobileMode && book?.reviewsInfo?.total > 0) && //View all
+            {(tabletMode && book?.reviewsInfo?.total > 0) && //View all
                 <Showmore onClick={() => handleToggleReview(true)}>
                     <Label>Xem tất cả ({numFormatter(productReviewsCount ?? 0)} đánh giá) <KeyboardArrowRight fontSize="small" /></Label>
                 </Showmore>
             }
-            {(isReview !== undefined && mobileMode) && //Mobile component
+            {(isReview !== undefined && tabletMode) && //Mobile component
                 <Suspense fallback={null}>
                     <Dialog
                         fullScreen
@@ -294,7 +294,7 @@ const ReviewComponent = ({ book, scrollIntoTab, mobileMode, pending, setPending,
                 <Suspense fallback={null}>
                     <ReviewForm {...{
                         username, bookId: book?.id, open: openForm, handleClose: handleCloseForm,
-                        mobileMode, pending, setPending, handlePageChange, review: haveReviews ? userReview : null
+                        mobileMode: tabletMode, pending, setPending, handlePageChange, review: haveReviews ? userReview : null
                     }} />
                 </Suspense>
             }

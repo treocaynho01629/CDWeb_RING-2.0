@@ -1,11 +1,12 @@
 import styled from '@emotion/styled'
-import { Fragment, useEffect } from 'react';
+import { useEffect } from 'react';
 import { MoreHoriz, Storefront, KeyboardArrowRight, LocalActivityOutlined } from '@mui/icons-material';
 import { IconButton, Box, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Link } from 'react-router';
 import { ActionTableCell, StyledItemTableRow, StyledTableRow, SpaceTableRow, StyledTableCell } from '../custom/CustomTableComponents';
 import { currencyFormat } from '../../ultils/covert';
+import { StyledCheckbox } from '../custom/CartComponents';
 import CustomAmountInput from '../custom/CustomAmountInput';
 
 //#region styled
@@ -175,10 +176,8 @@ const StyledIconButton = styled(IconButton)`
 `
 //#endregion
 
-function ItemRow({ product, index, handleSelect, handleDeselect, isSelected, handleDecrease, increaseAmount,
-    handleChangeQuantity, handleClick, StyledCheckbox }) {
-    const isItemSelected = isSelected(product.id);
-    const labelId = `item-checkbox-${index}`;
+function ItemRow({ product, handleSelect, handleDeselect, isItemSelected, handleDecrease, increaseAmount, handleChangeQuantity, handleClick }) {
+    const labelId = `item-checkbox-${product?.id}`;
     const isDisabled = !product || product.amount < 1;
 
     useEffect(() => {
@@ -189,7 +188,7 @@ function ItemRow({ product, index, handleSelect, handleDeselect, isSelected, han
         <StyledItemTableRow
             role="checkbox"
             tabIndex={-1}
-            key={`item-${product.id}-${index}`}
+            key={`item-${product.id}`}
             className={isDisabled ? 'error' : ''}
         >
             <StyledTableCell padding="checkbox">
@@ -269,14 +268,12 @@ function ItemRow({ product, index, handleSelect, handleDeselect, isSelected, han
     )
 }
 
-const CartDetailRow = ({ id, index, shop, coupon, couponDiscount, isSelected, isShopSelected, handleSelect, handleDeselect,
-    handleSelectShop, handleDecrease, handleChangeQuantity, handleClick, increaseAmount,
-    handleOpenDialog, StyledCheckbox }) => {
-    const isGroupSelected = isShopSelected(shop);
-    const shopLabelId = `shop-label-checkbox-${index}`;
+const CartDetailRow = ({ shop, coupon, discount, isSelected, isGroupSelected, handleSelect, handleDeselect,
+    handleSelectShop, handleDecrease, handleChangeQuantity, handleClick, increaseAmount, handleOpenDialog }) => {
+    const shopLabelId = `shop-label-checkbox-${shop?.id}`;
 
     return (
-        <Fragment key={`detail-${id}-${index}`}>
+        <>
             <SpaceTableRow />
             <StyledTableRow role="shop-checkbox" tabIndex={-1}>
                 <StyledTableCell padding="checkbox">
@@ -296,22 +293,26 @@ const CartDetailRow = ({ id, index, shop, coupon, couponDiscount, isSelected, is
                     </Link>
                 </StyledTableCell>
             </StyledTableRow>
-            {shop.products?.map((product, index) => (
-                <ItemRow key={`item-${product.id}-${index}`}
-                    {...{
-                        product, index, handleSelect, handleDeselect, isSelected, handleDecrease, handleChangeQuantity,
-                        handleClick, increaseAmount, StyledCheckbox
-                    }} />
-            ))}
+            {shop.products?.map((product, index) => {
+                const isItemSelected = isSelected(product.id);
+
+                return (
+                    <ItemRow key={`item-${product.id}-${index}`}
+                        {...{
+                            product, handleSelect, handleDeselect, isItemSelected, handleDecrease, handleChangeQuantity,
+                            handleClick, increaseAmount
+                        }} />
+                )
+            })}
             <StyledTableRow role="coupon-row">
                 <StyledTableCell align="left" colSpan={6}>
-                    <CouponButton onClick={() => handleOpenDialog(id)}>
+                    <CouponButton onClick={() => handleOpenDialog(shop?.id)}>
                         <span>
                             <LocalActivityOutlined color="error" />&nbsp;
                             {coupon
-                                ? couponDiscount
+                                ? discount
                                     ? isGroupSelected
-                                        ? `Đã giảm ${currencyFormat.format(couponDiscount)}`
+                                        ? `Đã giảm ${currencyFormat.format(discount)}`
                                         : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
                                     : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
                                 : 'Thêm mã giảm giá'
@@ -321,7 +322,7 @@ const CartDetailRow = ({ id, index, shop, coupon, couponDiscount, isSelected, is
                     </CouponButton>
                 </StyledTableCell>
             </StyledTableRow>
-        </Fragment>
+        </>
     )
 }
 

@@ -14,18 +14,19 @@ import com.ring.bookstore.model.Book;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
-    @Query("""
+    @Query(value = """
         select b.id as id, b.slug as slug, b.title as title, i.name as image,
-            b.price as price, b.discount as discount, b.amount as amount, s.id as shopId, 
-            s.name as shopName, 
-            coalesce(rv.rating, 0) as rating, 
+            (case when :withDesc = true then b.description else null end) as description,
+            b.price as price, b.discount as discount, b.amount as amount, s.id as shopId,
+            s.name as shopName,
+            coalesce(rv.rating, 0) as rating,
             coalesce(od.totalOrders, 0) as totalOrders
         from Book b join b.shop s join b.image i
-        left join (select r.book.id as book_id, avg(r.rating) as rating 
-            from Review r 
+        left join (select r.book.id as book_id, avg(r.rating) as rating
+            from Review r
             group by r.book.id) rv on b.id = rv.book_id
-        left join (select o.book.id as book_id, sum(o.quantity) as totalOrders 
-            from OrderItem o 
+        left join (select o.book.id as book_id, sum(o.quantity) as totalOrders
+            from OrderItem o
             group by o.book.id) od on b.id = od.book_id
         where concat (b.title, b.author, s.name) ilike %:keyword%
         and (coalesce(:shopId) is null or b.shop.id = :shopId)
@@ -36,49 +37,68 @@ public interface BookRepository extends JpaRepository<Book, Long> {
         and b.price * (1 - b.discount) between :fromRange and :toRange
         and b.amount >= :amount
         group by b, i.name, rv.rating, od.totalOrders, s.id, s.name
+    """,
+    countQuery = """
+     select count(b)
+        from Book b join b.shop s
+        left join (select r.book.id as book_id, avg(r.rating) as rating
+            from Review r
+            group by r.book.id) rv on b.id = rv.book_id
+        where concat (b.title, b.author, s.name) ilike %:keyword%
+        and (coalesce(:shopId) is null or b.shop.id = :shopId)
+        and (coalesce(:cateId) is null or b.cate.id = :cateId or b.cate.parent.id = :cateId)
+        and (coalesce(:pubIds) is null or b.publisher.id in :pubIds)
+        and (coalesce(:types) is null or b.type in :types)
+        and coalesce(rv.rating, 0) >= :rating
+        and b.price * (1 - b.discount) between :fromRange and :toRange
+        and b.amount >= :amount
+        group by b, rv.rating, s.id, s.name
     """)
-    Page<IBookDisplay> findBooksWithFilter(String keyword, //Get books by filtering
+    Page<IBookDisplay> findBooksWithFilter(String keyword,
                                            Integer cateId,
                                            List<Integer> pubIds,
                                            List<String> types,
                                            Long shopId,
                                            Double fromRange,
                                            Double toRange,
+                                           Boolean withDesc,
                                            Integer rating,
                                            Integer amount,
                                            Pageable pageable);
 
     @Query("""
         select b.id as id, b.slug as slug, b.title as title, i.name as image,
-            b.price as price, b.discount as discount, b.amount as amount, s.id as shopId, 
-            s.name as shopName, 
-            coalesce(rv.rating, 0) as rating, 
+            (case when :withDesc = true then b.description else null end) as description,
+            b.price as price, b.discount as discount, b.amount as amount, s.id as shopId,
+            s.name as shopName,
+            coalesce(rv.rating, 0) as rating,
             coalesce(od.totalOrders, 0) as totalOrders
         from Book b join b.shop s join b.image i
-        left join (select r.book.id as book_id, avg(r.rating) as rating 
-            from Review r 
+        left join (select r.book.id as book_id, avg(r.rating) as rating
+            from Review r
             group by r.book.id) rv on b.id = rv.book_id
-        left join (select o.book.id as book_id, sum(o.quantity) as totalOrders 
-            from OrderItem o 
+        left join (select o.book.id as book_id, sum(o.quantity) as totalOrders
+            from OrderItem o
             group by o.book.id) od on b.id = od.book_id
         group by b, i.name, rv.rating, od.totalOrders, s.id, s.name
         order by random()
         limit :amount
     """)
-    List<IBookDisplay> findRandomBooks(Integer amount); //Get random books
+    List<IBookDisplay> findRandomBooks(Integer amount,
+                                       Boolean withDesc); //Get random books
 
     @Query("""
         select b.id as id, b.slug as slug, b.title as title, i.name as image,
-            b.price as price, b.discount as discount, b.amount as amount, s.id as shopId, 
-            s.name as shopName, 
-            coalesce(rv.rating, 0) as rating, 
+            b.price as price, b.discount as discount, b.amount as amount, s.id as shopId,
+            s.name as shopName,
+            coalesce(rv.rating, 0) as rating,
             coalesce(od.totalOrders, 0) as totalOrders
         from Book b join b.shop s join b.image i
-        left join (select r.book.id as book_id, avg(r.rating) as rating 
-            from Review r 
+        left join (select r.book.id as book_id, avg(r.rating) as rating
+            from Review r
             group by r.book.id) rv on b.id = rv.book_id
-        left join (select o.book.id as book_id, sum(o.quantity) as totalOrders 
-            from OrderItem o 
+        left join (select o.book.id as book_id, sum(o.quantity) as totalOrders
+            from OrderItem o
             group by o.book.id) od on b.id = od.book_id
         where b.id in :ids
     """)
