@@ -9,6 +9,7 @@ import { Link } from 'react-router';
 import { StyledDialogTitle } from "../custom/ProfileComponents";
 import dayjs from 'dayjs';
 import useAuth from '../../hooks/useAuth';
+import useConfirm from '../../hooks/useConfirm';
 
 const CustomDatePicker = lazy(() => import('../custom/CustomDatePicker'));
 
@@ -125,6 +126,10 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
     const [editDob, setEditDob] = useState(false);
     const [pic, setPic] = useState(profile?.image || null);
     const [file, setFile] = useState(null);
+    const [ConfirmationDialog, confirm] = useConfirm(
+        'Gỡ ảnh đại diện?',
+        'Gỡ bỏ anh đại diện hiện tại?',
+    )
 
     //Update profile hook
     const [updateProfile, { isLoading: updating }] = useUpdateProfileMutation();
@@ -161,15 +166,20 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
         }
     }
 
-    const handleRemovePic = () => {
-        setFile(null);
-        if (pic == profile?.image) {
-            setPic(null);
+    const handleRemovePic = async () => {
+        const confirmation = await confirm();
+        if (confirmation) {
+            setFile(null);
+            if (pic == profile?.image) {
+                setPic(null);
+            } else {
+                setPic(profile?.image);
+            }
+            setErrMsg('');
+            setErr([]);
         } else {
-            setPic(profile?.image);
+            console.log('Cancel');
         }
-        setErrMsg('');
-        setErr([]);
     }
 
     const handleClickBadge = () => {
@@ -498,6 +508,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                 style={{ display: "none" }}
                 onChange={handleChangePic}
             />
+            <ConfirmationDialog />
         </>
     )
 }

@@ -16,52 +16,61 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review, Long>{
 
 	@Query("""
-	select r as review, u.id as userId, u.username as username, i.name as image,
-	b.id as bookId, b.title as bookTitle, b.slug as bookSlug
-	from Review r 
-	join r.book b
-	join r.user u
-	left join u.profile p
-	left join p.image i
-	where (coalesce(:userId) is null or u.id = :userId)
-	and (coalesce(:bookId) is null or r.book.id = :bookId)
-	and (coalesce(:rating) is null or  r.rating = :rating)
+		select r as review, u.id as userId, u.username as username, i.name as image,
+		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
+		from Review r 
+		join r.book b
+		join r.user u
+		left join u.profile p
+		left join p.image i
+		where (coalesce(:userId) is null or u.id = :userId)
+		and (coalesce(:bookId) is null or r.book.id = :bookId)
+		and (coalesce(:rating) is null or  r.rating = :rating)
 	""")
 	public Page<IReview> findReviewsByFilter(Long bookId, Long userId, Integer rating, Pageable pageable);
 
 	@Query("""
-	select r.id from Review r
-	where (coalesce(:userId) is null or r.user.id = :userId)
-	and (coalesce(:bookId) is null or r.book.id = :bookId)
-	and (coalesce(:rating) is null or  r.rating = :rating)
-	and r.id not in :ids
-	group by r.id
+		select r.id from Review r
+		where (coalesce(:userId) is null or r.user.id = :userId)
+		and (coalesce(:bookId) is null or r.book.id = :bookId)
+		and (coalesce(:rating) is null or  r.rating = :rating)
+		and r.id not in :ids
+		group by r.id
 	""")
 	List<Long> findInverseIds(Long bookId, Long userId, Integer rating, List<Long> ids);
 
 	@Query("""
-	select r as review, u.id as userId, u.username as username, i.name as image,
-	b.id as bookId, b.title as bookTitle, b.slug as bookSlug
-	from Review r join r.book b
-	join r.user u
-	left join u.profile p
-	left join p.image i
-	where b.id = :id
-	and (coalesce(:rating) is null or  r.rating = :rating)
+		select r as review, u.id as userId, u.username as username, i.name as image,
+		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
+		from Review r join r.book b
+		join r.user u
+		left join u.profile p
+		left join p.image i
+		where b.id = :id
+		and (coalesce(:rating) is null or  r.rating = :rating)
 	""")
 	Page<IReview> findReviewsByBookId(Long id, Integer rating, Pageable pageable); //Get reviews from book's {id}
 
 	@Query("""
-	select r as review, u.id as userId, u.username as username, i.name as image,
-	b.id as bookId, b.title as bookTitle, b.slug as bookSlug
-	from Review r join r.book b
-	join r.user u
-	left join u.profile p
-	left join p.image i
-	where r.user.id = :id
-	and (coalesce(:rating) is null or  r.rating = :rating)
+		select r as review, u.id as userId, u.username as username, i.name as image,
+		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
+		from Review r join r.book b
+		join r.user u
+		left join u.profile p
+		left join p.image i
+		where r.user.id = :id
+		and (coalesce(:rating) is null or  r.rating = :rating)
 	""")
 	Page<IReview> findUserReviews(Long id, Integer rating, Pageable pageable); //Get reviews by user's {id}
-	
-	Optional<Review> findByBook_IdAndUser_Id(Long bookId, Long userId); //Get user's review of this book
+
+	@Query("""
+		select r as review, u.id as userId, u.username as username, i.name as image,
+		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
+		from Review r join r.book b
+		join r.user u
+		left join u.profile p
+		left join p.image i
+		where r.user.id = :userId and b.id = :bookId
+	""")
+	Optional<IReview> findUserReviewOfBook(Long bookId, Long userId); //Get user's review of this book
 }

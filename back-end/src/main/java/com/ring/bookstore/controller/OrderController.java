@@ -40,6 +40,7 @@ public class OrderController {
 
 	//Calculate price
 	@PostMapping("/calculate")
+	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<CalculateDTO> calculate(@RequestBody @Valid CalculateRequest request) {
 		CalculateDTO calculateResult = orderService.calculate(request);
 		return new ResponseEntity< >(calculateResult, HttpStatus.CREATED);
@@ -78,7 +79,7 @@ public class OrderController {
 
     //Get order by {id}
     @GetMapping("/detail/{id}")
-    @PreAuthorize("hasAnyRole('USER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id){
         OrderDetailDTO order = orderService.getOrderDetail(id);
         return new ResponseEntity< >(order, HttpStatus.OK);

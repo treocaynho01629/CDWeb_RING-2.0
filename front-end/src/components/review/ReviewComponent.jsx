@@ -91,8 +91,10 @@ const ReviewComponent = ({ book, scrollIntoTab, tabletMode, pending, setPending,
     //Fetch reviews
     const productReviewsCount = book?.reviewsInfo?.total;
     const haveReviews = !(!book || productReviewsCount == 0);
-    const { data: userReview, isSuccess: doneReview, error: errorReview } = useGetReviewByBookIdQuery(book?.id, //User's review of this product
-        { skip: !username || !book });
+    const { data: userReview, isSuccess: doneReview, error: errorReview } = useGetReviewByBookIdQuery(
+        book?.id, //User's review of this product
+        { skip: !username || !book }
+    );
     const { data, isLoading, isFetching, isSuccess, isUninitialized, isError, error } = useGetReviewsByBookIdQuery({
         id: book?.id,
         page: pagination?.number,

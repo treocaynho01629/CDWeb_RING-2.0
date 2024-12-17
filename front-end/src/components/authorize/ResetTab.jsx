@@ -9,7 +9,7 @@ import PasswordEvaluate from '../custom/PasswordEvaluate';
 
 const ReCaptcha = lazy(() => import('./ReCaptcha'));
 
-const ResetTab = ({ resetToken, pending, setPending, reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge }) => {
+const ResetTab = ({ resetToken, pending, setPending, reCaptchaLoaded, generateReCaptchaToken }) => {
     //Password validation
     const [password, setPassword] = useState('');
     const [validPass, setValidPass] = useState(false);
@@ -64,7 +64,6 @@ const ResetTab = ({ resetToken, pending, setPending, reCaptchaLoaded, generateRe
                 setErr([]);
                 setErrMsg('');
                 setChallenge(false);
-                showBadge();
 
                 //Queue snack
                 enqueueSnackbar('Đổi mật khẩu thành công!', { variant: 'success' });
@@ -86,7 +85,6 @@ const ResetTab = ({ resetToken, pending, setPending, reCaptchaLoaded, generateRe
                     setErrMsg('Lỗi xác thực!');
                 } else if (err?.status === 412) {
                     setChallenge(true);
-                    hideBadge();
                     setErrMsg('Yêu cầu của bạn cần xác thực lại!');
                 } else {
                     setErrMsg('Khôi phục thất bại!')

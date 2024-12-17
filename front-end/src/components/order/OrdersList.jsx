@@ -178,8 +178,7 @@ const OrdersList = () => {
 
     //Show more
     const handleShowMore = () => {
-        if (isFetching || typeof data?.page?.number !== 'number') return;
-        if (data?.page?.number < pagination?.number) return;
+        if (isFetching || typeof data?.page?.number !== 'number' || data?.page?.number < pagination?.number) return;
         const nextPage = data?.page?.number + 1;
         if (nextPage < data?.page?.totalPages) setPagination(prev => ({ ...prev, number: nextPage }));
     }

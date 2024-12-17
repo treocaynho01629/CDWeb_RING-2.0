@@ -148,7 +148,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
                 }
             },
             merge: (currentCache, newItems) => {
-                currentCache.info = newItems.info;
+                currentCache.page = newItems.page;
                 reviewsAdapter.upsertMany(
                     currentCache, reviewsSelector.selectAll(newItems)
                 )

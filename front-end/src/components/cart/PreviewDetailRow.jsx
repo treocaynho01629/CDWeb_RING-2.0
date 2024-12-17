@@ -199,7 +199,6 @@ function ItemRow({ product, index }) {
 }
 
 const PreviewDetailRow = ({ shop, coupon, discount, handleOpenDialog }) => {
-
     return (
         <>
             <SpaceTableRow />
@@ -213,7 +212,7 @@ const PreviewDetailRow = ({ shop, coupon, discount, handleOpenDialog }) => {
             ))}
             <StyledTableRow role="coupon-row">
                 <StyledTableCell align="left" colSpan={6}>
-                    <CouponButton onClick={() => handleOpenDialog(shop.id)}>
+                    <CouponButton onClick={() => handleOpenDialog(shop?.id)}>
                         <span>
                             <LocalActivityOutlined color="error" />&nbsp;
                             {coupon

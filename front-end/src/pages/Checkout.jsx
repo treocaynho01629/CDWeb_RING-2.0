@@ -73,6 +73,7 @@ const MiniTitle = styled.h4`
 const StyledStepper = styled(Stepper)(({ theme }) => ({
     marginTop: theme.spacing(1),
     '& .MuiStepLabel-root': {
+        cursor: 'pointer',
         [theme.breakpoints.down("sm")]: {
             marginLeft: theme.spacing(1),
         }
@@ -129,7 +130,8 @@ const Checkout = () => {
     const [contextCoupon, setContextCoupon] = useState(null);
     const [coupon, setCoupon] = useState(checkoutState?.coupon || '');
     const [shopCoupon, setShopCoupon] = useState(checkoutState?.shopCoupon || '');
-    const [couponDiscount, setCouponDiscount] = useState(0);
+    const [discount, setDiscount] = useState(0);
+    const [shopDiscount, setShopDiscount] = useState([]);
     const [checkState, setCheckState] = useState(null);
 
     //Address
@@ -150,7 +152,7 @@ const Checkout = () => {
     const [token, setToken] = useState('');
 
     //Recaptcha
-    const { reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge } = useReCaptchaV3();
+    const { reCaptchaLoaded, generateReCaptchaToken } = useReCaptchaV3();
 
     //Checkout hook
     const [checkout, { isLoading }] = useCheckoutMutation();
@@ -196,11 +198,11 @@ const Checkout = () => {
                     let detail = result.cart.find(shopItem => shopItem.shopId === shopId);
 
                     if (!detail) {
-                        const coupon =  shopCoupon[shopId];
-                        detail = { 
-                            shopId, 
+                        const coupon = shopCoupon[shopId];
+                        detail = {
+                            shopId,
                             items: [],
-                            // coupon: coupon?.isUsable ? coupon?.code : null, 
+                            coupon: coupon?.isUsable ? coupon?.code : null,
                         };
                         result.cart.push(detail);
                     }
@@ -316,16 +318,14 @@ const Checkout = () => {
                     }
                 })
 
-                //Replace recommend coupon
-                setCouponDiscount((prev) => ({
+                //Replace recommended coupons
+                const discountValue = detail?.couponDiscount + detail?.shippingDiscount;
+                setShopDiscount((prev) => ({
                     ...prev,
-                    [detail?.shopId]: detail?.couponDiscount > 0 ? detail?.couponDiscount : detail?.shippingDiscount
+                    [detail?.shopId]: discountValue
                 }));
-                if (detail?.coupon != null
-                    && shopCoupon[detail?.shopId] != null
-                    && !isEqual(detail.coupon, shopCoupon[detail?.shopId]
-                    )) {
-                    setShopCoupon((prev) => ({ ...prev, [detail?.shopId]: detail.coupon }));
+                if (detail?.coupon != null && shopCoupon[detail?.shopId] !== null) {
+                    setShopCoupon((prev) => ({ ...prev, [detail?.shopId]: { ...detail.coupon, isUsable: discountValue > 0 } }));
                 }
             } else { //Remove all items of the invalid Shop
                 removeShopProduct(detail.shopId);
@@ -333,7 +333,11 @@ const Checkout = () => {
         })
 
         //Replace recommend coupon
-        if (cart?.coupon != null && coupon != null && !isEqual(cart?.coupon, coupon)) setCoupon(cart.coupon);
+        const discountValue = cart?.couponDiscount + cart?.shippingDiscount;
+        setDiscount(discountValue);
+        if (cart?.coupon != null && coupon !== null) {
+            setCoupon({ ...cart.coupon, isUsable: discountValue > 0 });
+        }
     }
 
     //Separate by shop
@@ -423,9 +427,8 @@ const Checkout = () => {
             .then((data) => {
                 enqueueSnackbar('Đặt hàng thành công!', { variant: 'success' });
                 clearCart();
-                navigate('/cart');
+                navigate('/cart', { replace: true });
                 setChallenge(false);
-                showBadge();
                 setPending(false);
             })
             .catch((err) => {
@@ -439,7 +442,6 @@ const Checkout = () => {
                     setErrMsg('Lỗi xác thực!');
                 } else if (err?.status === 412) {
                     setChallenge(true);
-                    hideBadge();
                     setErrMsg('Yêu cầu của bạn cần xác thực lại!');
                 } else if (err?.status === 400) {
                     setErrMsg('Sai định dạng thông tin!');
@@ -518,8 +520,8 @@ const Checkout = () => {
 
                                                         return (<PreviewDetailRow key={`preview-${shop?.shopId}-${index}`}
                                                             {...{
-                                                                shop, coupon: shopCoupon[shopId], discount: couponDiscount[shopId], 
-                                                                handleOpenDialog: handleOpenCouponDialog
+                                                                shop: { ...shop, id: shopId }, coupon: shopCoupon[shopId],
+                                                                discount: shopDiscount[shopId], handleOpenDialog: handleOpenCouponDialog
                                                             }}
                                                         />)
                                                     })}
@@ -586,7 +588,7 @@ const Checkout = () => {
                                 <SemiTitle className="end">Tổng quan</SemiTitle>
                             </Box>
                             <FinalCheckoutDialog {...{
-                                coupon, shopCoupon, calculating, displayInfo, isValid: validAddressInfo,
+                                coupon, shopCoupon, discount, calculating, displayInfo, isValid: validAddressInfo,
                                 activeStep, maxSteps, handleOpenDialog: handleOpenCouponDialog, addressInfo,
                                 backFirstStep, handleNext, handleSubmit, reCaptchaLoaded
                             }} />

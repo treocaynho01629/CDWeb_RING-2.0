@@ -93,7 +93,7 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
                 }
             },
             merge: (currentCache, newItems) => {
-                currentCache.info = newItems.info;
+                currentCache.page = newItems.page;
                 couponsAdapter.upsertMany(
                     currentCache, couponsSelector.selectAll(newItems)
                 )

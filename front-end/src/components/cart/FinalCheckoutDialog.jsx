@@ -86,7 +86,7 @@ const AddressDivider = styled.div`
 `
 //#endregion
 
-const FinalCheckoutDialog = ({ coupon, displayInfo, calculating, addressInfo,
+const FinalCheckoutDialog = ({ coupon, discount, displayInfo, calculating, addressInfo,
     isValid, handleNext, activeStep, maxSteps, backFirstStep, handleOpenDialog, handleSubmit, reCaptchaLoaded }) => {
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('sm'));
@@ -99,7 +99,7 @@ const FinalCheckoutDialog = ({ coupon, displayInfo, calculating, addressInfo,
 
     //Component stuff
     let checkoutDetail = <>
-        <PriceDisplay displayInfo={displayInfo} loggedIn={true}/>
+        <PriceDisplay displayInfo={displayInfo} loggedIn={true} />
         <CheckoutRow>
             <PriceContainer>
                 <CheckoutPrice>
@@ -126,10 +126,11 @@ const FinalCheckoutDialog = ({ coupon, displayInfo, calculating, addressInfo,
                 {mobileMode
                     ? <>
                         <CheckoutStack>
-                            <CouponButton onClick={() => handleOpenDialog()}>
+                            <CouponButton onClick={handleOpenDialog}>
                                 <span>
                                     <LocalActivityOutlined color="error" />&nbsp;
-                                    Chọn mã giảm giá {coupon && 'khác'}
+                                    {(coupon && discount) ? `Đã giảm ${currencyFormat.format(discount)}`
+                                        : `Chọn mã giảm giá ${(coupon != null) ? 'khác' : ''}`}
                                 </span>
                                 <MiniCouponContainer>
                                     {coupon && <CouponDisplay coupon={coupon} />}
@@ -140,7 +141,17 @@ const FinalCheckoutDialog = ({ coupon, displayInfo, calculating, addressInfo,
                         <CheckoutStack>
                             <AltCheckoutBox onClick={() => toggleDrawer(true)}>
                                 <PriceContainer>
-                                    <CheckoutPrice><b>Tổng: ({activeStep + 1}/{maxSteps})</b>{currencyFormat.format(displayInfo.total)}</CheckoutPrice>
+                                    <CheckoutPrice
+                                    ><b>Tổng: ({activeStep + 1}/{maxSteps})</b>
+                                        <NumberFlow
+                                            value={displayInfo.total}
+                                            format={{ style: 'currency', currency: 'VND' }}
+                                            locales={'vi-VN'}
+                                            aria-hidden="true"
+                                            respectMotionPreference={false}
+                                            willChange
+                                        />
+                                    </CheckoutPrice>
                                     {(!calculating && displayInfo.totalDiscount > 0) &&
                                         <SavePrice>Tiết kiệm {currencyFormat.format(displayInfo.totalDiscount)}</SavePrice>}
                                 </PriceContainer>
@@ -175,10 +186,11 @@ const FinalCheckoutDialog = ({ coupon, displayInfo, calculating, addressInfo,
                         ? <>
                             <CheckoutBox className="sticky">
                                 <CheckoutStack>
-                                    <CouponButton onClick={() => handleOpenDialog()}>
+                                    <CouponButton onClick={handleOpenDialog}>
                                         <span>
                                             <LocalActivityOutlined color="error" />&nbsp;
-                                            Chọn mã giảm giá {coupon && 'khác'}
+                                            {(coupon && discount) ? `Đã giảm ${currencyFormat.format(discount)}`
+                                                : `Chọn mã giảm giá ${(coupon != null) ? 'khác' : ''}`}
                                         </span>
                                         <MiniCouponContainer>
                                             <Suspense fallback={null}>
@@ -195,7 +207,14 @@ const FinalCheckoutDialog = ({ coupon, displayInfo, calculating, addressInfo,
                                         </PriceContainer>
                                         <PriceContainer>
                                             <CheckoutPrice onClick={() => toggleDrawer(true)}>
-                                                {currencyFormat.format(displayInfo.total)}
+                                                <NumberFlow
+                                                    value={displayInfo.total}
+                                                    format={{ style: 'currency', currency: 'VND' }}
+                                                    locales={'vi-VN'}
+                                                    aria-hidden="true"
+                                                    respectMotionPreference={false}
+                                                    willChange
+                                                />
                                             </CheckoutPrice>&emsp;
                                             {(!calculating && displayInfo.totalDiscount > 0) &&
                                                 <SavePrice>Tiết kiệm {currencyFormat.format(displayInfo.totalDiscount)}</SavePrice>}
@@ -258,10 +277,11 @@ const FinalCheckoutDialog = ({ coupon, displayInfo, calculating, addressInfo,
                                     <CheckoutRow>
                                         {coupon && <CouponDisplay coupon={coupon} />}
                                     </CheckoutRow>
-                                    <CouponButton onClick={() => handleOpenDialog()}>
+                                    <CouponButton onClick={handleOpenDialog}>
                                         <span>
                                             <LocalActivityOutlined color="error" />&nbsp;
-                                            Chọn mã giảm giá {coupon && 'khác'}
+                                            {(coupon && discount) ? `Đã giảm ${currencyFormat.format(discount)}`
+                                                : `Chọn mã giảm giá ${(coupon != null) ? 'khác' : ''}`}
                                         </span>
                                         <KeyboardArrowRight fontSize="small" />
                                     </CouponButton>
