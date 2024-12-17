@@ -13,7 +13,7 @@ import useLogout from '../../hooks/useLogout';
 
 const ReCaptcha = lazy(() => import('./ReCaptcha'));
 
-const LoginTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge }) => {
+const LoginTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken }) => {
     const dispatch = useDispatch();
     const { persist, username: loginedUser } = useAuth();
     const [authenticate, { isLoading, isSuccess, isUninitialized }] = useAuthenticateMutation();
@@ -70,7 +70,6 @@ const LoginTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken
                 setUsername('');
                 setPassword('');
                 setErrMsg('');
-                showBadge();
                 setChallenge(false);
                 setPending(false);
             })
@@ -86,7 +85,6 @@ const LoginTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken
                     setErrMsg('Lỗi xác thực!');
                 } else if (err?.status === 412) {
                     setChallenge(true);
-                    hideBadge();
                     setErrMsg('Yêu cầu của bạn cần xác thực lại!');
                 } else if (err?.status === 429) {
                     setErrMsg('Bạn đã thử quá nhiều lần, vui lòng thử lại sau!');

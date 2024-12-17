@@ -97,7 +97,7 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
                 }
             },
             merge: (currentCache, newItems) => {
-                currentCache.info = newItems.info;
+                currentCache.page = newItems.page;
                 catesAdapter.addMany(
                     currentCache, catesSelector.selectAll(newItems)
                 )

@@ -2,6 +2,7 @@ package com.ring.bookstore.service;
 
 import java.util.List;
 
+import com.ring.bookstore.model.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -37,9 +38,9 @@ public interface ReviewService {
     ReviewDTO getReviewByBook(Long id,
                               Account user);
 
-    ReviewDTO review(Long id,
-                     ReviewRequest request,
-                     Account user);
+    Review review(Long id,
+                  ReviewRequest request,
+                  Account user);
 
     ReviewDTO updateReview(Long id,
                            ReviewRequest request,

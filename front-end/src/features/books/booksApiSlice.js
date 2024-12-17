@@ -89,7 +89,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 }
             },
             merge: (currentCache, newItems) => {
-                currentCache.info = newItems.info;
+                currentCache.page = newItems.page;
                 booksAdapter.upsertMany(
                     currentCache, booksSelector.selectAll(newItems)
                 )

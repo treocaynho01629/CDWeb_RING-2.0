@@ -110,7 +110,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                 }
             },
             merge: (currentCache, newItems) => {
-                currentCache.info = newItems.info;
+                currentCache.page = newItems.page;
                 ordersAdapter.upsertMany(
                     currentCache, ordersSelector.selectAll(newItems)
                 )

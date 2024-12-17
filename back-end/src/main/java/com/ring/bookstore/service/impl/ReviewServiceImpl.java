@@ -37,18 +37,19 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ReviewMapper reviewMapper;
 	
 	//Review
-	public ReviewDTO review(Long id, ReviewRequest request, Account user) {
+	@Transactional
+	public Review review(Long id, ReviewRequest request, Account user) {
 		//Book validation
 		Book book = bookRepo.findById(id).orElseThrow(()
 				-> new ResourceNotFoundException("Book not found"));
 		//Check if user had bought it yet
-		if (!orderRepo.existsByUserBuyBook(id, user.getUsername())) throw new HttpResponseException(
+		if (!orderRepo.hasUserBuyBook(id, user.getUsername())) throw new HttpResponseException(
 				HttpStatus.FORBIDDEN,
 				"User have not bought the product!",
 				"Hãy mua sản phẩm để có thể đánh giá!"
 		);
 		//Check if user had reviewed it yet
-		if (reviewRepo.findByBook_IdAndUser_Id(id, user.getId()).isPresent()) throw new HttpResponseException(
+		if (reviewRepo.findUserReviewOfBook(id, user.getId()).isPresent()) throw new HttpResponseException(
 				HttpStatus.CONFLICT,
 				"User have already reviewed this product!",
 				"Bạn đã đánh giá sản phẩm rồi!"
@@ -63,7 +64,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
         
         Review addedReview = reviewRepo.save(review); //Save to database
-		return reviewMapper.reviewToDTO(addedReview); //Return added review
+		return addedReview;
 	}
 	
 	//Get reviews (ADMIN)
@@ -95,15 +96,15 @@ public class ReviewServiceImpl implements ReviewService {
 
 	//Get review by book
 	public ReviewDTO getReviewByBook(Long id, Account user) {
-		if (!orderRepo.existsByUserBuyBook(id, user.getUsername()))
+		if (!orderRepo.hasUserBuyBook(id, user.getUsername()))
 			throw new HttpResponseException(
 					HttpStatus.FORBIDDEN,
 					"User have not bought the product!",
 					"Hãy mua sản phẩm để có thể đánh giá!"
 			);
-		Review review = reviewRepo.findByBook_IdAndUser_Id(id, user.getId()).orElseThrow(()
+		IReview projection = reviewRepo.findUserReviewOfBook(id, user.getId()).orElseThrow(()
 				-> new ResourceNotFoundException("Review not found", "Người dùng chưa đánh giá sản phẩm này!"));
-		return reviewMapper.reviewToDTO(review);
+		return reviewMapper.projectionToDTO(projection);
 	}
 
 	//Update review

@@ -129,7 +129,7 @@ function AuthPage() {
     const [pending, setPending] = useState(false);
 
     //Recaptcha
-    const { reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge } = useReCaptchaV3();
+    const { reCaptchaLoaded, generateReCaptchaToken } = useReCaptchaV3();
 
     //Set title
     useTitle('RING! - Chào mừng');
@@ -148,13 +148,13 @@ function AuthPage() {
                         {tab == 'login' ?
                             <Grow key={'login'} in={tab == 'login'}>
                                 <ContentContainer>
-                                    <LoginTab {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge }} />
+                                    <LoginTab {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken }} />
                                 </ContentContainer>
                             </Grow>
                             : tab == 'register' ?
                                 <Grow key={'register'} in={tab == 'register'}>
                                     <ContentContainer>
-                                        <RegisterTab {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge }} />
+                                        <RegisterTab {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken  }} />
                                     </ContentContainer>
                                 </Grow>
                                 : null}

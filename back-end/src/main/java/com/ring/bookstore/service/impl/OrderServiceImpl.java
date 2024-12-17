@@ -1,6 +1,7 @@
 package com.ring.bookstore.service.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -209,6 +210,10 @@ public class OrderServiceImpl implements OrderService {
                 //Add discount deal & discount coupon
                 discountValue += (discountDeal + discountCoupon);
 
+                //Free
+                if (discountValue >= detailTotal) discountValue = detailTotal;
+                if (discountShipping >= shippingFee) discountShipping = shippingFee;
+
                 //Add to receipt total
                 totalPrice += detailTotal;
                 totalQuantity += detailQuantity;
@@ -242,12 +247,14 @@ public class OrderServiceImpl implements OrderService {
         if (coupon != null && coupon.getShop() == null && !couponService.isExpired(coupon)) {
             double discountValue = 0.0;
             double shippingDiscount = 0.0;
+            double value = totalPrice - totalDealDiscount - totalCouponDiscount;
+            double shipping = totalShippingFee - totalShippingDiscount;
 
-            //Apply coupon (must use price with deal discount)
+            //Apply coupon (must use price with all discount)
             CouponDiscountDTO discountAll = couponService.applyCoupon(coupon,
                     new CartStateRequest(
-                            totalPrice - totalDealDiscount,
-                            totalShippingFee,
+                            value,
+                            shipping,
                             totalQuantity)
             );
 
@@ -255,18 +262,20 @@ public class OrderServiceImpl implements OrderService {
                 coupon.setIsUsable(true);
                 discountValue = discountAll.discountValue();
                 shippingDiscount = discountAll.discountShipping();
-            }
 
-            //Split discount for each detail
-            int totalDetail = orderReceipt.getDetails().size();
-            double applyDiscount = discountValue / totalDetail;
-            double applyShippingDiscount = shippingDiscount / totalDetail;
+                //Split discount for each detail
+                double discountRatio = discountValue / value;
+                double shippingDiscountRatio = shippingDiscount / shipping;
 
-            for (OrderDetail detail : orderReceipt.getDetails()) {
-                detail.setDiscount((detail.getDiscount() == null ? 0
-                        : detail.getDiscount()) + applyDiscount);
-                detail.setShippingDiscount((detail.getShippingDiscount() == null ? 0
-                        : detail.getShippingDiscount()) + applyShippingDiscount);
+                for (OrderDetail detail : orderReceipt.getDetails()) {
+                    double pDiscount = detail.getDiscount() != null ? detail.getDiscount() : 0;
+                    double sDiscount = detail.getShippingDiscount() != null ? detail.getShippingDiscount() : 0;
+                    double applyDiscount = (detail.getTotalPrice() - pDiscount) * discountRatio;
+                    double applyShippingDiscount = (detail.getShippingFee() - sDiscount) * shippingDiscountRatio;
+
+                    detail.setDiscount(pDiscount + applyDiscount);
+                    detail.setShippingDiscount(sDiscount + applyShippingDiscount);
+                }
             }
 
             //Add to total
@@ -478,6 +487,10 @@ public class OrderServiceImpl implements OrderService {
                 //Add discount deal & discount coupon
                 discountValue += (discountDeal + discountCoupon);
 
+                //Free
+                if (discountValue >= detailTotal) discountValue = detailTotal;
+                if (discountShipping >= shippingFee) discountShipping = shippingFee;
+
                 //Add to receipt total
                 totalPrice += detailTotal;
                 totalQuantity += detailQuantity;
@@ -506,12 +519,14 @@ public class OrderServiceImpl implements OrderService {
         if (coupon != null && coupon.getShop() == null && !couponService.isExpired(coupon)) {
             double discountValue = 0.0;
             double shippingDiscount = 0.0;
+            double value = totalPrice - totalDealDiscount - totalCouponDiscount;
+            double shipping = totalShippingFee - totalShippingDiscount;
 
-            //Apply coupon (must use price - deal discount)
+            //Apply coupon (must use price with all discount)
             CouponDiscountDTO discountAll = couponService.applyCoupon(coupon,
                     new CartStateRequest(
-                            totalPrice - totalDealDiscount,
-                            totalShippingFee,
+                            value,
+                            shipping,
                             totalQuantity
                     )
             );
@@ -520,24 +535,26 @@ public class OrderServiceImpl implements OrderService {
                 couponRepo.decreaseUsage(coupon.getId());
                 discountValue = discountAll.discountValue();
                 shippingDiscount = discountAll.discountShipping();
+
+                //Split discount for each detail
+                double discountRatio = discountValue / value;
+                double shippingDiscountRatio = shippingDiscount / shipping;
+
+                for (OrderDetail detail : orderReceipt.getDetails()) {
+                    double pDiscount = detail.getDiscount() != null ? detail.getDiscount() : 0;
+                    double sDiscount = detail.getShippingDiscount() != null ? detail.getShippingDiscount() : 0;
+                    double applyDiscount = (detail.getTotalPrice() - pDiscount) * discountRatio;
+                    double applyShippingDiscount = (detail.getShippingFee() - sDiscount) * shippingDiscountRatio;
+
+                    detail.setDiscount(pDiscount + applyDiscount);
+                    detail.setShippingDiscount(sDiscount + applyShippingDiscount);
+                }
             } else {
                 throw new HttpResponseException(
                         HttpStatus.CONFLICT,
                         "Coupon expired!",
                         "Không thể sử dụng mã coupon " + checkRequest.getCoupon() + "!"
                 );
-            }
-
-            //Split discount for each detail
-            int totalDetail = orderReceipt.getDetails().size();
-            double applyDiscount = discountValue / totalDetail;
-            double applyShippingDiscount = shippingDiscount / totalDetail;
-
-            for (OrderDetail detail : orderReceipt.getDetails()) {
-                detail.setDiscount((detail.getDiscount() == null ? 0
-                        : detail.getDiscount()) + applyDiscount);
-                detail.setShippingDiscount((detail.getShippingDiscount() == null ? 0
-                        : detail.getShippingDiscount()) + applyShippingDiscount);
             }
 
             //Add to total

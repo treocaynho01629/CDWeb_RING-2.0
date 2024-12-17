@@ -56,7 +56,7 @@ const ButtonContainer = styled.div`
 `
 //#endregion
 
-const ForgotTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge }) => {
+const ForgotTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken }) => {
     //Initial value
     const [email, setEmail] = useState('');
     const [validEmail, setValidEmail] = useState(false);
@@ -107,7 +107,6 @@ const ForgotTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToke
                 setErrMsg('');
                 setSended(true);
                 setChallenge(false);
-                showBadge();
 
                 //Queue snack
                 enqueueSnackbar('Đã gửi yêu cầu về email!', { variant: 'success' });
@@ -128,7 +127,6 @@ const ForgotTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToke
                     setErrMsg('Lỗi xác thực!');
                 } else if (err?.status === 412) {
                     setChallenge(true);
-                    hideBadge();
                     setErrMsg('Yêu cầu của bạn cần xác thực lại!');
                 } else {
                     setErrMsg('Gửi yêu cầu thất bại');

@@ -15,6 +15,7 @@ import PropTypes from 'prop-types';
 import CartDetailRow from './CartDetailRow';
 import useDeepEffect from '../../hooks/useDeepEffect';
 import useAuth from "../../hooks/useAuth";
+import useConfirm from "../../hooks/useConfirm";
 
 const Menu = lazy(() => import('@mui/material/Menu'));
 const CouponDialog = lazy(() => import('../coupon/CouponDialog'));
@@ -63,7 +64,7 @@ const StyledDeleteButton = styled(Button)`
 
 const tempShippingFee = 10000;
 
-function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, handleDeleteMultiple, disabled }) {
+function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, handleDeleteMultiple }) {
     let isIndeterminate = numSelected > 0 && numSelected < rowCount;
     let isSelectedAll = rowCount > 0 && numSelected === rowCount;
 
@@ -116,7 +117,6 @@ function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, handleDele
                         endIcon={<DeleteIcon />}
                         disableRipple
                         onClick={handleDeleteMultiple}
-                        disabled={disabled}
                     >
                         Xoá
                     </StyledDeleteButton>
@@ -131,7 +131,6 @@ EnhancedTableHead.propTypes = {
     onSelectAllClick: PropTypes.func.isRequired,
     handleDeleteMultiple: PropTypes.func.isRequired,
     rowCount: PropTypes.number.isRequired,
-    disabled: PropTypes.bool,
 };
 
 const CartContent = () => {
@@ -141,7 +140,7 @@ const CartContent = () => {
     const [selected, setSelected] = useState([]);
     const [shopIds, setShopIds] = useState([]);
     const [coupon, setCoupon] = useState('');
-    const [shopCoupon, setShopCoupon] = useState('');
+    const [shopCoupon, setShopCoupon] = useState([]);
     const [discount, setDiscount] = useState(0);
     const [shopDiscount, setShopDiscount] = useState([]);
     const [checkState, setCheckState] = useState(null);
@@ -153,6 +152,10 @@ const CartContent = () => {
     const [contextCoupon, setContextCoupon] = useState(null);
     const [openDialog, setOpenDialog] = useState(undefined);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [ConfirmationDialog, confirm] = useConfirm(
+        'Xoá khỏi giỏ?',
+        'Xoá sản phẩm đã chọn khỏi giỏ?',
+    )
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
 
@@ -324,10 +327,7 @@ const CartContent = () => {
                     ...prev,
                     [detail?.shopId]: discountValue
                 }));
-                if (detail?.coupon != null
-                    && shopCoupon[detail?.shopId] != null
-                    && !isEqual(detail.coupon, shopCoupon[detail?.shopId])
-                ) {
+                if (detail?.coupon != null && shopCoupon[detail?.shopId] !== null) {
                     setShopCoupon((prev) => ({ ...prev, [detail?.shopId]: { ...detail.coupon, isUsable: discountValue > 0 } }));
                 }
             } else { //Remove all items of the invalid Shop
@@ -339,7 +339,7 @@ const CartContent = () => {
         //Replace recommend coupon
         const discountValue = cart?.couponDiscount + cart?.shippingDiscount;
         setDiscount(discountValue);
-        if (cart?.coupon != null && coupon != null && !isEqual(cart?.coupon, coupon)) {
+        if (cart?.coupon != null && coupon !== null) {
             setCoupon({ ...cart.coupon, isUsable: discountValue > 0 });
         }
     }
@@ -499,14 +499,19 @@ const CartContent = () => {
         changeAmount({ quantity, id })
     };
 
-    const handleDeleteMultiple = () => {
-        if (selected.length == cartProducts.length) {
-            clearCart();
+    const handleDeleteMultiple = async () => {
+        const confirmation = await confirm();
+        if (confirmation) {
+            if (selected.length == cartProducts.length) {
+                clearCart();
+            } else {
+                selected.forEach((id) => { removeProduct(id) });
+            }
+            handleCalculate.cancel();
+            handleClearSelect();
         } else {
-            selected.forEach((id) => { removeProduct(id) });
+            console.log('Cancel');
         }
-        handleCalculate.cancel();
-        handleClearSelect();
     };
 
     const handleFindSimilar = async () => {
@@ -539,7 +544,6 @@ const CartContent = () => {
                         onSelectAllClick={handleSelectAllClick}
                         handleDeleteMultiple={handleDeleteMultiple}
                         rowCount={cartProducts?.length}
-                        disabled={calculating}
                     />
                     <TableBody>
                         {Object.keys(reducedCart).map((shopId, index) => {
@@ -607,6 +611,7 @@ const CartContent = () => {
                     </Menu>
                 }
             </Suspense>
+            <ConfirmationDialog />
         </Grid>
     )
 }

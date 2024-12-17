@@ -77,7 +77,7 @@ export const publishersApiSlice = apiSlice.injectEndpoints({
                 }
             },
             merge: (currentCache, newItems) => {
-                currentCache.info = newItems.info;
+                currentCache.page = newItems.page;
                 pubsAdapter.addMany(
                     currentCache, pubsSelector.selectAll(newItems)
                 )

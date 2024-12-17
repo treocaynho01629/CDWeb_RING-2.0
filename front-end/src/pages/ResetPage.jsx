@@ -44,7 +44,7 @@ function ResetPage() {
     const [pending, setPending] = useState(false);
 
     //Recaptcha
-    const { reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge } = useReCaptchaV3();
+    const { reCaptchaLoaded, generateReCaptchaToken} = useReCaptchaV3();
 
     return (
         <Wrapper>
@@ -57,8 +57,8 @@ function ResetPage() {
             <Container>
                 <Suspense fallback={null}>
                     <ContentContainer>
-                        {token ? <ResetTab {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge }} />
-                            : <ForgotTab resetToken={token} {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge }} />}
+                        {token ? <ResetTab {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken }} />
+                            : <ForgotTab resetToken={token} {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken }} />}
                     </ContentContainer>
                 </Suspense>
             </Container>

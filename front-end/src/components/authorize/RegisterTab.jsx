@@ -10,7 +10,7 @@ import PasswordEvaluate from '../custom/PasswordEvaluate';
 
 const ReCaptcha = lazy(() => import('./ReCaptcha'));
 
-const RegisterTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge }) => {
+const RegisterTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken }) => {
     const userRef = useRef();
     const errRef = useRef();
 
@@ -105,7 +105,6 @@ const RegisterTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaTo
                 setErr([]);
                 setErrMsg('');
                 setChallenge(false);
-                showBadge();
 
                 //Queue snack
                 enqueueSnackbar('Đăng ký thành công!', { variant: 'success' });
@@ -124,7 +123,6 @@ const RegisterTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaTo
                     setErrMsg('Lỗi xác thực!');
                 } else if (err?.status === 412) {
                     setChallenge(true);
-                    hideBadge();
                     setErrMsg('Yêu cầu của bạn cần xác thực lại!');
                 } else {
                     setErrMsg('Đăng ký thất bại!');

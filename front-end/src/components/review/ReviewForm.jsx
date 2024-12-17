@@ -123,7 +123,7 @@ const ReviewForm = ({ username, bookId, review, open, handleClose, mobileMode, h
                     } else if (err?.status === 400) {
                         setErrMsg(err.data.errors.content);
                     } else if (err?.status === 409) {
-                        setErrMsg(err.data.errors.errorMessage);
+                        setErrMsg(err.data.message);
                     } else {
                         setErrMsg("Đánh giá thất bại!");
                     }
