@@ -55,16 +55,8 @@ public class Account extends Auditable implements UserDetails {
     @JsonIgnore
     private String pass;
 
-    @Column(nullable = false, length = 1000)
+    @Column(unique = true, nullable = false, length = 100)
     private String email;
-
-    @Column(unique = true)
-    @JsonIgnore
-    private String resetPassToken;
-    
-    @Column
-    @JsonIgnore
-	private LocalDateTime tokenCreationDate;
 
     @OneToOne(cascade = CascadeType.ALL,
 			fetch = FetchType.LAZY,
@@ -139,6 +131,17 @@ public class Account extends Auditable implements UserDetails {
 	@JsonIgnore
 	public boolean isEnabled() {
 		return this.isActive();
+	}
+
+	public void setProfile(AccountProfile profile) {
+		if (profile == null) {
+			if (this.profile != null) {
+				this.profile.setUser(null);
+			}
+		} else {
+			profile.setUser(this);
+		}
+		this.profile = profile;
 	}
 
 	public void removeAllOrders() {

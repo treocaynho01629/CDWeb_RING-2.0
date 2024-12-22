@@ -51,10 +51,10 @@ const ResetTab = ({ resetToken, pending, setPending, reCaptchaLoaded, generateRe
         reset({
             token: recaptchaToken,
             source: challenge ? 'v2' : 'v3',
-            user: {
-                token: resetToken,
-                newPass: password,
-                newPassRe: matchPass
+            resetToken,
+            newPass: {
+                password: password,
+                reInputPassword: matchPass
             }
         }).unwrap()
             .then((data) => {

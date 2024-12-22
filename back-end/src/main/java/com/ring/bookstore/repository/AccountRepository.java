@@ -22,9 +22,7 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	""")
 	Optional<Account> findByUsername(String username); //Get Account by {username}
 
-	List<Account> findByEmail(String email); //Get Account by {email}
-
-	Optional<Account> findByResetPassToken(String resetPassToken); //Get Account by {resetPassToken}
+	Optional<Account> findByEmail(String email); //Get Account by {email}
 	
 	@Query("""
 		select a from Account a left join fetch AccountProfile p on a.id = p.user.id

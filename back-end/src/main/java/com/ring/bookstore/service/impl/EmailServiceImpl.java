@@ -1,6 +1,9 @@
 package com.ring.bookstore.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,19 +15,25 @@ import com.ring.bookstore.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
-	
-    private final JavaMailSender emailSender;
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
 
     @Value("${spring.mail.sender}")
     private String sender;
 
+    @Value("${ring.client-url}")
+    private String clientUrl;
+
     //Normal email
-    public boolean sendSimpleMessage(String to, String subject, String text) {
-    	
+    public void sendSimpleMail(String to, String subject, String text) {
         try {
         	//Create
             SimpleMailMessage message = new SimpleMailMessage();
@@ -33,32 +42,37 @@ public class EmailServiceImpl implements EmailService {
             message.setSubject(subject);
             message.setText(text);
 
-            emailSender.send(message); //Send
-            return true;
+            mailSender.send(message); //Send
         } catch (MailException e) {
-            e.printStackTrace();
-            return false;
+            log.error(e.getMessage());
         }
     }
 
     //Mail with HTML
-    public boolean sendHtmlMessage(String to, String subject, String htmlBody) {
-    	
+    public void sendTemplateMail(String to, String subject, String template, Context context) {
+        context.setVariable("logo", "logo");
+        context.setVariable("clientUrl", clientUrl);
+
         try {
         	//Create
-            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            
+
+            //Get template
+            String htmlContent = templateEngine.process(template, context);
+
+            //Add logo
+            helper.addInline("logo", new ClassPathResource("static/logo.png"), "image/png");
+
+            //Set properties
             helper.setFrom(sender);
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setText(htmlBody, true);
+            helper.setText(htmlContent, true);
             
-            emailSender.send(message); //Send
-            return true;
+            mailSender.send(message); //Send
         } catch (MessagingException e) {
-        	e.printStackTrace();
-            return false;
+            log.error(e.getMessage());
         }
     }
 }

@@ -165,8 +165,8 @@ const AddressComponent = ({ pending, setPending }) => {
         enqueueSnackbar('Thêm địa chỉ thành công!', { variant: 'success' });
       } else { //Saved address
         createAddress({
-          name: address.name,
-          companyName: address.companyName,
+          name: address.name == "" ? null : address.name,
+          companyName: address.companyName == "" ? null : address.companyName,
           phone: address.phone,
           city: address.city,
           address: address.address,
@@ -228,8 +228,8 @@ const AddressComponent = ({ pending, setPending }) => {
       } else { //Saved address
         updateAddress({
           id: address.id, updatedAddress: {
-            name: address.name,
-            companyName: address.companyName,
+            name: address.name == "" ? null : address.name,
+            companyName: address.companyName == "" ? null : address.companyName,
             phone: address.phone,
             city: address.city,
             address: address.address,

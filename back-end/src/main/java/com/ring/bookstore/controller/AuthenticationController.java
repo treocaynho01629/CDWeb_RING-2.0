@@ -2,7 +2,6 @@ package com.ring.bookstore.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +27,7 @@ public class AuthenticationController {
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest,
 									  HttpServletRequest request) {
-		Account newUser = authService.register(registerRequest, request);
+		authService.register(registerRequest, request);
 		return ResponseEntity.ok("Đăng ký thành công!");
 	}
 
@@ -70,16 +69,16 @@ public class AuthenticationController {
 	public ResponseEntity<?> forgotPassword(@RequestParam(value="email") String email,
 											HttpServletRequest request){
 		authService.forgotPassword(email, request);
-		return new ResponseEntity< >("Đã gửi email khôi phục mật khẩu", HttpStatus.OK);
+
+		return ResponseEntity.ok("Đã gửi email khôi phục mật khẩug!");
 	}
 	
 	//Reset password
-	@PutMapping("/reset-password")
-	public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPassRequest resetRequest,
-												HttpServletRequest request){
-		Account account = authService.resetPassword(resetRequest, request);
-		String result = "Đổi mật khẩu thất bại";
-		if (account != null) result = "Thay đổi mật khẩu thành công!";
-		return new ResponseEntity< >(result, HttpStatus.OK);
+	@PutMapping("/reset-password/{token}")
+	public ResponseEntity<?> resetPassword(@PathVariable("token") String token,
+										   @Valid @RequestBody ResetPassRequest resetRequest,
+											HttpServletRequest request){
+		authService.resetPassword(token, resetRequest, request);
+		return ResponseEntity.ok("Thay đổi mật khẩu thành công!");
 	}
 }

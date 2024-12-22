@@ -93,6 +93,9 @@ public class Shop extends Auditable {
     }
 
     public void removeFollower(Account user) {
-        this.followers.remove(user);
+        this.followers.stream()
+                .filter(f -> f.getId().equals(user.getId()))
+                .findFirst()
+                .ifPresent(removeUser -> this.followers.remove(removeUser));
     }
 }

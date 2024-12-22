@@ -1,9 +1,11 @@
 HELP.md
+application-dev.properties
 .env
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+TestController.java
 
 ### STS ###
 .apt_generated

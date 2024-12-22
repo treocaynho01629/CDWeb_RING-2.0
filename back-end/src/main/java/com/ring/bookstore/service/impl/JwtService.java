@@ -1,9 +1,11 @@
 package com.ring.bookstore.service.impl;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
 import java.util.function.Function;
 
+import com.google.common.hash.Hashing;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,7 +44,11 @@ public class JwtService {
     }
 
     public String extractCustomUsername(String token, String key) {
-        return extractClaim(token, Claims::getSubject, getSignInKey(key));
+        //Hash the key string
+        String sha256hex = Hashing.sha256()
+                .hashString(key, StandardCharsets.UTF_8)
+                .toString();
+        return extractClaim(token, Claims::getSubject, getSignInKey(sha256hex));
     }
 
     //Extract claims (Second part)
@@ -67,7 +73,13 @@ public class JwtService {
     }
 
     public String generateCustomToken(String username, long expTime, String key) {
-        return buildCustomToken(username, expTime, secretRefreshKey);
+        //Hash the key string
+        String sha256hex = Hashing.sha256()
+                .hashString(key, StandardCharsets.UTF_8)
+                .toString();
+        System.out.println(sha256hex);
+
+        return buildCustomToken(username, expTime, sha256hex);
     }
 
     //Build JWT
@@ -121,9 +133,13 @@ public class JwtService {
     }
 
     public boolean isCustomTokenValid(String token, String username, String key) {
+        //Hash the key string
+        String sha256hex = Hashing.sha256()
+                .hashString(key, StandardCharsets.UTF_8)
+                .toString();
         final String extractedUsername = extractCustomUsername(token, key); //Extract username
         return (extractedUsername.equals(username))
-                && !isTokenExpired(token, key); //Check expiration and valid username
+                && !isTokenExpired(token, sha256hex); //Check expiration and valid username
     }
 
     public boolean validateToken(String token) {

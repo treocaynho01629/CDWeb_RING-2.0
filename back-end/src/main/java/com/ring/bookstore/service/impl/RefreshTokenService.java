@@ -3,45 +3,39 @@ package com.ring.bookstore.service.impl;
 import com.ring.bookstore.exception.TokenRefreshException;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.AccountToken;
-import com.ring.bookstore.repository.RefreshTokenRepository;
+import com.ring.bookstore.repository.AccountTokenRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    private final RefreshTokenRepository refreshRepo;
+    private final AccountTokenRepository accTokenRepo;
 
     private final JwtService jwtService;
-
-    public Optional<AccountToken> findToken(String token, String username) {
-        return refreshRepo.findToken(token, username);
-    }
 
     @Transactional
     public ResponseCookie generateRefreshToken(Account user){
         String token = jwtService.generateRefreshToken(user); //Generate refresh token
-        AccountToken refreshToken = refreshRepo.findTokenByUserName(user.getUsername())
+        AccountToken accToken = accTokenRepo.findAccTokenByUserName(user.getUsername())
                 .orElse(AccountToken.builder().user(user).build());
 
-        refreshToken.setRefreshToken(token);
-        AccountToken savedToken = refreshRepo.save(refreshToken);
+        accToken.setRefreshToken(token);
+        AccountToken savedToken = accTokenRepo.save(accToken);
         return jwtService.generateRefreshCookie(savedToken.getRefreshToken());
     }
 
-    public boolean verifyToken(AccountToken token) {
+    public boolean verifyRefreshToken(AccountToken token) {
         String username = jwtService.extractRefreshUsername(token.getRefreshToken()); //Get username from token
 
         if (username != null) { //Get stored refresh token by username
             if (!jwtService.isRefreshTokenValid(token.getRefreshToken(), username)) { //Invalidate token
                 String oldToken = token.getRefreshToken();
-                token.setRefreshToken(""); //Set empty
-                refreshRepo.save(token);
+                token.setRefreshToken(null); //Set empty
+                accTokenRepo.save(token);
                 throw new TokenRefreshException(oldToken, "Refresh token expired. Please make a new sign in request!");
             }
         }
@@ -51,6 +45,6 @@ public class RefreshTokenService {
 
     @Transactional
     public void clearRefreshToken(String token) {
-        refreshRepo.clearRefreshToken(token);
+        accTokenRepo.clearRefreshToken(token);
     }
 }

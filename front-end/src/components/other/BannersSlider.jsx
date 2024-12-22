@@ -125,6 +125,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
     
     ${props => props.theme.breakpoints.down("md")} {
         width: 90%;
+        background-color: ${props => props.theme.palette.grey[400]};
     }
 `
 

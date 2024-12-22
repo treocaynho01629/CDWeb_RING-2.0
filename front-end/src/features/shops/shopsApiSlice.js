@@ -63,7 +63,7 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
                 url: `/api/shops/follow/${id}`,
                 method: 'PUT',
                 credentials: 'include',
-                responseHandler: (response) => response.text(),
+                responseHandler: "text",
             }),
             async onQueryStarted(id, { dispatch, queryFulfilled }) {
                 const patchResult = dispatch( //Update cache
@@ -85,7 +85,7 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
                 url: `/api/shops/unfollow/${id}`,
                 method: 'PUT',
                 credentials: 'include',
-                responseHandler: (response) => response.text(),
+                responseHandler: "text",
             }),
             async onQueryStarted(id, { dispatch, queryFulfilled }) {
                 const patchResult = dispatch( //Update cache

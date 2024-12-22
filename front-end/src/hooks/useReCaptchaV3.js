@@ -12,7 +12,7 @@ const useReCaptchaV3 = () => {
         const initiateScript = () => {
             if (typeof window === 'undefined' || reCaptchaLoaded) return;
             if (window.grecaptcha) {
-                hideBadge();
+                showBadge();
                 setReCaptchaLoaded(true);
                 return;
             }
@@ -22,7 +22,7 @@ const useReCaptchaV3 = () => {
             script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}&badge=bottomleft&hl=vi`
             script.addEventListener('load', () => {
                 setReCaptchaLoaded(true);
-                hideBadge();
+                showBadge();
             })
             document.body.appendChild(script);
         }
