@@ -18,7 +18,6 @@
 
 	<properties>
 		<java.version>17</java.version>
-<!--		<blaze-persistence.version>1.6.14</blaze-persistence.version>-->
 	</properties>
 
 	<dependencies>
@@ -39,42 +38,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.blazebit</groupId>-->
-<!--			<artifactId>blaze-persistence-core-api-jakarta</artifactId>-->
-<!--			<version>${blaze-persistence.version}</version>-->
-<!--			<scope>compile</scope>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>com.blazebit</groupId>-->
-<!--			<artifactId>blaze-persistence-core-impl-jakarta</artifactId>-->
-<!--			<version>${blaze-persistence.version}</version>-->
-<!--			<scope>runtime</scope>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>com.blazebit</groupId>-->
-<!--			<artifactId>blaze-persistence-integration-hibernate-6.2</artifactId>-->
-<!--			<version>${blaze-persistence.version}</version>-->
-<!--			<scope>runtime</scope>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>com.blazebit</groupId>-->
-<!--			<artifactId>blaze-persistence-entity-view-api-jakarta</artifactId>-->
-<!--			<version>${blaze-persistence.version}</version>-->
-<!--			<scope>compile</scope>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>com.blazebit</groupId>-->
-<!--			<artifactId>blaze-persistence-entity-view-impl-jakarta</artifactId>-->
-<!--			<version>${blaze-persistence.version}</version>-->
-<!--			<scope>runtime</scope>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>com.blazebit</groupId>-->
-<!--			<artifactId>blaze-persistence-entity-view-processor-jakarta</artifactId>-->
-<!--			<version>${blaze-persistence.version}</version>-->
-<!--			<scope>provided</scope>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>

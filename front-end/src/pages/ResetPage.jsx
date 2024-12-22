@@ -57,8 +57,8 @@ function ResetPage() {
             <Container>
                 <Suspense fallback={null}>
                     <ContentContainer>
-                        {token ? <ResetTab {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken }} />
-                            : <ForgotTab resetToken={token} {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken }} />}
+                        {token ? <ResetTab resetToken={token}  {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken }} />
+                            : <ForgotTab {...{ pending, setPending, reCaptchaLoaded, generateReCaptchaToken }} />}
                     </ContentContainer>
                 </Suspense>
             </Container>

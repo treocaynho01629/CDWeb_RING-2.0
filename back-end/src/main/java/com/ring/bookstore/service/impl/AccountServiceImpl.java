@@ -37,7 +37,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -277,7 +276,7 @@ public class AccountServiceImpl implements AccountService {
                 + "<p>- Chúc bạn có trả nghiệm vui vẻ khi mua sách tại RING! - BOOKSTORE</p>\n"
                 + "<br><p>Không phải bạn thực hiện thay đổi trên? Liên hệ và yêu cầu xử lý tại: <b>ringbookstore@ring.email</b></p>\n"
                 + "<br><br><h3>Cảm ơn đã sử dụng dịch vụ!</h3>\n";
-        emailService.sendHtmlMessage(user.getEmail(), subject, content);
+//        emailService.sendTemplateMail(user.getEmail(), subject, content);
 
         return savedAccount; //Return updated account
     }

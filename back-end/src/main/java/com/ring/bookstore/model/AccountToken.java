@@ -13,8 +13,11 @@ public class AccountToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String refreshToken;
+
+    @Column(unique = true)
+    private String resetToken;
 
     @OneToOne(fetch = FetchType.LAZY)  //Un-directional
     @JoinColumn(name = "user_id", referencedColumnName = "id")

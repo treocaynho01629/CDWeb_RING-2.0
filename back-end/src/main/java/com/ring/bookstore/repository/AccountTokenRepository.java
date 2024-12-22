@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface RefreshTokenRepository extends JpaRepository<AccountToken, Long>{
+public interface AccountTokenRepository extends JpaRepository<AccountToken, Long>{
 
     @Query("""
         select t from AccountToken t
@@ -18,20 +18,36 @@ public interface RefreshTokenRepository extends JpaRepository<AccountToken, Long
         where t.refreshToken = :token
         and a.username = :username
     """)
-    Optional<AccountToken> findToken(String token, String username);
+    Optional<AccountToken> findByRefreshToken(String token, String username);
+
+    @Query("""
+        select t from AccountToken t
+        join fetch t.user a
+        join fetch a.roles r
+        where t.resetToken = :token
+    """)
+    Optional<AccountToken> findByResetToken(String token);
 
     @Query("""
         select t from AccountToken t
         join t.user a
         where a.username = :username
     """)
-    Optional<AccountToken> findTokenByUserName(String username);
+    Optional<AccountToken> findAccTokenByUserName(String username);
 
     @Modifying
     @Query("""
         update AccountToken t
-        set t.refreshToken = ''
+        set t.refreshToken = null
         where t.refreshToken = :token
     """)
     void clearRefreshToken(String token);
+
+    @Modifying
+    @Query("""
+        update AccountToken t
+        set t.resetToken = null
+        where t.resetToken = :token
+    """)
+    void clearResetToken(String token);
 }

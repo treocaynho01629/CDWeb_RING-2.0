@@ -33,7 +33,8 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 headers: { response: token, source },
                 body: {
                     ...user,
-                }
+                },
+                responseHandler: "text",
             }),
             invalidatesTags: [
                 { type: 'User', id: "LIST" }
@@ -48,13 +49,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
             }),
         }),
         reset: builder.mutation({
-            query: ({ token, source, user }) => ({
-                url: '/api/auth/reset-password',
+            query: ({ token, source, resetToken, newPass }) => ({
+                url: `/api/auth/reset-password/${resetToken}`,
                 method: 'PUT',
                 headers: { response: token, source },
                 body: {
-                    ...user,
-                }
+                    ...newPass,
+                },
+                responseHandler: "text",
             }),
             invalidatesTags: [
                 { type: 'User', id: "LIST" }

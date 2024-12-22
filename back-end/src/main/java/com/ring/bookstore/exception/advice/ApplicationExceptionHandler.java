@@ -140,6 +140,16 @@ public class ApplicationExceptionHandler{
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ResetPasswordException.class)
+    public ExceptionResponse handleResetPasswordException(ResetPasswordException e) {
+        return new ExceptionResponse(
+                HttpStatus.FORBIDDEN.value() ,
+                "Reset password failed!",
+                e.getMessage()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(ReCaptchaInvalidException.class)
     public ExceptionResponse handleInvalidReCaptchaException(ReCaptchaInvalidException e) {
         return new ExceptionResponse(

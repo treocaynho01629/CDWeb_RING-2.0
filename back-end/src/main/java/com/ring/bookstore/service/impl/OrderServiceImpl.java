@@ -1,7 +1,6 @@
 package com.ring.bookstore.service.impl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -14,12 +13,15 @@ import com.ring.bookstore.dtos.mappers.CalculateMapper;
 import com.ring.bookstore.dtos.mappers.ChartDataMapper;
 import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.enums.ShippingType;
+import com.ring.bookstore.listener.checkout.OnCheckoutCompletedEvent;
+import com.ring.bookstore.listener.registration.OnRegistrationCompleteEvent;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.*;
 import com.ring.bookstore.request.*;
 import com.ring.bookstore.service.CaptchaService;
 import com.ring.bookstore.service.CouponService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -30,7 +32,6 @@ import com.ring.bookstore.dtos.mappers.OrderMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.service.EmailService;
 import com.ring.bookstore.service.OrderService;
 
 import jakarta.transaction.Transactional;
@@ -49,12 +50,13 @@ public class OrderServiceImpl implements OrderService {
     private final AddressRepository addressRepo;
 
     private final CouponService couponService;
-    private final EmailService emailService;
     private final CaptchaService captchaService;
 
     private final OrderMapper orderMapper;
     private final CalculateMapper calculateMapper;
     private final ChartDataMapper chartMapper;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     //Calculate
     public CalculateDTO calculate(CalculateRequest request) {
@@ -314,7 +316,6 @@ public class OrderServiceImpl implements OrderService {
         captchaService.validate(recaptchaToken, source, CaptchaServiceImpl.CHECKOUT_ACTION);
 
         List<CartDetailRequest> cart = checkRequest.getCart();
-        String cartContent = ""; //Email content
 
         //Create address
         AddressRequest addressRequest = checkRequest.getAddress();
@@ -442,16 +443,6 @@ public class OrderServiceImpl implements OrderService {
                                 .build();
 
                         orderDetail.addOrderItem(orderItem);
-
-                        //Add to email content
-                        cartContent +=
-                                "<div style=\"display: flex; padding: 5px 15px; border: 0.5px solid lightgray;\">\r\n"
-                                        + "	   <div style=\"margin-left: 15px;\">\r\n"
-                                        + "      <h3>" + book.getTitle() + "</h3>\r\n"
-                                        + "      <p style=\"font-size: 14px;\">x" + item.getQuantity() + "</p>\r\n"
-                                        + "      <p style=\"font-size: 16px; color: green;\"><b style=\"color: black;\">Thành tiền: </b>" + "FIX" + "đ</p>\r\n"
-                                        + "    </div>\r\n"
-                                        + "</div><br><br>";
                     }
                 }
 
@@ -574,24 +565,17 @@ public class OrderServiceImpl implements OrderService {
         orderReceipt.setTotal(totalPrice + totalShippingFee);
         orderReceipt.setTotalDiscount(totalDiscount);
 
-//        //Create and send email
-//        String subject = "RING! - BOOKSTORE: Đặt hàng thành công! ";
-//        String content = "<h1><b style=\"color: #63e399;\">RING!</b> - BOOKSTORE</h1>\n"
-//                + "<h2 style=\"background-color: #63e399; padding: 10px; color: white;\" >\r\n"
-//                + "Đơn hàng của bạn đã được xác nhận!\r\n"
-//                + "</h2>\n"
-//                + "<h3>Chi tiết đơn hàng:</h3>\n"
-//                + "<p><b>Tên người nhận: </b>" + request.getName() + "</p>\n"
-//                + "<p><b>SĐT người nhận: </b>" + request.getPhone() + "</p>\n"
-//                + "<p><b>Địa chỉ: </b>" + request.getAddress() + "</p>\n"
-//                + "<br><p>Lời nhắn cho shipper: <b>" + request.getMessage() + "</b></p>\n"
-//                + "<br><br><h3>Chi tiết sản phẩm:</h3>\n"
-//                + cartContent
-//                + "<br><br><h3>Tổng đơn giá: <b style=\"color: red\">" + total + "đ</b></h3>";
-//        emailService.sendHtmlMessage(user.getEmail(), subject, content); //Send
-
         OrderReceipt savedOrder = orderRepo.save(orderReceipt);
-        return orderMapper.orderToOrderDTO(savedOrder);
+        ReceiptDTO receiptDTO = orderMapper.orderToOrderDTO(savedOrder);
+
+        //Trigger email event
+        eventPublisher.publishEvent(new OnCheckoutCompletedEvent(
+                user.getUsername(),
+                user.getEmail(),
+                totalPrice,
+                totalShippingFee,
+                receiptDTO));
+        return receiptDTO;
     }
 
     //Get all orders

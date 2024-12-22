@@ -64,7 +64,9 @@ public class ShopServiceImpl implements ShopService {
     public void follow(Long id, Account user) {
         Shop shop = shopRepo.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Shop not found"));
-        shop.addFollower(user);
+        Account currUser = accountRepo.findByUsername(user.getUsername()).orElseThrow(() ->
+                new ResourceNotFoundException("User not found"));
+        shop.addFollower(currUser);
         shopRepo.save(shop);
     }
 

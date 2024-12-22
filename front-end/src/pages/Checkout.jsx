@@ -152,7 +152,7 @@ const Checkout = () => {
     const [token, setToken] = useState('');
 
     //Recaptcha
-    const { reCaptchaLoaded, generateReCaptchaToken } = useReCaptchaV3();
+    const { reCaptchaLoaded, generateReCaptchaToken, hideBadge } = useReCaptchaV3();
 
     //Checkout hook
     const [checkout, { isLoading }] = useCheckoutMutation();
@@ -171,6 +171,8 @@ const Checkout = () => {
     useDeepEffect(() => { handleCartChange(); }, [cartProducts, shopCoupon, coupon, addressInfo, delivery])
 
     useEffect(() => { scrollToTop(); }, [activeStep])
+
+    useEffect(() => { hideBadge() }, [reCaptchaLoaded]) //Hide badge cuz it's in the way of stepper
 
     //Set title
     useTitle('Thanh toán');
@@ -342,7 +344,8 @@ const Checkout = () => {
 
     //Separate by shop
     const reduceCart = () => {
-        let resultCart = cartProducts.reduce((result, item) => {
+        let selectedCart = cartProducts.filter(product => selected.includes(product.id))
+        let resultCart = selectedCart.reduce((result, item) => {
             if (!result[item.shopId]) { //Check if not exists shop >> Add new one
                 result[item.shopId] = { shopName: item.shopName, products: [] };
             }
