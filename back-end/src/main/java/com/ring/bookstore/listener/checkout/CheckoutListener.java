@@ -29,7 +29,7 @@ public class CheckoutListener implements ApplicationListener<OnCheckoutCompleted
         context.setVariable("subject", subject);
         emailService.sendTemplateMail(event.getEmail(),
                 subject,
-                "receiptEmailTemplate",
+                "receipt-email-template",
                 context);
     }
 }

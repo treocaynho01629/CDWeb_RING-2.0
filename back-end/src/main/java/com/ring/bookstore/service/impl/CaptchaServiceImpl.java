@@ -91,7 +91,6 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     protected void verifyV2(RecaptchaResponse response) {
-        System.out.println(response.toString());
         if (!response.isSuccess()) {
             if (response.hasClientError()) {
                 captchaProtectionService.captchaFailed(getClientIP());
