@@ -6,6 +6,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 TestController.java
+TestRestController.java
 
 ### STS ###
 .apt_generated

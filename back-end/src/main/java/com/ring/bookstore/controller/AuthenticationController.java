@@ -70,7 +70,7 @@ public class AuthenticationController {
 											HttpServletRequest request){
 		authService.forgotPassword(email, request);
 
-		return ResponseEntity.ok("Đã gửi email khôi phục mật khẩug!");
+		return ResponseEntity.ok("Đã gửi email khôi phục mật khẩu!");
 	}
 	
 	//Reset password

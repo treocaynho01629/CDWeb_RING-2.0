@@ -43,7 +43,7 @@ public class EmailServiceImpl implements EmailService {
             message.setText(text);
 
             mailSender.send(message); //Send
-        } catch (MailException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }
@@ -71,7 +71,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(htmlContent, true);
             
             mailSender.send(message); //Send
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }
