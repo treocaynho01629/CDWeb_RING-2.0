@@ -77,7 +77,6 @@ public class JwtService {
         String sha256hex = Hashing.sha256()
                 .hashString(key, StandardCharsets.UTF_8)
                 .toString();
-        System.out.println(sha256hex);
 
         return buildCustomToken(username, expTime, sha256hex);
     }

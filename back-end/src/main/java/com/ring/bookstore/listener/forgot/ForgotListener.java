@@ -27,7 +27,7 @@ public class ForgotListener implements ApplicationListener<OnResetTokenCreatedEv
         context.setVariable("subject", subject);
         emailService.sendTemplateMail(event.getEmail(),
                 subject,
-                "forgotEmailTemplate",
+                "forgot-email-template",
                 context);
     }
 }

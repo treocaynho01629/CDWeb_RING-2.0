@@ -9,14 +9,19 @@ services:
         environment:
             JWT_SECRET_KEY: <Your secret key>
             JWT_SECRET_REFRESH_KEY: <Your refresh secret key>
+            EMAIL_HOST: <Your email host>
+            EMAIL_PORT: <Your email port>
             EMAIL_USERNAME: <Your email address>
-            EMAIL_PASSOWRD: <Your email app password>
+            EMAIL_PASSWORD: <Your email app password>
             DB_HOST: <Your SQL database path>
             DB_PORT: <Your SQL database port>
             DB_USERNAME: <Your SQL username>
             DB_PASSWORD: <Your SQL password>
             DB_NAME: <Your SQL database name>
-            CLIENT_URL: <Your client path>
+            CLIENT_URL: <Your client url>
+            PROD_URL: <Your api url>
+            RECAPTCHA_SECRET_KEY: <reCAPTCHA v2 secret key>
+            RECAPTCHA_V3_SECRET_KEY: <reCAPTCHA v3 secret key>
             SPRING_PROFILES_ACTIVE: <Active profiles>
         depends_on:
             - postgresql-db

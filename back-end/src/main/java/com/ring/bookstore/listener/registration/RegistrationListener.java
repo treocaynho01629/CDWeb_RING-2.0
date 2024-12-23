@@ -26,7 +26,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
         context.setVariable("subject", subject);
         emailService.sendTemplateMail(event.getEmail(),
                 subject,
-                "signUpEmailTemplate",
+                "welcome-email-template",
                 context);
     }
 }

@@ -26,7 +26,7 @@ public class ResetListener implements ApplicationListener<OnResetPasswordComplet
         context.setVariable("subject", subject);
         emailService.sendTemplateMail(event.getEmail(),
                 subject,
-                "resetEmailTemplate",
+                "reset-email-template",
                 context);
     }
 }
