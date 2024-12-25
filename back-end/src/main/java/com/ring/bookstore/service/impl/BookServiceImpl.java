@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import com.github.slugify.Slugify;
 import com.ring.bookstore.dtos.books.BookResponseDTO;
 import com.ring.bookstore.dtos.books.IBookDetail;
+import com.ring.bookstore.enums.BookType;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.*;
@@ -72,7 +73,7 @@ public class BookServiceImpl implements BookService {
                                   Integer cateId,
                                   List<Integer> pubIds,
                                   Long shopId,
-                                  List<String> types,
+                                  List<BookType> types,
                                   Double fromRange,
                                   Double toRange,
                                   Boolean withDesc) {

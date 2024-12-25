@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch, Avatar, Grid2 as Grid, TextField, MenuItem } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch, Avatar, Grid2 as Grid, TextField, MenuItem, Toolbar } from '@mui/material';
 import { Delete as DeleteIcon, Search, Star } from '@mui/icons-material';
 import { Link } from 'react-router';
 import { useDeleteReviewMutation, useDeleteReviewsMutation, useGetReviewsQuery } from '../../../features/reviews/reviewsApiSlice';
 import { FooterLabel, ItemTitle, FooterContainer } from '../custom/ShareComponents';
 import { idFormatter } from '../../../ultils/covert';
 import useAuth from "../../../hooks/useAuth";
-import CustomTablePagination from '../custom/CustomTablePagination';
+import CustomTablePagination from '../table/CustomTablePagination';
 import CustomProgress from '../../custom/CustomProgress';
-import CustomTableHead from '../custom/CustomTableHead';
-import CustomTableToolbar from '../custom/CustomTableToolbar';
+import CustomTableHead from '../table/CustomTableHead';
 
 const headCells = [
   {
@@ -407,15 +406,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
 
   return (
     <TableContainer component={Paper}>
-      <CustomTableToolbar
-        numSelected={numSelected()}
-        icon={<Star />}
-        title={'đánh giá'}
-        submitIcon={<DeleteIcon />}
-        submitTooltip={'Xoá đánh giá đã chọn'}
-        onSubmitSelected={handleDeleteMultiples}
-        filterComponent={<FilterContent />}
-      />
+      <Toolbar><FilterContent /></Toolbar>
       <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
         <Table
           stickyHeader

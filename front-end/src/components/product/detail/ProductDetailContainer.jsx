@@ -6,6 +6,7 @@ import { useGetBooksQuery } from '../../../features/books/booksApiSlice';
 import { MobileExtendButton, Showmore, Title } from '../../custom/GlobalComponents';
 import { KeyboardArrowDown, KeyboardArrowRight, KeyboardArrowUp } from '@mui/icons-material';
 import { idFormatter } from '../../../ultils/covert';
+import { bookTypes } from '../../../ultils/book';
 import ProductsScroll from '../ProductsScroll';
 
 const SwipeableDrawer = lazy(() => import('@mui/material/SwipeableDrawer'));
@@ -171,7 +172,7 @@ const ProductDetailContainer = ({ loading, book, tabletMode }) => {
             <InfoTitle><InfoText className="secondary">Hình thức: </InfoText></InfoTitle>
             <InfoStack>
               <Link to={`/store?types=${book?.type}`}>
-                <InfoText>{book?.type}</InfoText>
+                <InfoText>{bookTypes[book?.type]}</InfoText>
               </Link>
             </InfoStack>
           </tr>

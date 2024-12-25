@@ -1,15 +1,14 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, FormControlLabel, Switch, Avatar, Chip, Grid2 as Grid, TextField, MenuItem, TableFooter, IconButton } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, FormControlLabel, Switch, Avatar, Chip, Grid2 as Grid, TextField, MenuItem, TableFooter, IconButton, Toolbar } from '@mui/material';
 import { Group as GroupIcon, Edit as EditIcon, Delete as DeleteIcon, Search, MoreHoriz } from '@mui/icons-material';
 import { Link } from 'react-router';
 import { useDeleteUserMutation, useDeleteUsersMutation, useGetUsersQuery } from '../../../features/users/usersApiSlice';
 import { FooterLabel, ItemTitle, FooterContainer } from '../custom/ShareComponents';
 import { idFormatter } from '../../../ultils/covert';
 import useAuth from "../../../hooks/useAuth";
-import CustomTablePagination from '../custom/CustomTablePagination';
+import CustomTablePagination from '../table/CustomTablePagination';
 import CustomProgress from '../../custom/CustomProgress';
-import CustomTableToolbar from '../custom/CustomTableToolbar';
-import CustomTableHead from '../custom/CustomTableHead';
+import CustomTableHead from '../table/CustomTableHead';
 
 const EditAccountDialog = lazy(() => import('../dialog/EditAccountDialog'));
 
@@ -396,15 +395,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
 
   return (
     <TableContainer component={Paper}>
-      <CustomTableToolbar
-        numSelected={numSelected()}
-        icon={<GroupIcon />}
-        title={`${isEmployees ? 'nhân viên' : 'thành viên'}`}
-        submitIcon={<DeleteIcon />}
-        submitTooltip={`Xoá ${isEmployees ? 'nhân viên' : 'thành viên'} đã chọn`}
-        onSubmitSelected={handleDeleteMultiples}
-        filterComponent={<FilterContent filter={isEmployees} />}
-      />
+      <Toolbar><FilterContent filter={isEmployees} /></Toolbar>
       <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
         <Table
           stickyHeader

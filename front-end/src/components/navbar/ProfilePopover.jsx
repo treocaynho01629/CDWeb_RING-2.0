@@ -76,7 +76,10 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mo
                 </Link>
             )}
             {mode &&
-                <MenuItem aria-label="toggle-mode" onClick={toggleMode} >
+                <MenuItem aria-label="toggle-mode" onClick={(e) => {
+                    e.stopPropagation();
+                    toggleMode();
+                }} >
                     <ListItemIcon>
                         {mode === 'dark' ? <NightlightOutlined fontSize="small" />
                             : mode === 'light' ? <LightModeOutlined fontSize="small" />

@@ -6,6 +6,7 @@ import { Link } from 'react-router';
 import { currencyFormat, numFormatter } from '../../../ultils/covert';
 import { lazy, Suspense, useState } from 'react';
 import { useGetMyAddressQuery } from '../../../features/addresses/addressesApiSlice';
+import { bookTypes } from '../../../ultils/book';
 import ProductImages from './ProductImages';
 import ProductAction from './ProductAction';
 import useAuth from '../../../hooks/useAuth';
@@ -278,7 +279,7 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                                     </Detail>
                                 </Box>
                                 <Detail>
-                                    {book ? <>Hình thức bìa: &nbsp;<Link to={`/store?types=${book?.type}`}> {book?.type}</Link></>
+                                    {book ? <>Hình thức bìa: &nbsp;<Link to={`/store?types=${book?.type}`}>{bookTypes[book?.type]}</Link></>
                                         : <Skeleton variant="text" sx={{ fontSize: '14px' }} width="90%" />}
                                 </Detail>
                             </Stack>

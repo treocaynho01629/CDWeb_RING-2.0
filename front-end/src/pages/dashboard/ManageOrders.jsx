@@ -5,13 +5,13 @@ import { Receipt } from '@mui/icons-material';
 import ChartSales from '../../components/dashboard/chart/ChartSales'
 import TableOrders from "../../components/dashboard/table/TableOrders";
 import useTitle from '../../hooks/useTitle';
-import CountCard from "../../components/dashboard/custom/CountCard";
+// import CountCard from "../../components/dashboard/custom/CountCard";
 
 const ManageOrders = () => {
   const [orderCount, setOrderCount] = useState(0);
 
   //Set title
-  useTitle('RING! - Doanh thu');
+  useTitle('Doanh thu');
 
   return (
     <>
@@ -24,11 +24,11 @@ const ManageOrders = () => {
       </Box>
       <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
         <Grid item sm={6} md={4}>
-          <CountCard
+          {/* <CountCard
             count={orderCount}
             icon={<Receipt />}
             title={'Đơn hàng'}
-          />
+          /> */}
         </Grid>
       </Grid>
       <ChartSales />

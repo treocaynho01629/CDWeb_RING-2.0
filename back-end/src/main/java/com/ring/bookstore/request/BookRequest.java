@@ -3,6 +3,7 @@ package com.ring.bookstore.request;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.ring.bookstore.enums.BookType;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -38,7 +39,7 @@ public class BookRequest { //Request body for book
 	private String description;
 	
 	@NotNull(message = "Hình thức bìa không được bỏ trống!")
-	private String type;
+	private BookType type;
 	
 	@NotNull(message = "Tác giả không được bỏ trống!")
 	private String author;

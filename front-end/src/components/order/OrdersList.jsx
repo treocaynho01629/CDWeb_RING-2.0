@@ -134,6 +134,7 @@ const OrdersList = () => {
         setFilters(prev => ({ ...prev, status: newValue }));
         handleResetPagination();
     }, []);
+    
     const handleChangeKeyword = useCallback((e) => {
         e.preventDefault();
         if (inputRef) setFilters(prev => ({ ...prev, keyword: inputRef.current.value }));

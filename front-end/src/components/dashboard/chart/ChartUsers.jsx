@@ -98,7 +98,7 @@ const ChartUsers = () => {
     }
 
     return (
-        <Grid container size="grow" spacing={3} mb={3}>
+        <Grid container size="grow" spacing={3}>
             <Grid size="grow">
                 <Paper elevation={3} sx={{ pb: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                     <ChartTitle><BarChartIcon />&nbsp;Xếp hạng khách hàng</ChartTitle>

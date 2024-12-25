@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.ring.bookstore.dtos.books.BookResponseDTO;
+import com.ring.bookstore.enums.BookType;
 import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +28,7 @@ public interface BookService {
                            Integer cateId,
                            List<Integer> pubIds,
                            Long shopId,
-                           List<String> types,
+                           List<BookType> types,
                            Double fromRange,
                            Double toRange,
                            Boolean withDesc);

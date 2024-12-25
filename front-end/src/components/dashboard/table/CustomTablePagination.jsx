@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 const CustomTablePagination = (props) => {
     const { pagination, onPageChange, onSizeChange, ...otherProps } = props;
+
     //Initial value
     const [page, setPage] = useState(pagination?.number ?? 0);
     const [size, setSize] = useState(pagination?.size ?? 10);
@@ -24,11 +25,11 @@ const CustomTablePagination = (props) => {
             {...otherProps}
             rowsPerPageOptions={[5, 10, 25, 50, 100]}
             component="div"
-            labelRowsPerPage={"Hiển thị"}
+            labelRowsPerPage={"SL"}
             labelDisplayedRows={
                 function defaultLabelDisplayedRows(
                     { from, to, count }) {
-                    return `${from}–${to} trong số ${count !== -1
+                    return `${from}–${to}/${count !== -1
                         ? count
                         : `Có hơn ${to}`}`;
                 }}

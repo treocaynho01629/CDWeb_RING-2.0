@@ -61,14 +61,14 @@ public class EmailServiceImpl implements EmailService {
             //Get template
             String htmlContent = templateEngine.process(template, context);
 
-            //Add logo
-            helper.addInline("logo", new ClassPathResource("static/logo.png"), "image/png");
-
             //Set properties
             helper.setFrom(sender);
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
+
+            //Add logo (After setText else mail readers might not be able to resolve inline references correctly)
+            helper.addInline("logo", new ClassPathResource("static/logo.png"));
             
             mailSender.send(message); //Send
         } catch (Exception e) {

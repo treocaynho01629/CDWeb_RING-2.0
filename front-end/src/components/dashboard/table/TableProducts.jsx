@@ -1,18 +1,26 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch, LinearProgress, Chip, Skeleton, Grid2 as Grid, TextField, MenuItem, Menu, ListItemIcon, ListItemText } from '@mui/material';
-import { AutoStories as AutoStoriesIcon, Delete as DeleteIcon, Search, MoreHoriz, Edit, Delete, Visibility } from '@mui/icons-material';
+import { useState, useEffect, lazy, Suspense, useCallback, useRef } from 'react';
+import {
+  Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch,
+  LinearProgress, Skeleton, TextField, MenuItem, Menu, ListItemIcon, ListItemText, Stack, Toolbar, Button
+} from '@mui/material';
+import { Search, MoreHoriz, Edit, Delete, Visibility, FilterAltOff, Add } from '@mui/icons-material';
 import { Link } from 'react-router';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useDeleteBookMutation, useDeleteBooksMutation, useGetBooksQuery } from '../../../features/books/booksApiSlice';
-import { ItemTitle, FooterContainer, FooterLabel } from '../custom/ShareComponents';
-import { idFormatter } from '../../../ultils/covert';
+import { ItemTitle, FooterContainer, FooterLabel, StyledStockBar } from '../custom/ShareComponents';
+import { currencyFormat, idFormatter } from '../../../ultils/covert';
+import { publishersApiSlice } from '../../../features/publishers/publishersApiSlice';
+import { categoriesApiSlice } from '../../../features/categories/categoriesApiSlice';
+import { bookTypeItems, bookTypes } from '../../../ultils/book';
 import useAuth from '../../../hooks/useAuth';
 import CustomProgress from '../../custom/CustomProgress';
-import CustomTableToolbar from '../custom/CustomTableToolbar';
-import CustomTableHead from '../custom/CustomTableHead';
-import CustomTablePagination from '../custom/CustomTablePagination';
+import CustomTableHead from './CustomTableHead';
+import CustomTablePagination from './CustomTablePagination';
+import useDeepEffect from '../../../hooks/useDeepEffect';
 
 const EditProductDialog = lazy(() => import('../dialog/EditProductDialog'));
+
+const maxStocks = 199;
 
 const headCells = [
   {
@@ -27,94 +35,324 @@ const headCells = [
   {
     id: 'title',
     align: 'left',
-    width: '500px',
+    width: '450px',
     disablePadding: false,
     sortable: true,
     label: 'Sản phẩm',
   },
   {
-    id: 'price',
+    id: 'shopId',
     align: 'left',
     width: '120px',
+    disablePadding: false,
+    sortable: true,
+    label: 'Shop',
+  },
+  {
+    id: 'price',
+    align: 'left',
+    width: '130px',
     disablePadding: false,
     sortable: true,
     label: 'Giá(đ)',
   },
   {
     id: 'amount',
-    align: 'center',
-    width: '150px',
+    align: 'left',
+    width: '75px',
     disablePadding: false,
     sortable: true,
     label: 'Số lượng',
   },
   {
-    id: 'amount',
-    align: 'center',
-    width: '120px',
-    disablePadding: false,
-    sortable: true,
-    hideOnMinimize: true,
-    label: 'Trạng thái',
-  },
-  {
     id: 'action',
-    width: '35px',
+    width: '24px',
     disablePadding: false,
     sortable: false,
     hideOnMinimize: true,
   },
 ];
 
-function FilterContent({ }) {
+function ProductFilters({ filters, setFilters }) {
+  const inputRef = useRef();
+  const [pubIds, setPubIds] = useState(filters.pubIds);
+  const [types, setTypes] = useState(filters.types);
+  const [pubsPagination, setPubsPagination] = useState({
+    number: 0,
+    totalPages: 0,
+    totalElements: 0,
+  })
+  const [catesPagination, setCatesPagination] = useState({
+    number: 0,
+    totalPages: 0,
+    totalElements: 0,
+  })
+
+  const [getPublishers, { data: pubs }] = publishersApiSlice.useLazyGetPublishersQuery();
+  const [getCategories, { data: cates }] = categoriesApiSlice.useLazyGetCategoriesQuery();
+
+  const handleOpenPubs = () => {
+    if (!pubs) {
+      getPublishers({
+        page: pubsPagination?.number,
+        loadMore: true,
+      })
+        .unwrap()
+        .then((data) => {
+          setPubsPagination({
+            ...pubsPagination,
+            number: data.page.number,
+            totalPages: data.page.totalPages,
+            totalElements: data.page.totalElements,
+          });
+        })
+        .catch((rejected) => console.error(rejected));
+    }
+  };
+
+  const handleOpenCates = () => {
+    if (!cates) {
+      getCategories({
+        include: 'children',
+        page: catesPagination?.number,
+        loadMore: true
+      })
+        .unwrap()
+        .then((data) => {
+          setCatesPagination({
+            ...catesPagination,
+            number: data.page.number,
+            totalPages: data.page.totalPages,
+            totalElements: data.page.totalElements,
+          });
+        })
+        .catch((rejected) => console.error(rejected));
+    }
+  };
+
+  const handleShowmorePubs = () => {
+    let currPage = (pubsPagination?.number || 0) + 1;
+    if (!pubsPagination?.totalPages <= currPage) {
+      getPublishers({
+        page: currPage,
+        loadMore: true
+      })
+        .unwrap()
+        .then((data) => {
+          setPubsPagination({
+            ...pubsPagination,
+            number: data.page.number,
+            totalPages: data.page.totalPages,
+            totalElements: data.page.totalElements,
+          });
+        })
+        .catch((rejected) => console.error(rejected));
+    }
+  }
+
+  const handleShowmoreCates = () => {
+    let currPage = (catesPagination?.number || 0) + 1;
+    if (!catesPagination?.totalPages <= currPage) {
+      getCategories({
+        include: 'children',
+        page: currPage,
+        loadMore: true,
+      })
+        .unwrap()
+        .then((data) => {
+          setCatesPagination({
+            ...catesPagination,
+            number: data.page.number,
+            totalPages: data.page.totalPages,
+            totalElements: data.page.totalElements,
+          });
+        })
+        .catch((rejected) => console.error(rejected));
+    }
+  }
+
+  const handleChangePubs = useCallback((e) => {
+    const value = e.target.value;
+    if (!pubIds?.includes(value)) setPubIds(value);
+  }, []);
+
+  const handleChangeTypes = useCallback((e) => {
+    const value = e.target.value;
+    if (!types?.includes(value)) setTypes(value);
+  }, []);
+
+  const handleChangeKeyword = useCallback((e) => {
+    e.preventDefault();
+    if (inputRef) setFilters(prev => ({ ...prev, keyword: inputRef.current.value }));
+  }, []);
+
+  const handleApplyPubs = () => {
+    setFilters(prev => ({ ...prev, pubIds: pubIds }))
+  };
+
+  const handleApplyTypes = () => {
+    setFilters(prev => ({ ...prev, types: types }))
+  };
+
+  const resetFilter = useCallback(() => {
+    setFilters({
+      keyword: "",
+      cate: "",
+      pubIds: [],
+      types: [],
+    });
+    setPubIds([]);
+    setTypes([]);
+  }, []);
+
   return (
-    <Grid container spacing={1} sx={{ width: '80vw', padding: '10px' }}>
-      <Grid item xs={12} sm={4}>
-        <TextField label='Temp'
-          // value={currAddress?.city || ''}
-          // onChange={(e) => setCurrAddress({ ...currAddress, city: e.target.value, ward: '' })}
-          select
-          defaultValue=""
-          fullWidth
-          size="small"
-        >
-          <MenuItem disabled value=""><em>--Tất cả--</em></MenuItem>
-          <MenuItem value={5}>5</MenuItem>
-          <MenuItem value={4}>4</MenuItem>
-          <MenuItem value={3}>3</MenuItem>
-          <MenuItem value={2}>2</MenuItem>
-          <MenuItem value={1}>1</MenuItem>
-        </TextField>
-      </Grid>
-      <Grid item xs={12} sm={8}>
+    <Stack width="100%" spacing={1} my={2} direction={{ xs: 'column', md: 'row' }}>
+      <TextField label='Nhà xuất bản'
+        select
+        size="small"
+        fullWidth
+        slotProps={{
+          select: {
+            multiple: true,
+            value: pubIds,
+            onChange: (e) => handleChangePubs(e),
+            onOpen: handleOpenPubs,
+            onClose: handleApplyPubs,
+            renderValue: (selected) => {
+              const filteredName = selected?.map(id => pubs?.entities[id]?.name);
+              return filteredName.join(", ");
+            },
+          }
+        }}
+      >
+        {pubs?.ids?.map((id, index) => {
+          const pub = pubs?.entities[id];
+
+          return (
+            <MenuItem key={`pub-${id}-${index}`} value={id}>
+              <Checkbox sx={{ py: .5, pr: 1, pl: 0 }} disableRipple checked={pubIds?.includes(id)} />
+              <ListItemText primary={pub?.name} />
+            </MenuItem>
+          )
+        })}
+        {pubsPagination?.totalPages > pubsPagination?.number + 1 &&
+          <Box display="flex" justifyContent="center">
+            <Button
+              onClick={handleShowmorePubs}
+              endIcon={<Add />}
+              fullWidth
+            >
+              Tải thêm
+            </Button>
+          </Box>
+        }
+      </TextField>
+      <TextField label='Danh mục'
+        value={filters.cate || ''}
+        onChange={(e) => setFilters({ ...filters, cate: e.target.value })}
+        select
+        defaultValue=""
+        size="small"
+        fullWidth
+        slotProps={{ select: { onOpen: handleOpenCates, } }}
+      >
+        <MenuItem value=""><em>--Tất cả--</em></MenuItem>
+        {cates?.ids?.map((id, index) => {
+          const cate = cates?.entities[id];
+          const cateList = [];
+
+          cateList.push(
+            <MenuItem key={`cate-${id}-${index}`} value={id}>
+              {cate?.name}
+            </MenuItem>);
+          {
+            cate?.children?.map((child, childIndex) => {
+              cateList.push(
+                <MenuItem sx={{ pl: 3, fontSize: 15 }} key={`child-cate-${child?.id}-${childIndex}`} value={child?.id}>
+                  {child?.name}
+                </MenuItem>)
+            })
+          }
+
+          return cateList;
+        })}
+        {catesPagination?.totalPages > catesPagination?.number + 1 &&
+          <Box display="flex" justifyContent="center">
+            <Button
+              onClick={handleShowmoreCates}
+              endIcon={<Add />}
+              fullWidth
+            >
+              Tải thêm
+            </Button>
+          </Box>
+        }
+      </TextField>
+      <TextField label='Hình thức'
+        select
+        size="small"
+        fullWidth
+        slotProps={{
+          select: {
+            multiple: true,
+            value: types,
+            onChange: (e) => handleChangeTypes(e),
+            onClose: handleApplyTypes,
+            renderValue: (selected) => {
+              const filteredLabel = selected?.map(value => bookTypes[value]);
+              return filteredLabel.join(", ");
+            },
+          }
+        }}
+      >
+        {bookTypeItems.map((type, index) => (
+          <MenuItem key={`type-${type.value}-${index}`} value={type.value}>
+            <Checkbox sx={{ py: .5, pr: 1, pl: 0 }} disableRipple checked={types?.includes(type.value)} />
+            <ListItemText primary={type.label} />
+          </MenuItem>
+        ))}
+      </TextField>
+      <form style={{ width: '100%' }} onSubmit={handleChangeKeyword}>
         <TextField
-          placeholder='Tìm kiếm... '
-          // onChange={(e) => setSearchField(e.target.value)}
-          // value={searchField}
-          id="search-review"
+          placeholder='Tìm kiếm'
+          autoComplete="products"
+          id="products"
           size="small"
+          inputRef={inputRef}
           fullWidth
-          InputProps={{ startAdornment: <Search sx={{ marginRight: 1 }} /> }}
+          slotProps={{
+            input: {
+              startAdornment: (< Search sx={{ marginRight: 1 }} />)
+            },
+          }}
         />
-      </Grid>
-    </Grid>
+      </form>
+      <Box display="flex" justifyContent="center">
+        <Button sx={{ width: 125 }} color="error" onClick={resetFilter} startIcon={<FilterAltOff />}>Xoá bộ lọc</Button>
+      </Box>
+    </Stack >
   )
 }
 
-export default function TableProducts({ setProductCount, sellerName, mini = false }) {
+export default function TableProducts({ setProductCount, shopId, isShop, setIsShop }) {
   //#region construct
-  const { username, roles } = useAuth();
+  const { roles } = useAuth();
   const isAdmin = useState(roles?.find(role => ['ROLE_ADMIN'].includes(role)));
   const [selected, setSelected] = useState([]);
   const [deselected, setDeseletected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [dense, setDense] = useState(true);
-  const [isSeller, setIsSeller] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role))));
   const [openEdit, setOpenEdit] = useState(false);
   const [pending, setPending] = useState(false);
+  const [filters, setFilters] = useState({
+    keyword: "",
+    cate: "",
+    pubIds: [],
+    types: [],
+  })
   const [pagination, setPagination] = useState({
-    currPage: 0,
-    pageSize: mini ? 5 : 10,
+    number: 0,
+    size: 10,
     totalPages: 0,
     sortBy: "id",
     sortDir: "asc",
@@ -135,7 +373,12 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
     size: pagination?.size,
     sortBy: pagination?.sortBy,
     sortDir: pagination?.sortDir,
-    seller: isSeller ? username : sellerName ?? '',
+    shopId: isShop ? 'test' : shopId ?? '',
+    keyword: filters.keyword,
+    cateId: filters.cate,
+    types: filters.types,
+    pubIds: filters.pubIds,
+    amount: 0
   })
 
   //Set pagination after fetch
@@ -144,12 +387,14 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
       setPagination({
         ...pagination,
         totalPages: data?.page?.totalPages,
-        currPage: data?.page?.number,
-        pageSize: data?.page?.size
+        number: data?.page?.number,
+        size: data?.page?.size
       });
       if (setProductCount) setProductCount(data?.page?.totalElements);
     }
   }, [data])
+
+  useDeepEffect(() => { handleChangePage(0); }, [filters])
 
   const handleRequestSort = (e, property) => {
     const isAsc = (pagination.sortBy === property && pagination.sortDir === 'asc');
@@ -221,24 +466,24 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
   };
 
   //Pagination
-  const handleChangePage = (page) => {
-    setPagination({ ...pagination, currPage: page });
-  };
+  const handleChangePage = useCallback((page) => {
+    setPagination({ ...pagination, number: page });
+  }, []);
 
-  const handleChangeRowsPerPage = (size) => {
+  const handleChangeRowsPerPage = useCallback((size) => {
     handleChangePage(0);
     const newValue = parseInt(size, 10);
-    setPagination({ ...pagination, pageSize: newValue });
-  };
+    setPagination({ ...pagination, size: newValue });
+  }, []);
 
-  const handleChangeDense = (e) => {
+  const handleChangeDense = useCallback((e) => {
     setDense(e.target.checked);
-  };
+  }, []);
 
-  const handleChangeSeller = (e) => {
-    handleChangePage(0)
-    setIsSeller(e.target.checked);
-  };
+  const handleChangeShop = useCallback((e) => {
+    handleChangePage(0);
+    setIsShop(e.target.checked);
+  }, []);
 
   //Actions
   const handleOpenContext = (e, product) => {
@@ -323,8 +568,8 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
   };
 
   const isSelected = (id) => (selected?.indexOf(id) !== -1 || (selectedAll && deselected?.indexOf(id) === -1));
-  const numSelected = () => (selectedAll ? data?.page?.totalElements - deselected?.length : selected?.length);
-  const colSpan = () => (mini ? headCells.filter((h) => !h.hideOnMinimize).length : headCells.length + 1);
+  const numSelected = selectedAll ? data?.page?.totalElements - deselected?.length : selected?.length;
+  const colSpan = headCells.length + 1;
   //#endregion
 
   let booksRows;
@@ -336,7 +581,7 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
           scope="row"
           padding="none"
           align="center"
-          colSpan={colSpan()}
+          colSpan={colSpan}
           sx={{ position: 'relative', height: '40dvh' }}
         >
           <CustomProgress color="primary" />
@@ -351,7 +596,7 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
         const book = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
-        const stockProgress = Math.min((book.amount / 199 * 100), 100);
+        const stockProgress = Math.min((book.amount / maxStocks * 100), 100);
         const stockStatus = stockProgress == 0 ? 'error' : stockProgress < 20 ? 'warning' : stockProgress < 80 ? 'primary' : 'info';
 
         return (
@@ -360,28 +605,23 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
             aria-checked={isItemSelected}
             tabIndex={-1}
             key={id}
-            selected={isItemSelected}
           >
-            {!mini &&
-              <>
-                <TableCell padding="checkbox">
-                  <Checkbox color="primary"
-                    onChange={(e) => handleClick(e, book.id)}
-                    checked={isItemSelected}
-                    inputProps={{
-                      'aria-labelledby': labelId,
-                    }}
-                  />
-                </TableCell>
-                <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
-                  <Link to={`/detail/${id}`}>{idFormatter(id)}</Link>
-                </TableCell>
-              </>
-            }
+            <TableCell padding="checkbox">
+              <Checkbox color="primary"
+                onChange={(e) => handleClick(e, book.id)}
+                checked={isItemSelected}
+                inputProps={{
+                  'aria-labelledby': labelId,
+                }}
+              />
+            </TableCell>
+            <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
+              <Link to={`/detail/${id}`}>{idFormatter(id)}</Link>
+            </TableCell>
             <TableCell align="left">
               <Link to={`/detail/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
                 <LazyLoadImage
-                  src={`${book.image}?size=small`}
+                  src={`${book.image}?size=tiny`}
                   height={45}
                   width={45}
                   style={{ marginRight: '10px' }}
@@ -389,34 +629,29 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
                 />
                 <Box>
                   <ItemTitle>{book.title}</ItemTitle>
-                  <ItemTitle className="secondary">Đã bán: {book.totalOrders}</ItemTitle>
+                  <Box display="flex">
+                    <ItemTitle className="secondary">Đã bán: {book.totalOrders}</ItemTitle>
+                    <ItemTitle className="secondary">&emsp;Đánh giá: {book.rating.toFixed(1)}</ItemTitle>
+                  </Box>
                 </Box>
               </Link>
             </TableCell>
             <TableCell align="left">
-              <ItemTitle>{Math.round(book.price * (1 - book.discount)).toLocaleString()}đ</ItemTitle>
+              <ItemTitle>{book.shopName}</ItemTitle>
+            </TableCell>
+            <TableCell align="left">
+              <ItemTitle>{currencyFormat.format(book.price * (1 - book.discount))}</ItemTitle>
               {book.discount > 0 && <ItemTitle className="secondary">-{book.discount * 100}%</ItemTitle>}
             </TableCell>
-            <TableCell align="center">
-              <LinearProgress color={stockStatus} variant="determinate" value={stockProgress} />
-              <ItemTitle className="secondary">{`${book.amount} trong kho`}</ItemTitle>
+            <TableCell align="left">
+              <Box>
+                <StyledStockBar color={stockStatus} variant="determinate" value={stockProgress} />
+                <ItemTitle className="secondary">{book.amount} trong kho</ItemTitle>
+              </Box>
             </TableCell>
-            {!mini &&
-              <>
-                <TableCell align="left">
-                  <Chip label={stockStatus == 'error' ? 'Ngừng bán' :
-                    stockStatus == 'warning' ? 'Gần hết' :
-                      stockStatus == 'primary' ? 'Bình thường' : 'Mới'}
-                    color={stockStatus}
-                    sx={{ fontWeight: 'bold' }}
-                    variant="outlined"
-                  />
-                </TableCell>
-                <TableCell align="right">
-                  <IconButton onClick={(e) => handleOpenContext(e, id)}><MoreHoriz /></IconButton>
-                </TableCell>
-              </>
-            }
+            <TableCell align="right">
+              <IconButton onClick={(e) => handleOpenContext(e, id)}><MoreHoriz /></IconButton>
+            </TableCell>
           </TableRow>
         )
       })
@@ -426,7 +661,7 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
           scope="row"
           padding="none"
           align="center"
-          colSpan={colSpan()}
+          colSpan={colSpan}
           sx={{ height: '40dvh' }}
         >
           <Box>Không tìm thấy sản phẩm nào!</Box>
@@ -439,7 +674,7 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
           scope="row"
           padding="none"
           align="center"
-          colSpan={colSpan()}
+          colSpan={colSpan}
           sx={{ height: '40dvh' }}
         >
           <Box>{error?.error || 'Đã xảy ra lỗi'}</Box>
@@ -449,81 +684,63 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
   }
 
   return (
-    <>
+    <Paper sx={{ width: '100%', height: '100%' }} elevation={3}>
+      <Toolbar>
+        <ProductFilters {...{ filters, setFilters }} />
+      </Toolbar>
       <TableContainer component={Paper}>
-        <CustomTableToolbar
-          numSelected={numSelected()}
-          icon={<AutoStoriesIcon />}
-          title={'sản phẩm'}
-          submitIcon={<DeleteIcon />}
-          submitTooltip={'Xoá sản phẩm đã chọn'}
-          onSubmitSelected={handleDeleteMultiples}
-          filterComponent={<FilterContent />}
-        />
-        <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
-          <Table
-            stickyHeader
-            sx={{ minWidth: mini ? 500 : 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <CustomTableHead
-              headCells={headCells}
-              numSelected={numSelected()}
-              sortBy={pagination.sortBy}
-              sortDir={pagination.sortDir}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              selectedAll={selectedAll}
-              mini={mini}
-            />
-            <TableBody>
-              {booksRows}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <FooterContainer>
-          {mini ?
-            <Link to={'/manage-products'}>Xem tất cả</Link>
-            :
-            <Box>
-              <FormControlLabel
-                control={<Switch checked={dense} onChange={handleChangeDense} />}
-                label={<FooterLabel>Thu gọn</FooterLabel>}
-              />
-              {(isAdmin && !sellerName) &&
-                <FormControlLabel
-                  control={<Switch checked={isSeller} onChange={handleChangeSeller} />}
-                  label={<FooterLabel>Theo người bán</FooterLabel>}
-                />
-              }
-            </Box>
-          }
-          <CustomTablePagination
-            pagination={pagination}
-            onPageChange={handleChangePage}
-            onSizeChange={handleChangeRowsPerPage}
-            count={data?.page?.totalElements ?? 0}
+        <Table stickyHeader size={dense ? 'small' : 'medium'}>
+          <CustomTableHead
+            headCells={headCells}
+            numSelected={numSelected}
+            sortBy={pagination.sortBy}
+            sortDir={pagination.sortDir}
+            onSelectAllClick={handleSelectAllClick}
+            onRequestSort={handleRequestSort}
+            onSubmitDelete={handleDeleteMultiples}
+            selectedAll={selectedAll}
           />
-        </FooterContainer>
-        <Suspense fallback={<></>}>
-          {openEdit &&
-            <EditProductDialog
-              id={contextId}
-              open={openEdit}
-              handleClose={handleCloseEdit}
+          <TableBody>
+            {booksRows}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <FooterContainer>
+        <Box pl={2}>
+          <FormControlLabel
+            control={<Switch checked={dense} onChange={handleChangeDense} />}
+            label={<FooterLabel>Thu gọn</FooterLabel>}
+          />
+          {(isAdmin && !shopId) &&
+            <FormControlLabel
+              control={<Switch checked={isShop} onChange={handleChangeShop} />}
+              label={<FooterLabel>Theo SHOP</FooterLabel>}
             />
           }
-        </Suspense>
-      </TableContainer>
+        </Box>
+        <CustomTablePagination
+          pagination={pagination}
+          onPageChange={handleChangePage}
+          onSizeChange={handleChangeRowsPerPage}
+          count={data?.page?.totalElements ?? 0}
+        />
+      </FooterContainer>
+      <Suspense fallback={null}>
+        {openEdit &&
+          <EditProductDialog
+            id={contextId}
+            open={openEdit}
+            handleClose={handleCloseEdit}
+          />
+        }
+      </Suspense>
       <Menu
         open={openContext}
         onClose={handleCloseContext}
         anchorEl={anchorEl}
-        MenuListProps={{ 'aria-labelledby': 'basic-button' }}
       >
         <Link to={`/detail/${contextId}`}>
-          <MenuItem onClick={() => handleOpenEdit(contextId)}>
+          <MenuItem>
             <ListItemIcon>
               <Visibility fontSize="small" />
             </ListItemIcon>
@@ -538,11 +755,11 @@ export default function TableProducts({ setProductCount, sellerName, mini = fals
         </MenuItem>
         <MenuItem onClick={() => handleDelete(contextId)}>
           <ListItemIcon >
-            <Delete sx={{ color: 'error.main' }} fontSize="small" />
+            <Delete color="error" fontSize="small" />
           </ListItemIcon>
-          <ListItemText sx={{ color: 'error.main' }}>Xoá</ListItemText>
+          <ListItemText color="error">Xoá</ListItemText>
         </MenuItem>
       </Menu >
-    </>
+    </Paper>
   );
 }

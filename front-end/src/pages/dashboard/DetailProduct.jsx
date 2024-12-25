@@ -115,7 +115,7 @@ const DetailProduct = () => {
                                     {data?.author}
                                 </Typography>
                                 <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
-                                    {data?.type}
+                                    {bookTypes[data?.type]}
                                 </Typography>
                                 <Typography my={1} variant="subtitle1" color="text.secondary" component="div">
                                     <a>{data?.sellerName}</a>

@@ -5,7 +5,7 @@ import { Add, Group } from "@mui/icons-material";
 import ChartUsers from '../../components/dashboard/chart/ChartUsers'
 import TableUsers from "../../components/dashboard/table/TableUsers";
 import useTitle from '../../hooks/useTitle';
-import CountCard from "../../components/dashboard/custom/CountCard";
+// import CountCard from "../../components/dashboard/custom/CountCard";
 
 const UserFormDialog = lazy(() => import("../../components/dashboard/dialog/UserFormDialog"));
 
@@ -25,7 +25,7 @@ const ManageUsers = () => {
   }
 
   //Set title
-  useTitle('RING! - Thành viên');
+  useTitle('Thành viên');
 
   return (
     <>
@@ -42,11 +42,11 @@ const ManageUsers = () => {
       <br />
       <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
         <Grid item sm={6} md={4}>
-          <CountCard
+          {/* <CountCard
             count={userCount}
             icon={<Group />}
             title={'Thành viên'}
-          />
+          /> */}
         </Grid>
       </Grid>
       <ChartUsers />

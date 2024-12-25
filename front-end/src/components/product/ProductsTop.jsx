@@ -169,7 +169,7 @@ const StyledDisplaySkeleton = styled(Skeleton)`
 const Price = styled.span`
     font-size: 18px;
     font-weight: 420;
-    color: ${props => props.theme.palette.primary.dark};
+    color: ${props => props.theme.palette.primary.main};
     display: flex;
     flex-wrap: wrap;
     align-items: center;

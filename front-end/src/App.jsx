@@ -132,7 +132,7 @@ function App() {
             },
             {
               lazy: async () => {
-                let DashboardLayout = await import("./components/dashboard/DashboardLayout")
+                let DashboardLayout = await import("./components/dashboard/layout/DashboardLayout")
                 return { Component: DashboardLayout.default }
               },
               children: [

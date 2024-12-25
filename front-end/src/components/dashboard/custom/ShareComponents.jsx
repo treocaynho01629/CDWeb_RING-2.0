@@ -1,4 +1,5 @@
 import styled from '@emotion/styled'
+import { LinearProgress } from '@mui/material'
 
 export const ItemTitle = styled.p`
     font-size: 12px;
@@ -21,15 +22,30 @@ export const ItemTitle = styled.p`
     }
 `
 
+export const HeaderContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: ${props => props.theme.spacing(4)};
+`
+
 export const FooterContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 5px;
-    padding-left: 15px;
+
+    ${props => props.theme.breakpoints.down("md")} {
+        flex-direction: column-reverse;
+        align-items: flex-end;
+    }
 `
 
 export const FooterLabel = styled.p`
     font-size: 14px;
     margin: 0;
+`
+
+export const StyledStockBar = styled(LinearProgress)`
+    height: 6px;
+    width: 60px;
 `
