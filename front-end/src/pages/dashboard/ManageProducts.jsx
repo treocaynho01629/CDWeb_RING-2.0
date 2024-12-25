@@ -1,75 +1,25 @@
-import styled from '@emotion/styled'
-import { styled as muiStyled } from '@mui/material';
-import { useState, useEffect, Suspense, lazy } from "react";
-import { Box, Breadcrumbs, Button, Grid2 as Grid, Paper, Stack, Typography } from '@mui/material';
-import { Add, AutoStories as AutoStoriesIcon, LocalFireDepartment, Star, Style } from '@mui/icons-material';
-import { Link, useNavigate } from 'react-router'
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { useState, Suspense, lazy } from "react";
+import { Box, Button, Paper, Grid2 as Grid } from '@mui/material';
+import { Add, LocalFireDepartment, Style } from '@mui/icons-material';
+import { NavLink } from 'react-router';
+import { HeaderContainer } from '../../components/dashboard/custom/ShareComponents';
+import { useGetBooksQuery } from "../../features/books/booksApiSlice";
 import TableProducts from '../../components/dashboard/table/TableProducts'
 import useAuth from "../../hooks/useAuth"
 import useTitle from "../../hooks/useTitle"
-import CountCard from '../../components/dashboard/custom/CountCard';
+import InfoCard from '../../components/dashboard/custom/InfoCard';
+import CustomDashboardBreadcrumbs from '../../components/dashboard/custom/CustomDashboardBreadcrumbs';
+import ProductsShowcase from "../../components/dashboard/product/ProductsShowcase";
 
 const ProductFormDialog = lazy(() => import("../../components/dashboard/dialog/ProductFormDialog"));
 
-//#region preStyled
-const CountContainer = muiStyled(Paper)(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '20px 15px'
-}));
-
-const CountInfo = styled.div`
-  text-align: right;
-`
-
-const countIconStyle = {
-  color: '#63e399',
-  backgroundColor: '#ebebeb',
-  borderRadius: '50%',
-  padding: '8px',
-  fontSize: '60px'
-}
-
-const imageStyle = {
-  width: '80px',
-  height: '80px',
-  objectFit: 'contain',
-}
-
-const BookTitle = styled.p`
-  font-size: 18px;
-  margin: 0;
-  font-weight: bold;
-  text-overflow: ellipsis;
-	overflow: hidden;
-	white-space: nowrap;
-	
-	@supports (-webkit-line-clamp: 1) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: initial;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-    }
-`
-
-const BookPrice = styled.p`
-  font-size: 18px;
-  font-weight: bold;
-  color: ${props => props.theme.palette.primary.main};
-  margin: 10px 0 0;
-`
-//#endregion
-
 const ManageProducts = () => {
-  const [productCount, setProductCount] = useState(0);
   const { roles } = useAuth();
-  const [seller, setSeller] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role.roleName))));
+  const shopId = 'test';
+  const [productCount, setProductCount] = useState(0);
   const [contextProduct, setContextProduct] = useState(null);
   const [open, setOpen] = useState(false);
+  const [isShop, setIsShop] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role))));
 
   const handleOpen = (product) => {
     setContextProduct(product);
@@ -81,58 +31,57 @@ const ManageProducts = () => {
     setOpen(false);
   }
 
-  // const { loading: loadingBest, data: best } = useFetch(BOOKS_URL + "?pSize=5&sortBy=orderTime&sortDir=desc&seller=" + (seller === false ? "" : username));
-  // const { loading: loadingFav, data: fav } = useFetch(BOOKS_URL + "?pSize=5&sortBy=rateAmount&sortDir=desc&seller=" + (seller === false ? "" : username));
+  const { data: bestSeller, isLoading: loadBest, isSuccess: doneBest, isError: errorBest } = useGetBooksQuery({
+    size: 5,
+    sortBy: 'totalOrders',
+    sortDir: 'desc',
+    amount: 0,
+    // shopId: isShop ? 'test' : shopId ?? ''
+  });
+
+  const { data: fav, isLoading: loadFav, isSuccess: doneFav, isError: errorFav } = useGetBooksQuery({
+    size: 5,
+    sortBy: 'rating',
+    sortDir: 'desc',
+    amount: 0,
+    // shopId: isShop ? 'test' : shopId ?? ''
+  });
 
   //Set title
-  useTitle('RING! - Sản phẩm');
+  useTitle('Sản phẩm');
 
   return (
     <>
-      <h2>Quản lý sản phẩm</h2>
-      <Box display="flex" justifyContent="space-between" mb={1}>
-        <Breadcrumbs aria-label="breadcrumb">
-          <Link style={{ color: 'inherit' }} to={'/dashboard'}>Dashboard</Link>
-          <Typography color="text.secondary">Quản lý sản phẩm</Typography>
-        </Breadcrumbs>
-        <Button variant="outlined" size="large" startIcon={<Add />} onClick={() => handleOpen()}>
-          Thêm sản phẩm mới
+      <HeaderContainer>
+        <div>
+          <h2>Quản lý sản phẩm</h2>
+          <CustomDashboardBreadcrumbs separator="." maxItems={4} aria-label="breadcrumb">
+            <NavLink to={'/manage-products'}>Quản lý sản phẩm</NavLink>
+          </CustomDashboardBreadcrumbs>
+        </div>
+        <Button variant="outlined" startIcon={<Add />} onClick={handleOpen}>
+          Thêm
         </Button>
+      </HeaderContainer>
+      <Box mb={4}>
+        <InfoCard
+          count={productCount}
+          icon={<Style color="primary" />}
+          title={'Sản phẩm'}
+        />
       </Box>
-      <Grid container spacing={3} mb={'20px'}>
-        <Grid size={{ sm: 6, md: 4 }}>
-          <CountCard
-            count={productCount}
-            icon={<Style />}
-            title={'Sản phẩm'}
-          />
-        </Grid>
-      </Grid>
-
-      {/* <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
-        {loadingBest ? null
+      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
+        {loadBest ? null
           :
-          <Grid item xs={12} lg={6}>
-            <Paper elevation={3} sx={{ padding: '5px 15px' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center' }}><LocalFireDepartment />Top 5 sách bán chạy</h3>
-              <Stack>
-                {best?.content?.map((book, index) => (
-                  <Paper elevation={1} key={index}
-                    onClick={() => navigate(`/detail/${book.id}`)}
-                    sx={{ width: '100%', display: 'flex', my: '5px', padding: 1, cursor: 'pointer' }}>
-                    <LazyLoadImage src={book.image} style={imageStyle} />
-                    <div>
-                      <BookTitle>{book.title}</BookTitle>
-                      <BookPrice>{book.price.toLocaleString()} đ</BookPrice>
-                    </div>
-                  </Paper>
-                ))}
-              </Stack>
-            </Paper>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <ProductsShowcase {...{
+              title: <><LocalFireDepartment />Top sản phẩm bán chạy</>, data: bestSeller,
+              isLoading: loadBest, isSuccess: doneBest, isError: errorBest
+            }} />
           </Grid>
         }
 
-        {loadingFav ? null
+        {/* {loadingFav ? null
           :
           <Grid item xs={12} lg={6}>
             <Paper elevation={3} sx={{ padding: '5px 15px' }}>
@@ -152,11 +101,10 @@ const ManageProducts = () => {
               </Stack>
             </Paper>
           </Grid>
-        }
-      </Grid> */}
-
-      <TableProducts setProductCount={setProductCount} />
-      <Suspense fallback={<></>}>
+        } */}
+      </Grid>
+      <TableProducts {...{ setProductCount, isShop, setIsShop }} />
+      <Suspense fallback={null}>
         {open && <ProductFormDialog open={open} handleClose={handleClose} />}
       </Suspense>
     </>

@@ -2,7 +2,8 @@ import styled from '@emotion/styled'
 import { useState, useEffect, Fragment, memo, useCallback, useRef } from "react"
 import { Button, Divider, Checkbox, FormGroup, FormControlLabel, List, ListItemButton, Collapse, Skeleton, Stack, Badge, Radio } from '@mui/material';
 import { ExpandLess, ExpandMore, FilterAltOff, Star, StarBorder, CategoryOutlined } from '@mui/icons-material';
-import { bookTypes, suggestPrices } from "../../../ultils/filters";
+import { suggestPrices } from "../../../ultils/filters";
+import { bookTypeItems } from '../../../ultils/book';
 import { useGetCategoriesQuery } from '../../../features/categories/categoriesApiSlice';
 import { useGetPublishersQuery } from '../../../features/publishers/publishersApiSlice';
 import { debounce } from 'lodash-es';
@@ -482,7 +483,7 @@ const TypeFilter = memo(({ types, onChangeType, typesRef }) => {
         <FilterText>Hình thức bìa</FilterText>
       </TitleContainer>
       <FormGroup sx={{ padding: 0, width: '100%' }}>
-        {bookTypes.map((option, index) => {
+        {bookTypeItems.map((option, index) => {
           const isItemSelected = isSelected(option.value);
 
           return (

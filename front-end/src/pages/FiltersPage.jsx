@@ -150,7 +150,7 @@ const FiltersPage = () => {
     useEffect(() => { updateFilters(); }, [cSlug, searchParams])
 
     //Set title
-    useTitle('RING! - Cửa hàng');
+    useTitle('Cửa hàng');
 
     //Handle change
     const scrollToTop = useCallback(() => { scrollRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, [])

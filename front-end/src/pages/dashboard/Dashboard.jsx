@@ -1,16 +1,19 @@
 import styled from '@emotion/styled'
 import { styled as muiStyled } from '@mui/material';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AutoStories as AutoStoriesIcon, Group as GroupIcon, Receipt as ReceiptIcon, Try as TryIcon } from "@mui/icons-material";
 import { Grid2 as Grid, Paper } from '@mui/material';
 import TableProducts from '../../components/dashboard/table/TableProducts'
-import TableUsers from "../../components/dashboard/table/TableUsers";
-import TableReviews from "../../components/dashboard/table/TableReviews";
-import TableOrders from "../../components/dashboard/table/TableOrders";
+// import TableUsers from "../../components/dashboard/table/TableUsers";
+// import TableReviews from "../../components/dashboard/table/TableReviews";
+// import TableOrders from "../../components/dashboard/table/TableOrders";
 import ChartUsers from "../../components/dashboard/chart/ChartUsers";
 import ChartSales from "../../components/dashboard/chart/ChartSales";
 import useAuth from "../../hooks/useAuth";
 import useTitle from "../../hooks/useTitle";
+import WelcomeCard from '../../components/dashboard/custom/WelcomeCard';
+import InfoCard from '../../components/dashboard/custom/InfoCard';
+import SummaryTableProducts from '../../components/dashboard/table/SummaryTableProducts';
 
 //#region preStyled
 const CountContainer = muiStyled(Paper)(({ theme }) => ({
@@ -39,53 +42,58 @@ const Dashboard = () => {
   const [reviewCount, setReviewCount] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
   const { roles, username } = useAuth();
-  const [admin, setAdmin] = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
+  const isAdmin = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
 
   //Set title
-  useTitle('RING! - Dashboard');
+  useTitle('Dashboard');
 
   return (
     <>
-      <h2>Chào mừng {username}!</h2>
-      <Grid container size="grow" spacing={3} mb={2}>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <CountContainer elevation={3} >
-            <AutoStoriesIcon sx={countIconStyle} />
-            <CountInfo><h2 style={{ margin: 0 }}>{productCount}</h2><span>Cuốn sách</span></CountInfo>
-          </CountContainer>
+      <Grid container size="grow" spacing={3} pt={2}>
+        <Grid size={{ xs: 12, sm: 7 }}>
+          <WelcomeCard />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <CountContainer elevation={3} >
-            <ReceiptIcon sx={countIconStyle} />
-            <CountInfo><h2 style={{ margin: 0 }}>{orderCount}</h2><span>Đơn hàng</span></CountInfo>
-          </CountContainer>
+        <Grid size={{ xs: 12, sm: 4 }}>
+          <p>STUFF</p>
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <CountContainer elevation={3} >
-            <ReceiptIcon sx={countIconStyle} />
-            <CountInfo><h2 style={{ margin: 0 }}>{orderCount}</h2><span>Đơn hàng</span></CountInfo>
-          </CountContainer>
+        <Grid size={{ xs: 12, sm: 4 }}>
+          <InfoCard
+            count={productCount}
+            icon={<AutoStoriesIcon color="primary" />}
+            title={'Sản phẩm'}
+          />
         </Grid>
-      </Grid>
-      <ChartSales />
-      {admin && <ChartUsers />}
-      <Grid container size="grow" spacing={3} mb={2}>
-        <Grid size={{ xs: 12, lg: 6 }}>
-          <TableProducts mini={true} setProductCount={setProductCount} />
+        <Grid size={{ xs: 12, sm: 4 }}>
+          <InfoCard
+            count={orderCount}
+            icon={<ReceiptIcon color="primary" />}
+            title={'Đơn hàng'}
+          />
         </Grid>
-        <Grid size={{ xs: 12, lg: 6 }}>
-          <TableOrders mini={true} setOrderCount={setOrderCount} />
+        <Grid size={{ xs: 12, sm: 4 }}>
+          <InfoCard
+            count={productCount}
+            icon={<AutoStoriesIcon color="primary" />}
+            title={'Sản phẩm'}
+          />
         </Grid>
-        {admin &&
-          <>
-            <Grid size={{ xs: 12, lg: 6 }}>
-              <TableUsers mini={true} setUserCount={setUserCount} />
-            </Grid>
-            <Grid size={{ xs: 12, lg: 6 }}>
-              <TableReviews mini={true} setReviewCount={setReviewCount} />
-            </Grid>
-          </>
+        <Grid size={12}>
+          <ChartSales />
+        </Grid>
+        {isAdmin &&
+          <Grid size={12}>
+            <ChartUsers />
+          </Grid>
         }
+        <Grid size={{ xs: 12, lg: 3.5 }}>
+          <SummaryTableProducts title={'test'} />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, lg: 5 }}>
+          <SummaryTableProducts title={'test'} />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, lg: 3.5 }}>
+          <SummaryTableProducts title={'test'} />
+        </Grid>
       </Grid>
     </>
   )

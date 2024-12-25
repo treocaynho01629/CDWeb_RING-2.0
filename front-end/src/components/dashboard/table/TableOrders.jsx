@@ -1,15 +1,14 @@
 import { useState, useEffect, Fragment } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, FormControlLabel, Switch, Collapse, TextField, MenuItem, Avatar, Checkbox, Skeleton, Chip, Badge, Grid2 as Grid, TableFooter } from '@mui/material';
-import { Receipt as ReceiptIcon, KeyboardArrowDown as KeyboardArrowDownIcon, KeyboardArrowUp as KeyboardArrowUpIcon, MoreHoriz } from '@mui/icons-material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, FormControlLabel, Switch, Collapse, TextField, MenuItem, Avatar, Checkbox, Skeleton, Chip, Badge, Grid2 as Grid, TableFooter, Toolbar } from '@mui/material';
+import { Receipt as ReceiptIcon, KeyboardArrowDown as KeyboardArrowDownIcon, KeyboardArrowUp as KeyboardArrowUpIcon, MoreHoriz, Search } from '@mui/icons-material';
 import { Link } from 'react-router';
 import { useGetReceiptsQuery } from '../../../features/orders/ordersApiSlice';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { FooterContainer, FooterLabel, ItemTitle } from '../custom/ShareComponents';
 import { idFormatter } from '../../../ultils/covert';
 import CustomProgress from '../../custom/CustomProgress';
-import CustomTableToolbar from '../custom/CustomTableToolbar';
-import CustomTableHead from '../custom/CustomTableHead';
-import CustomTablePagination from '../custom/CustomTablePagination';
+import CustomTableHead from '../table/CustomTableHead';
+import CustomTablePagination from '../table/CustomTablePagination';
 
 const headCells = [
   {
@@ -586,15 +585,7 @@ export default function TableOrders({ setOrderCount, mini = false }) {
 
   return (
     <TableContainer component={Paper}>
-      <CustomTableToolbar
-        numSelected={numSelected()}
-        icon={<ReceiptIcon />}
-        title={'đơn hàng'}
-        submitIcon={<MoreHoriz />}
-        submitTooltip={'Chỉnh sửa đơn hàng đã chọn'}
-        // onSubmitSelected={console.log('hehe')}
-        filterComponent={<FilterContent />}
-      />
+      <Toolbar> <FilterContent /></Toolbar>
       <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
         <Table
           stickyHeader

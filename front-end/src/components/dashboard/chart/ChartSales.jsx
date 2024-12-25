@@ -60,7 +60,7 @@ const ChartSales = () => {
     let display = chartDisplay();
 
     return (
-      <Grid container spacing={3} size="grow" mb={3}>
+      <Grid container spacing={3} size="grow">
         <Grid size={{ xs: 12, lg: 4 }}>
           <Paper elevation={3} sx={{ height: '100%', padding: 3, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Box>

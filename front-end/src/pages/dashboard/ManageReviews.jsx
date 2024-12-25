@@ -5,13 +5,13 @@ import { Link } from 'react-router'
 import { Star } from "@mui/icons-material";
 import TableReviews from "../../components/dashboard/table/TableReviews";
 import useTitle from '../../hooks/useTitle';
-import CountCard from "../../components/dashboard/custom/CountCard";
+// import CountCard from "../../components/dashboard/custom/CountCard";
 
 const ManageReviews = () => {
   const [reviewCount, setReviewCount] = useState(0);
 
   //Set title
-  useTitle('RING! - Đánh giá');
+  useTitle('Đánh giá');
 
   return (
     <>
@@ -25,11 +25,11 @@ const ManageReviews = () => {
       <br />
       <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
         <Grid item sm={6} md={4}>
-          <CountCard
+          {/* <CountCard
             count={reviewCount}
             icon={<Star />}
             title={'Đánh giá'}
-          />
+          /> */}
         </Grid>
       </Grid>
       <TableReviews setReviewCount={setReviewCount} />

@@ -62,7 +62,7 @@ const CheckoutDialog = ({ coupon, shopCoupon, discount, selected, navigate, hand
                             <CouponButton onClick={() => handleOpenDialog()}>
                                 <span>
                                     <LocalActivityOutlined color="error" />&nbsp;
-                                    {(coupon && discount) ? `Đã giảm ${currencyFormat.format(discount)}`
+                                    {(coupon && discount && numSelected > 0) ? `Đã giảm ${currencyFormat.format(discount)}`
                                         : `Chọn mã giảm giá ${(coupon != null) ? 'khác' : ''}`}
                                 </span>
                                 <MiniCouponContainer>
@@ -113,7 +113,7 @@ const CheckoutDialog = ({ coupon, shopCoupon, discount, selected, navigate, hand
                                     <CouponButton onClick={() => handleOpenDialog()}>
                                         <span>
                                             <LocalActivityOutlined color="error" />&nbsp;
-                                            {(coupon && discount) ? `Đã giảm ${currencyFormat.format(discount)}`
+                                            {(coupon && discount && numSelected > 0) ? `Đã giảm ${currencyFormat.format(discount)}`
                                                 : `Chọn mã giảm giá ${(coupon != null) ? 'khác' : ''}`}
                                         </span>
                                         <MiniCouponContainer>
@@ -173,7 +173,7 @@ const CheckoutDialog = ({ coupon, shopCoupon, discount, selected, navigate, hand
                                 <CouponButton onClick={() => handleOpenDialog()}>
                                     <span>
                                         <LocalActivityOutlined color="error" />&nbsp;
-                                        {(coupon && discount) ? `Đã giảm ${currencyFormat.format(discount)}`
+                                        {(coupon && discount && numSelected > 0) ? `Đã giảm ${currencyFormat.format(discount)}`
                                             : `Chọn mã giảm giá ${(coupon != null) ? 'khác' : ''}`}
                                     </span>
                                     <KeyboardArrowRight fontSize="small" />

@@ -15,7 +15,7 @@ const initialState = pubsAdapter.getInitialState({
 
 export const publishersApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
-        getPublishers: builder.query({
+        getPublisher: builder.query({
             query: (id) => ({
                 url: `/api/publishers/${id}`,
                 validateStatus: (response, result) => {

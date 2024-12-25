@@ -2,6 +2,7 @@ package com.ring.bookstore.repository;
 
 import java.util.List;
 
+import com.ring.bookstore.enums.BookType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -57,7 +58,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Page<IBookDisplay> findBooksWithFilter(String keyword,
                                            Integer cateId,
                                            List<Integer> pubIds,
-                                           List<String> types,
+                                           List<BookType> types,
                                            Long shopId,
                                            Double fromRange,
                                            Double toRange,

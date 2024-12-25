@@ -19,7 +19,7 @@ public class CategoryMapper {
         return new CategoryDTO(category.getId(),
                 category.getSlug(),
                 category.getName(),
-                category.getParent().getId());
+                category.getParent() != null ? category.getParent().getId() : null);
     }
 
     public CategoryDTO cateToCateDTO(Category category, String include) {

@@ -1,5 +1,6 @@
 package com.ring.bookstore.dtos.books;
 
+import com.ring.bookstore.enums.BookType;
 import com.ring.bookstore.model.Category;
 import com.ring.bookstore.model.Publisher;
 
@@ -12,7 +13,7 @@ public record BookResponseDTO(Long id,
                               BigDecimal discount,
                               String title,
                               String description,
-                              String type,
+                              BookType type,
                               String author,
                               String size,
                               Integer page,

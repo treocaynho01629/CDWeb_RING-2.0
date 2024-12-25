@@ -132,7 +132,7 @@ function AuthPage() {
     const { reCaptchaLoaded, generateReCaptchaToken } = useReCaptchaV3();
 
     //Set title
-    useTitle('RING! - Chào mừng');
+    useTitle('Chào mừng');
 
     return (
         <Wrapper>

@@ -3,6 +3,7 @@ package com.ring.bookstore.model;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.ring.bookstore.enums.BookType;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Index;
@@ -64,9 +65,9 @@ public class Book extends Auditable {
     @Nationalized
     private String description;
 
-    @Column(length = 200)
-    @Nationalized
-    private String type;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private BookType type;
 
     @Column(length = 200)
     @Nationalized

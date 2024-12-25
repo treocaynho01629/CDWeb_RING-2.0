@@ -2,7 +2,8 @@ import styled from '@emotion/styled'
 import { Fragment, useState, useEffect, memo, useRef, useCallback } from "react"
 import { Button, Skeleton, Stack, DialogContent, DialogActions, DialogTitle, SwipeableDrawer, Collapse, Badge } from '@mui/material';
 import { Check, FilterAltOff, CategoryOutlined, ExpandLess, ExpandMore } from '@mui/icons-material';
-import { suggestPrices, bookTypes } from "../../../ultils/filters";
+import { suggestPrices } from "../../../ultils/filters";
+import { bookTypeItems } from '../../../ultils/book';
 import { useGetCategoriesQuery } from '../../../features/categories/categoriesApiSlice';
 import { useGetPublishersQuery } from '../../../features/publishers/publishersApiSlice';
 import PriceRangeSlider from './PriceRangeSlider';
@@ -521,7 +522,7 @@ const TypeFilter = memo(({ types, onChangeType }) => {
         <FilterText>Hình thức bìa</FilterText>
       </TitleContainer>
       <Stack spacing={{ xs: 1 }} direction="row" useFlexGap flexWrap="wrap">
-        {bookTypes.map((option, index) => {
+        {bookTypeItems.map((option, index) => {
           const isItemSelected = isSelected(option.value);
 
           return (

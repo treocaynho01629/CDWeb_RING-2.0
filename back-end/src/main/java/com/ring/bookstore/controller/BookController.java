@@ -3,6 +3,7 @@ package com.ring.bookstore.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.ring.bookstore.enums.BookType;
 import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -63,7 +64,7 @@ public class BookController {
                                       @RequestParam(value = "cateId", required = false) Integer cateId,
                                       @RequestParam(value = "pubIds", required = false) List<Integer> pubIds,
                                       @RequestParam(value = "shopId", required = false) Long shopId,
-                                      @RequestParam(value = "types", required = false) List<String> types,
+                                      @RequestParam(value = "types", required = false) List<BookType> types,
                                       @RequestParam(value = "fromRange", defaultValue = "0") Double fromRange,
                                       @RequestParam(value = "toRange", defaultValue = "100000000") Double toRange,
                                       @RequestParam(value = "rating", defaultValue = "0") Integer rating,

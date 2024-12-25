@@ -1,12 +1,12 @@
 import styled from "@emotion/styled";
 import { useEffect, useMemo, useState, Suspense, lazy, useCallback } from "react";
 import { Delete as DeleteIcon, ShoppingCart as ShoppingCartIcon, Search, ChevronLeft, Sell } from '@mui/icons-material';
-import { Checkbox, Button, Grid2 as Grid, Table, TableBody, TableRow, Box, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
+import { Button, Grid2 as Grid, Table, TableBody, TableRow, Box, MenuItem, ListItemText, ListItemIcon } from '@mui/material';
 import { Link, useNavigate } from 'react-router';
 import { booksApiSlice } from '../../features/books/booksApiSlice';
 import { useCalculateMutation } from '../../features/orders/ordersApiSlice';
 import { ActionTableCell, StyledTableCell, StyledTableHead } from '../custom/CustomTableComponents';
-import { debounce, isEqual } from 'lodash-es';
+import { debounce } from 'lodash-es';
 import { useGetRecommendCouponsQuery } from '../../features/coupons/couponsApiSlice';
 import { StyledCheckbox } from '../custom/CartComponents';
 import useCart from '../../hooks/useCart';

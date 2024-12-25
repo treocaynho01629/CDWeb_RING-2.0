@@ -44,25 +44,6 @@ export const suggestPrices = [
     },
 ];
 
-export const bookTypes = [
-    {
-        value: 'Bìa mềm',
-        label: 'Bìa mềm',
-    },
-    {
-        value: 'Bìa rời',
-        label: 'Bìa rời',
-    },
-    {
-        value: 'Bìa cứng',
-        label: 'Bìa cứng',
-    },
-    {
-        value: 'Bìa gỗ',
-        label: 'Bìa gỗ',
-    },
-];
-
 export const sortBy = [
     {
         value: 'createdDate',

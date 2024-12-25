@@ -233,8 +233,8 @@ const OrderItem = ({ order, handleAddToCart }) => {
                             <StuffContainer>
                                 <Amount>Số lượng: <b>{item?.quantity}</b></Amount>
                                 <PriceContainer>
-                                    <Discount>{item?.discount > 0 ? currencyFormat.format(item.price) : ''}</Discount>
                                     <Price>{currencyFormat.format(item.price * (1 - (item?.discount || 0)))}</Price>
+                                    <Discount>{item?.discount > 0 ? currencyFormat.format(item.price) : ''}</Discount>
                                 </PriceContainer>
                             </StuffContainer>
                         </ContentContainer>
