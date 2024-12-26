@@ -78,18 +78,15 @@ export const Title = styled.h3`
     text-transform: uppercase;
     margin: 0 0 20px;
     padding: 15px 0;
-    border-bottom: .5px solid ${props => props.theme.palette.divider};
+    border-bottom: .5px solid ${props => props.theme.palette[props.color]?.main || props.theme.palette.divider};
+    color: ${props => props.theme.palette[props.color]?.main || props.theme.palette.text.primary};
+    border-color: ${props => props.theme.palette[props.color]?.main || props.theme.palette.primary.main};
     width: 100%;
 
     a {
         display: none;
         align-items: center;
         color: ${props => props.theme.palette.text.primary};
-    }
-
-    &.primary {
-        color: ${props => props.theme.palette.primary.main};
-        border-color: ${props => props.theme.palette.primary.main};
     }
 
     ${props => props.theme.breakpoints.down("md")} {
@@ -150,12 +147,5 @@ export const Message = styled.span`
     justify-content: center;
     text-align: center;
     white-space: wrap;
-
-    &.warning {
-        color: ${props => props.theme.palette.warning.main};
-    }
-
-    &.error {
-        color: ${props => props.theme.palette.error.main};
-    }
+    color: ${props => props.theme.palette[props.color]?.main || props.theme.palette.text.primary}
 `

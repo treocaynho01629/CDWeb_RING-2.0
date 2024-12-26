@@ -43,7 +43,7 @@ const PriceDisplay = ({ displayInfo, loggedIn }) => {
                     <Collapse key={'disclaimer'}>
                         <CheckoutRow>
                             <CheckoutText></CheckoutText>
-                            <CheckoutText className="warning">&nbsp;<br/>Đăng nhập để có thể áp dụng mã</CheckoutText>
+                            <CheckoutText color="warning">&nbsp;<br/>Đăng nhập để có thể áp dụng mã</CheckoutText>
                         </CheckoutRow>
                     </Collapse>
                 }

@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 public class CalculateMapper {
     private final CouponMapper couponMapper;
 
-    public CalculateDetailDTO detailToDetailDTO(OrderDetail detail) {
+    public CalculateDetailDTO detailToDTO(OrderDetail detail) {
         List<OrderItem> orderItems = detail.getItems();
-        List<CalculateItemDTO> itemDTOS = orderItems.stream().map(this::itemToItemDTO).collect(Collectors.toList());
+        List<CalculateItemDTO> itemDTOS = orderItems.stream().map(this::itemToDTO).collect(Collectors.toList());
 
         //Shop
         Shop shop = detail.getShop();
@@ -35,7 +35,7 @@ public class CalculateMapper {
                 itemDTOS);
     }
 
-    public CalculateItemDTO itemToItemDTO(OrderItem item) {
+    public CalculateItemDTO itemToDTO(OrderItem item) {
         Book book = item.getBook();
         double price = (price = book.getPrice()) != 0.0 ? price : -1.0;
         short amount = book.getAmount();
@@ -52,9 +52,9 @@ public class CalculateMapper {
                 title);
     }
 
-    public CalculateDTO orderToCalculate(OrderReceipt order) {
+    public CalculateDTO orderToDTO(OrderReceipt order) {
         List<OrderDetail> orderDetails = order.getDetails();
-        List<CalculateDetailDTO> detailDTOS = orderDetails.stream().map(this::detailToDetailDTO).collect(Collectors.toList());
+        List<CalculateDetailDTO> detailDTOS = orderDetails.stream().map(this::detailToDTO).collect(Collectors.toList());
 
         return new CalculateDTO(order.getTotal(),
                 order.getProductsPrice(),

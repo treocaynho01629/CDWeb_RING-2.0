@@ -100,9 +100,7 @@ export const CheckoutText = styled.span`
     font-size: 14px;
     font-weight: 400;
     white-space: nowrap;
-
-    &.error { color: ${props => props.theme.palette.error.main}}
-    &.warning { color: ${props => props.theme.palette.warning.main}}
+    color: ${props => props.theme.palette[props.color]?.main || props.theme.palette.text.primary};
 `
 
 export const PriceContainer = styled.div`

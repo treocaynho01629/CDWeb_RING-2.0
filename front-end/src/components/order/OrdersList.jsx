@@ -230,7 +230,7 @@ const OrdersList = () => {
             </MessageContainer>
     } else if (isError) {
         ordersContent = <MessageContainer>
-            <Message className="error">{error?.error || 'Đã xảy ra lỗi'}</Message>
+            <Message color="error">{error?.error || 'Đã xảy ra lỗi'}</Message>
         </MessageContainer>
     }
 
@@ -270,7 +270,7 @@ const OrdersList = () => {
                     {ordersContent}
                     {(pagination.number > 0 && isFetching) && <LoadContainer><CircularProgress size={30} color="primary" /></LoadContainer>}
                     {(data?.ids?.length > 0 && data?.ids?.length == data?.page?.totalElements)
-                        && <Message className="warning">Không còn đơn hàng nào!</Message>}
+                        && <Message color="warning">Không còn đơn hàng nào!</Message>}
                 </OrdersContainer>
             </DialogContent>
         </>

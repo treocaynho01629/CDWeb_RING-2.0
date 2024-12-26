@@ -35,7 +35,7 @@ public class CategoryController {
     public ResponseEntity<?> getCategories(@RequestParam(value = "pSize", defaultValue = "20") Integer pageSize,
                                            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                            @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-                                           @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
+                                           @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
                                            @RequestParam(value = "include", required = false) String include,
                                            @RequestParam(value = "parentId", required = false) Integer parentId) {
         return new ResponseEntity<>(cateService.getCategories(pageNo, pageSize, sortBy, sortDir, include, parentId), HttpStatus.OK);

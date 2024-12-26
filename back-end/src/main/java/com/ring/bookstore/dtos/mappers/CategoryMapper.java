@@ -15,27 +15,27 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryMapper {
 
-    public CategoryDTO cateToCateDTO(Category category) {
+    public CategoryDTO cateToDTO(Category category) {
         return new CategoryDTO(category.getId(),
                 category.getSlug(),
                 category.getName(),
                 category.getParent() != null ? category.getParent().getId() : null);
     }
 
-    public CategoryDTO cateToCateDTO(Category category, String include) {
+    public CategoryDTO cateToDTO(Category category, String include) {
         List<CategoryDTO> children = null;
         CategoryDTO parent = null;
         Category parentCate = category.getParent();
 
         //Include?
-        if (include == null) return this.cateToCateDTO(category);
+        if (include == null) return this.cateToDTO(category);
         if (include.equalsIgnoreCase("parent")){
-            parent = parentCate != null ? this.cateToCateDTO(parentCate, "parent") : null;
+            parent = parentCate != null ? this.cateToDTO(parentCate, "parent") : null;
         } else if (include.equalsIgnoreCase("children")) {
             children = category.getSubCates()
                     .stream()
                     .sorted(Comparator.comparingInt(Category::getId))
-                    .map(this::cateToCateDTO).collect(Collectors.toList());
+                    .map(this::cateToDTO).collect(Collectors.toList());
         }
 
         return new CategoryDTO(category.getId(),
@@ -62,12 +62,12 @@ public class CategoryMapper {
         //Include?
         if (include == null) return this.cateToDetailDTO(category);
         if (include.equalsIgnoreCase("parent")){
-            parent = parentCate != null ? this.cateToCateDTO(parentCate, "parent") : null;
+            parent = parentCate != null ? this.cateToDTO(parentCate, "parent") : null;
         } else if (include.equalsIgnoreCase("children")) {
             children = category.getSubCates()
                     .stream()
                     .sorted(Comparator.comparingInt(Category::getId))
-                    .map(this::cateToCateDTO).collect(Collectors.toList());
+                    .map(this::cateToDTO).collect(Collectors.toList());
         }
 
         return new CategoryDetailDTO(category.getId(),
@@ -79,7 +79,7 @@ public class CategoryMapper {
                 children);
     }
 
-    public PreviewCategoryDTO projectionToPreview(ICategory projection) {
+    public PreviewCategoryDTO projectionToPreviewDTO(ICategory projection) {
         Category category = projection.getCategory();
 
         String fileDownloadUri = projection.getImage() != null ?

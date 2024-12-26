@@ -11,9 +11,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @Service
 public class OrderMapper {
 
-    public ReceiptDTO orderToOrderDTO(OrderReceipt order) {
+    public ReceiptDTO orderToDTO(OrderReceipt order) {
         List<OrderDetail> orderDetails = order.getDetails();
-        List<OrderDTO> detailDTOS = orderDetails.stream().map(this::detailToDetailDTO).collect(Collectors.toList());
+        List<OrderDTO> detailDTOS = orderDetails.stream().map(this::detailToOrderDTO).collect(Collectors.toList());
         Account user = order.getUser();
         Address address = order.getAddress();
 
@@ -84,9 +84,9 @@ public class OrderMapper {
         return result;
     }
 
-    public OrderDTO detailToDetailDTO(OrderDetail detail) {
+    public OrderDTO detailToOrderDTO(OrderDetail detail) {
         List<OrderItem> orderItems = detail.getItems();
-        List<OrderItemDTO> itemDTOS = orderItems.stream().map(this::itemToItemDTO).collect(Collectors.toList());
+        List<OrderItemDTO> itemDTOS = orderItems.stream().map(this::itemToDTO).collect(Collectors.toList());
         Shop shop = detail.getShop();
 
         return new OrderDTO(detail.getId(),
@@ -100,7 +100,7 @@ public class OrderMapper {
                 itemDTOS);
     }
 
-    public OrderItemDTO itemToItemDTO(OrderItem item) {
+    public OrderItemDTO itemToDTO(OrderItem item) {
         Book book = item.getBook();
         String fileDownloadUri = book.getImage().getFileDownloadUri();
 
@@ -114,9 +114,9 @@ public class OrderMapper {
                 book.getTitle());
     }
 
-    public OrderDetailDTO orderToDetailDTO(OrderDetail detail) {
+    public OrderDetailDTO detailToDTO(OrderDetail detail) {
         List<OrderItem> orderItems = detail.getItems();
-        List<OrderItemDTO> itemDTOS = orderItems.stream().map(this::itemToItemDTO).collect(Collectors.toList());
+        List<OrderItemDTO> itemDTOS = orderItems.stream().map(this::itemToDTO).collect(Collectors.toList());
         OrderReceipt order = detail.getOrder();
         Address address = order.getAddress();
         Shop shop = detail.getShop();
@@ -136,5 +136,15 @@ public class OrderMapper {
                 detail.getShippingFee(),
                 detail.getShippingDiscount(),
                 itemDTOS);
+    }
+
+    public ReceiptSummaryDTO summaryToDTO(IReceiptSummary projection) {
+        return new ReceiptSummaryDTO(projection.getId(),
+                projection.getImage(),
+                projection.getName(),
+                projection.getDate(),
+                projection.getTotalPrice(),
+                projection.getTotalItems()
+        );
     }
 }

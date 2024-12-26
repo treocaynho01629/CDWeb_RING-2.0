@@ -27,10 +27,12 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
         }),
         getReceipts: builder.query({
             query: (args) => {
-                const { page, size, sortBy, sortDir } = args || {};
+                const { shopId, bookId, page, size, sortBy, sortDir } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
+                if (shopId) params.append('shopId', shopId);
+                if (page) params.append('bookId', bookId);
                 if (page) params.append('pageNo', page);
                 if (size) params.append('pSize', size);
                 if (sortBy) params.append('sortBy', sortBy);
@@ -57,6 +59,42 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                         ...result.ids.map(id => ({ type: 'Receipt', id }))
                     ]
                 } else return [{ type: 'Receipt', id: 'LIST' }]
+            },
+        }),
+        getSummaries: builder.query({
+            query: (args) => {
+                const { shopId, bookId, page, size, sortBy, sortDir } = args || {};
+
+                //Params
+                const params = new URLSearchParams();
+                if (shopId) params.append('shopId', shopId);
+                if (page) params.append('bookId', bookId);
+                if (page) params.append('pageNo', page);
+                if (size) params.append('pSize', size);
+                if (sortBy) params.append('sortBy', sortBy);
+                if (sortDir) params.append('sortDir', sortDir);
+
+                return {
+                    url: `/api/orders/summaries?${params.toString()}`,
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result?.isError
+                    },
+                }
+            },
+            transformResponse: responseData => {
+                const { content, page } = responseData;
+                return ordersAdapter.setAll({
+                    ...initialState,
+                    page
+                }, content)
+            },
+            providesTags: (result, error, arg) => {
+                if (result?.ids) {
+                    return [
+                        { type: 'Summary', id: 'LIST' },
+                        ...result.ids.map(id => ({ type: 'Summary', id }))
+                    ]
+                } else return [{ type: 'Summary', id: 'LIST' }]
             },
         }),
         getOrdersByUser: builder.query({
@@ -197,6 +235,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
 export const {
     useGetReceiptQuery,
     useGetReceiptsQuery,
+    useGetSummariesQuery,
     useGetOrdersByUserQuery,
     useGetOrdersByBookIdQuery,
     useGetSaleQuery,

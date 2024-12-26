@@ -1,12 +1,8 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.accounts.AccountDetailDTO;
+import com.ring.bookstore.dtos.accounts.*;
 import com.ring.bookstore.dtos.ChartDTO;
-import com.ring.bookstore.dtos.accounts.ProfileDTO;
-import com.ring.bookstore.dtos.mappers.AccountDetailMapper;
-import com.ring.bookstore.dtos.mappers.ChartDataMapper;
-import com.ring.bookstore.dtos.mappers.ProfileMapper;
-import com.ring.bookstore.dtos.accounts.IProfile;
+import com.ring.bookstore.dtos.mappers.AccountMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ImageResizerException;
@@ -21,7 +17,6 @@ import com.ring.bookstore.request.AccountRequest;
 import com.ring.bookstore.request.ChangePassRequest;
 import com.ring.bookstore.request.ProfileRequest;
 import com.ring.bookstore.service.AccountService;
-import com.ring.bookstore.service.EmailService;
 import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.service.RoleService;
 import jakarta.transaction.Transactional;
@@ -44,31 +39,31 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepo;
     private final AccountProfileRepository profileRepo;
-    private final PasswordEncoder passwordEncoder;
+
     private final RoleService roleService;
-    private final EmailService emailService;
     private final ImageService imageService;
-    private final ProfileMapper profileMapper;
-    private final AccountDetailMapper detailMapper;
-    private final ChartDataMapper chartMapper;
+
+    private final AccountMapper accountMapper;
+    private final PasswordEncoder passwordEncoder;
 
     //Get all accounts
-    public Page<Account> getAllAccounts(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                Boolean isEmployees, String keyword, Integer role) {
+    public Page<AccountDTO> getAllAccounts(Integer pageNo,
+                                           Integer pageSize,
+                                           String sortBy,
+                                           String sortDir,
+                                           String keyword,
+                                           Short roles) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
-
-        //Filter by role/employees
-        int maxRoles = role != null ? role : RoleName.values().length + 1; //+ 1 to prevent role = 3 (ADMIN)
-        int minRoles = (maxRoles < RoleName.values().length + 1) ? maxRoles - 1 : (isEmployees ? 1 : 0);
-        return accountRepo.findAccountsWithFilter(keyword, maxRoles, minRoles, pageable);
+        Page<IAccount> accountsList = accountRepo.findAccountsWithFilter(keyword, roles, pageable);
+        return accountsList.map(accountMapper::projectionToDTO);
     }
 
     //Get account by {id}
     public AccountDetailDTO getAccountById(Long id) {
         Account account = accountRepo.findById(id).orElseThrow(()
                 -> new ResourceNotFoundException("User not found!"));
-        return detailMapper.apply(account);
+        return accountMapper.accountToDetailDTO(account);
     }
 
     //Create account (ADMIN)
@@ -214,7 +209,7 @@ public class AccountServiceImpl implements AccountService {
     public ProfileDTO getProfile(Account user) {
         IProfile currProfile = profileRepo.findProfileByUser(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found!"));
-        return profileMapper.apply(currProfile);
+        return accountMapper.projectionToProfileDTO(currProfile);
     }
 
     //Update account's profile

@@ -1,8 +1,8 @@
 package com.ring.bookstore.repository;
 
-import java.util.List;
 import java.util.Optional;
 
+import com.ring.bookstore.dtos.accounts.IAccount;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,12 +25,14 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	Optional<Account> findByEmail(String email); //Get Account by {email}
 	
 	@Query("""
-		select a from Account a left join fetch AccountProfile p on a.id = p.user.id
+		select a.id as id, a.username as username, i.name as image, a.email as email, size(a.roles) as roles
+		from Account a
+		left join a.profile p
+		left join p.image i
 		where concat (a.email, a.username) ilike %:keyword%
-		and size(a.roles) <= :maxRoles
-		and size(a.roles) > :minRoles
+		and (coalesce(:roles) is null or size(a.roles) = :roles)
 	""")
-	Page<Account> findAccountsWithFilter(String keyword, Integer maxRoles, Integer minRoles, Pageable pageable);
+	Page<IAccount> findAccountsWithFilter(String keyword, Short roles, Pageable pageable);
 	
 //	@Query(value ="""
 //		select t.username as name, coalesce(t.rv, 0) as reviews, coalesce(t2.od, 0) as orders, coalesce(t2.sp, 0) as spends

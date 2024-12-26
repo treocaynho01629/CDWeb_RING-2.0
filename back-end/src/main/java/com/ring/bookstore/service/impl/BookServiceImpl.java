@@ -52,13 +52,13 @@ public class BookServiceImpl implements BookService {
     //Get random books
     public List<BookDTO> getRandomBooks(Integer amount, Boolean withDesc) {
         List<IBookDisplay> booksList = bookRepo.findRandomBooks(amount, withDesc);
-        List<BookDTO> bookDTOS = booksList.stream().map(bookMapper::displayToBookDTO).collect(Collectors.toList()); //Return books
+        List<BookDTO> bookDTOS = booksList.stream().map(bookMapper::projectionToDTO).collect(Collectors.toList()); //Return books
         return bookDTOS;
     }
 
     public List<BookDTO> getBooksInIds(List<Long> ids) {
         List<IBookDisplay> booksList = bookRepo.findBooksDisplayInIds(ids);
-        List<BookDTO> bookDTOS = booksList.stream().map(bookMapper::displayToBookDTO).collect(Collectors.toList()); //Return books
+        List<BookDTO> bookDTOS = booksList.stream().map(bookMapper::projectionToDTO).collect(Collectors.toList()); //Return books
         return bookDTOS;
     }
 
@@ -93,7 +93,7 @@ public class BookServiceImpl implements BookService {
                 rating,
                 amount,
                 pageable);
-        Page<BookDTO> bookDTOS = booksList.map(bookMapper::displayToBookDTO);
+        Page<BookDTO> bookDTOS = booksList.map(bookMapper::projectionToDTO);
         return bookDTOS;
     }
 
@@ -101,7 +101,7 @@ public class BookServiceImpl implements BookService {
     public BookDetailDTO getBookDetail(Long id, String slug) {
         IBookDetail book = detailRepo.findBookDetail(id, slug).orElseThrow(() ->
                 new ResourceNotFoundException("Product not found!"));
-        BookDetailDTO bookDetailDTO = bookMapper.detailToDetailDTO(book); //Map to DTO
+        BookDetailDTO bookDetailDTO = bookMapper.projectionToDetailDTO(book); //Map to DTO
         return bookDetailDTO;
     }
 

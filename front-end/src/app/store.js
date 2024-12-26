@@ -34,7 +34,7 @@ export const store = configureStore({
                 ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
             },
         }).concat(apiSlice.middleware),
-    devTools: import.meta.env.VITE_NODE_ENV === 'development',
+    devTools: import.meta.env.VITE_NODE_ENV === 'dev',
 });
 
 export let persistor = persistStore(store);

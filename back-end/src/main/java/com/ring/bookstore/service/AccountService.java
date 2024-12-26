@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.ring.bookstore.dtos.ChartDTO;
+import com.ring.bookstore.dtos.accounts.AccountDTO;
 import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.data.domain.Page;
 
@@ -18,13 +19,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface AccountService {
 	
-	Page<Account> getAllAccounts(Integer pageNo,
-								 Integer pageSize,
-								 String sortBy,
-								 String sortDir,
-								 Boolean isEmployee,
-								 String keyword,
-								 Integer role);
+	Page<AccountDTO> getAllAccounts(Integer pageNo,
+									Integer pageSize,
+									String sortBy,
+									String sortDir,
+									String keyword,
+									Short roles);
 	AccountDetailDTO getAccountById(Long id);
 	Account saveAccount(AccountRequest request);
 	Account updateAccount(AccountRequest request,

@@ -1,17 +1,13 @@
 package com.ring.bookstore.controller;
 
-import com.ring.bookstore.dtos.orders.CalculateDTO;
-import com.ring.bookstore.dtos.orders.OrderDetailDTO;
-import com.ring.bookstore.dtos.orders.OrderDTO;
+import com.ring.bookstore.dtos.orders.*;
 import com.ring.bookstore.enums.OrderStatus;
-import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.request.CalculateRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ring.bookstore.config.CurrentAccount;
-import com.ring.bookstore.dtos.orders.ReceiptDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.request.OrderRequest;
 import com.ring.bookstore.service.OrderService;
@@ -35,8 +30,6 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 	
 	private final OrderService orderService;
-
-	private final AccountRepository accRepo;
 
 	//Calculate price
 	@PostMapping("/calculate")
@@ -60,21 +53,36 @@ public class OrderController {
 	//Get all orders
 	@GetMapping("/receipts")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> getAllOrders(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+    public ResponseEntity<?> getAllOrders(@RequestParam(value = "shopId", required = false) Long shopId,
+											@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
     										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
     										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-    										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
+    										@RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
         									@CurrentAccount Account currUser){
-        Page<ReceiptDTO> orders = orderService.getAllReceipts(currUser, pageNo, pageSize, sortBy, sortDir);
+        Page<ReceiptDTO> orders = orderService.getAllReceipts(currUser, shopId, pageNo, pageSize, sortBy, sortDir);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
+
+	//Get summaries
+	@GetMapping("/summaries")
+	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+	public ResponseEntity<?> getSummaries(@RequestParam(value = "shopId", required = false) Long shopId,
+										  @RequestParam(value = "bookId", required = false) Long bookId,
+										  @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+										  @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+										  @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+										  @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+										  @CurrentAccount Account currUser){
+		Page<ReceiptSummaryDTO> summaries = orderService.getSummariesWithFilter(currUser, shopId, bookId, pageNo, pageSize, sortBy, sortDir);
+		return new ResponseEntity<>(summaries, HttpStatus.OK);
+	}
 	
 	//Get order by {id}
 	@GetMapping("/receipts/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> getReceipt(@PathVariable("id") Long id){
 		ReceiptDTO receipt = orderService.getReceipt(id);
-        return new ResponseEntity< >(receipt, HttpStatus.OK);
+        return new ResponseEntity<>(receipt, HttpStatus.OK);
     }
 
     //Get order by {id}
@@ -104,7 +112,7 @@ public class OrderController {
     										@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
     										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
     										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-    										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir){
+    										@RequestParam(value = "sortDir", defaultValue = "desc") String sortDir){
         Page<OrderDTO> orders = orderService.getOrdersByBookId(id, pageNo, pageSize, sortBy, sortDir);
         return new ResponseEntity< >(orders, HttpStatus.OK);
     }

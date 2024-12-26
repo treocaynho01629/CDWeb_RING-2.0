@@ -221,10 +221,10 @@ const RegisterTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaTo
                 }
                 <TermText>Được bảo vệ bởi reCAPTCHA và Google thông qua<br />
                     <a href="https://policies.google.com/terms">
-                        <AuthHighlight className="warning">Điều khoản dịch vụ</AuthHighlight>
+                        <AuthHighlight color="warning">Điều khoản dịch vụ</AuthHighlight>
                     </a>&nbsp;&&nbsp;
                     <a href="https://policies.google.com/privacy">
-                        <AuthHighlight className="warning">Chính sách bảo mật</AuthHighlight>
+                        <AuthHighlight color="warning">Chính sách bảo mật</AuthHighlight>
                     </a>
                 </TermText>
                 <ConfirmButton

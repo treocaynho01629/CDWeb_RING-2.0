@@ -14,7 +14,6 @@ import com.ring.bookstore.dtos.mappers.ChartDataMapper;
 import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.enums.ShippingType;
 import com.ring.bookstore.listener.checkout.OnCheckoutCompletedEvent;
-import com.ring.bookstore.listener.registration.OnRegistrationCompleteEvent;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.*;
 import com.ring.bookstore.request.*;
@@ -304,7 +303,7 @@ public class OrderServiceImpl implements OrderService {
         orderReceipt.setCouponDiscount(totalCouponDiscount);
         orderReceipt.setShippingDiscount(totalShippingDiscount);
 
-        return calculateMapper.orderToCalculate(orderReceipt);
+        return calculateMapper.orderToDTO(orderReceipt);
     }
 
     //Commit order
@@ -566,7 +565,7 @@ public class OrderServiceImpl implements OrderService {
         orderReceipt.setTotalDiscount(totalDiscount);
 
         OrderReceipt savedOrder = orderRepo.save(orderReceipt);
-        ReceiptDTO receiptDTO = orderMapper.orderToOrderDTO(savedOrder);
+        ReceiptDTO receiptDTO = orderMapper.orderToDTO(savedOrder);
 
         //Trigger email event
         eventPublisher.publishEvent(new OnCheckoutCompletedEvent(
@@ -579,22 +578,40 @@ public class OrderServiceImpl implements OrderService {
     }
 
     //Get all orders
-    @Override
-    public Page<ReceiptDTO> getAllReceipts(Account user, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+    @Transactional
+    public Page<ReceiptDTO> getAllReceipts(Account user, Long shopId, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
+        boolean isAdmin = isAuthAdmin();
 
         Page<OrderReceipt> ordersList = null;
+//        Page<OrderReceipt> ordersList = shopId != null ?
+//                orderRepo.findAllByUsersShop(shopId, isAdmin ? null : user.getId(), pageable) //Fetch by shop
+//                : isAdmin ? orderRepo.findAllReceipts(pageable) : null; //Fetch all
+        if (ordersList == null) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString()))) {
-            ordersList = orderRepo.findAll(pageable); //Get all if ADMIN
-        } else {
-            ordersList = orderRepo.findAllBySellerId(user.getId(), pageable); //If SELLER, only get their
-        }
+        Page<ReceiptDTO> orderDTOS = ordersList.map(orderMapper::orderToDTO);
+        return orderDTOS;
+    }
 
-        Page<ReceiptDTO> ordersDTO = ordersList.map(orderMapper::orderToOrderDTO);
-        return ordersDTO;
+    //Get all order summaries
+    @Transactional
+    public Page<ReceiptSummaryDTO> getSummariesWithFilter(Account user,
+                                                          Long shopId,
+                                                          Long bookId,
+                                                          Integer pageNo,
+                                                          Integer pageSize,
+                                                          String sortBy,
+                                                          String sortDir) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
+                : Sort.by(sortBy).descending());
+        boolean isAdmin = isAuthAdmin();
+
+        Page<IReceiptSummary> summariesList = orderRepo.findAllSummaries(shopId, isAdmin ? null : user.getId(), bookId, pageable);
+        if (summariesList == null) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+
+        Page<ReceiptSummaryDTO> summariesDTOS = summariesList.map(orderMapper::summaryToDTO);
+        return summariesDTOS;
     }
 
     //Get order with book's {id} FIX
@@ -637,7 +654,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ReceiptDTO getReceipt(Long id) {
         OrderReceipt order = orderRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found!"));
-        ReceiptDTO receiptDTO = orderMapper.orderToOrderDTO(order); //Map to DTO
+        ReceiptDTO receiptDTO = orderMapper.orderToDTO(order); //Map to DTO
         return receiptDTO;
     }
 
@@ -645,7 +662,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDetailDTO getOrderDetail(Long id) {
         OrderDetail orderDetail = detailRepo.findDetailById(id).orElseThrow(() -> new ResourceNotFoundException("Detail not found!"));
-        OrderDetailDTO detailDTO = orderMapper.orderToDetailDTO(orderDetail); //Map to DTO
+        OrderDetailDTO detailDTO = orderMapper.detailToDTO(orderDetail); //Map to DTO
         return detailDTO;
     }
 
@@ -666,5 +683,20 @@ public class OrderServiceImpl implements OrderService {
     //Return fixed amount of shipping fee for now :<
     private double distanceCalculation(Address origin, Address destination) {
         return 10000.0;
+    }
+
+    //Check valid role function
+    protected boolean isAuthAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
+        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+    }
+
+    protected boolean isOwnerValid(Shop shop, Account user) {
+        //Check if is admin or valid owner id
+        boolean isAdmin = isAuthAdmin();
+
+        if (shop != null) {
+            return shop.getOwner().getId().equals(user.getId()) || isAdmin;
+        } else return isAdmin;
     }
 }

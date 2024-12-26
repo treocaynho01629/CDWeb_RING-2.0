@@ -61,8 +61,8 @@ const CouponContainer = styled.div`
 const CouponIcon = styled.div`
     height: 50px;
     aspect-ratio: 1/1;
-    background-color: ${props => props.theme.palette.primary.light};
-    color: ${props => props.theme.palette.primary.contrastText};
+    background-color: ${props => props.theme.palette[props.color]?.light || props.theme.palette.primary.light};
+    color: ${props => props.theme.palette[props.color]?.contrastText || props.theme.palette.primary.contrastText};
     border-right: 5px dotted ${props => props.theme.palette.background.paper};
     display: flex;
     align-items: center;
@@ -71,16 +71,6 @@ const CouponIcon = styled.div`
     border-radius: 5px;
 
     svg { font-size: 30px;}
-
-    &.error {
-        background-color: ${props => props.theme.palette.error.light};
-        color: ${props => props.theme.palette.error.contrastText};
-    }
-
-    &.warning {
-        background-color: ${props => props.theme.palette.warning.light};
-        color: ${props => props.theme.palette.warning.contrastText};
-    }
 
     ${props => props.theme.breakpoints.down("md_lg")} {
         width: 30px;
@@ -95,19 +85,10 @@ const CouponIcon = styled.div`
         width: 22px;
         height: 22px;
         margin: 0;
-        border: .5px solid ${props => props.theme.palette.divider};
         border-right: none;
         border-radius: 6px;
-        background-color: ${props => props.theme.palette.primary.light};
-        color: ${props => props.theme.palette.primary.dark};
-
-        &.error {
-            color: ${props => props.theme.palette.error.dark};
-        }
-
-        &.warning {
-            color: ${props => props.theme.palette.warning.dark};
-        }
+        border: .5px solid ${props => props.theme.palette.divider};
+        color: ${props => props.theme.palette[props.color]?.dark || props.theme.palette.primary.dark};
 
         svg { font-size: 15px; }
     }
@@ -152,7 +133,7 @@ const CouponDisplay = ({ coupon }) => {
 
     return (
         <CouponContainer>
-            <CouponIcon className={summary?.color}>
+            <CouponIcon color={summary?.color}>
                 {summary?.icon}
             </CouponIcon>
             <CouponDesc>

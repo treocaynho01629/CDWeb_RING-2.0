@@ -32,7 +32,7 @@ public class ShopController {
             @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-            @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir) {
+            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
         return new ResponseEntity<>(shopService.getShops(pageNo, pageSize, sortBy, sortDir, keyword, ownerId), HttpStatus.OK);
     }
 

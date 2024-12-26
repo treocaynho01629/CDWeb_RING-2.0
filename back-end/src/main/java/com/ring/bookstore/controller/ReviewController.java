@@ -32,7 +32,7 @@ public class ReviewController {
             @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-            @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir) {
+            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
         return new ResponseEntity<>(reviewService.getReviews(bookId, userId, rating, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
     }
 
@@ -50,7 +50,7 @@ public class ReviewController {
                                                 @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
                                                 @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                                 @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-                                                @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir) {
+                                                @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
         return new ResponseEntity<>(reviewService.getReviewsByBookId(bookId, rating, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
     }
 
@@ -61,7 +61,7 @@ public class ReviewController {
                                             @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
                                             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-                                            @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
+                                            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
                                             @CurrentAccount Account currUser) {
         return new ResponseEntity<>(reviewService.getUserReviews(currUser, rating, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
     }

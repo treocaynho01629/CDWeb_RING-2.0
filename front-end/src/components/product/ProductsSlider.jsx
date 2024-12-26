@@ -151,7 +151,7 @@ const ProductsSlider = ({ data, isError, isLoading, isFetching, isSuccess, isUni
       </Carousel>
       {(isSuccess && !data?.ids?.length) &&
         <MessageContainer>
-          <Message className="warning">Không có sản phẩm nào</Message>
+          <Message color="warning">Không có sản phẩm nào</Message>
         </MessageContainer>
       }
     </Container>

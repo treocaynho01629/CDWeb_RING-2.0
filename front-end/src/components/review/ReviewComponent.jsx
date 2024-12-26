@@ -168,10 +168,10 @@ const ReviewComponent = ({ book, scrollIntoTab, tabletMode, pending, setPending,
                 </Message>
             }
             {(ids?.length > 0 && ids?.length < pagination.size)
-                && <Message className="warning">Không còn đánh giá nào!</Message>}
+                && <Message color="warning">Không còn đánh giá nào!</Message>}
         </>
     } else if (isError) {
-        reviewsContent = <Message className="error">{error?.error || 'Đã xảy ra lỗi'}</Message>
+        reviewsContent = <Message color="error">{error?.error || 'Đã xảy ra lỗi'}</Message>
     } else if (isUninitialized && productReviewsCount == 0) {
         reviewsContent = <Message>
             <StyledEmptyIcon />

@@ -128,18 +128,9 @@ const ContainerTitle = styled.span`
   font-weight: 450;
   display: flex;
   align-items: center;
+  color: ${props => props.theme.palette[props.color]?.main || props.theme.palette.text.primary};
 
-  &.error {
-    color: ${props => props.theme.palette.error.main};
-
-    svg {  color: inherit; }
-  }
-
-  &.success {
-    color: ${props => props.theme.palette.success.main};
-
-    svg {  color: inherit; }
-  }
+  svg {  color: inherit; }
 
   ${props => props.theme.breakpoints.down("sm")} {
     font-size: 16px;
@@ -213,7 +204,7 @@ const SaleList = () => {
   return (
     <>
       <TitleContainer>
-        <ContainerTitle className="error"><ThumbUpAlt />&nbsp;Top Khuyến Mãi</ContainerTitle>
+        <ContainerTitle color="error"><ThumbUpAlt />&nbsp;Top Khuyến Mãi</ContainerTitle>
         {isError ?
           <MoreButton className="error" onClick={() => refetch()}>
             Tải lại <Replay />
@@ -386,7 +377,7 @@ const TopList = ({ categories }) => {
   return (
     <Container>
       <TitleContainer ref={listRef}>
-        <ContainerTitle className="success"><BarChart />&nbsp;Top bán chạy</ContainerTitle>
+        <ContainerTitle color="success"><BarChart />&nbsp;Top bán chạy</ContainerTitle>
         {isError ?
           <MoreButton className="error" onClick={() => refetch()}>
             Tải lại <Replay />

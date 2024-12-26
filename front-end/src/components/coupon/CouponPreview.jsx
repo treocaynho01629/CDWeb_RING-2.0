@@ -76,31 +76,13 @@ const CouponIcon = styled.div`
     border-radius: 6px;
     border: .5px solid ${props => props.theme.palette.divider};
     border-right: none;
-    background-color: ${props => props.theme.palette.primary.light};
-    color: ${props => props.theme.palette.primary.contrastText};
-
-    &.error {
-        background-color: ${props => props.theme.palette.error.light};
-        color: ${props => props.theme.palette.error.contrastText};
-    }
-
-    &.warning {
-        background-color: ${props => props.theme.palette.warning.light};
-        color: ${props => props.theme.palette.warning.contrastText};
-    }
+    background-color: ${props => props.theme.palette[props.color]?.light || props.theme.palette.primary.light};
+    color: ${props => props.theme.palette[props.color]?.contrastText || props.theme.palette.primary.contrastText};
 
     ${props => props.theme.breakpoints.down("md")} {
         width: 22px;
         height: 22px;
-        color: ${props => props.theme.palette.primary.dark};
-
-        &.error {
-            color: ${props => props.theme.palette.error.dark};
-        }
-
-        &.warning {
-            color: ${props => props.theme.palette.warning.dark};
-        }
+        color: ${props => props.theme.palette[props.color]?.dark || props.theme.palette.primary.dark};
 
         svg { font-size: 15px; }
     }
@@ -255,7 +237,7 @@ const CouponPreview = ({ shopId }) => {
                         aria-haspopup="true"
                         onMouseEnter={(e) => handlePopover(e, coupon, summary)}
                     >
-                        <CouponIcon className={summary.color}>{summary.icon}</CouponIcon>
+                        <CouponIcon color={summary.color}>{summary.icon}</CouponIcon>
                         <CouponContent>
                             <CouponTitle>{coupon?.summary}</CouponTitle>
                         </CouponContent>

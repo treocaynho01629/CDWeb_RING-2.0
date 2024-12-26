@@ -125,7 +125,7 @@ const ReviewsList = ({ mobileMode }) => {
         </>
     } else if (isError) {
         reviewsContent = <MessageContainer>
-            <Message className="error">{error?.error || 'Đã xảy ra lỗi'}</Message>
+            <Message color="error">{error?.error || 'Đã xảy ra lỗi'}</Message>
         </MessageContainer>
     }
 
@@ -136,7 +136,7 @@ const ReviewsList = ({ mobileMode }) => {
                     <PendingModal open={pending} message="Đang gửi yêu cầu..." />
                 </Suspense>
             }
-            <Title className="primary">
+            <Title color="primary">
                 <Link to={'/profile/detail'}><KeyboardArrowLeft /></Link>
                 <Try />&nbsp;ĐÁNH GIÁ CỦA BẠN
             </Title>
@@ -145,7 +145,7 @@ const ReviewsList = ({ mobileMode }) => {
                     {reviewsContent}
                     {(pagination.number > 0 && isFetching) && <LoadContainer><CircularProgress size={30} color="primary" /></LoadContainer>}
                     {(data?.ids?.length > 0 && data?.ids?.length == data?.page?.totalElements)
-                        && <Message className="warning">Không còn đánh giá nào!</Message>}
+                        && <Message color="warning">Không còn đánh giá nào!</Message>}
                 </ReviewsContainer>
             </DialogContent>
             {openForm !== undefined &&
