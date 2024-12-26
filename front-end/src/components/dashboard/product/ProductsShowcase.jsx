@@ -5,18 +5,10 @@ import { Star, StarBorder, StarRounded } from "@mui/icons-material";
 import { Link } from "react-router";
 import { Message } from "../../custom/GlobalComponents";
 import { currencyFormat, numFormatter } from "../../../ultils/covert";
+import { Title } from "../custom/ShareComponents";
 import CustomProgress from "../../custom/CustomProgress";
 
 //#region styled
-const Title = styled.span`
-    display: flex;
-    align-items: center;
-    font-size: 20px;
-    font-weight: 400;
-    padding-left: ${props => props.theme.spacing(1)};
-    margin: ${props => props.theme.spacing(1.5)} 0;
-`
-
 const MessageContainer = styled.div`
     height: 100%;
     display: flex;
@@ -245,7 +237,7 @@ const ProductsShowcase = ({ title, data, isError, isLoading, isSuccess, scrollPo
                 )
             })
             : <MessageContainer>
-                <Message className="warning">
+                <Message color="warning">
                     Không có sản phẩmn nào
                 </Message>
             </MessageContainer>

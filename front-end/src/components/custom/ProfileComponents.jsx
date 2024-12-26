@@ -12,7 +12,7 @@ export const StyledDialogTitle = styled(DialogTitle)`
     padding: ${props => props.theme.spacing(1.5)} 0px;
     border-bottom: .5px solid ${props => props.theme.palette.divider};
     color: ${props => props.theme.palette.primary.main};
-        border-color: ${props => props.theme.palette.primary.main};
+    border-color: ${props => props.theme.palette.primary.main};
     width: 100%;
 
     a {

@@ -3,7 +3,9 @@ package com.ring.bookstore.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.ring.bookstore.dtos.accounts.AccountDTO;
 import com.ring.bookstore.exception.ImageResizerException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,36 +29,31 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/accounts")
+@RequiredArgsConstructor
 @Validated
 public class AccountController {
 	
-	private AccountService accountService;
-	
-	public AccountController(AccountService accountService) {
-		super();
-		this.accountService = accountService;
-	}
+	private final AccountService accountService;
 	
 	//Get all accounts
 	@GetMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllAccounts(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
-										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-										@RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
-										@RequestParam(value = "keyword", defaultValue = "") String keyword,
-										@RequestParam(value = "role", required = false) Integer role,
-										@RequestParam(value = "isEmployees", defaultValue = "false") Boolean isEmployees
+											@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+											@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+											@RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+											@RequestParam(value = "keyword", defaultValue = "") String keyword,
+											@RequestParam(value = "roles", required = false) Short roles
 	){
-		Page<Account> accounts = accountService.getAllAccounts(pageNo, pageSize, sortBy, sortDir, isEmployees, keyword, role);
-		return new ResponseEntity< >(accounts, HttpStatus.OK);
+		Page<AccountDTO> accounts = accountService.getAllAccounts(pageNo, pageSize, sortBy, sortDir, keyword, roles);
+		return new ResponseEntity<>(accounts, HttpStatus.OK);
 	}
 	
 	//Get account by {id}
 	@GetMapping("{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<AccountDetailDTO> getAccountById(@PathVariable("id") Long accountId){
-		return new ResponseEntity<AccountDetailDTO>(accountService.getAccountById(accountId), HttpStatus.OK);
+		return new ResponseEntity<>(accountService.getAccountById(accountId), HttpStatus.OK);
 	}
 	
 	//Edit account by {id}
@@ -64,14 +61,14 @@ public class AccountController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Account> updateAccount(@PathVariable("id") Long accountId,
 			@Valid @RequestBody AccountRequest requestt){
-		return new ResponseEntity<Account>(accountService.updateAccount(requestt, accountId), HttpStatus.OK);
+		return new ResponseEntity<>(accountService.updateAccount(requestt, accountId), HttpStatus.OK);
 	}
 	
 	//Create new account through Admin dashboard
 	@PostMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Account> saveAccount(@Valid @RequestBody AccountRequest request){
-		return new ResponseEntity<Account>(accountService.saveAccount(request), HttpStatus.CREATED);
+		return new ResponseEntity<>(accountService.saveAccount(request), HttpStatus.CREATED);
 	}
 	
 	//Delete account by {id}
@@ -79,7 +76,7 @@ public class AccountController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<String> deleteAccount(@PathVariable("id") Long accountId){
 		accountService.deleteAccount(accountId);
-		return new ResponseEntity<String>("Account deleted successfully!", HttpStatus.OK);
+		return new ResponseEntity<>("Account deleted successfully!", HttpStatus.OK);
 	}
 	
 	//Delete multiple accounts from a lists of {ids}
@@ -103,7 +100,7 @@ public class AccountController {
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<ProfileDTO> getProfile(@CurrentAccount Account currUser){
 		ProfileDTO profile = accountService.getProfile(currUser);
-		return new ResponseEntity< >(profile, HttpStatus.OK);
+		return new ResponseEntity<>(profile, HttpStatus.OK);
 	}
 	
 	//Update account's profile
@@ -113,7 +110,7 @@ public class AccountController {
 														@RequestPart(name = "image", required = false) MultipartFile file,
 														@CurrentAccount Account currUser) throws ImageResizerException, IOException {
 		AccountProfile profile = accountService.updateProfile(request, file, currUser);
-		return new ResponseEntity< >(profile, HttpStatus.OK);
+		return new ResponseEntity<>(profile, HttpStatus.OK);
 	}
 	
 	//Change account's password
@@ -123,20 +120,20 @@ public class AccountController {
 		Account account = accountService.changePassword(request, currUser);
 		String result = "Đổi mật khẩu thất bại";
 		if (account != null) result = "Thay đổi mật khẩu thành công!";
-		return new ResponseEntity< >(result, HttpStatus.OK);
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
 	//Get accounts chart (User)
 	@GetMapping("/top-accounts")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getTopAccounts(){
-		return new ResponseEntity< >(accountService.getTopAccount(), HttpStatus.OK);
+		return new ResponseEntity<>(accountService.getTopAccount(), HttpStatus.OK);
 	}
 	
 	//Get sellers chart
 	@GetMapping("/top-sellers")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getTopSellers(){
-		return new ResponseEntity< >(accountService.getTopSeller(), HttpStatus.OK);
+		return new ResponseEntity<>(accountService.getTopSeller(), HttpStatus.OK);
 	}
 }

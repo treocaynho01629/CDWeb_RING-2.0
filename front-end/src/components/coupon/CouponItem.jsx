@@ -124,6 +124,7 @@ const ExpText = styled.span`
     font-size: 14px;
     margin-right: 10px;
     font-weight: 450;
+    color: ${props => props.theme.palette[props.color]?.main || props.theme.palette.text.primary};
 
     &::before { content: "Còn:"; }
 
@@ -132,10 +133,6 @@ const ExpText = styled.span`
         font-weight: normal;
 
         &::before { content: "HSD:"; }
-    }
-
-    &.error {
-        color: ${props => props.theme.palette.error.main};
     }
 
     ${props => props.theme.breakpoints.down("sm")} {   
@@ -147,8 +144,8 @@ const ExpText = styled.span`
 const CouponIcon = styled.div`
     width: 80px;
     height: 80px;
-    background-color: ${props => props.theme.palette.primary.light};
-    color: ${props => props.theme.palette.primary.contrastText};
+    background-color: ${props => props.theme.palette[props.color]?.light || props.theme.palette.primary.light};
+    color: ${props => props.theme.palette[props.color]?.contrastText || props.theme.palette.primary.contrastText};
     border-right: 5px dotted ${props => props.theme.palette.background.default};
     display: flex;
     align-items: center;
@@ -157,16 +154,6 @@ const CouponIcon = styled.div`
     border-radius: 5px;
 
     svg { font-size: 40px;}
-
-    &.error {
-        background-color: ${props => props.theme.palette.error.light};
-        color: ${props => props.theme.palette.error.contrastText};
-    }
-
-    &.warning {
-        background-color: ${props => props.theme.palette.warning.light};
-        color: ${props => props.theme.palette.warning.contrastText};
-    }
 
     ${props => props.theme.breakpoints.down("sm")} {
         width: 70px;
@@ -261,14 +248,14 @@ const CouponItem = ({ coupon, summary, isDisabled, isSelected, selectMode, onCli
                     <CouponEdge elevation={24} className="left" />
                     <CouponEdge elevation={24} className="right" />
                     <CouponContent>
-                        <CouponIcon className={summary?.color}>
+                        <CouponIcon color={summary?.color}>
                             {summary?.icon}
                         </CouponIcon>
                         <CouponMain>
                             <h2>{coupon?.summary}</h2>
                             <p>{coupon?.condition}</p>
                             <Expire>
-                                <ExpText className={date <= warnDate ? 'date error' : 'date'}>&nbsp;
+                                <ExpText color={date <= warnDate && "error"} className="date">&nbsp;
                                     {date.toLocaleDateString("en-GB", {
                                         year: "numeric",
                                         month: "2-digit",
@@ -276,7 +263,7 @@ const CouponItem = ({ coupon, summary, isDisabled, isSelected, selectMode, onCli
                                     })}
                                 </ExpText>
                                 {coupon?.usage < 100
-                                    && <ExpText className="error">&nbsp;{coupon?.usage} lượt</ExpText>}
+                                    && <ExpText color="error">&nbsp;{coupon?.usage} lượt</ExpText>}
                             </Expire>
                         </CouponMain>
                     </CouponContent>

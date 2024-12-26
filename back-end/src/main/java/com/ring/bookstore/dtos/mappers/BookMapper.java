@@ -22,10 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class BookMapper {
-
-    private final CategoryMapper cateMapper;
-
-    public BookDTO displayToBookDTO(IBookDisplay book) {
+    public BookDTO projectionToDTO(IBookDisplay book) {
 
         String fileDownloadUri = book.getImage() != null ?
                 ServletUriComponentsBuilder
@@ -52,7 +49,7 @@ public class BookMapper {
                 totalOrders);
     }
 
-    public BookDetailDTO detailToDetailDTO(IBookDetail projection) {
+    public BookDetailDTO projectionToDetailDTO(IBookDetail projection) {
         //Info
         Integer totalOrders = projection.getTotalOrders();
         Double rating = projection.getRating();

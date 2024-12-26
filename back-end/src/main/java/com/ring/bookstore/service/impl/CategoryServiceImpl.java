@@ -41,13 +41,13 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (include != null && include.equalsIgnoreCase("children")) {
             Page<Category> catesList = cateRepo.findCatesWithChildren(parentId, pageable);
-            cateDTOS = catesList.map(category -> cateMapper.cateToCateDTO(category, "children"));
+            cateDTOS = catesList.map(category -> cateMapper.cateToDTO(category, "children"));
         } else if (include != null && include.equalsIgnoreCase("parent")) {
             Page<Category> catesList = cateRepo.findCatesWithParent(parentId, pageable);
-            cateDTOS = catesList.map(category -> cateMapper.cateToCateDTO(category, "parent"));
+            cateDTOS = catesList.map(category -> cateMapper.cateToDTO(category, "parent"));
         } else {
             Page<Category> catesList = cateRepo.findCates(parentId, pageable);
-            cateDTOS = catesList.map(cateMapper::cateToCateDTO);
+            cateDTOS = catesList.map(cateMapper::cateToDTO);
         }
         return cateDTOS;
     }
@@ -55,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<PreviewCategoryDTO> getPreviewCategories() {
         List<ICategory> previews = cateRepo.findPreviewCategories();
-        return previews.stream().map(cateMapper::projectionToPreview).collect(Collectors.toList());
+        return previews.stream().map(cateMapper::projectionToPreviewDTO).collect(Collectors.toList());
     }
 
     //Get category

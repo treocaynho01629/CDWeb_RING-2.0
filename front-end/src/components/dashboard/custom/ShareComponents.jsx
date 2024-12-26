@@ -49,3 +49,16 @@ export const StyledStockBar = styled(LinearProgress)`
     height: 6px;
     width: 60px;
 `
+
+export const Title = styled.span`
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 450;
+    margin: ${props => props.theme.spacing(1.5)} 0;
+`
+
+export const LinkButton = styled.span`
+    color: ${props => props.theme.palette.info.main};
+    font-size: 14px;
+`

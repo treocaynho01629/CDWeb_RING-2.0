@@ -15,7 +15,6 @@ import PropTypes from 'prop-types';
 import CartDetailRow from './CartDetailRow';
 import useDeepEffect from '../../hooks/useDeepEffect';
 import useAuth from "../../hooks/useAuth";
-import useConfirm from "../../hooks/useConfirm";
 
 const Menu = lazy(() => import('@mui/material/Menu'));
 const CouponDialog = lazy(() => import('../coupon/CouponDialog'));
@@ -133,7 +132,7 @@ EnhancedTableHead.propTypes = {
     rowCount: PropTypes.number.isRequired,
 };
 
-const CartContent = () => {
+const CartContent = ({ confirm }) => {
     const { cartProducts, replaceProduct, removeProduct, removeShopProduct, clearCart,
         decreaseAmount, increaseAmount, changeAmount } = useCart();
     const { username } = useAuth();
@@ -152,10 +151,7 @@ const CartContent = () => {
     const [contextCoupon, setContextCoupon] = useState(null);
     const [openDialog, setOpenDialog] = useState(undefined);
     const [anchorEl, setAnchorEl] = useState(null);
-    const [ConfirmationDialog, confirm] = useConfirm(
-        'Xoá khỏi giỏ?',
-        'Xoá sản phẩm đã chọn khỏi giỏ?',
-    )
+
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
 
@@ -611,7 +607,6 @@ const CartContent = () => {
                     </Menu>
                 }
             </Suspense>
-            <ConfirmationDialog />
         </Grid>
     )
 }

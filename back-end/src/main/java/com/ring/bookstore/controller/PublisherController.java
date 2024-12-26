@@ -29,7 +29,7 @@ public class PublisherController {
 	public ResponseEntity<?> getPublishers(@RequestParam(value = "pSize", defaultValue = "20") Integer pageSize,
 										   @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
 										   @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-										   @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir) {
+										   @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
 		return new ResponseEntity<>(pubService.getPublishers(pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 

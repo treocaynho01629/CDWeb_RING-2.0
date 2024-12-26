@@ -74,9 +74,7 @@ const ItemContent = styled.div`
 
 const PriceTag = styled.span`
     font-weight: 450;
-
-    &.success { color: ${props => props.theme.palette.success.dark}; }
-    &.warning { color: ${props => props.theme.palette.warning.dark}; }
+    color: ${props => props.theme.palette[props.color]?.dark || props.theme.palette.text.primary};
 `
 
 const ItemTitle = styled.div`
@@ -181,7 +179,7 @@ const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadAddress, value, 
                         label={<FormContent>
                             <ItemContent>
                                 <ItemTitle>{item.icon}{item.label}</ItemTitle>
-                                <PriceTag className={item.color}>{currencyFormat.format(item.price)}</PriceTag>
+                                <PriceTag color={item.color}>{currencyFormat.format(item.price)}</PriceTag>
                             </ItemContent>
                             <Estimate>{item.description}</Estimate>
                         </FormContent>}

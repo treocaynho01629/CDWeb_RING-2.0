@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { styled as muiStyled } from '@mui/material';
 import { useState } from "react";
-import { AutoStories as AutoStoriesIcon, Group as GroupIcon, Receipt as ReceiptIcon, Try as TryIcon } from "@mui/icons-material";
+import { AutoStories, Group, AttachMoney, Storefront } from "@mui/icons-material";
 import { Grid2 as Grid, Paper } from '@mui/material';
 import TableProducts from '../../components/dashboard/table/TableProducts'
 // import TableUsers from "../../components/dashboard/table/TableUsers";
@@ -14,27 +14,8 @@ import useTitle from "../../hooks/useTitle";
 import WelcomeCard from '../../components/dashboard/custom/WelcomeCard';
 import InfoCard from '../../components/dashboard/custom/InfoCard';
 import SummaryTableProducts from '../../components/dashboard/table/SummaryTableProducts';
-
-//#region preStyled
-const CountContainer = muiStyled(Paper)(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '20px 15px'
-}));
-
-const CountInfo = styled.div`
-  text-align: right;
-`
-
-const countIconStyle = {
-  color: '#63e399',
-  backgroundColor: '#ebebeb',
-  borderRadius: '50%',
-  padding: '8px',
-  fontSize: '60px'
-}
-//#endregion
+import SummaryTableOrders from '../../components/dashboard/table/SummaryTableOrders';
+import SummaryTableUsers from '../../components/dashboard/table/SummaryTableUsers';
 
 const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
@@ -56,25 +37,36 @@ const Dashboard = () => {
         <Grid size={{ xs: 12, sm: 4 }}>
           <p>STUFF</p>
         </Grid>
-        <Grid size={{ xs: 12, sm: 4 }}>
+        <Grid size={{ xs: 12, sm: 6, md_lg: 3 }}>
           <InfoCard
             count={productCount}
-            icon={<AutoStoriesIcon color="primary" />}
+            icon={<AutoStories color="info" />}
             title={'Sản phẩm'}
+            color="info"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 4 }}>
+        <Grid size={{ xs: 12, sm: 6, md_lg: 3 }}>
           <InfoCard
             count={orderCount}
-            icon={<ReceiptIcon color="primary" />}
-            title={'Đơn hàng'}
+            icon={<Storefront color="primary" />}
+            title={'Cửa hàng'}
+            color="primary"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 4 }}>
+        <Grid size={{ xs: 12, sm: 6, md_lg: 3 }}>
+          <InfoCard
+            count={orderCount}
+            icon={<Group color="warning" />}
+            title={'Thành viên'}
+            color="warning"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md_lg: 3 }}>
           <InfoCard
             count={productCount}
-            icon={<AutoStoriesIcon color="primary" />}
-            title={'Sản phẩm'}
+            icon={<AttachMoney color="error" />}
+            title={'Doanh thu'}
+            color="error"
           />
         </Grid>
         <Grid size={12}>
@@ -85,14 +77,14 @@ const Dashboard = () => {
             <ChartUsers />
           </Grid>
         }
-        <Grid size={{ xs: 12, lg: 3.5 }}>
-          <SummaryTableProducts title={'test'} />
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <SummaryTableOrders />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 5 }}>
-          <SummaryTableProducts title={'test'} />
+        <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
+          <SummaryTableProducts />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 3.5 }}>
-          <SummaryTableProducts title={'test'} />
+        <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
+          <SummaryTableUsers />
         </Grid>
       </Grid>
     </>

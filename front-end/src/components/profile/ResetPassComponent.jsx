@@ -94,7 +94,7 @@ const ResetPassComponent = ({ pending, setPending }) => {
 
     return (
         <div>
-            <StyledDialogTitle className="primary">
+            <StyledDialogTitle>
                 <Link to={'/profile/detail/info'}><KeyboardArrowLeft /></Link>
                 <Password />&nbsp;Thay đổi mật khẩu
             </StyledDialogTitle>

@@ -431,7 +431,7 @@ const AddressComponent = ({ pending, setPending }) => {
     </>
   } else if (isError) {
     addressesContent = <MessageContainer>
-      <Message className="error">{error?.error || 'Đã xảy ra lỗi'}</Message>
+      <Message color="error">{error?.error || 'Đã xảy ra lỗi'}</Message>
     </MessageContainer>
   }
 

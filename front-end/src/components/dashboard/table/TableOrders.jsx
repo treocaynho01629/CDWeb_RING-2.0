@@ -527,10 +527,10 @@ export default function TableOrders({ setOrderCount, mini = false }) {
   const colSpan = () => (mini ? headCells.filter((h) => !h.hideOnMinimize).length : headCells.length + 1);
   //#endregion
 
-  let ordersRows;
+  let orderRows;
 
   if (isLoading) {
-    ordersRows = (
+    orderRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -546,7 +546,7 @@ export default function TableOrders({ setOrderCount, mini = false }) {
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    ordersRows = ids?.length
+    orderRows = ids?.length
       ? ids?.map((id, index) => {
         const order = entities[id];
 
@@ -568,7 +568,7 @@ export default function TableOrders({ setOrderCount, mini = false }) {
         </TableCell>
       </TableRow >
   } else if (isError) {
-    ordersRows = (
+    orderRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -604,7 +604,7 @@ export default function TableOrders({ setOrderCount, mini = false }) {
             mini={mini}
           />
           <TableBody>
-            {ordersRows}
+            {orderRows}
           </TableBody>
         </Table>
       </TableContainer>

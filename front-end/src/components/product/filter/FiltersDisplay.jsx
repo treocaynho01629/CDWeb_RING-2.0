@@ -31,8 +31,8 @@ const FilterChip = styled.span`
     padding: 6px 10px;
     margin: ${props => props.theme.spacing(.5)} 0;
     margin-right: ${props => props.theme.spacing(1)};
-    border: 1px solid ${props => props.theme.palette.warning.main};
-    color: ${props => props.theme.palette.warning.light};
+    border: 1px solid ${props => props.theme.palette[props.color]?.main || props.theme.palette.warning.main};
+    color: ${props => props.theme.palette[props.color]?.light || props.theme.palette.warning.light};
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -40,20 +40,9 @@ const FilterChip = styled.span`
     transition: all .2s ease;
     cursor: pointer;
 
-    &.error {
-        border-color: ${props => props.theme.palette.error.main};
-        color: ${props => props.theme.palette.error.main};
-    }
-
     &:hover {
-        border-color: ${props => props.theme.palette.warning.light};
-        background-color: ${props => alpha(props.theme.palette.warning.light, .1)};
-
-        &.error {
-            color: ${props => props.theme.palette.error.light};
-            border-color: ${props => props.theme.palette.error.light};
-            background-color: ${props => alpha(props.theme.palette.error.light, .1)};
-        }
+        border-color: ${props => props.theme.palette[props.color]?.light || props.theme.palette.warning.light};
+        background-color: ${props => alpha(props.theme.palette[props.color]?.light ||props.theme.palette.warning.light, .1)};
     }
 
     svg { margin-left: ${props => props.theme.spacing(1)}}
@@ -126,7 +115,7 @@ const FiltersDisplay = memo(({ filters, setFilters, defaultFilters, resetFilter,
                     <><FilterTitle>Lọc theo</FilterTitle>
                         <ChipsContainer>
                             {filtersApplied}
-                            <FilterChip className="error" onClick={resetFilter}>
+                            <FilterChip color="error" onClick={resetFilter}>
                                 Xoá bộ lọc
                                 <FilterAltOff />
                             </FilterChip>

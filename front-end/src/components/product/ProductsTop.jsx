@@ -370,7 +370,7 @@ const ProductsTop = ({ data, isError, isLoading, isFetching, isSuccess, isUninit
                 )
             })
             : <MessageContainer>
-                <Message className="warning">
+                <Message color="warning">
                     Không có sản phẩmn nào
                 </Message>
             </MessageContainer>

@@ -21,19 +21,11 @@ export const AuthText = styled.p`
 
 export const AuthHighlight = styled.span`
     text-decoration: underline;
-    color: ${props => props.theme.palette.primary.main};
+    color: ${props => props.theme.palette[props.color]?.main || props.theme.palette.primary.main};
     cursor: pointer;
 
-    &.warning {
-        color: ${props => props.theme.palette.warning.main};
-        
-        &:hover {
-            color: ${props => props.theme.palette.warning.dark};
-        }
-    }
-
     &:hover {
-        color: ${props => props.theme.palette.primary.dark};
+        color: ${props => props.theme.palette[props.color]?.dark || props.theme.palette.primary.dark};
     }
 `
 

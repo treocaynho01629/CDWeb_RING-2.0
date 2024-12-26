@@ -59,7 +59,7 @@ public class BookController {
     public ResponseEntity<?> getBooks(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
                                       @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                       @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-                                      @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
+                                      @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
                                       @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                       @RequestParam(value = "cateId", required = false) Integer cateId,
                                       @RequestParam(value = "pubIds", required = false) List<Integer> pubIds,

@@ -8,6 +8,7 @@ import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
 import styled from '@emotion/styled';
 import useCart from '../hooks/useCart';
 import useTitle from '../hooks/useTitle';
+import useConfirm from '../hooks/useConfirm';
 
 const CartContent = lazy(() => import("../components/cart/CartContent"));
 
@@ -39,6 +40,10 @@ const StyledEmptyIcon = styled(EmptyIcon)`
 
 const Cart = () => {
     const { cartProducts } = useCart();
+    const [ConfirmationDialog, confirm] = useConfirm(
+        'Xoá khỏi giỏ?',
+        'Xoá sản phẩm đã chọn khỏi giỏ?',
+    )
     useTitle('Giỏ hàng'); //Set title
 
     useLayoutEffect(() => {
@@ -66,7 +71,8 @@ const Cart = () => {
                 </EmptyWrapper>
                 :
                 <Suspense fallback={<EmptyWrapper><CustomPlaceholder /></EmptyWrapper>}>
-                    <CartContent />
+                    <CartContent confirm={confirm}/>
+                    <ConfirmationDialog />
                 </Suspense>
             }
         </Wrapper >

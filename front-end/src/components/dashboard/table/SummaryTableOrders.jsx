@@ -1,53 +1,51 @@
 import { useState } from 'react';
 import {
   Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper,
-  Skeleton, Toolbar, TableHead,
+  Skeleton, Toolbar, TableHead, Avatar
 } from '@mui/material';
 import { Link } from 'react-router';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { useGetBooksQuery } from '../../../features/books/booksApiSlice';
 import { ItemTitle, LinkButton, Title } from '../custom/ShareComponents';
-import { currencyFormat } from '../../../ultils/covert';
+import { currencyFormat, idFormatter } from '../../../ultils/covert';
+import { useGetSummariesQuery } from '../../../features/orders/ordersApiSlice';
 import useAuth from '../../../hooks/useAuth';
 import CustomProgress from '../../custom/CustomProgress';
 
 const headCells = [
   {
-    id: 'title',
+    id: 'user',
     align: 'left',
     width: 'auto',
     disablePadding: false,
-    label: 'Sản phẩm',
+    label: 'Thông tin',
   },
   {
     id: 'info',
     align: 'right',
     width: '110px',
     disablePadding: false,
-    label: 'Thông tin',
+    label: 'Thành tiền',
   },
 ];
 
-export default function SummaryTableProducts({ shopId }) {
+export default function SummaryTableOrders({ title, shopId }) {
   //#region construct
   const { roles } = useAuth();
   const isAdmin = useState(roles?.find(role => ['ROLE_ADMIN'].includes(role)));
 
-  //Fetch books
-  const { data, isLoading, isSuccess, isError, error } = useGetBooksQuery({
+  //Fetch order summaries
+  const { data, isLoading, isSuccess, isError, error } = useGetSummariesQuery({
     size: 5,
     sortBy: 'createdDate',
     sortDir: 'desc',
-    shopId: shopId ?? '',
-    amount: 0
+    shopId: shopId ?? ''
   })
   //#endregion
 
   const colSpan = headCells.length + 1;
-  let bookRows;
+  let orderRows;
 
   if (isLoading) {
-    bookRows = (
+    orderRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -63,33 +61,34 @@ export default function SummaryTableProducts({ shopId }) {
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    bookRows = ids?.length
+    orderRows = ids?.length
       ? ids?.map((id, index) => {
-        const book = entities[id];
+        const order = entities[id];
+        const date = new Date(order?.date);
 
         return (
           <TableRow hover tabIndex={-1} key={id}>
             <TableCell align="left">
               <Link to={`/detail/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
-                <LazyLoadImage
-                  src={`${book.image}?size=tiny`}
-                  height={45}
-                  width={45}
-                  style={{ marginRight: '10px' }}
-                  placeholder={<Skeleton width={45} height={45} animation={false} variant="rectangular" />}
-                />
+                <Avatar sx={{ marginRight: 1 }} src={order?.image ? order.image + '?size=tiny' : null}>{order?.name?.charAt(0) ?? ''}</Avatar>
                 <Box>
-                  <ItemTitle>{book.title}</ItemTitle>
+                  <ItemTitle>{order.name}</ItemTitle>
                   <Box display="flex">
-                    <ItemTitle>{currencyFormat.format(book.price * (1 - book.discount))}</ItemTitle>
-                    {book.discount > 0 && <ItemTitle className="secondary">&emsp;-{book.discount * 100}%</ItemTitle>}
+                    <ItemTitle>{idFormatter(order.id)}</ItemTitle>
+                    <ItemTitle className="secondary">&emsp;{
+                      date.toLocaleDateString("en-GB", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })
+                    }</ItemTitle>
                   </Box>
                 </Box>
               </Link>
             </TableCell>
             <TableCell align="right">
-              <ItemTitle className="secondary">Đã bán: {book.totalOrders}</ItemTitle>
-              <ItemTitle className="secondary">Đánh giá: {book.rating.toFixed(1)}</ItemTitle>
+              <ItemTitle>{currencyFormat.format(order.totalPrice)}</ItemTitle>
+              <ItemTitle className="secondary">Tổng SL: {order.totalItems}</ItemTitle>
             </TableCell>
           </TableRow>
         )
@@ -103,11 +102,11 @@ export default function SummaryTableProducts({ shopId }) {
           colSpan={colSpan}
           sx={{ height: '40dvh' }}
         >
-          <Box>Không tìm thấy sản phẩm nào!</Box>
+          <Box>Không tìm thấy đơn hàng nào!</Box>
         </TableCell>
       </TableRow >
   } else if (isError) {
-    bookRows = (
+    orderRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -125,8 +124,8 @@ export default function SummaryTableProducts({ shopId }) {
   return (
     <Paper sx={{ width: '100%', height: '100%' }} elevation={3}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Title>Sản phẩm mới nhất</Title>
-        <Link to={'/manage-products'}><LinkButton>Xem tất cả</LinkButton></Link>
+        <Title>Giao dịch mới nhất</Title>
+        <Link to={'/manage-orders'}><LinkButton>Xem tất cả</LinkButton></Link>
       </Toolbar>
       <TableContainer component={Paper}>
         <Table stickyHeader size="small">
@@ -145,7 +144,7 @@ export default function SummaryTableProducts({ shopId }) {
             </TableRow>
           </TableHead >
           <TableBody>
-            {bookRows}
+            {orderRows}
           </TableBody>
         </Table>
       </TableContainer>

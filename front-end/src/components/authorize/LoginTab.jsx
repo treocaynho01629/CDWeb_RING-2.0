@@ -154,7 +154,7 @@ const LoginTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken
                             label="Lưu đăng nhập"
                         />
                         <Link to={'/reset'}>
-                            <AuthHighlight className="warning">Quên mật khẩu?</AuthHighlight>
+                            <AuthHighlight color="warning">Quên mật khẩu?</AuthHighlight>
                         </Link>
                     </AuthActionContainer>
                     <ConfirmButton

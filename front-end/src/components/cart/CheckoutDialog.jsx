@@ -32,7 +32,7 @@ const CheckoutDialog = ({ coupon, shopCoupon, discount, selected, navigate, hand
         <PriceDisplay displayInfo={displayInfo} loggedIn={loggedIn} />
         <CheckoutRow>
             {!numSelected ?
-                <CheckoutText className="error">Vui lòng chọn sản phẩm</CheckoutText>
+                <CheckoutText color="error">Vui lòng chọn sản phẩm</CheckoutText>
                 : <PriceContainer>
                     <CheckoutPrice>
                         <b>Tổng:</b>
@@ -76,7 +76,7 @@ const CheckoutDialog = ({ coupon, shopCoupon, discount, selected, navigate, hand
                         <CheckoutStack>
                             <AltCheckoutBox onClick={() => toggleDrawer(true)}>
                                 {!numSelected ?
-                                    <CheckoutText className="error">Vui lòng chọn sản phẩm</CheckoutText>
+                                    <CheckoutText color="error">Vui lòng chọn sản phẩm</CheckoutText>
                                     : <PriceContainer>
                                         <CheckoutPrice>
                                             <b>Tổng:</b>

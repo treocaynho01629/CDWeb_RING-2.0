@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense, useCallback, useRef } from 'react';
 import {
   Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch,
-  LinearProgress, Skeleton, TextField, MenuItem, Menu, ListItemIcon, ListItemText, Stack, Toolbar, Button
+  Skeleton, TextField, MenuItem, Menu, ListItemIcon, ListItemText, Stack, Toolbar, Button
 } from '@mui/material';
 import { Search, MoreHoriz, Edit, Delete, Visibility, FilterAltOff, Add } from '@mui/icons-material';
 import { Link } from 'react-router';
@@ -572,10 +572,10 @@ export default function TableProducts({ setProductCount, shopId, isShop, setIsSh
   const colSpan = headCells.length + 1;
   //#endregion
 
-  let booksRows;
+  let bookRows;
 
   if (isLoading) {
-    booksRows = (
+    bookRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -591,7 +591,7 @@ export default function TableProducts({ setProductCount, shopId, isShop, setIsSh
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    booksRows = ids?.length
+    bookRows = ids?.length
       ? ids?.map((id, index) => {
         const book = entities[id];
         const isItemSelected = isSelected(id);
@@ -668,7 +668,7 @@ export default function TableProducts({ setProductCount, shopId, isShop, setIsSh
         </TableCell>
       </TableRow >
   } else if (isError) {
-    booksRows = (
+    bookRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -701,7 +701,7 @@ export default function TableProducts({ setProductCount, shopId, isShop, setIsSh
             selectedAll={selectedAll}
           />
           <TableBody>
-            {booksRows}
+            {bookRows}
           </TableBody>
         </Table>
       </TableContainer>

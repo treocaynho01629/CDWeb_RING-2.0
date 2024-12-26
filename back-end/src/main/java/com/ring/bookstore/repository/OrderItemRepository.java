@@ -12,7 +12,7 @@ import java.util.List;
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     @Query("""
         select oi as item,
-        b.id as bookId, b.title as title, b.slug as slug, i.name as image, 
+        b.id as bookId, b.title as title, b.slug as slug, i.name as image,
         od.id as detailId, od.totalPrice as totalPrice, od.shippingFee as shippingFee,
         od.shippingDiscount as shippingDiscount, od.discount as discount, od.status as status,
         s.id as shopId, s.name as shopName

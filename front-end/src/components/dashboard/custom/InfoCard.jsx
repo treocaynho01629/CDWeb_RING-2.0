@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { alpha, Paper } from '@mui/material';
+import { Paper } from '@mui/material';
 
 //#region preStyled
 const InfoWrapper = styled(Paper)`
@@ -16,10 +16,10 @@ const InfoWrapper = styled(Paper)`
         position: absolute;
         top: -25%;
         left: -5%;
-        height: 100%;
+        height: 110%;
         aspect-ratio: 1/1;
-        border-radius: 43%;
-        background-color: ${props => alpha(props.theme.palette.primary.light, 0.3)};
+        background-color: ${props => props.theme.palette[props.color]?.light || props.theme.palette.primary.light};
+        opacity: .3;
         transform: rotate(30deg);
         z-index: -1;
     }
@@ -52,10 +52,10 @@ const ChartContainer = styled.div`
 `
 //#endregion
 
-const InfoCard = ({ count, icon, title }) => {
+const InfoCard = ({ count, icon, title, color }) => {
 
     return (
-        <InfoWrapper elevation={3} >
+        <InfoWrapper elevation={3} color={color}>
             <InfoContainer>
                 {icon}
                 <div>
