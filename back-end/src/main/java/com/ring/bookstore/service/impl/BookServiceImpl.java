@@ -1,6 +1,8 @@
 package com.ring.bookstore.service.impl;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -8,6 +10,8 @@ import java.util.stream.Collectors;
 import com.github.slugify.Slugify;
 import com.ring.bookstore.dtos.books.BookResponseDTO;
 import com.ring.bookstore.dtos.books.IBookDetail;
+import com.ring.bookstore.dtos.dashboard.StatDTO;
+import com.ring.bookstore.dtos.mappers.DashboardMapper;
 import com.ring.bookstore.enums.BookType;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.model.*;
@@ -45,8 +49,11 @@ public class BookServiceImpl implements BookService {
     private final PublisherRepository pubRepo;
     private final CategoryRepository cateRepo;
     private final ShopRepository shopRepo;
+
     private final ImageService imageService;
+
     private final BookMapper bookMapper;
+    private final DashboardMapper dashMapper;
     private final Slugify slg = Slugify.builder().lowerCase(false).build();
 
     //Get random books
@@ -209,6 +216,12 @@ public class BookServiceImpl implements BookService {
         //Update
         Book updatedBook = bookRepo.save(book);
         return bookMapper.bookToResponseDTO(updatedBook);
+    }
+
+    public StatDTO getAnalytics(Long shopId) {
+        return dashMapper.statToDTO(bookRepo.getBookAnalytics(shopId),
+                "books",
+                "Sản phẩm");
     }
 
     //Delete book (SELLER)

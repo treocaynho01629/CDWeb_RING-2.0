@@ -60,7 +60,7 @@ export default function SummaryTableUsers() {
         return (
           <TableRow hover tabIndex={-1} key={id}>
             <TableCell align="left">
-              <Link to={`/detail/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
+              <Link to={`/users/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
                 <Avatar sx={{ marginRight: 1 }} src={user?.image ? user.image + '?size=tiny' : null}>{user?.username?.charAt(0) ?? ''}</Avatar>
                 <Box>
                   <ItemTitle>{user.username}</ItemTitle>
@@ -110,7 +110,7 @@ export default function SummaryTableUsers() {
     <Paper sx={{ width: '100%', height: '100%' }} elevation={3}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Title>Thành viên mới đăng ký</Title>
-        <Link to={'/manage-users'}><LinkButton>Xem tất cả</LinkButton></Link>
+        <Link to={'/dashboard/user'}><LinkButton>Xem tất cả</LinkButton></Link>
       </Toolbar>
       <TableContainer component={Paper}>
         <Table stickyHeader size="small">

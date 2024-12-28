@@ -16,5 +16,5 @@ public interface BannerRepository extends JpaRepository<Banner, Long> {
 	and (coalesce(:shopId) is null or b.shop.id = :shopId)
 	and (coalesce(:byShop) is null or case when :byShop = true then b.shop.id is not null else b.shop.id is null end)
 	""")
-    Page<IBanner> findBannerByFilter(String keyword, Long shopId, Boolean byShop, Pageable pageable);
+    Page<IBanner> findBanner(String keyword, Long shopId, Boolean byShop, Pageable pageable);
 }

@@ -363,7 +363,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
               </Box>
             </TableCell>
             <TableCell align="left">
-              <Link to={`/detail/${review.bookId}`} >
+              <Link to={`/dashboard/product/${review.bookId}`} >
                 <ItemTitle>{review.bookTitle}</ItemTitle>
                 <ItemTitle className="secondary">ID: {idFormatter(review.bookId)}</ItemTitle>
               </Link>
@@ -431,7 +431,7 @@ export default function TableReviews({ setReviewCount, bookId, userId, mini = fa
       </TableContainer>
       <FooterContainer>
         {mini ?
-          <Link to={'/manage-reviews'}>Xem tất cả</Link>
+          <Link to={'/dashboard/review'}>Xem tất cả</Link>
           :
           <FormControlLabel
             control={<Switch checked={dense} onChange={handleChangeDense} />}

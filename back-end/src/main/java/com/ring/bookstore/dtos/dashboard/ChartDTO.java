@@ -1,4 +1,4 @@
-package com.ring.bookstore.dtos;
+package com.ring.bookstore.dtos.dashboard;
 
 import java.util.Map;
 

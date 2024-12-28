@@ -616,10 +616,10 @@ export default function TableProducts({ setProductCount, shopId, isShop, setIsSh
               />
             </TableCell>
             <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
-              <Link to={`/detail/${id}`}>{idFormatter(id)}</Link>
+              <Link to={`/dashboard/product/${id}`}>{idFormatter(id)}</Link>
             </TableCell>
             <TableCell align="left">
-              <Link to={`/detail/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
+              <Link to={`/dashboard/product/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
                 <LazyLoadImage
                   src={`${book.image}?size=tiny`}
                   height={45}
@@ -739,7 +739,7 @@ export default function TableProducts({ setProductCount, shopId, isShop, setIsSh
         onClose={handleCloseContext}
         anchorEl={anchorEl}
       >
-        <Link to={`/detail/${contextId}`}>
+        <Link to={`/dashboard/product/${contextId}`}>
           <MenuItem>
             <ListItemIcon>
               <Visibility fontSize="small" />

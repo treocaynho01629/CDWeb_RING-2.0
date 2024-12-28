@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { alpha, Rating, Skeleton, Stack } from "@mui/material";
 import { LazyLoadImage, trackWindowScroll } from "react-lazy-load-image-component";
-import { currencyFormat, numFormatter } from "../../ultils/covert";
+import { currencyFormat, numFormat } from "../../ultils/covert";
 import { useEffect, useState } from "react";
 import { Star, StarBorder, StarRounded } from "@mui/icons-material";
 import { Message } from "../custom/GlobalComponents";
@@ -289,7 +289,7 @@ const TopItem = ({ book, scrollPosition }) => {
                             emptyIcon={<StarBorder style={{ fontSize: 14 }} />}
                             readOnly
                         />
-                        <TextMore>Đã bán {numFormatter(book?.totalOrders)}</TextMore>
+                        <TextMore>Đã bán {numFormat.format(book?.totalOrders)}</TextMore>
                     </MoreInfo>
                     :
                     <Skeleton variant="text" width="40%" />

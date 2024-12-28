@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { Paper } from '@mui/material';
+import { TrendingDown, TrendingFlat, TrendingUp } from '@mui/icons-material';
+import { alpha, Paper, Skeleton } from '@mui/material';
 
 //#region preStyled
 const InfoWrapper = styled(Paper)`
@@ -9,18 +10,19 @@ const InfoWrapper = styled(Paper)`
     align-items: center;
     padding: ${props => props.theme.spacing(2.5)};
     overflow: hidden;
+    height: 100%;
     z-index: 1;
 
     &:before {
         content: "";
         position: absolute;
-        top: -25%;
-        left: -5%;
+        top: -35%;
+        left: -25%;
         height: 110%;
         aspect-ratio: 1/1;
         background-color: ${props => props.theme.palette[props.color]?.light || props.theme.palette.primary.light};
         opacity: .3;
-        transform: rotate(30deg);
+        transform: rotate(45deg);
         z-index: -1;
     }
 `
@@ -29,6 +31,7 @@ const InfoContainer = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    white-space: nowrap;
 
     span { font-weight: 450; }
 
@@ -46,26 +49,47 @@ const InfoContainer = styled.div`
 const ChartContainer = styled.div`
     height: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    text-align: right;
+    align-items: flex-start;
+`
+
+const Diff = styled.span`
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 14px;
+    color: ${props => props.theme.palette.text.secondary};
+    width: 0;
+    overflow: visible;
+
+    span { white-space: nowrap; }
+
+    svg {
+        font-size: 24px;
+        border-radius: 50%;
+        padding: 4px;
+        background-color: color-mix(in srgb, currentColor 20%, transparent);
+    }
 `
 //#endregion
 
-const InfoCard = ({ count, icon, title, color }) => {
+const InfoCard = ({ info, icon, color }) => {
+    const diff = info?.diff;
 
     return (
         <InfoWrapper elevation={3} color={color}>
             <InfoContainer>
                 {icon}
                 <div>
-                    <span>{title}</span>
-                    <h2>{count}</h2>
+                    <span>{info != null ? info?.label : <Skeleton variant="text" width="120px" />}</span>
+                    <h2>{info != null ? info?.value : <Skeleton variant="text" width="80px" />}</h2>
                 </div>
             </InfoContainer>
             <ChartContainer>
-                <span>123</span>
-                <div>CHART</div>
+                {diff != null &&
+                    <Diff>{diff > 0 ? <TrendingUp color="success" /> : diff < 0 ? <TrendingDown color="error" /> : <TrendingFlat />}
+                        &nbsp;{diff * 100}%&nbsp;<span>tháng trước</span>
+                    </Diff>
+                }
             </ChartContainer>
         </InfoWrapper>
     )

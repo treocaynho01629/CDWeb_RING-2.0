@@ -10,23 +10,23 @@ import useAuth from "../../../hooks/useAuth";
 const drawerWidth = 250;
 
 const openedMixin = (theme) => ({
-    width: drawerWidth,
-    transition: theme.transitions.create('all', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    backgroundColor: theme.palette.background.default,
-    overflowX: 'hidden',
+  width: drawerWidth,
+  transition: theme.transitions.create('all', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  backgroundColor: theme.palette.background.default,
+  overflowX: 'hidden',
 });
 
 const closedMixin = (theme) => ({
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    backgroundColor: theme.palette.background.default,
-    overflowX: 'hidden',
-    width: `calc(${theme.spacing(7)} + 1px)`,
+  transition: theme.transitions.create('width', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  backgroundColor: theme.palette.background.default,
+  overflowX: 'hidden',
+  width: `calc(${theme.spacing(7)} + 1px)`,
 });
 
 const ImageLogo = styled.img`
@@ -70,38 +70,38 @@ const DrawerContainer = styled.div`
 `
 
 const StyledListSubheader = styled(ListSubheader)(({ theme }) => ({
-    backgroundColor: 'transparent',
-    fontSize: 14,
-    fontWeight: 450,
+  backgroundColor: 'transparent',
+  fontSize: 14,
+  fontWeight: 450,
 }));
 
 const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
-    minHeight: 48,
-    justifyContent: 'center',
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
+  minHeight: 48,
+  justifyContent: 'center',
+  transition: theme.transitions.create('margin', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
 
-    '&.Mui-selected': {
+  '&.Mui-selected': {
+    color: theme.palette.primary.main,
+
+    '.MuiListItemIcon-root': {
       color: theme.palette.primary.main,
-
-      '.MuiListItemIcon-root': {
-        color: theme.palette.primary.main,
-      }
-    },
-
-    '&.open': {
-      justifyContent: 'initial',
-      margin: theme.spacing(0, 1.5),
     }
+  },
+
+  '&.open': {
+    justifyContent: 'initial',
+    margin: theme.spacing(0, 1.5),
+  }
 }));
 
 const StyledListItemIcon = styled(ListItemIcon)(({ theme }) => ({
-    minWidth: 0,
-    justifyContent: 'center',
+  minWidth: 0,
+  justifyContent: 'center',
 
-    '&.open': { marginRight: theme.spacing(3) }
+  '&.open': { marginRight: theme.spacing(3) }
 }));
 //#endregion
 
@@ -109,11 +109,11 @@ const managementListItems = [
   {
     label: 'Sản phẩm',
     icon: <AutoStoriesOutlined />,
-    url: '/manage-products',
+    url: '/dashboard/product',
     subItems: [
       {
         label: 'Tổng quan',
-        url: '/manage-products',
+        url: '/dashboard/product',
       },
       {
         label: 'Thêm mới',
@@ -141,11 +141,11 @@ const managementListItems = [
     isAdmin: true,
     label: 'Thành viên',
     icon: <GroupsOutlined />,
-    url: '/manage-users',
+    url: '/dashboard/user',
     subItems: [
       {
         label: 'Tổng quan',
-        url: '/manage-users',
+        url: '/dashboard/user',
       },
       {
         label: 'Thêm mới',
@@ -156,12 +156,12 @@ const managementListItems = [
   {
     label: 'Đánh giá',
     icon: <StarBorder />,
-    url: '/manage-reviews',
+    url: '/dashboard/review',
   },
   {
     label: 'Doanh thu',
     icon: <TrendingUpOutlined />,
-    url: '/manage-orders',
+    url: '/dashboard/order',
   },
 ];
 
@@ -195,7 +195,7 @@ const DashboardDrawer = ({ open, setOpen, mobileMode }) => {
         }
       >
         <ListItem key={0} disablePadding sx={{ display: 'block' }}>
-          <NavLink to={'/dashboard'}>
+          <NavLink to={'/dashboard'} end>
             {({ isActive }) => (
               <StyledListItemButton
                 className={open ? 'open' : ''}
@@ -220,7 +220,7 @@ const DashboardDrawer = ({ open, setOpen, mobileMode }) => {
       >
         {managementListItems.map((item, index) => (
           (!item.isAdmin || isAdmin) &&
-          <NavLink key={`link-${index}`} to={item.url}>
+          <NavLink key={`link-${index}`} to={item.url} end>
             {({ isActive }) => (
               <>
                 <ListItem key={`item-${index}`} disablePadding sx={{ display: 'block' }}>
@@ -240,7 +240,7 @@ const DashboardDrawer = ({ open, setOpen, mobileMode }) => {
                 </ListItem>
                 {item.subItems &&
                   <Collapse key={index} in={openList[index]} timeout={250} unmountOnExit sx={{ display: open ? 'block' : 'none' }}>
-                    <List component="div" disablePadding>
+                    <List sx={{ mx: 1.5 }} component="div" disablePadding>
                       {item.subItems?.map((sub, subIndex) => (
                         <NavLink key={`sub-${index}-${subIndex}`} to={sub.url}>
                           <ListItemButton sx={{ pl: 4 }}>
@@ -274,7 +274,7 @@ const DashboardDrawer = ({ open, setOpen, mobileMode }) => {
         </Drawer>
         :
         <StyledDrawer variant="permanent" open={open}>
-            {drawerContent}
+          {drawerContent}
         </StyledDrawer>
       }
     </>

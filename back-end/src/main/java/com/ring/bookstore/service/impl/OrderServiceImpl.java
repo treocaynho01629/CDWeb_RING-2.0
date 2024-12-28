@@ -7,10 +7,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
+import com.ring.bookstore.dtos.dashboard.StatDTO;
+import com.ring.bookstore.dtos.mappers.DashboardMapper;
 import com.ring.bookstore.dtos.orders.*;
-import com.ring.bookstore.dtos.ChartDTO;
+import com.ring.bookstore.dtos.dashboard.ChartDTO;
 import com.ring.bookstore.dtos.mappers.CalculateMapper;
-import com.ring.bookstore.dtos.mappers.ChartDataMapper;
 import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.enums.ShippingType;
 import com.ring.bookstore.listener.checkout.OnCheckoutCompletedEvent;
@@ -53,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderMapper orderMapper;
     private final CalculateMapper calculateMapper;
-    private final ChartDataMapper chartMapper;
+    private final DashboardMapper dashMapper;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -577,7 +578,7 @@ public class OrderServiceImpl implements OrderService {
         return receiptDTO;
     }
 
-    //Get all orders
+    //Get all orders FIX
     @Transactional
     public Page<ReceiptDTO> getAllReceipts(Account user, Long shopId, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
@@ -666,18 +667,18 @@ public class OrderServiceImpl implements OrderService {
         return detailDTO;
     }
 
-    //Get monthly sales FIX
-    @Override
-    public List<ChartDTO> getMonthlySale(Account user) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        List<Map<String, Object>> result;
+    public StatDTO getAnalytics(Account user, Long shopId) {
+        boolean isAdmin = isAuthAdmin();
+        return dashMapper.statToDTO(orderRepo.getSalesAnalytics(shopId, isAdmin ? null : user.getId()),
+                "sales",
+                "Doanh thu tháng này");
+    }
 
-        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString()))) {
-            result = orderRepo.getMonthlySale(); //Get all if ADMIN
-        } else {
-            result = orderRepo.getMonthlySaleBySeller(user.getId()); //If seller only get their
-        }
-        return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
+    //Get monthly sales
+    public List<ChartDTO> getMonthlySales(Account user, Long shopId, Integer year) {
+        boolean isAdmin = isAuthAdmin();
+        List<Map<String, Object>> data = orderRepo.getMonthlySales(shopId, isAdmin ? null : user.getId(), year);
+        return data.stream().map(dashMapper::dataToChartDTO).collect(Collectors.toList()); //Return chart data
     }
 
     //Return fixed amount of shipping fee for now :<

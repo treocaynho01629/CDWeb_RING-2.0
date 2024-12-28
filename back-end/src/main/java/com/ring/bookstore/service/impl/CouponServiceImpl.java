@@ -49,7 +49,7 @@ public class CouponServiceImpl implements CouponService {
                 : Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<Coupon> couponsList = couponRepo.findCouponByFilter(types, keyword, shopId,
+        Page<Coupon> couponsList = couponRepo.findCoupon(types, keyword, shopId,
                 byShop, showExpired, pageable);
 
         //Check usable

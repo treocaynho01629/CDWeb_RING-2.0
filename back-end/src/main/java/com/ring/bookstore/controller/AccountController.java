@@ -55,6 +55,12 @@ public class AccountController {
 	public ResponseEntity<AccountDetailDTO> getAccountById(@PathVariable("id") Long accountId){
 		return new ResponseEntity<>(accountService.getAccountById(accountId), HttpStatus.OK);
 	}
+
+	@GetMapping("/analytics")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> getUserAnalytics() {
+		return new ResponseEntity<>(accountService.getAnalytics(), HttpStatus.OK);
+	}
 	
 	//Edit account by {id}
 	@PutMapping("{id}")

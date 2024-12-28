@@ -36,7 +36,7 @@ public class BannerServiceImpl implements BannerService {
                 : Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<IBanner> bannersList = bannerRepo.findBannerByFilter(keyword, shopId, byShop, pageable);
+        Page<IBanner> bannersList = bannerRepo.findBanner(keyword, shopId, byShop, pageable);
         Page<BannerDTO> bannerDTOS = bannersList.map(bannerMapper::apply);
         return bannerDTOS;
     }

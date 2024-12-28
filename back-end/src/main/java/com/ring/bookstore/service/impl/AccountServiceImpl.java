@@ -1,8 +1,10 @@
 package com.ring.bookstore.service.impl;
 
 import com.ring.bookstore.dtos.accounts.*;
-import com.ring.bookstore.dtos.ChartDTO;
+import com.ring.bookstore.dtos.dashboard.ChartDTO;
+import com.ring.bookstore.dtos.dashboard.StatDTO;
 import com.ring.bookstore.dtos.mappers.AccountMapper;
+import com.ring.bookstore.dtos.mappers.DashboardMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ImageResizerException;
@@ -46,6 +48,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
     private final PasswordEncoder passwordEncoder;
 
+    private final DashboardMapper dashMapper;
+
     //Get all accounts
     public Page<AccountDTO> getAllAccounts(Integer pageNo,
                                            Integer pageSize,
@@ -64,6 +68,12 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepo.findById(id).orElseThrow(()
                 -> new ResourceNotFoundException("User not found!"));
         return accountMapper.accountToDetailDTO(account);
+    }
+
+    public StatDTO getAnalytics() {
+        return dashMapper.statToDTO(accountRepo.getAccountAnalytics(),
+                "users",
+                "Thành viên mới");
     }
 
     //Create account (ADMIN)

@@ -1,7 +1,9 @@
 package com.ring.bookstore.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import com.ring.bookstore.dtos.dashboard.IStat;
 import com.ring.bookstore.enums.BookType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -110,6 +112,16 @@ public interface BookRepository extends JpaRepository<Book, Long> {
         where b.id in :ids
     """)
     List<Book> findBooksInIds(List<Long> ids);
+
+    @Query("""
+        select count(b.id) as total,
+        count(case when b.lastModifiedDate >= date_trunc('month', current date) then 1 end) as currentMonth,
+        count(case when b.lastModifiedDate >= date_trunc('month', current date) - 1 month
+            and b.lastModifiedDate < date_trunc('month', current date) then 1 end) lastMonth
+        from Book b
+        where (coalesce(:shopId) is null or b.shop.id = :shopId)
+    """)
+    IStat getBookAnalytics(Long shopId);
 
     @Query("""
         delete from Book b where b.shop.owner.id = :id

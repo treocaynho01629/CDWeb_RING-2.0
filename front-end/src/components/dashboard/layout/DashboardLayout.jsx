@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router';
-import { Container, useMediaQuery, useTheme } from "@mui/material";
+import { useMediaQuery, useTheme } from "@mui/material";
 import DashboardNavbar from "./DashboardNavbar";
 import DashboardDrawer from "./DashboardDrawer";
 import styled from '@emotion/styled';
 
+//#region styled
 const LayoutWrapper = styled.div`
     display: flex;
 
@@ -22,6 +23,21 @@ const MainContainer = styled.div`
     }
 `
 
+const LayoutContainer = styled.div`
+    position: relative;
+    min-height: 60dvh;
+    padding-bottom: ${props => props.theme.spacing(4)};
+
+    ${props => props.theme.breakpoints.up("sm_md")} {
+        padding-right: ${props => props.theme.spacing(2)};
+        padding-left: ${props => props.theme.spacing(2)};
+        margin-right: auto;
+        margin-left: auto;
+        max-width: ${props => props.theme.breakpoints.values['xl']}px;
+    }
+`
+//#endregion
+
 export default function DashboardLayout() {
     const theme = useTheme();
     const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
@@ -32,9 +48,9 @@ export default function DashboardLayout() {
             <DashboardDrawer {...{ open, setOpen, mobileMode }} />
             <MainContainer component="main">
                 <DashboardNavbar {...{ open, setOpen, mobileMode }} />
-                <Container maxWidth="xl" sx={{ pb: 4 }}>
+                <LayoutContainer>
                     <Outlet />
-                </Container>
+                </LayoutContainer>
             </MainContainer>
         </LayoutWrapper>
     )

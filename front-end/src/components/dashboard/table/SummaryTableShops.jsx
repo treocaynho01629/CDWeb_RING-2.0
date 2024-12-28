@@ -1,53 +1,57 @@
-import { useState } from 'react';
 import {
   Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper,
-  Skeleton, Toolbar, TableHead,
+  Skeleton, Toolbar, TableHead, Avatar, Chip,
 } from '@mui/material';
 import { Link } from 'react-router';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { useGetBooksQuery } from '../../../features/books/booksApiSlice';
 import { ItemTitle, LinkButton, Title } from '../custom/ShareComponents';
-import { currencyFormat } from '../../../ultils/covert';
-import useAuth from '../../../hooks/useAuth';
+import { useGetShopsQuery } from '../../../features/shops/shopsApiSlice';
+import { currencyFormat, idFormatter, numFormat } from '../../../ultils/covert';
 import CustomProgress from '../../custom/CustomProgress';
 
 const headCells = [
   {
-    id: 'title',
+    id: 'shop',
     align: 'left',
     width: 'auto',
     disablePadding: false,
-    label: 'Sản phẩm',
+    label: 'Cửa hàng',
   },
   {
-    id: 'info',
-    align: 'right',
-    width: '110px',
+    id: 'owner',
+    align: 'left',
+    width: '120px',
     disablePadding: false,
-    label: 'Thông tin',
+    label: 'Sở hữu',
+  },
+  {
+    id: 'sales',
+    align: 'left',
+    width: '120px',
+    disablePadding: false,
+    label: 'Doanh thu',
+  },
+  {
+    id: 'rank',
+    align: 'right',
+    width: '95px',
+    disablePadding: false,
+    label: 'Xếp hạng',
   },
 ];
 
-export default function SummaryTableProducts({ shopId }) {
-  //#region construct
-  const { roles } = useAuth();
-  const isAdmin = useState(roles?.find(role => ['ROLE_ADMIN'].includes(role)));
-
+export default function SummaryTableShops() {
   //Fetch books
-  const { data, isLoading, isSuccess, isError, error } = useGetBooksQuery({
+  const { data, isLoading, isSuccess, isError, error } = useGetShopsQuery({
     size: 5,
-    sortBy: 'createdDate',
-    sortDir: 'desc',
-    shopId: shopId ?? '',
-    amount: 0
+    sortBy: 'sales',
+    sortDir: 'desc'
   })
-  //#endregion
 
   const colSpan = headCells.length + 1;
-  let bookRows;
+  let shopRows;
 
   if (isLoading) {
-    bookRows = (
+    shopRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -63,33 +67,50 @@ export default function SummaryTableProducts({ shopId }) {
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    bookRows = ids?.length
+    shopRows = ids?.length
       ? ids?.map((id, index) => {
-        const book = entities[id];
+        const shop = entities[id];
+        const date = new Date(shop?.joinedDate);
 
         return (
           <TableRow hover tabIndex={-1} key={id}>
             <TableCell align="left">
-              <Link to={`/dashboard/product/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
-                <LazyLoadImage
-                  src={`${book.image}?size=tiny`}
-                  height={45}
-                  width={45}
-                  style={{ marginRight: '10px' }}
-                  placeholder={<Skeleton width={45} height={45} animation={false} variant="rectangular" />}
-                />
+              <Link to={`/shop/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar sx={{ marginRight: 1 }} src={shop?.image ? shop.image + '?size=tiny' : null}>{shop?.name?.charAt(0) ?? ''}</Avatar>
                 <Box>
-                  <ItemTitle>{book.title}</ItemTitle>
+                  <ItemTitle>{shop.name}</ItemTitle>
                   <Box display="flex">
-                    <ItemTitle>{currencyFormat.format(book.price * (1 - book.discount))}</ItemTitle>
-                    {book.discount > 0 && <ItemTitle className="secondary">&emsp;-{book.discount * 100}%</ItemTitle>}
+                    <ItemTitle className="secondary">{
+                      date.toLocaleDateString("en-GB", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })
+                    }</ItemTitle>
+                    <ItemTitle>&emsp;Lượt theo dõi: {shop.totalFollowers}</ItemTitle>
                   </Box>
                 </Box>
               </Link>
             </TableCell>
+            <TableCell align="left">
+              <ItemTitle>{shop.username}</ItemTitle>
+              <ItemTitle>{idFormatter(shop.ownerId)}</ItemTitle>
+            </TableCell>
+            <TableCell align="left">
+              <ItemTitle>{currencyFormat.format(shop.sales)}</ItemTitle>
+              <ItemTitle className="secondary">Doanh số: {numFormat.format(shop.totalSold)}</ItemTitle>
+            </TableCell>
             <TableCell align="right">
-              <ItemTitle className="secondary">Đã bán: {book.totalOrders}</ItemTitle>
-              <ItemTitle className="secondary">Đánh giá: {book.rating.toFixed(1)}</ItemTitle>
+              <Chip
+                label={`Top ${index + 1}`}
+                color={index == 0 ? 'success' :
+                  index == 1 ? 'primary' :
+                    index == 2 ? 'info' :
+                      index == 3 ? 'warning' :
+                        'error'}
+                variant="outlined"
+                sx={{ fontWeight: 'bold' }}
+              />
             </TableCell>
           </TableRow>
         )
@@ -103,11 +124,11 @@ export default function SummaryTableProducts({ shopId }) {
           colSpan={colSpan}
           sx={{ height: '40dvh' }}
         >
-          <Box>Không tìm thấy sản phẩm nào!</Box>
+          <Box>Không tìm thấy cửa hàng nào!</Box>
         </TableCell>
       </TableRow >
   } else if (isError) {
-    bookRows = (
+    shopRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -125,8 +146,8 @@ export default function SummaryTableProducts({ shopId }) {
   return (
     <Paper sx={{ width: '100%', height: '100%' }} elevation={3}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Title>Sản phẩm mới nhất</Title>
-        <Link to={'/dashboard/product'}><LinkButton>Xem tất cả</LinkButton></Link>
+        <Title>Cửa hàng đóng góp nhiều nhất</Title>
+        <Link to={'/dashboard/shop'}><LinkButton>Xem tất cả</LinkButton></Link>
       </Toolbar>
       <TableContainer component={Paper}>
         <Table stickyHeader size="small">
@@ -145,7 +166,7 @@ export default function SummaryTableProducts({ shopId }) {
             </TableRow>
           </TableHead >
           <TableBody>
-            {bookRows}
+            {shopRows}
           </TableBody>
         </Table>
       </TableContainer>

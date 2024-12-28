@@ -45,6 +45,11 @@ const SimpleButton = styled.span`
 const Logo = styled.img`
     height: 45px;
     padding: 4px;
+
+    ${props => props.theme.breakpoints.down("md")} {
+        filter: drop-shadow(0px -1000px 0 ${props => props.theme.palette.text.primary});
+        transform: translateY(1000px);
+    }
 `
 //#endregion
 

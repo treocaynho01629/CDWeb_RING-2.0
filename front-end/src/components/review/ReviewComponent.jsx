@@ -5,7 +5,7 @@ import { Message, MobileExtendButton, Showmore, Title } from '../custom/GlobalCo
 import { Button, DialogActions, DialogTitle, Rating, Box, Skeleton } from '@mui/material';
 import { KeyboardArrowRight, KeyboardArrowLeft, Star, StarBorder, EditOutlined } from '@mui/icons-material';
 import { ReactComponent as EmptyIcon } from '../../assets/empty.svg';
-import { numFormatter } from '../../ultils/covert';
+import { numFormat } from '../../ultils/covert';
 import useAuth from "../../hooks/useAuth";
 import CustomProgress from '../custom/CustomProgress';
 import ReviewItem from './ReviewItem';
@@ -224,7 +224,7 @@ const ReviewComponent = ({ book, scrollIntoTab, tabletMode, pending, setPending,
                                     emptyIcon={<StarBorder sx={{ fontSize: 16 }} />}
                                 />
                                 <Label>{(book?.reviewsInfo?.rating ?? 0).toFixed(1)}/5</Label>
-                                <Label className="secondary">({numFormatter(productReviewsCount ?? 0)} đánh giá)</Label>
+                                <Label className="secondary">({numFormat.format(productReviewsCount ?? 0)} đánh giá)</Label>
                             </>
                                 : <Skeleton variant="text" sx={{ fontSize: '16px' }} width={200} />
                             }
@@ -252,7 +252,7 @@ const ReviewComponent = ({ book, scrollIntoTab, tabletMode, pending, setPending,
             </ReviewsContainer>
             {(tabletMode && book?.reviewsInfo?.total > 0) && //View all
                 <Showmore onClick={() => handleToggleReview(true)}>
-                    <Label>Xem tất cả ({numFormatter(productReviewsCount ?? 0)} đánh giá) <KeyboardArrowRight fontSize="small" /></Label>
+                    <Label>Xem tất cả ({numFormat.format(productReviewsCount ?? 0)} đánh giá) <KeyboardArrowRight fontSize="small" /></Label>
                 </Showmore>
             }
             {(isReview !== undefined && tabletMode) && //Mobile component

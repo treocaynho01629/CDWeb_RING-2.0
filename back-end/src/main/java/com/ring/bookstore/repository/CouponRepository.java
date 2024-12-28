@@ -23,7 +23,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 			then c.shop.id is not null else c.shop.id is null end)
 		group by c.id, cd.id
 	""")
-    Page<Coupon> findCouponByFilter(List<CouponType> types, String keyword, Long shopId,
+    Page<Coupon> findCoupon(List<CouponType> types, String keyword, Long shopId,
 									Boolean byShop, Boolean showExpired, Pageable pageable);
 
 	@Query("""
@@ -64,10 +64,10 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 		select c from Coupon c join fetch c.detail cd
 		where (cd.expDate > current date and cd.usage > 0)
 		and (case when coalesce(:shopId) is null then c.shop.id is null else c.shop.id = :shopId end)
-		and (coalesce(:value) is null or (cd.type in (com.ring.bookstore.enums.CouponType.MIN_VALUE, 
+		and (coalesce(:value) is null or (cd.type in (com.ring.bookstore.enums.CouponType.MIN_VALUE,
 				com.ring.bookstore.enums.CouponType.SHIPPING) and cd.attribute < :value)
-			or (coalesce(:quantity) is null 
-				or (cd.type = com.ring.bookstore.enums.CouponType.MIN_AMOUNT and cd.attribute < :quantity))) 
+			or (coalesce(:quantity) is null
+				or (cd.type = com.ring.bookstore.enums.CouponType.MIN_AMOUNT and cd.attribute < :quantity)))
 		group by c.shop.id, c.id, cd.id, cd.attribute, cd.discount, cd.maxDiscount
 		order by cd.attribute asc, cd.discount desc, cd.maxDiscount desc
 		limit 1

@@ -1,12 +1,6 @@
-import styled from '@emotion/styled'
-import { styled as muiStyled } from '@mui/material';
 import { useState } from "react";
-import { AutoStories, Group, AttachMoney, Storefront } from "@mui/icons-material";
-import { Grid2 as Grid, Paper } from '@mui/material';
-import TableProducts from '../../components/dashboard/table/TableProducts'
-// import TableUsers from "../../components/dashboard/table/TableUsers";
-// import TableReviews from "../../components/dashboard/table/TableReviews";
-// import TableOrders from "../../components/dashboard/table/TableOrders";
+import { AutoStories, Group, AttachMoney, Storefront, LocalFireDepartment } from "@mui/icons-material";
+import { Grid2 as Grid } from '@mui/material';
 import ChartUsers from "../../components/dashboard/chart/ChartUsers";
 import ChartSales from "../../components/dashboard/chart/ChartSales";
 import useAuth from "../../hooks/useAuth";
@@ -16,74 +10,101 @@ import InfoCard from '../../components/dashboard/custom/InfoCard';
 import SummaryTableProducts from '../../components/dashboard/table/SummaryTableProducts';
 import SummaryTableOrders from '../../components/dashboard/table/SummaryTableOrders';
 import SummaryTableUsers from '../../components/dashboard/table/SummaryTableUsers';
+import { useGetBookAnalyticsQuery, useGetBooksQuery } from "../../features/books/booksApiSlice";
+import { useGetUserAnalyticsQuery } from "../../features/users/usersApiSlice";
+import { useGetSalesAnalyticsQuery } from "../../features/orders/ordersApiSlice";
+import { useGetShopAnalyticsQuery } from "../../features/shops/shopsApiSlice";
+import SummaryTableShops from "../../components/dashboard/table/SummaryTableShops";
+import ProductsShowcase from "../../components/dashboard/product/ProductsShowcase";
+
+const TopProducts = () => {
+  const { data, isLoading, isSuccess, isError } = useGetBooksQuery({
+    size: 6,
+    sortBy: 'totalOrders',
+    sortDir: 'desc',
+    amount: 0,
+  });
+
+  return (
+    <ProductsShowcase {...{
+      title: <><LocalFireDepartment />Top sản phẩm bán chạy</>,
+      data, isLoading, isSuccess, isError
+    }} />
+  )
+}
 
 const Dashboard = () => {
-  const [userCount, setUserCount] = useState(0);
-  const [productCount, setProductCount] = useState(0);
-  const [reviewCount, setReviewCount] = useState(0);
-  const [orderCount, setOrderCount] = useState(0);
   const { roles, username } = useAuth();
   const isAdmin = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
+  const { data: bookAnalytics } = useGetBookAnalyticsQuery();
+  const { data: userAnalytics } = useGetUserAnalyticsQuery();
+  const { data: shopAnalytics } = useGetShopAnalyticsQuery();
+  const { data: salesAnalytics } = useGetSalesAnalyticsQuery();
 
   //Set title
   useTitle('Dashboard');
 
   return (
     <>
-      <Grid container size="grow" spacing={3} pt={2}>
+      <Grid container size="grow" spacing={2} pt={2}>
         <Grid size={{ xs: 12, sm: 7 }}>
-          <WelcomeCard />
+          <WelcomeCard username={username} />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
           <p>STUFF</p>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md_lg: 3 }}>
           <InfoCard
-            count={productCount}
-            icon={<AutoStories color="info" />}
-            title={'Sản phẩm'}
-            color="info"
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md_lg: 3 }}>
-          <InfoCard
-            count={orderCount}
-            icon={<Storefront color="primary" />}
-            title={'Cửa hàng'}
+            icon={<AutoStories color="primary" />}
+            info={bookAnalytics}
             color="primary"
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md_lg: 3 }}>
           <InfoCard
-            count={orderCount}
+            icon={<Storefront color="info" />}
+            info={shopAnalytics}
+            color="info"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md_lg: 3 }}>
+          <InfoCard
             icon={<Group color="warning" />}
-            title={'Thành viên'}
+            info={userAnalytics}
             color="warning"
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md_lg: 3 }}>
           <InfoCard
-            count={productCount}
-            icon={<AttachMoney color="error" />}
-            title={'Doanh thu'}
-            color="error"
+            icon={<AttachMoney color="success" />}
+            info={salesAnalytics}
+            color="success"
           />
         </Grid>
-        <Grid size={12}>
+        <Grid size={{ xs: 12, md_lg: 4 }}>
+          <p>STUFF</p>
+        </Grid>
+        <Grid size={{ xs: 12, md_lg: 8 }}>
           <ChartSales />
         </Grid>
         {isAdmin &&
           <Grid size={12}>
-            <ChartUsers />
+            {/* <ChartUsers /> */}
           </Grid>
         }
+        <Grid size={{ xs: 12, md_lg: 7 }}>
+          <SummaryTableShops />
+        </Grid>
+        <Grid size={{ xs: 12, md_lg: 5 }}>
+          <TopProducts />
+        </Grid>
         <Grid size={{ xs: 12, lg: 4 }}>
           <SummaryTableOrders />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
+        <Grid size={{ xs: 12, md: 6, lg: 4 }}>
           <SummaryTableProducts />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
+        <Grid size={{ xs: 12, md: 6, lg: 4 }}>
           <SummaryTableUsers />
         </Grid>
       </Grid>

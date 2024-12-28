@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 import PropTypes from 'prop-types'
 import { Button, LinearProgress, Rating, Skeleton } from '@mui/material';
 import { EditOutlined, Star, StarBorder } from '@mui/icons-material';
-import { numFormatter } from '../../ultils/covert';
+import { numFormat } from '../../ultils/covert';
 
 //#region styled
 const ReviewsInfoContainer = styled.div`
@@ -133,7 +133,7 @@ const ReviewInfo = ({ handleClick, book, disabled, editable }) => {
                         icon={<Star fontSize="inherit" />}
                         emptyIcon={<StarBorder fontSize="inherit" />}
                     />
-                    <TotalLabel>({numFormatter(book?.reviewsInfo?.total ?? 0)} đánh giá)</TotalLabel>
+                    <TotalLabel>({numFormat.format(book?.reviewsInfo?.total ?? 0)} đánh giá)</TotalLabel>
                 </>
                     : <>
                         <Score><Skeleton variant="text" sx={{ fontSize: 'inherit', width: { xs: 60, md: 100 } }} /></Score>

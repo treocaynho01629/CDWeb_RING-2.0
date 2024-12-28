@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.ring.bookstore.dtos.books.BookResponseDTO;
+import com.ring.bookstore.dtos.dashboard.StatDTO;
 import com.ring.bookstore.enums.BookType;
 import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.data.domain.Page;
@@ -50,6 +51,8 @@ public interface BookService {
 
     BookResponseDTO deleteBook(Long id,
                                Account seller);
+
+    StatDTO getAnalytics(Long shopId);
 
     void deleteBooks(List<Long> ids,
                      Account seller);
