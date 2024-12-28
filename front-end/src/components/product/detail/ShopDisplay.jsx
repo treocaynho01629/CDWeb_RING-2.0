@@ -3,7 +3,7 @@ import { Avatar, Box, Button, Grid2 as Grid, Skeleton, Stack } from "@mui/materi
 import { Add, AutoStories, Check, LocalActivity, PersonAddAlt1, Store, Today, Verified as VerifiedIcon } from "@mui/icons-material";
 import { useFollowShopMutation, useGetShopQuery, useUnfollowShopMutation } from "../../../features/shops/shopsApiSlice";
 import { Link } from 'react-router';
-import { numFormatter } from '../../../ultils/covert';
+import { numFormat } from '../../../ultils/covert';
 
 //#region styled
 const ShopContainer = styled.div`
@@ -190,9 +190,9 @@ const ShopDisplay = ({ id, name }) => {
                             </>
                             :
                             <>
-                                <ShopDetail><LocalActivity color="warning" />Đánh giá:<b>{numFormatter(data?.totalReviews)}</b></ShopDetail>
-                                <ShopDetail><AutoStories color="warning" />Sản phẩm:<b>{numFormatter(data?.totalProducts)}</b></ShopDetail>
-                                <ShopDetail><PersonAddAlt1 color="warning" />Người theo dõi:<b>{numFormatter(data?.totalFollowers)}</b></ShopDetail>
+                                <ShopDetail><LocalActivity color="warning" />Đánh giá:<b>{numFormat.format(data?.totalReviews)}</b></ShopDetail>
+                                <ShopDetail><AutoStories color="warning" />Sản phẩm:<b>{numFormat.format(data?.totalProducts)}</b></ShopDetail>
+                                <ShopDetail><PersonAddAlt1 color="warning" />Người theo dõi:<b>{numFormat.format(data?.totalFollowers)}</b></ShopDetail>
                                 <ShopDetail className="hide-on-mobile">
                                     <Today color="warning" />Tham gia:<b>
                                         {new Date(data?.joinedDate).toLocaleDateString("en-GB", {

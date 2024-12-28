@@ -23,7 +23,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                     return response.status === 200 && !result?.isError
                 },
             }),
-            providesTags: (result, error, id) => [{ type: 'Receipt', id }]
+            providesTags: (result, error, id) => [{ type: 'Order', id }]
         }),
         getReceipts: builder.query({
             query: (args) => {
@@ -55,10 +55,10 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
                     return [
-                        { type: 'Receipt', id: 'LIST' },
-                        ...result.ids.map(id => ({ type: 'Receipt', id }))
+                        { type: 'Order', id: 'LIST' },
+                        ...result.ids.map(id => ({ type: 'Order', id }))
                     ]
-                } else return [{ type: 'Receipt', id: 'LIST' }]
+                } else return [{ type: 'Order', id: 'LIST' }]
             },
         }),
         getSummaries: builder.query({
@@ -91,10 +91,10 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
                     return [
-                        { type: 'Summary', id: 'LIST' },
-                        ...result.ids.map(id => ({ type: 'Summary', id }))
+                        { type: 'Order', id: 'LIST' },
+                        ...result.ids.map(id => ({ type: 'Order', id }))
                     ]
-                } else return [{ type: 'Summary', id: 'LIST' }]
+                } else return [{ type: 'Order', id: 'LIST' }]
             },
         }),
         getOrdersByUser: builder.query({
@@ -200,14 +200,34 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                 } else return [{ type: 'Order', id: 'LIST' }]
             }
         }),
-        getSale: builder.query({
-            query: () => ({
-                url: `/api/orders/sale`,
-                validateStatus: (response, result) => {
-                    return response.status === 200 && !result?.isError
-                },
-            }),
-            providesTags: ['Chart'],
+        getSalesAnalytics: builder.query({
+            query: (shopId) => {
+                return {
+                    url: `/api/orders/analytics${shopId ? `?shopId=${shopId}` : ''}`,
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result?.isError
+                    },
+                }
+            },
+            providesTags: [{ type: 'Order', id: 'LIST' }],
+        }),
+        getSales: builder.query({
+            query: (args) => {
+                const { shopId, year } = args || {};
+
+                //Params
+                const params = new URLSearchParams();
+                if (shopId) params.append('shopId', shopId);
+                if (year) params.append('year', year);
+
+                return {
+                    url: `/api/orders/sales?${params.toString()}`,
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result?.isError
+                    },
+                }
+            },
+            providesTags: [{ type: 'Order', id: 'LIST' }],
         }),
         calculate: builder.mutation({
             query: (currCart) => ({
@@ -225,9 +245,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
                 headers: { response: token, source },
                 body: { ...cart }
             }),
-            invalidatesTags: [
-                { type: 'Receipt', id: "LIST" }, { type: 'Order', id: "LIST" }
-            ]
+            invalidatesTags: [{ type: 'Order', id: 'LIST' }]
         }),
     }),
 })
@@ -238,7 +256,8 @@ export const {
     useGetSummariesQuery,
     useGetOrdersByUserQuery,
     useGetOrdersByBookIdQuery,
-    useGetSaleQuery,
+    useGetSalesAnalyticsQuery,
+    useGetSalesQuery,
     useCalculateMutation,
     useCheckoutMutation,
 } = ordersApiSlice

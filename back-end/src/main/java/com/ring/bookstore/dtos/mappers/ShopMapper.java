@@ -1,17 +1,13 @@
 package com.ring.bookstore.dtos.mappers;
 
-import com.ring.bookstore.dtos.shops.ShopDTO;
-import com.ring.bookstore.dtos.shops.IShopDetail;
+import com.ring.bookstore.dtos.shops.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.function.Function;
-
 @Service
-public class ShopMapper implements Function<IShopDetail, ShopDTO> {
-	
-    @Override
-    public ShopDTO apply(IShopDetail shop) {
+public class ShopMapper {
+
+	public ShopDisplayDTO displayToDTO(IShopDisplay shop) {
 		String fileDownloadUri = shop.getImage() != null ?
 				ServletUriComponentsBuilder
 						.fromCurrentContextPath()
@@ -20,16 +16,56 @@ public class ShopMapper implements Function<IShopDetail, ShopDTO> {
 						.toUriString()
 				: null;
 
-        return new ShopDTO(shop.getOwnerUsername()
-				, shop.getOwnerId()
-				, shop.getId()
-        		, shop.getName()
-        		, shop.getDescription()
-        		, fileDownloadUri
-        		, shop.getJoinedDate()
-        		, shop.getTotalReviews()
-                , shop.getTotalProducts()
-        		, shop.getTotalFollowers()
-				, shop.getFollowed());
+		return new ShopDisplayDTO(shop.getOwnerId(),
+				shop.getId(),
+				shop.getName(),
+				fileDownloadUri,
+				shop.getJoinedDate(),
+				shop.getTotalReviews(),
+				shop.getTotalProducts(),
+				shop.getTotalFollowers(),
+				shop.getFollowed());
+	}
+
+	public ShopDTO shopToDTO(IShop shop) {
+		String fileDownloadUri = shop.getImage() != null ?
+				ServletUriComponentsBuilder
+						.fromCurrentContextPath()
+						.path("/api/images/")
+						.path(shop.getImage())
+						.toUriString()
+				: null;
+
+		return new ShopDTO(shop.getUsername(),
+				shop.getOwnerId(),
+				shop.getId(),
+				shop.getName(),
+				fileDownloadUri,
+				shop.getSales(),
+				shop.getTotalSold(),
+				shop.getTotalFollowers(),
+				shop.getJoinedDate());
+	}
+	
+    public ShopDetailDTO detailToDTO(IShopDetail shop) {
+		String fileDownloadUri = shop.getImage() != null ?
+				ServletUriComponentsBuilder
+						.fromCurrentContextPath()
+						.path("/api/images/")
+						.path(shop.getImage())
+						.toUriString()
+				: null;
+
+        return new ShopDetailDTO(shop.getUsername(),
+				shop.getOwnerId(),
+				shop.getId(),
+        		shop.getName(),
+        		shop.getDescription(),
+        		fileDownloadUri,
+        		shop.getJoinedDate(),
+        		shop.getTotalReviews(),
+                shop.getTotalProducts(),
+        		shop.getTotalFollowers(),
+				shop.getFollowed());
     }
 }

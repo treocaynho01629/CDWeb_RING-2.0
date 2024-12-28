@@ -3,7 +3,7 @@ import { styled as muiStyled } from '@mui/material';
 import { Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
 import { Skeleton, Rating, Box, Grid2 as Grid, alpha, Divider, Stack } from '@mui/material';
 import { Link } from 'react-router';
-import { currencyFormat, numFormatter } from '../../../ultils/covert';
+import { currencyFormat, numFormat } from '../../../ultils/covert';
 import { lazy, Suspense, useState } from 'react';
 import { useGetMyAddressQuery } from '../../../features/addresses/addressesApiSlice';
 import { bookTypes } from '../../../ultils/book';
@@ -311,12 +311,12 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                                             <Divider orientation="vertical" sx={{ mx: { xs: 0.7, md: 1 } }} flexItem />
                                             <UserInfoText className="rate">
                                                 {book?.reviewsInfo?.total > 0 ?
-                                                    `(${numFormatter(book?.reviewsInfo?.total)}) Đánh giá`
+                                                    `(${numFormat.format(book?.reviewsInfo?.total)}) Đánh giá`
                                                     : 'Chưa có đánh giá'}
                                             </UserInfoText>
                                         </UserInfoContainer>
                                         <Divider orientation="vertical" sx={{ mx: 1, display: { xs: 'none', md: 'block' } }} flexItem />
-                                        <UserInfoText className="hide-on-mobile">Đã bán: {numFormatter(book?.totalOrders)}</UserInfoText>
+                                        <UserInfoText className="hide-on-mobile">Đã bán: {numFormat.format(book?.totalOrders)}</UserInfoText>
                                         <UserInfoText className="end">Tố cáo</UserInfoText>
                                     </>
                                     :
@@ -338,7 +338,7 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                                                 <Percentage>-{book.discount * 100}%</Percentage>
                                             </>
                                         }
-                                        <UserInfoText className="end mobile">Đã bán: {numFormatter(book?.totalOrders)}</UserInfoText>
+                                        <UserInfoText className="end mobile">Đã bán: {numFormat.format(book?.totalOrders)}</UserInfoText>
                                     </>
                                     :
                                     <Box display="flex" width="100%" justifyContent="space-between" sx={{ marginBottom: { xs: '5px', md: 0 } }}>

@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { Link } from 'react-router';
 import { ItemTitle, LinkButton, Title } from '../custom/ShareComponents';
-import { currencyFormat, idFormatter } from '../../../ultils/covert';
+import { currencyFormat, idFormatter, numFormat } from '../../../ultils/covert';
 import { useGetSummariesQuery } from '../../../features/orders/ordersApiSlice';
 import useAuth from '../../../hooks/useAuth';
 import CustomProgress from '../../custom/CustomProgress';
@@ -69,7 +69,7 @@ export default function SummaryTableOrders({ title, shopId }) {
         return (
           <TableRow hover tabIndex={-1} key={id}>
             <TableCell align="left">
-              <Link to={`/detail/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
+              <Link to={`/dashboard/product/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
                 <Avatar sx={{ marginRight: 1 }} src={order?.image ? order.image + '?size=tiny' : null}>{order?.name?.charAt(0) ?? ''}</Avatar>
                 <Box>
                   <ItemTitle>{order.name}</ItemTitle>
@@ -88,7 +88,7 @@ export default function SummaryTableOrders({ title, shopId }) {
             </TableCell>
             <TableCell align="right">
               <ItemTitle>{currencyFormat.format(order.totalPrice)}</ItemTitle>
-              <ItemTitle className="secondary">Tổng SL: {order.totalItems}</ItemTitle>
+              <ItemTitle className="secondary">Tổng SL: {numFormat.format(order.totalItems)}</ItemTitle>
             </TableCell>
           </TableRow>
         )
@@ -125,7 +125,7 @@ export default function SummaryTableOrders({ title, shopId }) {
     <Paper sx={{ width: '100%', height: '100%' }} elevation={3}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Title>Giao dịch mới nhất</Title>
-        <Link to={'/manage-orders'}><LinkButton>Xem tất cả</LinkButton></Link>
+        <Link to={'/dashboard/order'}><LinkButton>Xem tất cả</LinkButton></Link>
       </Toolbar>
       <TableContainer component={Paper}>
         <Table stickyHeader size="small">

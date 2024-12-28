@@ -8,7 +8,7 @@ import {
 } from '@mui/icons-material';
 import { NavLink } from 'react-router';
 import { MobileExtendButton } from "../custom/GlobalComponents";
-import { numFormatter } from '../../ultils/covert';
+import { numFormat } from '../../ultils/covert';
 import useAuth from "../../hooks/useAuth";
 
 //#region styled
@@ -288,10 +288,10 @@ const ProfileTabsList = ({ profile, loading, tabletMode }) => {
                         </>
                             : <>
                                 <Additional>
-                                    <PersonAddAlt1 color="warning" />Theo dõi:<b>{numFormatter(profile?.totalFollows || 0)}</b>
+                                    <PersonAddAlt1 color="warning" />Theo dõi:<b>{numFormat.format(profile?.totalFollows || 0)}</b>
                                 </Additional>
                                 <Additional>
-                                    <LocalActivity color="warning" />Đánh giá:<b>{numFormatter(profile?.totalReviews || 0)}</b>
+                                    <LocalActivity color="warning" />Đánh giá:<b>{numFormat.format(profile?.totalReviews || 0)}</b>
                                 </Additional>
                                 <Additional>
                                     <Today color="warning" />Tham gia:<b>

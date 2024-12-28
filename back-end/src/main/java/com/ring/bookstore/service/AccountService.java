@@ -3,8 +3,9 @@ package com.ring.bookstore.service;
 import java.io.IOException;
 import java.util.List;
 
-import com.ring.bookstore.dtos.ChartDTO;
+import com.ring.bookstore.dtos.dashboard.ChartDTO;
 import com.ring.bookstore.dtos.accounts.AccountDTO;
+import com.ring.bookstore.dtos.dashboard.StatDTO;
 import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.data.domain.Page;
 
@@ -26,6 +27,8 @@ public interface AccountService {
 									String keyword,
 									Short roles);
 	AccountDetailDTO getAccountById(Long id);
+
+	StatDTO getAnalytics();
 	Account saveAccount(AccountRequest request);
 	Account updateAccount(AccountRequest request,
 						  Long id);

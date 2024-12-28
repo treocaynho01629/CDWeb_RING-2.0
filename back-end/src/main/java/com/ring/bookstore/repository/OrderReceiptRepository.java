@@ -1,8 +1,10 @@
 package com.ring.bookstore.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import com.ring.bookstore.dtos.dashboard.IStat;
 import com.ring.bookstore.dtos.orders.IReceiptSummary;
 import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.model.OrderDetail;
@@ -64,29 +66,34 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
     """)
     Page<OrderReceipt> findAllByUsersShop(Long shopId, Long userId, Pageable pageable);
 
+    //Exclude shipping fee?
     @Query("""
-        select month(o.createdDate) as name, coalesce(sum(o3.quantity), 0) as books, coalesce(sum(distinct o.total) , 0) as sales 
-        from OrderReceipt o left join OrderDetail o2 on o.id = o2.order.id 
-        left join OrderItem o3 on o2.id = o3.detail.id
-        group by month(o.createdDate)
+        select t.currentMonth as total, t.currentMonth as currentMonth, t.lastMonth as lastMonth
+        from (select coalesce(sum(case when o.createdDate >= date_trunc('month', current date)
+                    then (od.totalPrice - od.discount) end), 0) as currentMonth,
+            coalesce(sum(case when o.createdDate >= date_trunc('month', current date) - 1 month
+                and o.createdDate < date_trunc('month', current date)
+                    then (od.totalPrice - od.discount) end), 0) lastMonth
+            from OrderDetail od join od.order o
+            where od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+            and o.createdDate >= date_trunc('month', current date) - 1 month
+            and (coalesce(:shopId) is null or od.shop.id = :shopId)
+            and (coalesce(:userId) is null or od.shop.owner.id = :userId)
+        ) t
     """)
-    List<Map<String, Object>> getMonthlySale(); //Get monthly sale
+    IStat getSalesAnalytics(Long shopId, Long userId);
 
     @Query("""
-        select month(o.createdDate) as name, coalesce(sum(o3.quantity), 0) as books, coalesce(sum(distinct o.total) , 0) as sales 
-        from OrderReceipt o left join OrderDetail o2 on o.id = o2.order.id 
-        left join OrderItem o3 on o2.id = o3.detail.id join Book b on b.id = o3.book.id
-        where b.shop.owner.id = :id
+        select month(o.createdDate) as name,
+            coalesce(sum(distinct od.discount), 0) as discount,
+            coalesce(sum(distinct o.total) , 0) as sales
+        from OrderReceipt o
+        join o.details od
+        where od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+        and (coalesce(:shopId) is null or od.shop.id = :shopId)
+        and (coalesce(:userId) is null or od.shop.owner.id = :userId)
+        and (coalesce(:year) is null or year(o.createdDate) = :year)
         group by month(o.createdDate)
     """)
-    List<Map<String, Object>> getMonthlySaleBySeller(Long id); //Get monthly sale by seller's {id}
-
-    @Query("""
-        select month(o.createdDate) as name, coalesce(sum(o3.quantity), 0) as books, coalesce(sum(distinct o.total) , 0) as sales 
-        from OrderReceipt o left join OrderDetail o2 on o.id = o2.order.id 
-        left join OrderItem o3 on o2.id = o3.detail.id join Book b on b.id = o3.book.id
-        where b.shop.id = :id
-        group by month(o.createdDate)
-    """)
-    List<Map<String, Object>> getMonthlySaleByShop(Long id); //Get monthly sale by shop's {id}
+    List<Map<String, Object>> getMonthlySales(Long shopId, Long userId, Integer year); //Get monthly sale
 }

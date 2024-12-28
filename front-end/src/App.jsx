@@ -147,28 +147,28 @@ function App() {
                       },
                     },
                     {
-                      path: "manage-products",
+                      path: "dashboard/product",
                       lazy: async () => {
                         let ManageProducts = await import("./pages/dashboard/ManageProducts")
                         return { Component: ManageProducts.default }
                       },
                     },
                     {
-                      path: "manage-orders",
+                      path: "dashboard/order",
                       lazy: async () => {
                         let ManageOrders = await import("./pages/dashboard/ManageOrders")
                         return { Component: ManageOrders.default }
                       },
                     },
                     {
-                      path: "detail/:id",
+                      path: "dashboard/product/:id",
                       lazy: async () => {
                         let DetailProduct = await import("./pages/dashboard/DetailProduct")
                         return { Component: DetailProduct.default }
                       },
                     },
                     {
-                      path: "user/:id",
+                      path: "dashboard/user/:id",
                       lazy: async () => {
                         let DetailAccount = await import("./pages/dashboard/DetailAccount")
                         return { Component: DetailAccount.default }
@@ -180,14 +180,14 @@ function App() {
                   element: <RequireAuth allowedRoles={['ROLE_ADMIN']} />,
                   children: [
                     {
-                      path: "manage-users",
+                      path: "dashboard/user",
                       lazy: async () => {
                         let ManageUsers = await import("./pages/dashboard/ManageUsers")
                         return { Component: ManageUsers.default }
                       },
                     },
                     {
-                      path: "manage-reviews",
+                      path: "dashboard/review",
                       lazy: async () => {
                         let ManageReviews = await import("./pages/dashboard/ManageReviews")
                         return { Component: ManageReviews.default }

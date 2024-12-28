@@ -100,6 +100,12 @@ public class BookController {
         return new ResponseEntity<>(bookService.getBookDetail(null, slug), HttpStatus.OK);
     }
 
+    @GetMapping("/analytics")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> getBookAnalytics(@RequestParam(value = "shopId", required = false) Long shopId) {
+        return new ResponseEntity<>(bookService.getAnalytics(shopId), HttpStatus.OK);
+    }
+
     //Add new book
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")

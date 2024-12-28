@@ -258,7 +258,7 @@ function OrderRow({ isSelected, isOrderSelected, index, id, order, dense,
                               />
                             </TableCell>
                             <TableCell align="left">
-                              <Link to={`/detail/${detail.bookId}`} style={{ display: 'flex', alignItems: 'center' }}>
+                              <Link to={`/dashboard/product/${detail.bookId}`} style={{ display: 'flex', alignItems: 'center' }}>
                                 <LazyLoadImage
                                   src={`${detail.image}?size=small`}
                                   height={45}
@@ -610,7 +610,7 @@ export default function TableOrders({ setOrderCount, mini = false }) {
       </TableContainer>
       <FooterContainer>
         {mini ?
-          <Link to={'/manage-orders'}>Xem tất cả</Link>
+          <Link to={'/dashboard/order'}>Xem tất cả</Link>
           :
           <FormControlLabel
             control={<Switch checked={dense} onChange={handleChangeDense} />}

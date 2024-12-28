@@ -3,16 +3,14 @@ package com.ring.bookstore.dtos.shops;
 import java.time.LocalDateTime;
 
 //Shop
-public record ShopDTO(String ownerUsername,
+public record ShopDTO(String username,
                       Long ownerId,
                       Long id,
                       String name,
-                      String description,
                       String image,
-                      LocalDateTime joinedDate,
-                      Integer totalReviews,
-                      Integer totalProducts,
+                      Double sales,
+                      Integer totalSold,
                       Integer totalFollowers,
-                      Boolean followed) {
+                      LocalDateTime joinedDate) {
 
 }

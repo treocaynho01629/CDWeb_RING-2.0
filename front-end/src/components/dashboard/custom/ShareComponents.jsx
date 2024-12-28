@@ -53,8 +53,8 @@ export const StyledStockBar = styled(LinearProgress)`
 export const Title = styled.span`
     display: flex;
     align-items: center;
-    font-size: 20px;
-    font-weight: 450;
+    font-size: 18px;
+    font-weight: 400;
     margin: ${props => props.theme.spacing(1.5)} 0;
 `
 

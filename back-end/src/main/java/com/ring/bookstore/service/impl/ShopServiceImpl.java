@@ -1,8 +1,9 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.shops.ShopDTO;
+import com.ring.bookstore.dtos.dashboard.StatDTO;
+import com.ring.bookstore.dtos.mappers.DashboardMapper;
+import com.ring.bookstore.dtos.shops.*;
 import com.ring.bookstore.dtos.mappers.ShopMapper;
-import com.ring.bookstore.dtos.shops.IShopDetail;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ImageResizerException;
@@ -37,27 +38,57 @@ public class ShopServiceImpl implements ShopService {
     private final ShopRepository shopRepo;
     private final AccountRepository accountRepo;
     private final AddressRepository addressRepo;
-    private final ShopMapper shopMapper;
+
     private final ImageService imageService;
 
+    private final ShopMapper shopMapper;
+    private final DashboardMapper dashMapper;
+
     @Override
-    public Page<ShopDTO> getShops(Integer pageNo, Integer pageSize, String sortBy, String sortDir, String keyword, Long ownerId) {
+    public Page<ShopDisplayDTO> getDisplayShops(Integer pageNo,
+                                                Integer pageSize,
+                                                String sortBy,
+                                                String sortDir,
+                                                String keyword) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
                 : Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<IShopDetail> shopsList = shopRepo.findShopByFilter(keyword, ownerId, pageable);
-        Page<ShopDTO> shopDTOS = shopsList.map(shopMapper::apply);
+        Page<IShopDisplay> shopsList = shopRepo.findShopsDisplay(keyword, pageable);
+        Page<ShopDisplayDTO> shopDTOS = shopsList.map(shopMapper::displayToDTO);
         return shopDTOS;
     }
 
     @Override
-    public ShopDTO getShopById(Long id, Account user) {
+    public Page<ShopDTO> getShops(Integer pageNo,
+                                  Integer pageSize,
+                                  String sortBy,
+                                  String sortDir,
+                                  String keyword,
+                                  Long userId,
+                                  Account user) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
+                : Sort.by(sortBy).descending());
+        boolean isAdmin = isAuthAdmin();
+
+        Page<IShop> shopsList = shopRepo.findShops(keyword, userId != null ? userId : isAdmin ? null : user.getId(), pageable);
+        Page<ShopDTO> shopDTOS = shopsList.map(shopMapper::shopToDTO);
+        return shopDTOS;
+    }
+
+    @Override
+    public ShopDetailDTO getShopById(Long id, Account user) {
         Long userId = user != null ? user.getId() : null;
-        IShopDetail shop = shopRepo.findShopById(id, userId).orElseThrow(() ->
+        IShopDetail shop = shopRepo.findShopDetailById(id, userId).orElseThrow(() ->
                 new ResourceNotFoundException("Shop not found!"));
-        ShopDTO shopDTO = shopMapper.apply(shop); //Map to DTO
+        ShopDetailDTO shopDTO = shopMapper.detailToDTO(shop); //Map to DTO
         return shopDTO;
+    }
+
+    public StatDTO getAnalytics() {
+        return dashMapper.statToDTO(shopRepo.getShopAnalytics(),
+                "shops",
+                "Cửa hàng");
     }
 
     @Transactional
@@ -180,6 +211,12 @@ public class ShopServiceImpl implements ShopService {
     @Override
     public void deleteAllShops() {
         shopRepo.deleteAll();
+    }
+
+    //Check valid role function
+    protected boolean isAuthAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
+        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
     }
 
     //Check valid role function

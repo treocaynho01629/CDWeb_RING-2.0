@@ -26,7 +26,7 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
         }),
         getShops: builder.query({
             query: (args) => {
-                const { page, size, sortBy, sortDir } = args || {};
+                const { page, size, sortBy, sortDir, keyword, userId } = args || {};
 
                 //Params
                 const params = new URLSearchParams();
@@ -34,6 +34,8 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
                 if (size) params.append('pSize', size);
                 if (sortBy) params.append('sortBy', sortBy);
                 if (sortDir) params.append('sortDir', sortDir);
+                if (keyword) params.append('keyword', keyword);
+                if (userId) params.append('userId', userId);
 
                 return {
                     url: `/api/shops?${params.toString()}`,
@@ -57,6 +59,52 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
                     ]
                 } else return [{ type: 'Shop', id: 'LIST' }]
             },
+        }),
+        getDisplayShops: builder.query({
+            query: (args) => {
+                const { page, size, sortBy, sortDir, keyword } = args || {};
+
+                //Params
+                const params = new URLSearchParams();
+                if (page) params.append('pageNo', page);
+                if (size) params.append('pSize', size);
+                if (sortBy) params.append('sortBy', sortBy);
+                if (sortDir) params.append('sortDir', sortDir);
+                if (keyword) params.append('keyword', keyword);
+
+                return {
+                    url: `/api/shops/find?${params.toString()}`,
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result?.isError
+                    },
+                }
+            },
+            transformResponse: responseData => {
+                const { content, page } = responseData;
+                return shopsAdapter.setAll({
+                        ...initialState,
+                    page
+                }, content)
+            },
+            providesTags: (result, error, arg) => {
+                if (result?.ids) {
+                    return [
+                        { type: 'Shop', id: 'LIST' },
+                        ...result.ids.map(id => ({ type: 'Shop', id }))
+                    ]
+                } else return [{ type: 'Shop', id: 'LIST' }]
+            },
+        }),
+        getShopAnalytics: builder.query({
+            query: () => {
+                return {
+                    url: '/api/shops/analytics',
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result?.isError
+                    },
+                }
+            },
+            providesTags: [{ type: 'Shop', id: 'LIST' }],
         }),
         followShop: builder.mutation({
             query: (id) => ({
@@ -159,6 +207,8 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
 export const {
     useGetShopQuery,
     useGetShopsQuery,
+    useGetDisplayShopsQuery,
+    useGetShopAnalyticsQuery,
     useFollowShopMutation,
     useUnfollowShopMutation,
     useCreateShopMutation,

@@ -90,7 +90,7 @@ public class OrderController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id){
         OrderDetailDTO order = orderService.getOrderDetail(id);
-        return new ResponseEntity< >(order, HttpStatus.OK);
+        return new ResponseEntity<>(order, HttpStatus.OK);
     }
 	
 	//Get orders from user
@@ -102,7 +102,7 @@ public class OrderController {
     										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
         									@CurrentAccount Account currUser){
         Page<OrderDTO> orders = orderService.getOrdersByUser(currUser, status, keyword, pageNo, pageSize);
-		return new ResponseEntity< >(orders, HttpStatus.OK);
+		return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 	
 	//Get orders for book's {id}
@@ -114,13 +114,22 @@ public class OrderController {
     										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
     										@RequestParam(value = "sortDir", defaultValue = "desc") String sortDir){
         Page<OrderDTO> orders = orderService.getOrdersByBookId(id, pageNo, pageSize, sortBy, sortDir);
-        return new ResponseEntity< >(orders, HttpStatus.OK);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
-	//Get orders chart
-	@GetMapping("/sale")
+	@GetMapping("/analytics")
 	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> getMonthlySale(@CurrentAccount Account currUser){
-        return new ResponseEntity< >(orderService.getMonthlySale(currUser), HttpStatus.OK);
+	public ResponseEntity<?> getUserAnalytics(@RequestParam(value = "shopId", required = false) Long shopId,
+											  @CurrentAccount Account currUser) {
+		return new ResponseEntity<>(orderService.getAnalytics(currUser, shopId), HttpStatus.OK);
+	}
+
+	//Get orders chart
+	@GetMapping("/sales")
+	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> getMonthlySales(@RequestParam(value = "shopId", required = false) Long shopId,
+											@RequestParam(value = "year", required = false) Integer year,
+											@CurrentAccount Account currUser){
+        return new ResponseEntity<>(orderService.getMonthlySales(currUser, shopId, year), HttpStatus.OK);
     }
 }

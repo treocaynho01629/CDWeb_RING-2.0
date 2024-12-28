@@ -27,7 +27,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>{
 		and (coalesce(:bookId) is null or r.book.id = :bookId)
 		and (coalesce(:rating) is null or  r.rating = :rating)
 	""")
-	public Page<IReview> findReviewsByFilter(Long bookId, Long userId, Integer rating, Pageable pageable);
+	public Page<IReview> findReviews(Long bookId, Long userId, Integer rating, Pageable pageable);
 
 	@Query("""
 		select r.id from Review r

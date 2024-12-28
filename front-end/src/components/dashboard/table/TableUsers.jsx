@@ -420,7 +420,7 @@ export default function TableUsers({ setUserCount, mini = false }) {
       </TableContainer>
       <FooterContainer>
         {mini ?
-          <Link to={'/manage-users'}>Xem tất cả</Link>
+          <Link to={'/dashboard/user'}>Xem tất cả</Link>
           :
           <Box>
             <FormControlLabel

@@ -25,15 +25,28 @@ public class ShopController {
     private final ShopService shopService;
 
     //Get shops
-    @GetMapping
-    public ResponseEntity<?> getShops(
+    @GetMapping("/find")
+    public ResponseEntity<?> getDisplayShops(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
-            @RequestParam(value = "ownerId", required = false) Long ownerId,
-            @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
+            @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
             @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
-        return new ResponseEntity<>(shopService.getShops(pageNo, pageSize, sortBy, sortDir, keyword, ownerId), HttpStatus.OK);
+        return new ResponseEntity<>(shopService.getDisplayShops(pageNo, pageSize, sortBy, sortDir, keyword), HttpStatus.OK);
+    }
+
+    //Get shops
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> getShops(
+            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+            @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+            @RequestParam(value = "userId", required = false) Long userId,
+            @CurrentAccount Account currUser) {
+        return new ResponseEntity<>(shopService.getShops(pageNo, pageSize, sortBy, sortDir, keyword, userId, currUser), HttpStatus.OK);
     }
 
     //Get shop by {id}
@@ -41,6 +54,12 @@ public class ShopController {
     public ResponseEntity<?> getShopById(@PathVariable("id") Long id,
                                          @CurrentAccount Account currUser) {
         return new ResponseEntity<>(shopService.getShopById(id, currUser), HttpStatus.OK);
+    }
+
+    @GetMapping("/analytics")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getUserAnalytics() {
+        return new ResponseEntity<>(shopService.getAnalytics(), HttpStatus.OK);
     }
 
     //Follow

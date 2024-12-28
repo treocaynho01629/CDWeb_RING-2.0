@@ -4,9 +4,8 @@ import { LazyLoadImage, trackWindowScroll } from "react-lazy-load-image-componen
 import { Star, StarBorder, StarRounded } from "@mui/icons-material";
 import { Link } from "react-router";
 import { Message } from "../../custom/GlobalComponents";
-import { currencyFormat, numFormatter } from "../../../ultils/covert";
+import { currencyFormat, numFormat } from "../../../ultils/covert";
 import { Title } from "../custom/ShareComponents";
-import CustomProgress from "../../custom/CustomProgress";
 
 //#region styled
 const MessageContainer = styled.div`
@@ -16,52 +15,40 @@ const MessageContainer = styled.div`
     justify-content: center;
 `
 
+const TitleContainer = styled.div`
+    padding: 0 ${props => `${props.theme.spacing(1)} ${props.theme.spacing(1)}`};
+`
+
 const Rank = styled.span`
-    display: grid;
-    place-content: center;
-    padding: 5px;
-
-    * {
-        grid-area: 1 / 1;
-        width: 50px;
-        height: 50px;
-    }
-
-    b {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: ${props => props.theme.palette.grey[900]};
-        z-index: 1;
-    }
-
-    svg {
-        font-size: 40px;
-        color: ${props => props.theme.palette.grey[400]};
-    }
+    font-size: 14px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    margin-right: ${props => props.theme.spacing(2)};
+    border-radius: 50%;
+    border: .5px solid currentColor;
 
     &.first {
-        svg { color: ${props => props.theme.palette.success.light}; }
+        color: ${props => props.theme.palette.success.light};
     }
 
     &.second {
-        svg { color: ${props => props.theme.palette.warning.light}; }
+        color: ${props => props.theme.palette.warning.light};
     }
 
     ${props => props.theme.breakpoints.down("sm")} {
         font-size: 12px;
-
-        * {
-            width: 40px;
-            height: 40px;
-        }
     }
 `
 
 const ProductContainer = styled.div`
     display: flex;
+    align-items: center;
     cursor: pointer;
-    padding-right: ${props => props.theme.spacing(1)};
+    padding: 0 ${props => props.theme.spacing(1)};
 
     ${props => props.theme.breakpoints.up("md_lg")} {
         &.selected {
@@ -78,12 +65,12 @@ const ProductTitle = styled.span`
 	overflow: hidden;
 	white-space: nowrap;
 	
-	@supports (-webkit-line-clamp:2) {
+	@supports (-webkit-line-clamp:1) {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: initial;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
+      -webkit-line-clamp: 1;
       -webkit-box-orient: vertical;
     }
 
@@ -190,7 +177,7 @@ const ProductItem = ({ book, scrollPosition }) => {
                                 emptyIcon={<StarBorder style={{ fontSize: 14 }} />}
                                 readOnly
                             />
-                            <TextMore>Đã bán {numFormatter(book?.totalOrders)}</TextMore>
+                            <TextMore>Đã bán {numFormat.format(book?.totalOrders)}</TextMore>
                         </Stat>
                     </MoreInfo>
                     :
@@ -201,9 +188,9 @@ const ProductItem = ({ book, scrollPosition }) => {
     )
 }
 
-const ProductsShowcase = ({ title, data, isError, isLoading, isSuccess, scrollPosition }) => {
+const ProductsShowcase = ({ title, size = 5, data, isError, isLoading, isSuccess, scrollPosition }) => {
     const tempProducts = (
-        [...Array(5)].map((item, index) => (
+        [...Array(size)].map((item, index) => (
             <ProductContainer key={`temp-top-${index}`}>
                 <Rank className={index == 0 ? 'first' : index == 1 ? 'second' : ''}>
                     <b>{index + 1}</b>
@@ -225,11 +212,10 @@ const ProductsShowcase = ({ title, data, isError, isLoading, isSuccess, scrollPo
             ? ids?.map((id, index) => {
                 const book = entities[id];
                 return (
-                    <Link to={`/product/${book?.slug}`} key={`top-${id}-${index}`}>
+                    <Link to={`/dashboard/product/${id}`} key={`top-${id}-${index}`}>
                         <ProductContainer>
                             <Rank className={index == 0 ? 'first' : index == 1 ? 'second' : ''}>
-                                <b>{index + 1}</b>
-                                <StarRounded />
+                                {index + 1}
                             </Rank>
                             <ProductItem {...{ book, scrollPosition }} />
                         </ProductContainer>
@@ -246,10 +232,9 @@ const ProductsShowcase = ({ title, data, isError, isLoading, isSuccess, scrollPo
     }
 
     return (
-        <Paper elevation={3} sx={{ padding: 1 }}>
-            {isLoading && <CustomProgress color={`${isError ? 'error' : 'primary'}`} />}
-            <Title>{title}</Title>
-            <Stack spacing={.5} pb={1}>
+        <Paper elevation={3} sx={{ padding: 1, height: '100%' }}>
+            <TitleContainer><Title>{title}</Title></TitleContainer>
+            <Stack spacing={2} pb={1}>
                 {products}
             </Stack>
         </Paper>

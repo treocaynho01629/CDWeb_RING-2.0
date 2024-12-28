@@ -32,7 +32,7 @@ const ManageProducts = () => {
   }
 
   const { data: bestSeller, isLoading: loadBest, isSuccess: doneBest, isError: errorBest } = useGetBooksQuery({
-    size: 5,
+    size: 6,
     sortBy: 'totalOrders',
     sortDir: 'desc',
     amount: 0,
@@ -40,7 +40,7 @@ const ManageProducts = () => {
   });
 
   const { data: fav, isLoading: loadFav, isSuccess: doneFav, isError: errorFav } = useGetBooksQuery({
-    size: 5,
+    size: 6,
     sortBy: 'rating',
     sortDir: 'desc',
     amount: 0,
@@ -56,7 +56,7 @@ const ManageProducts = () => {
         <div>
           <h2>Quản lý sản phẩm</h2>
           <CustomDashboardBreadcrumbs separator="." maxItems={4} aria-label="breadcrumb">
-            <NavLink to={'/manage-products'}>Quản lý sản phẩm</NavLink>
+            <NavLink to={'/dashboard/product'}>Quản lý sản phẩm</NavLink>
           </CustomDashboardBreadcrumbs>
         </div>
         <Button variant="outlined" startIcon={<Add />} onClick={handleOpen}>
@@ -75,8 +75,8 @@ const ManageProducts = () => {
           :
           <Grid size={{ xs: 12, sm: 6 }}>
             <ProductsShowcase {...{
-              title: <><LocalFireDepartment />Top sản phẩm bán chạy</>, data: bestSeller,
-              isLoading: loadBest, isSuccess: doneBest, isError: errorBest
+              title: <><LocalFireDepartment />Top sản phẩm bán chạy</>, size: 6,
+              data: bestSeller, isLoading: loadBest, isSuccess: doneBest, isError: errorBest
             }} />
           </Grid>
         }

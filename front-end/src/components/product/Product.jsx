@@ -3,7 +3,7 @@ import { Star as StarIcon, ShoppingCart as ShoppingCartIcon, StarBorder } from '
 import { Divider, Skeleton, Rating } from '@mui/material'
 import { Link } from 'react-router'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { currencyFormat, numFormatter } from '../../ultils/covert';
+import { currencyFormat, numFormat } from '../../ultils/covert';
 import useCart from '../../hooks/useCart';
 
 //#region styled
@@ -279,7 +279,7 @@ const Product = ({ book, scrollPosition }) => {
                                             emptyIcon={<StarBorder style={{ fontSize: 14 }} />}
                                             readOnly
                                         />
-                                        <TextMore className="secondary">Đã bán {numFormatter(book?.totalOrders)}</TextMore>
+                                        <TextMore className="secondary">Đã bán {numFormat.format(book?.totalOrders)}</TextMore>
                                     </MoreInfo>
                                 </MainInfo>
                             </Info>

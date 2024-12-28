@@ -160,6 +160,17 @@ export const booksApiSlice = apiSlice.injectEndpoints({
                 } else return [{ type: 'Book', id: 'LIST' }]
             }
         }),
+        getBookAnalytics: builder.query({
+            query: (shopId) => {
+                return {
+                    url: `/api/books/analytics${shopId ? `?shopId=${shopId}` : ''}`,
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result?.isError
+                    },
+                }
+            },
+            providesTags: [{ type: 'Book', id: 'LIST' }],
+        }),
         createBook: builder.mutation({
             query: (newBook) => ({
                 url: '/api/books',
@@ -219,6 +230,7 @@ export const {
     useGetBooksQuery,
     useGetBooksByIdsQuery,
     useGetRandomBooksQuery,
+    useGetBookAnalyticsQuery,
     useCreateBookMutation,
     useUpdateBookMutation,
     useDeleteBookMutation,

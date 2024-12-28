@@ -2,16 +2,12 @@ package com.ring.bookstore.dtos.shops;
 
 import java.time.LocalDateTime;
 
-public interface IShopDetail {
-    String getUsername();
-
+public interface IShopDisplay {
     Long getOwnerId();
 
     Long getId();
 
     String getName();
-
-    String getDescription();
 
     String getImage();
 

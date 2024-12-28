@@ -1,6 +1,9 @@
 package com.ring.bookstore.service;
 
+import com.ring.bookstore.dtos.dashboard.StatDTO;
 import com.ring.bookstore.dtos.shops.ShopDTO;
+import com.ring.bookstore.dtos.shops.ShopDetailDTO;
+import com.ring.bookstore.dtos.shops.ShopDisplayDTO;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.Shop;
@@ -13,15 +16,24 @@ import java.util.List;
 
 public interface ShopService {
 
+    Page<ShopDisplayDTO> getDisplayShops(Integer pageNo,
+                                         Integer pageSize,
+                                         String sortBy,
+                                         String sortDir,
+                                         String keyword);
+
     Page<ShopDTO> getShops(Integer pageNo,
                            Integer pageSize,
                            String sortBy,
                            String sortDir,
                            String keyword,
-                           Long ownerId);
+                           Long userId,
+                           Account user);
 
-    ShopDTO getShopById(Long id,
-                        Account user);
+    ShopDetailDTO getShopById(Long id,
+                              Account user);
+
+    StatDTO getAnalytics();
 
     void follow(Long id,
                 Account user);
