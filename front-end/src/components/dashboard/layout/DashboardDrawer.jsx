@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import { useState } from 'react'
-import { ExpandLess, ExpandMore, Speed, AutoStoriesOutlined, CategoryOutlined, GroupsOutlined, TrendingUpOutlined, StarBorder } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, Speed, AutoStoriesOutlined, CategoryOutlined, TrendingUpOutlined, StarBorder, GroupOutlined } from '@mui/icons-material';
 import { ListItem, ListItemButton, ListItemIcon, ListItemText, List, Collapse, ListSubheader, Drawer } from '@mui/material';
 import { NavLink } from 'react-router';
 import MuiDrawer from '@mui/material/Drawer';
@@ -140,7 +140,7 @@ const managementListItems = [
   {
     isAdmin: true,
     label: 'Thành viên',
-    icon: <GroupsOutlined />,
+    icon: <GroupOutlined />,
     url: '/dashboard/user',
     subItems: [
       {

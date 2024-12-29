@@ -1,11 +1,10 @@
 import { useState, Suspense, lazy } from "react";
 import { Box, Button, Paper, Grid2 as Grid } from '@mui/material';
-import { Add, LocalFireDepartment, Style } from '@mui/icons-material';
+import { Add, AutoStories, LocalFireDepartment, Style } from '@mui/icons-material';
 import { NavLink } from 'react-router';
 import { HeaderContainer } from '../../components/dashboard/custom/ShareComponents';
-import { useGetBooksQuery } from "../../features/books/booksApiSlice";
+import { useGetBookAnalyticsQuery, useGetBooksQuery } from "../../features/books/booksApiSlice";
 import TableProducts from '../../components/dashboard/table/TableProducts'
-import useAuth from "../../hooks/useAuth"
 import useTitle from "../../hooks/useTitle"
 import InfoCard from '../../components/dashboard/custom/InfoCard';
 import CustomDashboardBreadcrumbs from '../../components/dashboard/custom/CustomDashboardBreadcrumbs';
@@ -14,22 +13,9 @@ import ProductsShowcase from "../../components/dashboard/product/ProductsShowcas
 const ProductFormDialog = lazy(() => import("../../components/dashboard/dialog/ProductFormDialog"));
 
 const ManageProducts = () => {
-  const { roles } = useAuth();
-  const shopId = 'test';
-  const [productCount, setProductCount] = useState(0);
   const [contextProduct, setContextProduct] = useState(null);
   const [open, setOpen] = useState(false);
-  const [isShop, setIsShop] = useState(!(roles?.find(role => ['ROLE_ADMIN'].includes(role))));
-
-  const handleOpen = (product) => {
-    setContextProduct(product);
-    setOpen(true);
-  }
-
-  const handleClose = () => {
-    setContextProduct(null);
-    setOpen(false);
-  }
+  const { data: bookAnalytics } = useGetBookAnalyticsQuery();
 
   const { data: bestSeller, isLoading: loadBest, isSuccess: doneBest, isError: errorBest } = useGetBooksQuery({
     size: 6,
@@ -50,6 +36,16 @@ const ManageProducts = () => {
   //Set title
   useTitle('Sản phẩm');
 
+  const handleOpen = (product) => {
+    setContextProduct(product);
+    setOpen(true);
+  }
+
+  const handleClose = () => {
+    setContextProduct(null);
+    setOpen(false);
+  }
+
   return (
     <>
       <HeaderContainer>
@@ -65,9 +61,9 @@ const ManageProducts = () => {
       </HeaderContainer>
       <Box mb={4}>
         <InfoCard
-          count={productCount}
-          icon={<Style color="primary" />}
-          title={'Sản phẩm'}
+          icon={<AutoStories color="primary" />}
+          info={bookAnalytics}
+          color="primary"
         />
       </Box>
       <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
@@ -103,7 +99,7 @@ const ManageProducts = () => {
           </Grid>
         } */}
       </Grid>
-      <TableProducts {...{ setProductCount, isShop, setIsShop }} />
+      <TableProducts />
       <Suspense fallback={null}>
         {open && <ProductFormDialog open={open} handleClose={handleClose} />}
       </Suspense>

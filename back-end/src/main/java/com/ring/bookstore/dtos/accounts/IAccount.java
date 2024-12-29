@@ -5,5 +5,7 @@ public interface IAccount {
     String getUsername();
     String getImage();
     String getEmail();
+    String getName();
+    String getPhone();
     Short getRoles();
 }

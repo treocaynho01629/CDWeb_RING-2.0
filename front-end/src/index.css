@@ -45,3 +45,8 @@ img {
   -o-user-drag: none;
   user-select: none;
 }
+
+.yarl__thumbnails_thumbnail:not(.yarl__thumbnails_thumbnail_active) {
+  opacity: .5;
+  border-color: transparent !important;
+}

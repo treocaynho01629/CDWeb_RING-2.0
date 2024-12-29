@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             new AntPathRequestMatcher("/api/shops/find", "GET"),
             new AntPathRequestMatcher("/api/banners", "GET"),
             new AntPathRequestMatcher("/api/coupons", "GET"),
-            new AntPathRequestMatcher("/api/images", "GET")
+            new AntPathRequestMatcher("/api/images/{name}", "GET")
     );
 
     @Override

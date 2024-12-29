@@ -12,7 +12,6 @@ import { currencyFormat, idFormatter } from '../../../ultils/covert';
 import { publishersApiSlice } from '../../../features/publishers/publishersApiSlice';
 import { categoriesApiSlice } from '../../../features/categories/categoriesApiSlice';
 import { bookTypeItems, bookTypes } from '../../../ultils/book';
-import useAuth from '../../../hooks/useAuth';
 import CustomProgress from '../../custom/CustomProgress';
 import CustomTableHead from './CustomTableHead';
 import CustomTablePagination from './CustomTablePagination';
@@ -222,6 +221,15 @@ function ProductFilters({ filters, setFilters }) {
               const filteredName = selected?.map(id => pubs?.entities[id]?.name);
               return filteredName.join(", ");
             },
+            MenuProps: {
+              slotProps: {
+                paper: {
+                  style: {
+                    maxHeight: 250,
+                  },
+                },
+              }
+            }
           }
         }}
       >
@@ -254,7 +262,20 @@ function ProductFilters({ filters, setFilters }) {
         defaultValue=""
         size="small"
         fullWidth
-        slotProps={{ select: { onOpen: handleOpenCates, } }}
+        slotProps={{
+          select: {
+            onOpen: handleOpenCates,
+            MenuProps: {
+              slotProps: {
+                paper: {
+                  style: {
+                    maxHeight: 250,
+                  },
+                },
+              }
+            }
+          }
+        }}
       >
         <MenuItem value=""><em>--Tất cả--</em></MenuItem>
         {cates?.ids?.map((id, index) => {
@@ -302,6 +323,15 @@ function ProductFilters({ filters, setFilters }) {
               const filteredLabel = selected?.map(value => bookTypes[value]);
               return filteredLabel.join(", ");
             },
+            MenuProps: {
+              slotProps: {
+                paper: {
+                  style: {
+                    maxHeight: 250,
+                  },
+                },
+              }
+            }
           }
         }}
       >
@@ -334,10 +364,8 @@ function ProductFilters({ filters, setFilters }) {
   )
 }
 
-export default function TableProducts({ setProductCount, shopId, isShop, setIsShop }) {
+export default function TableProducts({ shopId }) {
   //#region construct
-  const { roles } = useAuth();
-  const isAdmin = useState(roles?.find(role => ['ROLE_ADMIN'].includes(role)));
   const [selected, setSelected] = useState([]);
   const [deselected, setDeseletected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
@@ -355,7 +383,7 @@ export default function TableProducts({ setProductCount, shopId, isShop, setIsSh
     size: 10,
     totalPages: 0,
     sortBy: "id",
-    sortDir: "asc",
+    sortDir: "desc",
   })
 
   //Actions
@@ -373,7 +401,7 @@ export default function TableProducts({ setProductCount, shopId, isShop, setIsSh
     size: pagination?.size,
     sortBy: pagination?.sortBy,
     sortDir: pagination?.sortDir,
-    shopId: isShop ? 'test' : shopId ?? '',
+    // shopId: isShop ? 'test' : shopId ?? '',
     keyword: filters.keyword,
     cateId: filters.cate,
     types: filters.types,
@@ -390,7 +418,6 @@ export default function TableProducts({ setProductCount, shopId, isShop, setIsSh
         number: data?.page?.number,
         size: data?.page?.size
       });
-      if (setProductCount) setProductCount(data?.page?.totalElements);
     }
   }, [data])
 
@@ -478,11 +505,6 @@ export default function TableProducts({ setProductCount, shopId, isShop, setIsSh
 
   const handleChangeDense = useCallback((e) => {
     setDense(e.target.checked);
-  }, []);
-
-  const handleChangeShop = useCallback((e) => {
-    handleChangePage(0);
-    setIsShop(e.target.checked);
   }, []);
 
   //Actions
@@ -711,12 +733,6 @@ export default function TableProducts({ setProductCount, shopId, isShop, setIsSh
             control={<Switch checked={dense} onChange={handleChangeDense} />}
             label={<FooterLabel>Thu gọn</FooterLabel>}
           />
-          {(isAdmin && !shopId) &&
-            <FormControlLabel
-              control={<Switch checked={isShop} onChange={handleChangeShop} />}
-              label={<FooterLabel>Theo SHOP</FooterLabel>}
-            />
-          }
         </Box>
         <CustomTablePagination
           pagination={pagination}

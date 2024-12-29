@@ -39,9 +39,11 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	IStat getAccountAnalytics();
 
 	@Query("""
-		select a.id as id, a.username as username, i.name as image, a.email as email, size(a.roles) as roles
+		select a.id as id, a.username as username, i.name as image,
+		a.email as email, p.name as name, ad.phone as phone, size(a.roles) as roles
 		from Account a
 		left join a.profile p
+		left join p.address ad
 		left join p.image i
 		where concat (a.email, a.username) ilike %:keyword%
 		and (coalesce(:roles) is null or size(a.roles) = :roles)
