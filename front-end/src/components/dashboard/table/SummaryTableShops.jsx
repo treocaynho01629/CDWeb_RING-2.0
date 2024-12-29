@@ -75,7 +75,7 @@ export default function SummaryTableShops() {
         return (
           <TableRow hover tabIndex={-1} key={id}>
             <TableCell align="left">
-              <Link to={`/shop/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
+              <Link to={`dashboard/shop/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
                 <Avatar sx={{ marginRight: 1 }} src={shop?.image ? shop.image + '?size=tiny' : null}>{shop?.name?.charAt(0) ?? ''}</Avatar>
                 <Box>
                   <ItemTitle>{shop.name}</ItemTitle>

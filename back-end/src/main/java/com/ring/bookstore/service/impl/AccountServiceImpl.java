@@ -226,7 +226,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public AccountProfile updateProfile(ProfileRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException {
         AccountProfile profile = profileRepo.findById(user.getProfile().getId()).orElseThrow(()
-            -> new ResourceNotFoundException("Profile not found!"));
+                -> new ResourceNotFoundException("Profile not found!"));
 
         //Image upload/replace
         if (file != null) { //Contain new image >> upload/replace

@@ -3,8 +3,11 @@ package com.ring.bookstore.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.ring.bookstore.exception.ImageResizerException;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -111,11 +114,13 @@ public class ImageController {
 
     //Get image by {name}
     @GetMapping("/{name}")
+    @Cacheable("images")
     public ResponseEntity<?> getImage(@PathVariable String name,
                                       @RequestParam(value = "size", defaultValue = "original") String predefinedTypeName) throws ImageResizerException {
         Image image = imageService.resolve(predefinedTypeName, name);
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.valueOf(image.getType()))
+                .cacheControl(CacheControl.maxAge(2592000, TimeUnit.SECONDS))
                 .body(image.getImage()); //Return image
     }
 

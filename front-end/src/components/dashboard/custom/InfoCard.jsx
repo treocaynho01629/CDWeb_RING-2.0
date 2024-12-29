@@ -7,7 +7,6 @@ const InfoWrapper = styled(Paper)`
     display: flex;
     position: relative;
     justify-content: space-between;
-    align-items: center;
     padding: ${props => props.theme.spacing(2.5)};
     overflow: hidden;
     height: 100%;
@@ -17,7 +16,7 @@ const InfoWrapper = styled(Paper)`
         content: "";
         position: absolute;
         top: -35%;
-        left: -25%;
+        left: -50px;
         height: 110%;
         aspect-ratio: 1/1;
         background-color: ${props => props.theme.palette[props.color]?.light || props.theme.palette.primary.light};
@@ -46,15 +45,8 @@ const InfoContainer = styled.div`
     }
 `
 
-const ChartContainer = styled.div`
-    height: 100%;
-    display: flex;
-    align-items: flex-start;
-`
-
 const Diff = styled.span`
     display: flex;
-    align-items: center;
     justify-content: flex-end;
     font-size: 14px;
     color: ${props => props.theme.palette.text.secondary};
@@ -84,13 +76,11 @@ const InfoCard = ({ info, icon, color }) => {
                     <h2>{info != null ? info?.value : <Skeleton variant="text" width="80px" />}</h2>
                 </div>
             </InfoContainer>
-            <ChartContainer>
-                {diff != null &&
-                    <Diff>{diff > 0 ? <TrendingUp color="success" /> : diff < 0 ? <TrendingDown color="error" /> : <TrendingFlat />}
-                        &nbsp;{diff * 100}%&nbsp;<span>tháng trước</span>
-                    </Diff>
-                }
-            </ChartContainer>
+            {diff != null &&
+                <Diff>{diff > 0 ? <TrendingUp color="success" /> : diff < 0 ? <TrendingDown color="error" /> : <TrendingFlat />}
+                    &nbsp;{diff * 100}%&nbsp;<span>tháng trước</span>
+                </Diff>
+            }
         </InfoWrapper>
     )
 }

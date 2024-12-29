@@ -1,11 +1,12 @@
 import styled from '@emotion/styled'
-import { useRef, useState } from 'react'
-import { Close } from '@mui/icons-material';
+import { useRef, useState, lazy, Suspense } from 'react'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { Backdrop, Modal, Skeleton } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import Carousel from 'react-multi-carousel';
+
+const LightboxImages = lazy(() => import("./LightboxImages"));
 
 //#region styled
 const ImgContainer = styled.div`
@@ -148,131 +149,11 @@ const StyledSmallSkeleton = styled(Skeleton)`
     aspect-ratio: 1/1;
 `
 
-const CloseButton = styled.button`
-    position: absolute;
-    border: none;
-    outline: none;
-    background-color: transparent;
-    right: ${props => props.theme.spacing(4)};
-    top: ${props => props.theme.spacing(4)};
-    text-align: center;
-    opacity: .8;
-    cursor: pointer;
-    transition: all .2s ease;
-    z-index: 1;
-
-    svg { font-size: 40px; }
-
-    &:hover {
-        opacity: 1;
-    }
-
-    &:after {
-        content: "Đóng";
-    }
-
-    ${props => props.theme.breakpoints.down("md")} {
-        color: ${props => props.theme.palette.text.primary};
-        right: ${props => props.theme.spacing(1.5)};
-        top: ${props => props.theme.spacing(1.5)};
-
-        &:after { display: none; }
-    }
-`
-
-const FullscreenBackdrop = styled(Backdrop)`
-    background-color: rgba(0, 0, 0, .95);
-    z-index: -1;
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        background-color: ${props => props.theme.palette.background.paper};
-    }
-`
-
 const TopContainer = styled.div`
     position: relative;
 
     ${CustomArrowButton} {
         display: none;
-    }
-`
-
-const SubContainer = styled.div`
-    width: 100%;
-
-    p {
-        color: ${props => props.theme.palette.primary.dark};
-        font-weight: 450;
-        font-size: 18px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid ${props => props.theme.palette.primary.main};
-    }
-`
-
-const FullscreenContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    width: 100%;
-    height: 100%;
-    padding: ${props => props.theme.spacing(2.5)};
-
-    .react-multi-carousel-track{
-      height: 100% !important;
-    }
-
-    ${StyledLazyImage} {
-        max-height: 550px;
-        height: 100%;
-    }
-
-    ${StyledSkeleton} {
-        max-height: 550px;
-        height: 100%;
-    }
-
-    ${MoreImageContainer} {
-        max-width: 950px;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 0;
-    }
-
-    ${StyledSmallLazyImage} {
-        max-height: 75px;
-    }
-
-    ${StyledSmallSkeleton} {
-        max-height: 75px;
-    }
-
-    ${SmallImageSlide} {
-        filter: grayscale(1);
-        opacity: 1;
-        max-height: 75px;
-
-        &.active {
-            filter: none;
-            border: 3px solid ${props => props.theme.palette.primary.main};
-            opacity: 1;
-        }
-    }
-
-    ${CustomArrowButton} {
-        width: 50px;
-        height: 50px;
-        font-size: 3.25em;
-        background-color: transparent;
-        color: white;
-        border-color: white;
-
-        &.left { left: 10%; }
-        &.right { right: 10%; }
-    }
-
-    ${props => props.theme.breakpoints.down("sm")} {
-        padding: ${props => props.theme.spacing(2)} 0;
     }
 `
 //#endregion
@@ -314,28 +195,6 @@ const responsiveGroup = {
         partialVisibilityGutter: 5
     }
 };
-
-const responsiveFullscreen = {
-    default: {
-        breakpoint: {
-            max: 3000,
-            min: 900
-        },
-        items: 12,
-        slidesToSlide: 3,
-        partialVisibilityGutter: 5
-    },
-    mobile: {
-        breakpoint: {
-            max: 900,
-            min: 0
-        },
-        items: 6,
-        slidesToSlide: 3,
-        partialVisibilityGutter: 5
-    }
-};
-
 //Custom stuff
 const CustomArrow = ({ onClick, className, direction }) => (
     <CustomArrowButton className={`${className} ${direction}`} onClick={onClick}>
@@ -362,7 +221,8 @@ const ButtonGroup = ({ book, images, goToSlide, currentSlide, responsive }) => {
                         onClick={() => goToSlide(index)}
                     >
                         <StyledSmallLazyImage
-                            src={`${image}?size=small`}
+                            src={`${image?.src}?size=small`}
+                            alt={image?.alt}
                             placeholder={<StyledSmallSkeleton variant="rectangular" animation={false} />}
                         />
                     </SmallImageSlide>
@@ -381,8 +241,20 @@ const ButtonGroup = ({ book, images, goToSlide, currentSlide, responsive }) => {
 const ProductImages = ({ book }) => {
     let sliderRef = useRef();
     const [slideIndex, setSlideIndex] = useState(1);
-    const [open, setOpen] = useState(false);
-    let images = book?.previews ? [].concat(book?.image, book.previews) : [].concat(book?.image);
+    const [open, setOpen] = useState(undefined);
+    let initialImages = book?.previews ? [].concat(book?.image, book.previews) : [].concat(book?.image);
+    let images = initialImages.map((image, index) => ({
+        src: image,
+        alt: `${book?.title} preview image #${index + 1}`,
+        width: 600,
+        height: 600,
+        srcSet: [
+            { src: `${image}?size=tiny`, width: 45, height: 45 },
+            { src: `${image}?size=small`, width: 150, height: 150 },
+            { src: `${image}?size=medium`, width: 350, height: 350 },
+            { src: image, width: 600, height: 600 },
+        ],
+    }))
 
     const goToSlide = (index) => { if (sliderRef?.goToSlide) sliderRef.goToSlide(index) }
     const handleOpen = () => { setOpen(true); }
@@ -407,9 +279,9 @@ const ProductImages = ({ book }) => {
             {book ? images.map((image, index) => (
                 <ImageSlide key={index} onClick={handleOpen}>
                     <StyledLazyImage
-                        src={image}
-                        srcSet={`${image}?size=medium 350w, ${image} 600w`}
-                        alt={`${book?.title} preview image #${index}`}
+                        src={image?.src}
+                        srcSet={image?.srcSet.map(item => `${item.src} ${item.width}w`).join(", ")}
+                        alt={image?.alt}
                         visibleByDefault={index == 0}
                         placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
                     />
@@ -433,23 +305,9 @@ const ProductImages = ({ book }) => {
                 </TopContainer>
                 <ButtonGroup {...{ images, book, goToSlide, currentSlide: slideIndex, responsive: responsiveGroup }} />
             </ImgContainer>
-            <Modal
-                open={open}
-                onClose={handleClose}
-                disableScrollLock={false}
-                slots={{ backdrop: FullscreenBackdrop }}
-                aria-labelledby="fullscreen-images-carousel"
-                aria-describedby="Views images"
-            >
-                <FullscreenContainer>
-                    <CloseButton onClick={handleClose}><Close /><br /></CloseButton>
-                    {carousel}
-                    <SubContainer>
-                        <p>Hình ảnh từ RING! ({images.length})</p>
-                        <ButtonGroup {...{ images, book, goToSlide, currentSlide: slideIndex, responsive: responsiveFullscreen }} />
-                    </SubContainer>
-                </FullscreenContainer>
-            </Modal >
+            <Suspense fallback={null}>
+                {open !== undefined && <LightboxImages {...{ images, open, handleClose }} />}
+            </Suspense>
         </>
     )
 }

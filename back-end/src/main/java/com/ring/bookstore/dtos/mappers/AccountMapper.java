@@ -17,6 +17,8 @@ public class AccountMapper {
         return new AccountDTO(projection.getId(),
                 projection.getUsername(),
                 projection.getEmail(),
+                projection.getName(),
+                projection.getPhone(),
                 projection.getImage(),
                 projection.getRoles());
     }

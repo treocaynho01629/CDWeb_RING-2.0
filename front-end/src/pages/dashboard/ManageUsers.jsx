@@ -1,18 +1,22 @@
 import { lazy, Suspense, useState } from "react";
-import { Box, Breadcrumbs, Button, Grid2 as Grid, Typography } from '@mui/material';
-import { Link } from 'react-router'
+import { Box, Button, Grid2 as Grid } from '@mui/material';
 import { Add, Group } from "@mui/icons-material";
+import { useGetUserAnalyticsQuery } from "../../features/users/usersApiSlice";
+import { HeaderContainer } from "../../components/dashboard/custom/ShareComponents";
+import { NavLink } from "react-router";
+import CustomDashboardBreadcrumbs from "../../components/dashboard/custom/CustomDashboardBreadcrumbs";
 import ChartUsers from '../../components/dashboard/chart/ChartUsers'
 import TableUsers from "../../components/dashboard/table/TableUsers";
 import useTitle from '../../hooks/useTitle';
-// import CountCard from "../../components/dashboard/custom/CountCard";
+import InfoCard from "../../components/dashboard/custom/InfoCard";
 
 const UserFormDialog = lazy(() => import("../../components/dashboard/dialog/UserFormDialog"));
 
 const ManageUsers = () => {
-  const [userCount, setUserCount] = useState(0);
   const [contextUser, setContextUser] = useState(null);
   const [open, setOpen] = useState(false);
+
+  const { data: userAnalytics } = useGetUserAnalyticsQuery();
 
   const handleOpen = (user) => {
     setContextUser(user);
@@ -29,30 +33,27 @@ const ManageUsers = () => {
 
   return (
     <>
-      <h2>Quản lý thành viên</h2>
-      <Box display="flex" justifyContent={'space-between'}>
-        <Breadcrumbs aria-label="breadcrumb">
-          <Link style={{ color: 'inherit' }} to={'/dashboard'}>Dashboard</Link>
-          <Typography color="text.secondary">Quản lý thành viên</Typography>
-        </Breadcrumbs>
-        <Button variant="outlined" size="large" startIcon={<Add />} onClick={() => handleOpen()}>
-          Thêm thành viên mới
+      <HeaderContainer>
+        <div>
+          <h2>Quản lý thành viên</h2>
+          <CustomDashboardBreadcrumbs separator="." maxItems={4} aria-label="breadcrumb">
+            <NavLink to={'/dashboard/user'}>Quản lý thành viên</NavLink>
+          </CustomDashboardBreadcrumbs>
+        </div>
+        <Button variant="outlined" startIcon={<Add />} onClick={handleOpen}>
+          Thêm
         </Button>
+      </HeaderContainer>
+      <Box mb={4}>
+        <InfoCard
+          icon={<Group color="warning" />}
+          info={userAnalytics}
+          color="warning"
+        />
       </Box>
-      <br />
-      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
-        <Grid item sm={6} md={4}>
-          {/* <CountCard
-            count={userCount}
-            icon={<Group />}
-            title={'Thành viên'}
-          /> */}
-        </Grid>
-      </Grid>
-      <ChartUsers />
-      <TableUsers setUserCount={setUserCount} />
+      <TableUsers />
       <Suspense fallback={<></>}>
-        {open && <UserFormDialog open={open} handleClose={handleClose}/>}
+        {open && <UserFormDialog open={open} handleClose={handleClose} />}
       </Suspense>
     </>
   )
