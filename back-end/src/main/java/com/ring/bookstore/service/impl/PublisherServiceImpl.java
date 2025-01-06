@@ -10,7 +10,7 @@ import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.model.Image;
 import com.ring.bookstore.model.Publisher;
 import com.ring.bookstore.service.ImageService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,8 +34,9 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     public Page<PublisherDTO> getPublishers(Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
-                : Sort.by(sortBy).descending());
+       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending());
 
         //Fetch from database
         Page<IPublisher> pubsList = pubRepo.findPublishers(pageable);

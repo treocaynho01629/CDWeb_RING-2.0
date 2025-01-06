@@ -12,14 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ring.bookstore.dtos.images.ImageDTO;
@@ -44,7 +37,7 @@ public class ImageController {
 
     //Upload image
     @PostMapping("/upload")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File not found!");
@@ -61,7 +54,7 @@ public class ImageController {
 
     //Upload multiples images
     @PostMapping("/upload-multiples")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> uploadImages(@RequestParam("images") MultipartFile[] files) {
         List<String> messages = new ArrayList<>();
 
@@ -78,8 +71,8 @@ public class ImageController {
     }
 
     //Upload image
-    @PostMapping("/replace")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PutMapping("/replace")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> replaceImage(@RequestParam("image") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File not found!");
@@ -95,8 +88,8 @@ public class ImageController {
     }
 
     //Upload multiples images
-    @PostMapping("/replace-multiples")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PutMapping("/replace-multiples")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> replaceImages(@RequestParam("images") MultipartFile[] files) {
         List<String> messages = new ArrayList<>();
 
@@ -130,5 +123,13 @@ public class ImageController {
     public ResponseEntity<?> deleteImage(@PathVariable Long id) {
         String response = imageService.deleteImage(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    //Delete images
+    @DeleteMapping("/delete-multiples")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteImages(@RequestParam("ids") List<Long> ids) {
+        imageService.deleteImages(ids);
+        return new ResponseEntity<>("Images deleted successfully!", HttpStatus.OK);
     }
 }

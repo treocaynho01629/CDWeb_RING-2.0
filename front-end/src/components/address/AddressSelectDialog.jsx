@@ -6,8 +6,8 @@ import { useCreateAddressMutation, useDeleteAddressMutation, useGetMyAddressesQu
 import { ReactComponent as EmptyIcon } from '../../assets/empty.svg';
 import { Message } from '../custom/GlobalComponents';
 import AddressItem from './AddressItem'
-import useCart from '../../hooks/useCart';
 import useConfirm from '../../hooks/useConfirm';
+import useAddress from '../../hooks/useAddress';
 
 const AddressForm = lazy(() => import('./AddressForm'));
 
@@ -35,7 +35,7 @@ const StyledEmptyIcon = styled(EmptyIcon)`
 //#endregion
 
 const AddressSelectDialog = ({ address, loggedIn = true, pending, setPending, setAddressInfo, openDialog, handleCloseDialog }) => {
-  const { addresses: storeAddresses, addNewAddress, removeAddress } = useCart();
+  const { addresses: storeAddresses, addNewAddress, removeAddress } = useAddress();
   const [openForm, setOpenForm] = useState(false); //Dialog open state
   const [err, setErr] = useState('');
   const [errMsg, setErrMsg] = useState('');

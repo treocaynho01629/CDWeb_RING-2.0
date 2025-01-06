@@ -165,11 +165,7 @@ public class JwtService {
     //Get refresh token
     public String getRefreshTokenFromCookie(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, "refreshToken");
-        if (cookie != null) {
-            return cookie.getValue();
-        } else {
-            return null;
-        }
+        return cookie.getValue();
     }
 
     //Clear cookie

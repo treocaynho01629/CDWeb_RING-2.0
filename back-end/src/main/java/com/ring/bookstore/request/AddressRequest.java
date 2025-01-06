@@ -20,7 +20,7 @@ public class AddressRequest { //Request body for address
 	private String companyName;
 
 	@NotBlank(message = "Số điện thoại không được để trống!")
-	@Size(max = 15, message = "Số điện thoại không quá 15 kí tự")
+	@Size(min = 9, max = 9, message = "Sai định dạng số điện thoại")
 	private String phone;
 
 	@NotBlank(message = "Tỉnh/Thành phố không được để trống!")

@@ -466,7 +466,7 @@ const Navbar = () => {
                                                             <IconText className="username">{username}</IconText>
                                                         </StyledIconButton>
                                                     </Link>
-                                                    <Suspense fallback={<></>}>
+                                                    <Suspense fallback={null}>
                                                         {anchorEl !== undefined &&
                                                             <ProfilePopover {...{
                                                                 open, anchorEl, handleClose: handleProfileClose,

@@ -33,7 +33,7 @@ const LayoutContainer = styled.div`
         padding-left: ${props => props.theme.spacing(2)};
         margin-right: auto;
         margin-left: auto;
-        max-width: ${props => props.theme.breakpoints.values['xl']}px;
+        max-width: ${props => props.theme.breakpoints.values['lg']}px;
     }
 `
 //#endregion

@@ -19,17 +19,17 @@ import lombok.NoArgsConstructor;
 public class BookRequest { //Request body for book
 	
 	@NotNull(message = "Giá không được bỏ trống!")
-	@Min(value = 1000, message = "Giá từ 1000đ")
-	@Max(value = 10000000, message = "Giá dưới 10000000đ")
+	@Min(value = 1000, message = "Giá từ 1.000 ₫")
+	@Max(value = 10000000, message = "Giá dưới 10.000.000 ₫")
 	private Double price;
 
 	@DecimalMin(value = "0.0", inclusive = false)
-	@Digits(integer=5, fraction=4)
+	@Digits(integer=1, fraction=4)
 	private BigDecimal discount;
 
 	@NotNull(message = "Số lượng không được bỏ trống!")
-	@Min(value = 0, message = "Số lượng phải trên 0")
-	@Max(value = 199, message = "Kho hàng đã đầy (giới hạn 199)")
+	@Min(value = 1, message = "Số lượng phải từ 1")
+	@Max(value = 10000, message = "Tối đa 10.000")
 	private Short amount;
 	
 	@NotBlank(message = "Tiêu đề không được bỏ trống!")
@@ -68,6 +68,6 @@ public class BookRequest { //Request body for book
 	@NotBlank(message = "Ngôn ngữ không được bỏ trống!")
 	private String language;
 
-	@NotNull(message = "Shop không được bỏ trống!")
+	@NotNull(message = "Cửa hàng không được bỏ trống!")
 	private Long shopId;
 }

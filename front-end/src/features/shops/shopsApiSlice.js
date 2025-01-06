@@ -3,7 +3,7 @@ import { apiSlice } from "../../app/api/apiSlice";
 
 const shopsAdapter = createEntityAdapter({});
 const initialState = shopsAdapter.getInitialState({
-  page: {
+    page: {
         number: 0,
         size: 0,
         totalElements: 0,
@@ -47,7 +47,7 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
             transformResponse: responseData => {
                 const { content, page } = responseData;
                 return shopsAdapter.setAll({
-                        ...initialState,
+                    ...initialState,
                     page
                 }, content)
             },
@@ -82,9 +82,30 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
             transformResponse: responseData => {
                 const { content, page } = responseData;
                 return shopsAdapter.setAll({
-                        ...initialState,
+                    ...initialState,
                     page
                 }, content)
+            },
+            providesTags: (result, error, arg) => {
+                if (result?.ids) {
+                    return [
+                        { type: 'Shop', id: 'LIST' },
+                        ...result.ids.map(id => ({ type: 'Shop', id }))
+                    ]
+                } else return [{ type: 'Shop', id: 'LIST' }]
+            },
+        }),
+        getPreviewShops: builder.query({
+            query: () => {
+                return {
+                    url: '/api/shops/preview',
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result?.isError
+                    },
+                }
+            },
+            transformResponse: responseData => {
+                return shopsAdapter.setAll(initialState, responseData ?? {})
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
@@ -208,6 +229,7 @@ export const {
     useGetShopQuery,
     useGetShopsQuery,
     useGetDisplayShopsQuery,
+    useGetPreviewShopsQuery,
     useGetShopAnalyticsQuery,
     useFollowShopMutation,
     useUnfollowShopMutation,

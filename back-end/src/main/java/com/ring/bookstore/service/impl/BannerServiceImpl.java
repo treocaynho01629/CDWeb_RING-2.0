@@ -10,7 +10,7 @@ import com.ring.bookstore.model.Shop;
 import com.ring.bookstore.repository.BannerRepository;
 import com.ring.bookstore.request.BannerRequest;
 import com.ring.bookstore.service.BannerService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,8 +32,9 @@ public class BannerServiceImpl implements BannerService {
     @Override
     public Page<BannerDTO> getBanners(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
                                    String keyword, Long shopId, Boolean byShop) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
-                : Sort.by(sortBy).descending());
+       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending());
 
         //Fetch from database
         Page<IBanner> bannersList = bannerRepo.findBanner(keyword, shopId, byShop, pageable);

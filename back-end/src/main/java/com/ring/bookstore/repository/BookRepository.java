@@ -48,10 +48,11 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             from Review r
             group by r.book.id) rv on b.id = rv.book_id
         where concat (b.title, b.author, s.name) ilike %:keyword%
-        and (coalesce(:shopId) is null or b.shop.id = :shopId)
         and (coalesce(:cateId) is null or b.cate.id = :cateId or b.cate.parent.id = :cateId)
         and (coalesce(:pubIds) is null or b.publisher.id in :pubIds)
         and (coalesce(:types) is null or b.type in :types)
+        and (coalesce(:shopId) is null or b.shop.id = :shopId)
+        and (coalesce(:userId) is null or b.shop.owner.id = :userId)
         and coalesce(rv.rating, 0) >= :rating
         and b.price * (1 - b.discount) between :fromRange and :toRange
         and b.amount >= :amount
@@ -62,6 +63,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                                            List<Integer> pubIds,
                                            List<BookType> types,
                                            Long shopId,
+                                           Long userId,
                                            Double fromRange,
                                            Double toRange,
                                            Boolean withDesc,

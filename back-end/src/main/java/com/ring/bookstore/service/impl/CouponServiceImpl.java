@@ -15,7 +15,7 @@ import com.ring.bookstore.repository.ShopRepository;
 import com.ring.bookstore.request.CartStateRequest;
 import com.ring.bookstore.request.CouponRequest;
 import com.ring.bookstore.service.CouponService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,8 +45,9 @@ public class CouponServiceImpl implements CouponService {
     public Page<CouponDTO> getCoupons(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
                                       List<CouponType> types, String keyword, Long shopId, Boolean byShop, Boolean showExpired,
                                       Double cValue, Integer cQuantity) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
-                : Sort.by(sortBy).descending());
+       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending());
 
         //Fetch from database
         Page<Coupon> couponsList = couponRepo.findCoupon(types, keyword, shopId,

@@ -36,7 +36,7 @@ public class AccountRequest { //Request body for account
 	@Size(max = 250, message = "Tên không quá 250 kí tự")
 	private String name;
 	
-	@Size(max = 15, message = "Số điện thoại không quấ 15 kí tự")
+	@Size(min = 9, max = 9, message = "Sai định dạng số điện thoại")
 	private String phone;
 	
 	@Past(message = "Ngày sinh phải trước hôm nay!")

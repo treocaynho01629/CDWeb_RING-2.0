@@ -1,10 +1,9 @@
 package com.ring.bookstore.service.impl;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.github.slugify.Slugify;
@@ -37,7 +36,7 @@ import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.request.BookRequest;
 import com.ring.bookstore.service.BookService;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -49,6 +48,7 @@ public class BookServiceImpl implements BookService {
     private final PublisherRepository pubRepo;
     private final CategoryRepository cateRepo;
     private final ShopRepository shopRepo;
+    private final ImageRepository imageRepo;
 
     private final ImageService imageService;
 
@@ -79,13 +79,15 @@ public class BookServiceImpl implements BookService {
                                   Integer amount,
                                   Integer cateId,
                                   List<Integer> pubIds,
-                                  Long shopId,
                                   List<BookType> types,
+                                  Long shopId,
+                                  Long userId,
                                   Double fromRange,
                                   Double toRange,
                                   Boolean withDesc) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
-                : Sort.by(sortBy).descending());
+       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending());
 
         //Fetch from database
         Page<IBookDisplay> booksList = bookRepo.findBooksWithFilter(
@@ -94,6 +96,7 @@ public class BookServiceImpl implements BookService {
                 pubIds,
                 types,
                 shopId,
+                userId,
                 fromRange,
                 toRange,
                 withDesc,
@@ -114,15 +117,18 @@ public class BookServiceImpl implements BookService {
 
     //Add book (SELLER)
     @Transactional
-    public BookResponseDTO addBook(BookRequest request, MultipartFile file, Account seller) throws IOException, ImageResizerException {
+    public BookResponseDTO addBook(BookRequest request,
+                                   MultipartFile thumbnail,
+                                   MultipartFile[] images,
+                                   Account user) throws IOException, ImageResizerException {
         //Validation
         Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
         Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
-        if (!Objects.equals(shop.getOwner().getId(), seller.getId())) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid owner!");
+        if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid owner!");
 
-        //Image upload
-        Image savedImage = imageService.upload(file);
+        //Thumbnail
+        Image savedThumbnail = imageService.upload(thumbnail);
 
         //Slugify
         String slug = slg.slugify(request.getTitle());
@@ -131,7 +137,7 @@ public class BookServiceImpl implements BookService {
         var book = Book.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .image(savedImage)
+                .image(savedThumbnail)
                 .price(request.getPrice())
                 .discount(request.getDiscount())
                 .publisher(pub)
@@ -144,6 +150,18 @@ public class BookServiceImpl implements BookService {
                 .build();
         Book addedBook = bookRepo.save(book); //Save to database
 
+        //Images upload
+        ArrayList<Image> previewImages = new ArrayList<>();
+        if (images != null && images.length != 0) {
+            Arrays.stream(images).forEach(image -> {
+                try {
+                    previewImages.add(imageService.upload(image));
+                } catch (Exception e) {
+                    throw new HttpResponseException(HttpStatus.EXPECTATION_FAILED, "Upload image failed!");
+                }
+            });
+        }
+
         //Create book details
         var bookDetail = BookDetail.builder()
                 .book(addedBook)
@@ -152,6 +170,7 @@ public class BookServiceImpl implements BookService {
                 .pages(request.getPages())
                 .bLanguage(request.getLanguage())
                 .bDate(request.getDate())
+                .previewImages(previewImages)
                 .build();
         BookDetail addedDetail = detailRepo.save(bookDetail); //Save details to database
 
@@ -162,41 +181,54 @@ public class BookServiceImpl implements BookService {
 
     //Update book (SELLER)
     @Transactional
-    public BookResponseDTO updateBook(Long id, BookRequest request, MultipartFile file, Account seller) throws IOException, ImageResizerException {
+    public BookResponseDTO updateBook(Long id,
+                                      BookRequest request,
+                                      MultipartFile thumbnail,
+                                      MultipartFile[] images,
+                                      List<String> remove,
+                                      Account user) throws IOException, ImageResizerException {
         //Check book exists & category, publisher validation
         Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
+        BookDetail currDetail = book.getDetail();
+        boolean isRemove = remove != null && !remove.isEmpty();
 
-        //Check if correct seller or admin
-        if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+        //Check if correct owner
+        if (!isOwnerValid(book.getShop(), user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
-        //FIX
-//        if (remove != null) {
-//            if (hasThumbnail && file == null) throw new;
-//            //loop + remove
-//        }
+        List<Long> removeImageIds = isRemove ? imageRepo.findIdsByNames(remove) : null;
 
         //Image upload/replace
-        if (file != null) { //Contain new image >> upload/replace
-            imageService.deleteImage(book.getImage().getId()); //Delete old image
-            Image savedImage = imageService.upload(file); //Upload new image
+        if (thumbnail != null) { //Contain new image >> upload/replace
+            Image oldImage = book.getImage();
+            Image savedImage = imageService.upload(thumbnail); //Upload new image
             book.setImage(savedImage); //Set new image
+
+            if (isRemove && removeImageIds.contains(oldImage.getId())) {
+                imageService.deleteImage(oldImage.getId());
+            } else {
+                currDetail.addImage(oldImage);
+            }
         }
 
-        //FIX
-//        //Preview images
-//        if (files != null) {
-//            //upload
-//        }
-
         //Set new details info
-        BookDetail currDetail = book.getDetail();
         currDetail.setBWeight(request.getWeight());
         currDetail.setSize(request.getSize());
         currDetail.setPages(request.getPages());
         currDetail.setBLanguage(request.getLanguage());
         currDetail.setBDate(request.getDate());
+
+        //Images
+        if (images != null && images.length != 0) {
+            Arrays.stream(images).forEach(image -> {
+                try {
+                    currDetail.addImage(imageService.upload(image));
+                } catch (Exception e) {
+                    throw new HttpResponseException(HttpStatus.EXPECTATION_FAILED, "Upload image failed!");
+                }
+            });
+        }
         detailRepo.save(currDetail); //Save new details to database
 
         //Set new info
@@ -213,9 +245,17 @@ public class BookServiceImpl implements BookService {
         book.setAmount(request.getAmount());
         book.setType(request.getType());
 
+        if (isRemove) imageService.deleteImages(removeImageIds);
+
         //Update
         Book updatedBook = bookRepo.save(book);
         return bookMapper.bookToResponseDTO(updatedBook);
+    }
+
+    public void replaceThumbnail(Long bookId,
+                                 String imageName,
+                                 Account user) {
+        //FIX?
     }
 
     public StatDTO getAnalytics(Long shopId) {
@@ -226,10 +266,10 @@ public class BookServiceImpl implements BookService {
 
     //Delete book (SELLER)
     @Transactional
-    public BookResponseDTO deleteBook(Long id, Account seller) {
+    public BookResponseDTO deleteBook(Long id, Account user) {
         Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
-        //Check if correct seller or admin
-        if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+        //Check if correct owner
+        if (!isOwnerValid(book.getShop(), user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
         bookRepo.deleteById(id); //Delete from database
         return bookMapper.bookToResponseDTO(book);
@@ -237,23 +277,23 @@ public class BookServiceImpl implements BookService {
 
     //Delete multiples books (SELLER)
     @Transactional
-    public void deleteBooks(List<Long> ids, Account seller) {
+    public void deleteBooks(List<Long> ids, Account user) {
         //Loop and delete
         for (Long id : ids) {
             Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
-            //Check if correct seller or admin
-            if (!isSellerValid(book, seller)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            //Check if correct owner
+            if (!isOwnerValid(book.getShop(), user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
             bookRepo.deleteById(id); //Delete from database
         }
     }
 
     //Delete all books (SELLER)
     @Transactional
-    public void deleteAllBooks(Account seller) {
+    public void deleteAllBooks(Account user) {
         if (isAuthAdmin()) {
             bookRepo.deleteAll();
         } else {
-            bookRepo.deleteBySellerId(seller.getId());
+            bookRepo.deleteBySellerId(user.getId());
         }
     }
 
@@ -263,8 +303,12 @@ public class BookServiceImpl implements BookService {
         return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
     }
 
-    protected boolean isSellerValid(Book book, Account seller) {
-        //Check if is admin or valid seller id
-        return book.getShop().getOwner().getId().equals(seller.getId()) || isAuthAdmin();
+    protected boolean isOwnerValid(Shop shop, Account user) {
+        //Check if is admin or valid owner id
+        boolean isAdmin = isAuthAdmin();
+
+        if (shop != null) {
+            return shop.getOwner().getId().equals(user.getId()) || isAuthAdmin();
+        } else return isAdmin;
     }
 }

@@ -2,9 +2,8 @@ package com.ring.bookstore.service.impl;
 
 import com.ring.bookstore.exception.ResetPasswordException;
 import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.AccountToken;
-import com.ring.bookstore.repository.AccountTokenRepository;
-import jakarta.transaction.Transactional;
+import com.ring.bookstore.repository.AccountRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ResetTokenService {
 
-    private final AccountTokenRepository accTokenRepo;
+    private final AccountRepository accRepo;
 
     private final JwtService jwtService;
 
@@ -23,23 +22,21 @@ public class ResetTokenService {
         String token = jwtService.generateCustomToken(user.getUsername(),
                 EXPIRE_TOKEN_TIME,
                 user.getPassword());
-        AccountToken accTokens = accTokenRepo.findAccTokenByUserName(user.getUsername())
-                .orElse(AccountToken.builder().user(user).build());
 
-        accTokens.setResetToken(token);
-        accTokenRepo.save(accTokens);
+        user.setResetToken(token);
+        accRepo.save(user);
         return token;
     }
 
-    public boolean verifyResetToken(AccountToken accToken) {
-        String key = accToken.getUser().getPassword();
-        String token = accToken.getResetToken();
+    public boolean verifyResetToken(Account user) {
+        String key = user.getPassword();
+        String token = user.getResetToken();
         String username = jwtService.extractCustomUsername(token, key); //Verify with sign in key
 
         if (username != null) {
             if (!jwtService.isCustomTokenValid(token, username, key)) { //Invalidate token
-                accToken.setResetToken(null); //Set empty
-                accTokenRepo.save(accToken);
+                user.setResetToken(null); //Set empty
+                accRepo.save(user);
                 throw new ResetPasswordException(token, "Reset token expired. Please make a new request!");
             }
         }
@@ -49,6 +46,6 @@ public class ResetTokenService {
 
     @Transactional
     public void clearResetToken(String token) {
-        accTokenRepo.clearResetToken(token);
+        accRepo.clearResetToken(token);
     }
 }

@@ -3,6 +3,7 @@ package com.ring.bookstore.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.ring.bookstore.dtos.images.ImageDTO;
 import com.ring.bookstore.enums.BookType;
 import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.data.domain.Page;
@@ -63,10 +64,11 @@ public class BookController {
                                       @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                       @RequestParam(value = "cateId", required = false) Integer cateId,
                                       @RequestParam(value = "pubIds", required = false) List<Integer> pubIds,
-                                      @RequestParam(value = "shopId", required = false) Long shopId,
                                       @RequestParam(value = "types", required = false) List<BookType> types,
+                                      @RequestParam(value = "shopId", required = false) Long shopId,
+                                      @RequestParam(value = "userId", required = false) Long userId,
                                       @RequestParam(value = "fromRange", defaultValue = "0") Double fromRange,
-                                      @RequestParam(value = "toRange", defaultValue = "100000000") Double toRange,
+                                      @RequestParam(value = "toRange", defaultValue = "10000000") Double toRange,
                                       @RequestParam(value = "rating", defaultValue = "0") Integer rating,
                                       @RequestParam(value = "amount", defaultValue = "1") Integer amount,
                                       @RequestParam(value = "withDesc", defaultValue = "false") Boolean withDesc) {
@@ -80,8 +82,9 @@ public class BookController {
                 amount,
                 cateId,
                 pubIds,
-                shopId,
                 types,
+                shopId,
+                userId,
                 fromRange,
                 toRange,
                 withDesc);
@@ -110,9 +113,11 @@ public class BookController {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> addBook(@Valid @RequestPart("request") BookRequest request,
-                                     @RequestPart("image") MultipartFile file,
+                                     @RequestPart("thumbnail") MultipartFile thumbnail,
+                                     @RequestPart(name = "images", required = false) MultipartFile[] images,
                                      @CurrentAccount Account currUser) throws ImageResizerException, IOException {
-        return new ResponseEntity<>(bookService.addBook(request, file, currUser), HttpStatus.CREATED);
+        return new ResponseEntity<>(bookService.addBook(request,
+                thumbnail, images, currUser), HttpStatus.CREATED);
     }
 
     //Update book by id
@@ -120,9 +125,22 @@ public class BookController {
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> updateBook(@PathVariable("id") Long id,
                                         @Valid @RequestPart("request") BookRequest request,
-                                        @RequestPart(name = "image", required = false) MultipartFile file,
+                                        @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail,
+                                        @RequestPart(name = "images", required = false) MultipartFile[] images,
+                                        @RequestPart(name = "remove", required = false) List<String> remove,
                                         @CurrentAccount Account currUser) throws ImageResizerException, IOException {
-        return new ResponseEntity<>(bookService.updateBook(id, request, file, currUser), HttpStatus.CREATED);
+        return new ResponseEntity<>(bookService.updateBook(id,
+                request, thumbnail, images, remove, currUser), HttpStatus.CREATED);
+    }
+
+    //Set thumbnail
+    @PutMapping("thumbnail/{id}/{name}")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> setBookThumbnail(@PathVariable Long id,
+                                              @PathVariable String name,
+                                              @CurrentAccount Account currUser) {
+        bookService.replaceThumbnail(id, name, currUser);
+        return new ResponseEntity<>("Thumbnail replaced successfully!", HttpStatus.OK);
     }
 
     //Delete book by {id}
@@ -139,7 +157,7 @@ public class BookController {
     public ResponseEntity<?> deleteBooks(@RequestParam("ids") List<Long> ids,
                                          @CurrentAccount Account currUser) {
         bookService.deleteBooks(ids, currUser);
-        return new ResponseEntity<>("Products delete successfully!", HttpStatus.OK);
+        return new ResponseEntity<>("Products deleted successfully!", HttpStatus.OK);
     }
 
     //Delete all books

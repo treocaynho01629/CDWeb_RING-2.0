@@ -8,7 +8,7 @@ import useLogout from "../../hooks/useLogout";
 const PendingModal = lazy(() => import('../../components/layout/PendingModal'));
 
 const PersistLogin = () => {
-    const { token, persist } = useAuth();
+    const { token, exp, persist } = useAuth();
     const [pending, setPending] = useState(true);
     const [errorMsg, setErrorMsg] = useState(null);
     const [refresh, { isLoading, isSuccess }] = useRefreshMutation();
@@ -18,6 +18,8 @@ const PersistLogin = () => {
 
     useEffect(() => {
         let isMounted = true;
+        const currentTime = Math.floor(Date.now() / 1000);
+        const checkBuffer = 5 * 60;
 
         const verifyRefreshToken = async () => {
             try {
@@ -34,7 +36,11 @@ const PersistLogin = () => {
             }
         }
 
-        (!token && persist) ? verifyRefreshToken() : setPending(false);
+        if (persist && (!token || (exp && currentTime > (exp - checkBuffer)))) {
+            verifyRefreshToken();
+        } else {
+            setPending(false);
+        }
         return () => isMounted = false;
     }, [])
 
@@ -42,7 +48,7 @@ const PersistLogin = () => {
         <>
             {(errorMsg && !pending)
                 ? <Navigate to='/auth/login' state={{ from: location, errorMsg }} replace /> //To login page if error
-                : !persist
+                : (!persist || token)
                     ? <Outlet />
                     : (isLoading || pending)
                         ?

@@ -4,6 +4,7 @@ import com.ring.bookstore.dtos.dashboard.IStat;
 import com.ring.bookstore.dtos.shops.IShop;
 import com.ring.bookstore.dtos.shops.IShopDetail;
 import com.ring.bookstore.dtos.shops.IShopDisplay;
+import com.ring.bookstore.dtos.shops.IShopPreview;
 import com.ring.bookstore.model.Shop;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +48,14 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 		group by s.id, s.owner.id, s.owner.username, i.name
 	""")
 	Page<IShop> findShops(String keyword, Long userId, Pageable pageable);
+
+	@Query("""
+		select s.id as id, s.name as name, i.name as image
+		from Shop s
+		left join s.image i 
+		where s.owner.id = :ownerId
+	""")
+	List<IShopPreview> findShopsPreview(Long ownerId);
 
 	@Query("""
 		select s from Shop s

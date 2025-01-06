@@ -10,7 +10,7 @@ import com.ring.bookstore.dtos.categories.PreviewCategoryDTO;
 import com.ring.bookstore.dtos.mappers.CategoryMapper;
 import com.ring.bookstore.dtos.categories.ICategory;
 import com.ring.bookstore.request.CategoryRequest;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,8 +35,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Page<CategoryDTO> getCategories(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
                                            String include, Integer parentId) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
-                : Sort.by(sortBy).descending());
+       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending());
         Page<CategoryDTO> cateDTOS = null;
 
         if (include != null && include.equalsIgnoreCase("children")) {

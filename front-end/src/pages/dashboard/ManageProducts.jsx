@@ -14,7 +14,7 @@ const ProductFormDialog = lazy(() => import("../../components/dashboard/dialog/P
 
 const ManageProducts = () => {
   const [contextProduct, setContextProduct] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(undefined);
   const { data: bookAnalytics } = useGetBookAnalyticsQuery();
 
   const { data: bestSeller, isLoading: loadBest, isSuccess: doneBest, isError: errorBest } = useGetBooksQuery({
@@ -101,7 +101,7 @@ const ManageProducts = () => {
       </Grid>
       <TableProducts />
       <Suspense fallback={null}>
-        {open && <ProductFormDialog open={open} handleClose={handleClose} />}
+        {open !== undefined && <ProductFormDialog open={open} handleClose={handleClose} />}
       </Suspense>
     </>
   )

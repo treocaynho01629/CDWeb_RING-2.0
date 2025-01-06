@@ -9,8 +9,8 @@ import { Link } from 'react-router';
 import { Message } from '../custom/GlobalComponents';
 import AddressItem from './AddressItem'
 import AddressForm from './AddressForm'
-import useCart from '../../hooks/useCart';
 import useConfirm from '../../hooks/useConfirm';
+import useAddress from '../../hooks/useAddress';
 
 //#region styled
 const TitleContainer = styled.div`
@@ -59,7 +59,7 @@ const StyledAddButton = styled.span`
 //#endregion
 
 const AddressComponent = ({ pending, setPending }) => {
-  const { addresses: storeAddresses, addNewAddress, removeAddress } = useCart();
+  const { addresses: storeAddresses, addNewAddress, removeAddress } = useAddress();
   const [open, setOpen] = useState(false); //Dialog open state
   const [err, setErr] = useState('');
   const [errMsg, setErrMsg] = useState('');
