@@ -21,6 +21,12 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     List<IImageInfo> findAllInfo();
 
     @Query("""
+        select i.id from Image i
+        where i.name in :names
+    """)
+    List<Long> findIdsByNames(List<String> names);
+
+    @Query("""
         select i.name as name, i.type as type from AccountProfile p
         join p.image i
         where p.id = :id

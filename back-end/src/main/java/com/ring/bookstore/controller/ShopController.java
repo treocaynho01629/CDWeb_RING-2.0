@@ -49,6 +49,12 @@ public class ShopController {
         return new ResponseEntity<>(shopService.getShops(pageNo, pageSize, sortBy, sortDir, keyword, userId, currUser), HttpStatus.OK);
     }
 
+    @GetMapping("/preview")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<?> getPreviewShops(@CurrentAccount Account currUser) {
+        return new ResponseEntity<>(shopService.getShopsPreview(currUser), HttpStatus.OK);
+    }
+
     //Get shop by {id}
     @GetMapping("/{id}")
     public ResponseEntity<?> getShopById(@PathVariable("id") Long id,

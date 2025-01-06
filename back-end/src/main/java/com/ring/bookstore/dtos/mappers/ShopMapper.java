@@ -46,6 +46,20 @@ public class ShopMapper {
 				shop.getTotalFollowers(),
 				shop.getJoinedDate());
 	}
+
+	public ShopPreviewDTO previewToDTO(IShopPreview shop) {
+		String fileDownloadUri = shop.getImage() != null ?
+				ServletUriComponentsBuilder
+						.fromCurrentContextPath()
+						.path("/api/images/")
+						.path(shop.getImage())
+						.toUriString()
+				: null;
+
+		return new ShopPreviewDTO(shop.getId(),
+				shop.getName(),
+				fileDownloadUri);
+	}
 	
     public ShopDetailDTO detailToDTO(IShopDetail shop) {
 		String fileDownloadUri = shop.getImage() != null ?

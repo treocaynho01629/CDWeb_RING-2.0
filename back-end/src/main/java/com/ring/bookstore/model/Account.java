@@ -2,11 +2,7 @@ package com.ring.bookstore.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.*;
@@ -74,6 +70,14 @@ public class Account extends Auditable implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonIgnore
     private Collection<Role> roles;
+
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<RefreshToken> refreshTokens = new ArrayList<>();
+
+	@Column(unique = true)
+	@JsonIgnore
+	private String resetToken;
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.LAZY)
 	@JsonIgnore
@@ -174,5 +178,15 @@ public class Account extends Auditable implements UserDetails {
 
 	public void unfollowShop(Shop shop) {
 		this.following.remove(shop);
+	}
+
+	public void addRefreshToken(RefreshToken token) {
+		this.refreshTokens.add(token);
+		token.setUser(this);
+	}
+
+	public void removeRefreshToken(RefreshToken token) {
+		this.refreshTokens.remove(token);
+		token.setUser(null);
 	}
 }

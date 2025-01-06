@@ -82,6 +82,7 @@ function UserFilters({ filters, setFilters }) {
       keyword: "",
       roles: "",
     });
+    if (inputRef) inputRef.current.value = "";
   }, []);
 
   return (
@@ -278,7 +279,6 @@ export default function TableUsers() {
   const handleCloseEdit = () => {
     setOpenEdit(false);
   }
-
 
   const handleDelete = async (id) => {
     if (pending) return;

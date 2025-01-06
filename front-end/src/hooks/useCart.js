@@ -1,13 +1,12 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { addAddress, addToCart, changeQuantity, decreaseQuantity, increaseQuantity, 
-    removeItem, resetCart, selectAddresses, selectCartProducts, removeStateAddress, 
-    replaceInCart, removeShopItem
+import {
+    addToCart, changeQuantity, decreaseQuantity, increaseQuantity, removeItem,
+    resetCart, selectCartProducts, replaceInCart, removeShopItem
 } from '../features/cart/cartReducer';
 
 const useCart = () => {
     const dispatch = useDispatch();
     const cartProducts = useSelector(selectCartProducts);
-    const addresses = useSelector(selectAddresses);
 
     //Cart
     const addProduct = async (item, quantity) => {
@@ -45,12 +44,10 @@ const useCart = () => {
     const removeShopProduct = (id) => dispatch(removeShopItem(id));
     const clearCart = () => dispatch(resetCart());
 
-    //Address
-    const addNewAddress = (address) => {dispatch(addAddress(address))}
-    const removeAddress = (id) => dispatch(removeStateAddress(id));
-
-    return { cartProducts, addresses, addProduct, replaceProduct, decreaseAmount, increaseAmount, 
-        changeAmount, removeProduct, removeShopProduct, clearCart, addNewAddress, removeAddress }
+    return {
+        cartProducts, addProduct, replaceProduct, decreaseAmount, increaseAmount,
+        changeAmount, removeProduct, removeShopProduct, clearCart
+    }
 }
 
 export default useCart

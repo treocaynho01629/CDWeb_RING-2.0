@@ -52,4 +52,14 @@ public class BookDetail {
             fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Image> previewImages;
+
+    public void addImage(Image image) {
+        previewImages.add(image);
+        image.setDetail(this);
+    }
+
+    public void removeImage(Image image) {
+        previewImages.remove(image);
+        image.setDetail(null);
+    }
 }

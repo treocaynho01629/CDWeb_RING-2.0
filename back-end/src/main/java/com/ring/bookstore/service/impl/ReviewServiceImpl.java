@@ -24,7 +24,7 @@ import com.ring.bookstore.repository.ReviewRepository;
 import com.ring.bookstore.request.ReviewRequest;
 import com.ring.bookstore.service.ReviewService;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

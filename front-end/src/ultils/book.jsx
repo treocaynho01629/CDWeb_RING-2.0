@@ -30,3 +30,22 @@ export const bookTypeItems = [
         label: 'Khác',
     },
 ];
+
+export const bookLanguageItems = [
+    {
+        value: 'Tiếng Việt',
+        label: 'Tiếng Việt',
+    },
+    {
+        value: 'Tiếng Anh',
+        label: 'Tiếng Anh',
+    },
+    {
+        value: 'Tiếng Trung',
+        label: 'Tiếng Trung',
+    },
+    {
+        value: 'Tiếng Nhật',
+        label: 'Tiếng Nhật',
+    },
+];

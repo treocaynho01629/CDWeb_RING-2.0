@@ -1,5 +1,5 @@
+import styled from '@emotion/styled';
 import { useEffect } from 'react';
-import { styled } from '@mui/material';
 import { useDropzone } from 'react-dropzone';
 import { Close, PermMedia } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
@@ -11,15 +11,15 @@ const DropZoneContainer = styled.div`
     align-items: center;
     height: 250px;
     background-color: ${props => props.theme.palette.action.focus};
-    border: 2px dashed ${props => props.theme.palette.primary.main};
+    border: 2.75px dashed ${props => props.theme.palette.primary.main};
     cursor: pointer;
 `
 
 const DropZoneContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 `
 
 const ThumbContainer = styled('aside')`
@@ -69,6 +69,16 @@ const StyledIconButton = styled(IconButton)`
 
     svg { font-size: 15px }
 `
+
+const Title = styled.h3`
+    margin: 0 0 10px;
+`
+
+const ErrMsg = styled.b`
+    display: flex;
+    align-items: center;
+    color: ${props => props.theme.palette.error.main};
+`
 //#endregion
 
 const CustomDropZone = ({ image, files, setFiles }) => {
@@ -86,9 +96,9 @@ const CustomDropZone = ({ image, files, setFiles }) => {
   });
 
   const fileRejectionItems = fileRejections.map(({ file, errors }) => (
-    <b style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'red' }}>
+    <ErrMsg>
       File: {file.path} - {file.size} bytes Quá lớn
-    </b>
+    </ErrMsg>
   ));
 
   let thumbs
@@ -97,17 +107,17 @@ const CustomDropZone = ({ image, files, setFiles }) => {
     thumbs = files.map((file, index) => (
       <Tooltip key={`${file.name}-${index}`} title={file.name}>
         <Thumb>
-            <StyledIconButton><Close /></StyledIconButton>
-            <ThumbInner>
-              <ThumbImage
-                src={file.preview}
-                onLoad={() => { URL.revokeObjectURL(file.preview) }}
-              />
-            </ThumbInner>
+          <StyledIconButton><Close /></StyledIconButton>
+          <ThumbInner>
+            <ThumbImage
+              src={file.preview}
+              onLoad={() => { URL.revokeObjectURL(file.preview) }}
+            />
+          </ThumbInner>
         </Thumb>
       </Tooltip>
     ));
-  } else {
+  } else if (image) {
     thumbs =
       <Thumb>
         <ThumbInner>
@@ -129,14 +139,16 @@ const CustomDropZone = ({ image, files, setFiles }) => {
         <input {...getInputProps()} />
         <DropZoneContent>
           <PermMedia fontSize="large" />
-          <h3 style={{ margin: 0, marginTop: 10 }}>Kéo thả hoặc chọn file ảnh</h3>
+          <Title>Kéo thả hoặc chọn file ảnh</Title>
           <span>(Tối đa 2MB, 10 ảnh)</span>
           {fileRejectionItems}
         </DropZoneContent>
       </DropZoneContainer>
-      <ThumbContainer>
-        {thumbs}
-      </ThumbContainer>
+      {thumbs?.length &&
+        <ThumbContainer>
+          {thumbs}
+        </ThumbContainer>
+      }
     </section>
   );
 }

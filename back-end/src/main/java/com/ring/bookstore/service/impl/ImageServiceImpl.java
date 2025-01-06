@@ -4,11 +4,15 @@ import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.dtos.images.ImageInfoDTO;
 import com.ring.bookstore.dtos.images.IImageInfo;
 import com.ring.bookstore.enums.ImageSize;
+import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ImageResizerException;
-import jakarta.transaction.Transactional;
+import com.ring.bookstore.model.Account;
+import com.ring.bookstore.model.Book;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -111,6 +115,12 @@ public class ImageServiceImpl implements ImageService {
         return "Delete image " + image.getName() + " successfully!";
     }
 
+    //Delete multiples images
+    @Transactional
+    public void deleteImages(List<Long> ids) {
+        imageRepo.deleteAllById(ids);
+    }
+
     //Check if image with {name} already exists
     public boolean existsImage(String name) {
         return imageRepo.existsByName(name);
@@ -118,10 +128,10 @@ public class ImageServiceImpl implements ImageService {
 
     //Get image by {name}
     private Image get(String name) {
-        Image imageData = imageRepo.findByName(name)
+        Image image = imageRepo.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
 
-        return new Image(imageData.getImage(), imageData.getType());
+        return image;
     }
 
     private Image getImageData(String name) {
@@ -181,16 +191,26 @@ public class ImageServiceImpl implements ImageService {
             Image image = get(reference); //Get original image
             BufferedImage resizedBi = getResizedImage(image.getImage(), type); //Resize it
 
-            //Save to database
-            Image resizedImage = this.save(resizedBi, getResizedFileName(reference, type), image.getType());
+            //Save
+            String fileName = getResizedFileName(reference, type);
+            String contentType = image.getType();
+            Image resizedImage = Image.builder()
+                    .name(fileName)
+                    .type(contentType)
+                    .parent(image)
+                    .image(null)
+                    .build();
 
-            //Set parent image for cascade
-            resizedImage.setParent(image);
-            imageRepo.save(resizedImage);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(resizedBi, contentType.split("/")[1], baos);
+            byte[] bytes = baos.toByteArray();
 
-            return resizedImage;
+            resizedImage.setImage(bytes); //Set image data
+            return imageRepo.save(resizedImage); //Save to database
         } catch (ResourceNotFoundException e) {
             throw new ImageResizerException("The original image could not be found!", e);
+        } catch (IOException e) {
+            throw new ImageResizerException("Resized image could not be saved!", e);
         }
     }
 

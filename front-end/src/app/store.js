@@ -9,24 +9,36 @@ import {
     PURGE,
     REGISTER,
 } from "redux-persist";
-import { apiSlice } from './api/apiSlice'
+import { apiSlice } from "./api/apiSlice"
 import storage from "redux-persist/lib/storage";
 import cartReducer from "../features/cart/cartReducer";
-import authReducer from '../features/auth/authReducer'
+import authReducer from "../features/auth/authReducer";
+import addressReducer from "../features/addresses/addressReducer";
 
-const persistConfig = {
-    key: "rootbook",
+const authPersistConfig = {
+    key: "auth",
+    version: 1,
+    storage
+}
+
+const cartPersistConfig = {
+    key: "cart",
     version: 1,
     storage,
 };
 
-const persistedReducer = persistReducer(persistConfig, cartReducer);
+const addressPersistConfig = {
+    key: "address",
+    version: 1,
+    storage,
+};
 
 export const store = configureStore({
     reducer: {
         [apiSlice.reducerPath]: apiSlice.reducer,
-        auth: authReducer, //AUTH
-        cart: persistedReducer, //CART
+        auth: persistReducer(authPersistConfig, authReducer), //AUTH
+        cart: persistReducer(cartPersistConfig, cartReducer), //CART
+        address: persistReducer(addressPersistConfig, addressReducer) //ADDRESS
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

@@ -12,7 +12,7 @@ import com.ring.bookstore.repository.AccountProfileRepository;
 import com.ring.bookstore.repository.AddressRepository;
 import com.ring.bookstore.request.AddressRequest;
 import com.ring.bookstore.service.AddressService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

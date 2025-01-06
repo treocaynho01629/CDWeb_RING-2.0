@@ -202,6 +202,7 @@ function ProductFilters({ filters, setFilters }) {
     });
     setPubIds([]);
     setTypes([]);
+    if (inputRef) inputRef.current.value = "";
   }, []);
 
   return (

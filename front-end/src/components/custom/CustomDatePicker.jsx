@@ -50,13 +50,15 @@ const StyledDatePicker = styled(DatePicker)(({ theme }) => ({
 }));
 
 const CustomDatePicker = (props) => {
+    const { margin } = props;
+    
     return (
         <LocalizationProvider
             localeText={viVN.components.MuiLocalizationProvider.defaultProps.localeText}
             dateAdapter={AdapterDayjs}
             adapterLocale="vi"
         >
-            <FormControl margin="dense" fullWidth>
+            <FormControl margin={margin ? margin : 'none'} fullWidth>
                 <StyledDatePicker {...props} />
             </FormControl>
         </LocalizationProvider>

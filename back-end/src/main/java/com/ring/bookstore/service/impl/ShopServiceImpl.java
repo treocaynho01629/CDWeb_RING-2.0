@@ -16,7 +16,7 @@ import com.ring.bookstore.request.AddressRequest;
 import com.ring.bookstore.request.ShopRequest;
 import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.service.ShopService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -50,8 +51,9 @@ public class ShopServiceImpl implements ShopService {
                                                 String sortBy,
                                                 String sortDir,
                                                 String keyword) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
-                : Sort.by(sortBy).descending());
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending());
 
         //Fetch from database
         Page<IShopDisplay> shopsList = shopRepo.findShopsDisplay(keyword, pageable);
@@ -67,12 +69,20 @@ public class ShopServiceImpl implements ShopService {
                                   String keyword,
                                   Long userId,
                                   Account user) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
-                : Sort.by(sortBy).descending());
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending());
         boolean isAdmin = isAuthAdmin();
 
         Page<IShop> shopsList = shopRepo.findShops(keyword, userId != null ? userId : isAdmin ? null : user.getId(), pageable);
         Page<ShopDTO> shopDTOS = shopsList.map(shopMapper::shopToDTO);
+        return shopDTOS;
+    }
+
+    @Override
+    public List<ShopPreviewDTO> getShopsPreview(Account user) {
+        List<IShopPreview> shops = shopRepo.findShopsPreview(user.getId());
+        List<ShopPreviewDTO> shopDTOS = shops.stream().map(shopMapper::previewToDTO).collect(Collectors.toList());
         return shopDTOS;
     }
 

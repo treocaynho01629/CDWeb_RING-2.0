@@ -147,7 +147,8 @@ const ChartSales = () => {
             wrapperStyle={{ padding: '0 16px 32px' }}
             formatter={(value, entry, index) => <LegendLabel>
               {value}&emsp;
-              {isLoading ? <h3><Skeleton variant="text" width={120}/>&emsp;</h3> : <h3>{currencyFormat.format(yearSales[index])}&emsp;</h3>}
+              {isLoading ? <h3><Skeleton variant="text" width={120}/>&emsp;</h3> 
+                : <h3>{currencyFormat.format(yearSales ? yearSales[index]: 0)}&emsp;</h3>}
             </LegendLabel>}
           />
           <Area

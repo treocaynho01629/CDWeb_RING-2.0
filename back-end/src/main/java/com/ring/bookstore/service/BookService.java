@@ -28,8 +28,9 @@ public interface BookService {
                            Integer rating,
                            Integer cateId,
                            List<Integer> pubIds,
-                           Long shopId,
                            List<BookType> types,
+                           Long shopId,
+                           Long userId,
                            Double fromRange,
                            Double toRange,
                            Boolean withDesc);
@@ -41,21 +42,28 @@ public interface BookService {
                                 String slug);
 
     BookResponseDTO addBook(BookRequest request,
-                            MultipartFile file,
-                            Account seller) throws IOException, ImageResizerException;
+                            MultipartFile thumbnail,
+                            MultipartFile[] images,
+                            Account user) throws IOException, ImageResizerException;
 
     BookResponseDTO updateBook(Long id,
                                BookRequest request,
-                               MultipartFile file,
-                               Account seller) throws IOException, ImageResizerException;
+                               MultipartFile thumbnail,
+                               MultipartFile[] images,
+                               List<String> remove,
+                               Account user) throws IOException, ImageResizerException;
+
+    void replaceThumbnail(Long bookId,
+                          String imageName,
+                          Account user);
 
     BookResponseDTO deleteBook(Long id,
-                               Account seller);
+                               Account user);
 
     StatDTO getAnalytics(Long shopId);
 
     void deleteBooks(List<Long> ids,
-                     Account seller);
+                     Account user);
 
-    void deleteAllBooks(Account seller);
+    void deleteAllBooks(Account user);
 }

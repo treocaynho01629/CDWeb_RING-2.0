@@ -7,6 +7,7 @@ import { useUpdateProfileMutation } from "../../features/users/usersApiSlice";
 import { Instruction, MobileExtendButton } from '../custom/GlobalComponents';
 import { Link } from 'react-router';
 import { StyledDialogTitle } from "../custom/ProfileComponents";
+import { PatternFormat } from 'react-number-format';
 import dayjs from 'dayjs';
 import useAuth from '../../hooks/useAuth';
 import useConfirm from '../../hooks/useConfirm';
@@ -356,24 +357,23 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                                 <InfoStackContainer>
                                     {editPhone
                                         ?
-                                        <TextField
+                                        <PatternFormat
                                             required
                                             id="phone"
-                                            onChange={e => setPhone(e.target.value)}
+                                            onValueChange={(values) => setPhone(values.value)}
                                             value={phone}
                                             error={phone && !validPhone || err?.data?.errors?.phone}
                                             helperText={phone && !validPhone ? "Sai định dạng số điện thoại!" : err?.data?.errors?.phone}
                                             size="small"
                                             fullWidth
+                                            format="(+84) ### ### ###"
+                                            allowEmptyFormatting
+                                            customInput={TextField}
                                         />
                                         :
                                         <>
-                                            {loading
-                                                ?
-                                                <Skeleton variant="text" sx={{ fontSize: '16px' }} width="25%" />
-                                                :
-                                                <InfoText>{phone ? phone.replace(/\d(?=\d{2})/g, '*') : 'Chưa có'}</InfoText>
-                                            }
+                                            {loading ? <Skeleton variant="text" sx={{ fontSize: '16px' }} width="25%" />
+                                                : <InfoText>{phone ? phone.replace(/\d(?=\d{2})/g, '*') : 'Chưa có'}</InfoText>}
                                             <InfoText className={`edit ${loading ? 'disabled' : ''}`} onClick={() => setEditPhone(true)}>Thay đổi</InfoText>
                                         </>
                                     }
@@ -435,7 +435,6 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                                                 <MenuItem value="Nữ">Nữ</MenuItem>
                                                 <MenuItem value="">Không</MenuItem>
                                             </TextField>
-
                                         :
                                         loading ?
                                             <>

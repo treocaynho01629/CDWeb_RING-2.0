@@ -7,7 +7,7 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mo
 
     return (
         <Menu
-            id="account-menu"
+            id="profile-menu"
             open={open}
             anchorEl={anchorEl}
             onClose={handleClose}
@@ -25,13 +25,6 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mo
                         mt: 1.5,
                         borderRadius: 0,
                         pointerEvents: 'auto',
-
-                        '& .MuiAvatar-root': {
-                            width: 32,
-                            height: 32,
-                            ml: -0.5,
-                            mr: 1,
-                        },
                     },
                     onMouseLeave: handleClose
                 }
@@ -53,7 +46,10 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mo
             }} />
             <Link to={'/profile/detail'} style={{ color: 'inherit' }}>
                 <MenuItem>
-                    <Avatar src={image ? image + '?size=tiny' : null} /> Thông tin tài khoản
+                    <Avatar
+                        sx={{ width: 30, height: 30, ml: -0.5, mr: 1 }}
+                        src={image ? image + '?size=tiny' : null}
+                    /> Thông tin tài khoản
                 </MenuItem>
             </Link>
             <Link to={'/profile/order'} style={{ color: 'inherit' }}>

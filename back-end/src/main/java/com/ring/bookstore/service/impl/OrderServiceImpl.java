@@ -34,7 +34,7 @@ import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.service.OrderService;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -581,8 +581,9 @@ public class OrderServiceImpl implements OrderService {
     //Get all orders FIX
     @Transactional
     public Page<ReceiptDTO> getAllReceipts(Account user, Long shopId, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
-                : Sort.by(sortBy).descending());
+       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending());
         boolean isAdmin = isAuthAdmin();
 
         Page<OrderReceipt> ordersList = null;
@@ -604,8 +605,9 @@ public class OrderServiceImpl implements OrderService {
                                                           Integer pageSize,
                                                           String sortBy,
                                                           String sortDir) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
-                : Sort.by(sortBy).descending());
+       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending());
         boolean isAdmin = isAuthAdmin();
 
         Page<IReceiptSummary> summariesList = orderRepo.findAllSummaries(shopId, isAdmin ? null : user.getId(), bookId, pageable);
@@ -618,8 +620,9 @@ public class OrderServiceImpl implements OrderService {
     //Get order with book's {id} FIX
     @Override
     public Page<OrderDTO> getOrdersByBookId(Long id, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
-                : Sort.by(sortBy).descending());
+       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending());
 
         //Same as getOrdersByUser
         Page<Long> orderIds = detailRepo.findAllIdsByBookId(id, pageable);

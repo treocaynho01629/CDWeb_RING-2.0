@@ -7,7 +7,7 @@ import com.ring.bookstore.listener.forgot.OnResetTokenCreatedEvent;
 import com.ring.bookstore.listener.registration.OnRegistrationCompleteEvent;
 import com.ring.bookstore.listener.reset.OnResetPasswordCompletedEvent;
 import com.ring.bookstore.model.*;
-import com.ring.bookstore.repository.AccountTokenRepository;
+import com.ring.bookstore.repository.RefreshTokenRepository;
 import com.ring.bookstore.repository.ImageRepository;
 import com.ring.bookstore.service.CaptchaService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +33,7 @@ import com.ring.bookstore.request.RegisterRequest;
 import com.ring.bookstore.request.ResetPassRequest;
 import com.ring.bookstore.service.RoleService;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -44,7 +45,7 @@ public class AuthenticationService {
 
 	private final AccountRepository accountRepo;
 	private final ImageRepository imageRepo;
-	private final AccountTokenRepository accTokenRepo;
+	private final RefreshTokenRepository refreshTokenRepo;
 
 	private final RoleService roleService;
 	private final JwtService jwtService;
@@ -111,7 +112,6 @@ public class AuthenticationService {
 
 		//Validate token
 		Account user;
-
 		try {
 			Authentication authentication = authenticationManager
 					.authenticate(new UsernamePasswordAuthenticationToken(
@@ -129,18 +129,18 @@ public class AuthenticationService {
 
 	//Refresh JWT
 	public Account refreshToken(HttpServletRequest request) {
-		String refreshToken = jwtService.getRefreshTokenFromCookie(request);
+		String token = jwtService.getRefreshTokenFromCookie(request);
 
 		//Find token
-		String username = jwtService.extractRefreshUsername(refreshToken);
-		AccountToken accToken = accTokenRepo.findByRefreshToken(refreshToken, username).orElseThrow(()
-				-> new TokenRefreshException(refreshToken, "Refresh token not found!"));
+		String username = jwtService.extractRefreshUsername(token);
+		Account user = accountRepo.findByRefreshTokenAndUsername(token, username).orElseThrow(()
+				-> new TokenRefreshException(token, "Refresh token not found!"));
 
 		//Verify >> return new jwt token
-		if (refreshService.verifyRefreshToken(accToken)) {
-			return accToken.getUser();
+		if (refreshService.verifyRefreshToken(token)) {
+			return user;
 		} else {
-			throw new TokenRefreshException(refreshToken, "Refresh token failed!");
+			throw new TokenRefreshException(token, "Refresh token failed!");
 		}
 	}
 
@@ -174,11 +174,11 @@ public class AuthenticationService {
 		captchaService.validate(recaptchaToken, source, CaptchaServiceImpl.RESET_ACTION);
 
 		//Find token
-		AccountToken accToken = accTokenRepo.findByResetToken(token).orElseThrow(()
+		Account user = accountRepo.findByResetToken(token).orElseThrow(()
 				-> new ResetPasswordException(token, "Reset token not found!"));
 
 		//Verify >> return new jwt token
-		if (!resetService.verifyResetToken(accToken)) {
+		if (!resetService.verifyResetToken(user)) {
 			throw new ResetPasswordException(token, "Reset token not valid!");
 		}
 
@@ -190,7 +190,6 @@ public class AuthenticationService {
 		);
 
 		//Change password and save to database
-		Account user = accToken.getUser();
 		user.setPass(passwordEncoder.encode(resetRequest.getPassword()));
 		resetService.clearResetToken(token);
 		accountRepo.save(user);
@@ -203,6 +202,7 @@ public class AuthenticationService {
 	}
 
 	//Create refresh token cookie
+	@Transactional
 	public ResponseCookie generateRefreshCookie(Account user) {
 		return refreshService.generateRefreshToken(user);
 	}

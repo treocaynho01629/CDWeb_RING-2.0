@@ -15,8 +15,6 @@ import java.util.List;
 @Service
 public interface ImageService {
 
-    String deleteImage(Long id);
-
     boolean existsImage(String name);
 
     List<ImageInfoDTO> getAllImages();
@@ -38,4 +36,8 @@ public interface ImageService {
 
     Image resizeAndSave(String reference,
                         String type) throws ImageResizerException;
+
+    String deleteImage(Long id);
+
+    void deleteImages(List<Long> ids);
 }

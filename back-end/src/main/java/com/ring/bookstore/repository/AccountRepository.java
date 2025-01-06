@@ -8,6 +8,7 @@ import com.ring.bookstore.dtos.dashboard.IStat;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -19,12 +20,24 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	boolean existsByUsernameOrEmail(String username, String email);
 
 	@Query("""
-		select a from Account a join fetch a.roles r
+		select a from Account a
+		join fetch a.roles r
 		where a.username = :username
 	""")
-	Optional<Account> findByUsername(String username); //Get Account by {username}
+	Optional<Account> findByUsername(String username);
 
-	Optional<Account> findByEmail(String email); //Get Account by {email}
+	Optional<Account> findByEmail(String email);
+
+	@Query("""
+		select a from Account a
+		join a.refreshTokens t
+		join fetch a.roles r
+		where t.refreshToken = :token
+		and a.username = :username
+	""")
+	Optional<Account> findByRefreshTokenAndUsername(String token, String username);
+
+	Optional<Account> findByResetToken(String token);
 
 	@Query("""
         select t.currentMonth as total, t.currentMonth as currentMonth, t.lastMonth as lastMonth
@@ -40,15 +53,22 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 
 	@Query("""
 		select a.id as id, a.username as username, i.name as image,
-		a.email as email, p.name as name, ad.phone as phone, size(a.roles) as roles
+		a.email as email, p.name as name, p.phone as phone, size(a.roles) as roles
 		from Account a
 		left join a.profile p
-		left join p.address ad
 		left join p.image i
 		where concat (a.email, a.username) ilike %:keyword%
 		and (coalesce(:roles) is null or size(a.roles) = :roles)
 	""")
 	Page<IAccount> findAccountsWithFilter(String keyword, Short roles, Pageable pageable);
+
+	@Modifying
+	@Query("""
+        update Account a
+        set a.resetToken = null
+        where a.resetToken = :token
+    """)
+	void clearResetToken(String token);
 
 //	@Query(value ="""
 //		select t.username as name, coalesce(t.rv, 0) as reviews, coalesce(t2.od, 0) as orders, coalesce(t2.sp, 0) as spends

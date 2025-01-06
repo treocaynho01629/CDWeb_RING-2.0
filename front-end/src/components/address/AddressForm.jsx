@@ -5,6 +5,7 @@ import { location } from '../../ultils/location'
 import { PHONE_REGEX } from '../../ultils/regex';
 import { Instruction } from '../custom/GlobalComponents';
 import { addressItems } from '../../ultils/address';
+import { PatternFormat } from 'react-number-format';
 
 const splitAddress = (addressInfo) => {
     let city = '';
@@ -74,7 +75,7 @@ const AddressForm = ({ handleClose, addressInfo, err, errMsg, setErrMsg, selecte
             if (addressInfo.isDefault != null) { //Saved address
                 selectTemp ? handleConvertAddress(newAddress, selectTemp) : handleUpdateAddress(newAddress, selectDefault);
             } else { //Stored address
-                selectDefault ? handleSetDefault(newAddress) 
+                selectDefault ? handleSetDefault(newAddress)
                     : selectTemp ? handleUpdateAddress(newAddress) : handleConvertAddress(newAddress, selectTemp);
             }
         }
@@ -92,6 +93,19 @@ const AddressForm = ({ handleClose, addressInfo, err, errMsg, setErrMsg, selecte
                 defaultValue=""
                 fullWidth
                 size="small"
+                slotProps={{
+                    select: {
+                        MenuProps: {
+                            slotProps: {
+                                paper: {
+                                    style: {
+                                        maxHeight: 250,
+                                    },
+                                },
+                            }
+                        }
+                    }
+                }}
             >
                 <MenuItem disabled value=""><em>--Phường/Xã--</em></MenuItem>
             </TextField>
@@ -107,6 +121,19 @@ const AddressForm = ({ handleClose, addressInfo, err, errMsg, setErrMsg, selecte
                 defaultValue=""
                 fullWidth
                 size="small"
+                slotProps={{
+                    select: {
+                        MenuProps: {
+                            slotProps: {
+                                paper: {
+                                    style: {
+                                        maxHeight: 250,
+                                    },
+                                },
+                            }
+                        }
+                    }
+                }}
             >
                 <MenuItem disabled value=""><em>--Phường/Xã--</em></MenuItem>
                 {selectedCity[0]?.wards?.map((ward) => (
@@ -127,102 +154,113 @@ const AddressForm = ({ handleClose, addressInfo, err, errMsg, setErrMsg, selecte
                 <form style={{ paddingTop: 10 }} onSubmit={handleSubmit}>
                     <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
                     <Grid container size="grow" spacing={1}>
-                        <Grid container size={12} spacing={1}>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <TextField label='Họ và tên'
-                                    type="text"
-                                    id="fullName"
-                                    required
-                                    onChange={(e) => setCurrAddress({ ...currAddress, name: e.target.value })}
-                                    value={currAddress?.name}
-                                    error={((errMsg != '' || addressInfo) && !currAddress?.name) || err?.data?.errors?.name}
-                                    helperText={err?.data?.errors?.name}
-                                    size="small"
-                                    fullWidth
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: <PersonIcon style={{ color: "gray" }} />
-                                        }
-                                    }}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <TextField placeholder='Số điện thoại (+84)'
-                                    id="phone"
-                                    required
-                                    onChange={(e) => setCurrAddress({ ...currAddress, phone: e.target.value })}
-                                    value={currAddress?.phone}
-                                    error={((errMsg != '' || addressInfo) && !currAddress?.phone)
-                                        || (currAddress.phone && !validPhone) || err?.data?.errors?.phone}
-                                    helperText={(currAddress.phone && !validPhone) ? "Sai định dạng số điện thoại!" : err?.data?.errors?.phone}
-                                    fullWidth
-                                    size="small"
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: <PhoneIcon style={{ color: "gray" }} />
-                                        }
-                                    }}
-                                />
-                            </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <TextField label='Họ và tên'
+                                type="text"
+                                id="fullName"
+                                required
+                                onChange={(e) => setCurrAddress({ ...currAddress, name: e.target.value })}
+                                value={currAddress?.name}
+                                error={((errMsg != '' || addressInfo) && !currAddress?.name) || err?.data?.errors?.name}
+                                helperText={err?.data?.errors?.name}
+                                size="small"
+                                fullWidth
+                                slotProps={{
+                                    input: {
+                                        endAdornment: <PersonIcon style={{ color: "gray" }} />
+                                    }
+                                }}
+                            />
                         </Grid>
-                        <Grid container size={12} spacing={1}>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <TextField label='Tên công ty'
-                                    type="text"
-                                    id="company"
-                                    onChange={(e) => setCurrAddress({ ...currAddress, companyName: e.target.value })}
-                                    value={currAddress?.companyName}
-                                    error={err?.data?.errors?.companyName}
-                                    helperText={err?.data?.errors?.companyName}
-                                    size="small"
-                                    fullWidth
-                                    slotProps={{
-                                        input: {
-                                            endAdornment: <Apartment style={{ color: "gray" }} />
-                                        }
-                                    }}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <TextField label='Loại địa chỉ'
-                                    onChange={(e) => setCurrAddress({ ...currAddress, type: e.target.value })}
-                                    select
-                                    value={currAddress?.type || ''}
-                                    error={err?.data?.errors?.type}
-                                    helperText={err?.data?.errors?.type}
-                                    fullWidth
-                                    size="small"
-                                >
-                                    <MenuItem value={null}><em>--Không--</em></MenuItem>
-                                    {addressItems.map((item, index) => (
-                                        <MenuItem key={index} value={item.value}>{item.label}</MenuItem>
-                                    ))}
-                                </TextField>
-                            </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <PatternFormat
+                                label="Số điện thoại"
+                                id="phone"
+                                required
+                                onValueChange={(values) => setCurrAddress({ ...currAddress, phone: values.value })}
+                                value={currAddress?.phone}
+                                error={((errMsg != '' || addressInfo) && !currAddress?.phone)
+                                    || (currAddress.phone && !validPhone) || err?.data?.errors?.phone}
+                                helperText={(currAddress.phone && !validPhone) ? "Sai định dạng số điện thoại!" : err?.data?.errors?.phone}
+                                fullWidth
+                                size="small"
+                                slotProps={{
+                                    input: {
+                                        endAdornment: <PhoneIcon style={{ color: "gray" }} />
+                                    }
+                                }}
+                                format="(+84) ### ### ###"
+                                allowEmptyFormatting
+                                customInput={TextField}
+                            />
                         </Grid>
-                        <Grid container size={12} spacing={1}>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <TextField label='Tỉnh/Thành phố'
-                                    required
-                                    value={currAddress?.city || ''}
-                                    onChange={(e) => setCurrAddress({ ...currAddress, city: e.target.value, ward: '' })}
-                                    select
-                                    defaultValue=""
-                                    error={(errMsg != '' || addressInfo) && !currAddress?.city}
-                                    fullWidth
-                                    size="small"
-                                >
-                                    <MenuItem disabled value=""><em>--Tỉnh/Thành phố--</em></MenuItem>
-                                    {location.map((city) => (
-                                        <MenuItem key={city.name} value={city.name}>
-                                            {city.name}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            </Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                {selectWards}
-                            </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <TextField label='Tên công ty'
+                                type="text"
+                                id="company"
+                                onChange={(e) => setCurrAddress({ ...currAddress, companyName: e.target.value })}
+                                value={currAddress?.companyName}
+                                error={err?.data?.errors?.companyName}
+                                helperText={err?.data?.errors?.companyName}
+                                size="small"
+                                fullWidth
+                                slotProps={{
+                                    input: {
+                                        endAdornment: <Apartment style={{ color: "gray" }} />
+                                    }
+                                }}
+                            />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <TextField label='Loại địa chỉ'
+                                onChange={(e) => setCurrAddress({ ...currAddress, type: e.target.value })}
+                                select
+                                value={currAddress?.type || ''}
+                                error={err?.data?.errors?.type}
+                                helperText={err?.data?.errors?.type}
+                                fullWidth
+                                size="small"
+                            >
+                                <MenuItem value={null}><em>--Không--</em></MenuItem>
+                                {addressItems.map((item, index) => (
+                                    <MenuItem key={index} value={item.value}>{item.label}</MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <TextField label='Tỉnh/Thành phố'
+                                required
+                                value={currAddress?.city || ''}
+                                onChange={(e) => setCurrAddress({ ...currAddress, city: e.target.value, ward: '' })}
+                                select
+                                defaultValue=""
+                                error={(errMsg != '' || addressInfo) && !currAddress?.city}
+                                fullWidth
+                                size="small"
+                                slotProps={{
+                                    select: {
+                                        MenuProps: {
+                                            slotProps: {
+                                                paper: {
+                                                    style: {
+                                                        maxHeight: 250,
+                                                    },
+                                                },
+                                            }
+                                        }
+                                    }
+                                }}
+                            >
+                                <MenuItem disabled value=""><em>--Tỉnh/Thành phố--</em></MenuItem>
+                                {location.map((city) => (
+                                    <MenuItem key={city.name} value={city.name}>
+                                        {city.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            {selectWards}
                         </Grid>
                         <Grid size={12}>
                             <TextField placeholder='Địa chỉ nhận hàng'
@@ -244,54 +282,50 @@ const AddressForm = ({ handleClose, addressInfo, err, errMsg, setErrMsg, selecte
                                 }}
                             />
                         </Grid>
-                        <Grid container size={12} spacing={1}>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            disableRipple
-                                            disableFocusRipple
-                                            disabled={selectTemp || addressInfo?.isDefault || isSelected}
-                                            checked={selectDefault}
-                                            color="primary"
-                                            inputProps={{ 'aria-label': 'select' }}
-                                            onChange={() => setSelectDefault(prev => !prev)}
-                                        />
-                                    }
-                                    label="Chọn làm địa chỉ mặc định" />
-                            </Grid>
-                            <Grid size={{ xs: 12, sm: 6 }} sx={{ justifyContent: { xs: 'flex-start', sm: 'flex-end' }, display: 'flex' }}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            disableRipple
-                                            disableFocusRipple
-                                            disabled={selectDefault}
-                                            checked={selectTemp}
-                                            color="primary"
-                                            inputProps={{ 'aria-label': 'select' }}
-                                            onChange={() => setSelectTemp(prev => !prev)}
-                                        />
-                                    }
-                                    label={(addressInfo != null && addressInfo?.isDefault != null) ?
-                                        'Chuyển về địa chỉ tạm thời' : 'Lưu địa chỉ tạm thời'}
-                                />
-                            </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        disableRipple
+                                        disableFocusRipple
+                                        disabled={selectTemp || addressInfo?.isDefault || isSelected}
+                                        checked={selectDefault}
+                                        color="primary"
+                                        inputProps={{ 'aria-label': 'select' }}
+                                        onChange={() => setSelectDefault(prev => !prev)}
+                                    />
+                                }
+                                label="Chọn làm địa chỉ mặc định" />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }} sx={{ justifyContent: { xs: 'flex-start', sm: 'flex-end' }, display: 'flex' }}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        disableRipple
+                                        disableFocusRipple
+                                        disabled={selectDefault}
+                                        checked={selectTemp}
+                                        color="primary"
+                                        inputProps={{ 'aria-label': 'select' }}
+                                        onChange={() => setSelectTemp(prev => !prev)}
+                                    />
+                                }
+                                label={(addressInfo != null && addressInfo?.isDefault != null) ?
+                                    'Chuyển về địa chỉ tạm thời' : 'Lưu địa chỉ tạm thời'}
+                            />
                         </Grid>
                         {(addressInfo && !addressInfo?.isDefault && !isSelected) &&
-                            <Grid container size={12} spacing={1}>
-                                <Grid size={{ xs: 12, sm: 5 }}>
-                                    <Button
-                                        disabled={addressInfo?.isDefault || isSelected}
-                                        variant="contained"
-                                        color="error"
-                                        size="large"
-                                        fullWidth
-                                        onClick={() => handleClickRemove(addressInfo)}
-                                    >
-                                        Xoá địa chỉ&nbsp;<Delete />
-                                    </Button>
-                                </Grid>
+                            <Grid size={{ xs: 12, sm: 5 }}>
+                                <Button
+                                    disabled={addressInfo?.isDefault || isSelected}
+                                    variant="contained"
+                                    color="error"
+                                    size="large"
+                                    fullWidth
+                                    onClick={() => handleClickRemove(addressInfo)}
+                                >
+                                    Xoá địa chỉ&nbsp;<Delete />
+                                </Button>
                             </Grid>
                         }
                     </Grid>

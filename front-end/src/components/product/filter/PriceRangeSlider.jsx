@@ -20,13 +20,18 @@ const NumericFormatCustom = forwardRef(
                 {...other}
                 getInputRef={ref}
                 onValueChange={(values, sourceInfo) => {
+                    let newValue = values.floatValue;
+                    //Threshold
+                    if (newValue < 0) newValue = 0;
+                    if (newValue > 10000000) newValue = 10000000;
+          
                     onChange({
-                        target: { value: values.value },
+                        target: { value: newValue },
                     });
                 }}
                 isAllowed={(values) => {
                     const { floatValue } = values;
-                    return floatValue >= 0 && floatValue <= 10000000;
+                    return floatValue >= 0 && floatValue <= 99999999;
                 }}
                 format={format}
             />
@@ -73,6 +78,7 @@ const PriceRangeSlider = ({ value, onChange, disabledLabel }) => {
     const [rangeValue, setRangeValue] = useState([firstValue, secondValue]);
 
     useEffect(() => {
+        inputValue.current = [...value];
         setRangeValue([reverseCalculateValue(value[0]), reverseCalculateValue(value[1])]);
     }, [value]);
 
@@ -109,10 +115,6 @@ const PriceRangeSlider = ({ value, onChange, disabledLabel }) => {
         //Input
         let newValue = [...inputValue.current];
         let newInputTo = e.target.value === '' ? '' : Number(e.target.value);
-
-        //Threshold
-        if (newInputTo < 0) newInputTo = 0;
-        if (newInputTo > 10000000) newInputTo = 10000000;
         newValue[1] = newInputTo;
 
         //Range

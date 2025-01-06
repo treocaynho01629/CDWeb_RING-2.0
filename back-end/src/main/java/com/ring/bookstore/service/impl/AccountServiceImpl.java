@@ -21,7 +21,7 @@ import com.ring.bookstore.request.ProfileRequest;
 import com.ring.bookstore.service.AccountService;
 import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.service.RoleService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -57,8 +57,9 @@ public class AccountServiceImpl implements AccountService {
                                            String sortDir,
                                            String keyword,
                                            Short roles) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
-                : Sort.by(sortBy).descending());
+       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending());
         Page<IAccount> accountsList = accountRepo.findAccountsWithFilter(keyword, roles, pageable);
         return accountsList.map(accountMapper::projectionToDTO);
     }
