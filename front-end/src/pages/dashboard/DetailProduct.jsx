@@ -9,8 +9,6 @@ import TableOrders from "../../components/dashboard/table/TableOrders";
 import EditIcon from '@mui/icons-material/Edit';
 import useTitle from '../../hooks/useTitle'
 
-const EditProductDialog = lazy(() => import('../../components/dashboard/dialog/EditProductDialog'));
-
 //#region styled
 const Button = styled.button`
     width: 250px;
@@ -132,7 +130,7 @@ const DetailProduct = () => {
                     </Box>
                 </Box>
             </Card>
-            <Suspense fallback={<></>}>
+            {/* <Suspense fallback={<></>}>
                 {openEdit ?
                     <EditProductDialog
                         id={id}
@@ -144,7 +142,7 @@ const DetailProduct = () => {
                         dataPub={dataPub}
                         refetch={refetch} />
                     : null}
-            </Suspense>
+            </Suspense> */}
             <Card elevation={3} sx={{ padding: '10px 30px', mb: 3 }}>
                 <Grid container spacing={3}>
                     <Grid item xs={12} lg={6}>

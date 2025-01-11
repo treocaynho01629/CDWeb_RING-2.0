@@ -28,7 +28,7 @@ const headCells = [
   },
 ];
 
-export default function SummaryTableProducts({ shopId }) {
+export default function SummaryTableProducts({ shop }) {
   //#region construct
   const { roles } = useAuth();
   const isAdmin = useState(roles?.find(role => ['ROLE_ADMIN'].includes(role)));
@@ -38,7 +38,7 @@ export default function SummaryTableProducts({ shopId }) {
     size: 5,
     sortBy: 'createdDate',
     sortDir: 'desc',
-    shopId: shopId ?? '',
+    shopId: shop ?? '',
     amount: 0
   })
   //#endregion

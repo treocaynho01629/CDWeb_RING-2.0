@@ -1,8 +1,6 @@
 import { useState, useRef, lazy, Suspense } from 'react';
 import { Stack, Button, FormControlLabel, Checkbox, TextField } from '@mui/material';
 import { useNavigate, useLocation, Link } from 'react-router';
-import { useDispatch } from 'react-redux';
-import { setAuth, setPersist } from '../../features/auth/authReducer';
 import { useAuthenticateMutation } from '../../features/auth/authApiSlice';
 import { Instruction } from '../custom/GlobalComponents';
 import { AuthActionContainer, AuthHighlight, AuthText, AuthTitle, ConfirmButton } from '../custom/CustomAuthComponents';
@@ -14,8 +12,7 @@ import useLogout from '../../hooks/useLogout';
 const ReCaptcha = lazy(() => import('./ReCaptcha'));
 
 const LoginTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken }) => {
-    const dispatch = useDispatch();
-    const { persist, username: loginedUser } = useAuth();
+    const { persist, username: loginedUser, setAuth, setPersist } = useAuth();
     const [authenticate, { isLoading, isSuccess, isUninitialized }] = useAuthenticateMutation();
     const signOut = useLogout();
 
@@ -58,11 +55,8 @@ const LoginTab = ({ pending, setPending, reCaptchaLoaded, generateReCaptchaToken
                 const { token } = data;
 
                 //Store access token to auth
-                dispatch(setAuth({ token }));
-
-                if (currPersist) { //Set persist in state to refresh token
-                    dispatch(setPersist({ persist: true }));
-                }
+                setAuth(token);
+                if (currPersist) setPersist(true);
 
                 //Queue snack
                 enqueueSnackbar('Đăng nhập thành công', { variant: 'success' });

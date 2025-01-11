@@ -2,25 +2,17 @@ package com.ring.bookstore.controller;
 
 import com.ring.bookstore.config.CurrentAccount;
 import com.ring.bookstore.dtos.accounts.AddressDTO;
-import com.ring.bookstore.dtos.books.BookDTO;
-import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.request.AddressRequest;
-import com.ring.bookstore.request.BookRequest;
 import com.ring.bookstore.service.AddressService;
-import com.ring.bookstore.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController

@@ -1,6 +1,7 @@
+import { Store } from '@mui/icons-material';
 import { Avatar, Menu, MenuItem, Paper } from '@mui/material';
 
-const ShopSelect = ({ open, anchorEl, handleClose, shop, data }) => {
+const ShopSelect = ({ open, anchorEl, handleClose, shop, setShop, data }) => {
     let shopsContent;
 
     if (data) {
@@ -11,11 +12,20 @@ const ShopSelect = ({ open, anchorEl, handleClose, shop, data }) => {
                 const shop = entities[id];
 
                 return (
-                    <MenuItem key={`${id}-${index}`} value={id} sx={{ px: 1, fontSize: 14 }}>
+                    <MenuItem
+                        key={`${id}-${index}`}
+                        value={id}
+                        selected={id == shop}
+                        onClick={() => setShop(id)}
+                        sx={{ px: 1, fontSize: 14 }}
+                    >
                         <Avatar
                             src={shop?.image ? shop.image + '?size=tiny' : null}
                             sx={{ width: 22, height: 22, mr: 1 }}
-                        /> {shop?.name}
+                        >
+                            <Store fontSize="small" />
+                        </Avatar>
+                        {shop?.name}
                     </MenuItem>
                 )
             })
@@ -40,6 +50,7 @@ const ShopSelect = ({ open, anchorEl, handleClose, shop, data }) => {
                         overflow: 'visible',
                         filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
                         bgcolor: 'background.paper',
+                        minWidth: 180,
                         mt: 1,
                         ml: -.5
                     },
@@ -61,8 +72,15 @@ const ShopSelect = ({ open, anchorEl, handleClose, shop, data }) => {
                 boxShadow: 'none',
                 zIndex: 0,
             }} />
-            <MenuItem value={''} sx={{ px: 1, fontSize: 14 }}>
-                <Avatar sx={{ width: 22, height: 22, mr: 1 }}/> Tổng thể
+            <MenuItem
+                selected={"" == shop}
+                onClick={() => setShop("")}
+                sx={{ px: 1, fontSize: 14 }}
+            >
+                <Avatar sx={{ width: 22, height: 22, mr: 1 }}>
+                    <Store fontSize="small" />
+                </Avatar>
+                Tổng thể
             </MenuItem>
             {shopsContent}
         </Menu>

@@ -43,7 +43,7 @@ public class Book extends Auditable {
             orphanRemoval = true,
             cascade = CascadeType.ALL,
             optional = false)
-    @JoinColumn(name = "image_id", nullable = false)
+    @JoinColumn(name = "image_id")
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Image image;
@@ -122,5 +122,10 @@ public class Book extends Auditable {
     public void removeReview(Review review) {
         bookReviews.remove(review);
         review.setBook(null);
+    }
+
+    @PreRemove
+    private void preRemove() {
+        this.setImage(null);
     }
 }

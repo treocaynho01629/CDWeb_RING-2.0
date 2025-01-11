@@ -1,6 +1,5 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.books.BookDTO;
 import com.ring.bookstore.dtos.coupons.CouponDTO;
 import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
 import com.ring.bookstore.dtos.mappers.CouponMapper;

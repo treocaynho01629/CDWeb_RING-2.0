@@ -20,7 +20,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 try { //Set new auth token after refresh
                     const { data } = await queryFulfilled;
                     const { token } = data;
-                    if (token) dispatch(setAuth({ token })) //Reauth
+                    if (token) dispatch(setAuth(token)) //Reauth
                 } catch (error) {
                     console.error(error);
                 }

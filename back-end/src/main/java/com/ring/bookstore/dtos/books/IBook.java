@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface IBookDetail {
+public interface IBook {
     Long getId();
 
     String getSlug();
@@ -25,7 +25,7 @@ public interface IBookDetail {
 
     Short getAmount();
 
-    String getImage();
+    Long getImage();
 
     Integer getPubId();
 
@@ -34,16 +34,6 @@ public interface IBookDetail {
     Integer getCateId();
 
     String getCateName();
-
-    String getCateSlug();
-
-    Integer getParentId();
-
-    String getParentName();
-
-    String getParentSlug();
-
-    Integer getAncestorId();
 
     Long getShopId();
 
@@ -59,21 +49,5 @@ public interface IBookDetail {
 
     Double getWeight();
 
-    List<String> getPreviews();
-
-    Integer getTotalOrders();
-
-    Double getRating();
-
-    Integer getTotalRates();
-
-    Integer getRate5();
-
-    Integer getRate4();
-
-    Integer getRate3();
-
-    Integer getRate2();
-
-    Integer getRate1();
+    List<Long> getPreviews();
 }

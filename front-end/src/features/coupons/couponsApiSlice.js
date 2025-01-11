@@ -172,7 +172,7 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
             ]
         }),
         deleteCoupons: builder.mutation({
-            query: (arg) => {
+            query: (args) => {
                 const { types, shop, byShop, showExpired, ids, isInverse } = args || {};
 
                 //Params

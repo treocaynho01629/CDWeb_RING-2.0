@@ -1,53 +1,70 @@
 import { useState, Suspense, lazy } from "react";
-import { Box, Button, Paper, Grid2 as Grid } from '@mui/material';
-import { Add, AutoStories, LocalFireDepartment, Style } from '@mui/icons-material';
+import { Box, Button, Grid2 as Grid } from '@mui/material';
+import { Add, AutoStories, LocalFireDepartment } from '@mui/icons-material';
 import { NavLink } from 'react-router';
 import { HeaderContainer } from '../../components/dashboard/custom/ShareComponents';
-import { useGetBookAnalyticsQuery, useGetBooksQuery } from "../../features/books/booksApiSlice";
+import { booksApiSlice, useGetBookAnalyticsQuery, useGetBooksQuery } from "../../features/books/booksApiSlice";
 import TableProducts from '../../components/dashboard/table/TableProducts'
-import useTitle from "../../hooks/useTitle"
 import InfoCard from '../../components/dashboard/custom/InfoCard';
 import CustomDashboardBreadcrumbs from '../../components/dashboard/custom/CustomDashboardBreadcrumbs';
 import ProductsShowcase from "../../components/dashboard/product/ProductsShowcase";
+import useTitle from "../../hooks/useTitle"
+import useAuth from "../../hooks/useAuth";
 
 const ProductFormDialog = lazy(() => import("../../components/dashboard/dialog/ProductFormDialog"));
+const PendingModal = lazy(() => import("../../components/layout/PendingModal"));
 
 const ManageProducts = () => {
+  const { shop } = useAuth();
   const [contextProduct, setContextProduct] = useState(null);
   const [open, setOpen] = useState(undefined);
-  const { data: bookAnalytics } = useGetBookAnalyticsQuery();
-
+  const [pending, setPending] = useState(false);
+  const { data: bookAnalytics } = useGetBookAnalyticsQuery(shop ?? null);
   const { data: bestSeller, isLoading: loadBest, isSuccess: doneBest, isError: errorBest } = useGetBooksQuery({
     size: 6,
     sortBy: 'totalOrders',
     sortDir: 'desc',
     amount: 0,
-    // shopId: isShop ? 'test' : shopId ?? ''
+    shopId: shop ?? ''
   });
 
-  const { data: fav, isLoading: loadFav, isSuccess: doneFav, isError: errorFav } = useGetBooksQuery({
-    size: 6,
-    sortBy: 'rating',
-    sortDir: 'desc',
-    amount: 0,
-    // shopId: isShop ? 'test' : shopId ?? ''
-  });
+  const [getBook, { isLoading }] = booksApiSlice.useLazyGetBookQuery();
+
+  // const { data: fav, isLoading: loadFav, isSuccess: doneFav, isError: errorFav } = useGetBooksQuery({
+  //   size: 6,
+  //   sortBy: 'rating',
+  //   sortDir: 'desc',
+  //   amount: 0,
+  //   shopId: shop ?? ''
+  // });
 
   //Set title
   useTitle('Sản phẩm');
 
-  const handleOpen = (product) => {
-    setContextProduct(product);
+  const handleOpen = () => {
+    setContextProduct(null);
     setOpen(true);
   }
 
-  const handleClose = () => {
-    setContextProduct(null);
-    setOpen(false);
+  const handleOpenEdit = (productId) => {
+    getBook(productId)
+      .unwrap()
+      .then((book) => {
+        setContextProduct(book);
+        setOpen(true);
+      })
+      .catch((rejected) => console.error(rejected));
   }
+
+  const handleClose = () => { setOpen(false); }
 
   return (
     <>
+      {(isLoading || pending) &&
+        <Suspense fallBack={null}>
+          <PendingModal open={(isLoading || pending)} message="Đang gửi yêu cầu..." />
+        </Suspense>
+      }
       <HeaderContainer>
         <div>
           <h2>Quản lý sản phẩm</h2>
@@ -99,9 +116,9 @@ const ManageProducts = () => {
           </Grid>
         } */}
       </Grid>
-      <TableProducts />
+      <TableProducts {...{ shop, handleOpenEdit, pending, setPending }} />
       <Suspense fallback={null}>
-        {open !== undefined && <ProductFormDialog open={open} handleClose={handleClose} />}
+        {open !== undefined && <ProductFormDialog {...{ open, handleClose, shop, product: contextProduct, pending, setPending }} />}
       </Suspense>
     </>
   )
