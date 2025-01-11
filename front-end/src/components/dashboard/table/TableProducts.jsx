@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch,
   Skeleton, TextField, MenuItem, Menu, ListItemIcon, ListItemText, Stack, Toolbar, Button
@@ -6,7 +6,7 @@ import {
 import { Search, MoreHoriz, Edit, Delete, Visibility, FilterAltOff, Add } from '@mui/icons-material';
 import { Link } from 'react-router';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { useDeleteBookMutation, useDeleteBooksMutation, useGetBooksQuery } from '../../../features/books/booksApiSlice';
+import { useDeleteAllBooksMutation, useDeleteBookMutation, useDeleteBooksInverseMutation, useDeleteBooksMutation, useGetBooksQuery } from '../../../features/books/booksApiSlice';
 import { ItemTitle, FooterContainer, FooterLabel, StyledStockBar } from '../custom/ShareComponents';
 import { currencyFormat, idFormatter } from '../../../ultils/covert';
 import { publishersApiSlice } from '../../../features/publishers/publishersApiSlice';
@@ -16,8 +16,6 @@ import CustomProgress from '../../custom/CustomProgress';
 import CustomTableHead from './CustomTableHead';
 import CustomTablePagination from './CustomTablePagination';
 import useDeepEffect from '../../../hooks/useDeepEffect';
-
-const EditProductDialog = lazy(() => import('../dialog/EditProductDialog'));
 
 const maxStocks = 199;
 
@@ -365,14 +363,12 @@ function ProductFilters({ filters, setFilters }) {
   )
 }
 
-export default function TableProducts({ shopId }) {
+export default function TableProducts({ shop, handleOpenEdit, pending, setPending }) {
   //#region construct
   const [selected, setSelected] = useState([]);
   const [deselected, setDeseletected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [dense, setDense] = useState(true);
-  const [openEdit, setOpenEdit] = useState(false);
-  const [pending, setPending] = useState(false);
   const [filters, setFilters] = useState({
     keyword: "",
     cate: "",
@@ -393,8 +389,10 @@ export default function TableProducts({ shopId }) {
   const openContext = Boolean(anchorEl);
 
   //Delete hook
-  const [deleteBook, { isLoading: deleting }] = useDeleteBookMutation();
-  const [deleteMultipleBooks, { isLoading: deletingMultiple }] = useDeleteBooksMutation();
+  const [deleteBook] = useDeleteBookMutation();
+  const [deleteBooks] = useDeleteBooksMutation();
+  const [deleteBooksInverse] = useDeleteBooksInverseMutation();
+  const [deleteAll] = useDeleteAllBooksMutation();
 
   //Fetch books
   const { data, isLoading, isSuccess, isError, error } = useGetBooksQuery({
@@ -402,7 +400,7 @@ export default function TableProducts({ shopId }) {
     size: pagination?.size,
     sortBy: pagination?.sortBy,
     sortDir: pagination?.sortDir,
-    // shopId: isShop ? 'test' : shopId ?? '',
+    shopId: shop ?? '',
     keyword: filters.keyword,
     cateId: filters.cate,
     types: filters.types,
@@ -445,6 +443,7 @@ export default function TableProducts({ shopId }) {
   //Select
   const handleClick = (e, id) => {
     if (selectedAll) {
+      console.log('a')
       //Set unselected elements for reverse
       const deselectedIndex = deselected?.indexOf(id);
       let newDeselected = [];
@@ -468,6 +467,7 @@ export default function TableProducts({ shopId }) {
         setSelectedAll(false);
       }
     } else {
+      console.log('b')
       //Set main selected elements
       const selectedIndex = selected?.indexOf(id);
       let newSelected = [];
@@ -519,21 +519,12 @@ export default function TableProducts({ shopId }) {
     setContextId(null);
   }
 
-  const handleOpenEdit = (id) => {
-    setOpenEdit(true);
-    setContextId(id);
-  };
-
-  const handleCloseEdit = () => {
-    setOpenEdit(false);
-  }
-
   const handleDelete = async (id) => {
     if (pending) return;
     setPending(true);
     const { enqueueSnackbar } = await import('notistack');
 
-    deleteBook({ id }).unwrap()
+    deleteBook(id).unwrap()
       .then((data) => {
         //Unselected
         const selectedIndex = selected.indexOf(id);
@@ -567,30 +558,91 @@ export default function TableProducts({ shopId }) {
     setPending(true);
     const { enqueueSnackbar } = await import('notistack');
 
-    deleteMultipleBooks({ ids: selected }).unwrap()
-      .then((data) => {
-        //Unselected
-        setSelected([]);
-        setSelectedAll(false);
-        enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
-        setPending(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        if (!err?.status) {
-          enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
-        } else if (err?.status === 409) {
-          enqueueSnackbar(err?.data?.message, { variant: 'error' });
-        } else if (err?.status === 400) {
-          enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
-        } else {
-          enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
-        }
-        setPending(false);
-      })
+    if (selectedAll) {
+      if (deselected.length == 0) { //Delete all
+        deleteAll(shop).unwrap()
+          .then((data) => {
+            //Unselected
+            setSelected([]);
+            setDeseletected([]);
+            setSelectedAll(false);
+            enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+            setPending(false);
+          })
+          .catch((err) => {
+            console.error(err);
+            if (!err?.status) {
+              enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
+            } else if (err?.status === 409) {
+              enqueueSnackbar(err?.data?.message, { variant: 'error' });
+            } else if (err?.status === 400) {
+              enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
+            } else {
+              enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+            }
+            setPending(false);
+          })
+      } else { //Delete books inverse
+        console.log('Delete multiples reverse: ' + deselected);
+        deleteBooksInverse({
+          shopId: shop ?? '',
+          keyword: filters.keyword,
+          cateId: filters.cate,
+          types: filters.types,
+          pubIds: filters.pubIds,
+          amount: 0,
+          ids: deselected
+        }).unwrap()
+          .then((data) => {
+            //Unselected
+            setSelected([]);
+            setDeseletected([]);
+            setSelectedAll(false);
+            enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+            setPending(false);
+          })
+          .catch((err) => {
+            console.error(err);
+            if (!err?.status) {
+              enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
+            } else if (err?.status === 409) {
+              enqueueSnackbar(err?.data?.message, { variant: 'error' });
+            } else if (err?.status === 400) {
+              enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
+            } else {
+              enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+            }
+            setPending(false);
+          })
+      }
+    } else { //Delete books
+      console.log('Delete multiples: ' + selected);
+      deleteBooks(selected).unwrap()
+        .then((data) => {
+          //Unselected
+          setSelected([]);
+          setDeseletected([]);
+          setSelectedAll(false);
+          enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+          setPending(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          if (!err?.status) {
+            enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
+          } else if (err?.status === 409) {
+            enqueueSnackbar(err?.data?.message, { variant: 'error' });
+          } else if (err?.status === 400) {
+            enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
+          } else {
+            enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+          }
+          setPending(false);
+        })
+    }
   };
 
-  const isSelected = (id) => (selected?.indexOf(id) !== -1 || (selectedAll && deselected?.indexOf(id) === -1));
+  const isSelected = (id) => ((!selectedAll && selected?.indexOf(id) !== -1) || (selectedAll && deselected?.indexOf(id) === -1));
   const numSelected = selectedAll ? data?.page?.totalElements - deselected?.length : selected?.length;
   const colSpan = headCells.length + 1;
   //#endregion
@@ -742,15 +794,6 @@ export default function TableProducts({ shopId }) {
           count={data?.page?.totalElements ?? 0}
         />
       </FooterContainer>
-      <Suspense fallback={null}>
-        {openEdit &&
-          <EditProductDialog
-            id={contextId}
-            open={openEdit}
-            handleClose={handleCloseEdit}
-          />
-        }
-      </Suspense>
       <Menu
         open={openContext}
         onClose={handleCloseContext}

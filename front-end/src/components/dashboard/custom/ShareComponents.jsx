@@ -58,6 +58,15 @@ export const Title = styled.span`
     margin: ${props => props.theme.spacing(1.5)} 0;
 `
 
+export const Label = styled.p`
+    font-weight: 450;
+
+    span {
+        font-weight: 350;
+        color: ${props => props.theme.palette.text.secondary};
+    }
+`
+
 export const LinkButton = styled.span`
     color: ${props => props.theme.palette.info.main};
     font-size: 14px;

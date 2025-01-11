@@ -2,6 +2,7 @@ package com.ring.bookstore.request;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import com.ring.bookstore.enums.BookType;
 import jakarta.validation.constraints.*;
@@ -70,4 +71,8 @@ public class BookRequest { //Request body for book
 
 	@NotNull(message = "Cửa hàng không được bỏ trống!")
 	private Long shopId;
+
+	private Long thumbnailId;
+
+	private List<Long> removeIds;
 }

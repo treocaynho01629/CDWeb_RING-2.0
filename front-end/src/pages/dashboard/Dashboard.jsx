@@ -17,12 +17,13 @@ import { useGetShopAnalyticsQuery } from "../../features/shops/shopsApiSlice";
 import SummaryTableShops from "../../components/dashboard/table/SummaryTableShops";
 import ProductsShowcase from "../../components/dashboard/product/ProductsShowcase";
 
-const TopProducts = () => {
+const TopProducts = ({ shop }) => {
   const { data, isLoading, isSuccess, isError } = useGetBooksQuery({
     size: 6,
     sortBy: 'totalOrders',
     sortDir: 'desc',
     amount: 0,
+    shopId: shop ?? ''
   });
 
   return (
@@ -34,12 +35,12 @@ const TopProducts = () => {
 }
 
 const Dashboard = () => {
-  const { roles, username } = useAuth();
+  const { roles, username, shop } = useAuth();
   const isAdmin = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
-  const { data: bookAnalytics } = useGetBookAnalyticsQuery();
+  const { data: bookAnalytics } = useGetBookAnalyticsQuery(shop ?? null);
+  const { data: salesAnalytics } = useGetSalesAnalyticsQuery(shop ?? null);
   const { data: userAnalytics } = useGetUserAnalyticsQuery();
   const { data: shopAnalytics } = useGetShopAnalyticsQuery();
-  const { data: salesAnalytics } = useGetSalesAnalyticsQuery();
 
   //Set title
   useTitle('Dashboard');
@@ -96,13 +97,13 @@ const Dashboard = () => {
           <SummaryTableShops />
         </Grid>
         <Grid size={{ xs: 12, md_lg: 5 }}>
-          <TopProducts />
+          <TopProducts shop={shop}/>
         </Grid>
         <Grid size={{ xs: 12, lg: 4 }}>
           <SummaryTableOrders />
         </Grid>
         <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-          <SummaryTableProducts />
+          <SummaryTableProducts shop={shop} />
         </Grid>
         <Grid size={{ xs: 12, md: 6, lg: 4 }}>
           <SummaryTableUsers />

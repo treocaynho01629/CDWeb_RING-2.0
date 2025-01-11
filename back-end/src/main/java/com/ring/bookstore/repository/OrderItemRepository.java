@@ -20,7 +20,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
         join oi.detail od
         join od.shop s
         join oi.book b
-        join b.image i
+        left join b.image i
         where od.id in (:ids)
         order by oi.detail.id desc
     """)

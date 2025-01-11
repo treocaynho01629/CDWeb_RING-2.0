@@ -1,7 +1,7 @@
 import { useState, useRef, lazy, Suspense } from 'react'
 import { Box, Skeleton, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { useParams, Navigate, NavLink, useSearchParams } from 'react-router';
-import { useGetBookQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
+import { useGetBookDetailQuery, useGetRandomBooksQuery } from '../features/books/booksApiSlice';
 import useTitle from '../hooks/useTitle';
 import CustomDivider from '../components/custom/CustomDivider';
 import ProductContent from '../components/product/detail/ProductContent';
@@ -38,7 +38,7 @@ const ProductDetail = () => {
 
     //Fetch data
     const { data: randomBooks, isLoading: loadRandom, isSuccess: doneRandom, isError: errorRandom } = useGetRandomBooksQuery({ amount: 10 });
-    const { data, isLoading, isFetching, isSuccess, isError, error } = useGetBookQuery(slug ? { slug } : id ? { id } : null, { skip: (!slug && !id) });
+    const { data, isLoading, isFetching, isSuccess, isError, error } = useGetBookDetailQuery(slug ? { slug } : id ? { id } : null, { skip: (!slug && !id) });
 
     //Set title
     useTitle(`${data?.title ?? 'RING - Bookstore!'}`);

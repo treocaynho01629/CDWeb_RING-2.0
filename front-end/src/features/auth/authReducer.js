@@ -9,15 +9,15 @@ const authSlice = createSlice({
     },
     reducers: {
         setAuth: (state, action) => {
-            const { token } = action.payload;
+            const token = action.payload;
             state.token = token;
         },
         setPersist: (state, action) => {
-            const { persist } = action.payload;
+            const persist = action.payload;
             state.persist = persist;
         },
         setShop: (state, action) => {
-            const { shop } = action.payload;
+            const shop = action.payload;
             state.shop = shop;
         },
         clearAuth: (state, action) => {
@@ -28,7 +28,7 @@ const authSlice = createSlice({
     }
 })
 
-export const { setAuth, setPersist, clearAuth } = authSlice.actions
+export const { setAuth, setShop, setPersist, clearAuth } = authSlice.actions
 export const selectCurrentToken = (state) => state.auth.token
 export const selectShop = (state) => state.auth.shop
 export const isPersist = (state) => state.auth.persist

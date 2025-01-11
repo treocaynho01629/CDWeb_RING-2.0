@@ -33,8 +33,9 @@ public class ImageMapper {
 				.path(image.getName())
 				.toUriString();
 
-		return new ImageInfoDTO(image.getName()
-				,fileDownloadUri
-				,image.getType());
+		return new ImageInfoDTO(image.getId(),
+				image.getName(),
+				fileDownloadUri,
+				image.getType());
 	}
 }

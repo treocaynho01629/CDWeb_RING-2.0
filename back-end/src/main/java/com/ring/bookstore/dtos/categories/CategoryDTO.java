@@ -9,6 +9,10 @@ public record CategoryDTO(Integer id,
                           Integer parentId,
                           CategoryDTO parent,
                           List<CategoryDTO> children) {
+    public CategoryDTO(Integer id, String name) {
+        this(id, null, name, null, null, null);
+    }
+
     public CategoryDTO(Integer id, String slug, String name, Integer parentId) {
         this(id, slug, name, parentId, null, null);
     }

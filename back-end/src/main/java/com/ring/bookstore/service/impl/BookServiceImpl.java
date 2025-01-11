@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.slugify.Slugify;
-import com.ring.bookstore.dtos.books.BookResponseDTO;
-import com.ring.bookstore.dtos.books.IBookDetail;
+import com.ring.bookstore.dtos.books.*;
 import com.ring.bookstore.dtos.dashboard.StatDTO;
+import com.ring.bookstore.dtos.images.IImageInfo;
 import com.ring.bookstore.dtos.mappers.DashboardMapper;
 import com.ring.bookstore.enums.BookType;
 import com.ring.bookstore.exception.ImageResizerException;
@@ -26,9 +26,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ring.bookstore.dtos.books.BookDTO;
-import com.ring.bookstore.dtos.books.BookDetailDTO;
-import com.ring.bookstore.dtos.books.IBookDisplay;
 import com.ring.bookstore.dtos.mappers.BookMapper;
 import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
@@ -57,35 +54,35 @@ public class BookServiceImpl implements BookService {
     private final Slugify slg = Slugify.builder().lowerCase(false).build();
 
     //Get random books
-    public List<BookDTO> getRandomBooks(Integer amount, Boolean withDesc) {
+    public List<BookDisplayDTO> getRandomBooks(Integer amount, Boolean withDesc) {
         List<IBookDisplay> booksList = bookRepo.findRandomBooks(amount, withDesc);
-        List<BookDTO> bookDTOS = booksList.stream().map(bookMapper::projectionToDTO).collect(Collectors.toList()); //Return books
+        List<BookDisplayDTO> bookDTOS = booksList.stream().map(bookMapper::displayToDTO).collect(Collectors.toList()); //Return books
         return bookDTOS;
     }
 
-    public List<BookDTO> getBooksInIds(List<Long> ids) {
+    public List<BookDisplayDTO> getBooksInIds(List<Long> ids) {
         List<IBookDisplay> booksList = bookRepo.findBooksDisplayInIds(ids);
-        List<BookDTO> bookDTOS = booksList.stream().map(bookMapper::projectionToDTO).collect(Collectors.toList()); //Return books
+        List<BookDisplayDTO> bookDTOS = booksList.stream().map(bookMapper::displayToDTO).collect(Collectors.toList()); //Return books
         return bookDTOS;
     }
 
     //Get books with filter
-    public Page<BookDTO> getBooks(Integer pageNo,
-                                  Integer pageSize,
-                                  String sortBy,
-                                  String sortDir,
-                                  String keyword,
-                                  Integer rating,
-                                  Integer amount,
-                                  Integer cateId,
-                                  List<Integer> pubIds,
-                                  List<BookType> types,
-                                  Long shopId,
-                                  Long userId,
-                                  Double fromRange,
-                                  Double toRange,
-                                  Boolean withDesc) {
-       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+    public Page<BookDisplayDTO> getBooks(Integer pageNo,
+                                         Integer pageSize,
+                                         String sortBy,
+                                         String sortDir,
+                                         String keyword,
+                                         Integer rating,
+                                         Integer amount,
+                                         Integer cateId,
+                                         List<Integer> pubIds,
+                                         List<BookType> types,
+                                         Long shopId,
+                                         Long userId,
+                                         Double fromRange,
+                                         Double toRange,
+                                         Boolean withDesc) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
 
@@ -103,15 +100,33 @@ public class BookServiceImpl implements BookService {
                 rating,
                 amount,
                 pageable);
-        Page<BookDTO> bookDTOS = booksList.map(bookMapper::projectionToDTO);
+        Page<BookDisplayDTO> bookDTOS = booksList.map(bookMapper::displayToDTO);
         return bookDTOS;
     }
 
-    //Get book with detail
-    public BookDetailDTO getBookDetail(Long id, String slug) {
-        IBookDetail book = detailRepo.findBookDetail(id, slug).orElseThrow(() ->
+    public BookDTO getBook(Long id) {
+        IBook book = detailRepo.findBook(id).orElseThrow(() ->
                 new ResourceNotFoundException("Product not found!"));
-        BookDetailDTO bookDetailDTO = bookMapper.projectionToDetailDTO(book); //Map to DTO
+        List<Long> imageIds = book.getPreviews() != null ? book.getPreviews() : new ArrayList<>();
+        imageIds.add(book.getImage());
+
+        List<IImageInfo> images = imageRepo.findInfo(imageIds);
+        BookDTO bookDTO = bookMapper.projectionToDTO(book, images); //Map to DTO
+        return bookDTO;
+    }
+
+    //Get book with detail
+    public BookDetailDTO getBookDetail(Long id) {
+        IBookDetail book = detailRepo.findBookDetail(id, null).orElseThrow(() ->
+                new ResourceNotFoundException("Product not found!"));
+        BookDetailDTO bookDetailDTO = bookMapper.detailToDTO(book); //Map to DTO
+        return bookDetailDTO;
+    }
+
+    public BookDetailDTO getBookDetail(String slug) {
+        IBookDetail book = detailRepo.findBookDetail(null, slug).orElseThrow(() ->
+                new ResourceNotFoundException("Product not found!"));
+        BookDetailDTO bookDetailDTO = bookMapper.detailToDTO(book); //Map to DTO
         return bookDetailDTO;
     }
 
@@ -185,31 +200,31 @@ public class BookServiceImpl implements BookService {
                                       BookRequest request,
                                       MultipartFile thumbnail,
                                       MultipartFile[] images,
-                                      List<String> remove,
                                       Account user) throws IOException, ImageResizerException {
         //Check book exists & category, publisher validation
         Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
         BookDetail currDetail = book.getDetail();
-        boolean isRemove = remove != null && !remove.isEmpty();
+        List<Long> removeImageIds = request.getRemoveIds();
+        boolean isRemove = removeImageIds != null && !removeImageIds.isEmpty();
 
         //Check if correct owner
         if (!isOwnerValid(book.getShop(), user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
-
-        List<Long> removeImageIds = isRemove ? imageRepo.findIdsByNames(remove) : null;
 
         //Image upload/replace
         if (thumbnail != null) { //Contain new image >> upload/replace
             Image oldImage = book.getImage();
             Image savedImage = imageService.upload(thumbnail); //Upload new image
             book.setImage(savedImage); //Set new image
-
-            if (isRemove && removeImageIds.contains(oldImage.getId())) {
-                imageService.deleteImage(oldImage.getId());
-            } else {
-                currDetail.addImage(oldImage);
-            }
+            currDetail.addImage(oldImage);
+        } else if (request.getThumbnailId() != null
+                && !request.getThumbnailId().equals(book.getImage().getId())) {
+            Image oldImage = book.getImage();
+            Image newImage = imageRepo.findBookImage(id, request.getThumbnailId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
+            book.setImage(newImage); //Set new image
+            currDetail.addImage(oldImage);
         }
 
         //Set new details info
@@ -245,17 +260,13 @@ public class BookServiceImpl implements BookService {
         book.setAmount(request.getAmount());
         book.setType(request.getType());
 
-        if (isRemove) imageService.deleteImages(removeImageIds);
-
         //Update
         Book updatedBook = bookRepo.save(book);
-        return bookMapper.bookToResponseDTO(updatedBook);
-    }
 
-    public void replaceThumbnail(Long bookId,
-                                 String imageName,
-                                 Account user) {
-        //FIX?
+        //Delete images
+        if (isRemove) imageRepo.deleteAllById(imageRepo.findBookImages(id, removeImageIds));
+
+        return bookMapper.bookToResponseDTO(updatedBook);
     }
 
     public StatDTO getAnalytics(Long shopId) {
@@ -278,22 +289,74 @@ public class BookServiceImpl implements BookService {
     //Delete multiples books (SELLER)
     @Transactional
     public void deleteBooks(List<Long> ids, Account user) {
-        //Loop and delete
-        for (Long id : ids) {
-            Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
-            //Check if correct owner
-            if (!isOwnerValid(book.getShop(), user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
-            bookRepo.deleteById(id); //Delete from database
+        List<Long> deleteIds = null;
+
+        if (isAuthAdmin()) {
+            deleteIds = ids;
+        } else {
+            deleteIds = bookRepo.findBookIdsByInIdsAndSeller(ids, user.getId());
         }
+        bookRepo.deleteAllById(deleteIds);
+    }
+
+    //Delete multiples books (SELLER)
+    @Transactional
+    public void deleteBooksInverse(String keyword,
+                                   Integer amount,
+                                   Integer rating,
+                                   Integer cateId,
+                                   List<Integer> pubIds,
+                                   List<BookType> types,
+                                   Long shopId,
+                                   Long userId,
+                                   Double fromRange,
+                                   Double toRange,
+                                   List<Long> ids,
+                                   Account user) {
+        List<Long> deleteIds = null;
+        if (isAuthAdmin()) {
+            deleteIds = bookRepo.findBookIdsInverse(keyword,
+                    cateId,
+                    pubIds,
+                    types,
+                    shopId,
+                    userId,
+                    fromRange,
+                    toRange,
+                    rating,
+                    amount,
+                    ids);
+        } else {
+            deleteIds = bookRepo.findBookIdsInverse(keyword,
+                    cateId,
+                    pubIds,
+                    types,
+                    shopId,
+                    user.getId(),
+                    fromRange,
+                    toRange,
+                    rating,
+                    amount,
+                    ids);
+        }
+        bookRepo.deleteAllById(deleteIds);
     }
 
     //Delete all books (SELLER)
     @Transactional
-    public void deleteAllBooks(Account user) {
+    public void deleteAllBooks(Long shopId, Account user) {
         if (isAuthAdmin()) {
-            bookRepo.deleteAll();
+            if (shopId != null) {
+                bookRepo.deleteAllByShopId(shopId);
+            } else {
+                bookRepo.deleteAll();
+            }
         } else {
-            bookRepo.deleteBySellerId(user.getId());
+            if (shopId != null) {
+                bookRepo.deleteAllByShopIdAndShop_Owner(shopId, user);
+            } else {
+                bookRepo.deleteAllByShop_Owner(user);
+            }
         }
     }
 

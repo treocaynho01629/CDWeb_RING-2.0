@@ -91,7 +91,7 @@ export default function CustomTableHead({ headCells, onSelectAllClick, sortDir, 
                         align={headCell.align}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={sortBy === headCell.id ? sortDir : false}
-                        sx={{ width: headCell.width }}
+                        sx={{ minWidth: headCell.width }}
                     >
 
                         {index == 0 && <CountLabel className={numSelected > 0 ? '' : 'hidden'}>Đang chọn ({numSelected})</CountLabel>}

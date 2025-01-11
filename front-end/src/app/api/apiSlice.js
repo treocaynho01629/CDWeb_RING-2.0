@@ -20,7 +20,7 @@ const baseQueryWithRefresh = async (args, api, extraOptions) => {
 
         if (data) {
             const { token } = data;
-            api.dispatch(setAuth({ token })) //Re-auth
+            api.dispatch(setAuth(token)) //Re-auth
             result = await baseQuery(args, api, extraOptions) //Refetch
         } else if (error) {
             console.error(error);

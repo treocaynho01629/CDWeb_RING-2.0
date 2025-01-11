@@ -7,6 +7,7 @@ import java.util.List;
 import com.ring.bookstore.dtos.categories.CategoryDTO;
 import com.ring.bookstore.dtos.publishers.PublisherDTO;
 import com.ring.bookstore.dtos.reviews.ReviewsInfoDTO;
+import com.ring.bookstore.enums.BookType;
 
 //Book details
 public record BookDetailDTO(Long id,
@@ -17,7 +18,7 @@ public record BookDetailDTO(Long id,
                             BigDecimal discount,
                             String title,
                             String description,
-                            String type,
+                            BookType type,
                             String author,
                             Short amount,
                             Long shopId,
@@ -25,7 +26,7 @@ public record BookDetailDTO(Long id,
                             PublisherDTO publisher,
                             CategoryDTO category,
                             String size,
-                            Integer page,
+                            Integer pages,
                             LocalDate date,
                             String language,
                             Double weight,

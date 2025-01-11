@@ -17,8 +17,17 @@ const initialState = booksAdapter.getInitialState({
 export const booksApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getBook: builder.query({
+            query: (id) => ({
+                url: `/api/books/${id}`,
+                validateStatus: (response, result) => {
+                    return response.status === 200 && !result?.isError
+                },
+            }),
+            providesTags: (result, error) => [{ type: 'Book', id: result ? result.id : 'LIST' }]
+        }),
+        getBookDetail: builder.query({
             query: ({ id, slug }) => ({
-                url: `/api/books/${slug ? 'slug/' + slug : id ? id : ''}`,
+                url: `/api/books/${slug ? 'slug/' + slug : id ? 'detail/' + id : ''}`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result?.isError
                 },
@@ -207,16 +216,50 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         deleteBooks: builder.mutation({
             query: (ids) => ({
                 url: `/api/books/delete-multiples?ids=${ids}`,
-                method: 'DELETE'
+                method: 'DELETE',
+                responseHandler: "text",
             }),
             invalidatesTags: (result, error) => [
                 { type: 'Book', id: "LIST" }
             ]
         }),
+        deleteBooksInverse: builder.mutation({
+            query: (args) => {
+                const { keyword, cateId, rating, amount, pubIds, types, shopId, value, ids } = args || {};
+
+                //Params
+                const params = new URLSearchParams();
+                if (keyword) params.append('keyword', keyword);
+                if (cateId) params.append('cateId', cateId);
+                if (rating) params.append('rating', rating);
+                if (amount != null) params.append('amount', amount);
+                if (types?.length) params.append('types', types);
+                if (shopId) params.append('shopId', shopId);
+                if (pubIds?.length) params.append('pubIds', pubIds);
+                if (value) {
+                    if (value[0] != 0) params.append('fromRange', value[0]);
+                    if (value[1] != 10000000) params.append('toRange', value[1]);
+                }
+                if (pubIds?.length) params.append('ids', ids);
+
+                return {
+                    url: `/api/books/delete-inverse?${params.toString()}`,
+                    method: 'DELETE',
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result?.isError
+                    },
+                    responseHandler: "text",
+                }
+            },
+            invalidatesTags: (result, error) => [
+                { type: 'Book', id: "LIST" }
+            ]
+        }),
         deleteAllBooks: builder.mutation({
-            query: () => ({
-                url: '/api/books/delete-all',
-                method: 'DELETE'
+            query: (shopId) => ({
+                url: `/api/books/delete-all?shopId=${shopId}`,
+                method: 'DELETE',
+                responseHandler: "text",
             }),
             invalidatesTags: (result, error) => [
                 { type: 'Book', id: "LIST" }
@@ -227,6 +270,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
 
 export const {
     useGetBookQuery,
+    useGetBookDetailQuery,
     useGetBooksQuery,
     useGetBooksByIdsQuery,
     useGetRandomBooksQuery,
@@ -235,6 +279,7 @@ export const {
     useUpdateBookMutation,
     useDeleteBookMutation,
     useDeleteBooksMutation,
+    useDeleteBooksInverseMutation,
     useDeleteAllBooksMutation,
     usePrefetch: usePrefetchBooks
 } = booksApiSlice

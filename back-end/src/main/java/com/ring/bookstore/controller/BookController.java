@@ -3,7 +3,6 @@ package com.ring.bookstore.controller;
 import java.io.IOException;
 import java.util.List;
 
-import com.ring.bookstore.dtos.images.ImageDTO;
 import com.ring.bookstore.enums.BookType;
 import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.data.domain.Page;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ring.bookstore.config.CurrentAccount;
-import com.ring.bookstore.dtos.books.BookDTO;
+import com.ring.bookstore.dtos.books.BookDisplayDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.request.BookRequest;
 import com.ring.bookstore.service.BookService;
@@ -44,14 +43,14 @@ public class BookController {
     @GetMapping("/random")
     public ResponseEntity<?> getRandomBooks(@RequestParam(value = "amount", defaultValue = "5") Integer amount,
                                             @RequestParam(value = "withDesc", defaultValue = "false") Boolean withDesc) {
-        List<BookDTO> books = bookService.getRandomBooks(amount, withDesc);
+        List<BookDisplayDTO> books = bookService.getRandomBooks(amount, withDesc);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     //Get books by ids
     @GetMapping("/find")
     public ResponseEntity<?> getBooksInIds(@RequestParam(value = "ids") List<Long> ids) {
-        List<BookDTO> books = bookService.getBooksInIds(ids);
+        List<BookDisplayDTO> books = bookService.getBooksInIds(ids);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
@@ -72,7 +71,7 @@ public class BookController {
                                       @RequestParam(value = "rating", defaultValue = "0") Integer rating,
                                       @RequestParam(value = "amount", defaultValue = "1") Integer amount,
                                       @RequestParam(value = "withDesc", defaultValue = "false") Boolean withDesc) {
-        Page<BookDTO> books = bookService.getBooks(
+        Page<BookDisplayDTO> books = bookService.getBooks(
                 pageNo,
                 pageSize,
                 sortBy,
@@ -91,16 +90,22 @@ public class BookController {
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
-    //Get book details by {id}
+    //Get book
     @GetMapping("/{id}")
+    public ResponseEntity<?> getBook(@PathVariable("id") Long bookId) {
+        return new ResponseEntity<>(bookService.getBook(bookId), HttpStatus.OK);
+    }
+
+    //Get book details by {id}
+    @GetMapping("/detail/{id}")
     public ResponseEntity<?> getBookDetailById(@PathVariable("id") Long bookId) {
-        return new ResponseEntity<>(bookService.getBookDetail(bookId, null), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.getBookDetail(bookId), HttpStatus.OK);
     }
 
     //Get book details by {id}
     @GetMapping("/slug/{slug}")
     public ResponseEntity<?> getBookDetailBySlug(@PathVariable("slug") String slug) {
-        return new ResponseEntity<>(bookService.getBookDetail(null, slug), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.getBookDetail(slug), HttpStatus.OK);
     }
 
     @GetMapping("/analytics")
@@ -127,20 +132,9 @@ public class BookController {
                                         @Valid @RequestPart("request") BookRequest request,
                                         @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail,
                                         @RequestPart(name = "images", required = false) MultipartFile[] images,
-                                        @RequestPart(name = "remove", required = false) List<String> remove,
                                         @CurrentAccount Account currUser) throws ImageResizerException, IOException {
         return new ResponseEntity<>(bookService.updateBook(id,
-                request, thumbnail, images, remove, currUser), HttpStatus.CREATED);
-    }
-
-    //Set thumbnail
-    @PutMapping("thumbnail/{id}/{name}")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> setBookThumbnail(@PathVariable Long id,
-                                              @PathVariable String name,
-                                              @CurrentAccount Account currUser) {
-        bookService.replaceThumbnail(id, name, currUser);
-        return new ResponseEntity<>("Thumbnail replaced successfully!", HttpStatus.OK);
+                request, thumbnail, images, currUser), HttpStatus.CREATED);
     }
 
     //Delete book by {id}
@@ -160,11 +154,42 @@ public class BookController {
         return new ResponseEntity<>("Products deleted successfully!", HttpStatus.OK);
     }
 
+    //Delete multiple books not in lists of {ids}
+    @DeleteMapping("/delete-inverse")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> deleteBooksInverse(@RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                                @RequestParam(value = "cateId", required = false) Integer cateId,
+                                                @RequestParam(value = "pubIds", required = false) List<Integer> pubIds,
+                                                @RequestParam(value = "types", required = false) List<BookType> types,
+                                                @RequestParam(value = "shopId", required = false) Long shopId,
+                                                @RequestParam(value = "userId", required = false) Long userId,
+                                                @RequestParam(value = "fromRange", defaultValue = "0") Double fromRange,
+                                                @RequestParam(value = "toRange", defaultValue = "10000000") Double toRange,
+                                                @RequestParam(value = "rating", defaultValue = "0") Integer rating,
+                                                @RequestParam(value = "amount", defaultValue = "1") Integer amount,
+                                                @RequestParam("ids") List<Long> ids,
+                                                @CurrentAccount Account currUser) {
+        bookService.deleteBooksInverse(keyword,
+                amount,
+                rating,
+                cateId,
+                pubIds,
+                types,
+                shopId,
+                userId,
+                fromRange,
+                toRange,
+                ids,
+                currUser);
+        return new ResponseEntity<>("Products deleted successfully!", HttpStatus.OK);
+    }
+
     //Delete all books
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> deleteAllBooks(@CurrentAccount Account currUser) {
-        bookService.deleteAllBooks(currUser);
+    public ResponseEntity<?> deleteAllBooks(@RequestParam(value = "shopId", required = false) Long shopId,
+                                            @CurrentAccount Account currUser) {
+        bookService.deleteAllBooks(shopId, currUser);
         return new ResponseEntity<>("All products deleted successfully!", HttpStatus.OK);
     }
 }

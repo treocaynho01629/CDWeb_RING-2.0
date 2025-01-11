@@ -1,13 +1,14 @@
-import { useState, useRef, forwardRef } from 'react'
-import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, useTheme, useMediaQuery, Button } from '@mui/material';
+import { useState, forwardRef, useEffect } from 'react'
+import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, useTheme, useMediaQuery, Button, TextareaAutosize } from '@mui/material';
 import { Check, Close as CloseIcon, AutoStories as AutoStoriesIcon } from '@mui/icons-material';
 import { bookLanguageItems, bookTypeItems } from '../../../ultils/book';
-import { Title } from '../custom/ShareComponents';
+import { Label, Title } from '../custom/ShareComponents';
 import { publishersApiSlice } from '../../../features/publishers/publishersApiSlice';
 import { categoriesApiSlice } from '../../../features/categories/categoriesApiSlice';
+import { useGetPreviewShopsQuery } from '../../../features/shops/shopsApiSlice';
 import { currencyFormat } from '../../../ultils/covert';
 import { NumberFormatBase, NumericFormat, PatternFormat } from 'react-number-format';
-import { useCreateBookMutation } from '../../../features/books/booksApiSlice';
+import { useCreateBookMutation, useGetBookQuery, useUpdateBookMutation } from '../../../features/books/booksApiSlice';
 import { Instruction } from '../../custom/GlobalComponents';
 import CustomDropZone from '../custom/CustomDropZone';
 import CustomDatePicker from '../../custom/CustomDatePicker';
@@ -44,11 +45,13 @@ const NumericFormatCustom = forwardRef(
 
 NumericFormatCustom.propTypes = { onChange: PropTypes.func.isRequired };
 
-const ProductFormDialog = ({ open, handleClose }) => {
+const ProductFormDialog = ({ product = null, open, handleClose, shop, pending, setPending }) => {
   //#region construct
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-  const [pending, setPending] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [thumbnailId, setThumbnailId] = useState(null);
+  const [remove, setRemove] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [weight, setWeight] = useState(0);
@@ -57,9 +60,8 @@ const ProductFormDialog = ({ open, handleClose }) => {
   const [size, setSize] = useState('');
   const [author, setAuthor] = useState('');
   const [date, setDate] = useState(dayjs('2001-01-01'));
-  const [files, setFiles] = useState([]);
-  const amountRef = useRef(0);
-  const authorRef = useRef();
+  const [currShop, setCurrShop] = useState(shop ?? '');
+  const [openShop, setOpenShop] = useState(false);
   const [price, setPrice] = useState({
     price: 0,
     discount: 0
@@ -74,16 +76,78 @@ const ProductFormDialog = ({ open, handleClose }) => {
     number: 0,
     totalPages: 0,
     totalElements: 0,
-  })
+  });
   const [catesPagination, setCatesPagination] = useState({
     number: 0,
     totalPages: 0,
     totalElements: 0,
-  })
+  });
 
+  //Fetch
+  const { data: shops, isLoading: loadShops } = useGetPreviewShopsQuery({}, { skip: product != null || (!currShop && !openShop) });
   const [getPublishers, { data: pubs }] = publishersApiSlice.useLazyGetPublishersQuery();
   const [getCategories, { data: cates }] = categoriesApiSlice.useLazyGetCategoriesQuery();
   const [createBook, { isLoading: creating }] = useCreateBookMutation();
+  const [updateBook, { isLoading: updating }] = useUpdateBookMutation();
+
+  useEffect(() => {
+    if (product) {
+      setTitle(product?.title);
+      setDescription(product?.description);
+      setWeight(product?.weight);
+      setPages(product?.pages);
+      setSize(product?.size);
+      setAmount(product?.amount);
+      setAuthor(product?.author);
+      setDate(dayjs(product?.date));
+      setLanguage(product?.language);
+      setType(product?.type);
+      setPrice({
+        price: product?.price,
+        discount: product?.discount
+      });
+      setPub(product?.publisher?.id);
+      setCate(product?.category?.id);
+      setCurrShop(product?.shopId);
+      setThumbnailId(product?.image?.id);
+      setRemove([]);
+      setErr([]);
+      setErrMsg('');
+    } else {
+      clearInput();
+    }
+  }, [product])
+
+  const clearInput = () => {
+    setTitle('');
+    setDescription('');
+    setWeight('');
+    setPages('');
+    setSize('');
+    setAmount('');
+    setAuthor('');
+    setDate(dayjs('2001-01-01'));
+    setLanguage('');
+    setType('');
+    setPrice({
+      price: 0,
+      discount: 0
+    });
+    setPub('');
+    setCate('');
+    setCurrShop(currShop);
+    setThumbnailId('');
+    setRemove([]);
+    setErr([]);
+    setErrMsg('');
+  }
+
+  const handleCloseDialog = () => {
+    setFiles([]);
+    setRemove([]);
+    setThumbnailId(product ? product.image?.id : '');
+    handleClose();
+  }
 
   const handleOpenPubs = () => {
     if (!pubs) {
@@ -123,6 +187,8 @@ const ProductFormDialog = ({ open, handleClose }) => {
         .catch((rejected) => console.error(rejected));
     }
   };
+
+  const handleOpenShops = () => { setOpenShop(true); };
 
   const handleShowmorePubs = () => {
     let currPage = (pubsPagination?.number || 0) + 1;
@@ -193,11 +259,8 @@ const ProductFormDialog = ({ open, handleClose }) => {
   }
 
   const handleSubmit = async (e) => {
-    console.log('a')
     e.preventDefault();
-    // if (creating || pending) return;
-
-    console.log('a')
+    if (creating || updating || pending) return;
 
     setPending(true);
     const { enqueueSnackbar } = await import('notistack');
@@ -219,46 +282,106 @@ const ProductFormDialog = ({ open, handleClose }) => {
       pages,
       date: date.format('YYYY-MM-DD'),
       language,
-      shopId: 10000//FIX
+      shopId: product ? product?.shopId : currShop,
+      thumbnailId: product ? thumbnailId : null,
+      removeIds: product ? remove : null
     });
     const blob = new Blob([json], { type: 'application/json' });
 
     formData.append('request', blob);
-    if (files) formData.append('thumbnail', files[0]);
-
-    createBook(formData).unwrap()
-      .then((data) => {
-        setErrMsg('');
-        setErr([]);
-        enqueueSnackbar('Thêm sản phẩm thành công!', { variant: 'success' });
-        setPending(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setErr(err);
-        if (!err?.status) {
-          setErrMsg('Server không phản hồi');
-        } else if (err?.status === 409) {
-          setErrMsg(err?.data?.message);
-        } else if (err?.status === 403) {
-          setErrMsg('Chưa có ảnh kèm theo!');
-        } else if (err?.status === 400) {
-          setErrMsg('Sai định dạng thông tin!');
-        } else if (err?.status === 417) {
-          setErrMsg('File ảnh quá lớn (Tối đa 5MB)!');
+    if (files) {
+      if (product) { //Update
+        if (!thumbnailId) {
+          formData.append('thumbnail', files[0]);
+          if (files?.length > 1) formData.append('images', files.splice(1, files?.length - 1));
         } else {
-          setErrMsg('Thêm sản phẩm thất bại!')
+          files.forEach((file, i) => {
+            formData.append('images', file);
+          });
         }
-        enqueueSnackbar('Thêm sản phẩm thất bại!', { variant: 'error' });
-        setPending(false);
-      })
+      } else { //Create
+        formData.append('thumbnail', files[0]);
+        if (files?.length > 1) {
+          files.splice(1, files?.length - 1).forEach((file, i) => {
+            formData.append('images', file);
+          });
+        }
+      }
+    }
+
+    if (product) { //Update
+      updateBook({ id: product?.id, updatedBook: formData }).unwrap()
+        .then((data) => {
+          setErrMsg('');
+          setErr([]);
+          enqueueSnackbar('Chỉnh sửa sản phẩm thành công!', { variant: 'success' });
+          setPending(false);
+          handleCloseDialog();
+        })
+        .catch((err) => {
+          console.error(err);
+          setErr(err);
+          if (!err?.status) {
+            setErrMsg('Server không phản hồi');
+          } else if (err?.status === 409) {
+            setErrMsg(err?.data?.message);
+          } else if (err?.status === 403) {
+            setErrMsg('Chưa có ảnh kèm theo!');
+          } else if (err?.status === 400) {
+            setErrMsg('Sai định dạng thông tin!');
+          } else if (err?.status === 417) {
+            setErrMsg('File ảnh quá lớn (Tối đa 5MB)!');
+          } else {
+            setErrMsg('Chỉnh sửa sản phẩm thất bại!')
+          }
+          enqueueSnackbar('Chỉnh sửa sản phẩm thất bại!', { variant: 'error' });
+          setPending(false);
+        })
+    } else { //Create
+      createBook(formData).unwrap()
+        .then((data) => {
+          setErrMsg('');
+          setErr([]);
+          enqueueSnackbar('Thêm sản phẩm thành công!', { variant: 'success' });
+          setPending(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setErr(err);
+          if (!err?.status) {
+            setErrMsg('Server không phản hồi');
+          } else if (err?.status === 409) {
+            setErrMsg(err?.data?.message);
+          } else if (err?.status === 403) {
+            setErrMsg('Chưa có ảnh kèm theo!');
+          } else if (err?.status === 400) {
+            setErrMsg('Sai định dạng thông tin!');
+          } else if (err?.status === 417) {
+            setErrMsg('File ảnh quá lớn (Tối đa 5MB)!');
+          } else {
+            setErrMsg('Thêm sản phẩm thất bại!')
+          }
+          enqueueSnackbar('Thêm sản phẩm thất bại!', { variant: 'error' });
+          setPending(false);
+        })
+    }
   };
   //#endregion
 
   return (
-    <Dialog open={open} scroll={'paper'} maxWidth={'md'} fullWidth onClose={handleClose} fullScreen={fullScreen}>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><AutoStoriesIcon />&nbsp;Thêm sản phẩm</DialogTitle>
-      <DialogContent>
+    <Dialog
+      open={open}
+      scroll={'paper'}
+      maxWidth={'md'}
+      fullWidth
+      onClose={handleCloseDialog}
+      fullScreen={fullScreen}
+      aria-modal
+    >
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
+        <AutoStoriesIcon />&nbsp;{product ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm'}
+      </DialogTitle>
+      <DialogContent sx={{ pt: 0, px: { xs: 1, sm: 3 } }}>
         <form onSubmit={handleSubmit}>
           <Instruction display={errMsg ? "block" : "none"}>{errMsg}</Instruction>
           <Grid container size="grow" spacing={1}>
@@ -285,7 +408,14 @@ const ProductFormDialog = ({ open, handleClose }) => {
                 label="Mô tả"
                 fullWidth
                 multiline
-                rows={5}
+                minRows={6}
+                slotProps={{
+                  inputComponent: TextareaAutosize,
+                  inputProps: {
+                    minRows: 6,
+                    style: { resize: "auto" }
+                  }
+                }}
                 variant="outlined"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -293,8 +423,165 @@ const ProductFormDialog = ({ open, handleClose }) => {
                 helperText={err?.data?.errors?.description}
               />
             </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField label='Danh mục'
+                value={cate || ''}
+                onChange={(e) => setCate(e.target.value)}
+                select
+                defaultValue=""
+                fullWidth
+                error={err?.data?.errors?.cateId}
+                helperText={err?.data?.errors?.cateId}
+                slotProps={{
+                  select: {
+                    onOpen: handleOpenCates,
+                    MenuProps: {
+                      slotProps: {
+                        paper: {
+                          style: {
+                            maxHeight: 250,
+                          },
+                        },
+                      }
+                    }
+                  }
+                }}
+              >
+                <MenuItem value=""><em>--Tất cả--</em></MenuItem>
+                {(product && !cates) &&
+                  <MenuItem key={`cate-${product?.category?.id}`} value={product?.category?.id}>
+                    {product?.category?.name}
+                  </MenuItem>
+                }
+                {cates?.ids?.map((id, index) => {
+                  const cate = cates?.entities[id];
+                  const cateList = [];
+
+                  cateList.push(
+                    <MenuItem key={`cate-${id}-${index}`} value={id}>
+                      {cate?.name}
+                    </MenuItem>);
+                  {
+                    cate?.children?.map((child, childIndex) => {
+                      cateList.push(
+                        <MenuItem sx={{ pl: 3, fontSize: 15 }} key={`child-cate-${child?.id}-${childIndex}`} value={child?.id}>
+                          {child?.name}
+                        </MenuItem>)
+                    })
+                  }
+
+                  return cateList;
+                })}
+                {catesPagination?.totalPages > catesPagination?.number + 1 &&
+                  <Box display="flex" justifyContent="center">
+                    <Button
+                      onClick={handleShowmoreCates}
+                      endIcon={<Add />}
+                      fullWidth
+                    >
+                      Tải thêm
+                    </Button>
+                  </Box>
+                }
+              </TextField>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField label='Nhà xuất bản'
+                value={pub || ''}
+                onChange={(e) => setPub(e.target.value)}
+                select
+                defaultValue=""
+                fullWidth
+                error={err?.data?.errors?.pubId}
+                helperText={err?.data?.errors?.pubId}
+                slotProps={{
+                  select: {
+                    onOpen: handleOpenPubs,
+                    MenuProps: {
+                      slotProps: {
+                        paper: {
+                          style: {
+                            maxHeight: 250,
+                          },
+                        },
+                      }
+                    }
+                  }
+                }}
+              >
+                {(product && !pubs) &&
+                  <MenuItem key={`pub-${product?.publisher?.id}`} value={product?.publisher?.id}>
+                    {product?.publisher?.name}
+                  </MenuItem>
+                }
+                {pubs?.ids?.map((id, index) => {
+                  const pub = pubs?.entities[id];
+
+                  return (
+                    <MenuItem key={`pub-${id}-${index}`} value={id}>
+                      {pub?.name}
+                    </MenuItem>
+                  )
+                })}
+                {pubsPagination?.totalPages > pubsPagination?.number + 1 &&
+                  <Box display="flex" justifyContent="center">
+                    <Button
+                      onClick={handleShowmorePubs}
+                      endIcon={<Add />}
+                      fullWidth
+                    >
+                      Tải thêm
+                    </Button>
+                  </Box>
+                }
+              </TextField>
+            </Grid>
             <Grid size={12}>
-              <CustomDropZone files={files} setFiles={setFiles} />
+              <TextField label='Cửa hàng'
+                value={currShop || ''}
+                onChange={(e) => setCurrShop(e.target.value)}
+                select
+                fullWidth
+                disabled={product != null}
+                error={err?.data?.errors?.shopId}
+                helperText={err?.data?.errors?.shopId}
+                slotProps={{
+                  select: {
+                    onOpen: handleOpenShops,
+                    MenuProps: {
+                      slotProps: {
+                        paper: {
+                          style: {
+                            maxHeight: 250,
+                          },
+                        },
+                      }
+                    }
+                  }
+                }}
+              >
+                <MenuItem disabled><em>--Cửa hàng--</em></MenuItem>
+                {product &&
+                  <MenuItem key={`shop-${product?.shopId}`} value={product?.shopId}>
+                    {product?.shopName}
+                  </MenuItem>
+                }
+                {shops?.ids?.map((id, index) => {
+                  const shop = shops?.entities[id];
+
+                  return (
+                    <MenuItem key={`shop-${id}-${index}`} value={id}>
+                      {shop?.name}
+                    </MenuItem>
+                  )
+                })}
+              </TextField>
+            </Grid>
+            <Grid size={12}>
+              <CustomDropZone {...{
+                files, setFiles, thumbnailId, setThumbnailId, remove, setRemove,
+                images: product ? product?.previews ? [product?.image].concat(product?.previews) : [product?.image] : null
+              }} />
             </Grid>
             <Grid size={12}>
               <Title>Chi tiết sản phẩm</Title>
@@ -364,19 +651,6 @@ const ProductFormDialog = ({ open, handleClose }) => {
                 }}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 4 }}>
-              <TextField
-                required
-                id="author"
-                label="Tác giả"
-                fullWidth
-                variant="outlined"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                error={err?.data?.errors?.author}
-                helperText={err?.data?.errors?.author}
-              />
-            </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
                 label="Ngôn ngữ"
@@ -411,104 +685,33 @@ const ProductFormDialog = ({ open, handleClose }) => {
                 ))}
               </TextField>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField label='Danh mục'
-                value={cate || ''}
-                onChange={(e) => setCate(e.target.value)}
-                select
-                defaultValue=""
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <NumericFormat
+                required
+                id="amount"
+                label="Số lượng"
                 fullWidth
-                slotProps={{
-                  select: {
-                    onOpen: handleOpenCates,
-                    MenuProps: {
-                      slotProps: {
-                        paper: {
-                          style: {
-                            maxHeight: 250,
-                          },
-                        },
-                      }
-                    }
-                  }
-                }}
-              >
-                <MenuItem value=""><em>--Tất cả--</em></MenuItem>
-                {cates?.ids?.map((id, index) => {
-                  const cate = cates?.entities[id];
-                  const cateList = [];
-
-                  cateList.push(
-                    <MenuItem key={`cate-${id}-${index}`} value={id}>
-                      {cate?.name}
-                    </MenuItem>);
-                  {
-                    cate?.children?.map((child, childIndex) => {
-                      cateList.push(
-                        <MenuItem sx={{ pl: 3, fontSize: 15 }} key={`child-cate-${child?.id}-${childIndex}`} value={child?.id}>
-                          {child?.name}
-                        </MenuItem>)
-                    })
-                  }
-
-                  return cateList;
-                })}
-                {catesPagination?.totalPages > catesPagination?.number + 1 &&
-                  <Box display="flex" justifyContent="center">
-                    <Button
-                      onClick={handleShowmoreCates}
-                      endIcon={<Add />}
-                      fullWidth
-                    >
-                      Tải thêm
-                    </Button>
-                  </Box>
-                }
-              </TextField>
+                variant="outlined"
+                value={amount}
+                onValueChange={(values) => setAmount(values.value)}
+                error={err?.data?.errors?.amount}
+                helperText={err?.data?.errors?.amount}
+                customInput={TextField}
+                allowNegative={false}
+              />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField label='Nhà xuất bản'
-                value={pub || ''}
-                onChange={(e) => setPub(e.target.value)}
-                select
-                defaultValue=""
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                required
+                id="author"
+                label="Tác giả"
                 fullWidth
-                slotProps={{
-                  select: {
-                    onOpen: handleOpenPubs,
-                    MenuProps: {
-                      slotProps: {
-                        paper: {
-                          style: {
-                            maxHeight: 250,
-                          },
-                        },
-                      }
-                    }
-                  }
-                }}
-              >
-                {pubs?.ids?.map((id, index) => {
-                  const pub = pubs?.entities[id];
-
-                  return (
-                    <MenuItem key={`pub-${id}-${index}`} value={id}>
-                      {pub?.name}
-                    </MenuItem>
-                  )
-                })}
-                {pubsPagination?.totalPages > pubsPagination?.number + 1 &&
-                  <Box display="flex" justifyContent="center">
-                    <Button
-                      onClick={handleShowmorePubs}
-                      endIcon={<Add />}
-                      fullWidth
-                    >
-                      Tải thêm
-                    </Button>
-                  </Box>
-                }
-              </TextField>
+                variant="outlined"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                error={err?.data?.errors?.author}
+                helperText={err?.data?.errors?.author}
+              />
             </Grid>
             <Grid size={12}>
               <Title>Giá sản phẩm</Title>
@@ -554,21 +757,6 @@ const ProductFormDialog = ({ open, handleClose }) => {
                 onChange={handleDiscountChange}
                 error={err?.data?.errors?.discount}
                 helperText={err?.data?.errors?.discount}
-                customInput={TextField}
-                allowNegative={false}
-              />
-            </Grid>
-            <Grid size={12}>
-              <NumericFormat
-                required
-                id="amount"
-                label="Số lượng"
-                fullWidth
-                variant="outlined"
-                value={amount}
-                onValueChange={(values) => setAmount(values.value)}
-                error={err?.data?.errors?.amount}
-                helperText={err?.data?.errors?.amount}
                 customInput={TextField}
                 allowNegative={false}
               />
