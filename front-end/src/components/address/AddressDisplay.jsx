@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { KeyboardArrowRight } from '@mui/icons-material';
 import { alpha, Button, FormControlLabel, IconButton, Radio, RadioGroup } from '@mui/material'
-import { getAddress } from '../../ultils/address';
+import { addressTypes } from '../../ultils/address';
 import { shippingItems } from '../../ultils/shipping';
 import { currencyFormat } from '../../ultils/covert';
 
@@ -127,8 +127,7 @@ const AddressTag = styled.span`
 
 const AddressDisplay = ({ addressInfo, handleOpen, isValid, loadAddress, value, handleChange }) => {
     const fullAddress = [addressInfo?.city, addressInfo?.address].join(", ");
-
-    const address = addressInfo?.type ? getAddress(addressInfo.type) : null;
+    const address = addressInfo?.type ? addressTypes[addressInfo.type] : null;
 
     return (
         <>

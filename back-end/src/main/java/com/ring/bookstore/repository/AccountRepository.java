@@ -1,6 +1,5 @@
 package com.ring.bookstore.repository;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.ring.bookstore.dtos.accounts.IAccount;
@@ -48,12 +47,13 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 			from Account a
 			where a.createdDate >= date_trunc('month', current date) - 1 month
         ) t
-    """)
+   	""")
 	IStat getAccountAnalytics();
 
 	@Query("""
 		select a.id as id, a.username as username, i.name as image,
-		a.email as email, p.name as name, p.phone as phone, size(a.roles) as roles
+		a.email as email, p.name as name, p.phone as phone,
+		size(a.roles) as roles
 		from Account a
 		left join a.profile p
 		left join p.image i

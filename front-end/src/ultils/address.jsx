@@ -1,13 +1,9 @@
-export const getAddress = (type) => {
-    switch (type) {
-        case 'HOME':
-            return { label: 'Nhà riêng', color: 'primary' };
-        case 'OFFICE':
-            return { label: 'Văn phòng', color: 'info' };
-    }
-}
-
 export const addressType = ['HOME', 'OFFICE'];
+
+export const addressTypes = {
+    HOME: { label: 'Nhà riêng', color: 'primary' },
+    OFFICE: { label: 'Văn phòng', color: 'info' },
+}
 
 export const addressItems = [
     {

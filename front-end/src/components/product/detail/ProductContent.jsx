@@ -35,8 +35,17 @@ const InfoContainer = styled.div`
     }
 `
 
+const ImageContainer = styled.div`
+     border: none;
+
+    ${props => props.theme.breakpoints.up("md")} {
+        border: .5px solid ${props => props.theme.palette.divider};
+    }
+`
+
 const BookTitle = styled.h2`
     font-size: 22px;
+    font-weight: 450;
     line-height: normal;
     margin: 0 0 20px 0;
     text-overflow: ellipsis;
@@ -238,6 +247,21 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
     const handleOpenDialog = () => { setOpenDialog(true) }
     const handleCloseDialog = () => { setOpenDialog(false) }
 
+    //Images
+    let initialImages = book?.previews ? [].concat(book?.image, book?.previews) : [].concat(book?.image);
+    let images = initialImages.map((image, index) => ({
+        src: image,
+        alt: `${book?.title} preview image #${index + 1}`,
+        width: 600,
+        height: 600,
+        srcSet: [
+            { src: `${image}?size=tiny`, width: 45, height: 45 },
+            { src: `${image}?size=small`, width: 150, height: 150 },
+            { src: `${image}?size=medium`, width: 350, height: 350 },
+            { src: image, width: 600, height: 600 },
+        ],
+    }))
+
     return (
         <Grid
             container
@@ -246,7 +270,9 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
             position="relative"
         >
             <Grid size={{ xs: 12, md: 5.5, lg: 5 }} position="relative">
-                {!book ? <ProductImages /> : <ProductImages book={book} />}
+                <ImageContainer>
+                    {!book ? <ProductImages /> : <ProductImages images={images} />}
+                </ImageContainer>
             </Grid>
             <Grid size={{ xs: 12, md: 6.5, lg: 7 }}>
                 <InfoContainer>

@@ -1,430 +1,343 @@
-import styled from '@emotion/styled'
-import { styled as muiStyled } from '@mui/material';
-import { useState } from 'react'
-import { TextField, InputAdornment, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, FormControl } from '@mui/material';
-import { Check as CheckIcon, Close as CloseIcon, Person as PersonIcon, VisibilityOff, Visibility } from '@mui/icons-material';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { useEffect, useState } from 'react'
+import { Button, useMediaQuery, useTheme } from '@mui/material';
+import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem } from '@mui/material';
+import { Check, Close as CloseIcon, Person as PersonIcon } from '@mui/icons-material';
+import { Instruction } from '../../custom/GlobalComponents';
+import { PatternFormat } from 'react-number-format';
+import { genderTypeItems, roleTypeItems } from '../../../ultils/user';
+import { useCreateUserMutation, useUpdateUserMutation } from '../../../features/users/usersApiSlice';
+import { EMAIL_REGEX, PHONE_REGEX } from '../../../ultils/regex';
+import CustomPasswordInput from '../../custom/CustomPasswordInput';
+import CustomDatePicker from '../../custom/CustomDatePicker';
+import CustomAvatarSelect from '../custom/CustomAvatarSelect';
 import dayjs from 'dayjs';
 
-//#region styled
-const Button = styled.div`
-    padding: 10px 15px;
-    font-size: 16px;
-    font-weight: 400;
-    background-color: ${props => props.theme.palette.primary.main};
-    color: ${props => props.theme.palette.primary.contrastText};
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.5s ease;
-
-    &:hover {
-        background: lightgray;
-        color: #424242;
-    }
-`
-
-const ClearButton = styled.div`
-    padding: 10px 15px;
-    font-size: 16px;
-    font-weight: 400;
-    background-color: #e66161;
-    color: white;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.5s ease;
-
-    &:hover {
-        background: lightgray;
-        color: #424242;
-    }
-`
-
-const Instruction = styled.p`
-    font-size: 14px;
-    font-style: italic;
-    color: red;
-    display: ${display};;
-`
-
-const CustomDialog = muiStyled(Dialog)(({ theme }) => ({
-  '& .MuiDialog-paper': {
-    borderRadius: 0,
-    padding: '20px 15px',
-  },
-  '& .MuiDialogContent-root': {
-    padding: theme.spacing(2),
-  },
-  '& .MuiDialogActions-root': {
-    padding: theme.spacing(1),
-  },
-}));
-
-const CustomInput = styled(TextField)({
-  '& .MuiInputBase-root': {
-    borderRadius: 0
-  },
-  '& label.Mui-focused': {
-    color: '#A0AAB4'
-  },
-  '& .MuiInput-underline:after': {
-    borderBottomColor: '#B2BAC2',
-  },
-  '& .MuiOutlinedInput-root': {
-    borderRadius: 0,
-    '& fieldset': {
-      borderRadius: 0,
-      borderColor: '#E0E3E7',
-    },
-    '&:hover fieldset': {
-      borderRadius: 0,
-      borderColor: '#B2BAC2',
-    },
-    '&.Mui-focused fieldset': {
-      borderRadius: 0,
-      borderColor: '#6F7E8C',
-    },
-  },
-  '& input:valid + fieldset': {
-    borderColor: 'lightgray',
-    borderRadius: 0,
-    borderWidth: 1,
-  },
-  '& input:invalid + fieldset': {
-    borderColor: '#e66161',
-    borderRadius: 0,
-    borderWidth: 1,
-  },
-  '& input:valid:focus + fieldset': {
-    borderColor: '#63e399',
-    borderLeftWidth: 4,
-    borderRadius: 0,
-    padding: '4px !important',
-  },
-});
-
-// const CustomDatePicker = styled(DatePicker)({
-//   '& .MuiInputBase-root': {
-//     borderRadius: 0
-//   },
-//   '& label.Mui-focused': {
-//     color: '#A0AAB4'
-//   },
-//   '& .MuiInput-underline:after': {
-//     borderBottomColor: '#B2BAC2',
-//   },
-//   '& .MuiOutlinedInput-root': {
-//     borderRadius: 0,
-//     '& fieldset': {
-//       borderRadius: 0,
-//       borderColor: '#E0E3E7',
-//     },
-//     '&:hover fieldset': {
-//       borderRadius: 0,
-//       borderColor: '#B2BAC2',
-//     },
-//     '&.Mui-focused fieldset': {
-//       borderRadius: 0,
-//       borderColor: '#6F7E8C',
-//     },
-//   },
-//   '& input:valid + fieldset': {
-//     borderColor: 'lightgray',
-//     borderRadius: 0,
-//     borderWidth: 1,
-//   },
-//   '& input:invalid + fieldset': {
-//     borderColor: '#e66161',
-//     borderRadius: 0,
-//     borderWidth: 1,
-//   },
-//   '& input:valid:focus + fieldset': {
-//     borderColor: '#63e399',
-//     borderLeftWidth: 4,
-//     borderRadius: 0,
-//     padding: '4px !important',
-//   },
-// });
-//#endregion
-
-const ACCOUNT_URL = 'api/accounts';
-const gendersList = [
-  {
-    value: '',
-    label: 'Không',
-  },
-  {
-    value: 'Nam',
-    label: 'Nam',
-  },
-  {
-    value: 'Nữ',
-    label: 'Nữ',
-  },
-];
-
-const rolesList = [
-  {
-    value: '1',
-    label: 'MEMBER',
-  },
-  {
-    value: '2',
-    label: 'SELLER',
-  },
-  {
-    value: '3',
-    label: 'ADMIN',
-  },
-];
-
-const UserFormDialog = ({ open, handleClose, userId }) => {
+const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
   //#region construct
-  const [username, setUserName] = useState('')
-  const [pass, setPass] = useState('')
-  const [email, setEmail] = useState('')
-  const [roles, setRoles] = useState(rolesList[0].value)
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [gender, setGender] = useState(gendersList[0].value)
-  const [dob, setDob] = useState(dayjs('2001-01-01'));
-  const [address, setAddress] = useState('')
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const [file, setFile] = useState([]);
+  const [pic, setPic] = useState(user?.image || null);
+  const [username, setUserName] = useState(user?.username || '');
+  const [pass, setPass] = useState('');
+  const [email, setEmail] = useState(user?.email || '');
+  const [name, setName] = useState(user?.name || '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [dob, setDob] = useState(user?.dob ? dayjs(user?.dob) : dayjs('1970-01-01'));
+  const [roles, setRoles] = useState(roleTypeItems[0].value);
+  const [gender, setGender] = useState(genderTypeItems[0].value);
   const [err, setErr] = useState([]);
   const [errMsg, setErrMsg] = useState('');
-  const [show, setShow] = useState(false);
+  const [validPhone, setValidPhone] = useState(false);
+  const [validEmail, setValidEmail] = useState(false);
 
-  const handleClickShow = () => setShow((show) => !show);
+  const [createUser, { isLoading: creating }] = useCreateUserMutation();
+  const [updateUser, { isLoading: updating }] = useUpdateUserMutation();
 
-  const handleMouseDown = (event) => {
-    event.preventDefault();
-  };
+  useEffect(() => {
+    if (user) {
+      setPic(user?.image || null);
+      setUserName(user?.username);
+      setEmail(user?.email);
+      setRoles(user?.roles);
+      setName(user?.name || '');
+      setPhone(user?.phone || '');
+      setGender(user?.gender || '');
+      setDob(dayjs(user?.dob));
+      setErr([]);
+      setErrMsg('');
+    } else {
+      clearInput();
+    }
+  }, [user])
 
-  const endAdornment =
-    <InputAdornment position="end">
-      <IconButton
-        aria-label="toggle password visibility"
-        onClick={handleClickShow}
-        onMouseDown={handleMouseDown}
-        edge="end"
-      >
-        {show ? <VisibilityOff /> : <Visibility />}
-      </IconButton>
-    </InputAdornment>
+  useEffect(() => {
+    const result = PHONE_REGEX.test(phone);
+    setValidPhone(result);
+  }, [phone])
 
-  const handleAddBook = async (event) => {
-    event.preventDefault();
+  useEffect(() => {
+    const result = EMAIL_REGEX.test(email);
+    setValidEmail(result);
+  }, [email])
+
+  const clearInput = () => {
+    setPic('');
+    setUserName('');
+    setPass('');
+    setEmail('');
+    setName('');
+    setPhone('');
+    setRoles(roleTypeItems[0].value);
+    setGender(genderTypeItems[0].value);
+    setDob(dayjs('2001-01-01'));
+    setErr([]);
+    setErrMsg('');
+  }
+
+  const handleCloseDialog = () => {
+    setFile([]);
+    handleClose();
+  }
+
+  const handleRemoveImage = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setFile([]);
+    if (pic == user?.image) {
+      setPic(null);
+    } else {
+      setPic(user?.image);
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (creating || updating || pending) return;
+
+    setPending(true);
     const { enqueueSnackbar } = await import('notistack');
 
-    // try {
-    //   const response = await axiosPrivate.post(ACCOUNT_URL,
-    //     JSON.stringify({
-    //       username: username, pass: pass, email: email, roles: roles,
-    //       name: name, phone: phone, dob: dob.format('YYYY-MM-DD'), gender: gender, address: address
-    //     }),
-    //     {
-    //       headers: { 'Content-Type': 'application/json' },
-    //       withCredentials: true
-    //     }
-    //   );
+    //Set data
+    const formData = new FormData();
+    const json = JSON.stringify({
+      username,
+      email,
+      roles,
+      pass: pass || null,
+      name: name || null,
+      phone: phone || null,
+      gender: gender || null,
+      dob: dob.format('YYYY-MM-DD'),
+      image: file ? null : pic,
+      keepOldPass: (user && !pass) ? true : false
+    });
+    const blob = new Blob([json], { type: 'application/json' });
 
-    //   refetch();
-    //   enqueueSnackbar('Đã thêm thành viên!', { variant: 'success' });
-    //   setUserName('');
-    //   setPass('');
-    //   setEmail('');
-    //   setRoles(rolesList[0].value);
-    //   setName('');
-    //   setPhone('');
-    //   setDob(dayjs('2001-01-01'));
-    //   setAddress('');
-    //   setGender(gendersList[0].value);
-    //   setErrMsg('');
-    //   setErr([]);
-    // } catch (err) {
-    //   console.error(err);
-    //   setErr(err);
-    //   if (!err?.response) {
-    //     setErrMsg('Server không phản hồi');
-    //   } else if (err.response?.status === 409) {
-    //     setErrMsg(err.response?.data?.errors?.errorMessage);
-    //   } else if (err.response?.status === 400) {
-    //     setErrMsg('Sai định dạng thông tin!');
-    //   } else {
-    //     setErrMsg('Thêm thành viên thất bại!')
-    //   }
+    formData.append('request', blob);
+    if (file?.length) formData.append('image', file[0]);
 
-    //   enqueueSnackbar('Thêm thành viên thất bại!', { variant: 'error' });
-    // }
+    if (user) { //Update
+      updateUser({ id: user?.id, updatedUser: formData }).unwrap()
+        .then((data) => {
+          setErrMsg('');
+          setErr([]);
+          enqueueSnackbar('Chỉnh sửa thành viên thành công!', { variant: 'success' });
+          setPending(false);
+          handleCloseDialog();
+        })
+        .catch((err) => {
+          console.error(err);
+          setErr(err);
+          if (!err?.status) {
+            setErrMsg('Server không phản hồi');
+          } else if (err?.status === 409) {
+            setErrMsg(err?.data?.message);
+          } else if (err?.status === 403) {
+            setErrMsg('Chưa có ảnh kèm theo!');
+          } else if (err?.status === 400) {
+            setErrMsg('Sai định dạng thông tin!');
+          } else if (err?.status === 417) {
+            setErrMsg('File ảnh quá lớn (Tối đa 2MB)!');
+          } else {
+            setErrMsg('Chỉnh sửa thành vien thất bại!')
+          }
+          enqueueSnackbar('Chỉnh sửa thành viên thất bại!', { variant: 'error' });
+          setPending(false);
+        })
+    } else { //Create
+      createUser(formData).unwrap()
+        .then((data) => {
+          clearInput();
+          setErrMsg('');
+          setErr([]);
+          enqueueSnackbar('Thêm thành viên thành công!', { variant: 'success' });
+          setPending(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setErr(err);
+          if (!err?.status) {
+            setErrMsg('Server không phản hồi');
+          } else if (err?.status === 409) {
+            setErrMsg(err?.data?.message);
+          } else if (err?.status === 403) {
+            setErrMsg('Chưa có ảnh kèm theo!');
+          } else if (err?.status === 400) {
+            setErrMsg('Sai định dạng thông tin!');
+          } else if (err?.status === 417) {
+            setErrMsg('File ảnh quá lớn (Tối đa 2MB)!');
+          } else {
+            setErrMsg('Thêm thành viên thất bại!')
+          }
+          enqueueSnackbar('Thêm thành viên thất bại!', { variant: 'error' });
+          setPending(false);
+        })
+    }
   };
   //#endregion
 
   return (
-    <CustomDialog open={open} onClose={handleClose} maxWidth={'md'}>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}><PersonIcon />&nbsp;Thêm thành viên</DialogTitle>
-      <DialogContent>
-        <Instruction display={errMsg ? "block" : "none"} aria-live="assertive">{errMsg}</Instruction>
-        <Grid container columnSpacing={1}>
-          <Grid container item columnSpacing={1}>
-            <Grid item xs={12} sm={6}>
-              <CustomInput
+    <Dialog
+      open={open}
+      scroll={'paper'}
+      maxWidth={'md'}
+      fullWidth
+      onClose={handleCloseDialog}
+      fullScreen={fullScreen}
+      aria-modal
+    >
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
+        <PersonIcon />&nbsp;{user ? 'Chỉnh sửa thành viên' : 'Thêm thành viên'}
+      </DialogTitle>
+      <DialogContent sx={{ pt: 0, px: { xs: 1, sm: 3 } }}>
+        <form onSubmit={handleSubmit}>
+          <Instruction display={errMsg ? "block" : "none"}>{errMsg}</Instruction>
+          <Grid container size="grow" spacing={1}>
+            <Grid size={12} display="flex" justifyContent="center" py={2}>
+              <CustomAvatarSelect {...{ image: pic, handleRemoveImage, file, setFile }} />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
                 required
-                margin="dense"
                 id="username"
                 label="Tên đăng nhập"
                 fullWidth
                 variant="outlined"
                 value={username}
                 onChange={(e) => setUserName(e.target.value)}
-                error={err?.response?.data?.errors?.username}
-                helperText={err?.response?.data?.errors?.username}
+                error={err?.data?.errors?.username}
+                helperText={err?.data?.errors?.username}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <CustomInput
-                margin="dense"
-                id="name"
-                label="Họ và tên"
-                fullWidth
-                variant="outlined"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                error={err?.response?.data?.errors?.name}
-                helperText={err?.response?.data?.errors?.name}
-              />
-            </Grid>
-          </Grid>
-          <Grid container item columnSpacing={1}>
-            <Grid item xs={12} sm={6}>
-              <CustomInput
-                type={show ? 'text' : 'password'}
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
                 required
-                margin="dense"
-                id="pass"
-                label="Mật khẩu"
-                fullWidth
-                variant="outlined"
-                value={pass}
-                onChange={(e) => setPass(e.target.value)}
-                error={err?.response?.data?.errors?.pass}
-                helperText={err?.response?.data?.errors?.pass}
-                InputProps={{
-                  endAdornment: endAdornment
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <CustomInput
-                margin="dense"
-                id="phone"
-                label="Số điện thoại"
-                fullWidth
-                variant="outlined"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                error={err?.response?.data?.errors?.phone}
-                helperText={err?.response?.data?.errors?.phone}
-              />
-            </Grid>
-          </Grid>
-          <Grid container item columnSpacing={1}>
-            <Grid item xs={12} sm={6}>
-              <CustomInput
-                required
-                margin="dense"
                 id="email"
                 label="Email"
                 fullWidth
                 variant="outlined"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                error={err?.response?.data?.errors?.email}
-                helperText={err?.response?.data?.errors?.email}
+                aria-invalid={validEmail ? "false" : "true"}
+                error={(email && !validEmail) || err?.data?.errors?.email != null}
+                helperText={(email && !validEmail) ? "Sai định dạng email." : err?.data?.errors?.email}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <CustomInput
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomPasswordInput
+                required={user != null}
+                id="pass"
+                label="Mật khẩu"
+                fullWidth
+                variant="outlined"
+                value={pass}
+                onChange={(e) => setPass(e.target.value)}
+                error={err?.data?.errors?.pass}
+                helperText={err?.data?.errors?.pass}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                id="name"
+                label="Họ và tên"
+                fullWidth
+                variant="outlined"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                error={err?.data?.errors?.name}
+                helperText={err?.data?.errors?.name}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <PatternFormat
+                id="phone"
+                label="Số điện thoại"
+                onValueChange={(values) => setPhone(values.value)}
+                value={phone}
+                error={phone && !validPhone || err?.data?.errors?.phone}
+                helperText={phone && !validPhone ? "Sai định dạng số điện thoại!" : err?.data?.errors?.phone}
+                fullWidth
+                format="(+84) ### ### ###"
+                allowEmptyFormatting
+                customInput={TextField}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
                 label="Giới tính"
                 select
-                margin="dense"
                 fullWidth
                 id="gender"
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
               >
-                {gendersList.map((option) => (
+                {genderTypeItems.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>
                 ))}
-              </CustomInput>
+              </TextField>
             </Grid>
-          </Grid>
-          <Grid container item columnSpacing={1}>
-            <Grid item xs={12} sm={6}>
-              <CustomInput CustomInput
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomDatePicker
+                label="Ngày sinh"
+                value={dob}
+                className="custom-date-picker"
+                onChange={(newValue) => setDob(newValue)}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    required: true,
+                    error: err?.data?.errors?.dob,
+                    helperText: err?.data?.errors?.dob,
+                  },
+                }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
                 label="Quyền"
                 select
                 required
-                margin="dense"
                 fullWidth
                 id="roles"
                 value={roles}
                 onChange={(e) => setRoles(e.target.value)}
               >
-                {rolesList.map((option) => (
+                {roleTypeItems.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>
                 ))}
-              </CustomInput>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <FormControl margin="dense" fullWidth>
-                  <CustomDatePicker
-                    label="Ngày sinh"
-                    value={dob}
-                    className="DatePicker"
-                    onChange={(newValue) => setDob(newValue)}
-                    error={err?.response?.data?.errors?.dob}
-                    helperText={err?.response?.data?.errors?.dob}
-                  />
-                </FormControl>
-              </LocalizationProvider> */}
+              </TextField>
             </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <CustomInput
-              required
-              margin="dense"
-              id="address"
-              label="Địa chỉ"
-              fullWidth
-              multiline
-              rows={2}
-              variant="outlined"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              error={err?.response?.data?.errors?.address}
-              helperText={err?.response?.data?.errors?.address}
-            />
-          </Grid>
-        </Grid>
+        </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleAddBook}><CheckIcon sx={{ marginRight: '10px' }} />Thêm</Button>
-        <ClearButton onClick={handleClose}><CloseIcon sx={{ marginRight: '10px' }} />Huỷ</ClearButton>
+        <Button
+          variant="outlined"
+          color="error"
+          size="large"
+          sx={{ marginY: '10px' }}
+          onClick={handleClose}
+          startIcon={<CloseIcon />}
+        >
+          Huỷ
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          sx={{ marginY: '10px' }}
+          onClick={handleSubmit}
+          startIcon={<Check />}
+        >
+          Áp dụng
+        </Button>
       </DialogActions>
-    </CustomDialog>
+    </Dialog>
   );
 }
 

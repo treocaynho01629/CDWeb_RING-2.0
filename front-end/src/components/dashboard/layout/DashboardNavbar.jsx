@@ -37,7 +37,7 @@ const StyledAvatar = styled(Avatar)`
 
 export default function DashboardNavbar({ open, setOpen }) {
   const { roles, shop, setShop } = useAuth();
-  const isAdmin = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
+  const isAdmin = roles?.length >= 3;
   const [openSetting, setOpenSetting] = useState(false)
   const [currShop, setCurrShop] = useState(shop ?? '');
   const [anchorEl, setAnchorEl] = useState(undefined);
@@ -106,7 +106,7 @@ export default function DashboardNavbar({ open, setOpen }) {
             <Chip label={isAdmin ? 'Admin' : 'Nhân viên'}
               color={isAdmin ? 'primary' : 'info'}
               size="small"
-              sx={{ fontWeight: 'bold', mr: 1 }}
+              sx={{ fontWeight: 450, mr: 1 }}
             />
             <UnfoldMore fontSize="16px" />
           </ShopButton>

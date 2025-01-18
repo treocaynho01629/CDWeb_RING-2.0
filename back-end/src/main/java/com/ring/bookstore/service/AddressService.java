@@ -8,14 +8,19 @@ import com.ring.bookstore.request.AddressRequest;
 import java.util.List;
 
 public interface AddressService {
-	List<AddressDTO> getMyAddresses(Account user);
-	AddressDTO getMyAddress(Account user);
-	Address getAddress(Long id);
-	Address addAddress(AddressRequest request,
-					   Account user);
-	Address updateAddress(AddressRequest request,
-						  Long id,
-						  Account user);
-	Address deleteAddress(Long id,
-						  Account user);
+    List<AddressDTO> getMyAddresses(Account user);
+
+    AddressDTO getMyAddress(Account user);
+
+    Address getAddress(Long id);
+
+    Address addAddress(AddressRequest request,
+                       Account user);
+
+    Address updateAddress(AddressRequest request,
+                          Long id,
+                          Account user);
+
+    Address deleteAddress(Long id,
+                          Account user);
 }

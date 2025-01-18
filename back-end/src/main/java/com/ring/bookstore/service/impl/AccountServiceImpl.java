@@ -9,6 +9,7 @@ import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
+import com.ring.bookstore.listener.reset.OnResetPasswordCompletedEvent;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.AccountProfile;
 import com.ring.bookstore.model.Image;
@@ -21,6 +22,9 @@ import com.ring.bookstore.request.ProfileRequest;
 import com.ring.bookstore.service.AccountService;
 import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.service.RoleService;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,9 +50,9 @@ public class AccountServiceImpl implements AccountService {
     private final ImageService imageService;
 
     private final AccountMapper accountMapper;
-    private final PasswordEncoder passwordEncoder;
-
     private final DashboardMapper dashMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
     //Get all accounts
     public Page<AccountDTO> getAllAccounts(Integer pageNo,
@@ -57,7 +61,7 @@ public class AccountServiceImpl implements AccountService {
                                            String sortDir,
                                            String keyword,
                                            Short roles) {
-       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
         Page<IAccount> accountsList = accountRepo.findAccountsWithFilter(keyword, roles, pageable);
@@ -66,9 +70,9 @@ public class AccountServiceImpl implements AccountService {
 
     //Get account by {id}
     public AccountDetailDTO getAccountById(Long id) {
-        Account account = accountRepo.findById(id).orElseThrow(()
+        IAccountDetail account = profileRepo.findDetailById(id).orElseThrow(()
                 -> new ResourceNotFoundException("User not found!"));
-        return accountMapper.accountToDetailDTO(account);
+        return accountMapper.projectionToDetailDTO(account);
     }
 
     public StatDTO getAnalytics() {
@@ -79,14 +83,14 @@ public class AccountServiceImpl implements AccountService {
 
     //Create account (ADMIN)
     @Transactional
-    public Account saveAccount(AccountRequest request) {
+    public Account saveAccount(AccountRequest request, MultipartFile file) throws IOException, ImageResizerException {
 
         //Check if Account with these username and email has exists >> throw exception
-        if (!accountRepo.findByUsername(request.getUsername()).isEmpty()) {
+        if (accountRepo.existsByUsernameOrEmail(request.getUsername(), request.getEmail())) {
             throw new HttpResponseException(
                     HttpStatus.CONFLICT,
                     "User already existed!",
-                    "Người dùng với tên đăng nhập này đã tồn tại!"
+                    "Người dùng với tên đăng nhập hoặc email này đã tồn tại!"
             );
         }
 
@@ -98,7 +102,9 @@ public class AccountServiceImpl implements AccountService {
         if (request.getRoles() >= 2) {
             roles.add(roleService.findByRoleName(RoleName.ROLE_SELLER).orElseThrow(
                     () -> new ResourceNotFoundException("Role not found!")));
-        } else if (request.getRoles() >= 3) {
+        }
+
+        if (request.getRoles() >= 3) {
             roles.add(roleService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(
                     () -> new ResourceNotFoundException("Role not found!")));
         }
@@ -122,50 +128,60 @@ public class AccountServiceImpl implements AccountService {
                 .user(savedAccount)
                 .build();
 
+        //Image upload/replace
+        profile = this.changeProfilePic(file, request.getImage(), profile);
+
         profileRepo.save(profile); //Save profile to Database
         return savedAccount; //Return created account
     }
 
     //Update account (ADMIN)
     @Transactional
-    public Account updateAccount(AccountRequest request, Long id) {
+    public Account updateAccount(AccountRequest request, MultipartFile file, Long id) throws IOException, ImageResizerException {
         //Check Account exists?
         Account currUser = accountRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         //Check if Account with these username and email has exists >> throw exception
-        if (!request.getUsername().equals(currUser.getUsername()) && !accountRepo.findByUsername(request.getUsername()).isEmpty()) {
+        if (!request.getUsername().equals(currUser.getUsername())
+                && !request.getEmail().equals(currUser.getEmail())
+                && accountRepo.existsByUsernameOrEmail(request.getUsername(), request.getEmail())) {
             throw new HttpResponseException(
                     HttpStatus.CONFLICT,
                     "User already existed!",
-                    "Người dùng với tên đăng nhập này đã tồn tại!"
+                    "Người dùng với tên đăng nhập hoặc email này đã tồn tại!"
             );
         }
 
         //Set roles: 1 USER, 2 SELLER, 3 ADMIN
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleService.findByRoleName(RoleName.ROLE_USER).orElseThrow(
-                () -> new ResourceNotFoundException("No roles has been set!")));
+        if (currUser.getRolesSize() != request.getRoles()) {
+            Set<Role> roles = new HashSet<>();
+            roles.add(roleService.findByRoleName(RoleName.ROLE_USER).orElseThrow(
+                    () -> new ResourceNotFoundException("No roles has been set!")));
 
-        if (request.getRoles() >= 2) {
-            roles.add(roleService.findByRoleName(RoleName.ROLE_SELLER).orElseThrow(
-                    () -> new ResourceNotFoundException("Role not found!")));
-        }
-        if (request.getRoles() >= 3) {
-            roles.add(roleService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(
-                    () -> new ResourceNotFoundException("Role not found!")));
+            if (request.getRoles() >= 2) {
+                roles.add(roleService.findByRoleName(RoleName.ROLE_SELLER).orElseThrow(
+                        () -> new ResourceNotFoundException("Role not found!")));
+            }
+            if (request.getRoles() >= 3) {
+                roles.add(roleService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(
+                        () -> new ResourceNotFoundException("Role not found!")));
+            }
+            currUser.setRoles(roles);
         }
 
         //Set new info
         currUser.setUsername(request.getUsername());
         currUser.setEmail(request.getEmail());
-        currUser.setRoles(roles);
         if (!request.isKeepOldPass()) currUser.setPass(passwordEncoder.encode(request.getPass()));
 
         Account updatedAccount = accountRepo.save(currUser); //Save to Database
 
         //Get current profile
         AccountProfile profile = updatedAccount.getProfile();
+
+        //Image upload/replace
+        profile = this.changeProfilePic(file, request.getImage(), profile);
 
         //Set new profile info
         profile.setName(request.getName());
@@ -230,14 +246,7 @@ public class AccountServiceImpl implements AccountService {
                 -> new ResourceNotFoundException("Profile not found!"));
 
         //Image upload/replace
-        if (file != null) { //Contain new image >> upload/replace
-            if (profile.getImage() != null) imageService.deleteImage(profile.getImage().getId()); //Delete old image
-            Image savedImage = imageService.upload(file); //Upload new image
-            profile.setImage(savedImage); //Set new image
-        } else if (request.getImage() == null) { //Remove image
-            if (profile.getImage() != null) imageService.deleteImage(profile.getImage().getId()); //Delete old image
-            profile.setImage(null);
-        }
+        profile = this.changeProfilePic(file, request.getImage(), profile);
 
         //Set info
         profile.setName(request.getName());
@@ -271,18 +280,10 @@ public class AccountServiceImpl implements AccountService {
         user.setPass(passwordEncoder.encode(request.getNewPass()));
         Account savedAccount = accountRepo.save(user);
 
-        //Create and send an email
-        String subject = "RING! - BOOKSTORE: Đổi mật khẩu thành công! ";
-        String content = "<h1><b style=\"color: #63e399;\">RING!</b> - BOOKSTORE</h1>\n"
-                + "<h2 style=\"background-color: #63e399; padding: 10px; color: white;\" >\r\n"
-                + "Tài khoản của bạn đã được đổi mật khẩu thành công!\r\n"
-                + "</h2>\n"
-                + "<h3>Tài khoản RING!:</h3>\n"
-                + "<p><b>- Tên đăng nhập: </b>" + user.getUsername() + " đã đổi mật khẩu thành công</p>\n"
-                + "<p>- Chúc bạn có trả nghiệm vui vẻ khi mua sách tại RING! - BOOKSTORE</p>\n"
-                + "<br><p>Không phải bạn thực hiện thay đổi trên? Liên hệ và yêu cầu xử lý tại: <b>ringbookstore@ring.email</b></p>\n"
-                + "<br><br><h3>Cảm ơn đã sử dụng dịch vụ!</h3>\n";
-//        emailService.sendTemplateMail(user.getEmail(), subject, content);
+        //Email event
+        eventPublisher.publishEvent(new OnResetPasswordCompletedEvent(
+                user.getUsername(),
+                user.getEmail()));
 
         return savedAccount; //Return updated account
     }
@@ -299,5 +300,18 @@ public class AccountServiceImpl implements AccountService {
 //        List<Map<String,Object>> result = accountRepo.getTopSeller();
 //        return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
         return null;
+    }
+
+    protected AccountProfile changeProfilePic(MultipartFile file, String image, AccountProfile profile) throws IOException, ImageResizerException {
+        if (file != null) { //Contain new image >> upload/replace
+            if (profile.getImage() != null) imageService.deleteImage(profile.getImage().getId()); //Delete old image
+            Image savedImage = imageService.upload(file); //Upload new image
+            profile.setImage(savedImage); //Set new image
+        } else if (image == null) { //Remove image
+            if (profile.getImage() != null) imageService.deleteImage(profile.getImage().getId()); //Delete old image
+            profile.setImage(null);
+        }
+
+        return profile;
     }
 }

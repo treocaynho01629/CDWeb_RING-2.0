@@ -1,11 +1,12 @@
 import {
   Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper,
-  Skeleton, Toolbar, TableHead, Avatar, Chip,
+  Toolbar, TableHead, Avatar, Chip,
 } from '@mui/material';
 import { Link } from 'react-router';
 import { ItemTitle, LinkButton, Title } from '../custom/ShareComponents';
 import { useGetUsersQuery } from '../../../features/users/usersApiSlice';
 import CustomProgress from '../../custom/CustomProgress';
+import { roleTypes } from '../../../ultils/user';
 
 const headCells = [
   {
@@ -55,7 +56,7 @@ export default function SummaryTableUsers() {
     userRows = ids?.length
       ? ids?.map((id, index) => {
         const user = entities[id];
-        const roles = user?.roles;
+        const roleItem = roleTypes[user?.roles];
 
         return (
           <TableRow hover tabIndex={-1} key={id}>
@@ -69,8 +70,9 @@ export default function SummaryTableUsers() {
               </Link>
             </TableCell>
             <TableCell align="right">
-              <Chip label={roles == 3 ? 'Admin' : roles == 2 ? 'Nhân viên' : 'Thành viên'}
-                color={roles == 3 ? 'primary' : roles == 2 ? 'info' : 'default'}
+              <Chip
+                color={roleItem?.color}
+                label={roleItem?.label}
                 variant="outlined"
                 sx={{ fontWeight: 'bold' }}
               />

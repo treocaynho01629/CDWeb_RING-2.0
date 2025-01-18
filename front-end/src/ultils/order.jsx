@@ -1,19 +1,12 @@
-export const getOrderStatus = (type) => {
-    switch (type) {
-        case 'COMPLETED':
-            return { status: 'Đã giao', color: 'success' };
-        case 'PENDING':
-            return { status: 'Đang chờ hàng', color: 'primary' };
-        case 'SHIPPING':
-            return { status: 'Đang giao', color: 'info' };
-        case 'CANCELED':
-            return { status: 'Đã huỷ', color: 'error' };
-        case 'REFUNDED':
-            return { status: 'Đã hoàn tiền', color: 'warning' };
-    }
-}
-
 export const orderType = ['COMPLETED', 'PENDING', 'SHIPPING', 'CANCELED', 'REFUNDED'];
+
+export const orderTypes = {
+    COMPLETED: { label: 'Đã giao', color: 'success' },
+    PENDING: { label: 'Đang chờ hàng', color: 'primary' },
+    SHIPPING: { label: 'Đang giao', color: 'info' },
+    CANCELED: { label: 'Đã huỷ', color: 'error' },
+    REFUNDED: { label: 'Đã hoàn tiền', color: 'warning' },
+}
 
 export const orderItems = [
     {

@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import { useState } from 'react'
-import { ExpandLess, ExpandMore, Speed, AutoStoriesOutlined, CategoryOutlined, TrendingUpOutlined, StarBorder, GroupOutlined } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, Speed, AutoStoriesOutlined, CategoryOutlined, TrendingUpOutlined, StarBorder, GroupOutlined, EventOutlined, Storefront } from '@mui/icons-material';
 import { ListItem, ListItemButton, ListItemIcon, ListItemText, List, Collapse, ListSubheader, Drawer } from '@mui/material';
 import { NavLink } from 'react-router';
 import MuiDrawer from '@mui/material/Drawer';
@@ -110,48 +110,17 @@ const managementListItems = [
     label: 'Sản phẩm',
     icon: <AutoStoriesOutlined />,
     url: '/dashboard/product',
-    subItems: [
-      {
-        label: 'Tổng quan',
-        url: '/dashboard/product',
-      },
-      {
-        label: 'Thêm mới',
-        url: '/temp',
-      },
-    ]
   },
   {
-    isAdmin: true,
-    label: 'Danh mục',
-    icon: <CategoryOutlined />,
-    url: '/temp',
-    subItems: [
-      {
-        label: 'Tổng quan',
-        url: '/temp',
-      },
-      {
-        label: 'Thêm mới',
-        url: '/temp',
-      },
-    ]
+    label: 'Cửa hàng',
+    icon: <Storefront />,
+    url: '/dashboard/shop',
   },
   {
     isAdmin: true,
     label: 'Thành viên',
     icon: <GroupOutlined />,
     url: '/dashboard/user',
-    subItems: [
-      {
-        label: 'Tổng quan',
-        url: '/dashboard/user',
-      },
-      {
-        label: 'Thêm mới',
-        url: '/temp',
-      },
-    ]
   },
   {
     label: 'Đánh giá',
@@ -163,12 +132,23 @@ const managementListItems = [
     icon: <TrendingUpOutlined />,
     url: '/dashboard/order',
   },
+  {
+    label: 'Sự kiện',
+    icon: <EventOutlined />,
+    url: '/dashboard/event',
+  },
+  {
+    isAdmin: true,
+    label: 'Khác',
+    icon: <CategoryOutlined />,
+    url: '/dashboard/misc',
+  },
 ];
 
 const DashboardDrawer = ({ open, setOpen, mobileMode }) => {
   const { roles } = useAuth();
   const [openList, setOpenList] = useState(true);
-  const isAdmin = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
+  const isAdmin = roles?.length >= 3;
 
   const handleClick = (e, id) => {
     setOpenList((prevState) => ({ ...prevState, [id]: !prevState[id] }));

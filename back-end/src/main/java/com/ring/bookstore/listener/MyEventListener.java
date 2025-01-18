@@ -48,6 +48,7 @@ public class MyEventListener {
                 context);
     }
 
+    @Async
     @EventListener
     public void resetNotification(final OnResetPasswordCompletedEvent event) {
         Context context = new Context();

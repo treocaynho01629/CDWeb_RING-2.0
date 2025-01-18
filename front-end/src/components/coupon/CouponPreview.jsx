@@ -4,7 +4,7 @@ import { KeyboardArrowRight, LabelOff} from '@mui/icons-material'
 import { MobileExtendButton } from '../custom/GlobalComponents'
 import { useGetCouponsQuery } from '../../features/coupons/couponsApiSlice'
 import { Skeleton } from '@mui/material'
-import { getCouponSummary } from '../../ultils/coupon'
+import { couponTypes } from '../../ultils/coupon'
 
 const Popover = lazy(() => import('@mui/material/Popover'));
 const CouponItem = lazy(() => import('./CouponItem'));
@@ -228,7 +228,7 @@ const CouponPreview = ({ shopId }) => {
         coupons = ids?.length
             ? ids?.map((id, index) => {
                 const coupon = entities[id];
-                const summary = getCouponSummary(coupon.type);
+                const summary = couponTypes[coupon.type];
 
                 return (
                     <Coupon

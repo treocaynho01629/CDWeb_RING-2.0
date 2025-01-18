@@ -137,6 +137,8 @@ public class Account extends Auditable implements UserDetails {
 		return this.isActive();
 	}
 
+	public int getRolesSize() { return this.roles.size();}
+
 	public void setProfile(AccountProfile profile) {
 		if (profile == null) {
 			if (this.profile != null) {

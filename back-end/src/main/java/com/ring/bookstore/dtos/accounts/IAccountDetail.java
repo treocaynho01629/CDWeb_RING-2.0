@@ -5,19 +5,24 @@ import com.ring.bookstore.enums.Gender;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public interface IProfile {
+public interface IAccountDetail {
+    Long getId();
 
-    String getName();
+    String getUsername();
+
+    String getImage();
 
     String getEmail();
 
+    String getName();
+
     String getPhone();
+
+    Short getRoles();
 
     Gender getGender();
 
     LocalDate getDob();
-
-    String getImage();
 
     LocalDateTime getJoinedDate();
 

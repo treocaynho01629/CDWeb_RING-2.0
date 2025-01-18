@@ -52,7 +52,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	@Query("""
 		select s.id as id, s.name as name, i.name as image
 		from Shop s
-		left join s.image i 
+		left join s.image i
 		where s.owner.id = :ownerId
 	""")
 	List<IShopPreview> findShopsPreview(Long ownerId);

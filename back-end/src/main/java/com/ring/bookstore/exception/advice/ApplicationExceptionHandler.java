@@ -119,11 +119,11 @@ public class ApplicationExceptionHandler{
         );
     }
 
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(BadCredentialsException.class)
     public ExceptionResponse handleBadCredentialsException(BadCredentialsException e) {
         return new ExceptionResponse(
-                HttpStatus.UNAUTHORIZED.value() ,
+                HttpStatus.FORBIDDEN.value() ,
                 "Invalid user!",
                 e.getLocalizedMessage()
         );

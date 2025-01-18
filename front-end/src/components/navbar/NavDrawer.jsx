@@ -30,7 +30,7 @@ const DrawerContainer = styled(Box)`
 //#endregion
 
 const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, roles, products, signOut, mode, toggleMode }) => {
-    const role = roles?.length;
+    const isSeller = roles?.length >= 2;
 
     return (
         <SwipeableDrawer
@@ -87,8 +87,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                     </Link>
                 </List>
                 <Divider />
-                {username
-                    ?
+                {username ?
                     <Box>
                         <List>
                             <ListItem disablePadding>
@@ -115,7 +114,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                         </List>
                         <Divider />
                         <List>
-                            {role >= 2 && (
+                            {isSeller &&
                                 <Link to={'/dashboard'}>
                                     <ListItem disablePadding onClick={handleClose}>
                                         <ListItemButton>
@@ -126,7 +125,7 @@ const NavDrawer = ({ location, openDrawer, handleOpen, handleClose, username, ro
                                         </ListItemButton>
                                     </ListItem>
                                 </Link>
-                            )}
+                            }
                             {mode &&
                                 <ListItem disablePadding>
                                     <ListItemButton onClick={toggleMode}>

@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Box, Stack, Button, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, FormControlLabel, Switch, Avatar, Chip, Grid2 as Grid, TextField, MenuItem, IconButton, Toolbar, Menu, ListItemIcon, ListItemText } from '@mui/material';
 import { Search, MoreHoriz, Edit, Delete, Visibility, FilterAltOff, Add } from '@mui/icons-material';
 import { Link } from 'react-router';
@@ -9,23 +9,7 @@ import CustomTablePagination from '../table/CustomTablePagination';
 import CustomProgress from '../../custom/CustomProgress';
 import CustomTableHead from '../table/CustomTableHead';
 import useDeepEffect from '../../../hooks/useDeepEffect';
-
-const EditAccountDialog = lazy(() => import('../dialog/EditAccountDialog'));
-
-const userRoles = [
-  {
-    value: 1,
-    label: 'Thành viên',
-  },
-  {
-    value: 2,
-    label: 'Nhân viên',
-  },
-  {
-    value: 3,
-    label: 'Admin',
-  },
-];
+import { roleTypeItems, roleTypes } from '../../../ultils/user';
 
 const headCells = [
   {
@@ -64,7 +48,6 @@ const headCells = [
     width: '35px',
     disablePadding: false,
     sortable: false,
-    hideOnMinimize: true,
     label: '',
   },
 ];
@@ -97,7 +80,7 @@ function UserFilters({ filters, setFilters }) {
         sx={{ maxWidth: 200 }}
       >
         <MenuItem value=""><em>--Tất cả--</em></MenuItem>
-        {userRoles.map((roles, index) => (
+        {roleTypeItems.map((roles, index) => (
           <MenuItem key={`type-${roles.value}-${index}`} value={roles.value}>
             {roles.label}
           </MenuItem>
@@ -125,14 +108,12 @@ function UserFilters({ filters, setFilters }) {
   )
 }
 
-export default function TableUsers() {
+export default function TableUsers({ handleOpenEdit, pending, setPending }) {
   //#region construct
   const [selected, setSelected] = useState([]);
   const [deselected, setDeseletected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [dense, setDense] = useState(true);
-  const [openEdit, setOpenEdit] = useState(false);
-  const [pending, setPending] = useState(false);
   const [filters, setFilters] = useState({
     keyword: "",
     roles: "",
@@ -271,15 +252,6 @@ export default function TableUsers() {
     setContextId(null);
   }
 
-  const handleOpenEdit = (id) => {
-    setOpenEdit(true);
-    setContextId(id);
-  };
-
-  const handleCloseEdit = () => {
-    setOpenEdit(false);
-  }
-
   const handleDelete = async (id) => {
     if (pending) return;
     setPending(true);
@@ -380,7 +352,7 @@ export default function TableUsers() {
         const user = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
-        const roles = user.roles;
+        const roleItem = roleTypes[user.roles];
 
         return (
           <TableRow
@@ -416,11 +388,10 @@ export default function TableUsers() {
               <ItemTitle className="secondary">{user?.phone}</ItemTitle>
             </TableCell>
             <TableCell align="left">
-              <Chip variant="outlined"
-                label={roles == 3 ? 'Admin' :
-                  roles == 2 ? 'Nhân viên' : 'Thành viên'}
-                color={roles == 3 ? 'primary' :
-                  roles == 2 ? 'info' : 'default'}
+              <Chip
+                variant="outlined"
+                label={roleItem?.label}
+                color={roleItem?.color}
                 sx={{ fontWeight: 'bold' }}
               />
             </TableCell>
@@ -492,15 +463,6 @@ export default function TableUsers() {
           count={data?.page?.totalElements ?? 0}
         />
       </FooterContainer>
-      <Suspense fallback={null}>
-        {openEdit &&
-          <EditAccountDialog
-            id={contextId}
-            open={openEdit}
-            setOpen={handleCloseEdit}
-          />
-        }
-      </Suspense>
       <Menu
         open={openContext}
         onClose={handleCloseContext}

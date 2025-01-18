@@ -1,19 +1,22 @@
 package com.ring.bookstore.dtos.accounts;
 
-import com.ring.bookstore.model.Address;
+import com.ring.bookstore.enums.Gender;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 //Account details
 public record AccountDetailDTO(Long id,
                                String username,
                                String image,
                                String email,
-                               Integer roles,
+                               Short roles,
                                String name,
                                String phone,
-                               String gender,
-                               Address address,
-                               LocalDate dob) {
+                               Gender gender,
+                               LocalDate dob,
+                               LocalDateTime joinedDate,
+                               Integer totalFollows,
+                               Integer totalReviews) {
 
 }

@@ -1,5 +1,6 @@
 package com.ring.bookstore.model;
 
+import com.ring.bookstore.enums.Gender;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -39,9 +40,9 @@ public class AccountProfile {
 	@Column(length = 15)
     private String phone;
 
-    @Column(length = 10)
-    @Nationalized 
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private Gender gender;
 
     @Column
     private LocalDate dob;

@@ -32,114 +32,116 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Validated
 public class AccountController {
-	
-	private final AccountService accountService;
-	
-	//Get all accounts
-	@GetMapping
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> getAllAccounts(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
-											@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-											@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-											@RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
-											@RequestParam(value = "keyword", defaultValue = "") String keyword,
-											@RequestParam(value = "roles", required = false) Short roles
-	){
-		Page<AccountDTO> accounts = accountService.getAllAccounts(pageNo, pageSize, sortBy, sortDir, keyword, roles);
-		return new ResponseEntity<>(accounts, HttpStatus.OK);
-	}
-	
-	//Get account by {id}
-	@GetMapping("{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<AccountDetailDTO> getAccountById(@PathVariable("id") Long accountId){
-		return new ResponseEntity<>(accountService.getAccountById(accountId), HttpStatus.OK);
-	}
 
-	@GetMapping("/analytics")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> getUserAnalytics() {
-		return new ResponseEntity<>(accountService.getAnalytics(), HttpStatus.OK);
-	}
-	
-	//Edit account by {id}
-	@PutMapping("{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<Account> updateAccount(@PathVariable("id") Long accountId,
-			@Valid @RequestBody AccountRequest requestt){
-		return new ResponseEntity<>(accountService.updateAccount(requestt, accountId), HttpStatus.OK);
-	}
-	
-	//Create new account through Admin dashboard
-	@PostMapping
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<Account> saveAccount(@Valid @RequestBody AccountRequest request){
-		return new ResponseEntity<>(accountService.saveAccount(request), HttpStatus.CREATED);
-	}
-	
-	//Delete account by {id}
-	@DeleteMapping("{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<String> deleteAccount(@PathVariable("id") Long accountId){
-		accountService.deleteAccount(accountId);
-		return new ResponseEntity<>("Account deleted successfully!", HttpStatus.OK);
-	}
-	
-	//Delete multiple accounts from a lists of {ids}
+    private final AccountService accountService;
+
+    //Get all accounts
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllAccounts(@RequestParam(value = "pSize", defaultValue = "10") Integer pageSize,
+                                            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                                            @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+                                            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+                                            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                            @RequestParam(value = "roles", required = false) Short roles
+    ) {
+        Page<AccountDTO> accounts = accountService.getAllAccounts(pageNo, pageSize, sortBy, sortDir, keyword, roles);
+        return new ResponseEntity<>(accounts, HttpStatus.OK);
+    }
+
+    //Get account by {id}
+    @GetMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAccountById(@PathVariable("id") Long accountId) {
+        return new ResponseEntity<>(accountService.getAccountById(accountId), HttpStatus.OK);
+    }
+
+    @GetMapping("/analytics")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAccountAnalytics() {
+        return new ResponseEntity<>(accountService.getAnalytics(), HttpStatus.OK);
+    }
+
+    //Create new account through Admin dashboard
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Account> saveAccount(@Valid @RequestPart AccountRequest request,
+                                               @RequestPart(name = "image", required = false) MultipartFile file) throws ImageResizerException, IOException {
+        return new ResponseEntity<>(accountService.saveAccount(request, file), HttpStatus.CREATED);
+    }
+
+    //Edit account by {id}
+    @PutMapping(value = "{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Account> updateAccount(@PathVariable("id") Long accountId,
+                                                 @Valid @RequestPart AccountRequest request,
+                                                 @RequestPart(name = "image", required = false) MultipartFile file) throws ImageResizerException, IOException {
+        return new ResponseEntity<>(accountService.updateAccount(request, file, accountId), HttpStatus.OK);
+    }
+
+    //Delete account by {id}
+    @DeleteMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deleteAccount(@PathVariable("id") Long accountId) {
+        accountService.deleteAccount(accountId);
+        return new ResponseEntity<>("Account deleted successfully!", HttpStatus.OK);
+    }
+
+    //Delete multiple accounts from a lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteAccounts(@RequestParam("ids") List<Long> ids) {
-    	accountService.deleteAccounts(ids);
+        accountService.deleteAccounts(ids);
         return new ResponseEntity<>("Accounts deleted successfully!", HttpStatus.OK);
     }
-    
+
     //Delete all accounts
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteAllAccounts() {
-    	accountService.deleteAllAccounts();
+        accountService.deleteAllAccounts();
         return new ResponseEntity<>("All accounts deleted successfully!", HttpStatus.OK);
     }
-	
-	//Get account's profile (AccountProfile)
-	@GetMapping("/profile")
-	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<ProfileDTO> getProfile(@CurrentAccount Account currUser){
-		ProfileDTO profile = accountService.getProfile(currUser);
-		return new ResponseEntity<>(profile, HttpStatus.OK);
-	}
-	
-	//Update account's profile
-	@PutMapping(value = "/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<AccountProfile> updateProfile(@Valid @RequestPart ProfileRequest request,
-														@RequestPart(name = "image", required = false) MultipartFile file,
-														@CurrentAccount Account currUser) throws ImageResizerException, IOException {
-		AccountProfile profile = accountService.updateProfile(request, file, currUser);
-		return new ResponseEntity<>(profile, HttpStatus.OK);
-	}
-	
-	//Change account's password
-	@PutMapping("/change-password")
-	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePassRequest request, @CurrentAccount Account currUser){
-		Account account = accountService.changePassword(request, currUser);
-		String result = "Đổi mật khẩu thất bại";
-		if (account != null) result = "Thay đổi mật khẩu thành công!";
-		return new ResponseEntity<>(result, HttpStatus.OK);
-	}
-	
-	//Get accounts chart (User)
-	@GetMapping("/top-accounts")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> getTopAccounts(){
-		return new ResponseEntity<>(accountService.getTopAccount(), HttpStatus.OK);
-	}
-	
-	//Get sellers chart
-	@GetMapping("/top-sellers")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> getTopSellers(){
-		return new ResponseEntity<>(accountService.getTopSeller(), HttpStatus.OK);
-	}
+
+    //Get account's profile (AccountProfile)
+    @GetMapping("/profile")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ProfileDTO> getProfile(@CurrentAccount Account currUser) {
+        ProfileDTO profile = accountService.getProfile(currUser);
+        return new ResponseEntity<>(profile, HttpStatus.OK);
+    }
+
+    //Update account's profile
+    @PutMapping(value = "/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<AccountProfile> updateProfile(@Valid @RequestPart ProfileRequest request,
+                                                        @RequestPart(name = "image", required = false) MultipartFile file,
+                                                        @CurrentAccount Account currUser) throws ImageResizerException, IOException {
+        AccountProfile profile = accountService.updateProfile(request, file, currUser);
+        return new ResponseEntity<>(profile, HttpStatus.OK);
+    }
+
+    //Change account's password
+    @PutMapping("/change-password")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePassRequest request, @CurrentAccount Account currUser) {
+        Account account = accountService.changePassword(request, currUser);
+        String result = "Đổi mật khẩu thất bại";
+        if (account != null) result = "Thay đổi mật khẩu thành công!";
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    //Get accounts chart (User)
+    @GetMapping("/top-accounts")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getTopAccounts() {
+        return new ResponseEntity<>(accountService.getTopAccount(), HttpStatus.OK);
+    }
+
+    //Get sellers chart
+    @GetMapping("/top-sellers")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getTopSellers() {
+        return new ResponseEntity<>(accountService.getTopSeller(), HttpStatus.OK);
+    }
 }
