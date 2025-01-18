@@ -27,6 +27,10 @@ export const HeaderContainer = styled.div`
     align-items: center;
     justify-content: space-between;
     margin-bottom: ${props => props.theme.spacing(4)};
+
+    ${props => props.theme.breakpoints.down("sm_md")} {
+        padding: 0 ${props => props.theme.spacing(1)};
+    }
 `
 
 export const FooterContainer = styled.div`
@@ -67,7 +71,17 @@ export const Label = styled.p`
     }
 `
 
+export const ButtonContainer = styled.div`
+    display: flex;
+    align-items: flex-start;
+    white-space: nowrap;
+`
+
 export const LinkButton = styled.span`
     color: ${props => props.theme.palette.info.main};
     font-size: 14px;
+`
+
+export const InfoTable = styled.table`
+    td { width: 50%; }
 `

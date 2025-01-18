@@ -3,7 +3,7 @@ import { Avatar, Menu, MenuItem, ListItemIcon, Divider, Paper } from '@mui/mater
 import { Link } from 'react-router';
 
 const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mode, toggleMode }) => {
-    const role = roles?.length;
+    const isSeller = roles?.length >= 2;
 
     return (
         <Menu
@@ -61,7 +61,7 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mo
                 </MenuItem>
             </Link>
             <Divider />
-            {role >= 2 && (
+            {isSeller &&
                 <Link to={'/dashboard'} style={{ color: 'inherit' }}>
                     <MenuItem>
                         <ListItemIcon>
@@ -70,7 +70,7 @@ const ProfilePopover = ({ open, image, anchorEl, handleClose, roles, signOut, mo
                         Dashboard
                     </MenuItem>
                 </Link>
-            )}
+            }
             {mode &&
                 <MenuItem aria-label="toggle-mode" onClick={(e) => {
                     e.stopPropagation();

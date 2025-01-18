@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { Paper, Rating, Skeleton, Stack } from "@mui/material";
 import { LazyLoadImage, trackWindowScroll } from "react-lazy-load-image-component";
-import { Star, StarBorder, StarRounded } from "@mui/icons-material";
+import { Star, StarBorder } from "@mui/icons-material";
 import { Link } from "react-router";
 import { Message } from "../../custom/GlobalComponents";
 import { currencyFormat, numFormat } from "../../../ultils/covert";
@@ -26,7 +26,7 @@ const Rank = styled.span`
     align-items: center;
     justify-content: center;
     width: 25px;
-    height: 25px;
+    aspect-ratio: 1/1;
     margin-right: ${props => props.theme.spacing(2)};
     border-radius: 50%;
     border: .5px solid currentColor;
@@ -122,8 +122,11 @@ const TextMore = styled.b`
     margin-left: 5px;
     padding-left: 5px;
     font-size: 12px;
-    border-left: .5px solid ${props => props.theme.palette.action.focus};
     color: ${props => props.theme.palette.info.main};
+
+    &:last-of-type {
+        border-left: .5px solid ${props => props.theme.palette.action.focus};
+    }
 `
 
 const StyledRating = styled(Rating)`
@@ -164,25 +167,33 @@ const ProductItem = ({ book, scrollPosition }) => {
                         </>
                     }
                 </ProductTitle>
-                {book ?
-                    <MoreInfo>
-                        <ProductShop>{currencyFormat.format(book?.price)}</ProductShop>
-                        <Stat>
-                            <StyledRating
-                                name="product-rating"
-                                value={book?.rating ?? 0}
-                                getLabelText={(value) => `${value} Star${value !== 1 ? 's' : ''}`}
-                                precision={0.5}
-                                icon={<Star style={{ fontSize: 14 }} />}
-                                emptyIcon={<StarBorder style={{ fontSize: 14 }} />}
-                                readOnly
-                            />
-                            <TextMore>Đã bán {numFormat.format(book?.totalOrders)}</TextMore>
-                        </Stat>
-                    </MoreInfo>
-                    :
-                    <Skeleton variant="text" width="40%" />
-                }
+                <MoreInfo>
+                    {book ?
+                        <>
+                            <ProductShop>{currencyFormat.format(book?.price)}</ProductShop>
+                            <Stat>
+                                <StyledRating
+                                    name="product-rating"
+                                    value={book?.rating ?? 0}
+                                    getLabelText={(value) => `${value} Star${value !== 1 ? 's' : ''}`}
+                                    precision={0.5}
+                                    icon={<Star style={{ fontSize: 14 }} />}
+                                    emptyIcon={<StarBorder style={{ fontSize: 14 }} />}
+                                    readOnly
+                                />
+                                <TextMore>Đã bán {numFormat.format(book?.totalOrders)}</TextMore>
+                            </Stat>
+                        </>
+                        :
+                        <>
+                            <ProductShop><Skeleton variant="text" width="100px" /></ProductShop>
+                            <Stat>
+                                <TextMore><Skeleton variant="text" width="55px" /></TextMore>
+                                <TextMore><Skeleton variant="text" width="50px" /></TextMore>
+                            </Stat>
+                        </>
+                    }
+                </MoreInfo>
             </ItemInfo>
         </ItemContainer>
     )
@@ -194,7 +205,6 @@ const ProductsShowcase = ({ title, size = 5, data, isError, isLoading, isSuccess
             <ProductContainer key={`temp-top-${index}`}>
                 <Rank className={index == 0 ? 'first' : index == 1 ? 'second' : ''}>
                     <b>{index + 1}</b>
-                    <StarRounded />
                 </Rank>
                 <ProductItem />
             </ProductContainer>

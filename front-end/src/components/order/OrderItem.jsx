@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 import { Box, Button, Skeleton, Typography } from '@mui/material';
 import { DeliveryDiningOutlined, KeyboardArrowRight, Storefront } from '@mui/icons-material';
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { getOrderStatus } from "../../ultils/order"
+import { orderTypes } from "../../ultils/order"
 import { Link } from 'react-router';
 import { currencyFormat } from '../../ultils/covert'
 
@@ -205,7 +205,7 @@ const StyledSkeleton = styled(Skeleton)`
 //#endregion
 
 const OrderItem = ({ order, handleAddToCart }) => {
-    const detailStatus = getOrderStatus(order?.status);
+    const detailStatus = orderTypes[order?.status];
 
     return (
         <OrderItemContainer>
@@ -217,7 +217,7 @@ const OrderItem = ({ order, handleAddToCart }) => {
                     </Shop>
                 </Link>
                 <Link to={`/profile/order/detail${order?.id}`}>
-                    <StatusTag color={detailStatus.color}>{detailStatus.status}</StatusTag>
+                    <StatusTag color={detailStatus.color}>{detailStatus.label}</StatusTag>
                 </Link>
             </HeadContainer>
             {order?.items?.map((item, itemIndex) => (

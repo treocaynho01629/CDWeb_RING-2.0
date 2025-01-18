@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Check, Close, LocalActivityOutlined, Loyalty } from '@mui/icons-material'
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, useMediaQuery, Box, Skeleton, TextField, useTheme } from '@mui/material'
 import { useGetCouponQuery, useGetCouponsQuery } from '../../features/coupons/couponsApiSlice';
-import { getCouponSummary } from '../../ultils/coupon';
+import { couponTypes } from '../../ultils/coupon';
 import { Instruction } from '../custom/GlobalComponents';
 import CouponItem from './CouponItem'
 import styled from '@emotion/styled'
@@ -126,7 +126,7 @@ const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, ope
             <DetailTitle>Mã vận chuyển</DetailTitle>
             {ids?.map((id, index) => {
                 const coupon = entities[id];
-                const summary = getCouponSummary(coupon?.type);
+                const summary = couponTypes[coupon?.type];
                 const isDisabled = selectMode && !coupon.isUsable;
                 const isSelected = tempCoupon?.id == id;
 
@@ -168,7 +168,7 @@ const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, ope
             <DetailTitle>Mã giảm giá</DetailTitle>
             {ids?.map((id, index) => {
                 const coupon = entities[id];
-                const summary = getCouponSummary(coupon.type);
+                const summary = couponTypes[coupon?.type];
                 const isDisabled = selectMode && !coupon.isUsable;
                 const isSelected = tempCoupon?.id == id;
 
@@ -179,7 +179,7 @@ const CouponDialog = ({ numSelected, selectMode = false, shopId, checkState, ope
     }
 
     if (currCoupon) {
-        const summary = getCouponSummary(currCoupon?.type);
+        const summary = couponTypes[currCoupon?.type];
         const isDisabled = selectMode && (!currCoupon?.isUsable || currCoupon?.shopId != shopId);
         const isSelected = tempCoupon?.id == currCoupon?.id;
 

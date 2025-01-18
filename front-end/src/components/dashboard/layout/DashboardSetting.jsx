@@ -13,7 +13,7 @@ const StyledMobileDrawer = styled(Drawer)(({ theme }) => ({
 
 const DashboardSetting = ({ open, setOpen, mobileMode }) => {
   const { roles } = useAuth();
-  const isAdmin = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
+  const isAdmin = roles?.length >= 3;
 
   const handleDrawerClose = () => { setOpen(false) };
 

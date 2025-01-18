@@ -11,6 +11,7 @@ import { PatternFormat } from 'react-number-format';
 import dayjs from 'dayjs';
 import useAuth from '../../hooks/useAuth';
 import useConfirm from '../../hooks/useConfirm';
+import { genderTypeItems } from '../../ultils/user';
 
 const CustomDatePicker = lazy(() => import('../custom/CustomDatePicker'));
 
@@ -119,7 +120,7 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
     const [errMsg, setErrMsg] = useState('');
     const [err, setErr] = useState([]);
     const [name, setName] = useState(profile?.name || '');
-    const [dob, setDob] = useState(profile?.dob ? dayjs(profile?.dob) : dayjs('2000-01-01'));
+    const [dob, setDob] = useState(profile?.dob ? dayjs(profile?.dob) : dayjs('1970-01-01'));
     const [gender, setGender] = useState(profile?.gender || '');
     const [phone, setPhone] = useState(profile?.phone || '');
     const [validPhone, setValidPhone] = useState(false);
@@ -138,11 +139,11 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
     //Set data
     useEffect(() => {
         if (!loading && isSuccess && profile) {
-            setName(profile?.name);
-            setPhone(profile?.phone);
-            setGender(profile?.gender);
-            setDob(dayjs(profile?.dob));
-            setPic(profile?.image);
+            setName(profile?.name)|| '';
+            setPhone(profile?.phone|| '');
+            setGender(profile?.gender|| '');
+            setDob(profile?.dob ? dayjs(profile?.dob) : dayjs('1970-01-01'));
+            setPic(profile?.image || null);
         }
     }, [profile])
 
@@ -207,11 +208,10 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
         //Set data
         const formData = new FormData();
         const json = JSON.stringify({
-            name,
-            phone,
-            gender,
+            name: name || null,
+            phone: phone || null,
+            gender: gender || null,
             dob: dob.format('YYYY-MM-DD'),
-            address: profile?.address,
             image: file ? null : pic
         });
         const blob = new Blob([json], { type: 'application/json' });
@@ -431,9 +431,14 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                                                 size="small"
                                                 fullWidth
                                             >
-                                                <MenuItem value="Nam">Nam</MenuItem>
-                                                <MenuItem value="Nữ">Nữ</MenuItem>
-                                                <MenuItem value="">Không</MenuItem>
+                                                {genderTypeItems?.map((gender, index) => (
+                                                    <MenuItem
+                                                        key={`menu-${gender?.value}-${index}`}
+                                                        value={gender?.value}
+                                                    >
+                                                        {gender?.label}
+                                                    </MenuItem>
+                                                ))}
                                             </TextField>
                                         :
                                         loading ?
@@ -449,9 +454,14 @@ const ProfileDetail = ({ pending, setPending, profile, loading, isSuccess, table
                                                 value={gender}
                                                 onChange={e => setGender(e.target.value)}
                                             >
-                                                <FormControlLabel value="Nam" control={<Radio color="primary" />} label="Nam" />
-                                                <FormControlLabel value="Nữ" control={<Radio color="primary" />} label="Nữ" />
-                                                <FormControlLabel value="" control={<Radio color="primary" />} label="Không" />
+                                                {genderTypeItems?.map((gender, index) => (
+                                                    <FormControlLabel
+                                                        key={`radio-${gender?.value}-${index}`}
+                                                        value={gender?.value}
+                                                        control={<Radio />}
+                                                        label={gender?.label}
+                                                    />
+                                                ))}
                                             </RadioGroup>
                                     }
                                 </InfoStackContainer>

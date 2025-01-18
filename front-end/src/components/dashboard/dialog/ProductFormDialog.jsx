@@ -2,13 +2,13 @@ import { useState, forwardRef, useEffect } from 'react'
 import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem, useTheme, useMediaQuery, Button, TextareaAutosize } from '@mui/material';
 import { Check, Close as CloseIcon, AutoStories as AutoStoriesIcon } from '@mui/icons-material';
 import { bookLanguageItems, bookTypeItems } from '../../../ultils/book';
-import { Label, Title } from '../custom/ShareComponents';
+import { Title } from '../custom/ShareComponents';
 import { publishersApiSlice } from '../../../features/publishers/publishersApiSlice';
 import { categoriesApiSlice } from '../../../features/categories/categoriesApiSlice';
 import { useGetPreviewShopsQuery } from '../../../features/shops/shopsApiSlice';
 import { currencyFormat } from '../../../ultils/covert';
 import { NumberFormatBase, NumericFormat, PatternFormat } from 'react-number-format';
-import { useCreateBookMutation, useGetBookQuery, useUpdateBookMutation } from '../../../features/books/booksApiSlice';
+import { useCreateBookMutation, useUpdateBookMutation } from '../../../features/books/booksApiSlice';
 import { Instruction } from '../../custom/GlobalComponents';
 import CustomDropZone from '../custom/CustomDropZone';
 import CustomDatePicker from '../../custom/CustomDatePicker';
@@ -330,7 +330,7 @@ const ProductFormDialog = ({ product = null, open, handleClose, shop, pending, s
           } else if (err?.status === 400) {
             setErrMsg('Sai định dạng thông tin!');
           } else if (err?.status === 417) {
-            setErrMsg('File ảnh quá lớn (Tối đa 5MB)!');
+            setErrMsg('File ảnh quá lớn (Tối đa 2MB)!');
           } else {
             setErrMsg('Chỉnh sửa sản phẩm thất bại!')
           }
@@ -340,6 +340,7 @@ const ProductFormDialog = ({ product = null, open, handleClose, shop, pending, s
     } else { //Create
       createBook(formData).unwrap()
         .then((data) => {
+          clearInput();
           setErrMsg('');
           setErr([]);
           enqueueSnackbar('Thêm sản phẩm thành công!', { variant: 'success' });
@@ -357,7 +358,7 @@ const ProductFormDialog = ({ product = null, open, handleClose, shop, pending, s
           } else if (err?.status === 400) {
             setErrMsg('Sai định dạng thông tin!');
           } else if (err?.status === 417) {
-            setErrMsg('File ảnh quá lớn (Tối đa 5MB)!');
+            setErrMsg('File ảnh quá lớn (Tối đa 2MB)!');
           } else {
             setErrMsg('Thêm sản phẩm thất bại!')
           }

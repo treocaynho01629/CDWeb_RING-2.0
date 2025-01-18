@@ -64,7 +64,7 @@ public class ShopController {
 
     @GetMapping("/analytics")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getUserAnalytics() {
+    public ResponseEntity<?> getShopAnalytics() {
         return new ResponseEntity<>(shopService.getAnalytics(), HttpStatus.OK);
     }
 

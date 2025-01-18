@@ -154,13 +154,6 @@ function App() {
                       },
                     },
                     {
-                      path: "dashboard/order",
-                      lazy: async () => {
-                        let ManageOrders = await import("./pages/dashboard/ManageOrders")
-                        return { Component: ManageOrders.default }
-                      },
-                    },
-                    {
                       path: "dashboard/product/:id",
                       lazy: async () => {
                         let DetailProduct = await import("./pages/dashboard/DetailProduct")
@@ -168,10 +161,31 @@ function App() {
                       },
                     },
                     {
-                      path: "dashboard/user/:id",
+                      path: "dashboard/shop",
                       lazy: async () => {
-                        let DetailAccount = await import("./pages/dashboard/DetailAccount")
-                        return { Component: DetailAccount.default }
+                        let ManageShops = await import("./pages/dashboard/ManageShops")
+                        return { Component: ManageShops.default }
+                      },
+                    },
+                    {
+                      path: "dashboard/event",
+                      lazy: async () => {
+                        let ManageShops = await import("./pages/dashboard/ManageShops")
+                        return { Component: ManageShops.default }
+                      },
+                    },
+                    {
+                      path: "dashboard/order",
+                      lazy: async () => {
+                        let ManageOrders = await import("./pages/dashboard/ManageOrders")
+                        return { Component: ManageOrders.default }
+                      },
+                    },
+                    {
+                      path: "dashboard/review",
+                      lazy: async () => {
+                        let ManageReviews = await import("./pages/dashboard/ManageReviews")
+                        return { Component: ManageReviews.default }
                       },
                     },
                   ]
@@ -187,10 +201,17 @@ function App() {
                       },
                     },
                     {
-                      path: "dashboard/review",
+                      path: "dashboard/user/:id",
                       lazy: async () => {
-                        let ManageReviews = await import("./pages/dashboard/ManageReviews")
-                        return { Component: ManageReviews.default }
+                        let DetailAccount = await import("./pages/dashboard/DetailAccount")
+                        return { Component: DetailAccount.default }
+                      },
+                    },
+                    {
+                      path: "dashboard/misc",
+                      lazy: async () => {
+                        let ManageMisc = await import("./pages/dashboard/ManageMisc")
+                        return { Component: ManageMisc.default }
                       },
                     },
                   ]

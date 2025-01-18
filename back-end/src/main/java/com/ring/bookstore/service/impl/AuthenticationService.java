@@ -7,7 +7,6 @@ import com.ring.bookstore.listener.forgot.OnResetTokenCreatedEvent;
 import com.ring.bookstore.listener.registration.OnRegistrationCompleteEvent;
 import com.ring.bookstore.listener.reset.OnResetPasswordCompletedEvent;
 import com.ring.bookstore.model.*;
-import com.ring.bookstore.repository.RefreshTokenRepository;
 import com.ring.bookstore.repository.ImageRepository;
 import com.ring.bookstore.service.CaptchaService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,7 +44,6 @@ public class AuthenticationService {
 
 	private final AccountRepository accountRepo;
 	private final ImageRepository imageRepo;
-	private final RefreshTokenRepository refreshTokenRepo;
 
 	private final RoleService roleService;
 	private final JwtService jwtService;

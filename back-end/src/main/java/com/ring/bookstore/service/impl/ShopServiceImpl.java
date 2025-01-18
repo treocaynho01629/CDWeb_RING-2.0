@@ -74,7 +74,8 @@ public class ShopServiceImpl implements ShopService {
                 Sort.by(sortBy).descending());
         boolean isAdmin = isAuthAdmin();
 
-        Page<IShop> shopsList = shopRepo.findShops(keyword, userId != null ? userId : isAdmin ? null : user.getId(), pageable);
+        Page<IShop> shopsList = shopRepo.findShops(keyword, userId != null ? isAdmin ? userId : null
+                : isAdmin ? null : user.getId(), pageable);
         Page<ShopDTO> shopDTOS = shopsList.map(shopMapper::shopToDTO);
         return shopDTOS;
     }

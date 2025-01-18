@@ -12,7 +12,6 @@ const LightboxImages = lazy(() => import("./LightboxImages"));
 const ImgContainer = styled.div`
     text-align: center;
     background-color: ${props => props.theme.palette.background.paper};
-    border: none;
 
     .react-multi-carousel-list{
       position: unset !important;
@@ -22,7 +21,6 @@ const ImgContainer = styled.div`
         width: 100%;
         position: sticky;
         top: ${props => props.theme.mixins.toolbar.minHeight + 15}px;
-        border: .5px solid ${props => props.theme.palette.divider};
     }
 `
 
@@ -53,26 +51,6 @@ const MoreImageContainer = styled.div`
 
     ${props => props.theme.breakpoints.down("md")} {
         padding: 5px;
-    }
-`
-
-const SmallImageSlide = styled.div`
-    display: flex;
-    border: .5px solid ${props => props.theme.palette.divider};
-    opacity: .5;
-    aspect-ratio: 1/1;
-    margin-right: ${props => props.theme.spacing(.5)};
-    cursor: pointer;
-    transition: opacity .25s ease;
-
-    &.active {
-        border: 3px solid ${props => props.theme.palette.primary.main};
-        opacity: 1;
-    }
-
-    &:hover {
-        border: 1px solid ${props => props.theme.palette.primary.light};
-        opacity: 1;
     }
 `
 
@@ -134,11 +112,33 @@ const StyledSkeleton = styled(Skeleton)`
     aspect-ratio: 1/1;
 `
 
+const SmallImageSlide = styled.div`
+    display: flex;
+    border: .5px solid ${props => props.theme.palette.divider};
+    opacity: .5;
+    aspect-ratio: 1/1;
+    max-height: 85px;
+    margin-right: ${props => props.theme.spacing(.5)};
+    cursor: pointer;
+    transition: opacity .25s ease;
+
+    &.active {
+        border: 3px solid ${props => props.theme.palette.primary.main};
+        opacity: 1;
+    }
+
+    &:hover {
+        border: 1px solid ${props => props.theme.palette.primary.light};
+        opacity: 1;
+    }
+`
+
 const StyledSmallLazyImage = styled(LazyLoadImage)`
     display: inline-block;
     object-fit: contain;
     width: 100%;
     aspect-ratio: 1/1;
+    max-height: 85px;
     background-color: ${props => props.theme.palette.action.disabledBackground};
 `
 
@@ -146,6 +146,7 @@ const StyledSmallSkeleton = styled(Skeleton)`
     display: inline-block;
     width: 100%;
     height: 100%;
+    max-height: 85px;
     aspect-ratio: 1/1;
 `
 
@@ -214,7 +215,7 @@ const ButtonGroup = ({ book, images, goToSlide, currentSlide, responsive }) => {
                 minimumTouchDrag={80}
                 partialVisible
             >
-                {book ? images.map((image, index) => (
+                {images?.length ? images.map((image, index) => (
                     <SmallImageSlide
                         key={index}
                         className={`${index === currentSlide ? 'active' : ''}`}
@@ -238,23 +239,10 @@ const ButtonGroup = ({ book, images, goToSlide, currentSlide, responsive }) => {
     );
 };
 
-const ProductImages = ({ book }) => {
+const ProductImages = ({ images }) => {
     let sliderRef = useRef();
-    const [slideIndex, setSlideIndex] = useState(1);
+    const [slideIndex, setSlideIndex] = useState(0);
     const [open, setOpen] = useState(undefined);
-    let initialImages = book?.previews ? [].concat(book?.image, book.previews) : [].concat(book?.image);
-    let images = initialImages.map((image, index) => ({
-        src: image,
-        alt: `${book?.title} preview image #${index + 1}`,
-        width: 600,
-        height: 600,
-        srcSet: [
-            { src: `${image}?size=tiny`, width: 45, height: 45 },
-            { src: `${image}?size=small`, width: 150, height: 150 },
-            { src: `${image}?size=medium`, width: 350, height: 350 },
-            { src: image, width: 600, height: 600 },
-        ],
-    }))
 
     const goToSlide = (index) => { if (sliderRef?.goToSlide) sliderRef.goToSlide(index) }
     const handleOpen = () => { setOpen(true); }
@@ -276,7 +264,7 @@ const ProductImages = ({ book }) => {
             beforeChange={(nextSlide) => { setSlideIndex(nextSlide) }}
             rewind
         >
-            {book ? images.map((image, index) => (
+            {images?.length ? images.map((image, index) => (
                 <ImageSlide key={index} onClick={handleOpen}>
                     <StyledLazyImage
                         src={image?.src}
@@ -299,11 +287,11 @@ const ProductImages = ({ book }) => {
         <>
             <ImgContainer>
                 <TopContainer>
-                    {book ? <ImageNumber>{slideIndex + 1}/{images.length}</ImageNumber>
+                    {images?.length ? <ImageNumber>{slideIndex + 1}/{images.length}</ImageNumber>
                         : <ImageNumber>Đang tải...</ImageNumber>}
                     {carousel}
                 </TopContainer>
-                <ButtonGroup {...{ images, book, goToSlide, currentSlide: slideIndex, responsive: responsiveGroup }} />
+                <ButtonGroup {...{ images, goToSlide, currentSlide: slideIndex, responsive: responsiveGroup }} />
             </ImgContainer>
             <Suspense fallback={null}>
                 {open !== undefined && <LightboxImages {...{ images, open, handleClose }} />}

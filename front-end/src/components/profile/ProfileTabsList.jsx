@@ -10,6 +10,7 @@ import { NavLink } from 'react-router';
 import { MobileExtendButton } from "../custom/GlobalComponents";
 import { numFormat } from '../../ultils/covert';
 import useAuth from "../../hooks/useAuth";
+import { roleTypes } from '../../ultils/user';
 
 //#region styled
 const ListContainer = styled.div`
@@ -91,18 +92,8 @@ const Role = styled.span`
     border-radius: 15px;
     white-space: nowrap;
     border: 1px solid;
-    border-color: ${props => props.theme.palette.primary.main};
-    color: ${props => props.theme.palette.primary.main};
-
-    &.admin {
-        border-color: ${props => props.theme.palette.error.main};
-        color: ${props => props.theme.palette.error.main};
-    }
-
-    &.seller {
-        border-color: ${props => props.theme.palette.info.main};
-        color: ${props => props.theme.palette.info.main};
-    }
+    border-color: ${props => props.theme.palette[props.color]?.main};
+    color: ${props => props.theme.palette[props.color]?.main};
 `
 
 const EditButton = styled.span`
@@ -244,7 +235,7 @@ const NavItem = styled.div`
 const ProfileTabsList = ({ profile, loading, tabletMode }) => {
     const { username, image, roles } = useAuth();
     const [open, setOpen] = useState(true);
-    const role = roles?.length;
+    const roleItem = roleTypes[roles?.length];
 
     const toggleOpen = (e) => {
         e.preventDefault();
@@ -272,9 +263,7 @@ const ProfileTabsList = ({ profile, loading, tabletMode }) => {
                                         <Name>{profile?.name || 'Sửa hồ sơ'}</Name>
                                     }
                                 </Username>
-                                <Role className={role == 3 ? 'admin' : role == 2 ? 'seller' : ''}>
-                                    {role == 3 ? 'Admin' : role == 2 ? 'Đối tác' : 'Thành viên'}
-                                </Role>
+                                <Role color={roleItem?.color}>{roleItem?.label}</Role>
                             </UserContainer>
                         </InfoContainer>
                     </MainProfile>

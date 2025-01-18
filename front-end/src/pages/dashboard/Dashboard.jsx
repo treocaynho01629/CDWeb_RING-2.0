@@ -36,7 +36,7 @@ const TopProducts = ({ shop }) => {
 
 const Dashboard = () => {
   const { roles, username, shop } = useAuth();
-  const isAdmin = useState((roles?.find(role => ['ROLE_ADMIN'].includes(role))));
+  const isAdmin = roles?.length >= 3;
   const { data: bookAnalytics } = useGetBookAnalyticsQuery(shop ?? null);
   const { data: salesAnalytics } = useGetSalesAnalyticsQuery(shop ?? null);
   const { data: userAnalytics } = useGetUserAnalyticsQuery();
@@ -88,26 +88,28 @@ const Dashboard = () => {
         <Grid size={{ xs: 12, md_lg: 8 }}>
           <ChartSales />
         </Grid>
-        {isAdmin &&
+        {/* {isAdmin &&
           <Grid size={12}>
-            {/* <ChartUsers /> */}
+            <ChartUsers />
           </Grid>
-        }
+        } */}
         <Grid size={{ xs: 12, md_lg: 7 }}>
           <SummaryTableShops />
         </Grid>
         <Grid size={{ xs: 12, md_lg: 5 }}>
-          <TopProducts shop={shop}/>
+          <TopProducts shop={shop} />
         </Grid>
-        <Grid size={{ xs: 12, lg: 4 }}>
+        <Grid size={isAdmin ? { xs: 12, lg: 4 } : { xs: 12, lg: 6 }}>
           <SummaryTableOrders />
         </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 4 }}>
+        <Grid size={isAdmin ? { xs: 12, md: 6, lg: 4 } : { xs: 12, lg: 6 }}>
           <SummaryTableProducts shop={shop} />
         </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-          <SummaryTableUsers />
-        </Grid>
+        {isAdmin &&
+          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
+            <SummaryTableUsers />
+          </Grid>
+        }
       </Grid>
     </>
   )

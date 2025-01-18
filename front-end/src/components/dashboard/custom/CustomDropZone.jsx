@@ -5,13 +5,27 @@ import { Close, Delete, PermMedia } from '@mui/icons-material';
 import { Button, IconButton, Tooltip } from '@mui/material';
 
 //#region styled
+const getColor = (props) => {
+  if (props.isDragAccept) {
+    return props.theme.palette.success.main;
+  }
+  if (props.isDragReject) {
+    return props.theme.palette.error.main;
+  }
+  if (props.isFocused) {
+    return props.theme.palette.info.main;
+  }
+  return props.theme.palette.primary.main;
+}
+
 const DropZoneContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
     height: 250px;
     background-color: ${props => props.theme.palette.action.focus};
-    border: 2.75px dashed ${props => props.theme.palette.primary.main};
+    border: 2.75px dashed;
+    border-color: ${props => getColor(props)};
     cursor: pointer;
 `
 
@@ -149,7 +163,7 @@ const ButtonContainer = styled.div`
 //#endregion
 
 const CustomDropZone = ({ thumbnailId, setThumbnailId, remove, setRemove, images, files, setFiles }) => {
-  const { getRootProps, getInputProps, fileRejections } = useDropzone({
+  const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject, fileRejections } = useDropzone({
     maxFiles: 10,
     maxSize: 2000000,
     accept: {
@@ -161,6 +175,11 @@ const CustomDropZone = ({ thumbnailId, setThumbnailId, remove, setRemove, images
       })));
     }
   });
+  
+  useEffect(() => {
+    // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
+    return () => files.forEach(file => URL.revokeObjectURL(file.preview));
+  }, []);
 
   const handleRemoveFile = (index) => {
     setFiles(prev => {
@@ -184,7 +203,7 @@ const CustomDropZone = ({ thumbnailId, setThumbnailId, remove, setRemove, images
     })
   }
 
-  const handleSetThumbnail = (id) => { 
+  const handleSetThumbnail = (id) => {
     const removeIndex = remove.indexOf(id);
     let newRemove = [];
 
@@ -286,14 +305,9 @@ const CustomDropZone = ({ thumbnailId, setThumbnailId, remove, setRemove, images
     })
   }
 
-  useEffect(() => {
-    // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
-    return () => files.forEach(file => URL.revokeObjectURL(file.preview));
-  }, []);
-
   return (
     <section className="container">
-      <DropZoneContainer {...getRootProps({ className: 'dropzone' })}>
+      <DropZoneContainer {...getRootProps({ isFocused, isDragAccept, isDragReject })}>
         <input {...getInputProps()} />
         <DropZoneContent>
           <PermMedia fontSize="large" />

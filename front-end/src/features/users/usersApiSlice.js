@@ -97,14 +97,27 @@ export const usersApiSlice = apiSlice.injectEndpoints({
             providesTags: [{ type: 'User', id: 'LIST' }],
         }),
         createUser: builder.mutation({
-            query: newUser => ({
+            query: (newUser) => ({
                 url: '/api/accounts',
                 method: 'POST',
                 credentials: 'include',
-                body: { ...newUser },
+                body: newUser,
+                formData: true
             }),
             invalidatesTags: [
                 { type: 'User', id: "LIST" }
+            ]
+        }),
+        updateUser: builder.mutation({
+            query: ({ id, updatedUser }) => ({
+                url: `/api/accounts/${id}`,
+                method: 'PUT',
+                credentials: 'include',
+                body: updatedUser,
+                formData: true
+            }),
+            invalidatesTags: (result, error, { id }) => [
+                { type: 'User', id }
             ]
         }),
         updateProfile: builder.mutation({
@@ -116,17 +129,6 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 formData: true
             }),
             invalidatesTags: ['Profile'],
-        }),
-        updateUser: builder.mutation({
-            query: ({ id, updatedUser }) => ({
-                url: `/api/accounts/${id}`,
-                method: 'PUT',
-                credentials: 'include',
-                body: updatedUser,
-            }),
-            invalidatesTags: (result, error, { id }) => [
-                { type: 'User', id }
-            ]
         }),
         changePassword: builder.mutation({
             query: changeBody => ({
@@ -179,8 +181,8 @@ export const {
     useGetTopUsersQuery,
     useGetTopSellersQuery,
     useCreateUserMutation,
-    useUpdateProfileMutation,
     useUpdateUserMutation,
+    useUpdateProfileMutation,
     useChangePasswordMutation,
     useDeleteUserMutation,
     useDeleteUsersMutation,

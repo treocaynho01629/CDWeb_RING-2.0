@@ -1,23 +1,23 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch,
-  Skeleton, TextField, MenuItem, Menu, ListItemIcon, ListItemText, Stack, Toolbar, Button
+  Skeleton, TextField, MenuItem, Menu, ListItemIcon, ListItemText, Stack, Toolbar, Button,
+  Avatar
 } from '@mui/material';
 import { Search, MoreHoriz, Edit, Delete, Visibility, FilterAltOff, Add } from '@mui/icons-material';
 import { Link } from 'react-router';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { useDeleteAllBooksMutation, useDeleteBookMutation, useDeleteBooksInverseMutation, useDeleteBooksMutation, useGetBooksQuery } from '../../../features/books/booksApiSlice';
+import { useDeleteAllBooksMutation, useDeleteBookMutation, useDeleteBooksInverseMutation, useDeleteBooksMutation } from '../../../features/books/booksApiSlice';
 import { ItemTitle, FooterContainer, FooterLabel, StyledStockBar } from '../custom/ShareComponents';
-import { currencyFormat, idFormatter } from '../../../ultils/covert';
+import { currencyFormat, idFormatter, numFormat } from '../../../ultils/covert';
 import { publishersApiSlice } from '../../../features/publishers/publishersApiSlice';
 import { categoriesApiSlice } from '../../../features/categories/categoriesApiSlice';
 import { bookTypeItems, bookTypes } from '../../../ultils/book';
+import { useGetShopsQuery } from '../../../features/shops/shopsApiSlice';
 import CustomProgress from '../../custom/CustomProgress';
 import CustomTableHead from './CustomTableHead';
 import CustomTablePagination from './CustomTablePagination';
 import useDeepEffect from '../../../hooks/useDeepEffect';
-
-const maxStocks = 199;
 
 const headCells = [
   {
@@ -29,36 +29,28 @@ const headCells = [
     label: 'ID',
   },
   {
-    id: 'title',
+    id: 'name',
     align: 'left',
-    width: '450px',
+    width: 'auto',
     disablePadding: false,
     sortable: true,
-    label: 'Sản phẩm',
+    label: 'Cửa hàng',
   },
   {
-    id: 'shopId',
+    id: 'ownerId',
     align: 'left',
     width: '120px',
     disablePadding: false,
     sortable: true,
-    label: 'Shop',
+    label: 'Sở hữu',
   },
   {
-    id: 'price',
+    id: 'sales',
     align: 'left',
-    width: '130px',
+    width: '120px',
     disablePadding: false,
     sortable: true,
-    label: 'Giá(đ)',
-  },
-  {
-    id: 'amount',
-    align: 'left',
-    width: '75px',
-    disablePadding: false,
-    sortable: true,
-    label: 'Số lượng',
+    label: 'Doanh thu',
   },
   {
     id: 'action',
@@ -68,7 +60,7 @@ const headCells = [
   },
 ];
 
-function ProductFilters({ filters, setFilters }) {
+function ShopFilters({ filters, setFilters }) {
   const inputRef = useRef();
   const [pubIds, setPubIds] = useState(filters.pubIds);
   const [types, setTypes] = useState(filters.types);
@@ -361,7 +353,7 @@ function ProductFilters({ filters, setFilters }) {
   )
 }
 
-export default function TableProducts({ shop, handleOpenEdit, pending, setPending }) {
+export default function TableShops({ handleOpenEdit, pending, setPending }) {
   //#region construct
   const [selected, setSelected] = useState([]);
   const [deselected, setDeseletected] = useState([]);
@@ -392,18 +384,13 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
   const [deleteBooksInverse] = useDeleteBooksInverseMutation();
   const [deleteAll] = useDeleteAllBooksMutation();
 
-  //Fetch books
-  const { data, isLoading, isSuccess, isError, error } = useGetBooksQuery({
+  //Fetch shops
+  const { data, isLoading, isSuccess, isError, error } = useGetShopsQuery({
     page: pagination?.number,
     size: pagination?.size,
     sortBy: pagination?.sortBy,
     sortDir: pagination?.sortDir,
-    shopId: shop ?? '',
-    keyword: filters.keyword,
-    cateId: filters.cate,
-    types: filters.types,
-    pubIds: filters.pubIds,
-    amount: 0
+    keyword: filters.keyword
   })
 
   //Set pagination after fetch
@@ -662,11 +649,10 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
 
     bookRows = ids?.length
       ? ids?.map((id, index) => {
-        const book = entities[id];
+        const shop = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
-        const stockProgress = Math.min((book.amount / maxStocks * 100), 100);
-        const stockStatus = stockProgress == 0 ? 'error' : stockProgress < 20 ? 'warning' : stockProgress < 80 ? 'primary' : 'info';
+        const date = new Date(shop?.joinedDate);
 
         return (
           <TableRow
@@ -677,7 +663,7 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
           >
             <TableCell padding="checkbox">
               <Checkbox color="primary"
-                onChange={(e) => handleClick(e, book.id)}
+                onChange={(e) => handleClick(e, id)}
                 checked={isItemSelected}
                 inputProps={{
                   'aria-labelledby': labelId,
@@ -688,35 +674,30 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
               <Link to={`/dashboard/product/${id}`}>{idFormatter(id)}</Link>
             </TableCell>
             <TableCell align="left">
-              <Link to={`/dashboard/product/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
-                <LazyLoadImage
-                  src={`${book.image}?size=tiny`}
-                  height={45}
-                  width={45}
-                  style={{ marginRight: '10px' }}
-                  placeholder={<Skeleton width={45} height={45} animation={false} variant="rectangular" />}
-                />
+              <Link to={`dashboard/shop/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar sx={{ marginRight: 1 }} src={shop?.image ? shop.image + '?size=tiny' : null}>{shop?.name?.charAt(0) ?? ''}</Avatar>
                 <Box>
-                  <ItemTitle>{book.title}</ItemTitle>
+                  <ItemTitle>{shop.name}</ItemTitle>
                   <Box display="flex">
-                    <ItemTitle className="secondary">Đã bán: {book.totalOrders}</ItemTitle>
-                    <ItemTitle className="secondary">&emsp;Đánh giá: {book.rating.toFixed(1)}</ItemTitle>
+                    <ItemTitle className="secondary">{
+                      date.toLocaleDateString("en-GB", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })
+                    }</ItemTitle>
+                    <ItemTitle>&emsp;Lượt theo dõi: {shop.totalFollowers}</ItemTitle>
                   </Box>
                 </Box>
               </Link>
             </TableCell>
             <TableCell align="left">
-              <ItemTitle>{book.shopName}</ItemTitle>
+              <ItemTitle>{shop.username}</ItemTitle>
+              <ItemTitle>{idFormatter(shop.ownerId)}</ItemTitle>
             </TableCell>
             <TableCell align="left">
-              <ItemTitle>{currencyFormat.format(book.price * (1 - book.discount))}</ItemTitle>
-              {book.discount > 0 && <ItemTitle className="secondary">-{book.discount * 100}%</ItemTitle>}
-            </TableCell>
-            <TableCell align="left">
-              <Box>
-                <StyledStockBar color={stockStatus} variant="determinate" value={stockProgress} />
-                <ItemTitle className="secondary">{book.amount} trong kho</ItemTitle>
-              </Box>
+              <ItemTitle>{currencyFormat.format(shop.sales)}</ItemTitle>
+              <ItemTitle className="secondary">Doanh số: {numFormat.format(shop.totalSold)}</ItemTitle>
             </TableCell>
             <TableCell align="right">
               <IconButton onClick={(e) => handleOpenContext(e, id)}><MoreHoriz /></IconButton>
@@ -755,7 +736,7 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
   return (
     <Paper sx={{ width: '100%', height: '100%' }} elevation={3}>
       <Toolbar>
-        <ProductFilters {...{ filters, setFilters }} />
+        <ShopFilters {...{ filters, setFilters }} />
       </Toolbar>
       <TableContainer component={Paper}>
         <Table stickyHeader size={dense ? 'small' : 'medium'}>

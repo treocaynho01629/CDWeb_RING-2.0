@@ -2,6 +2,7 @@ package com.ring.bookstore.request;
 
 import java.time.LocalDate;
 
+import com.ring.bookstore.enums.Gender;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -20,7 +21,7 @@ public class AccountRequest { //Request body for account
 	@Size(min = 4, max = 24, message = "Tên đăng nhập dài 4-24 kí tự")
 	private String username;
 	
-	@NotBlank(message = "Mật khẩu không được để trống!")
+//	@NotBlank(message = "Mật khẩu không được để trống!")
 	@Size(min = 8, max = 24, message = "Mật khẩu dài 8-24 kí tự")
 	private String pass;
 	
@@ -29,21 +30,23 @@ public class AccountRequest { //Request body for account
 	private String email;
 	
 	@NotNull(message = "Quyền người dùng từ 1-3!")
-	@Min(value = 1)
-	@Max(value = 3)
+	@Min(value = 1, message = "Quyền người dùng từ 1-3!")
+	@Max(value = 3, message = "Quyền người dùng từ 1-3!")
 	private Integer roles;
 	
 	@Size(max = 250, message = "Tên không quá 250 kí tự")
 	private String name;
 	
-	@Size(min = 9, max = 9, message = "Sai định dạng số điện thoại")
+	@Pattern(regexp="\\(?([0-9]{3})\\)?([ .-]?)([0-9]{3})\\2([0-9]{3})", message = "Sai định dạng số điện thoại")
 	private String phone;
 	
 	@Past(message = "Ngày sinh phải trước hôm nay!")
 	@DateTimeFormat(pattern = "dd-MM-yyyy")
 	private LocalDate dob;
 	
-	private String gender;
+	private Gender gender;
+
+	private String image;
 	
 	private boolean keepOldPass;
 }

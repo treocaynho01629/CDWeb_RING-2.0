@@ -7,7 +7,7 @@ import {
 import { useMediaQuery, useTheme } from '@mui/material';
 import { Edit, KeyboardArrowRight, KeyboardDoubleArrowDown, LocalActivityOutlined } from '@mui/icons-material';
 import { lazy, Suspense, useState } from 'react';
-import { getAddress } from '../../ultils/address';
+import { addressTypes } from '../../ultils/address';
 import { currencyFormat } from '../../ultils/covert';
 import CouponDisplay from '../coupon/CouponDisplay';
 import PriceDisplay from './PriceDisplay';
@@ -95,7 +95,7 @@ const FinalCheckoutDialog = ({ coupon, discount, displayInfo, calculating, addre
     const [open, setOpen] = useState(undefined);
 
     const toggleDrawer = (newOpen) => { setOpen(newOpen) };
-    const address = addressInfo?.type ? getAddress(addressInfo.type) : null;
+    const address = addressInfo?.type ? addressTypes[addressInfo.type] : null;
 
     //Component stuff
     let checkoutDetail = <>

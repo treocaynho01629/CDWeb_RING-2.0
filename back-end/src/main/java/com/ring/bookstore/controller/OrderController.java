@@ -28,108 +28,107 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
-	
-	private final OrderService orderService;
 
-	//Calculate price
-	@PostMapping("/calculate")
-	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<CalculateDTO> calculate(@RequestBody @Valid CalculateRequest request) {
-		CalculateDTO calculateResult = orderService.calculate(request);
-		return new ResponseEntity< >(calculateResult, HttpStatus.CREATED);
-	}
-	
-	//Commit order
-	@PostMapping
-	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<ReceiptDTO> checkout(@RequestBody @Valid OrderRequest checkRequest,
-											   	HttpServletRequest request,
-												@CurrentAccount Account currUser
-    ) {
-		ReceiptDTO result = orderService.checkout(checkRequest, request, currUser);
-          return new ResponseEntity<>(result, HttpStatus.CREATED);
+    private final OrderService orderService;
+
+    //Calculate price
+    @PostMapping("/calculate")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<CalculateDTO> calculate(@RequestBody @Valid CalculateRequest request) {
+        CalculateDTO calculateResult = orderService.calculate(request);
+        return new ResponseEntity<>(calculateResult, HttpStatus.CREATED);
     }
-	
-	//Get all orders
-	@GetMapping("/receipts")
-	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+
+    //Commit order
+    @PostMapping
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ReceiptDTO> checkout(@RequestBody @Valid OrderRequest checkRequest,
+                                               HttpServletRequest request,
+                                               @CurrentAccount Account currUser) {
+        ReceiptDTO result = orderService.checkout(checkRequest, request, currUser);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
+
+    //Get all orders
+    @GetMapping("/receipts")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> getAllOrders(@RequestParam(value = "shopId", required = false) Long shopId,
-											@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
-    										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-    										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-    										@RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
-        									@CurrentAccount Account currUser){
+                                          @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+                                          @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                                          @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+                                          @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+                                          @CurrentAccount Account currUser) {
         Page<ReceiptDTO> orders = orderService.getAllReceipts(currUser, shopId, pageNo, pageSize, sortBy, sortDir);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
-	//Get summaries
-	@GetMapping("/summaries")
-	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-	public ResponseEntity<?> getSummaries(@RequestParam(value = "shopId", required = false) Long shopId,
-										  @RequestParam(value = "bookId", required = false) Long bookId,
-										  @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
-										  @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-										  @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-										  @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
-										  @CurrentAccount Account currUser){
-		Page<ReceiptSummaryDTO> summaries = orderService.getSummariesWithFilter(currUser, shopId, bookId, pageNo, pageSize, sortBy, sortDir);
-		return new ResponseEntity<>(summaries, HttpStatus.OK);
-	}
-	
-	//Get order by {id}
-	@GetMapping("/receipts/{id}")
-	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> getReceipt(@PathVariable("id") Long id){
-		ReceiptDTO receipt = orderService.getReceipt(id);
+    //Get summaries
+    @GetMapping("/summaries")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> getSummaries(@RequestParam(value = "shopId", required = false) Long shopId,
+                                          @RequestParam(value = "bookId", required = false) Long bookId,
+                                          @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+                                          @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                                          @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+                                          @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+                                          @CurrentAccount Account currUser) {
+        Page<ReceiptSummaryDTO> summaries = orderService.getSummariesWithFilter(currUser, shopId, bookId, pageNo, pageSize, sortBy, sortDir);
+        return new ResponseEntity<>(summaries, HttpStatus.OK);
+    }
+
+    //Get order by {id}
+    @GetMapping("/receipts/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> getReceipt(@PathVariable("id") Long id) {
+        ReceiptDTO receipt = orderService.getReceipt(id);
         return new ResponseEntity<>(receipt, HttpStatus.OK);
     }
 
     //Get order by {id}
     @GetMapping("/detail/{id}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id){
+    public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id) {
         OrderDetailDTO order = orderService.getOrderDetail(id);
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
-	
-	//Get orders from user
-	@GetMapping("/user")
-	@PreAuthorize("hasRole('USER')")
+
+    //Get orders from user
+    @GetMapping("/user")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getOrdersByUser(@RequestParam(value = "status", defaultValue = "") OrderStatus status,
-											@RequestParam(value = "keyword", defaultValue = "") String keyword,
-											@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
-    										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-        									@CurrentAccount Account currUser){
+                                             @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                             @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+                                             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                                             @CurrentAccount Account currUser) {
         Page<OrderDTO> orders = orderService.getOrdersByUser(currUser, status, keyword, pageNo, pageSize);
-		return new ResponseEntity<>(orders, HttpStatus.OK);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
     }
-	
-	//Get orders for book's {id}
-	@GetMapping("/book/{id}")
-	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+
+    //Get orders for book's {id}
+    @GetMapping("/book/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> getOrdersByBookId(@PathVariable("id") Long id,
-    										@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
-    										@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-    										@RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-    										@RequestParam(value = "sortDir", defaultValue = "desc") String sortDir){
+                                               @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+                                               @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                                               @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+                                               @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
         Page<OrderDTO> orders = orderService.getOrdersByBookId(id, pageNo, pageSize, sortBy, sortDir);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
-	@GetMapping("/analytics")
-	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-	public ResponseEntity<?> getUserAnalytics(@RequestParam(value = "shopId", required = false) Long shopId,
-											  @CurrentAccount Account currUser) {
-		return new ResponseEntity<>(orderService.getAnalytics(currUser, shopId), HttpStatus.OK);
-	}
+    @GetMapping("/analytics")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> getUserAnalytics(@RequestParam(value = "shopId", required = false) Long shopId,
+                                              @CurrentAccount Account currUser) {
+        return new ResponseEntity<>(orderService.getAnalytics(currUser, shopId), HttpStatus.OK);
+    }
 
-	//Get orders chart
-	@GetMapping("/sales")
-	@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    //Get orders chart
+    @GetMapping("/sales")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
     public ResponseEntity<?> getMonthlySales(@RequestParam(value = "shopId", required = false) Long shopId,
-											@RequestParam(value = "year", required = false) Integer year,
-											@CurrentAccount Account currUser){
+                                             @RequestParam(value = "year", required = false) Integer year,
+                                             @CurrentAccount Account currUser) {
         return new ResponseEntity<>(orderService.getMonthlySales(currUser, shopId, year), HttpStatus.OK);
     }
 }

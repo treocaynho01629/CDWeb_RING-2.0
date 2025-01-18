@@ -1,6 +1,6 @@
 import { useState, Suspense, lazy } from "react";
 import { Box, Button, Grid2 as Grid } from '@mui/material';
-import { Add, AutoStories, LocalFireDepartment } from '@mui/icons-material';
+import { Add, AutoStories, LocalFireDepartment, Storefront } from '@mui/icons-material';
 import { NavLink } from 'react-router';
 import { HeaderContainer } from '../../components/dashboard/custom/ShareComponents';
 import { booksApiSlice, useGetBookAnalyticsQuery, useGetBooksQuery } from "../../features/books/booksApiSlice";
@@ -10,23 +10,17 @@ import CustomDashboardBreadcrumbs from '../../components/dashboard/custom/Custom
 import ProductsShowcase from "../../components/dashboard/product/ProductsShowcase";
 import useTitle from "../../hooks/useTitle"
 import useAuth from "../../hooks/useAuth";
+import TableShops from "../../components/dashboard/table/TableShops";
 
 const ProductFormDialog = lazy(() => import("../../components/dashboard/dialog/ProductFormDialog"));
 const PendingModal = lazy(() => import("../../components/layout/PendingModal"));
 
-const ManageProducts = () => {
+const ManageShops = () => {
   const { shop } = useAuth();
   const [contextProduct, setContextProduct] = useState(null);
   const [open, setOpen] = useState(undefined);
   const [pending, setPending] = useState(false);
-  const { data: bookAnalytics } = useGetBookAnalyticsQuery(shop ?? null);
-  const { data: bestSeller, isLoading: loadBest, isSuccess: doneBest, isError: errorBest } = useGetBooksQuery({
-    size: 6,
-    sortBy: 'totalOrders',
-    sortDir: 'desc',
-    amount: 0,
-    shopId: shop ?? ''
-  });
+  const { data: shopAnalytics } = useGetShopAnalyticsQuery();
   const [getBook, { isLoading }] = booksApiSlice.useLazyGetBookQuery();
 
   // const { data: fav, isLoading: loadFav, isSuccess: doneFav, isError: errorFav } = useGetBooksQuery({
@@ -66,9 +60,9 @@ const ManageProducts = () => {
       }
       <HeaderContainer>
         <div>
-          <h2>Quản lý sản phẩm</h2>
+          <h2>Quản lý cửa hàng</h2>
           <CustomDashboardBreadcrumbs separator="." maxItems={4} aria-label="breadcrumb">
-            <NavLink to={'/dashboard/product'}>Quản lý sản phẩm</NavLink>
+            <NavLink to={'/dashboard/shop'}>Quản lý cửa hàng</NavLink>
           </CustomDashboardBreadcrumbs>
         </div>
         <Button variant="outlined" startIcon={<Add />} onClick={handleOpen}>
@@ -77,22 +71,12 @@ const ManageProducts = () => {
       </HeaderContainer>
       <Box mb={3}>
         <InfoCard
-          icon={<AutoStories color="primary" />}
-          info={bookAnalytics}
-          color="primary"
+          icon={<Storefront color="info" />}
+          info={shopAnalytics}
+          color="info"
         />
       </Box>
       <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
-        {loadBest ? null
-          :
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <ProductsShowcase {...{
-              title: <><LocalFireDepartment />Top sản phẩm bán chạy</>, size: 6,
-              data: bestSeller, isLoading: loadBest, isSuccess: doneBest, isError: errorBest
-            }} />
-          </Grid>
-        }
-
         {/* {loadingFav ? null
           :
           <Grid item xs={12} lg={6}>
@@ -115,7 +99,7 @@ const ManageProducts = () => {
           </Grid>
         } */}
       </Grid>
-      <TableProducts {...{ shop, handleOpenEdit, pending, setPending }} />
+      <TableShops {...{ handleOpenEdit, pending, setPending }} />
       <Suspense fallback={null}>
         {open !== undefined && <ProductFormDialog {...{ open, handleClose, shop, product: contextProduct, pending, setPending }} />}
       </Suspense>
@@ -123,4 +107,4 @@ const ManageProducts = () => {
   )
 }
 
-export default ManageProducts
+export default ManageShops

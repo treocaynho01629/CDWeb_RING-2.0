@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { getCouponSummary } from '../../ultils/coupon'
+import { couponTypes } from '../../ultils/coupon'
 
 //#region styled
 const CouponContainer = styled.div`
@@ -129,7 +129,7 @@ const CouponDesc = styled.b`
 //#endregion
 
 const CouponDisplay = ({ coupon }) => {
-    const summary = getCouponSummary(coupon?.type);
+    const summary = couponTypes[coupon?.type];
 
     return (
         <CouponContainer>
