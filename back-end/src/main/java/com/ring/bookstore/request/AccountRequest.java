@@ -21,7 +21,6 @@ public class AccountRequest { //Request body for account
 	@Size(min = 4, max = 24, message = "Tên đăng nhập dài 4-24 kí tự")
 	private String username;
 	
-//	@NotBlank(message = "Mật khẩu không được để trống!")
 	@Size(min = 8, max = 24, message = "Mật khẩu dài 8-24 kí tự")
 	private String pass;
 	
