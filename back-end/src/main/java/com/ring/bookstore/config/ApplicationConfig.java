@@ -31,10 +31,19 @@ public class ApplicationConfig { //Application config
     @Value("${ring.client-url}")
     private String clientUrl;
 
+    @Value("${ring.dashboard-url}")
+    private String dashboardUrl;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:4173", "http://localhost:5173", clientUrl));
+        corsConfiguration.setAllowedOrigins(List.of(
+                "http://localhost:4173",
+                "http://localhost:5173",
+                "http://localhost:3001",
+                "http://localhost:3000",
+                clientUrl,
+                dashboardUrl));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedHeaders(List.of("*"));
