@@ -1,52 +1,24 @@
 {
-  "name": "client",
+  "name": "ring-client",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "1.0.0",
+  "description": "RING! Front-End monorepo",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
-    "@mui/icons-material": "^6.0.1",
-    "@mui/lab": "^6.0.0-beta.8",
-    "@mui/material": "^6.0.1",
-    "@mui/x-date-pickers": "^7.15.0",
-    "@number-flow/react": "^0.4.2",
-    "@reduxjs/toolkit": "^2.4.0",
-    "dayjs": "^1.11.11",
-    "history": "^5.3.0",
-    "jwt-decode": "^4.0.0",
-    "localforage": "^1.10.0",
-    "lodash-es": "^4.17.21",
-    "match-sorter": "^6.3.4",
-    "notistack": "^3.0.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-dropzone": "^14.2.3",
-    "react-lazy-load-image-component": "^1.6.2",
-    "react-lazyload": "^3.2.1",
-    "react-multi-carousel": "^2.8.5",
-    "react-number-format": "^5.4.2",
-    "react-redux": "^9.1.2",
-    "react-router": "^7.0.1",
-    "recharts": "^2.15.0",
-    "redux-persist": "^6.0.0",
-    "sort-by": "^1.2.0",
-    "yet-another-react-lightbox": "^3.21.7"
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "update-dependencies": "turbo update-dependencies && npx npm-check-updates -u"
   },
   "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "eslint": "^8.38.0",
-    "eslint-plugin-react": "^7.34.4",
-    "eslint-plugin-react-hooks": "^4.6.2",
-    "eslint-plugin-react-refresh": "^0.4.8",
-    "vite": "^5.3.3",
-    "vite-plugin-svgr": "^4.2.0"
-  }
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "tsup": "^8.3.5",
+    "turbo": "^2.3.3"
+  },
+  "packageManager": "npm@10.4.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }

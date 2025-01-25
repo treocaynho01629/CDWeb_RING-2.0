@@ -1,0 +1,38 @@
+{
+  "name": "@ring/auth",
+  "version": "0.0.0",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": "./src/index.js",
+    "./PersistLogin": "./src/components/PersistLogin.jsx",
+    "./RequireAuth": "./src/components/RequireAuth.jsx",
+    "./ReCaptcha": "./src/components/ReCaptcha.jsx"
+  },
+  "scripts": {
+    "lint": "eslint \"**/*.ts\""
+  },
+  "dependencies": {
+    "@ring/redux": "*",
+    "@ring/ui": "*",
+    "jwt-decode": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@ring/eslint-config": "*",
+    "@ring/typescript-config": "*",
+    "eslint": "^8.57.0",
+    "typescript": "5.5.4"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-router": "^7.0.1",
+    "react-redux": "^9.1.2",
+    "@mui/material": "^6.0.1",
+    "notistack": "^3.0.1"
+  }
+}

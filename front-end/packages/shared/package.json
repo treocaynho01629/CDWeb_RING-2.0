@@ -1,0 +1,36 @@
+{
+  "name": "@ring/shared",
+  "version": "0.0.0",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "src",
+    "assets"
+  ],
+  "exports": {
+    ".": "./src/index.js",
+    "./ConfirmDialog": "./src/components/ConfirmDialog.jsx",
+    "./address": "./src/ultils/address.jsx",
+    "./book": "./src/ultils/book.jsx",
+    "./convert": "./src/ultils/convert.jsx",
+    "./coupon": "./src/ultils/coupon.jsx",
+    "./filters": "./src/ultils/filters.jsx",
+    "./order": "./src/ultils/order.jsx",
+    "./payment": "./src/ultils/payment.jsx",
+    "./regex": "./src/ultils/regex.jsx",
+    "./shipping": "./src/ultils/shipping.jsx",
+    "./user": "./src/ultils/user.jsx",
+    "./assets/empty": "./assets/empty.svg"
+  },
+  "scripts": {
+    "lint": "eslint \"**/*.ts\""
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "lodash-es": "^4.17.21",
+    "@mui/icons-material": "^6.0.1",
+    "@mui/material": "^6.0.1",
+    "notistack": "^3.0.1"
+  }
+}
