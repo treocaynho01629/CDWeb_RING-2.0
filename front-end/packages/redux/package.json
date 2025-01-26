@@ -1,24 +1,21 @@
 {
   "name": "@ring/redux",
   "version": "0.0.0",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
   "sideEffects": false,
   "files": [
-    "dist",
     "src"
   ],
   "exports": {
     ".": "./src/index.js"
   },
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch"
+    "lint": "eslint \"**/*.js\""
   },
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "@ring/eslint-config": "*",
+    "eslint": "^8.57.0"
+  },
   "peerDependencies": {
     "@reduxjs/toolkit": "^2.4.0"
   }

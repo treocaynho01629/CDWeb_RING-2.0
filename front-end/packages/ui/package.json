@@ -29,7 +29,7 @@
     "./ThemeContextProvider": "./src/provider/ThemeContextProvider.jsx"
   },
   "scripts": {
-    "lint": "eslint \"**/*.ts\""
+    "lint": "eslint \"**/*.js\""
   },
   "dependencies": {
     "@ring/shared": "*",
@@ -37,8 +37,8 @@
     "yet-another-react-lightbox": "^3.21.7"
   },
   "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0"
+    "@ring/eslint-config": "*",
+    "eslint": "^8.57.0"
   },
   "peerDependencies": {
     "react": "^18.3.1",
