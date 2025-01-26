@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "sideEffects": false,
   "files": [
-    "dist",
     "src"
   ],
   "exports": {
@@ -13,7 +12,7 @@
     "./ReCaptcha": "./src/components/ReCaptcha.jsx"
   },
   "scripts": {
-    "lint": "eslint \"**/*.ts\""
+    "lint": "eslint \"**/*.js\""
   },
   "dependencies": {
     "@ring/redux": "*",
@@ -21,12 +20,8 @@
     "jwt-decode": "^4.0.0"
   },
   "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
     "@ring/eslint-config": "*",
-    "@ring/typescript-config": "*",
-    "eslint": "^8.57.0",
-    "typescript": "5.5.4"
+    "eslint": "^8.57.0"
   },
   "peerDependencies": {
     "react": "^18.3.1",

@@ -1,7 +1,6 @@
 {
   "name": "@ring/shared",
   "version": "0.0.0",
-  "type": "module",
   "sideEffects": false,
   "files": [
     "src",
@@ -23,9 +22,13 @@
     "./assets/empty": "./assets/empty.svg"
   },
   "scripts": {
-    "lint": "eslint \"**/*.ts\""
+    "lint": "eslint \"**/*.js\""
   },
   "dependencies": {},
+  "devDependencies": {
+    "@ring/eslint-config": "*",
+    "eslint": "^8.57.0"
+  },
   "peerDependencies": {
     "react": "^18.3.1",
     "lodash-es": "^4.17.21",
