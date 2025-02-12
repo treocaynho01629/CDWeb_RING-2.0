@@ -20,6 +20,8 @@ public class ShopRequest {
 	@Size(max = 500, message = "Mô tả không quá 500 kí tự")
 	private String description;
 
+	private String image;
+
     @Valid
     @NotNull(groups = AddressRequest.class)
     private AddressRequest addressRequest;

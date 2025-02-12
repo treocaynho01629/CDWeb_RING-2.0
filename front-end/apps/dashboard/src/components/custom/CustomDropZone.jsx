@@ -1,8 +1,8 @@
-import styled from '@emotion/styled';
-import { useEffect } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { Close, Delete, PermMedia } from '@mui/icons-material';
-import { Button, IconButton, Tooltip } from '@mui/material';
+import styled from "@emotion/styled";
+import { useEffect } from "react";
+import { useDropzone } from "react-dropzone";
+import { Close, Delete, PermMedia } from "@mui/icons-material";
+import { Button, IconButton, Tooltip } from "@mui/material";
 
 //#region styled
 const getColor = (props) => {
@@ -16,192 +16,231 @@ const getColor = (props) => {
     return props.theme.palette.info.main;
   }
   return props.theme.palette.primary.main;
-}
+};
 
 const DropZoneContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 250px;
-    background-color: ${props => props.theme.palette.action.focus};
-    border: 2.75px dashed;
-    border-color: ${props => getColor(props)};
-    cursor: pointer;
-`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 250px;
+  background-color: ${(props) => props.theme.palette.action.focus};
+  border: 2.75px dashed;
+  border-color: ${(props) => getColor(props)};
+  cursor: pointer;
+`;
 
 const DropZoneContent = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
-    ${props => props.theme.breakpoints.down("sm")} {
-        font-size: 14px;
-    }
-`
+  ${(props) => props.theme.breakpoints.down("sm")} {
+    font-size: 14px;
+  }
+`;
 
 const ThumbContainer = styled.aside`
-    display: flex;
-    margin: 16px 0px;
-    overflow-x: scroll;
-    scroll-behavior: smooth;
+  display: flex;
+  margin: 16px 0px;
+  overflow-x: scroll;
+  scroll-behavior: smooth;
 
-    -ms-overflow-style: none;
-    scrollbar-width: none; 
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 
-    &::-webkit-scrollbar {display: none;}
-`
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
 const Thumb = styled.div`
+  display: flex;
+  border: 0.5 solid ${(props) => props.theme.palette.action.focus};
+  height: 80px;
+  width: 80px;
+  margin-right: 5px;
+  box-sizing: border-box;
+  justify-content: center;
+  position: relative;
+
+  &:before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 50%;
+    font-size: 12px;
+    font-weight: 450;
     display: flex;
-    border: .5 solid ${props => props.theme.palette.action.focus};
-    height: 80px;
-    width: 80px;
-    margin-right: 5px;
-    box-sizing: border-box;
+    align-items: flex-end;
     justify-content: center;
-    position: relative;
+    color: ${(props) => props.theme.palette.grey[800]};
+  }
+
+  &.file {
+    border: 3px solid ${(props) => props.theme.palette.warning.main};
 
     &:before {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 50%;
-        font-size: 12px;
-        font-weight: 450;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        color: ${props => props.theme.palette.grey[800]};
+      background-image: linear-gradient(
+        0deg,
+        ${(props) => props.theme.palette.warning.main},
+        transparent 100%
+      ) !important;
     }
+  }
 
-    &.file {
-      border: 3px solid ${props => props.theme.palette.warning.main};
+  &.remove {
+    border: 3px solid ${(props) => props.theme.palette.error.main};
 
-      &:before {
-        background-image: linear-gradient(0deg, ${props => props.theme.palette.warning.main}, transparent 100%) !important;
-      }
+    &:before {
+      background-image: linear-gradient(
+        0deg,
+        ${(props) => props.theme.palette.error.main},
+        transparent 100%
+      ) !important;
     }
+  }
 
-    &.remove {
-      border: 3px solid ${props => props.theme.palette.error.main};
-
-      &:before {
-        background-image: linear-gradient(0deg, ${props => props.theme.palette.error.main}, transparent 100%) !important;
-      }
+  &.thumbnail {
+    &:before {
+      content: "<Thumbnail>";
+      background-image: linear-gradient(
+        0deg,
+        ${(props) => props.theme.palette.success.main},
+        transparent 100%
+      );
     }
+  }
 
-    &.thumbnail {
-      &:before {
-        content: "<Thumbnail>";
-        background-image: linear-gradient(0deg, ${props => props.theme.palette.success.main}, transparent 100%);
-      }
-    }
-    
-    ${props => props.theme.breakpoints.down("sm")} {
-        height: 55px;
-        width: 55px;
+  ${(props) => props.theme.breakpoints.down("sm")} {
+    height: 55px;
+    width: 55px;
 
-        &:before {
-          font-size: 9px;
-        }
+    &:before {
+      font-size: 9px;
     }
-`
+  }
+`;
 
 const ThumbInner = styled.div`
-    display: flex;
-    min-width: 0;
-    overflow: hidden;
-    justify-content: center;
-`
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  justify-content: center;
+`;
 
-const ThumbImage = styled('img')`
-    display: block;
-    width: auto;
-    height: 100%;
-    object-fit: cover;
-`
+const ThumbImage = styled("img")`
+  display: block;
+  width: auto;
+  height: 100%;
+  object-fit: cover;
+`;
 
 const StyledIconButton = styled(IconButton)`
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    font-size: 5px;
-    padding: 1.9px;
-    color: white;
-    background-color: #0000008b;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 5px;
+  padding: 1.9px;
+  color: white;
+  background-color: #0000008b;
 
-    &:hover {
-      background-color: #000000bc;
-    }
+  &:hover {
+    background-color: #000000bc;
+  }
 
-    &.left {
-      right: unset;
-      left: 2px;
-    }
+  &.left {
+    right: unset;
+    left: 2px;
+  }
 
-    svg { font-size: 15px }
-`
+  svg {
+    font-size: 15px;
+  }
+`;
 
 const Title = styled.h3`
-    margin: 0 0 10px;
-    font-weight: 450;
-`
+  margin: 0 0 10px;
+  font-weight: 450;
+`;
 
 const ErrMsg = styled.b`
-    display: flex;
-    align-items: center;
-    color: ${props => props.theme.palette.error.main};
-`
+  display: flex;
+  align-items: center;
+  color: ${(props) => props.theme.palette.error.main};
+`;
 
 const ButtonContainer = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`;
 //#endregion
 
-const CustomDropZone = ({ thumbnailId, setThumbnailId, remove, setRemove, images, files, setFiles }) => {
-  const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject, fileRejections } = useDropzone({
+const CustomDropZone = ({
+  thumbnailId,
+  setThumbnailId,
+  remove,
+  setRemove,
+  images,
+  files,
+  setFiles,
+}) => {
+  const {
+    getRootProps,
+    getInputProps,
+    isFocused,
+    isDragAccept,
+    isDragReject,
+    fileRejections,
+  } = useDropzone({
     maxFiles: 10,
     maxSize: 2000000,
     accept: {
-      'image/*': []
+      "image/*": [],
     },
-    onDrop: acceptedFiles => {
-      setFiles(acceptedFiles.map(file => Object.assign(file, {
-        preview: URL.createObjectURL(file)
-      })));
-    }
+    onDrop: (acceptedFiles) => {
+      setFiles(
+        acceptedFiles.map((file) =>
+          Object.assign(file, {
+            preview: URL.createObjectURL(file),
+          }),
+        ),
+      );
+    },
   });
-  
+
   useEffect(() => {
     // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
-    return () => files.forEach(file => URL.revokeObjectURL(file.preview));
+    return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
   }, []);
 
   const handleRemoveFile = (index) => {
-    setFiles(prev => {
+    setFiles((prev) => {
       const newFiles = [...prev];
       newFiles.splice(index, 1);
-      return (newFiles.map(file => Object.assign(file, {
-        preview: URL.createObjectURL(file)
-      })));
-    })
-  }
+      return newFiles.map((file) =>
+        Object.assign(file, {
+          preview: URL.createObjectURL(file),
+        }),
+      );
+    });
+  };
 
   const handleChangeThumbnail = (index) => {
     setThumbnailId(null);
-    setFiles(prev => {
+    setFiles((prev) => {
       let newFiles = [...prev];
       const thumb = newFiles.splice(index, 1);
       newFiles = thumb.concat(newFiles);
-      return (newFiles.map(file => Object.assign(file, {
-        preview: URL.createObjectURL(file)
-      })));
-    })
-  }
+      return newFiles.map((file) =>
+        Object.assign(file, {
+          preview: URL.createObjectURL(file),
+        }),
+      );
+    });
+  };
 
   const handleSetThumbnail = (id) => {
     const removeIndex = remove.indexOf(id);
@@ -220,9 +259,11 @@ const CustomDropZone = ({ thumbnailId, setThumbnailId, remove, setRemove, images
 
     setRemove(newRemove);
     setThumbnailId(id);
-  }
+  };
 
-  const handleClearFiles = () => { setFiles([]); }
+  const handleClearFiles = () => {
+    setFiles([]);
+  };
 
   const handleRemoveImage = (id) => {
     const removeIndex = remove.indexOf(id);
@@ -242,7 +283,7 @@ const CustomDropZone = ({ thumbnailId, setThumbnailId, remove, setRemove, images
     }
 
     setRemove(newRemove);
-  }
+  };
 
   const fileRejectionItems = fileRejections.map(({ file, errors }) => (
     <ErrMsg>
@@ -253,36 +294,58 @@ const CustomDropZone = ({ thumbnailId, setThumbnailId, remove, setRemove, images
   let previews = [];
 
   if (thumbnailId) {
-    const thumbnail = images?.filter(image => { return image.id == thumbnailId })[0];
+    const thumbnail = images?.filter((image) => {
+      return image.id == thumbnailId;
+    })[0];
 
-    if (thumbnail) previews.push(
-      <Tooltip key={`thumbnail-${thumbnail.id}`} title={'Thumbnail: ' + thumbnail.name}>
-        <Thumb className="thumbnail">
-          <ThumbInner>
-            <ThumbImage src={`${thumbnail.url}?size=small`} />
-          </ThumbInner>
-        </Thumb>
-      </Tooltip>
-    )
+    if (thumbnail)
+      previews.push(
+        <Tooltip
+          key={`thumbnail-${thumbnail.id}`}
+          title={"Thumbnail: " + thumbnail.name}
+        >
+          <Thumb className="thumbnail">
+            <ThumbInner>
+              <ThumbImage src={`${thumbnail.url}?size=small`} />
+            </ThumbInner>
+          </Thumb>
+        </Tooltip>,
+      );
   }
 
   if (files?.length) {
     files.forEach((file, index) => {
       previews.push(
-        <Tooltip key={`file-${file.name}-${index}`} title={'Tải ảnh: ' + file.name}>
-          <Thumb className={`${!thumbnailId && index == 0 ? 'thumbnail' : ''} file`}>
-            <StyledIconButton onClick={() => handleRemoveFile(index)}><Close /></StyledIconButton>
-            {(thumbnailId || index > 0) && <StyledIconButton className="left" onClick={() => handleChangeThumbnail(index)}><PermMedia /></StyledIconButton>}
+        <Tooltip
+          key={`file-${file.name}-${index}`}
+          title={"Tải ảnh: " + file.name}
+        >
+          <Thumb
+            className={`${!thumbnailId && index == 0 ? "thumbnail" : ""} file`}
+          >
+            <StyledIconButton onClick={() => handleRemoveFile(index)}>
+              <Close />
+            </StyledIconButton>
+            {(thumbnailId || index > 0) && (
+              <StyledIconButton
+                className="left"
+                onClick={() => handleChangeThumbnail(index)}
+              >
+                <PermMedia />
+              </StyledIconButton>
+            )}
             <ThumbInner>
               <ThumbImage
                 src={file.preview}
-                onLoad={() => { URL.revokeObjectURL(file.preview) }}
+                onLoad={() => {
+                  URL.revokeObjectURL(file.preview);
+                }}
               />
             </ThumbInner>
           </Thumb>
-        </Tooltip>
-      )
-    })
+        </Tooltip>,
+      );
+    });
   }
 
   if (images?.length) {
@@ -291,23 +354,35 @@ const CustomDropZone = ({ thumbnailId, setThumbnailId, remove, setRemove, images
         const isRemoved = remove.indexOf(image.id);
 
         previews.push(
-          <Tooltip key={`preview-${image.id}-${index}`} title={isRemoved ? 'Gỡ ảnh: ' : '' + image.name}>
-            <Thumb className={isRemoved != -1 ? 'remove' : ''}>
-              <StyledIconButton onClick={() => handleRemoveImage(image.id)}><Delete /></StyledIconButton>
-              <StyledIconButton className="left" onClick={() => handleSetThumbnail(image.id)}><PermMedia /></StyledIconButton>
+          <Tooltip
+            key={`preview-${image.id}-${index}`}
+            title={isRemoved ? "Gỡ ảnh: " : "" + image.name}
+          >
+            <Thumb className={isRemoved != -1 ? "remove" : ""}>
+              <StyledIconButton onClick={() => handleRemoveImage(image.id)}>
+                <Delete />
+              </StyledIconButton>
+              <StyledIconButton
+                className="left"
+                onClick={() => handleSetThumbnail(image.id)}
+              >
+                <PermMedia />
+              </StyledIconButton>
               <ThumbInner>
                 <ThumbImage src={`${image.url}?size=small`} />
               </ThumbInner>
             </Thumb>
-          </Tooltip>
-        )
+          </Tooltip>,
+        );
       }
-    })
+    });
   }
 
   return (
     <section className="container">
-      <DropZoneContainer {...getRootProps({ isFocused, isDragAccept, isDragReject })}>
+      <DropZoneContainer
+        {...getRootProps({ isFocused, isDragAccept, isDragReject })}
+      >
         <input {...getInputProps()} />
         <DropZoneContent>
           <PermMedia fontSize="large" />
@@ -316,24 +391,18 @@ const CustomDropZone = ({ thumbnailId, setThumbnailId, remove, setRemove, images
           {fileRejectionItems}
         </DropZoneContent>
       </DropZoneContainer>
-      {previews?.length > 0 &&
+      {previews?.length > 0 && (
         <>
-          <ThumbContainer>
-            {previews}
-          </ThumbContainer>
+          <ThumbContainer>{previews}</ThumbContainer>
           <ButtonContainer>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={handleClearFiles}
-            >
+            <Button variant="outlined" color="error" onClick={handleClearFiles}>
               Xoá tất cả
             </Button>
           </ButtonContainer>
         </>
-      }
+      )}
     </section>
   );
-}
+};
 
 export default CustomDropZone;

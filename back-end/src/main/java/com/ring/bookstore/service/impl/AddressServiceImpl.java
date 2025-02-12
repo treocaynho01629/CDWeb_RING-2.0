@@ -30,14 +30,14 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public List<AddressDTO> getMyAddresses(Account user) {
         List<IAddress> addresses = addressRepo.findAddressesByProfile(user.getProfile().getId());
-        List<AddressDTO> addressDTOS = addresses.stream().map(addressMapper::apply).toList();
+        List<AddressDTO> addressDTOS = addresses.stream().map(addressMapper::projectionToDTO).toList();
         return addressDTOS;
     }
 
     @Override
     public AddressDTO getMyAddress(Account user) {
         IAddress address = addressRepo.findAddressByProfile(user.getProfile().getId());
-        return addressMapper.apply(address);
+        return addressMapper.projectionToDTO(address);
     }
 
     @Override

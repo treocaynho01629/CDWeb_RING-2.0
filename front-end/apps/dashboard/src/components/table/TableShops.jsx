@@ -1,339 +1,146 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
-  Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch,
-  Skeleton, TextField, MenuItem, Menu, ListItemIcon, ListItemText, Stack, Toolbar, Button,
-  Avatar
-} from '@mui/material';
-import { Search, MoreHoriz, Edit, Delete, Visibility, FilterAltOff, Add } from '@mui/icons-material';
-import { Link } from 'react-router';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { useDeleteAllBooksMutation, useDeleteBookMutation, useDeleteBooksInverseMutation, useDeleteBooksMutation } from '../../features/books/booksApiSlice';
-import { ItemTitle, FooterContainer, FooterLabel, StyledStockBar } from '../custom/Components';
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  Checkbox,
+  IconButton,
+  FormControlLabel,
+  Switch,
+  Skeleton,
+  TextField,
+  MenuItem,
+  Menu,
+  ListItemIcon,
+  ListItemText,
+  Stack,
+  Toolbar,
+  Button,
+  Avatar,
+} from "@mui/material";
+import {
+  Search,
+  MoreHoriz,
+  Edit,
+  Delete,
+  Visibility,
+  FilterAltOff,
+  Add,
+} from "@mui/icons-material";
+import { Link } from "react-router";
+import {
+  useDeleteAllBooksMutation,
+  useDeleteBookMutation,
+  useDeleteBooksInverseMutation,
+  useDeleteBooksMutation,
+} from "../../features/books/booksApiSlice";
+import { ItemTitle, FooterContainer, FooterLabel } from "../custom/Components";
 import { currencyFormat, idFormatter, numFormat } from "@ring/shared";
-import { publishersApiSlice } from '../../features/publishers/publishersApiSlice';
-import { categoriesApiSlice } from '../../features/categories/categoriesApiSlice';
-import { bookTypeItems, bookTypes } from "@ring/shared/book";
-import { useGetShopsQuery } from '../../features/shops/shopsApiSlice';
+import { useGetShopsQuery } from "../../features/shops/shopsApiSlice";
 import { Progress } from "@ring/ui";
-import { useDeepEffect } from "@ring/shared"
-import CustomTableHead from './CustomTableHead';
-import CustomTablePagination from './CustomTablePagination';
+import { useDeepEffect } from "@ring/shared";
+import { useAuth } from "@ring/auth";
+import CustomTableHead from "./CustomTableHead";
+import CustomTablePagination from "./CustomTablePagination";
 
 const headCells = [
   {
-    id: 'id',
-    align: 'center',
-    width: '70px',
+    id: "id",
+    align: "center",
+    width: "70px",
     disablePadding: false,
     sortable: true,
-    label: 'ID',
+    label: "ID",
   },
   {
-    id: 'name',
-    align: 'left',
-    width: 'auto',
+    id: "name",
+    align: "left",
+    width: "auto",
     disablePadding: false,
     sortable: true,
-    label: 'Cửa hàng',
+    label: "Cửa hàng",
   },
   {
-    id: 'ownerId',
-    align: 'left',
-    width: '120px',
+    id: "ownerId",
+    align: "left",
+    width: "120px",
     disablePadding: false,
     sortable: true,
-    label: 'Sở hữu',
+    label: "Sở hữu",
   },
   {
-    id: 'sales',
-    align: 'left',
-    width: '120px',
+    id: "sales",
+    align: "left",
+    width: "120px",
     disablePadding: false,
     sortable: true,
-    label: 'Doanh thu',
+    label: "Doanh thu",
   },
   {
-    id: 'action',
-    width: '24px',
+    id: "action",
+    width: "24px",
     disablePadding: false,
     sortable: false,
   },
 ];
 
-function ShopFilters({ filters, setFilters }) {
+function ShopFilters({ userId, isAdmin, filters, setFilters }) {
   const inputRef = useRef();
-  const [pubIds, setPubIds] = useState(filters.pubIds);
-  const [types, setTypes] = useState(filters.types);
-  const [pubsPagination, setPubsPagination] = useState({
-    number: 0,
-    totalPages: 0,
-    totalElements: 0,
-  })
-  const [catesPagination, setCatesPagination] = useState({
-    number: 0,
-    totalPages: 0,
-    totalElements: 0,
-  })
-
-  const [getPublishers, { data: pubs }] = publishersApiSlice.useLazyGetPublishersQuery();
-  const [getCategories, { data: cates }] = categoriesApiSlice.useLazyGetCategoriesQuery();
-
-  const handleOpenPubs = () => {
-    if (!pubs) {
-      getPublishers({
-        page: pubsPagination?.number,
-        loadMore: true,
-      })
-        .unwrap()
-        .then((data) => {
-          setPubsPagination({
-            ...pubsPagination,
-            number: data.page.number,
-            totalPages: data.page.totalPages,
-            totalElements: data.page.totalElements,
-          });
-        })
-        .catch((rejected) => console.error(rejected));
-    }
-  };
-
-  const handleOpenCates = () => {
-    if (!cates) {
-      getCategories({
-        include: 'children',
-        page: catesPagination?.number,
-        loadMore: true
-      })
-        .unwrap()
-        .then((data) => {
-          setCatesPagination({
-            ...catesPagination,
-            number: data.page.number,
-            totalPages: data.page.totalPages,
-            totalElements: data.page.totalElements,
-          });
-        })
-        .catch((rejected) => console.error(rejected));
-    }
-  };
-
-  const handleShowmorePubs = () => {
-    let currPage = (pubsPagination?.number || 0) + 1;
-    if (!pubsPagination?.totalPages <= currPage) {
-      getPublishers({
-        page: currPage,
-        loadMore: true
-      })
-        .unwrap()
-        .then((data) => {
-          setPubsPagination({
-            ...pubsPagination,
-            number: data.page.number,
-            totalPages: data.page.totalPages,
-            totalElements: data.page.totalElements,
-          });
-        })
-        .catch((rejected) => console.error(rejected));
-    }
-  }
-
-  const handleShowmoreCates = () => {
-    let currPage = (catesPagination?.number || 0) + 1;
-    if (!catesPagination?.totalPages <= currPage) {
-      getCategories({
-        include: 'children',
-        page: currPage,
-        loadMore: true,
-      })
-        .unwrap()
-        .then((data) => {
-          setCatesPagination({
-            ...catesPagination,
-            number: data.page.number,
-            totalPages: data.page.totalPages,
-            totalElements: data.page.totalElements,
-          });
-        })
-        .catch((rejected) => console.error(rejected));
-    }
-  }
-
-  const handleChangePubs = useCallback((e) => {
-    const value = e.target.value;
-    if (!pubIds?.includes(value)) setPubIds(value);
-  }, []);
-
-  const handleChangeTypes = useCallback((e) => {
-    const value = e.target.value;
-    if (!types?.includes(value)) setTypes(value);
-  }, []);
 
   const handleChangeKeyword = useCallback((e) => {
     e.preventDefault();
-    if (inputRef) setFilters(prev => ({ ...prev, keyword: inputRef.current.value }));
+    if (inputRef)
+      setFilters((prev) => ({ ...prev, keyword: inputRef.current.value }));
   }, []);
-
-  const handleApplyPubs = () => {
-    setFilters(prev => ({ ...prev, pubIds: pubIds }))
-  };
-
-  const handleApplyTypes = () => {
-    setFilters(prev => ({ ...prev, types: types }))
-  };
 
   const resetFilter = useCallback(() => {
     setFilters({
       keyword: "",
-      cate: "",
-      pubIds: [],
-      types: [],
+      userId: "",
     });
-    setPubIds([]);
-    setTypes([]);
     if (inputRef) inputRef.current.value = "";
   }, []);
 
   return (
-    <Stack width="100%" spacing={1} my={2} direction={{ xs: 'column', md: 'row' }}>
-      <TextField label='Nhà xuất bản'
-        select
-        size="small"
-        fullWidth
-        slotProps={{
-          select: {
-            multiple: true,
-            value: pubIds,
-            onChange: (e) => handleChangePubs(e),
-            onOpen: handleOpenPubs,
-            onClose: handleApplyPubs,
-            renderValue: (selected) => {
-              const filteredName = selected?.map(id => pubs?.entities[id]?.name);
-              return filteredName.join(", ");
-            },
-            MenuProps: {
-              slotProps: {
-                paper: {
-                  style: {
-                    maxHeight: 250,
-                  },
-                },
-              }
-            }
-          }
-        }}
-      >
-        {pubs?.ids?.map((id, index) => {
-          const pub = pubs?.entities[id];
-
-          return (
-            <MenuItem key={`pub-${id}-${index}`} value={id}>
-              <Checkbox sx={{ py: .5, pr: 1, pl: 0 }} disableRipple checked={pubIds?.includes(id)} />
-              <ListItemText primary={pub?.name} />
-            </MenuItem>
-          )
-        })}
-        {pubsPagination?.totalPages > pubsPagination?.number + 1 &&
-          <Box display="flex" justifyContent="center">
-            <Button
-              onClick={handleShowmorePubs}
-              endIcon={<Add />}
-              fullWidth
-            >
-              Tải thêm
-            </Button>
-          </Box>
-        }
-      </TextField>
-      <TextField label='Danh mục'
-        value={filters.cate || ''}
-        onChange={(e) => setFilters({ ...filters, cate: e.target.value })}
-        select
-        defaultValue=""
-        size="small"
-        fullWidth
-        slotProps={{
-          select: {
-            onOpen: handleOpenCates,
-            MenuProps: {
-              slotProps: {
-                paper: {
-                  style: {
-                    maxHeight: 250,
-                  },
-                },
-              }
-            }
-          }
-        }}
-      >
-        <MenuItem value=""><em>--Tất cả--</em></MenuItem>
-        {cates?.ids?.map((id, index) => {
-          const cate = cates?.entities[id];
-          const cateList = [];
-
-          cateList.push(
-            <MenuItem key={`cate-${id}-${index}`} value={id}>
-              {cate?.name}
-            </MenuItem>);
-          {
-            cate?.children?.map((child, childIndex) => {
-              cateList.push(
-                <MenuItem sx={{ pl: 3, fontSize: 15 }} key={`child-cate-${child?.id}-${childIndex}`} value={child?.id}>
-                  {child?.name}
-                </MenuItem>)
-            })
-          }
-
-          return cateList;
-        })}
-        {catesPagination?.totalPages > catesPagination?.number + 1 &&
-          <Box display="flex" justifyContent="center">
-            <Button
-              onClick={handleShowmoreCates}
-              endIcon={<Add />}
-              fullWidth
-            >
-              Tải thêm
-            </Button>
-          </Box>
-        }
-      </TextField>
-      <TextField label='Hình thức'
-        select
-        size="small"
-        fullWidth
-        slotProps={{
-          select: {
-            multiple: true,
-            value: types,
-            onChange: (e) => handleChangeTypes(e),
-            onClose: handleApplyTypes,
-            renderValue: (selected) => {
-              const filteredLabel = selected?.map(value => bookTypes[value]);
-              return filteredLabel.join(", ");
-            },
-            MenuProps: {
-              slotProps: {
-                paper: {
-                  style: {
-                    maxHeight: 250,
-                  },
-                },
-              }
-            }
-          }
-        }}
-      >
-        {bookTypeItems.map((type, index) => (
-          <MenuItem key={`type-${type.value}-${index}`} value={type.value}>
-            <Checkbox sx={{ py: .5, pr: 1, pl: 0 }} disableRipple checked={types?.includes(type.value)} />
-            <ListItemText primary={type.label} />
-          </MenuItem>
-        ))}
-      </TextField>
-      <form style={{ width: '100%' }} onSubmit={handleChangeKeyword}>
+    <Stack
+      width="100%"
+      spacing={1}
+      my={2}
+      direction={{ xs: "column", md: "row" }}
+    >
+      {isAdmin && (
         <TextField
-          placeholder='Tìm kiếm'
+          label="Lọc theo"
+          value={filters.userId || ""}
+          onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+          select
+          size="small"
+          fullWidth
+          slotProps={{
+            select: {
+              MenuProps: {
+                slotProps: {
+                  paper: {
+                    style: {
+                      maxHeight: 250,
+                    },
+                  },
+                },
+              },
+            },
+          }}
+        >
+          <MenuItem value="">Tất cả</MenuItem>
+          <MenuItem value={userId}>Sở hữu</MenuItem>
+        </TextField>
+      )}
+      <form style={{ width: "100%" }} onSubmit={handleChangeKeyword}>
+        <TextField
+          placeholder="Tìm kiếm"
           autoComplete="products"
           id="products"
           size="small"
@@ -341,37 +148,46 @@ function ShopFilters({ filters, setFilters }) {
           fullWidth
           slotProps={{
             input: {
-              startAdornment: (< Search sx={{ marginRight: 1 }} />)
+              startAdornment: <Search sx={{ marginRight: 1 }} />,
             },
           }}
         />
       </form>
       <Box display="flex" justifyContent="center">
-        <Button sx={{ width: 125 }} color="error" onClick={resetFilter} startIcon={<FilterAltOff />}>Xoá bộ lọc</Button>
+        <Button
+          sx={{ width: 125 }}
+          color="error"
+          onClick={resetFilter}
+          startIcon={<FilterAltOff />}
+        >
+          Xoá bộ lọc
+        </Button>
       </Box>
-    </Stack >
-  )
+    </Stack>
+  );
 }
 
 export default function TableShops({ handleOpenEdit, pending, setPending }) {
   //#region construct
+  const { id, roles } = useAuth();
+  const isAdmin = useState(
+    roles?.find((role) => ["ROLE_ADMIN"].includes(role))
+  );
   const [selected, setSelected] = useState([]);
   const [deselected, setDeseletected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [dense, setDense] = useState(true);
   const [filters, setFilters] = useState({
     keyword: "",
-    cate: "",
-    pubIds: [],
-    types: [],
-  })
+    userId: "",
+  });
   const [pagination, setPagination] = useState({
     number: 0,
     size: 10,
     totalPages: 0,
     sortBy: "id",
     sortDir: "desc",
-  })
+  });
 
   //Actions
   const [anchorEl, setAnchorEl] = useState(null);
@@ -390,8 +206,9 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
     size: pagination?.size,
     sortBy: pagination?.sortBy,
     sortDir: pagination?.sortDir,
-    keyword: filters.keyword
-  })
+    keyword: filters.keyword,
+    userId: filters.userId,
+  });
 
   //Set pagination after fetch
   useEffect(() => {
@@ -400,21 +217,25 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
         ...pagination,
         totalPages: data?.page?.totalPages,
         number: data?.page?.number,
-        size: data?.page?.size
+        size: data?.page?.size,
       });
     }
-  }, [data])
+  }, [data]);
 
-  useDeepEffect(() => { handleChangePage(0); }, [filters])
+  useDeepEffect(() => {
+    handleChangePage(0);
+  }, [filters]);
 
   const handleRequestSort = (e, property) => {
-    const isAsc = (pagination.sortBy === property && pagination.sortDir === 'asc');
-    const sortDir = isAsc ? 'desc' : 'asc';
+    const isAsc =
+      pagination.sortBy === property && pagination.sortDir === "asc";
+    const sortDir = isAsc ? "desc" : "asc";
     setPagination({ ...pagination, sortBy: property, sortDir: sortDir });
   };
 
   const handleSelectAllClick = (e) => {
-    if (e.target.checked) { //Selected all
+    if (e.target.checked) {
+      //Selected all
       setSelectedAll(true);
       return;
     }
@@ -441,7 +262,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
       } else if (deselectedIndex > 0) {
         newDeselected = newDeselected.concat(
           deselected.slice(0, deselectedIndex),
-          deselected.slice(deselectedIndex + 1),
+          deselected.slice(deselectedIndex + 1)
         );
       }
 
@@ -464,7 +285,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
       } else if (selectedIndex > 0) {
         newSelected = newSelected.concat(
           selected.slice(0, selectedIndex),
-          selected.slice(selectedIndex + 1),
+          selected.slice(selectedIndex + 1)
         );
       }
 
@@ -500,14 +321,15 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
   const handleCloseContext = () => {
     setAnchorEl(null);
     setContextId(null);
-  }
+  };
 
   const handleDelete = async (id) => {
     if (pending) return;
     setPending(true);
-    const { enqueueSnackbar } = await import('notistack');
+    const { enqueueSnackbar } = await import("notistack");
 
-    deleteBook(id).unwrap()
+    deleteBook(id)
+      .unwrap()
       .then((data) => {
         //Unselected
         const selectedIndex = selected.indexOf(id);
@@ -518,113 +340,123 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
           setSelected(newSelected);
         }
 
-        enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+        enqueueSnackbar("Đã xoá sản phẩm!", { variant: "success" });
         setPending(false);
       })
       .catch((err) => {
         console.error(err);
         if (!err?.status) {
-          enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
+          enqueueSnackbar("Server không phản hồi!", { variant: "error" });
         } else if (err?.status === 409) {
-          enqueueSnackbar(err?.data?.message, { variant: 'error' });
+          enqueueSnackbar(err?.data?.message, { variant: "error" });
         } else if (err?.status === 400) {
-          enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
+          enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
         } else {
-          enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+          enqueueSnackbar("Xoá sản phẩm thất bại!", { variant: "error" });
         }
         setPending(false);
-      })
+      });
   };
 
   const handleDeleteMultiples = async () => {
     if (pending) return;
     setPending(true);
-    const { enqueueSnackbar } = await import('notistack');
+    const { enqueueSnackbar } = await import("notistack");
 
     if (selectedAll) {
-      if (deselected.length == 0) { //Delete all
-        deleteAll(shop).unwrap()
+      if (deselected.length == 0) {
+        //Delete all
+        deleteAll(shop)
+          .unwrap()
           .then((data) => {
             //Unselected
             setSelected([]);
             setDeseletected([]);
             setSelectedAll(false);
-            enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+            enqueueSnackbar("Đã xoá sản phẩm!", { variant: "success" });
             setPending(false);
           })
           .catch((err) => {
             console.error(err);
             if (!err?.status) {
-              enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
+              enqueueSnackbar("Server không phản hồi!", { variant: "error" });
             } else if (err?.status === 409) {
-              enqueueSnackbar(err?.data?.message, { variant: 'error' });
+              enqueueSnackbar(err?.data?.message, { variant: "error" });
             } else if (err?.status === 400) {
-              enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
+              enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
             } else {
-              enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+              enqueueSnackbar("Xoá sản phẩm thất bại!", { variant: "error" });
             }
             setPending(false);
-          })
-      } else { //Delete books inverse
+          });
+      } else {
+        //Delete books inverse
         deleteBooksInverse({
-          shopId: shop ?? '',
+          shopId: shop ?? "",
           keyword: filters.keyword,
           cateId: filters.cate,
           types: filters.types,
           pubIds: filters.pubIds,
           amount: 0,
-          ids: deselected
-        }).unwrap()
+          ids: deselected,
+        })
+          .unwrap()
           .then((data) => {
             //Unselected
             setSelected([]);
             setDeseletected([]);
             setSelectedAll(false);
-            enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+            enqueueSnackbar("Đã xoá sản phẩm!", { variant: "success" });
             setPending(false);
           })
           .catch((err) => {
             console.error(err);
             if (!err?.status) {
-              enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
+              enqueueSnackbar("Server không phản hồi!", { variant: "error" });
             } else if (err?.status === 409) {
-              enqueueSnackbar(err?.data?.message, { variant: 'error' });
+              enqueueSnackbar(err?.data?.message, { variant: "error" });
             } else if (err?.status === 400) {
-              enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
+              enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
             } else {
-              enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+              enqueueSnackbar("Xoá sản phẩm thất bại!", { variant: "error" });
             }
             setPending(false);
-          })
+          });
       }
-    } else { //Delete books
-      deleteBooks(selected).unwrap()
+    } else {
+      //Delete books
+      deleteBooks(selected)
+        .unwrap()
         .then((data) => {
           //Unselected
           setSelected([]);
           setDeseletected([]);
           setSelectedAll(false);
-          enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+          enqueueSnackbar("Đã xoá sản phẩm!", { variant: "success" });
           setPending(false);
         })
         .catch((err) => {
           console.error(err);
           if (!err?.status) {
-            enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
+            enqueueSnackbar("Server không phản hồi!", { variant: "error" });
           } else if (err?.status === 409) {
-            enqueueSnackbar(err?.data?.message, { variant: 'error' });
+            enqueueSnackbar(err?.data?.message, { variant: "error" });
           } else if (err?.status === 400) {
-            enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
+            enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
           } else {
-            enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+            enqueueSnackbar("Xoá sản phẩm thất bại!", { variant: "error" });
           }
           setPending(false);
-        })
+        });
     }
   };
 
-  const isSelected = (id) => ((!selectedAll && selected?.indexOf(id) !== -1) || (selectedAll && deselected?.indexOf(id) === -1));
-  const numSelected = selectedAll ? data?.page?.totalElements - deselected?.length : selected?.length;
+  const isSelected = (id) =>
+    (!selectedAll && selected?.indexOf(id) !== -1) ||
+    (selectedAll && deselected?.indexOf(id) === -1);
+  const numSelected = selectedAll
+    ? data?.page?.totalElements - deselected?.length
+    : selected?.length;
   const colSpan = headCells.length + 1;
   //#endregion
 
@@ -638,55 +470,67 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ position: 'relative', height: '40dvh' }}
+          sx={{ position: "relative", height: "40dvh" }}
         >
           <Progress color="primary" />
         </TableCell>
       </TableRow>
-    )
+    );
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    bookRows = ids?.length
-      ? ids?.map((id, index) => {
+    bookRows = ids?.length ? (
+      ids?.map((id, index) => {
         const shop = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
         const date = new Date(shop?.joinedDate);
 
         return (
-          <TableRow
-            hover
-            aria-checked={isItemSelected}
-            tabIndex={-1}
-            key={id}
-          >
+          <TableRow hover aria-checked={isItemSelected} tabIndex={-1} key={id}>
             <TableCell padding="checkbox">
-              <Checkbox color="primary"
+              <Checkbox
+                color="primary"
                 onChange={(e) => handleClick(e, id)}
                 checked={isItemSelected}
                 inputProps={{
-                  'aria-labelledby': labelId,
+                  "aria-labelledby": labelId,
                 }}
               />
             </TableCell>
-            <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
+            <TableCell
+              component="th"
+              id={labelId}
+              scope="row"
+              padding="none"
+              align="center"
+            >
               <Link to={`/product/${id}`}>{idFormatter(id)}</Link>
             </TableCell>
             <TableCell align="left">
-              <Link to={`dashboard/shop/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
-                <Avatar sx={{ marginRight: 1 }} src={shop?.image ? shop.image + '?size=tiny' : null}>{shop?.name?.charAt(0) ?? ''}</Avatar>
+              <Link
+                to={`dashboard/shop/${id}`}
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <Avatar
+                  sx={{ marginRight: 1 }}
+                  src={shop?.image ? shop.image + "?size=tiny" : null}
+                >
+                  {shop?.name?.charAt(0) ?? ""}
+                </Avatar>
                 <Box>
                   <ItemTitle>{shop.name}</ItemTitle>
                   <Box display="flex">
-                    <ItemTitle className="secondary">{
-                      date.toLocaleDateString("en-GB", {
+                    <ItemTitle className="secondary">
+                      {date.toLocaleDateString("en-GB", {
                         year: "numeric",
                         month: "2-digit",
                         day: "2-digit",
-                      })
-                    }</ItemTitle>
-                    <ItemTitle>&emsp;Lượt theo dõi: {shop.totalFollowers}</ItemTitle>
+                      })}
+                    </ItemTitle>
+                    <ItemTitle>
+                      &emsp;Lượt theo dõi: {shop.totalFollowers}
+                    </ItemTitle>
                   </Box>
                 </Box>
               </Link>
@@ -697,26 +541,31 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
             </TableCell>
             <TableCell align="left">
               <ItemTitle>{currencyFormat.format(shop.sales)}</ItemTitle>
-              <ItemTitle className="secondary">Doanh số: {numFormat.format(shop.totalSold)}</ItemTitle>
+              <ItemTitle className="secondary">
+                Doanh số: {numFormat.format(shop.totalSold)}
+              </ItemTitle>
             </TableCell>
             <TableCell align="right">
-              <IconButton onClick={(e) => handleOpenContext(e, id)}><MoreHoriz /></IconButton>
+              <IconButton onClick={(e) => handleOpenContext(e, id)}>
+                <MoreHoriz />
+              </IconButton>
             </TableCell>
           </TableRow>
-        )
+        );
       })
-      :
+    ) : (
       <TableRow>
         <TableCell
           scope="row"
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: '40dvh' }}
+          sx={{ height: "40dvh" }}
         >
           <Box>Không tìm thấy sản phẩm nào!</Box>
         </TableCell>
-      </TableRow >
+      </TableRow>
+    );
   } else if (isError) {
     bookRows = (
       <TableRow>
@@ -725,21 +574,21 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: '40dvh' }}
+          sx={{ height: "40dvh" }}
         >
-          <Box>{error?.error || 'Đã xảy ra lỗi'}</Box>
+          <Box>{error?.error || "Đã xảy ra lỗi"}</Box>
         </TableCell>
       </TableRow>
-    )
+    );
   }
 
   return (
-    <Paper sx={{ width: '100%', height: '100%' }} elevation={3}>
+    <Paper sx={{ width: "100%", height: "100%" }} elevation={3}>
       <Toolbar>
-        <ShopFilters {...{ filters, setFilters }} />
+        <ShopFilters {...{ isAdmin, userId: id, filters, setFilters }} />
       </Toolbar>
       <TableContainer component={Paper}>
-        <Table stickyHeader size={dense ? 'small' : 'medium'}>
+        <Table stickyHeader size={dense ? "small" : "medium"}>
           <CustomTableHead
             headCells={headCells}
             numSelected={numSelected}
@@ -750,9 +599,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
             onSubmitDelete={handleDeleteMultiples}
             selectedAll={selectedAll}
           />
-          <TableBody>
-            {bookRows}
-          </TableBody>
+          <TableBody>{bookRows}</TableBody>
         </Table>
       </TableContainer>
       <FooterContainer>
@@ -769,11 +616,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
           count={data?.page?.totalElements ?? 0}
         />
       </FooterContainer>
-      <Menu
-        open={openContext}
-        onClose={handleCloseContext}
-        anchorEl={anchorEl}
-      >
+      <Menu open={openContext} onClose={handleCloseContext} anchorEl={anchorEl}>
         <Link to={`/product/${contextId}`}>
           <MenuItem>
             <ListItemIcon>
@@ -789,12 +632,12 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
           <ListItemText>Thay đổi</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleDelete(contextId)}>
-          <ListItemIcon >
+          <ListItemIcon>
             <Delete color="error" fontSize="small" />
           </ListItemIcon>
           <ListItemText color="error">Xoá</ListItemText>
         </MenuItem>
-      </Menu >
+      </Menu>
     </Paper>
   );
 }

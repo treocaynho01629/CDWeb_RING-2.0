@@ -1,7 +1,6 @@
-
 import { useState } from "react";
-import { Box, Breadcrumbs, Grid2 as Grid, Typography } from '@mui/material';
-import { Link } from 'react-router'
+import { Box, Breadcrumbs, Grid2 as Grid, Typography } from "@mui/material";
+import { Link } from "react-router";
 import { Star } from "@mui/icons-material";
 import { useTitle } from "@ring/shared";
 import TableReviews from "../components/table/TableReviews";
@@ -11,19 +10,21 @@ const ManageReviews = () => {
   const [reviewCount, setReviewCount] = useState(0);
 
   //Set title
-  useTitle('Đánh giá');
+  useTitle("Đánh giá");
 
   return (
     <>
       <h2>Quản lý đánh giá</h2>
-      <Box display="flex" justifyContent={'space-between'}>
+      <Box display="flex" justifyContent={"space-between"}>
         <Breadcrumbs aria-label="breadcrumb">
-          <Link style={{ color: 'inherit' }} to={'/dashboard'}>Dashboard</Link>
+          <Link style={{ color: "inherit" }} to="/">
+            Dashboard
+          </Link>
           <Typography color="text.secondary">Quản lý đánh giá</Typography>
         </Breadcrumbs>
       </Box>
       <br />
-      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
+      <Grid container spacing={3} sx={{ marginBottom: "20px" }}>
         <Grid item sm={6} md={4}>
           {/* <CountCard
             count={reviewCount}
@@ -34,7 +35,7 @@ const ManageReviews = () => {
       </Grid>
       <TableReviews setReviewCount={setReviewCount} />
     </>
-  )
-}
+  );
+};
 
-export default ManageReviews
+export default ManageReviews;

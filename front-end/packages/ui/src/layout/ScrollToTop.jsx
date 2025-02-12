@@ -1,5 +1,5 @@
-import { useLayoutEffect } from 'react';
-import { useLocation } from 'react-router';
+import { useLayoutEffect } from "react";
+import { useLocation } from "react-router";
 
 const ScrollToTop = ({ children }) => {
   const { pathname } = useLocation(); // Extracts pathname
@@ -10,6 +10,6 @@ const ScrollToTop = ({ children }) => {
   }, [pathname]);
 
   return children;
-}
+};
 
 export default ScrollToTop;

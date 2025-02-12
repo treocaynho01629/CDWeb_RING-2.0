@@ -1,31 +1,48 @@
-import { useEffect, useState } from 'react'
-import { Button, useMediaQuery, useTheme } from '@mui/material';
-import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid2 as Grid, MenuItem } from '@mui/material';
-import { Check, Close as CloseIcon, Person as PersonIcon } from '@mui/icons-material';
+import { useEffect, useState } from "react";
+import { Button, useMediaQuery, useTheme } from "@mui/material";
+import {
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid2 as Grid,
+  MenuItem,
+} from "@mui/material";
+import {
+  Check,
+  Close as CloseIcon,
+  Person as PersonIcon,
+} from "@mui/icons-material";
 import { Instruction, DatePicker, PasswordInput } from "@ring/ui";
-import { PatternFormat } from 'react-number-format';
-import { useCreateUserMutation, useUpdateUserMutation } from '../../features/users/usersApiSlice';
+import { PatternFormat } from "react-number-format";
+import {
+  useCreateUserMutation,
+  useUpdateUserMutation,
+} from "../../features/users/usersApiSlice";
 import { genderTypeItems, roleTypeItems } from "@ring/shared/user";
 import { EMAIL_REGEX, PHONE_REGEX } from "@ring/shared/regex";
-import AvatarSelect from '../custom/AvatarSelect';
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
+import ImageSelect from "../custom/ImageSelect";
 
 const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
   //#region construct
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [file, setFile] = useState([]);
   const [pic, setPic] = useState(user?.image || null);
-  const [username, setUserName] = useState(user?.username || '');
-  const [pass, setPass] = useState('');
-  const [email, setEmail] = useState(user?.email || '');
-  const [name, setName] = useState(user?.name || '');
-  const [phone, setPhone] = useState(user?.phone || '');
-  const [dob, setDob] = useState(user?.dob ? dayjs(user?.dob) : dayjs('1970-01-01'));
+  const [username, setUserName] = useState(user?.username || "");
+  const [pass, setPass] = useState("");
+  const [email, setEmail] = useState(user?.email || "");
+  const [name, setName] = useState(user?.name || "");
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [dob, setDob] = useState(
+    user?.dob ? dayjs(user?.dob) : dayjs("1970-01-01")
+  );
   const [roles, setRoles] = useState(roleTypeItems[0].value);
   const [gender, setGender] = useState(genderTypeItems[0].value);
   const [err, setErr] = useState([]);
-  const [errMsg, setErrMsg] = useState('');
+  const [errMsg, setErrMsg] = useState("");
   const [validPhone, setValidPhone] = useState(false);
   const [validEmail, setValidEmail] = useState(false);
 
@@ -38,45 +55,45 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
       setUserName(user?.username);
       setEmail(user?.email);
       setRoles(user?.roles);
-      setName(user?.name || '');
-      setPhone(user?.phone || '');
-      setGender(user?.gender || '');
+      setName(user?.name || "");
+      setPhone(user?.phone || "");
+      setGender(user?.gender || "");
       setDob(dayjs(user?.dob));
       setErr([]);
-      setErrMsg('');
+      setErrMsg("");
     } else {
       clearInput();
     }
-  }, [user])
+  }, [user]);
 
   useEffect(() => {
     const result = PHONE_REGEX.test(phone);
     setValidPhone(result);
-  }, [phone])
+  }, [phone]);
 
   useEffect(() => {
     const result = EMAIL_REGEX.test(email);
     setValidEmail(result);
-  }, [email])
+  }, [email]);
 
   const clearInput = () => {
-    setPic('');
-    setUserName('');
-    setPass('');
-    setEmail('');
-    setName('');
-    setPhone('');
+    setPic("");
+    setUserName("");
+    setPass("");
+    setEmail("");
+    setName("");
+    setPhone("");
     setRoles(roleTypeItems[0].value);
     setGender(genderTypeItems[0].value);
-    setDob(dayjs('2001-01-01'));
+    setDob(dayjs("2001-01-01"));
     setErr([]);
-    setErrMsg('');
-  }
+    setErrMsg("");
+  };
 
   const handleCloseDialog = () => {
     setFile([]);
     handleClose();
-  }
+  };
 
   const handleRemoveImage = (e) => {
     e.stopPropagation();
@@ -87,14 +104,14 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
     } else {
       setPic(user?.image);
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (creating || updating || pending) return;
 
     setPending(true);
-    const { enqueueSnackbar } = await import('notistack');
+    const { enqueueSnackbar } = await import("notistack");
 
     //Set data
     const formData = new FormData();
@@ -106,21 +123,25 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
       name: name || null,
       phone: phone || null,
       gender: gender || null,
-      dob: dob.format('YYYY-MM-DD'),
+      dob: dob.format("YYYY-MM-DD"),
       image: file ? null : pic,
-      keepOldPass: (user && !pass) ? true : false
+      keepOldPass: user && !pass ? true : false,
     });
-    const blob = new Blob([json], { type: 'application/json' });
+    const blob = new Blob([json], { type: "application/json" });
 
-    formData.append('request', blob);
-    if (file?.length) formData.append('image', file[0]);
+    formData.append("request", blob);
+    if (file?.length) formData.append("image", file[0]);
 
-    if (user) { //Update
-      updateUser({ id: user?.id, updatedUser: formData }).unwrap()
+    if (user) {
+      //Update
+      updateUser({ id: user?.id, updatedUser: formData })
+        .unwrap()
         .then((data) => {
-          setErrMsg('');
+          setErrMsg("");
           setErr([]);
-          enqueueSnackbar('Chỉnh sửa thành viên thành công!', { variant: 'success' });
+          enqueueSnackbar("Chỉnh sửa thành viên thành công!", {
+            variant: "success",
+          });
           setPending(false);
           handleCloseDialog();
         })
@@ -128,49 +149,55 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
           console.error(err);
           setErr(err);
           if (!err?.status) {
-            setErrMsg('Server không phản hồi');
+            setErrMsg("Server không phản hồi");
           } else if (err?.status === 409) {
             setErrMsg(err?.data?.message);
           } else if (err?.status === 403) {
-            setErrMsg('Chưa có ảnh kèm theo!');
+            setErrMsg("Chưa có ảnh kèm theo!");
           } else if (err?.status === 400) {
-            setErrMsg('Sai định dạng thông tin!');
+            setErrMsg("Sai định dạng thông tin!");
           } else if (err?.status === 417) {
-            setErrMsg('File ảnh quá lớn (Tối đa 2MB)!');
+            setErrMsg("File ảnh quá lớn (Tối đa 2MB)!");
           } else {
-            setErrMsg('Chỉnh sửa thành vien thất bại!')
+            setErrMsg("Chỉnh sửa thành vien thất bại!");
           }
-          enqueueSnackbar('Chỉnh sửa thành viên thất bại!', { variant: 'error' });
+          enqueueSnackbar("Chỉnh sửa thành viên thất bại!", {
+            variant: "error",
+          });
           setPending(false);
-        })
-    } else { //Create
-      createUser(formData).unwrap()
+        });
+    } else {
+      //Create
+      createUser(formData)
+        .unwrap()
         .then((data) => {
           clearInput();
-          setErrMsg('');
+          setErrMsg("");
           setErr([]);
-          enqueueSnackbar('Thêm thành viên thành công!', { variant: 'success' });
+          enqueueSnackbar("Thêm thành viên thành công!", {
+            variant: "success",
+          });
           setPending(false);
         })
         .catch((err) => {
           console.error(err);
           setErr(err);
           if (!err?.status) {
-            setErrMsg('Server không phản hồi');
+            setErrMsg("Server không phản hồi");
           } else if (err?.status === 409) {
             setErrMsg(err?.data?.message);
           } else if (err?.status === 403) {
-            setErrMsg('Chưa có ảnh kèm theo!');
+            setErrMsg("Chưa có ảnh kèm theo!");
           } else if (err?.status === 400) {
-            setErrMsg('Sai định dạng thông tin!');
+            setErrMsg("Sai định dạng thông tin!");
           } else if (err?.status === 417) {
-            setErrMsg('File ảnh quá lớn (Tối đa 2MB)!');
+            setErrMsg("File ảnh quá lớn (Tối đa 2MB)!");
           } else {
-            setErrMsg('Thêm thành viên thất bại!')
+            setErrMsg("Thêm thành viên thất bại!");
           }
-          enqueueSnackbar('Thêm thành viên thất bại!', { variant: 'error' });
+          enqueueSnackbar("Thêm thành viên thất bại!", { variant: "error" });
           setPending(false);
-        })
+        });
     }
   };
   //#endregion
@@ -178,22 +205,27 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
   return (
     <Dialog
       open={open}
-      scroll={'paper'}
-      maxWidth={'md'}
+      scroll={"paper"}
+      maxWidth={"md"}
       fullWidth
       onClose={handleCloseDialog}
       fullScreen={fullScreen}
       aria-modal
     >
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
-        <PersonIcon />&nbsp;{user ? 'Chỉnh sửa thành viên' : 'Thêm thành viên'}
+      <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
+        <PersonIcon />
+        &nbsp;{user ? "Chỉnh sửa thành viên" : "Thêm thành viên"}
       </DialogTitle>
       <DialogContent sx={{ pt: 0, px: { xs: 1, sm: 3 } }}>
         <form onSubmit={handleSubmit}>
-          <Instruction display={errMsg ? "block" : "none"}>{errMsg}</Instruction>
+          <Instruction display={errMsg ? "block" : "none"}>
+            {errMsg}
+          </Instruction>
           <Grid container size="grow" spacing={1}>
             <Grid size={12} display="flex" justifyContent="center" py={2}>
-              <AvatarSelect {...{ image: pic, handleRemoveImage, file, setFile }} />
+              <ImageSelect
+                {...{ image: pic, handleRemoveImage, file, setFile }}
+              />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
@@ -218,8 +250,14 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 aria-invalid={validEmail ? "false" : "true"}
-                error={(email && !validEmail) || err?.data?.errors?.email != null}
-                helperText={(email && !validEmail) ? "Sai định dạng email." : err?.data?.errors?.email}
+                error={
+                  (email && !validEmail) || err?.data?.errors?.email != null
+                }
+                helperText={
+                  email && !validEmail
+                    ? "Sai định dạng email."
+                    : err?.data?.errors?.email
+                }
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -253,8 +291,12 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
                 label="Số điện thoại"
                 onValueChange={(values) => setPhone(values.value)}
                 value={phone}
-                error={phone && !validPhone || err?.data?.errors?.phone}
-                helperText={phone && !validPhone ? "Sai định dạng số điện thoại!" : err?.data?.errors?.phone}
+                error={(phone && !validPhone) || err?.data?.errors?.phone}
+                helperText={
+                  phone && !validPhone
+                    ? "Sai định dạng số điện thoại!"
+                    : err?.data?.errors?.phone
+                }
                 fullWidth
                 format="(+84) ### ### ###"
                 allowEmptyFormatting
@@ -318,7 +360,7 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
           variant="outlined"
           color="error"
           size="large"
-          sx={{ marginY: '10px' }}
+          sx={{ marginY: "10px" }}
           onClick={handleClose}
           startIcon={<CloseIcon />}
         >
@@ -328,7 +370,7 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
           variant="contained"
           color="primary"
           size="large"
-          sx={{ marginY: '10px' }}
+          sx={{ marginY: "10px" }}
           onClick={handleSubmit}
           startIcon={<Check />}
         >
@@ -337,6 +379,6 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
       </DialogActions>
     </Dialog>
   );
-}
+};
 
-export default UserFormDialog
+export default UserFormDialog;

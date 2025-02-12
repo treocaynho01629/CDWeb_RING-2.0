@@ -1,5 +1,9 @@
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
   root: true,
-  extends: ["@repo/eslint-config/index.js"],
+  extends: ["@ring/eslint-config/index.js"],
+  plugins: ["eslint-plugin-react-compiler"],
+  rules: {
+    "react-compiler/react-compiler": "error",
+  },
 };

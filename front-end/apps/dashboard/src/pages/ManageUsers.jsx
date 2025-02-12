@@ -1,7 +1,10 @@
 import { lazy, Suspense, useState } from "react";
-import { Box, Button, Grid2 as Grid } from '@mui/material';
+import { Box, Button, Grid2 as Grid } from "@mui/material";
 import { Add, Group } from "@mui/icons-material";
-import { useGetUserAnalyticsQuery, usersApiSlice } from "../features/users/usersApiSlice";
+import {
+  useGetUserAnalyticsQuery,
+  usersApiSlice,
+} from "../features/users/usersApiSlice";
 import { HeaderContainer } from "../components/custom/Components";
 import { NavLink } from "react-router";
 import { useTitle } from "@ring/shared";
@@ -9,7 +12,9 @@ import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 import TableUsers from "../components/table/TableUsers";
 import InfoCard from "../components/custom/InfoCard";
 
-const UserFormDialog = lazy(() => import("../components/dialog/UserFormDialog"));
+const UserFormDialog = lazy(
+  () => import("../components/dialog/UserFormDialog"),
+);
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 
 const ManageUsers = () => {
@@ -20,11 +25,10 @@ const ManageUsers = () => {
   const { data: userAnalytics } = useGetUserAnalyticsQuery();
   const [getUser, { isLoading }] = usersApiSlice.useLazyGetUserQuery();
 
-
   const handleOpen = () => {
     setContextUser(null);
     setOpen(true);
-  }
+  };
 
   const handleOpenEdit = (userId) => {
     getUser(userId)
@@ -34,27 +38,30 @@ const ManageUsers = () => {
         setOpen(true);
       })
       .catch((rejected) => console.error(rejected));
-  }
+  };
 
   const handleClose = () => {
     setOpen(false);
-  }
+  };
 
   //Set title
-  useTitle('Thành viên');
+  useTitle("Thành viên");
 
   return (
     <>
-      {(isLoading || pending) &&
+      {(isLoading || pending) && (
         <Suspense fallBack={null}>
-          <PendingModal open={(isLoading || pending)} message="Đang gửi yêu cầu..." />
+          <PendingModal
+            open={isLoading || pending}
+            message="Đang gửi yêu cầu..."
+          />
         </Suspense>
-      }
+      )}
       <HeaderContainer>
         <div>
           <h2>Quản lý thành viên</h2>
           <CustomBreadcrumbs separator="." maxItems={4} aria-label="breadcrumb">
-            <NavLink to={'/user'}>Quản lý thành viên</NavLink>
+            <NavLink to={"/user"}>Quản lý thành viên</NavLink>
           </CustomBreadcrumbs>
         </div>
         <Button variant="outlined" startIcon={<Add />} onClick={handleOpen}>
@@ -70,10 +77,14 @@ const ManageUsers = () => {
       </Box>
       <TableUsers {...{ handleOpenEdit, pending, setPending }} />
       <Suspense fallback={null}>
-        {open !== undefined && <UserFormDialog {...{ open, handleClose, user: contextUser, pending, setPending }} />}
+        {open !== undefined && (
+          <UserFormDialog
+            {...{ open, handleClose, user: contextUser, pending, setPending }}
+          />
+        )}
       </Suspense>
     </>
-  )
-}
+  );
+};
 
-export default ManageUsers
+export default ManageUsers;

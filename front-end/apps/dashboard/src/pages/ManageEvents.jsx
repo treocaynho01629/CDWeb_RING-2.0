@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 const ManageEvents = () => {
-  return (
-    <div>ManageEvents</div>
-  )
-}
+  return <div>ManageEvents</div>;
+};
 
-export default ManageEvents
+export default ManageEvents;

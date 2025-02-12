@@ -1,63 +1,63 @@
-import styled from '@emotion/styled'
-import { useRef, useState, lazy, Suspense } from 'react'
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { Skeleton } from '@mui/material';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
-import Carousel from 'react-multi-carousel';
+import styled from "@emotion/styled";
+import { useRef, useState, lazy, Suspense } from "react";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import { Skeleton } from "@mui/material";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import Carousel from "react-multi-carousel";
 
 const LightboxImages = lazy(() => import("./LightboxImages"));
 
 //#region styled
 const ImgContainer = styled.div`
-    text-align: center;
-    background-color: ${props => props.theme.palette.background.paper};
+  text-align: center;
+  background-color: ${(props) => props.theme.palette.background.paper};
 
-    .react-multi-carousel-list{
-      position: unset !important;
-    }
-    
-    ${props => props.theme.breakpoints.up("md")} {
-        width: 100%;
-        position: sticky;
-        top: ${props => props.theme.mixins.toolbar.minHeight + 15}px;
-    }
-`
+  .react-multi-carousel-list {
+    position: unset !important;
+  }
+
+  ${(props) => props.theme.breakpoints.up("md")} {
+    width: 100%;
+    position: sticky;
+    top: ${(props) => props.theme.mixins.toolbar.minHeight + 15}px;
+  }
+`;
 
 const ImageNumber = styled.span`
-    font-size: 14px;
-    font-weight: 420;
-    padding: 2px 8px;
-    position: absolute;
-    color: white;
-    background-color: rgba(0, 0, 0, .5);
-    border-radius: 50px;
-    top: ${props => props.theme.spacing(3)};
-    left: ${props => props.theme.spacing(3)};
-    opacity: .9;
-    z-index: 5;
-    pointer-events: none;
+  font-size: 14px;
+  font-weight: 420;
+  padding: 2px 8px;
+  position: absolute;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50px;
+  top: ${(props) => props.theme.spacing(3)};
+  left: ${(props) => props.theme.spacing(3)};
+  opacity: 0.9;
+  z-index: 5;
+  pointer-events: none;
 
-    ${props => props.theme.breakpoints.down("md")} {
-        bottom: ${props => props.theme.spacing(3)};
-        right: ${props => props.theme.spacing(3)};
-        top: auto;
-        left: auto;
-    }
-`
+  ${(props) => props.theme.breakpoints.down("md")} {
+    bottom: ${(props) => props.theme.spacing(3)};
+    right: ${(props) => props.theme.spacing(3)};
+    top: auto;
+    left: auto;
+  }
+`;
 
 const MoreImageContainer = styled.div`
-    padding: 10px;
+  padding: 10px;
 
-    ${props => props.theme.breakpoints.down("md")} {
-        padding: 5px;
-    }
-`
+  ${(props) => props.theme.breakpoints.down("md")} {
+    padding: 5px;
+  }
+`;
 
 const CustomArrowButton = styled.div`
   position: absolute;
-  background-color: ${props => props.theme.palette.background.paper};
-  border: .5px solid ${props => props.theme.palette.divider};
+  background-color: ${(props) => props.theme.palette.background.paper};
+  border: 0.5px solid ${(props) => props.theme.palette.divider};
   border-radius: 50%;
   height: 30px;
   width: 30px;
@@ -65,9 +65,9 @@ const CustomArrowButton = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all .2s ease;
+  transition: all 0.2s ease;
   cursor: pointer;
-  opacity: .8;
+  opacity: 0.8;
   z-index: 1;
 
   &:hover {
@@ -75,229 +75,267 @@ const CustomArrowButton = styled.div`
     transform: scale(1.1);
   }
 
-  &.left { left: -10px; }
-  &.right { right: -10px; }
+  &.left {
+    left: -10px;
+  }
+  &.right {
+    right: -10px;
+  }
 
-  svg { font-size: inherit; }
-`
+  svg {
+    font-size: inherit;
+  }
+`;
 
 const ImageSlide = styled.div`
-    padding: 10px;
-    padding-bottom: 0;
-    position: relative;
-    width: 100%;
-    height: 100%;
-    max-height: 450px;
-    aspect-ratio: 1/1;
-    background-clip: content-box;
+  padding: 10px;
+  padding-bottom: 0;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: 450px;
+  aspect-ratio: 1/1;
+  background-clip: content-box;
 
-    ${props => props.theme.breakpoints.down("md")} {
-        padding: 0;
-        border: none;
-    }
-`
+  ${(props) => props.theme.breakpoints.down("md")} {
+    padding: 0;
+    border: none;
+  }
+`;
 
 const StyledLazyImage = styled(LazyLoadImage)`
-    object-fit: contain;
-    width: 100%;
-    max-height: 450px;
-    aspect-ratio: 1/1;
-    cursor: pointer;
-`
+  object-fit: contain;
+  width: 100%;
+  max-height: 450px;
+  aspect-ratio: 1/1;
+  cursor: pointer;
+`;
 
 const StyledSkeleton = styled(Skeleton)`
-    width: 100%;
-    height: 100%;
-    max-height: 450px;
-    aspect-ratio: 1/1;
-`
+  width: 100%;
+  height: 100%;
+  max-height: 450px;
+  aspect-ratio: 1/1;
+`;
 
 const SmallImageSlide = styled.div`
-    display: flex;
-    border: .5px solid ${props => props.theme.palette.divider};
-    opacity: .5;
-    aspect-ratio: 1/1;
-    max-height: 85px;
-    margin-right: ${props => props.theme.spacing(.5)};
-    cursor: pointer;
-    transition: opacity .25s ease;
+  display: flex;
+  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  opacity: 0.5;
+  aspect-ratio: 1/1;
+  max-height: 85px;
+  margin-right: ${(props) => props.theme.spacing(0.5)};
+  cursor: pointer;
+  transition: opacity 0.25s ease;
 
-    &.active {
-        border: 3px solid ${props => props.theme.palette.primary.main};
-        opacity: 1;
-    }
+  &.active {
+    border: 3px solid ${(props) => props.theme.palette.primary.main};
+    opacity: 1;
+  }
 
-    &:hover {
-        border: 1px solid ${props => props.theme.palette.primary.light};
-        opacity: 1;
-    }
-`
+  &:hover {
+    border: 1px solid ${(props) => props.theme.palette.primary.light};
+    opacity: 1;
+  }
+`;
 
 const StyledSmallLazyImage = styled(LazyLoadImage)`
-    display: inline-block;
-    object-fit: contain;
-    width: 100%;
-    aspect-ratio: 1/1;
-    max-height: 85px;
-    background-color: ${props => props.theme.palette.action.disabledBackground};
-`
+  display: inline-block;
+  object-fit: contain;
+  width: 100%;
+  aspect-ratio: 1/1;
+  max-height: 85px;
+  background-color: ${(props) => props.theme.palette.action.disabledBackground};
+`;
 
 const StyledSmallSkeleton = styled(Skeleton)`
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    max-height: 85px;
-    aspect-ratio: 1/1;
-`
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  max-height: 85px;
+  aspect-ratio: 1/1;
+`;
 
 const TopContainer = styled.div`
-    position: relative;
+  position: relative;
 
-    ${CustomArrowButton} {
-        display: none;
-    }
-`
+  ${CustomArrowButton} {
+    display: none;
+  }
+`;
 //#endregion
 
 const responsive = {
-    default: {
-        breakpoint: {
-            max: 3000,
-            min: 900,
-        },
-        items: 1,
+  default: {
+    breakpoint: {
+      max: 3000,
+      min: 900,
     },
-    mobile: {
-        breakpoint: {
-            max: 900,
-            min: 0
-        },
-        items: 1,
-    }
+    items: 1,
+  },
+  mobile: {
+    breakpoint: {
+      max: 900,
+      min: 0,
+    },
+    items: 1,
+  },
 };
 
 const responsiveGroup = {
-    default: {
-        breakpoint: {
-            max: 3000,
-            min: 900
-        },
-        items: 5,
-        slidesToSlide: 3,
-        partialVisibilityGutter: 5
+  default: {
+    breakpoint: {
+      max: 3000,
+      min: 900,
     },
-    mobile: {
-        breakpoint: {
-            max: 900,
-            min: 0
-        },
-        items: 6,
-        slidesToSlide: 3,
-        partialVisibilityGutter: 5
-    }
+    items: 5,
+    slidesToSlide: 3,
+    partialVisibilityGutter: 5,
+  },
+  mobile: {
+    breakpoint: {
+      max: 900,
+      min: 0,
+    },
+    items: 6,
+    slidesToSlide: 3,
+    partialVisibilityGutter: 5,
+  },
 };
 //Custom stuff
 const CustomArrow = ({ onClick, className, direction }) => (
-    <CustomArrowButton className={`${className} ${direction}`} onClick={onClick}>
-        {direction == 'left' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-    </CustomArrowButton>
+  <CustomArrowButton className={`${className} ${direction}`} onClick={onClick}>
+    {direction == "left" ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+  </CustomArrowButton>
 );
 
 const ButtonGroup = ({ images, goToSlide, currentSlide, responsive }) => {
-    return (
-        <MoreImageContainer>
-            <Carousel
-                responsive={responsive}
-                autoPlay={false}
-                customLeftArrow={<CustomArrow direction="left" />}
-                customRightArrow={<CustomArrow direction="right" />}
-                removeArrowOnDeviceType={["mobile"]}
-                minimumTouchDrag={80}
-                partialVisible
-            >
-                {images?.length ? images.map((image, index) => (
-                    <SmallImageSlide
-                        key={index}
-                        className={`${index === currentSlide ? 'active' : ''}`}
-                        onClick={() => goToSlide(index)}
-                    >
-                        <StyledSmallLazyImage
-                            src={`${image?.src}?size=small`}
-                            alt={image?.alt}
-                            placeholder={<StyledSmallSkeleton variant="rectangular" animation={false} />}
-                        />
-                    </SmallImageSlide>
-                ))
-                    : [...Array(4)].map((item, index) => (
-                        <SmallImageSlide key={index}>
-                            <StyledSmallSkeleton variant="rectangular" />
-                        </SmallImageSlide>
-                    ))
-                }
-            </Carousel>
-        </MoreImageContainer>
-    );
+  return (
+    <MoreImageContainer>
+      <Carousel
+        responsive={responsive}
+        autoPlay={false}
+        customLeftArrow={<CustomArrow direction="left" />}
+        customRightArrow={<CustomArrow direction="right" />}
+        removeArrowOnDeviceType={["mobile"]}
+        minimumTouchDrag={80}
+        partialVisible
+      >
+        {images?.length
+          ? images.map((image, index) => (
+              <SmallImageSlide
+                key={index}
+                className={`${index === currentSlide ? "active" : ""}`}
+                onClick={() => goToSlide(index)}
+              >
+                <StyledSmallLazyImage
+                  src={`${image?.src}?size=small`}
+                  alt={image?.alt}
+                  placeholder={
+                    <StyledSmallSkeleton
+                      variant="rectangular"
+                      animation={false}
+                    />
+                  }
+                />
+              </SmallImageSlide>
+            ))
+          : [...Array(4)].map((item, index) => (
+              <SmallImageSlide key={index}>
+                <StyledSmallSkeleton variant="rectangular" />
+              </SmallImageSlide>
+            ))}
+      </Carousel>
+    </MoreImageContainer>
+  );
 };
 
 const ProductImages = ({ images }) => {
-    let sliderRef = useRef();
-    const [slideIndex, setSlideIndex] = useState(0);
-    const [open, setOpen] = useState(undefined);
+  let sliderRef = useRef();
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [open, setOpen] = useState(undefined);
 
-    const goToSlide = (index) => { if (sliderRef?.goToSlide) sliderRef.goToSlide(index) }
-    const handleOpen = () => { setOpen(true); }
-    const handleClose = () => { setOpen(false); }
+  const goToSlide = (index) => {
+    if (sliderRef?.goToSlide) sliderRef.goToSlide(index);
+  };
+  const handleOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-    let carousel = (
-        <Carousel
-            ref={e => sliderRef = e}
-            responsive={responsive}
-            autoPlay={!open}
-            customLeftArrow={<CustomArrow direction="left" />}
-            customRightArrow={<CustomArrow direction="right" />}
-            removeArrowOnDeviceType={["mobile"]}
-            pauseOnHover={true}
-            arrows={open}
-            rewindWithAnimation={true}
-            autoPlaySpeed={15000}
-            transitionDuration={200}
-            beforeChange={(nextSlide) => { setSlideIndex(nextSlide) }}
-            rewind
-        >
-            {images?.length ? images.map((image, index) => (
-                <ImageSlide key={index} onClick={handleOpen}>
-                    <StyledLazyImage
-                        src={image?.src}
-                        srcSet={image?.srcSet.map(item => `${item.src} ${item.width}w`).join(", ")}
-                        alt={image?.alt}
-                        visibleByDefault={index == 0}
-                        placeholder={<StyledSkeleton variant="rectangular" animation={false} />}
-                    />
-                </ImageSlide>
-            ))
-                :
-                <ImageSlide>
-                    <StyledSkeleton variant="rectangular" />
-                </ImageSlide>
-            }
-        </Carousel>
-    )
+  let carousel = (
+    <Carousel
+      ref={(e) => (sliderRef = e)}
+      responsive={responsive}
+      autoPlay={!open}
+      customLeftArrow={<CustomArrow direction="left" />}
+      customRightArrow={<CustomArrow direction="right" />}
+      removeArrowOnDeviceType={["mobile"]}
+      pauseOnHover={true}
+      arrows={open}
+      rewindWithAnimation={true}
+      autoPlaySpeed={15000}
+      transitionDuration={200}
+      beforeChange={(nextSlide) => {
+        setSlideIndex(nextSlide);
+      }}
+      rewind
+    >
+      {images?.length ? (
+        images.map((image, index) => (
+          <ImageSlide key={index} onClick={handleOpen}>
+            <StyledLazyImage
+              src={image?.src}
+              srcSet={image?.srcSet
+                .map((item) => `${item.src} ${item.width}w`)
+                .join(", ")}
+              alt={image?.alt}
+              visibleByDefault={index == 0}
+              placeholder={
+                <StyledSkeleton variant="rectangular" animation={false} />
+              }
+            />
+          </ImageSlide>
+        ))
+      ) : (
+        <ImageSlide>
+          <StyledSkeleton variant="rectangular" />
+        </ImageSlide>
+      )}
+    </Carousel>
+  );
 
-    return (
-        <>
-            <ImgContainer>
-                <TopContainer>
-                    {images?.length ? <ImageNumber>{slideIndex + 1}/{images.length}</ImageNumber>
-                        : <ImageNumber>Đang tải...</ImageNumber>}
-                    {carousel}
-                </TopContainer>
-                <ButtonGroup {...{ images, goToSlide, currentSlide: slideIndex, responsive: responsiveGroup }} />
-            </ImgContainer>
-            <Suspense fallback={null}>
-                {open !== undefined && <LightboxImages {...{ images, open, handleClose }} />}
-            </Suspense>
-        </>
-    )
-}
+  return (
+    <>
+      <ImgContainer>
+        <TopContainer>
+          {images?.length ? (
+            <ImageNumber>
+              {slideIndex + 1}/{images.length}
+            </ImageNumber>
+          ) : (
+            <ImageNumber>Đang tải...</ImageNumber>
+          )}
+          {carousel}
+        </TopContainer>
+        <ButtonGroup
+          {...{
+            images,
+            goToSlide,
+            currentSlide: slideIndex,
+            responsive: responsiveGroup,
+          }}
+        />
+      </ImgContainer>
+      <Suspense fallback={null}>
+        {open !== undefined && (
+          <LightboxImages {...{ images, open, handleClose }} />
+        )}
+      </Suspense>
+    </>
+  );
+};
 
-export default ProductImages
+export default ProductImages;

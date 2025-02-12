@@ -88,9 +88,18 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
-    public ShopDetailDTO getShopById(Long id, Account user) {
+    public ShopInfoDTO getShopInfo(Long id, Account user) {
         Long userId = user != null ? user.getId() : null;
-        IShopDetail shop = shopRepo.findShopDetailById(id, userId).orElseThrow(() ->
+        IShopInfo shop = shopRepo.findShopInfoById(id, userId).orElseThrow(() ->
+                new ResourceNotFoundException("Shop not found!"));
+        ShopInfoDTO shopDTO = shopMapper.infoToDTO(shop); //Map to DTO
+        return shopDTO;
+    }
+
+    @Override
+    public ShopDetailDTO getShopDetail(Long id, Account user) {
+        IShopDetail shop = shopRepo.findShopDetailById(id,
+                isAuthAdmin() ? null : user.getId()).orElseThrow(() ->
                 new ResourceNotFoundException("Shop not found!"));
         ShopDetailDTO shopDTO = shopMapper.detailToDTO(shop); //Map to DTO
         return shopDTO;
@@ -149,6 +158,10 @@ public class ShopServiceImpl implements ShopService {
                 .owner(user)
                 .address(savedAddress)
                 .build();
+
+        //Image upload/replace
+        shop = this.changeShopPic(file, request.getImage(), shop);
+
         Shop addedShop = shopRepo.save(shop); //Save to database
         return addedShop;
     }
@@ -175,6 +188,8 @@ public class ShopServiceImpl implements ShopService {
         AddressRequest addressRequest = request.getAddressRequest();
         Address address = shop.getAddress();
 
+        if (address == null) address = new Address();
+
         address.setName(addressRequest.getName());
         address.setCompanyName(addressRequest.getCompanyName());
         address.setPhone(addressRequest.getPhone());
@@ -187,6 +202,9 @@ public class ShopServiceImpl implements ShopService {
         shop.setAddress(updatedAddress);
         shop.setName(request.getName());
         shop.setDescription(request.getDescription());
+
+        //Image upload/replace
+        shop = this.changeShopPic(file, request.getImage(), shop);
 
         //Update
         Shop updatedShop = shopRepo.save(shop);
@@ -236,5 +254,18 @@ public class ShopServiceImpl implements ShopService {
         boolean isAdmin = (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
         //Check if is admin or valid owner id
         return shop.getOwner().getId().equals(user.getId()) || isAdmin;
+    }
+
+    protected Shop changeShopPic(MultipartFile file, String image, Shop shop) throws IOException, ImageResizerException {
+        if (file != null) { //Contain new image >> upload/replace
+            if (shop.getImage() != null) imageService.deleteImage(shop.getImage().getId()); //Delete old image
+            Image savedImage = imageService.upload(file); //Upload new image
+            shop.setImage(savedImage); //Set new image
+        } else if (image == null) { //Remove image
+            if (shop.getImage() != null) imageService.deleteImage(shop.getImage().getId()); //Delete old image
+            shop.setImage(null);
+        }
+
+        return shop;
     }
 }

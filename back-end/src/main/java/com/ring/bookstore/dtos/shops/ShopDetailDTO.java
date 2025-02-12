@@ -1,5 +1,7 @@
 package com.ring.bookstore.dtos.shops;
 
+import com.ring.bookstore.dtos.accounts.AddressDTO;
+
 import java.time.LocalDateTime;
 
 //Shop
@@ -9,10 +11,12 @@ public record ShopDetailDTO(String username,
                             String name,
                             String description,
                             String image,
-                            LocalDateTime joinedDate,
-                            Integer totalReviews,
+                            AddressDTO address,
+                            Double sales,
+                            Integer totalSold,
                             Integer totalProducts,
+                            Integer totalReviews,
                             Integer totalFollowers,
-                            Boolean followed) {
+                            LocalDateTime joinedDate) {
 
 }

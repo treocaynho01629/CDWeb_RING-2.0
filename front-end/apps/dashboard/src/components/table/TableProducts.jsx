@@ -1,66 +1,109 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
-  Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, IconButton, FormControlLabel, Switch,
-  Skeleton, TextField, MenuItem, Menu, ListItemIcon, ListItemText, Stack, Toolbar, Button
-} from '@mui/material';
-import { Search, MoreHoriz, Edit, Delete, Visibility, FilterAltOff, Add } from '@mui/icons-material';
-import { Link } from 'react-router';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { useDeleteAllBooksMutation, useDeleteBookMutation, useDeleteBooksInverseMutation, useDeleteBooksMutation, useGetBooksQuery } from '../../features/books/booksApiSlice';
-import { ItemTitle, FooterContainer, FooterLabel, StyledStockBar } from '../custom/Components';
-import { currencyFormat, idFormatter, useDeepEffect, bookTypeItems, bookTypes } from "@ring/shared";
-import { publishersApiSlice } from '../../features/publishers/publishersApiSlice';
-import { categoriesApiSlice } from '../../features/categories/categoriesApiSlice';
-import { Progress } from '@ring/ui';
-import CustomTableHead from './CustomTableHead';
-import CustomTablePagination from './CustomTablePagination';
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  Checkbox,
+  IconButton,
+  FormControlLabel,
+  Switch,
+  Skeleton,
+  TextField,
+  MenuItem,
+  Menu,
+  ListItemIcon,
+  ListItemText,
+  Stack,
+  Toolbar,
+  Button,
+} from "@mui/material";
+import {
+  Search,
+  MoreHoriz,
+  Edit,
+  Delete,
+  Visibility,
+  FilterAltOff,
+  Add,
+} from "@mui/icons-material";
+import { Link } from "react-router";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import {
+  useDeleteAllBooksMutation,
+  useDeleteBookMutation,
+  useDeleteBooksInverseMutation,
+  useDeleteBooksMutation,
+  useGetBooksQuery,
+} from "../../features/books/booksApiSlice";
+import {
+  ItemTitle,
+  FooterContainer,
+  FooterLabel,
+  StyledStockBar,
+} from "../custom/Components";
+import {
+  currencyFormat,
+  idFormatter,
+  useDeepEffect,
+  bookTypeItems,
+  bookTypes,
+} from "@ring/shared";
+import { publishersApiSlice } from "../../features/publishers/publishersApiSlice";
+import { categoriesApiSlice } from "../../features/categories/categoriesApiSlice";
+import { Progress } from "@ring/ui";
+import CustomTableHead from "./CustomTableHead";
+import CustomTablePagination from "./CustomTablePagination";
 
 const maxStocks = 199;
 
 const headCells = [
   {
-    id: 'id',
-    align: 'center',
-    width: '70px',
+    id: "id",
+    align: "center",
+    width: "70px",
     disablePadding: false,
     sortable: true,
-    label: 'ID',
+    label: "ID",
   },
   {
-    id: 'title',
-    align: 'left',
-    width: '450px',
+    id: "title",
+    align: "left",
+    width: "450px",
     disablePadding: false,
     sortable: true,
-    label: 'Sản phẩm',
+    label: "Sản phẩm",
   },
   {
-    id: 'shopId',
-    align: 'left',
-    width: '120px',
+    id: "shopId",
+    align: "left",
+    width: "120px",
     disablePadding: false,
     sortable: true,
-    label: 'Shop',
+    label: "Shop",
   },
   {
-    id: 'price',
-    align: 'left',
-    width: '130px',
+    id: "price",
+    align: "left",
+    width: "130px",
     disablePadding: false,
     sortable: true,
-    label: 'Giá(đ)',
+    label: "Giá(đ)",
   },
   {
-    id: 'amount',
-    align: 'left',
-    width: '75px',
+    id: "amount",
+    align: "left",
+    width: "75px",
     disablePadding: false,
     sortable: true,
-    label: 'Số lượng',
+    label: "Số lượng",
   },
   {
-    id: 'action',
-    width: '24px',
+    id: "action",
+    width: "24px",
     disablePadding: false,
     sortable: false,
   },
@@ -74,15 +117,17 @@ function ProductFilters({ filters, setFilters }) {
     number: 0,
     totalPages: 0,
     totalElements: 0,
-  })
+  });
   const [catesPagination, setCatesPagination] = useState({
     number: 0,
     totalPages: 0,
     totalElements: 0,
-  })
+  });
 
-  const [getPublishers, { data: pubs }] = publishersApiSlice.useLazyGetPublishersQuery();
-  const [getCategories, { data: cates }] = categoriesApiSlice.useLazyGetCategoriesQuery();
+  const [getPublishers, { data: pubs }] =
+    publishersApiSlice.useLazyGetPublishersQuery();
+  const [getCategories, { data: cates }] =
+    categoriesApiSlice.useLazyGetCategoriesQuery();
 
   const handleOpenPubs = () => {
     if (!pubs) {
@@ -106,9 +151,9 @@ function ProductFilters({ filters, setFilters }) {
   const handleOpenCates = () => {
     if (!cates) {
       getCategories({
-        include: 'children',
+        include: "children",
         page: catesPagination?.number,
-        loadMore: true
+        loadMore: true,
       })
         .unwrap()
         .then((data) => {
@@ -128,7 +173,7 @@ function ProductFilters({ filters, setFilters }) {
     if (!pubsPagination?.totalPages <= currPage) {
       getPublishers({
         page: currPage,
-        loadMore: true
+        loadMore: true,
       })
         .unwrap()
         .then((data) => {
@@ -141,13 +186,13 @@ function ProductFilters({ filters, setFilters }) {
         })
         .catch((rejected) => console.error(rejected));
     }
-  }
+  };
 
   const handleShowmoreCates = () => {
     let currPage = (catesPagination?.number || 0) + 1;
     if (!catesPagination?.totalPages <= currPage) {
       getCategories({
-        include: 'children',
+        include: "children",
         page: currPage,
         loadMore: true,
       })
@@ -162,7 +207,7 @@ function ProductFilters({ filters, setFilters }) {
         })
         .catch((rejected) => console.error(rejected));
     }
-  }
+  };
 
   const handleChangePubs = useCallback((e) => {
     const value = e.target.value;
@@ -176,15 +221,16 @@ function ProductFilters({ filters, setFilters }) {
 
   const handleChangeKeyword = useCallback((e) => {
     e.preventDefault();
-    if (inputRef) setFilters(prev => ({ ...prev, keyword: inputRef.current.value }));
+    if (inputRef)
+      setFilters((prev) => ({ ...prev, keyword: inputRef.current.value }));
   }, []);
 
   const handleApplyPubs = () => {
-    setFilters(prev => ({ ...prev, pubIds: pubIds }))
+    setFilters((prev) => ({ ...prev, pubIds: pubIds }));
   };
 
   const handleApplyTypes = () => {
-    setFilters(prev => ({ ...prev, types: types }))
+    setFilters((prev) => ({ ...prev, types: types }));
   };
 
   const resetFilter = useCallback(() => {
@@ -200,8 +246,14 @@ function ProductFilters({ filters, setFilters }) {
   }, []);
 
   return (
-    <Stack width="100%" spacing={1} my={2} direction={{ xs: 'column', md: 'row' }}>
-      <TextField label='Nhà xuất bản'
+    <Stack
+      width="100%"
+      spacing={1}
+      my={2}
+      direction={{ xs: "column", md: "row" }}
+    >
+      <TextField
+        label="Nhà xuất bản"
         select
         size="small"
         fullWidth
@@ -213,7 +265,9 @@ function ProductFilters({ filters, setFilters }) {
             onOpen: handleOpenPubs,
             onClose: handleApplyPubs,
             renderValue: (selected) => {
-              const filteredName = selected?.map(id => pubs?.entities[id]?.name);
+              const filteredName = selected?.map(
+                (id) => pubs?.entities[id]?.name,
+              );
               return filteredName.join(", ");
             },
             MenuProps: {
@@ -223,9 +277,9 @@ function ProductFilters({ filters, setFilters }) {
                     maxHeight: 250,
                   },
                 },
-              }
-            }
-          }
+              },
+            },
+          },
         }}
       >
         {pubs?.ids?.map((id, index) => {
@@ -233,25 +287,26 @@ function ProductFilters({ filters, setFilters }) {
 
           return (
             <MenuItem key={`pub-${id}-${index}`} value={id}>
-              <Checkbox sx={{ py: .5, pr: 1, pl: 0 }} disableRipple checked={pubIds?.includes(id)} />
+              <Checkbox
+                sx={{ py: 0.5, pr: 1, pl: 0 }}
+                disableRipple
+                checked={pubIds?.includes(id)}
+              />
               <ListItemText primary={pub?.name} />
             </MenuItem>
-          )
+          );
         })}
-        {pubsPagination?.totalPages > pubsPagination?.number + 1 &&
+        {pubsPagination?.totalPages > pubsPagination?.number + 1 && (
           <Box display="flex" justifyContent="center">
-            <Button
-              onClick={handleShowmorePubs}
-              endIcon={<Add />}
-              fullWidth
-            >
+            <Button onClick={handleShowmorePubs} endIcon={<Add />} fullWidth>
               Tải thêm
             </Button>
           </Box>
-        }
+        )}
       </TextField>
-      <TextField label='Danh mục'
-        value={filters.cate || ''}
+      <TextField
+        label="Danh mục"
+        value={filters.cate || ""}
         onChange={(e) => setFilters({ ...filters, cate: e.target.value })}
         select
         defaultValue=""
@@ -267,12 +322,14 @@ function ProductFilters({ filters, setFilters }) {
                     maxHeight: 250,
                   },
                 },
-              }
-            }
-          }
+              },
+            },
+          },
         }}
       >
-        <MenuItem value=""><em>--Tất cả--</em></MenuItem>
+        <MenuItem value="">
+          <em>--Tất cả--</em>
+        </MenuItem>
         {cates?.ids?.map((id, index) => {
           const cate = cates?.entities[id];
           const cateList = [];
@@ -280,31 +337,34 @@ function ProductFilters({ filters, setFilters }) {
           cateList.push(
             <MenuItem key={`cate-${id}-${index}`} value={id}>
               {cate?.name}
-            </MenuItem>);
+            </MenuItem>,
+          );
           {
             cate?.children?.map((child, childIndex) => {
               cateList.push(
-                <MenuItem sx={{ pl: 3, fontSize: 15 }} key={`child-cate-${child?.id}-${childIndex}`} value={child?.id}>
+                <MenuItem
+                  sx={{ pl: 3, fontSize: 15 }}
+                  key={`child-cate-${child?.id}-${childIndex}`}
+                  value={child?.id}
+                >
                   {child?.name}
-                </MenuItem>)
-            })
+                </MenuItem>,
+              );
+            });
           }
 
           return cateList;
         })}
-        {catesPagination?.totalPages > catesPagination?.number + 1 &&
+        {catesPagination?.totalPages > catesPagination?.number + 1 && (
           <Box display="flex" justifyContent="center">
-            <Button
-              onClick={handleShowmoreCates}
-              endIcon={<Add />}
-              fullWidth
-            >
+            <Button onClick={handleShowmoreCates} endIcon={<Add />} fullWidth>
               Tải thêm
             </Button>
           </Box>
-        }
+        )}
       </TextField>
-      <TextField label='Hình thức'
+      <TextField
+        label="Hình thức"
         select
         size="small"
         fullWidth
@@ -315,7 +375,7 @@ function ProductFilters({ filters, setFilters }) {
             onChange: (e) => handleChangeTypes(e),
             onClose: handleApplyTypes,
             renderValue: (selected) => {
-              const filteredLabel = selected?.map(value => bookTypes[value]);
+              const filteredLabel = selected?.map((value) => bookTypes[value]);
               return filteredLabel.join(", ");
             },
             MenuProps: {
@@ -325,21 +385,25 @@ function ProductFilters({ filters, setFilters }) {
                     maxHeight: 250,
                   },
                 },
-              }
-            }
-          }
+              },
+            },
+          },
         }}
       >
         {bookTypeItems.map((type, index) => (
           <MenuItem key={`type-${type.value}-${index}`} value={type.value}>
-            <Checkbox sx={{ py: .5, pr: 1, pl: 0 }} disableRipple checked={types?.includes(type.value)} />
+            <Checkbox
+              sx={{ py: 0.5, pr: 1, pl: 0 }}
+              disableRipple
+              checked={types?.includes(type.value)}
+            />
             <ListItemText primary={type.label} />
           </MenuItem>
         ))}
       </TextField>
-      <form style={{ width: '100%' }} onSubmit={handleChangeKeyword}>
+      <form style={{ width: "100%" }} onSubmit={handleChangeKeyword}>
         <TextField
-          placeholder='Tìm kiếm'
+          placeholder="Tìm kiếm"
           autoComplete="products"
           id="products"
           size="small"
@@ -347,19 +411,31 @@ function ProductFilters({ filters, setFilters }) {
           fullWidth
           slotProps={{
             input: {
-              startAdornment: (< Search sx={{ marginRight: 1 }} />)
+              startAdornment: <Search sx={{ marginRight: 1 }} />,
             },
           }}
         />
       </form>
       <Box display="flex" justifyContent="center">
-        <Button sx={{ width: 125 }} color="error" onClick={resetFilter} startIcon={<FilterAltOff />}>Xoá bộ lọc</Button>
+        <Button
+          sx={{ width: 125 }}
+          color="error"
+          onClick={resetFilter}
+          startIcon={<FilterAltOff />}
+        >
+          Xoá bộ lọc
+        </Button>
       </Box>
-    </Stack >
-  )
+    </Stack>
+  );
 }
 
-export default function TableProducts({ shop, handleOpenEdit, pending, setPending }) {
+export default function TableProducts({
+  shop,
+  handleOpenEdit,
+  pending,
+  setPending,
+}) {
   //#region construct
   const [selected, setSelected] = useState([]);
   const [deselected, setDeseletected] = useState([]);
@@ -370,14 +446,14 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
     cate: "",
     pubIds: [],
     types: [],
-  })
+  });
   const [pagination, setPagination] = useState({
     number: 0,
     size: 10,
     totalPages: 0,
     sortBy: "id",
     sortDir: "desc",
-  })
+  });
 
   //Actions
   const [anchorEl, setAnchorEl] = useState(null);
@@ -396,13 +472,13 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
     size: pagination?.size,
     sortBy: pagination?.sortBy,
     sortDir: pagination?.sortDir,
-    shopId: shop ?? '',
+    shopId: shop ?? "",
     keyword: filters.keyword,
     cateId: filters.cate,
     types: filters.types,
     pubIds: filters.pubIds,
-    amount: 0
-  })
+    amount: 0,
+  });
 
   //Set pagination after fetch
   useEffect(() => {
@@ -411,21 +487,25 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
         ...pagination,
         totalPages: data?.page?.totalPages,
         number: data?.page?.number,
-        size: data?.page?.size
+        size: data?.page?.size,
       });
     }
-  }, [data])
+  }, [data]);
 
-  useDeepEffect(() => { handleChangePage(0); }, [filters])
+  useDeepEffect(() => {
+    handleChangePage(0);
+  }, [filters]);
 
   const handleRequestSort = (e, property) => {
-    const isAsc = (pagination.sortBy === property && pagination.sortDir === 'asc');
-    const sortDir = isAsc ? 'desc' : 'asc';
+    const isAsc =
+      pagination.sortBy === property && pagination.sortDir === "asc";
+    const sortDir = isAsc ? "desc" : "asc";
     setPagination({ ...pagination, sortBy: property, sortDir: sortDir });
   };
 
   const handleSelectAllClick = (e) => {
-    if (e.target.checked) { //Selected all
+    if (e.target.checked) {
+      //Selected all
       setSelectedAll(true);
       return;
     }
@@ -511,14 +591,15 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
   const handleCloseContext = () => {
     setAnchorEl(null);
     setContextId(null);
-  }
+  };
 
   const handleDelete = async (id) => {
     if (pending) return;
     setPending(true);
-    const { enqueueSnackbar } = await import('notistack');
+    const { enqueueSnackbar } = await import("notistack");
 
-    deleteBook(id).unwrap()
+    deleteBook(id)
+      .unwrap()
       .then((data) => {
         //Unselected
         const selectedIndex = selected.indexOf(id);
@@ -529,113 +610,123 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
           setSelected(newSelected);
         }
 
-        enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+        enqueueSnackbar("Đã xoá sản phẩm!", { variant: "success" });
         setPending(false);
       })
       .catch((err) => {
         console.error(err);
         if (!err?.status) {
-          enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
+          enqueueSnackbar("Server không phản hồi!", { variant: "error" });
         } else if (err?.status === 409) {
-          enqueueSnackbar(err?.data?.message, { variant: 'error' });
+          enqueueSnackbar(err?.data?.message, { variant: "error" });
         } else if (err?.status === 400) {
-          enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
+          enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
         } else {
-          enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+          enqueueSnackbar("Xoá sản phẩm thất bại!", { variant: "error" });
         }
         setPending(false);
-      })
+      });
   };
 
   const handleDeleteMultiples = async () => {
     if (pending) return;
     setPending(true);
-    const { enqueueSnackbar } = await import('notistack');
+    const { enqueueSnackbar } = await import("notistack");
 
     if (selectedAll) {
-      if (deselected.length == 0) { //Delete all
-        deleteAll(shop).unwrap()
+      if (deselected.length == 0) {
+        //Delete all
+        deleteAll(shop)
+          .unwrap()
           .then((data) => {
             //Unselected
             setSelected([]);
             setDeseletected([]);
             setSelectedAll(false);
-            enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+            enqueueSnackbar("Đã xoá sản phẩm!", { variant: "success" });
             setPending(false);
           })
           .catch((err) => {
             console.error(err);
             if (!err?.status) {
-              enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
+              enqueueSnackbar("Server không phản hồi!", { variant: "error" });
             } else if (err?.status === 409) {
-              enqueueSnackbar(err?.data?.message, { variant: 'error' });
+              enqueueSnackbar(err?.data?.message, { variant: "error" });
             } else if (err?.status === 400) {
-              enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
+              enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
             } else {
-              enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+              enqueueSnackbar("Xoá sản phẩm thất bại!", { variant: "error" });
             }
             setPending(false);
-          })
-      } else { //Delete books inverse
+          });
+      } else {
+        //Delete books inverse
         deleteBooksInverse({
-          shopId: shop ?? '',
+          shopId: shop ?? "",
           keyword: filters.keyword,
           cateId: filters.cate,
           types: filters.types,
           pubIds: filters.pubIds,
           amount: 0,
-          ids: deselected
-        }).unwrap()
+          ids: deselected,
+        })
+          .unwrap()
           .then((data) => {
             //Unselected
             setSelected([]);
             setDeseletected([]);
             setSelectedAll(false);
-            enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+            enqueueSnackbar("Đã xoá sản phẩm!", { variant: "success" });
             setPending(false);
           })
           .catch((err) => {
             console.error(err);
             if (!err?.status) {
-              enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
+              enqueueSnackbar("Server không phản hồi!", { variant: "error" });
             } else if (err?.status === 409) {
-              enqueueSnackbar(err?.data?.message, { variant: 'error' });
+              enqueueSnackbar(err?.data?.message, { variant: "error" });
             } else if (err?.status === 400) {
-              enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
+              enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
             } else {
-              enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+              enqueueSnackbar("Xoá sản phẩm thất bại!", { variant: "error" });
             }
             setPending(false);
-          })
+          });
       }
-    } else { //Delete books
-      deleteBooks(selected).unwrap()
+    } else {
+      //Delete books
+      deleteBooks(selected)
+        .unwrap()
         .then((data) => {
           //Unselected
           setSelected([]);
           setDeseletected([]);
           setSelectedAll(false);
-          enqueueSnackbar('Đã xoá sản phẩm!', { variant: 'success' });
+          enqueueSnackbar("Đã xoá sản phẩm!", { variant: "success" });
           setPending(false);
         })
         .catch((err) => {
           console.error(err);
           if (!err?.status) {
-            enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
+            enqueueSnackbar("Server không phản hồi!", { variant: "error" });
           } else if (err?.status === 409) {
-            enqueueSnackbar(err?.data?.message, { variant: 'error' });
+            enqueueSnackbar(err?.data?.message, { variant: "error" });
           } else if (err?.status === 400) {
-            enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
+            enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
           } else {
-            enqueueSnackbar('Xoá sản phẩm thất bại!', { variant: 'error' });
+            enqueueSnackbar("Xoá sản phẩm thất bại!", { variant: "error" });
           }
           setPending(false);
-        })
+        });
     }
   };
 
-  const isSelected = (id) => ((!selectedAll && selected?.indexOf(id) !== -1) || (selectedAll && deselected?.indexOf(id) === -1));
-  const numSelected = selectedAll ? data?.page?.totalElements - deselected?.length : selected?.length;
+  const isSelected = (id) =>
+    (!selectedAll && selected?.indexOf(id) !== -1) ||
+    (selectedAll && deselected?.indexOf(id) === -1);
+  const numSelected = selectedAll
+    ? data?.page?.totalElements - deselected?.length
+    : selected?.length;
   const colSpan = headCells.length + 1;
   //#endregion
 
@@ -649,56 +740,79 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ position: 'relative', height: '40dvh' }}
+          sx={{ position: "relative", height: "40dvh" }}
         >
           <Progress color="primary" />
         </TableCell>
       </TableRow>
-    )
+    );
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    bookRows = ids?.length
-      ? ids?.map((id, index) => {
+    bookRows = ids?.length ? (
+      ids?.map((id, index) => {
         const book = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
-        const stockProgress = Math.min((book.amount / maxStocks * 100), 100);
-        const stockStatus = stockProgress == 0 ? 'error' : stockProgress < 20 ? 'warning' : stockProgress < 80 ? 'primary' : 'info';
+        const stockProgress = Math.min((book.amount / maxStocks) * 100, 100);
+        const stockStatus =
+          stockProgress == 0
+            ? "error"
+            : stockProgress < 20
+              ? "warning"
+              : stockProgress < 80
+                ? "primary"
+                : "info";
 
         return (
-          <TableRow
-            hover
-            aria-checked={isItemSelected}
-            tabIndex={-1}
-            key={id}
-          >
+          <TableRow hover aria-checked={isItemSelected} tabIndex={-1} key={id}>
             <TableCell padding="checkbox">
-              <Checkbox color="primary"
+              <Checkbox
+                color="primary"
                 onChange={(e) => handleClick(e, book.id)}
                 checked={isItemSelected}
                 inputProps={{
-                  'aria-labelledby': labelId,
+                  "aria-labelledby": labelId,
                 }}
               />
             </TableCell>
-            <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
+            <TableCell
+              component="th"
+              id={labelId}
+              scope="row"
+              padding="none"
+              align="center"
+            >
               <Link to={`/product/${id}`}>{idFormatter(id)}</Link>
             </TableCell>
             <TableCell align="left">
-              <Link to={`/product/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
+              <Link
+                to={`/product/${id}`}
+                style={{ display: "flex", alignItems: "center" }}
+              >
                 <LazyLoadImage
                   src={`${book.image}?size=tiny`}
                   height={45}
                   width={45}
-                  style={{ marginRight: '10px' }}
-                  placeholder={<Skeleton width={45} height={45} animation={false} variant="rectangular" />}
+                  style={{ marginRight: "10px" }}
+                  placeholder={
+                    <Skeleton
+                      width={45}
+                      height={45}
+                      animation={false}
+                      variant="rectangular"
+                    />
+                  }
                 />
                 <Box>
                   <ItemTitle>{book.title}</ItemTitle>
                   <Box display="flex">
-                    <ItemTitle className="secondary">Đã bán: {book.totalOrders}</ItemTitle>
-                    <ItemTitle className="secondary">&emsp;Đánh giá: {book.rating.toFixed(1)}</ItemTitle>
+                    <ItemTitle className="secondary">
+                      Đã bán: {book.totalOrders}
+                    </ItemTitle>
+                    <ItemTitle className="secondary">
+                      &emsp;Đánh giá: {book.rating.toFixed(1)}
+                    </ItemTitle>
                   </Box>
                 </Box>
               </Link>
@@ -707,33 +821,48 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
               <ItemTitle>{book.shopName}</ItemTitle>
             </TableCell>
             <TableCell align="left">
-              <ItemTitle>{currencyFormat.format(book.price * (1 - book.discount))}</ItemTitle>
-              {book.discount > 0 && <ItemTitle className="secondary">-{book.discount * 100}%</ItemTitle>}
+              <ItemTitle>
+                {currencyFormat.format(book.price * (1 - book.discount))}
+              </ItemTitle>
+              {book.discount > 0 && (
+                <ItemTitle className="secondary">
+                  -{book.discount * 100}%
+                </ItemTitle>
+              )}
             </TableCell>
             <TableCell align="left">
               <Box>
-                <StyledStockBar color={stockStatus} variant="determinate" value={stockProgress} />
-                <ItemTitle className="secondary">{book.amount} trong kho</ItemTitle>
+                <StyledStockBar
+                  color={stockStatus}
+                  variant="determinate"
+                  value={stockProgress}
+                />
+                <ItemTitle className="secondary">
+                  {book.amount} trong kho
+                </ItemTitle>
               </Box>
             </TableCell>
             <TableCell align="right">
-              <IconButton onClick={(e) => handleOpenContext(e, id)}><MoreHoriz /></IconButton>
+              <IconButton onClick={(e) => handleOpenContext(e, id)}>
+                <MoreHoriz />
+              </IconButton>
             </TableCell>
           </TableRow>
-        )
+        );
       })
-      :
+    ) : (
       <TableRow>
         <TableCell
           scope="row"
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: '40dvh' }}
+          sx={{ height: "40dvh" }}
         >
           <Box>Không tìm thấy sản phẩm nào!</Box>
         </TableCell>
-      </TableRow >
+      </TableRow>
+    );
   } else if (isError) {
     bookRows = (
       <TableRow>
@@ -742,21 +871,21 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: '40dvh' }}
+          sx={{ height: "40dvh" }}
         >
-          <Box>{error?.error || 'Đã xảy ra lỗi'}</Box>
+          <Box>{error?.error || "Đã xảy ra lỗi"}</Box>
         </TableCell>
       </TableRow>
-    )
+    );
   }
 
   return (
-    <Paper sx={{ width: '100%', height: '100%' }} elevation={3}>
+    <Paper sx={{ width: "100%", height: "100%" }} elevation={3}>
       <Toolbar>
         <ProductFilters {...{ filters, setFilters }} />
       </Toolbar>
       <TableContainer component={Paper}>
-        <Table stickyHeader size={dense ? 'small' : 'medium'}>
+        <Table stickyHeader size={dense ? "small" : "medium"}>
           <CustomTableHead
             headCells={headCells}
             numSelected={numSelected}
@@ -767,9 +896,7 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
             onSubmitDelete={handleDeleteMultiples}
             selectedAll={selectedAll}
           />
-          <TableBody>
-            {bookRows}
-          </TableBody>
+          <TableBody>{bookRows}</TableBody>
         </Table>
       </TableContainer>
       <FooterContainer>
@@ -786,11 +913,7 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
           count={data?.page?.totalElements ?? 0}
         />
       </FooterContainer>
-      <Menu
-        open={openContext}
-        onClose={handleCloseContext}
-        anchorEl={anchorEl}
-      >
+      <Menu open={openContext} onClose={handleCloseContext} anchorEl={anchorEl}>
         <Link to={`/product/${contextId}`}>
           <MenuItem>
             <ListItemIcon>
@@ -806,12 +929,12 @@ export default function TableProducts({ shop, handleOpenEdit, pending, setPendin
           <ListItemText>Thay đổi</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleDelete(contextId)}>
-          <ListItemIcon >
+          <ListItemIcon>
             <Delete color="error" fontSize="small" />
           </ListItemIcon>
           <ListItemText color="error">Xoá</ListItemText>
         </MenuItem>
-      </Menu >
+      </Menu>
     </Paper>
   );
 }

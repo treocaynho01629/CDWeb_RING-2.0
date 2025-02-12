@@ -23,8 +23,6 @@ import com.ring.bookstore.service.AccountService;
 import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.service.RoleService;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

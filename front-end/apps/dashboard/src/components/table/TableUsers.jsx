@@ -1,52 +1,92 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Box, Stack, Button, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Checkbox, FormControlLabel, Switch, Avatar, Chip, Grid2 as Grid, TextField, MenuItem, IconButton, Toolbar, Menu, ListItemIcon, ListItemText } from '@mui/material';
-import { Search, MoreHoriz, Edit, Delete, Visibility, FilterAltOff, Add } from '@mui/icons-material';
-import { Link } from 'react-router';
-import { useDeleteUserMutation, useDeleteUsersMutation, useGetUsersQuery } from '../../features/users/usersApiSlice';
-import { FooterLabel, ItemTitle, FooterContainer } from '../custom/Components';
-import { Progress } from '@ring/ui';
-import { useDeepEffect, roleTypeItems, roleTypes, idFormatter } from "@ring/shared";
-import CustomTablePagination from '../table/CustomTablePagination';
-import CustomTableHead from '../table/CustomTableHead';
+import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  Box,
+  Stack,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  Checkbox,
+  FormControlLabel,
+  Switch,
+  Avatar,
+  Chip,
+  Grid2 as Grid,
+  TextField,
+  MenuItem,
+  IconButton,
+  Toolbar,
+  Menu,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import {
+  Search,
+  MoreHoriz,
+  Edit,
+  Delete,
+  Visibility,
+  FilterAltOff,
+  Add,
+} from "@mui/icons-material";
+import { Link } from "react-router";
+import {
+  useDeleteUserMutation,
+  useDeleteUsersMutation,
+  useGetUsersQuery,
+} from "../../features/users/usersApiSlice";
+import { FooterLabel, ItemTitle, FooterContainer } from "../custom/Components";
+import { Progress } from "@ring/ui";
+import {
+  useDeepEffect,
+  roleTypeItems,
+  roleTypes,
+  idFormatter,
+} from "@ring/shared";
+import CustomTablePagination from "../table/CustomTablePagination";
+import CustomTableHead from "../table/CustomTableHead";
 
 const headCells = [
   {
-    id: 'id',
-    align: 'center',
-    width: '70px',
+    id: "id",
+    align: "center",
+    width: "70px",
     disablePadding: false,
     sortable: true,
-    label: 'ID',
+    label: "ID",
   },
   {
-    id: 'username',
-    align: 'left',
+    id: "username",
+    align: "left",
     disablePadding: false,
     sortable: true,
-    label: 'Tên đăng nhập',
+    label: "Tên đăng nhập",
   },
   {
-    id: 'name',
-    align: 'left',
-    width: '150px',
+    id: "name",
+    align: "left",
+    width: "150px",
     disablePadding: false,
     sortable: true,
-    label: 'Thông tin',
+    label: "Thông tin",
   },
   {
-    id: 'roles',
-    align: 'left',
-    width: '120px',
+    id: "roles",
+    align: "left",
+    width: "120px",
     disablePadding: false,
     sortable: false,
-    label: 'Quyền',
+    label: "Quyền",
   },
   {
-    id: 'action',
-    width: '35px',
+    id: "action",
+    width: "35px",
     disablePadding: false,
     sortable: false,
-    label: '',
+    label: "",
   },
 ];
 
@@ -55,7 +95,8 @@ function UserFilters({ filters, setFilters }) {
 
   const handleChangeKeyword = useCallback((e) => {
     e.preventDefault();
-    if (inputRef) setFilters(prev => ({ ...prev, keyword: inputRef.current.value }));
+    if (inputRef)
+      setFilters((prev) => ({ ...prev, keyword: inputRef.current.value }));
   }, []);
 
   const resetFilter = useCallback(() => {
@@ -67,9 +108,15 @@ function UserFilters({ filters, setFilters }) {
   }, []);
 
   return (
-    <Stack width="100%" spacing={1} my={2} direction={{ xs: 'column', md: 'row' }}>
-      <TextField label='Quyền'
-        value={filters.roles || ''}
+    <Stack
+      width="100%"
+      spacing={1}
+      my={2}
+      direction={{ xs: "column", md: "row" }}
+    >
+      <TextField
+        label="Quyền"
+        value={filters.roles || ""}
         onChange={(e) => setFilters({ ...filters, roles: e.target.value })}
         select
         defaultValue=""
@@ -77,16 +124,18 @@ function UserFilters({ filters, setFilters }) {
         fullWidth
         sx={{ maxWidth: 200 }}
       >
-        <MenuItem value=""><em>--Tất cả--</em></MenuItem>
+        <MenuItem value="">
+          <em>--Tất cả--</em>
+        </MenuItem>
         {roleTypeItems.map((roles, index) => (
           <MenuItem key={`type-${roles.value}-${index}`} value={roles.value}>
             {roles.label}
           </MenuItem>
         ))}
       </TextField>
-      <form style={{ width: '100%' }} onSubmit={handleChangeKeyword}>
+      <form style={{ width: "100%" }} onSubmit={handleChangeKeyword}>
         <TextField
-          placeholder='Tìm kiếm'
+          placeholder="Tìm kiếm"
           autoComplete="products"
           id="products"
           size="small"
@@ -94,16 +143,23 @@ function UserFilters({ filters, setFilters }) {
           fullWidth
           slotProps={{
             input: {
-              startAdornment: (< Search sx={{ marginRight: 1 }} />)
+              startAdornment: <Search sx={{ marginRight: 1 }} />,
             },
           }}
         />
       </form>
       <Box display="flex" justifyContent="center">
-        <Button sx={{ width: 125 }} color="error" onClick={resetFilter} startIcon={<FilterAltOff />}>Xoá bộ lọc</Button>
+        <Button
+          sx={{ width: 125 }}
+          color="error"
+          onClick={resetFilter}
+          startIcon={<FilterAltOff />}
+        >
+          Xoá bộ lọc
+        </Button>
       </Box>
-    </Stack >
-  )
+    </Stack>
+  );
 }
 
 export default function TableUsers({ handleOpenEdit, pending, setPending }) {
@@ -115,14 +171,14 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
   const [filters, setFilters] = useState({
     keyword: "",
     roles: "",
-  })
+  });
   const [pagination, setPagination] = useState({
     number: 0,
     size: 10,
     totalPages: 0,
     sortBy: "id",
     sortDir: "desc",
-  })
+  });
 
   //Actions
   const [anchorEl, setAnchorEl] = useState(null);
@@ -131,7 +187,8 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
 
   //Delete hook
   const [deleteUser, { isLoading: deleting }] = useDeleteUserMutation();
-  const [deleteMultipleUsers, { isLoading: deletingMultiple }] = useDeleteUsersMutation();
+  const [deleteMultipleUsers, { isLoading: deletingMultiple }] =
+    useDeleteUsersMutation();
 
   const { isLoading, isSuccess, isError, error, data } = useGetUsersQuery({
     page: pagination.number,
@@ -139,8 +196,8 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
     sortBy: pagination.sortBy,
     sortDir: pagination.sortDir,
     keyword: filters.keyword,
-    roles: filters.roles
-  })
+    roles: filters.roles,
+  });
 
   //Set pagination after fetch
   useEffect(() => {
@@ -149,21 +206,25 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
         ...pagination,
         totalPages: data?.page?.totalPages,
         currPage: data?.page?.number,
-        pageSize: data?.page?.size
+        pageSize: data?.page?.size,
       });
     }
-  }, [data])
+  }, [data]);
 
-  useDeepEffect(() => { handleChangePage(0); }, [filters])
+  useDeepEffect(() => {
+    handleChangePage(0);
+  }, [filters]);
 
   const handleRequestSort = (e, property) => {
-    const isAsc = (pagination.sortBy === property && pagination.sortDir === 'asc');
-    const sortDir = isAsc ? 'desc' : 'asc';
+    const isAsc =
+      pagination.sortBy === property && pagination.sortDir === "asc";
+    const sortDir = isAsc ? "desc" : "asc";
     setPagination({ ...pagination, sortBy: property, sortDir: sortDir });
   };
 
   const handleSelectAllClick = (e) => {
-    if (e.target.checked) { //Selected all
+    if (e.target.checked) {
+      //Selected all
       setSelectedAll(true);
       return;
     }
@@ -248,14 +309,15 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
   const handleCloseContext = () => {
     setAnchorEl(null);
     setContextId(null);
-  }
+  };
 
   const handleDelete = async (id) => {
     if (pending) return;
     setPending(true);
-    const { enqueueSnackbar } = await import('notistack');
+    const { enqueueSnackbar } = await import("notistack");
 
-    deleteUser({ id }).unwrap()
+    deleteUser({ id })
+      .unwrap()
       .then((data) => {
         //Unselected
         const selectedIndex = selected?.indexOf(id);
@@ -266,33 +328,33 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
           setSelected(newSelected);
         }
 
-        enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
+        enqueueSnackbar("Đã xoá thành viên!", { variant: "success" });
         setPending(false);
       })
       .catch((err) => {
         console.error(err);
         if (!err?.status) {
-          enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
+          enqueueSnackbar("Server không phản hồi!", { variant: "error" });
         } else if (err?.status === 409) {
-          enqueueSnackbar(err?.data?.message, { variant: 'error' });
+          enqueueSnackbar(err?.data?.message, { variant: "error" });
         } else if (err?.status === 400) {
-          enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
+          enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
         } else {
-          enqueueSnackbar('Xoá thành viên thất bại!', { variant: 'error' });
+          enqueueSnackbar("Xoá thành viên thất bại!", { variant: "error" });
         }
         setPending(false);
-      })
+      });
   };
 
   const handleDeleteMultiples = async () => {
     if (selectedAll) {
       if (deselected.length == 0) {
-        console.log('Delete all');
+        console.log("Delete all");
       } else {
-        console.log('Delete multiples reverse: ' + deselected);
+        console.log("Delete multiples reverse: " + deselected);
       }
     } else {
-      console.log('Delete multiples: ' + selected);
+      console.log("Delete multiples: " + selected);
     }
     // if (pending) return;
     // setPending(true);
@@ -321,8 +383,12 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
     //   })
   };
 
-  const isSelected = (id) => (selected?.indexOf(id) !== -1 || (selectedAll && deselected?.indexOf(id) === -1));
-  const numSelected = selectedAll ? data?.page?.totalElements - deselected?.length : selected?.length;
+  const isSelected = (id) =>
+    selected?.indexOf(id) !== -1 ||
+    (selectedAll && deselected?.indexOf(id) === -1);
+  const numSelected = selectedAll
+    ? data?.page?.totalElements - deselected?.length
+    : selected?.length;
   const colSpan = headCells.length + 1;
   //#endregion
 
@@ -336,45 +402,51 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ position: 'relative', height: '40dvh' }}
+          sx={{ position: "relative", height: "40dvh" }}
         >
           <Progress color="primary" />
         </TableCell>
       </TableRow>
-    )
+    );
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    usersRows = ids?.length
-      ? ids?.map((id, index) => {
+    usersRows = ids?.length ? (
+      ids?.map((id, index) => {
         const user = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
         const roleItem = roleTypes[user.roles];
 
         return (
-          <TableRow
-            hover
-            aria-checked={isItemSelected}
-            tabIndex={-1}
-            key={id}
-          >
+          <TableRow hover aria-checked={isItemSelected} tabIndex={-1} key={id}>
             <TableCell padding="checkbox">
               <Checkbox
                 color="primary"
                 onChange={(e) => handleClick(e, id)}
                 checked={isItemSelected}
                 inputProps={{
-                  'aria-labelledby': labelId,
+                  "aria-labelledby": labelId,
                 }}
               />
             </TableCell>
-            <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
+            <TableCell
+              component="th"
+              id={labelId}
+              scope="row"
+              padding="none"
+              align="center"
+            >
               <Link to={`/user/${id}`}>{idFormatter(id)}</Link>
             </TableCell>
             <TableCell align="left">
-              <Link to={`/user/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
-                <Avatar sx={{ marginRight: 1 }}>{user?.username?.charAt(0) ?? ''}</Avatar>
+              <Link
+                to={`/user/${id}`}
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <Avatar sx={{ marginRight: 1 }}>
+                  {user?.username?.charAt(0) ?? ""}
+                </Avatar>
                 <Box>
                   <ItemTitle>{user.username}</ItemTitle>
                   <ItemTitle className="secondary">{user.email}</ItemTitle>
@@ -390,27 +462,30 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
                 variant="outlined"
                 label={roleItem?.label}
                 color={roleItem?.color}
-                sx={{ fontWeight: 'bold' }}
+                sx={{ fontWeight: "bold" }}
               />
             </TableCell>
             <TableCell align="right">
-              <IconButton onClick={(e) => handleOpenContext(e, id)}><MoreHoriz /></IconButton>
+              <IconButton onClick={(e) => handleOpenContext(e, id)}>
+                <MoreHoriz />
+              </IconButton>
             </TableCell>
           </TableRow>
-        )
+        );
       })
-      :
+    ) : (
       <TableRow>
         <TableCell
           scope="row"
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: '40dvh' }}
+          sx={{ height: "40dvh" }}
         >
           <Box>Không tìm thấy thành viên nào!</Box>
         </TableCell>
-      </TableRow >
+      </TableRow>
+    );
   } else if (isError) {
     usersRows = (
       <TableRow>
@@ -419,19 +494,21 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: '40dvh' }}
+          sx={{ height: "40dvh" }}
         >
-          <Box>{error?.error || 'Đã xảy ra lỗi'}</Box>
+          <Box>{error?.error || "Đã xảy ra lỗi"}</Box>
         </TableCell>
       </TableRow>
-    )
+    );
   }
 
   return (
-    <Paper sx={{ width: '100%', height: '100%' }} elevation={3}>
-      <Toolbar><UserFilters {...{ filters, setFilters }} /></Toolbar>
+    <Paper sx={{ width: "100%", height: "100%" }} elevation={3}>
+      <Toolbar>
+        <UserFilters {...{ filters, setFilters }} />
+      </Toolbar>
       <TableContainer component={Paper}>
-        <Table stickyHeader size={dense ? 'small' : 'medium'}>
+        <Table stickyHeader size={dense ? "small" : "medium"}>
           <CustomTableHead
             headCells={headCells}
             numSelected={numSelected}
@@ -442,9 +519,7 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
             onSubmitDelete={handleDeleteMultiples}
             selectedAll={selectedAll}
           />
-          <TableBody>
-            {usersRows}
-          </TableBody>
+          <TableBody>{usersRows}</TableBody>
         </Table>
       </TableContainer>
       <FooterContainer>
@@ -461,11 +536,7 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
           count={data?.page?.totalElements ?? 0}
         />
       </FooterContainer>
-      <Menu
-        open={openContext}
-        onClose={handleCloseContext}
-        anchorEl={anchorEl}
-      >
+      <Menu open={openContext} onClose={handleCloseContext} anchorEl={anchorEl}>
         <Link to={`/user/${contextId}`}>
           <MenuItem>
             <ListItemIcon>
@@ -481,12 +552,12 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
           <ListItemText>Thay đổi</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleDelete(contextId)}>
-          <ListItemIcon >
+          <ListItemIcon>
             <Delete color="error" fontSize="small" />
           </ListItemIcon>
           <ListItemText color="error">Xoá</ListItemText>
         </MenuItem>
-      </Menu >
+      </Menu>
     </Paper>
   );
 }

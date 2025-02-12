@@ -57,9 +57,17 @@ public class ShopController {
 
     //Get shop by {id}
     @GetMapping("/{id}")
-    public ResponseEntity<?> getShopById(@PathVariable("id") Long id,
+    public ResponseEntity<?> getShopInfo(@PathVariable("id") Long id,
                                          @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(shopService.getShopById(id, currUser), HttpStatus.OK);
+        return new ResponseEntity<>(shopService.getShopInfo(id, currUser), HttpStatus.OK);
+    }
+
+    //Get shop by {id}
+    @GetMapping("/detail/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<?> getShopDetail(@PathVariable("id") Long id,
+                                         @CurrentAccount Account currUser) {
+        return new ResponseEntity<>(shopService.getShopDetail(id, currUser), HttpStatus.OK);
     }
 
     @GetMapping("/analytics")

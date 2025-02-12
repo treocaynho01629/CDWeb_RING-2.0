@@ -1,64 +1,79 @@
-import styled from '@emotion/styled'
-import { MenuItem, Skeleton, TextField, useTheme } from '@mui/material';
-import { CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts'
-import { Paper, LinearProgress } from '@mui/material'
-import { SsidChart } from '@mui/icons-material';
-import { useGetSalesQuery } from '../../features/orders/ordersApiSlice';
+import styled from "@emotion/styled";
+import { MenuItem, Skeleton, TextField, useTheme } from "@mui/material";
+import {
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+} from "recharts";
+import { Paper, LinearProgress } from "@mui/material";
+import { SsidChart } from "@mui/icons-material";
+import { useGetSalesQuery } from "../../features/orders/ordersApiSlice";
 import { currencyFormat } from "@ring/shared";
-import { Title } from '../custom/Components';
-import { useState } from 'react';
+import { Title } from "../custom/Components";
+import { useState } from "react";
 
 //#region styled
 const TooltipContainer = styled.div`
-    border: .5px solid ${props => props.theme.palette.divider};
-    background-color: ${props => props.theme.palette.background.default};
-    padding: ${props => props.theme.spacing(1.5)};
-`
+  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  background-color: ${(props) => props.theme.palette.background.default};
+  padding: ${(props) => props.theme.spacing(1.5)};
+`;
 
 const TooltipLabel = styled.p`
-    margin: 0 0 8px;
-    font-weight: 450;
-    text-decoration: underline;
-`
+  margin: 0 0 8px;
+  font-weight: 450;
+  text-decoration: underline;
+`;
 
 const TooltipValue = styled.p`
-    margin: 0;
-    font-size: 14px;
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
+  margin: 0;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 
-    span { color: ${props => props.color} }
-`
+  span {
+    color: ${(props) => props.color};
+  }
+`;
 
 const TitleContainer = styled.div`
-    padding: 0 ${props => props.theme.spacing(2)};
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-`
+  padding: 0 ${(props) => props.theme.spacing(2)};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
 
 const LegendLabel = styled.span`
-    color: ${props => props.theme.palette.text.primary};
-    h3 { 
-      font-weight: 400;
-      font-size: 18px;
-      margin: 8px 0; 
-    }
-`
+  color: ${(props) => props.theme.palette.text.primary};
+  h3 {
+    font-weight: 400;
+    font-size: 18px;
+    margin: 8px 0;
+  }
+`;
 //#endregion
 
 const tempData = [
-  { name: '1', data: { discount: 0, sales: 0 } },
-  { name: '12', data: { discount: 0, sales: 0 } },
-]
+  { name: "1", data: { discount: 0, sales: 0 } },
+  { name: "12", data: { discount: 0, sales: 0 } },
+];
 
 function YearsSelect({ year, setYear }) {
   let yearsSelect = [];
   const currYear = new Date().getFullYear();
 
   for (let i = currYear; i > currYear - 5; i--) {
-    yearsSelect.push(<MenuItem key={`year-${i}`} value={i}>{i}</MenuItem>)
+    yearsSelect.push(
+      <MenuItem key={`year-${i}`} value={i}>
+        {i}
+      </MenuItem>,
+    );
   }
 
   return (
@@ -71,7 +86,7 @@ function YearsSelect({ year, setYear }) {
     >
       {yearsSelect}
     </TextField>
-  )
+  );
 }
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -84,9 +99,16 @@ const CustomTooltip = ({ active, payload, label }) => {
     return (
       <TooltipContainer>
         <TooltipLabel>Tháng {label}</TooltipLabel>
-        <TooltipValue color={sales.color}>Doanh thu:&emsp;<span>{currencyFormat.format(sales.value)}</span></TooltipValue>
-        <TooltipValue color={discount.color}>Giảm giá:&emsp;<span>{currencyFormat.format(-discount.value)}</span></TooltipValue>
-        <TooltipValue color={theme.palette.error.main}>Tổng:&emsp;<span>{currencyFormat.format(sales.value - discount.value)}</span></TooltipValue>
+        <TooltipValue color={sales.color}>
+          Doanh thu:&emsp;<span>{currencyFormat.format(sales.value)}</span>
+        </TooltipValue>
+        <TooltipValue color={discount.color}>
+          Giảm giá:&emsp;<span>{currencyFormat.format(-discount.value)}</span>
+        </TooltipValue>
+        <TooltipValue color={theme.palette.error.main}>
+          Tổng:&emsp;
+          <span>{currencyFormat.format(sales.value - discount.value)}</span>
+        </TooltipValue>
       </TooltipContainer>
     );
   }
@@ -96,33 +118,64 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const ChartSales = () => {
   const [year, setYear] = useState(new Date().getFullYear());
-  const axisFormat = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', currencyDisplay: 'narrowSymbol', notation: 'compact', compactDisplay: 'short' });
+  const axisFormat = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    currencyDisplay: "narrowSymbol",
+    notation: "compact",
+    compactDisplay: "short",
+  });
   const theme = useTheme();
 
   const { data, isLoading } = useGetSalesQuery({ year });
-  const yearSales = data?.reduce((result, month) => {
-    let data = month?.data;
-    result[0] += data?.discount;
-    result[1] += data?.sales;
-    return result;
-  }, [0, 0]);
+  const yearSales = data?.reduce(
+    (result, month) => {
+      let data = month?.data;
+      result[0] += data?.discount;
+      result[1] += data?.sales;
+      return result;
+    },
+    [0, 0],
+  );
 
   return (
-    <Paper elevation={3} sx={{ px: { xs: 0, sm: 1 }, py: { xs: 1, sm: 2 }, width: '100%' }}>
+    <Paper
+      elevation={3}
+      sx={{ px: { xs: 0, sm: 1 }, py: { xs: 1, sm: 2 }, width: "100%" }}
+    >
       <TitleContainer>
-        <Title><SsidChart />&nbsp;Doanh thu hằng năm</Title>
+        <Title>
+          <SsidChart />
+          &nbsp;Doanh thu hằng năm
+        </Title>
         <YearsSelect {...{ year, setYear }} />
       </TitleContainer>
       <ResponsiveContainer height={350}>
         <AreaChart data={isLoading ? tempData : data} margin={{ right: 20 }}>
           <defs>
             <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={theme.palette.warning.light} stopOpacity={0.3} />
-              <stop offset="95%" stopColor={theme.palette.warning.dark} stopOpacity={0} />
+              <stop
+                offset="5%"
+                stopColor={theme.palette.warning.light}
+                stopOpacity={0.3}
+              />
+              <stop
+                offset="95%"
+                stopColor={theme.palette.warning.dark}
+                stopOpacity={0}
+              />
             </linearGradient>
             <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={theme.palette.primary.light} stopOpacity={0.3} />
-              <stop offset="95%" stopColor={theme.palette.primary.dark} stopOpacity={0} />
+              <stop
+                offset="5%"
+                stopColor={theme.palette.primary.light}
+                stopOpacity={0.3}
+              />
+              <stop
+                offset="95%"
+                stopColor={theme.palette.primary.dark}
+                stopOpacity={0}
+              />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="4 4" vertical={false} />
@@ -144,12 +197,23 @@ const ChartSales = () => {
             align="left"
             iconType="circle"
             iconSize={12}
-            wrapperStyle={{ padding: '0 16px 32px' }}
-            formatter={(value, entry, index) => <LegendLabel>
-              {value}&emsp;
-              {isLoading ? <h3><Skeleton variant="text" width={120} />&emsp;</h3>
-                : <h3>{currencyFormat.format(yearSales ? yearSales[index] : 0)}&emsp;</h3>}
-            </LegendLabel>}
+            wrapperStyle={{ padding: "0 16px 32px" }}
+            formatter={(value, entry, index) => (
+              <LegendLabel>
+                {value}&emsp;
+                {isLoading ? (
+                  <h3>
+                    <Skeleton variant="text" width={120} />
+                    &emsp;
+                  </h3>
+                ) : (
+                  <h3>
+                    {currencyFormat.format(yearSales ? yearSales[index] : 0)}
+                    &emsp;
+                  </h3>
+                )}
+              </LegendLabel>
+            )}
           />
           <Area
             strokeWidth={3}
@@ -170,7 +234,7 @@ const ChartSales = () => {
         </AreaChart>
       </ResponsiveContainer>
     </Paper>
-  )
-}
+  );
+};
 
-export default ChartSales
+export default ChartSales;

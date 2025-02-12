@@ -1,38 +1,56 @@
 import { useState } from "react";
-import { AutoStories, Group, AttachMoney, Storefront, LocalFireDepartment } from "@mui/icons-material";
-import { Grid2 as Grid } from '@mui/material';
+import {
+  AutoStories,
+  Group,
+  AttachMoney,
+  Storefront,
+  LocalFireDepartment,
+} from "@mui/icons-material";
+import { Grid2 as Grid } from "@mui/material";
 import { useTitle } from "@ring/shared";
 import { useAuth } from "@ring/auth";
-import { useGetBookAnalyticsQuery, useGetBooksQuery } from "../features/books/booksApiSlice";
+import {
+  useGetBookAnalyticsQuery,
+  useGetBooksQuery,
+} from "../features/books/booksApiSlice";
 import { useGetUserAnalyticsQuery } from "../features/users/usersApiSlice";
 import { useGetSalesAnalyticsQuery } from "../features/orders/ordersApiSlice";
 import { useGetShopAnalyticsQuery } from "../features/shops/shopsApiSlice";
-import ChartUsers from "../components/chart/ChartUsers";
 import ChartSales from "../components/chart/ChartSales";
-import WelcomeCard from '../components/custom/WelcomeCard';
-import InfoCard from '../components/custom/InfoCard';
-import SummaryTableProducts from '../components/table/SummaryTableProducts';
-import SummaryTableOrders from '../components/table/SummaryTableOrders';
-import SummaryTableUsers from '../components/table/SummaryTableUsers';
+import WelcomeCard from "../components/custom/WelcomeCard";
+import InfoCard from "../components/custom/InfoCard";
+import SummaryTableProducts from "../components/table/SummaryTableProducts";
+import SummaryTableOrders from "../components/table/SummaryTableOrders";
+import SummaryTableUsers from "../components/table/SummaryTableUsers";
 import SummaryTableShops from "../components/table/SummaryTableShops";
 import ProductsShowcase from "../components/product/ProductsShowcase";
 
 const TopProducts = ({ shop }) => {
   const { data, isLoading, isSuccess, isError } = useGetBooksQuery({
     size: 6,
-    sortBy: 'totalOrders',
-    sortDir: 'desc',
+    sortBy: "totalOrders",
+    sortDir: "desc",
     amount: 0,
-    shopId: shop ?? ''
+    shopId: shop ?? "",
   });
 
   return (
-    <ProductsShowcase {...{
-      title: <><LocalFireDepartment />Top sản phẩm bán chạy</>,
-      data, isLoading, isSuccess, isError
-    }} />
-  )
-}
+    <ProductsShowcase
+      {...{
+        title: (
+          <>
+            <LocalFireDepartment />
+            Top sản phẩm bán chạy
+          </>
+        ),
+        data,
+        isLoading,
+        isSuccess,
+        isError,
+      }}
+    />
+  );
+};
 
 const Dashboard = () => {
   const { roles, username, shop } = useAuth();
@@ -43,7 +61,7 @@ const Dashboard = () => {
   const { data: shopAnalytics } = useGetShopAnalyticsQuery();
 
   //Set title
-  useTitle('Dashboard');
+  useTitle("Dashboard");
 
   return (
     <>
@@ -105,14 +123,14 @@ const Dashboard = () => {
         <Grid size={isAdmin ? { xs: 12, md: 6, lg: 4 } : { xs: 12, lg: 6 }}>
           <SummaryTableProducts shop={shop} />
         </Grid>
-        {isAdmin &&
+        {isAdmin && (
           <Grid size={{ xs: 12, md: 6, lg: 4 }}>
             <SummaryTableUsers />
           </Grid>
-        }
+        )}
       </Grid>
     </>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
