@@ -1,21 +1,21 @@
-import styled from '@emotion/styled'
-import { useState } from 'react'
-import { Drawer } from '@mui/material';
+import styled from "@emotion/styled";
+import { useState } from "react";
+import { Drawer } from "@mui/material";
 import { useAuth } from "@ring/auth";
 
 //#region preStyled
 const drawerWidth = 250;
 
-const StyledMobileDrawer = styled(Drawer)(({ theme }) => ({
-
-}));
+const StyledMobileDrawer = styled(Drawer)(({ theme }) => ({}));
 //#endregion
 
 const NavSetting = ({ open, setOpen, mobileMode }) => {
   const { roles } = useAuth();
   const isAdmin = roles?.length >= 3;
 
-  const handleDrawerClose = () => { setOpen(false) };
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
 
   return (
     <StyledMobileDrawer
@@ -28,7 +28,7 @@ const NavSetting = ({ open, setOpen, mobileMode }) => {
     >
       <p>STUFF THAT I WILL ADD LATER</p>
     </StyledMobileDrawer>
-  )
-}
+  );
+};
 
-export default NavSetting
+export default NavSetting;

@@ -1,10 +1,7 @@
 package com.ring.bookstore.service;
 
 import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.dtos.shops.ShopDTO;
-import com.ring.bookstore.dtos.shops.ShopDetailDTO;
-import com.ring.bookstore.dtos.shops.ShopDisplayDTO;
-import com.ring.bookstore.dtos.shops.ShopPreviewDTO;
+import com.ring.bookstore.dtos.shops.*;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.Shop;
@@ -33,8 +30,11 @@ public interface ShopService {
 
     List<ShopPreviewDTO> getShopsPreview(Account user);
 
-    ShopDetailDTO getShopById(Long id,
-                              Account user);
+    ShopInfoDTO getShopInfo(Long id,
+                                Account user);
+
+    ShopDetailDTO getShopDetail(Long id,
+                                  Account user);
 
     StatDTO getAnalytics();
 

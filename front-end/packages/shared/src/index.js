@@ -18,6 +18,7 @@ export * from "./ultils/payment";
 export * from "./ultils/regex";
 export * from "./ultils/shipping";
 export * from "./ultils/user";
+export * from "./ultils/location";
 
 // Theme
 export * from "./theme";

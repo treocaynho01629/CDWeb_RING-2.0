@@ -1,10 +1,7 @@
 package com.ring.bookstore.repository;
 
 import com.ring.bookstore.dtos.dashboard.IStat;
-import com.ring.bookstore.dtos.shops.IShop;
-import com.ring.bookstore.dtos.shops.IShopDetail;
-import com.ring.bookstore.dtos.shops.IShopDisplay;
-import com.ring.bookstore.dtos.shops.IShopPreview;
+import com.ring.bookstore.dtos.shops.*;
 import com.ring.bookstore.model.Shop;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -74,7 +71,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
-			s.name as name, s.description as description, i.name as image, s.createdDate as joinedDate, 
+			s.name as name, s.description as description, i.name as image, s.createdDate as joinedDate,
 			count(r.id) as totalReviews, count(b.id) as totalProducts, size(s.followers) as totalFollowers,
 			case when f.id is null then false else true end as followed
 		from Shop s left join Image i on i.id = s.image.id
@@ -84,7 +81,28 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 		where s.id = :id
 		group by s.id, s.owner.username, s.owner.id, i.id, f.id
 	""")
-    Optional<IShopDetail> findShopDetailById(Long id, Long userId);
+    Optional<IShopInfo> findShopInfoById(Long id, Long userId);
+
+	@Query("""
+		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
+			s.name as name, s.description as description, i.name as image, a as address,
+			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+				then o.total - o.totalDiscount else 0 end) as sales,
+			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+				then oi.quantity else 0 end) as totalSold,
+			count(b.id) as totalProducts, count(r.id) as totalReviews, size(s.followers) as totalFollowers, s.createdDate as joinedDate
+		from Shop s left join Image i on i.id = s.image.id
+		left join s.address a
+		left join OrderDetail od on od.shop.id = s.id
+		left join od.order o
+		left join od.items oi
+		left join Book b on s.id = b.shop.id
+		left join Review r on b.id = r.book.id
+		where s.id = :id
+		and (coalesce(:userId) is null or s.owner.id = :userId)
+		group by s.id, s.owner.username, s.owner.id, i.id, a.id
+	""")
+	Optional<IShopDetail> findShopDetailById(Long id, Long userId);
 
 	@Query("""
         select count(s.id) as total,

@@ -1,46 +1,56 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
-  Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper,
-  Skeleton, Toolbar, TableHead,
-} from '@mui/material';
-import { Link } from 'react-router';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { useGetBooksQuery } from '../../features/books/booksApiSlice';
-import { ItemTitle, LinkButton, Title } from '../custom/Components';
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  Skeleton,
+  Toolbar,
+  TableHead,
+} from "@mui/material";
+import { Link } from "react-router";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import { useGetBooksQuery } from "../../features/books/booksApiSlice";
+import { ItemTitle, LinkButton, Title } from "../custom/Components";
 import { currencyFormat } from "@ring/shared";
-import { Progress } from '@ring/ui';
+import { Progress } from "@ring/ui";
 import { useAuth } from "@ring/auth";
 
 const headCells = [
   {
-    id: 'title',
-    align: 'left',
-    width: 'auto',
+    id: "title",
+    align: "left",
+    width: "auto",
     disablePadding: false,
-    label: 'Sản phẩm',
+    label: "Sản phẩm",
   },
   {
-    id: 'info',
-    align: 'right',
-    width: '110px',
+    id: "info",
+    align: "right",
+    width: "110px",
     disablePadding: false,
-    label: 'Thông tin',
+    label: "Thông tin",
   },
 ];
 
 export default function SummaryTableProducts({ shop }) {
   //#region construct
   const { roles } = useAuth();
-  const isAdmin = useState(roles?.find(role => ['ROLE_ADMIN'].includes(role)));
+  const isAdmin = useState(
+    roles?.find((role) => ["ROLE_ADMIN"].includes(role)),
+  );
 
   //Fetch books
   const { data, isLoading, isSuccess, isError, error } = useGetBooksQuery({
     size: 5,
-    sortBy: 'createdDate',
-    sortDir: 'desc',
-    shopId: shop ?? '',
-    amount: 0
-  })
+    sortBy: "createdDate",
+    sortDir: "desc",
+    shopId: shop ?? "",
+    amount: 0,
+  });
   //#endregion
 
   const colSpan = headCells.length + 1;
@@ -54,58 +64,79 @@ export default function SummaryTableProducts({ shop }) {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ position: 'relative', height: '40dvh' }}
+          sx={{ position: "relative", height: "40dvh" }}
         >
           <Progress color="primary" />
         </TableCell>
       </TableRow>
-    )
+    );
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    bookRows = ids?.length
-      ? ids?.map((id, index) => {
+    bookRows = ids?.length ? (
+      ids?.map((id, index) => {
         const book = entities[id];
 
         return (
           <TableRow hover tabIndex={-1} key={id}>
             <TableCell align="left">
-              <Link to={`/product/${id}`} style={{ display: 'flex', alignItems: 'center' }}>
+              <Link
+                to={`/product/${id}`}
+                style={{ display: "flex", alignItems: "center" }}
+              >
                 <LazyLoadImage
                   src={`${book.image}?size=tiny`}
                   height={45}
                   width={45}
-                  style={{ marginRight: '10px' }}
-                  placeholder={<Skeleton width={45} height={45} animation={false} variant="rectangular" />}
+                  style={{ marginRight: "10px" }}
+                  placeholder={
+                    <Skeleton
+                      width={45}
+                      height={45}
+                      animation={false}
+                      variant="rectangular"
+                    />
+                  }
                 />
                 <Box>
                   <ItemTitle>{book.title}</ItemTitle>
                   <Box display="flex">
-                    <ItemTitle>{currencyFormat.format(book.price * (1 - book.discount))}</ItemTitle>
-                    {book.discount > 0 && <ItemTitle className="secondary">&emsp;-{book.discount * 100}%</ItemTitle>}
+                    <ItemTitle>
+                      {currencyFormat.format(book.price * (1 - book.discount))}
+                    </ItemTitle>
+                    {book.discount > 0 && (
+                      <ItemTitle className="secondary">
+                        &emsp;-{book.discount * 100}%
+                      </ItemTitle>
+                    )}
                   </Box>
                 </Box>
               </Link>
             </TableCell>
             <TableCell align="right">
-              <ItemTitle className="secondary">Đã bán: {book.totalOrders}</ItemTitle>
-              <ItemTitle className="secondary">Đánh giá: {book.rating.toFixed(1)}</ItemTitle>
+              <ItemTitle className="secondary">
+                Đã bán: {book.totalOrders}
+              </ItemTitle>
+              <ItemTitle className="secondary">
+                Đánh giá: {book.rating.toFixed(1)}
+              </ItemTitle>
             </TableCell>
           </TableRow>
-        )
+        );
       })
-      :
+    ) : (
       <TableRow>
         <TableCell
           scope="row"
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: '40dvh' }}
+          sx={{ height: "40dvh" }}
         >
           <Box>Không tìm thấy sản phẩm nào!</Box>
         </TableCell>
-      </TableRow >
+      </TableRow>
+    );
   } else if (isError) {
     bookRows = (
       <TableRow>
@@ -114,19 +145,27 @@ export default function SummaryTableProducts({ shop }) {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: '40dvh' }}
+          sx={{ height: "40dvh" }}
         >
-          <Box>{error?.error || 'Đã xảy ra lỗi'}</Box>
+          <Box>{error?.error || "Đã xảy ra lỗi"}</Box>
         </TableCell>
       </TableRow>
-    )
+    );
   }
 
   return (
-    <Paper sx={{ width: '100%', height: '100%' }} elevation={3}>
-      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Paper sx={{ width: "100%", height: "100%" }} elevation={3}>
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Title>Sản phẩm mới nhất</Title>
-        <Link to={'/product'}><LinkButton>Xem tất cả</LinkButton></Link>
+        <Link to={"/product"}>
+          <LinkButton>Xem tất cả</LinkButton>
+        </Link>
       </Toolbar>
       <TableContainer component={Paper}>
         <Table stickyHeader size="small">
@@ -136,17 +175,15 @@ export default function SummaryTableProducts({ shop }) {
                 <TableCell
                   key={`headcell-${headCell.id}-${index}`}
                   align={headCell.align}
-                  padding={headCell.disablePadding ? 'none' : 'normal'}
-                  sx={{ width: headCell.width, bgcolor: 'action.hover' }}
+                  padding={headCell.disablePadding ? "none" : "normal"}
+                  sx={{ width: headCell.width, bgcolor: "action.hover" }}
                 >
                   {headCell.label}
                 </TableCell>
               ))}
             </TableRow>
-          </TableHead >
-          <TableBody>
-            {bookRows}
-          </TableBody>
+          </TableHead>
+          <TableBody>{bookRows}</TableBody>
         </Table>
       </TableContainer>
     </Paper>

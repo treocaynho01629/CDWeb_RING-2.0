@@ -1,66 +1,73 @@
 import { useState, Suspense, lazy } from "react";
-import { Box, Button, Grid2 as Grid } from '@mui/material';
-import { Add, AutoStories, LocalFireDepartment, Storefront } from '@mui/icons-material';
-import { NavLink } from 'react-router';
-import { HeaderContainer } from '../components/custom/Components';
-import { shopsApiSlice, useGetShopAnalyticsQuery, useGetShopsQuery } from "../features/shops/shopsApiSlice";
-import { useTitle } from "@ring/shared"
+import { Box, Button, Grid2 as Grid } from "@mui/material";
+import {
+  Add,
+  AutoStories,
+  LocalFireDepartment,
+  Storefront,
+} from "@mui/icons-material";
+import { NavLink } from "react-router";
+import { HeaderContainer } from "../components/custom/Components";
+import {
+  shopsApiSlice,
+  useGetShopAnalyticsQuery,
+  useGetShopsQuery,
+} from "../features/shops/shopsApiSlice";
+import { useTitle } from "@ring/shared";
 import { useAuth } from "@ring/auth";
-import InfoCard from '../components/custom/InfoCard';
-import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
+import InfoCard from "../components/custom/InfoCard";
+import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 import TableShops from "../components/table/TableShops";
 
-const ProductFormDialog = lazy(() => import("../components/dialog/ProductFormDialog"));
+const ShopFormDialog = lazy(
+  () => import("../components/dialog/ShopFormDialog")
+);
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 
 const ManageShops = () => {
-  const { shop } = useAuth();
   const { data: shopAnalytics } = useGetShopAnalyticsQuery();
-  const [contextProduct, setContextProduct] = useState(null);
+  const [contextShop, setContextShop] = useState(null);
   const [open, setOpen] = useState(undefined);
   const [pending, setPending] = useState(false);
   const [getShop, { isLoading }] = shopsApiSlice.useLazyGetShopQuery();
 
-  // const { data: fav, isLoading: loadFav, isSuccess: doneFav, isError: errorFav } = useGetBooksQuery({
-  //   size: 6,
-  //   sortBy: 'rating',
-  //   sortDir: 'desc',
-  //   amount: 0,
-  //   shopId: shop ?? ''
-  // });
-
   //Set title
-  useTitle('Sản phẩm');
+  useTitle("Cửa hàng");
 
   const handleOpen = () => {
-    setContextProduct(null);
+    setContextShop(null);
     setOpen(true);
-  }
+  };
 
-  const handleOpenEdit = (productId) => {
-    getShop(productId)
+  const handleOpenEdit = (shopId) => {
+    getShop(shopId)
       .unwrap()
       .then((book) => {
-        setContextProduct(book);
+        setContextShop(book);
         setOpen(true);
       })
       .catch((rejected) => console.error(rejected));
-  }
+  };
 
-  const handleClose = () => { setOpen(false); }
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <>
-      {(isLoading || pending) &&
+      {(isLoading || pending) && (
         <Suspense fallBack={null}>
-          <PendingModal open={(isLoading || pending)} message="Đang gửi yêu cầu..." />
+          <PendingModal
+            open={isLoading || pending}
+            message="Đang gửi yêu cầu..."
+          />
         </Suspense>
-      }
+      )}
       <HeaderContainer>
         <div>
           <h2>Quản lý cửa hàng</h2>
           <CustomBreadcrumbs separator="." maxItems={4} aria-label="breadcrumb">
-            <NavLink to={'/shop'}>Quản lý cửa hàng</NavLink>
+            <NavLink to={"/shop"}>Quản lý cửa hàng</NavLink>
           </CustomBreadcrumbs>
         </div>
         <Button variant="outlined" startIcon={<Add />} onClick={handleOpen}>
@@ -74,7 +81,8 @@ const ManageShops = () => {
           color="info"
         />
       </Box>
-      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
+      <Grid container spacing={3} sx={{ marginBottom: "20px" }}>
+        dsads
         {/* {loadingFav ? null
           :
           <Grid item xs={12} lg={6}>
@@ -99,10 +107,20 @@ const ManageShops = () => {
       </Grid>
       <TableShops {...{ handleOpenEdit, pending, setPending }} />
       <Suspense fallback={null}>
-        {open !== undefined && <ProductFormDialog {...{ open, handleClose, shop, product: contextProduct, pending, setPending }} />}
+        {open !== undefined && (
+          <ShopFormDialog
+            {...{
+              open,
+              handleClose,
+              shop: contextShop,
+              pending,
+              setPending,
+            }}
+          />
+        )}
       </Suspense>
     </>
-  )
-}
+  );
+};
 
-export default ManageShops
+export default ManageShops;

@@ -9,7 +9,7 @@
     ".": "./src/index.js"
   },
   "scripts": {
-    "lint": "eslint \"**/*.js\""
+    "lint": "eslint \"**/*.{ts,tsx,js,jsx}\""
   },
   "dependencies": {},
   "devDependencies": {

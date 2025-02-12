@@ -20,7 +20,7 @@ public interface AddressRepository extends JpaRepository<Address, Long>{
     List<IAddress> findAddressesByProfile(Long profileId);
 
     @Query("""
-        select p.address as address, true as isDefault from AccountProfile p  
+        select p.address as address, true as isDefault from AccountProfile p
         where p.id = :profileId
 	""")
     IAddress findAddressByProfile(Long profileId);

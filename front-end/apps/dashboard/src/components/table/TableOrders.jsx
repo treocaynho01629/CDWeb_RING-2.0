@@ -1,108 +1,138 @@
-import { useState, useEffect, Fragment } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, FormControlLabel, Switch, Collapse, TextField, MenuItem, Avatar, Checkbox, Skeleton, Chip, Badge, Grid2 as Grid, TableFooter, Toolbar } from '@mui/material';
-import { Receipt as ReceiptIcon, KeyboardArrowDown as KeyboardArrowDownIcon, KeyboardArrowUp as KeyboardArrowUpIcon, MoreHoriz, Search } from '@mui/icons-material';
-import { Link } from 'react-router';
-import { useGetReceiptsQuery } from '../../features/orders/ordersApiSlice';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { FooterContainer, FooterLabel, ItemTitle } from '../custom/Components';
+import { useState, useEffect, Fragment } from "react";
+import {
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  FormControlLabel,
+  Switch,
+  Collapse,
+  TextField,
+  MenuItem,
+  Avatar,
+  Checkbox,
+  Skeleton,
+  Chip,
+  Badge,
+  Grid2 as Grid,
+  TableFooter,
+  Toolbar,
+} from "@mui/material";
+import {
+  Receipt as ReceiptIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  KeyboardArrowUp as KeyboardArrowUpIcon,
+  MoreHoriz,
+  Search,
+} from "@mui/icons-material";
+import { Link } from "react-router";
+import { useGetReceiptsQuery } from "../../features/orders/ordersApiSlice";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import { FooterContainer, FooterLabel, ItemTitle } from "../custom/Components";
 import { idFormatter } from "@ring/shared";
-import { Progress } from '@ring/ui';
-import CustomTableHead from '../table/CustomTableHead';
-import CustomTablePagination from '../table/CustomTablePagination';
+import { Progress } from "@ring/ui";
+import CustomTableHead from "../table/CustomTableHead";
+import CustomTablePagination from "../table/CustomTablePagination";
 
 const headCells = [
   {
-    id: 'id',
-    align: 'center',
-    width: '70px',
+    id: "id",
+    align: "center",
+    width: "70px",
     disablePadding: false,
     sortable: true,
     hideOnMinimize: true,
-    label: 'ID',
+    label: "ID",
   },
   {
-    id: 'user.username',
-    align: 'left',
-    width: '200px',
+    id: "user.username",
+    align: "left",
+    width: "200px",
     disablePadding: false,
     sortable: true,
-    label: 'Khách hàng',
+    label: "Khách hàng",
   },
   {
-    id: 'oAddress',
-    align: 'left',
+    id: "oAddress",
+    align: "left",
     disablePadding: false,
     sortable: true,
     hideOnMinimize: true,
-    label: 'Thông tin',
+    label: "Thông tin",
   },
   {
-    id: 'oDate',
-    align: 'left',
-    width: '150px',
+    id: "oDate",
+    align: "left",
+    width: "150px",
     disablePadding: false,
     sortable: true,
-    label: 'Thời gian',
+    label: "Thời gian",
   },
   {
-    id: 'total',
-    align: 'left',
-    width: '150px',
+    id: "total",
+    align: "left",
+    width: "150px",
     disablePadding: false,
     sortable: true,
-    label: 'Tổng thống kê',
-  }
+    label: "Tổng thống kê",
+  },
 ];
 
 const detailHeadCells = [
   {
-    id: 'item',
-    align: 'left',
-    label: 'Sản phẩm',
+    id: "item",
+    align: "left",
+    label: "Sản phẩm",
   },
   {
-    id: 'price',
-    align: 'left',
-    width: '120px',
-    label: 'Giá(đ)',
+    id: "price",
+    align: "left",
+    width: "120px",
+    label: "Giá(đ)",
   },
   {
-    id: 'total',
-    align: 'left',
-    width: '150px',
-    label: 'Thành tiền(đ)',
+    id: "total",
+    align: "left",
+    width: "150px",
+    label: "Thành tiền(đ)",
   },
   {
-    id: 'status',
-    align: 'left',
-    width: '120px',
-    label: 'Trạng thái',
+    id: "status",
+    align: "left",
+    width: "120px",
+    label: "Trạng thái",
   },
 ];
 
 //Item status
 const getOrderStatus = (status) => {
   switch (status) {
-    case 'REFUNDED':
-      return { status: 'Hoàn trả', color: 'default' };
-    case 'CANCELED':
-      return { status: 'Đã huỷ', color: 'error' };
-    case 'PENDING':
-      return { status: 'Đang chờ', color: 'warning' };
-    case 'SHIPPING':
-      return { status: 'Đang giao', color: 'info' };
-    case 'COMPLETED':
-      return { status: 'Đã giao', color: 'primary' };
+    case "REFUNDED":
+      return { status: "Hoàn trả", color: "default" };
+    case "CANCELED":
+      return { status: "Đã huỷ", color: "error" };
+    case "PENDING":
+      return { status: "Đang chờ", color: "warning" };
+    case "SHIPPING":
+      return { status: "Đang giao", color: "info" };
+    case "COMPLETED":
+      return { status: "Đã giao", color: "primary" };
     default:
-      return { status: 'Không xác định', color: 'error' };
+      return { status: "Không xác định", color: "error" };
   }
-}
+};
 
-function FilterContent({ }) {
+function FilterContent({}) {
   return (
-    <Grid container spacing={1} sx={{ width: '80vw', padding: '10px' }}>
+    <Grid container spacing={1} sx={{ width: "80vw", padding: "10px" }}>
       <Grid item xs={12} sm={4}>
-        <TextField label='Temp'
+        <TextField
+          label="Temp"
           // value={currAddress?.city || ''}
           // onChange={(e) => setCurrAddress({ ...currAddress, city: e.target.value, ward: '' })}
           select
@@ -110,7 +140,9 @@ function FilterContent({ }) {
           fullWidth
           size="small"
         >
-          <MenuItem disabled value=""><em>--Tất cả--</em></MenuItem>
+          <MenuItem disabled value="">
+            <em>--Tất cả--</em>
+          </MenuItem>
           <MenuItem value={5}>5</MenuItem>
           <MenuItem value={4}>4</MenuItem>
           <MenuItem value={3}>3</MenuItem>
@@ -120,7 +152,7 @@ function FilterContent({ }) {
       </Grid>
       <Grid item xs={12} sm={8}>
         <TextField
-          placeholder='Tìm kiếm... '
+          placeholder="Tìm kiếm... "
           // onChange={(e) => setSearchField(e.target.value)}
           // value={searchField}
           id="search-review"
@@ -130,11 +162,21 @@ function FilterContent({ }) {
         />
       </Grid>
     </Grid>
-  )
+  );
 }
 
-function OrderRow({ isSelected, isOrderSelected, index, id, order, dense,
-  handleClick, onSelectAllDetail, colSpan, mini }) {
+function OrderRow({
+  isSelected,
+  isOrderSelected,
+  index,
+  id,
+  order,
+  dense,
+  handleClick,
+  onSelectAllDetail,
+  colSpan,
+  mini,
+}) {
   const [open, setOpen] = useState(false);
   const isItemSelected = isOrderSelected(id);
   const labelId = `enhanced-table-checkbox-${index}`;
@@ -145,10 +187,12 @@ function OrderRow({ isSelected, isOrderSelected, index, id, order, dense,
   order.details.forEach(function (detail) {
     detail?.items.forEach(function (item) {
       totalItems += item.amount;
-    })
+    });
   });
 
-  const toggleOpen = () => { setOpen(prev => !prev); }
+  const toggleOpen = () => {
+    setOpen((prev) => !prev);
+  };
 
   return (
     <Fragment key={index}>
@@ -159,7 +203,7 @@ function OrderRow({ isSelected, isOrderSelected, index, id, order, dense,
         aria-checked={isItemSelected}
         selected={isItemSelected}
       >
-        {!mini &&
+        {!mini && (
           <>
             <TableCell align="left">
               <IconButton
@@ -167,57 +211,81 @@ function OrderRow({ isSelected, isOrderSelected, index, id, order, dense,
                 size="small"
                 onClick={toggleOpen}
               >
-                <Badge color="primary" variant="dot" invisible={!isItemSelected}>
+                <Badge
+                  color="primary"
+                  variant="dot"
+                  invisible={!isItemSelected}
+                >
                   {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                 </Badge>
               </IconButton>
             </TableCell>
-            <TableCell component="th" id={labelId} scope="row" padding="none" align="center">{idFormatter(id)}</TableCell>
+            <TableCell
+              component="th"
+              id={labelId}
+              scope="row"
+              padding="none"
+              align="center"
+            >
+              {idFormatter(id)}
+            </TableCell>
           </>
-        }
+        )}
         <TableCell align="left">
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Avatar sx={{ marginRight: 1 }}>{order?.username?.charAt(0) ?? ''}</Avatar>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Avatar sx={{ marginRight: 1 }}>
+              {order?.username?.charAt(0) ?? ""}
+            </Avatar>
             <Box>
               <ItemTitle>{order.fullName}</ItemTitle>
               <ItemTitle className="secondary">{order.email}</ItemTitle>
             </Box>
           </Box>
         </TableCell>
-        {!mini &&
+        {!mini && (
           <TableCell align="left">
             <Box>
               <ItemTitle className="address">{order.address}</ItemTitle>
               <ItemTitle className="secondary">SĐT: {order.phone}</ItemTitle>
             </Box>
           </TableCell>
-        }
+        )}
         <TableCell align="left">
           <Box>
-            <ItemTitle>{`${('0' + date.getDate()).slice(-2)}-${('0' + (date.getMonth() + 1)).slice(-2)}-${date.getFullYear()}`}</ItemTitle>
-            <ItemTitle className="secondary">{`${('0' + date?.getHours()).slice(-2)}:${('0' + date?.getMinutes()).slice(-2)}`}</ItemTitle>
+            <ItemTitle>{`${("0" + date.getDate()).slice(-2)}-${("0" + (date.getMonth() + 1)).slice(-2)}-${date.getFullYear()}`}</ItemTitle>
+            <ItemTitle className="secondary">{`${("0" + date?.getHours()).slice(-2)}:${("0" + date?.getMinutes()).slice(-2)}`}</ItemTitle>
           </Box>
         </TableCell>
         <TableCell align="left">
           <Box>
-            <ItemTitle>Thành tiền: {Math.round(order.total).toLocaleString()}đ</ItemTitle>
+            <ItemTitle>
+              Thành tiền: {Math.round(order.total).toLocaleString()}đ
+            </ItemTitle>
             <ItemTitle className="secondary">Số lượng: {totalItems}</ItemTitle>
           </Box>
         </TableCell>
       </TableRow>
-      {!mini &&
-        <TableRow sx={{ display: open ? 'table-row' : 'none' }}>
-          <TableCell sx={{ padding: 1, backgroundColor: 'action.hover' }} colSpan={colSpan()}>
+      {!mini && (
+        <TableRow sx={{ display: open ? "table-row" : "none" }}>
+          <TableCell
+            sx={{ padding: 1, backgroundColor: "action.hover" }}
+            colSpan={colSpan()}
+          >
             <Collapse in={open} timeout={250} unmountOnExit>
-              <Table aria-label="order-details" size={dense ? 'small' : 'medium'}>
-                <TableHead sx={{ backgroundColor: 'background.default', height: '58px' }}>
+              <Table
+                aria-label="order-details"
+                size={dense ? "small" : "medium"}
+              >
+                <TableHead
+                  sx={{ backgroundColor: "background.default", height: "58px" }}
+                >
                   <TableRow>
                     <TableCell padding="checkbox">
                       <Checkbox
                         color="primary"
                         indeterminate={isItemSelected}
                         onChange={(e) => onSelectAllDetail(e, order)}
-                        inputProps={{ 'aria-label': 'Chọn tất cả' }}
+                        inputProps={{ "aria-label": "Chọn tất cả" }}
                       />
                     </TableCell>
                     {detailHeadCells.map((headCell, index) => (
@@ -233,72 +301,94 @@ function OrderRow({ isSelected, isOrderSelected, index, id, order, dense,
                 </TableHead>
                 <TableBody>
                   {order?.details.map((temp, tempIndex) => {
-                    return (
-                      temp?.items.map((detail, index) => {
-                        const itemStatus = getOrderStatus(detail.status);
-                        const isDetailSelected = isSelected(detail.id);
-                        const detailLabelId = `table-checkbox-${index}`;
+                    return temp?.items.map((detail, index) => {
+                      const itemStatus = getOrderStatus(detail.status);
+                      const isDetailSelected = isSelected(detail.id);
+                      const detailLabelId = `table-checkbox-${index}`;
 
-                        return (
-                          <TableRow
-                            key={`${detail.id}-${index}`}
-                            hover
-                            tabIndex={-1}
-                            aria-checked={isDetailSelected}
-                            selected={isDetailSelected}
-                            sx={{ backgroundColor: 'background.default' }}
-                          >
-                            <TableCell padding="checkbox">
-                              <Checkbox color="primary"
-                                onChange={() => handleClick(order, detail.id)}
-                                checked={isDetailSelected}
-                                inputProps={{
-                                  'aria-labelledby': detailLabelId,
-                                }}
+                      return (
+                        <TableRow
+                          key={`${detail.id}-${index}`}
+                          hover
+                          tabIndex={-1}
+                          aria-checked={isDetailSelected}
+                          selected={isDetailSelected}
+                          sx={{ backgroundColor: "background.default" }}
+                        >
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              color="primary"
+                              onChange={() => handleClick(order, detail.id)}
+                              checked={isDetailSelected}
+                              inputProps={{
+                                "aria-labelledby": detailLabelId,
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell align="left">
+                            <Link
+                              to={`/product/${detail.bookId}`}
+                              style={{ display: "flex", alignItems: "center" }}
+                            >
+                              <LazyLoadImage
+                                src={`${detail.image}?size=small`}
+                                height={45}
+                                width={45}
+                                style={{ marginRight: "10px" }}
+                                placeholder={
+                                  <Skeleton
+                                    width={45}
+                                    height={45}
+                                    animation={false}
+                                    variant="rectangular"
+                                  />
+                                }
                               />
-                            </TableCell>
-                            <TableCell align="left">
-                              <Link to={`/product/${detail.bookId}`} style={{ display: 'flex', alignItems: 'center' }}>
-                                <LazyLoadImage
-                                  src={`${detail.image}?size=small`}
-                                  height={45}
-                                  width={45}
-                                  style={{ marginRight: '10px' }}
-                                  placeholder={<Skeleton width={45} height={45} animation={false} variant="rectangular" />}
-                                />
-                                <Box>
-                                  <ItemTitle>{detail.bookTitle}</ItemTitle>
-                                  <ItemTitle className="secondary">ID: {idFormatter(detail.bookId)}</ItemTitle>
-                                </Box>
-                              </Link>
-                            </TableCell>
-                            <TableCell>{detail.price.toLocaleString()}đ</TableCell>
-                            <TableCell align="left">
                               <Box>
-                                <ItemTitle>Thành tiền: {Math.round(detail.amount * detail.price).toLocaleString()}đ</ItemTitle>
-                                <ItemTitle className="secondary">Số lượng: {detail.amount}</ItemTitle>
+                                <ItemTitle>{detail.bookTitle}</ItemTitle>
+                                <ItemTitle className="secondary">
+                                  ID: {idFormatter(detail.bookId)}
+                                </ItemTitle>
                               </Box>
-                            </TableCell>
-                            <TableCell align="left">
-                              <Chip label={itemStatus.status}
-                                color={itemStatus.color}
-                                sx={{ fontWeight: 'bold' }}
-                                variant="outlined"
-                              />
-                            </TableCell>
-                          </TableRow>
-                        )
-                      })
-                    )
+                            </Link>
+                          </TableCell>
+                          <TableCell>
+                            {detail.price.toLocaleString()}đ
+                          </TableCell>
+                          <TableCell align="left">
+                            <Box>
+                              <ItemTitle>
+                                Thành tiền:{" "}
+                                {Math.round(
+                                  detail.amount * detail.price,
+                                ).toLocaleString()}
+                                đ
+                              </ItemTitle>
+                              <ItemTitle className="secondary">
+                                Số lượng: {detail.amount}
+                              </ItemTitle>
+                            </Box>
+                          </TableCell>
+                          <TableCell align="left">
+                            <Chip
+                              label={itemStatus.status}
+                              color={itemStatus.color}
+                              sx={{ fontWeight: "bold" }}
+                              variant="outlined"
+                            />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    });
                   })}
                 </TableBody>
               </Table>
             </Collapse>
           </TableCell>
         </TableRow>
-      }
+      )}
     </Fragment>
-  )
+  );
 }
 
 export default function TableOrders({ setOrderCount, mini = false }) {
@@ -315,7 +405,7 @@ export default function TableOrders({ setOrderCount, mini = false }) {
     totalPages: 0,
     sortBy: "id",
     sortDir: "asc",
-  })
+  });
 
   //Fetch receipts
   const { data, isLoading, isSuccess, isError, error } = useGetReceiptsQuery({
@@ -332,15 +422,16 @@ export default function TableOrders({ setOrderCount, mini = false }) {
         ...pagination,
         totalPages: data?.page?.totalPages,
         currPage: data?.page?.number,
-        pageSize: data?.page?.size
+        pageSize: data?.page?.size,
       });
       if (setOrderCount) setOrderCount(data?.page?.totalElements);
     }
-  }, [data])
+  }, [data]);
 
   const handleRequestSort = (e, property) => {
-    const isAsc = (pagination.sortBy === property && pagination.sortDir === 'asc');
-    const sortDir = isAsc ? 'desc' : 'asc';
+    const isAsc =
+      pagination.sortBy === property && pagination.sortDir === "asc";
+    const sortDir = isAsc ? "desc" : "asc";
     setPagination({ ...pagination, sortBy: property, sortDir: sortDir });
   };
 
@@ -350,53 +441,69 @@ export default function TableOrders({ setOrderCount, mini = false }) {
     setSelectedOrder([]);
     setDeselectedOrder([]);
 
-    if (e.target.checked) { //Selected all
+    if (e.target.checked) {
+      //Selected all
       setSelectedAll(true);
-    } else { //Unselected all
+    } else {
+      //Unselected all
       setSelectedAll(false);
     }
   };
 
-  const onSelectAllDetail = (e, order) => { //A coding disaster T_T
+  const onSelectAllDetail = (e, order) => {
+    //A coding disaster T_T
     //Determines which boxes gonna change
     let newSelected = [];
     let newDeselected = [];
     let changed = order?.details;
-    changed = changed.filter(detail => (e.target.checked !== isSelected(detail.id))).map((detail) => (detail.id));
+    changed = changed
+      .filter((detail) => e.target.checked !== isSelected(detail.id))
+      .map((detail) => detail.id);
 
-    if (e.target.checked) { //If check all the empty boxes
-      if (selectedAll) { //Remove boxes from deselected[]
+    if (e.target.checked) {
+      //If check all the empty boxes
+      if (selectedAll) {
+        //Remove boxes from deselected[]
         newDeselected = deselected;
-        newDeselected = newDeselected.filter(id => (changed.indexOf(id) === -1));
+        newDeselected = newDeselected.filter(
+          (id) => changed.indexOf(id) === -1,
+        );
 
         setDeseletected(newDeselected);
-      } else { //Add new boxes to selected[]
+      } else {
+        //Add new boxes to selected[]
         newSelected = selected.concat(changed);
         newSelected = [...new Set(newSelected)];
 
         setSelected(newSelected);
       }
-    } else { //Uncheck all selected boxes
-      if (selectedAll) { //Add boxes to deselected[]
+    } else {
+      //Uncheck all selected boxes
+      if (selectedAll) {
+        //Add boxes to deselected[]
         newDeselected = deselected.concat(changed);
         newDeselected = [...new Set(newDeselected)];
 
         setDeseletected(newDeselected);
-      } else { //Remove boxes from selected[]
+      } else {
+        //Remove boxes from selected[]
         let newSelected = selected;
-        newSelected = newSelected.filter(id => (changed.indexOf(id) === -1));
+        newSelected = newSelected.filter((id) => changed.indexOf(id) === -1);
 
         setSelected(newSelected);
       }
     }
 
-    const isOrderSelected = (order?.details.forEach(function (detail) {
-      detail?.items.some(detail => newSelected?.includes(detail.id))
-    })) || (selectedAll && order?.details.forEach(function (detail) {
-      detail?.items.some(detail => !newDeselected?.includes(detail.id))
-    }));
+    const isOrderSelected =
+      order?.details.forEach(function (detail) {
+        detail?.items.some((detail) => newSelected?.includes(detail.id));
+      }) ||
+      (selectedAll &&
+        order?.details.forEach(function (detail) {
+          detail?.items.some((detail) => !newDeselected?.includes(detail.id));
+        }));
     handleSelectedOrder(order.id, isOrderSelected);
-  }
+  };
 
   const handleClick = (order, id) => {
     let newDeselected = [];
@@ -439,11 +546,14 @@ export default function TableOrders({ setOrderCount, mini = false }) {
       setSelected(newSelected);
     }
 
-    const isOrderSelected = (order?.details.forEach(function (detail) {
-      detail?.items.some(detail => newSelected?.includes(detail.id))
-    })) || (selectedAll && order?.details.forEach(function (detail) {
-      detail?.items.some(detail => !newDeselected?.includes(detail.id))
-    }));
+    const isOrderSelected =
+      order?.details.forEach(function (detail) {
+        detail?.items.some((detail) => newSelected?.includes(detail.id));
+      }) ||
+      (selectedAll &&
+        order?.details.forEach(function (detail) {
+          detail?.items.some((detail) => !newDeselected?.includes(detail.id));
+        }));
     handleSelectedOrder(order.id, isOrderSelected);
   };
 
@@ -521,10 +631,20 @@ export default function TableOrders({ setOrderCount, mini = false }) {
     setDense(e.target.checked);
   };
 
-  const isSelected = (id) => (selected?.indexOf(id) !== -1 || (selectedAll && deselected?.indexOf(id) === -1));
-  const isOrderSelected = (orderId) => (selectedOrder?.indexOf(orderId) !== -1 || (selectedAll && deselectedOrder?.indexOf(orderId) === -1));
-  const numSelected = () => (selectedAll ? data?.page?.totalElements - [...new Set(deselectedOrder)]?.length : [...new Set(selectedOrder)]?.length);
-  const colSpan = () => (mini ? headCells.filter((h) => !h.hideOnMinimize).length : headCells.length + 1);
+  const isSelected = (id) =>
+    selected?.indexOf(id) !== -1 ||
+    (selectedAll && deselected?.indexOf(id) === -1);
+  const isOrderSelected = (orderId) =>
+    selectedOrder?.indexOf(orderId) !== -1 ||
+    (selectedAll && deselectedOrder?.indexOf(orderId) === -1);
+  const numSelected = () =>
+    selectedAll
+      ? data?.page?.totalElements - [...new Set(deselectedOrder)]?.length
+      : [...new Set(selectedOrder)]?.length;
+  const colSpan = () =>
+    mini
+      ? headCells.filter((h) => !h.hideOnMinimize).length
+      : headCells.length + 1;
   //#endregion
 
   let orderRows;
@@ -537,36 +657,50 @@ export default function TableOrders({ setOrderCount, mini = false }) {
           padding="none"
           align="center"
           colSpan={colSpan()}
-          sx={{ position: 'relative', height: '40dvh' }}
+          sx={{ position: "relative", height: "40dvh" }}
         >
           <Progress color="primary" />
         </TableCell>
       </TableRow>
-    )
+    );
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    orderRows = ids?.length
-      ? ids?.map((id, index) => {
+    orderRows = ids?.length ? (
+      ids?.map((id, index) => {
         const order = entities[id];
 
-        return (<OrderRow key={index} {...{
-          index, id, order, isSelected, isOrderSelected, dense,
-          handleClick, onSelectAllDetail, colSpan, mini
-        }} />)
+        return (
+          <OrderRow
+            key={index}
+            {...{
+              index,
+              id,
+              order,
+              isSelected,
+              isOrderSelected,
+              dense,
+              handleClick,
+              onSelectAllDetail,
+              colSpan,
+              mini,
+            }}
+          />
+        );
       })
-      :
+    ) : (
       <TableRow>
         <TableCell
           scope="row"
           padding="none"
           align="center"
           colSpan={colSpan()}
-          sx={{ height: '40dvh' }}
+          sx={{ height: "40dvh" }}
         >
           <Box>Không tìm thấy đơn hàng nào!</Box>
         </TableCell>
-      </TableRow >
+      </TableRow>
+    );
   } else if (isError) {
     orderRows = (
       <TableRow>
@@ -575,23 +709,26 @@ export default function TableOrders({ setOrderCount, mini = false }) {
           padding="none"
           align="center"
           colSpan={colSpan()}
-          sx={{ height: '40dvh' }}
+          sx={{ height: "40dvh" }}
         >
-          <Box>{error?.error || 'Đã xảy ra lỗi'}</Box>
+          <Box>{error?.error || "Đã xảy ra lỗi"}</Box>
         </TableCell>
       </TableRow>
-    )
+    );
   }
 
   return (
     <TableContainer component={Paper}>
-      <Toolbar> <FilterContent /></Toolbar>
-      <TableContainer sx={{ maxHeight: mini ? 330 : 'auto' }}>
+      <Toolbar>
+        {" "}
+        <FilterContent />
+      </Toolbar>
+      <TableContainer sx={{ maxHeight: mini ? 330 : "auto" }}>
         <Table
           stickyHeader
           sx={{ minWidth: mini ? 500 : 750 }}
           aria-labelledby="tableTitle"
-          size={dense ? 'small' : 'medium'}
+          size={dense ? "small" : "medium"}
         >
           <CustomTableHead
             headCells={headCells}
@@ -603,20 +740,18 @@ export default function TableOrders({ setOrderCount, mini = false }) {
             selectedAll={selectedAll}
             mini={mini}
           />
-          <TableBody>
-            {orderRows}
-          </TableBody>
+          <TableBody>{orderRows}</TableBody>
         </Table>
       </TableContainer>
       <FooterContainer>
-        {mini ?
-          <Link to={'/order'}>Xem tất cả</Link>
-          :
+        {mini ? (
+          <Link to={"/order"}>Xem tất cả</Link>
+        ) : (
           <FormControlLabel
             control={<Switch checked={dense} onChange={handleChangeDense} />}
             label={<FooterLabel>Thu gọn</FooterLabel>}
           />
-        }
+        )}
         <CustomTablePagination
           pagination={pagination}
           onPageChange={handleChangePage}

@@ -1,17 +1,23 @@
 import { useState, Suspense, lazy } from "react";
-import { Box, Button, Grid2 as Grid } from '@mui/material';
-import { Add, AutoStories, LocalFireDepartment } from '@mui/icons-material';
-import { NavLink } from 'react-router';
-import { HeaderContainer } from '../components/custom/Components';
-import { booksApiSlice, useGetBookAnalyticsQuery, useGetBooksQuery } from "../features/books/booksApiSlice";
+import { Box, Button, Grid2 as Grid } from "@mui/material";
+import { Add, AutoStories, LocalFireDepartment } from "@mui/icons-material";
+import { NavLink } from "react-router";
+import { HeaderContainer } from "../components/custom/Components";
+import {
+  booksApiSlice,
+  useGetBookAnalyticsQuery,
+  useGetBooksQuery,
+} from "../features/books/booksApiSlice";
 import { useTitle } from "@ring/shared";
 import { useAuth } from "@ring/auth";
-import TableProducts from '../components/table/TableProducts'
-import InfoCard from '../components/custom/InfoCard';
-import CustomBreadcrumbs from '../components/custom/CustomBreadcrumbs';
+import TableProducts from "../components/table/TableProducts";
+import InfoCard from "../components/custom/InfoCard";
+import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 import ProductsShowcase from "../components/product/ProductsShowcase";
 
-const ProductFormDialog = lazy(() => import("../components/dialog/ProductFormDialog"));
+const ProductFormDialog = lazy(
+  () => import("../components/dialog/ProductFormDialog"),
+);
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 
 const ManageProducts = () => {
@@ -20,12 +26,17 @@ const ManageProducts = () => {
   const [open, setOpen] = useState(undefined);
   const [pending, setPending] = useState(false);
   const { data: bookAnalytics } = useGetBookAnalyticsQuery(shop ?? null);
-  const { data: bestSeller, isLoading: loadBest, isSuccess: doneBest, isError: errorBest } = useGetBooksQuery({
+  const {
+    data: bestSeller,
+    isLoading: loadBest,
+    isSuccess: doneBest,
+    isError: errorBest,
+  } = useGetBooksQuery({
     size: 6,
-    sortBy: 'totalOrders',
-    sortDir: 'desc',
+    sortBy: "totalOrders",
+    sortDir: "desc",
     amount: 0,
-    shopId: shop ?? ''
+    shopId: shop ?? "",
   });
   const [getBook, { isLoading }] = booksApiSlice.useLazyGetBookQuery();
 
@@ -38,12 +49,12 @@ const ManageProducts = () => {
   // });
 
   //Set title
-  useTitle('Sản phẩm');
+  useTitle("Sản phẩm");
 
   const handleOpen = () => {
     setContextProduct(null);
     setOpen(true);
-  }
+  };
 
   const handleOpenEdit = (productId) => {
     getBook(productId)
@@ -53,22 +64,27 @@ const ManageProducts = () => {
         setOpen(true);
       })
       .catch((rejected) => console.error(rejected));
-  }
+  };
 
-  const handleClose = () => { setOpen(false); }
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <>
-      {(isLoading || pending) &&
+      {(isLoading || pending) && (
         <Suspense fallBack={null}>
-          <PendingModal open={(isLoading || pending)} message="Đang gửi yêu cầu..." />
+          <PendingModal
+            open={isLoading || pending}
+            message="Đang gửi yêu cầu..."
+          />
         </Suspense>
-      }
+      )}
       <HeaderContainer>
         <div>
           <h2>Quản lý sản phẩm</h2>
           <CustomBreadcrumbs separator="." maxItems={4} aria-label="breadcrumb">
-            <NavLink to={'/product'}>Quản lý sản phẩm</NavLink>
+            <NavLink to={"/product"}>Quản lý sản phẩm</NavLink>
           </CustomBreadcrumbs>
         </div>
         <Button variant="outlined" startIcon={<Add />} onClick={handleOpen}>
@@ -82,16 +98,26 @@ const ManageProducts = () => {
           color="primary"
         />
       </Box>
-      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
-        {loadBest ? null
-          :
+      <Grid container spacing={3} sx={{ marginBottom: "20px" }}>
+        {loadBest ? null : (
           <Grid size={{ xs: 12, sm: 6 }}>
-            <ProductsShowcase {...{
-              title: <><LocalFireDepartment />Top sản phẩm bán chạy</>, size: 6,
-              data: bestSeller, isLoading: loadBest, isSuccess: doneBest, isError: errorBest
-            }} />
+            <ProductsShowcase
+              {...{
+                title: (
+                  <>
+                    <LocalFireDepartment />
+                    Top sản phẩm bán chạy
+                  </>
+                ),
+                size: 6,
+                data: bestSeller,
+                isLoading: loadBest,
+                isSuccess: doneBest,
+                isError: errorBest,
+              }}
+            />
           </Grid>
-        }
+        )}
 
         {/* {loadingFav ? null
           :
@@ -117,10 +143,21 @@ const ManageProducts = () => {
       </Grid>
       <TableProducts {...{ shop, handleOpenEdit, pending, setPending }} />
       <Suspense fallback={null}>
-        {open !== undefined && <ProductFormDialog {...{ open, handleClose, shop, product: contextProduct, pending, setPending }} />}
+        {open !== undefined && (
+          <ProductFormDialog
+            {...{
+              open,
+              handleClose,
+              shop,
+              product: contextProduct,
+              pending,
+              setPending,
+            }}
+          />
+        )}
       </Suspense>
     </>
-  )
-}
+  );
+};
 
-export default ManageProducts
+export default ManageProducts;
