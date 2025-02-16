@@ -54,7 +54,7 @@ public class CouponController {
 
     //Add coupon
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('CREATE_PRIVILEGE')")
     public ResponseEntity<?> createCoupon(@Valid @RequestPart("request") CouponRequest request,
                                           @CurrentAccount Account currUser) {
         return new ResponseEntity<>(couponService.addCoupon(request, currUser), HttpStatus.CREATED);
@@ -62,7 +62,7 @@ public class CouponController {
 
     //Update coupon by id
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('UPDATE_PRIVILEGE')")
     public ResponseEntity<?> updateCoupon(@PathVariable("id") Long id,
                                           @Valid @RequestPart("request") CouponRequest request,
                                           @CurrentAccount Account currUser) {
@@ -71,14 +71,14 @@ public class CouponController {
 
     //Delete coupon
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteCoupon(@PathVariable("id") Long id, @CurrentAccount Account currUser) {
         return new ResponseEntity<>(couponService.deleteCoupon(id, currUser), HttpStatus.OK);
     }
 
     //Delete multiples coupons in a lists of {ids}
     @DeleteMapping("/delete-multiples")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteCoupons(@RequestParam(value = "types", required = false) List<CouponType> types,
                                            @RequestParam(value = "shopId", required = false) Long shopId,
                                            @RequestParam(value = "byShop", required = false) Boolean byShop,
@@ -94,7 +94,7 @@ public class CouponController {
 
     //Delete all coupons
     @DeleteMapping("/delete-all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteAllCoupons() {
         couponService.deleteAllCoupons();
         return new ResponseEntity<>("All coupons deleted successfully!", HttpStatus.OK);

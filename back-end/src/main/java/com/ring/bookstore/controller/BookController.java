@@ -109,14 +109,14 @@ public class BookController {
     }
 
     @GetMapping("/analytics")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getBookAnalytics(@RequestParam(value = "shopId", required = false) Long shopId) {
         return new ResponseEntity<>(bookService.getAnalytics(shopId), HttpStatus.OK);
     }
 
     //Add new book
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('CREATE_PRIVILEGE')")
     public ResponseEntity<?> addBook(@Valid @RequestPart("request") BookRequest request,
                                      @RequestPart("thumbnail") MultipartFile thumbnail,
                                      @RequestPart(name = "images", required = false) MultipartFile[] images,
@@ -127,7 +127,7 @@ public class BookController {
 
     //Update book by id
     @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('UPDATE_PRIVILEGE')")
     public ResponseEntity<?> updateBook(@PathVariable("id") Long id,
                                         @Valid @RequestPart("request") BookRequest request,
                                         @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail,
@@ -139,7 +139,7 @@ public class BookController {
 
     //Delete book by {id}
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteBook(@PathVariable("id") Long id,
                                         @CurrentAccount Account currUser) {
         return new ResponseEntity<>(bookService.deleteBook(id, currUser), HttpStatus.OK);
@@ -147,7 +147,7 @@ public class BookController {
 
     //Delete multiple books by lists of {ids}
     @DeleteMapping("/delete-multiples")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteBooks(@RequestParam("ids") List<Long> ids,
                                          @CurrentAccount Account currUser) {
         bookService.deleteBooks(ids, currUser);
@@ -156,7 +156,7 @@ public class BookController {
 
     //Delete multiple books not in lists of {ids}
     @DeleteMapping("/delete-inverse")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteBooksInverse(@RequestParam(value = "keyword", defaultValue = "") String keyword,
                                                 @RequestParam(value = "cateId", required = false) Integer cateId,
                                                 @RequestParam(value = "pubIds", required = false) List<Integer> pubIds,
@@ -186,7 +186,7 @@ public class BookController {
 
     //Delete all books
     @DeleteMapping("/delete-all")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteAllBooks(@RequestParam(value = "shopId", required = false) Long shopId,
                                             @CurrentAccount Account currUser) {
         bookService.deleteAllBooks(shopId, currUser);

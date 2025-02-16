@@ -17,7 +17,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getReviews: builder.query({
       query: (args) => {
-        const { page, size, sortBy, sortDir, rating, bookId, userId } =
+        const { page, size, sortBy, sortDir, rating, keyword, bookId, userId } =
           args || {};
 
         //Params
@@ -27,6 +27,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
         if (sortBy) params.append("sortBy", sortBy);
         if (sortDir) params.append("sortDir", sortDir);
         if (rating) params.append("rating", rating);
+        if (keyword) params.append("keyword", keyword);
         if (bookId) params.append("bookId", bookId);
         if (userId) params.append("userId", userId);
 
@@ -44,7 +45,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       providesTags: (result, error, arg) => {
@@ -93,7 +94,7 @@ export const selectReviewsResult =
 
 const selectReviewsData = createSelector(
   selectReviewsResult,
-  (reviewsResult) => reviewsResult.data, // normalized state object with ids & entities
+  (reviewsResult) => reviewsResult.data // normalized state object with ids & entities
 );
 
 export const {
@@ -102,5 +103,5 @@ export const {
   selectIds: selectReviewIds,
   selectEntities: selectReviewEntities,
 } = reviewsAdapter.getSelectors(
-  (state) => selectReviewsData(state) ?? initialState,
+  (state) => selectReviewsData(state) ?? initialState
 );

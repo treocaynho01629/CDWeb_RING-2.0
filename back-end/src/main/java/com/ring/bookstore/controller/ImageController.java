@@ -37,7 +37,7 @@ public class ImageController {
 
     //Upload image
     @PostMapping("/upload")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('CREATE_PRIVILEGE')")
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File not found!");
@@ -54,7 +54,7 @@ public class ImageController {
 
     //Upload multiples images
     @PostMapping("/upload-multiples")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('CREATE_PRIVILEGE')")
     public ResponseEntity<?> uploadImages(@RequestParam("images") MultipartFile[] files) {
         List<String> messages = new ArrayList<>();
 
@@ -72,7 +72,7 @@ public class ImageController {
 
     //Upload image
     @PutMapping("/replace")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('UPDATE_PRIVILEGE')")
     public ResponseEntity<?> replaceImage(@RequestParam("image") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File not found!");
@@ -89,7 +89,7 @@ public class ImageController {
 
     //Upload multiples images
     @PutMapping("/replace-multiples")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('UPDATE_PRIVILEGE')")
     public ResponseEntity<?> replaceImages(@RequestParam("images") MultipartFile[] files) {
         List<String> messages = new ArrayList<>();
 
@@ -119,7 +119,7 @@ public class ImageController {
 
     //Delete image by {id}
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteImage(@PathVariable Long id) {
         String response = imageService.deleteImage(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -127,7 +127,7 @@ public class ImageController {
 
     //Delete images
     @DeleteMapping("/delete-multiples")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteImages(@RequestParam("ids") List<Long> ids) {
         imageService.deleteImages(ids);
         return new ResponseEntity<>("Images deleted successfully!", HttpStatus.OK);

@@ -1,39 +1,24 @@
-import { useState } from "react";
-import { Box, Breadcrumbs, Grid2 as Grid, Typography } from "@mui/material";
-import { Link } from "react-router";
-import { Star } from "@mui/icons-material";
+import { NavLink } from "react-router";
 import { useTitle } from "@ring/shared";
+import { HeaderContainer } from "../components/custom/Components";
 import TableReviews from "../components/table/TableReviews";
-// import CountCard from "../../components/custom/CountCard";
+import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 
 const ManageReviews = () => {
-  const [reviewCount, setReviewCount] = useState(0);
-
   //Set title
   useTitle("Đánh giá");
 
   return (
     <>
-      <h2>Quản lý đánh giá</h2>
-      <Box display="flex" justifyContent={"space-between"}>
-        <Breadcrumbs aria-label="breadcrumb">
-          <Link style={{ color: "inherit" }} to="/">
-            Dashboard
-          </Link>
-          <Typography color="text.secondary">Quản lý đánh giá</Typography>
-        </Breadcrumbs>
-      </Box>
-      <br />
-      <Grid container spacing={3} sx={{ marginBottom: "20px" }}>
-        <Grid item sm={6} md={4}>
-          {/* <CountCard
-            count={reviewCount}
-            icon={<Star />}
-            title={'Đánh giá'}
-          /> */}
-        </Grid>
-      </Grid>
-      <TableReviews setReviewCount={setReviewCount} />
+      <HeaderContainer>
+        <div>
+          <h2>Quản lý đánh giá</h2>
+          <CustomBreadcrumbs separator="." maxItems={4} aria-label="breadcrumb">
+            <NavLink to={"/review"}>Quản lý đánh giá</NavLink>
+          </CustomBreadcrumbs>
+        </div>
+      </HeaderContainer>
+      <TableReviews />
     </>
   );
 };

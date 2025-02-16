@@ -24,20 +24,22 @@ public class ReviewController {
 
     //Get reviews
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getReviews(
             @RequestParam(value = "bookId", required = false) Long bookId,
             @RequestParam(value = "userId", required = false) Long userId,
             @RequestParam(value = "rating", required = false) Integer rating,
+            @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
             @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
-        return new ResponseEntity<>(reviewService.getReviews(bookId, userId, rating, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
+        return new ResponseEntity<>(reviewService.getReviews(bookId, userId, rating, keyword, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
     }
 
     //Get reviews for book's {id}
     @GetMapping("/book/{id}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
     public ResponseEntity<?> getReviewByBook(@PathVariable("id") Long bookId,
                                              @CurrentAccount Account currUser) {
         return new ResponseEntity<>(reviewService.getReviewByBook(bookId, currUser), HttpStatus.OK);
@@ -45,18 +47,18 @@ public class ReviewController {
 
     //Get reviews for book's {id}
     @GetMapping("/books/{id}")
-    public ResponseEntity<?> getReviewsByBookId(@PathVariable("id") Long bookId,
-                                                @RequestParam(value = "rating", required = false) Integer rating,
-                                                @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
-                                                @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                                @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-                                                @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
+    public ResponseEntity<?> getReviewsByBook(@PathVariable("id") Long bookId,
+                                              @RequestParam(value = "rating", required = false) Integer rating,
+                                              @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
+                                              @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                                              @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+                                              @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
         return new ResponseEntity<>(reviewService.getReviewsByBookId(bookId, rating, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
     }
 
     //Get current user's reviews
     @GetMapping("/user")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
     public ResponseEntity<?> getUserReviews(@RequestParam(value = "rating", required = false) Integer rating,
                                             @RequestParam(value = "pSize", defaultValue = "5") Integer pageSize,
                                             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
@@ -68,7 +70,7 @@ public class ReviewController {
 
     //Review by bookId
     @PostMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
     public ResponseEntity<?> reviewBook(@PathVariable("id") Long bookId,
                                         @RequestBody @Valid ReviewRequest request,
                                         @CurrentAccount Account currUser) {
@@ -77,7 +79,7 @@ public class ReviewController {
 
     //Update review by id
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
     public ResponseEntity<?> updateReview(@PathVariable("id") Long bookId,
                                           @Valid @RequestBody ReviewRequest request,
                                           @CurrentAccount Account currUser) {
@@ -86,7 +88,7 @@ public class ReviewController {
 
     //Delete review
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteReview(@PathVariable("id") Long id) {
         reviewService.deleteReview(id);
         return new ResponseEntity<>("Review deleted successfully!", HttpStatus.OK);
@@ -94,7 +96,7 @@ public class ReviewController {
 
     //Delete multiples reviews in a lists of {ids}
     @DeleteMapping("/delete-multiples")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteReviews(@RequestParam(value = "bookId", required = false) Long bookId,
                                            @RequestParam(value = "userId", required = false) Long userId,
                                            @RequestParam(value = "rating", required = false) Integer rating,
@@ -106,7 +108,7 @@ public class ReviewController {
 
     //Delete all reviews
     @DeleteMapping("/delete-all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteAllReviews() {
         reviewService.deleteAllReviews();
         return new ResponseEntity<>("All reviews deleted successfully!", HttpStatus.OK);

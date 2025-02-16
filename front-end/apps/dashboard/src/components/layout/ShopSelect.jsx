@@ -1,5 +1,6 @@
 import { Store } from "@mui/icons-material";
 import { Avatar, Menu, MenuItem, Paper } from "@mui/material";
+import { Link } from "react-router";
 
 const ShopSelect = ({ open, anchorEl, handleClose, shop, setShop, data }) => {
   let shopsContent;
@@ -30,7 +31,9 @@ const ShopSelect = ({ open, anchorEl, handleClose, shop, setShop, data }) => {
         );
       })
     ) : (
-      <MenuItem sx={{ px: 1, fontSize: 14 }}>Thêm cửa hàng</MenuItem>
+      <Link to={"/shop"}>
+        <MenuItem sx={{ px: 1, fontSize: 14 }}>Thêm cửa hàng</MenuItem>
+      </Link>
     );
   }
 

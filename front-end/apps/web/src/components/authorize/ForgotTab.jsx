@@ -7,6 +7,7 @@ import { AuthTitle, ConfirmButton } from "@ring/ui/AuthComponents";
 import { MarkEmailReadOutlined } from "@mui/icons-material";
 import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
+import { Link } from "react-router";
 
 const ReCaptcha = lazy(() => import("@ring/auth/ReCaptcha"));
 
@@ -179,16 +180,19 @@ const ForgotTab = ({
           </Suspense>
         )}
         <ButtonContainer>
-          <ConfirmButton
-            variant="outlined"
-            color="error"
-            size="large"
-            type="submit"
-            fullWidth
-            sx={{ mr: 1 }}
+          <Link
+            to={"/auth/login"}
+            style={{ width: "100%", marginRight: "8px" }}
           >
-            Quay lại
-          </ConfirmButton>
+            <ConfirmButton
+              variant="outlined"
+              color="error"
+              size="large"
+              fullWidth
+            >
+              Quay lại
+            </ConfirmButton>
+          </Link>
           <ConfirmButton
             variant="contained"
             color="primary"

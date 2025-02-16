@@ -256,7 +256,7 @@ const NavItem = styled.div`
 const ProfileTabsList = ({ profile, loading, tabletMode }) => {
   const { username, image, roles } = useAuth();
   const [open, setOpen] = useState(true);
-  const roleItem = roleTypes[roles?.length];
+  const currRole = roleTypes[roles?.find((role) => role.startsWith("ROLE_"))];
 
   const toggleOpen = (e) => {
     e.preventDefault();
@@ -294,7 +294,7 @@ const ProfileTabsList = ({ profile, loading, tabletMode }) => {
                     <Name>{profile?.name || "Sửa hồ sơ"}</Name>
                   )}
                 </Username>
-                <Role color={roleItem?.color}>{roleItem?.label}</Role>
+                <Role color={currRole?.color}>{currRole?.label}</Role>
               </UserContainer>
             </InfoContainer>
           </MainProfile>

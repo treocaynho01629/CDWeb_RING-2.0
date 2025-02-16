@@ -24,6 +24,7 @@ public class OrderMapper {
         return new ReceiptDTO(order.getId(),
                 order.getEmail(),
                 address.getCompanyName() != null ? address.getCompanyName() : address.getName(),
+                null,
                 address.getPhone(),
                 address.getCity() + ", " + address.getAddress(),
                 order.getOrderMessage(),
@@ -84,6 +85,59 @@ public class OrderMapper {
         return result;
     }
 
+    public List<ReceiptDTO> detailsToReceiptDTO(List<IOrderDetail> details) {
+        Map<Long, ReceiptDTO> receiptsMap = new LinkedHashMap<>();
+
+        for (IOrderDetail projectedDetail : details) {
+            OrderDetail detail = projectedDetail.getDetail(); //Get detail
+
+            String fileDownloadUri = projectedDetail.getImage() != null ?
+                    ServletUriComponentsBuilder
+                            .fromCurrentContextPath()
+                            .path("/api/images/")
+                            .path(projectedDetail.getImage())
+                            .toUriString()
+                    : null;
+
+            var newDetail = OrderDTO.builder().id(detail.getId())
+                    .shopId(detail.getShop().getId())
+                    .shopName(projectedDetail.getShopName())
+                    .totalPrice(detail.getTotalPrice())
+                    .totalDiscount(detail.getDiscount())
+                    .shippingFee(detail.getShippingFee())
+                    .shippingDiscount(detail.getShippingDiscount())
+                    .totalItems(projectedDetail.getTotalItems())
+                    .status(detail.getStatus())
+                    .build();
+
+            if (!receiptsMap.containsKey(projectedDetail.getOrderId())) { //Insert if not exist
+                List<OrderDTO> detailsList = new ArrayList<>(); //New list
+                detailsList.add(newDetail);
+
+                var newReceipt = ReceiptDTO.builder().id(projectedDetail.getOrderId())
+                        .email(projectedDetail.getEmail())
+                        .name(projectedDetail.getName())
+                        .image(fileDownloadUri)
+                        .phone(projectedDetail.getPhone())
+                        .address(projectedDetail.getAddress())
+                        .message(projectedDetail.getMessage())
+                        .date(projectedDetail.getDate())
+                        .total(projectedDetail.getTotal())
+                        .totalDiscount(projectedDetail.getTotalDiscount())
+                        .username(projectedDetail.getUsername())
+                        .details(detailsList)
+                        .build();
+                receiptsMap.put(projectedDetail.getOrderId(), newReceipt);
+            } else { //Add to existing list
+                receiptsMap.get(projectedDetail.getOrderId()).details().add(newDetail);
+            }
+        }
+
+        //Convert & return
+        List<ReceiptDTO> result = new ArrayList<ReceiptDTO>(receiptsMap.values());
+        return result;
+    }
+
     public OrderDTO detailToOrderDTO(OrderDetail detail) {
         List<OrderItem> orderItems = detail.getItems();
         List<OrderItemDTO> itemDTOS = orderItems.stream().map(this::itemToDTO).collect(Collectors.toList());
@@ -96,6 +150,7 @@ public class OrderMapper {
                 detail.getDiscount(),
                 detail.getShippingFee(),
                 detail.getShippingDiscount(),
+                null,
                 detail.getStatus(),
                 itemDTOS);
     }

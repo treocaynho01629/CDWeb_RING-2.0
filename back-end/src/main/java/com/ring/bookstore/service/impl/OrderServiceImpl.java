@@ -448,7 +448,8 @@ public class OrderServiceImpl implements OrderService {
 
                 //Coupon
                 Coupon shopCoupon = coupons.get(detail.getCoupon());
-                if (detail.getCoupon() != null && shopCoupon == null) throw new ResourceNotFoundException("Coupon not found!");
+                if (detail.getCoupon() != null && shopCoupon == null)
+                    throw new ResourceNotFoundException("Coupon not found!");
 
                 if (shopCoupon != null
                         && shopCoupon.getShop().getId().equals(shop.getId())
@@ -505,7 +506,8 @@ public class OrderServiceImpl implements OrderService {
 
         //Main coupon
         Coupon coupon = coupons.get(checkRequest.getCoupon());
-        if (checkRequest.getCoupon() != null && coupon == null) throw new ResourceNotFoundException("Coupon not found!");
+        if (checkRequest.getCoupon() != null && coupon == null)
+            throw new ResourceNotFoundException("Coupon not found!");
 
         if (coupon != null && coupon.getShop() == null && !couponService.isExpired(coupon)) {
             double discountValue = 0.0;
@@ -578,22 +580,25 @@ public class OrderServiceImpl implements OrderService {
         return receiptDTO;
     }
 
-    //Get all orders FIX
+    //Get all orders
     @Transactional
-    public Page<ReceiptDTO> getAllReceipts(Account user, Long shopId, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
-       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+    public Page<ReceiptDTO> getAllReceipts(Account user, Long shopId, OrderStatus status,
+                                           String keyword, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
         boolean isAdmin = isAuthAdmin();
 
-        Page<OrderReceipt> ordersList = null;
-//        Page<OrderReceipt> ordersList = shopId != null ?
-//                orderRepo.findAllByUsersShop(shopId, isAdmin ? null : user.getId(), pageable) //Fetch by shop
-//                : isAdmin ? orderRepo.findAllReceipts(pageable) : null; //Fetch all
-        if (ordersList == null) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+        Page<Long> receiptIds = orderRepo.findAllIds(shopId, isAdmin ? null : user.getId(), status, keyword, pageable); //Fetch from database
+        List<IOrderDetail> detailsList = detailRepo.findAllWithReceiptIds(receiptIds.getContent());
+        List<ReceiptDTO> ordersList = orderMapper.detailsToReceiptDTO(detailsList);
+        Page<ReceiptDTO> ordersDTOS = new PageImpl<ReceiptDTO>(
+                ordersList,
+                pageable,
+                receiptIds.getTotalElements()
+        );
 
-        Page<ReceiptDTO> orderDTOS = ordersList.map(orderMapper::orderToDTO);
-        return orderDTOS;
+        return ordersDTOS;
     }
 
     //Get all order summaries
@@ -605,7 +610,7 @@ public class OrderServiceImpl implements OrderService {
                                                           Integer pageSize,
                                                           String sortBy,
                                                           String sortDir) {
-       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
         boolean isAdmin = isAuthAdmin();
@@ -617,10 +622,10 @@ public class OrderServiceImpl implements OrderService {
         return summariesDTOS;
     }
 
-    //Get order with book's {id} FIX
+    //Get order with book's {id}
     @Override
     public Page<OrderDTO> getOrdersByBookId(Long id, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
-       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
 
@@ -693,14 +698,5 @@ public class OrderServiceImpl implements OrderService {
     protected boolean isAuthAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
         return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
-    }
-
-    protected boolean isOwnerValid(Shop shop, Account user) {
-        //Check if is admin or valid owner id
-        boolean isAdmin = isAuthAdmin();
-
-        if (shop != null) {
-            return shop.getOwner().getId().equals(user.getId()) || isAdmin;
-        } else return isAdmin;
     }
 }

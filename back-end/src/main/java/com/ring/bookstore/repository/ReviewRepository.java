@@ -18,7 +18,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>{
 	@Query("""
 		select r as review, u.id as userId, u.username as username, i.name as image,
 		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
-		from Review r 
+		from Review r
 		join r.book b
 		join r.user u
 		left join u.profile p
@@ -26,8 +26,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long>{
 		where (coalesce(:userId) is null or u.id = :userId)
 		and (coalesce(:bookId) is null or r.book.id = :bookId)
 		and (coalesce(:rating) is null or  r.rating = :rating)
+		and concat (r.rContent, u.username) ilike %:keyword%
 	""")
-	public Page<IReview> findReviews(Long bookId, Long userId, Integer rating, Pageable pageable);
+	public Page<IReview> findReviews(Long bookId, Long userId, Integer rating, String keyword, Pageable pageable);
 
 	@Query("""
 		select r.id from Review r

@@ -22,6 +22,7 @@ import { useAuth } from "@ring/auth";
 import MuiAppBar from "@mui/material/AppBar";
 import NavSetting from "./NavSetting";
 import styled from "@emotion/styled";
+import { roleTypes } from "@ring/shared";
 
 const ShopSelect = lazy(() => import("./ShopSelect"));
 
@@ -52,11 +53,11 @@ const StyledAvatar = styled(Avatar)`
 //#endregion
 
 export default function Navbar({ open, setOpen }) {
-  const { roles, shop, setShop } = useAuth();
-  const isAdmin = roles?.length >= 3;
+  const { image, username, roles, shop, setShop } = useAuth();
   const [openSetting, setOpenSetting] = useState(false);
   const [anchorEl, setAnchorEl] = useState(undefined);
   const openShop = Boolean(anchorEl);
+  const currRole = roleTypes[roles?.find((role) => role.startsWith("ROLE_"))];
 
   //Shop select
   const { data, isLoading, isSuccess, isError } = useGetPreviewShopsQuery(
@@ -143,8 +144,8 @@ export default function Navbar({ open, setOpen }) {
           >
             {shopBadgeContent}
             <Chip
-              label={isAdmin ? "Admin" : "Nhân viên"}
-              color={isAdmin ? "primary" : "info"}
+              label={currRole?.label ?? "Đang tải"}
+              color={currRole?.color ?? "default"}
               size="small"
               sx={{ fontWeight: 450, mr: 1 }}
             />
@@ -175,10 +176,15 @@ export default function Navbar({ open, setOpen }) {
             aria-controls={openSetting ? "account-menu" : undefined}
             aria-expanded={openSetting ? "true" : undefined}
           >
-            <Avatar sx={{ width: 32, height: 32 }} />
+            <Avatar
+              sx={{ width: 32, height: 32 }}
+              src={image ? image + "?size=tiny" : null}
+            />
           </IconButton>
         </Stack>
-        <NavSetting {...{ open: openSetting, setOpen: setOpenSetting }} />
+        <NavSetting
+          {...{ open: openSetting, setOpen: setOpenSetting, image, username }}
+        />
       </Toolbar>
     </AppBar>
   );

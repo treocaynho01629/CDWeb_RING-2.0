@@ -352,7 +352,7 @@ const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selectedPub.slice(0, selectedIndex),
-        selectedPub.slice(selectedIndex + 1),
+        selectedPub.slice(selectedIndex + 1)
       );
     }
 
@@ -540,7 +540,7 @@ const RangeFilter = memo(
         />
       </Filter>
     );
-  },
+  }
 );
 
 const TypeFilter = memo(({ types, onChangeType, typesRef }) => {
@@ -563,7 +563,7 @@ const TypeFilter = memo(({ types, onChangeType, typesRef }) => {
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selectedType.slice(0, selectedIndex),
-        selectedType.slice(selectedIndex + 1),
+        selectedType.slice(selectedIndex + 1)
       );
     }
 
@@ -677,7 +677,7 @@ const FilterList = ({
     debounce((newValue) => {
       setFilters((prev) => ({ ...prev, pubIds: newValue }));
     }, 500),
-    [],
+    []
   );
   const onChangeInputRange = useCallback((newValue) => {
     setFilters((prev) => ({ ...prev, value: newValue }));
@@ -686,13 +686,13 @@ const FilterList = ({
     debounce((newValue) => {
       setFilters((prev) => ({ ...prev, value: newValue }));
     }, 1000),
-    [],
+    []
   );
   const onChangeType = useCallback(
     debounce((newValue) => {
       setFilters((prev) => ({ ...prev, types: newValue }));
     }, 500),
-    [],
+    []
   );
   const onChangeRate = useCallback((newValue) => {
     setFilters((prev) => ({

@@ -68,10 +68,10 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 	
 	//Get reviews (ADMIN)
-	public Page<ReviewDTO> getReviews(Long bookId, Long userId, Integer rating, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+	public Page<ReviewDTO> getReviews(Long bookId, Long userId, Integer rating, String keyword, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
 		Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ? Sort.by(sortBy).ascending() //Pagination
 				: Sort.by(sortBy).descending());
-		Page<IReview> reviewsList = reviewRepo.findReviews(bookId, userId, rating, pageable); //Fetch from database
+		Page<IReview> reviewsList = reviewRepo.findReviews(bookId, userId, rating, keyword, pageable); //Fetch from database
 		Page<ReviewDTO> reviewDTOS = reviewsList.map(reviewMapper::projectionToDTO);
 		return reviewDTOS;
 	}

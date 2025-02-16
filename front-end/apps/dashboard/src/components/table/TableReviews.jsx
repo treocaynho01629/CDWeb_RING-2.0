@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Box,
   Table,
@@ -11,25 +11,36 @@ import {
   IconButton,
   FormControlLabel,
   Switch,
-  Avatar,
-  Grid2 as Grid,
+  Skeleton,
   TextField,
   MenuItem,
+  Menu,
+  ListItemIcon,
+  ListItemText,
+  Stack,
   Toolbar,
+  Button,
+  Avatar,
 } from "@mui/material";
-import { Delete as DeleteIcon, Search, Star } from "@mui/icons-material";
-import { Link } from "react-router";
 import {
-  useDeleteReviewMutation,
+  Search,
+  MoreHoriz,
+  Delete,
+  FilterAltOff,
+  Star,
+} from "@mui/icons-material";
+import { Link } from "react-router";
+import { ItemTitle, FooterContainer, FooterLabel } from "../custom/Components";
+import { idFormatter, useDeepEffect } from "@ring/shared";
+import {
+  useDeleteAllReviewsMutation,
   useDeleteReviewsMutation,
+  useDeleteReviewMutation,
   useGetReviewsQuery,
 } from "../../features/reviews/reviewsApiSlice";
-import { FooterLabel, ItemTitle, FooterContainer } from "../custom/Components";
-import { idFormatter } from "@ring/shared";
-import { useAuth } from "@ring/auth";
 import { Progress } from "@ring/ui";
-import CustomTablePagination from "../table/CustomTablePagination";
-import CustomTableHead from "../table/CustomTableHead";
+import CustomTableHead from "./CustomTableHead";
+import CustomTablePagination from "./CustomTablePagination";
 
 const headCells = [
   {
@@ -38,7 +49,6 @@ const headCells = [
     width: "70px",
     disablePadding: false,
     sortable: true,
-    hideOnMinimize: true,
     label: "ID",
   },
   {
@@ -76,85 +86,129 @@ const headCells = [
     width: "35px",
     disablePadding: false,
     sortable: false,
-    hideOnMinimize: true,
     label: "",
   },
 ];
 
-function FilterContent({}) {
+function ReviewFilters({ filters, setFilters }) {
+  const inputRef = useRef();
+  const handleChangeKeyword = useCallback((e) => {
+    e.preventDefault();
+    if (inputRef)
+      setFilters((prev) => ({ ...prev, keyword: inputRef.current.value }));
+  }, []);
+
+  const resetFilter = useCallback(() => {
+    setFilters({
+      keyword: "",
+      cate: "",
+      pubIds: [],
+      types: [],
+    });
+    setPubIds([]);
+    setTypes([]);
+    if (inputRef) inputRef.current.value = "";
+  }, []);
+
   return (
-    <Grid container spacing={1} sx={{ width: "80vw", padding: "10px" }}>
-      <Grid item xs={12} sm={4}>
+    <Stack
+      width="100%"
+      spacing={1}
+      my={2}
+      direction={{ xs: "column", md: "row" }}
+    >
+      <TextField
+        label="Đánh giá"
+        select
+        defaultValue=""
+        fullWidth
+        size="small"
+        value={filters.rating || ""}
+        onChange={(e) => setFilters({ ...filters, rating: e.target.value })}
+      >
+        <MenuItem value="">
+          <em>Tất cả</em>
+        </MenuItem>
+        <MenuItem value={5}>5</MenuItem>
+        <MenuItem value={4}>4</MenuItem>
+        <MenuItem value={3}>3</MenuItem>
+        <MenuItem value={2}>2</MenuItem>
+        <MenuItem value={1}>1</MenuItem>
+      </TextField>
+      <form style={{ width: "100%" }} onSubmit={handleChangeKeyword}>
         <TextField
-          label="Đánh giá"
-          // value={currAddress?.city || ''}
-          // onChange={(e) => setCurrAddress({ ...currAddress, city: e.target.value, ward: '' })}
-          select
-          defaultValue=""
-          fullWidth
+          placeholder="Tìm kiếm"
+          autoComplete="products"
+          id="products"
           size="small"
-        >
-          <MenuItem disabled value="">
-            <em>--Tất cả--</em>
-          </MenuItem>
-          <MenuItem value={5}>5</MenuItem>
-          <MenuItem value={4}>4</MenuItem>
-          <MenuItem value={3}>3</MenuItem>
-          <MenuItem value={2}>2</MenuItem>
-          <MenuItem value={1}>1</MenuItem>
-        </TextField>
-      </Grid>
-      <Grid item xs={12} sm={8}>
-        <TextField
-          placeholder="Tìm kiếm... "
-          // onChange={(e) => setSearchField(e.target.value)}
-          // value={searchField}
-          id="search-review"
-          size="small"
+          inputRef={inputRef}
           fullWidth
-          InputProps={{ startAdornment: <Search sx={{ marginRight: 1 }} /> }}
+          slotProps={{
+            input: {
+              startAdornment: <Search sx={{ marginRight: 1 }} />,
+            },
+          }}
         />
-      </Grid>
-    </Grid>
+      </form>
+      <Box display="flex" justifyContent="center">
+        <Button
+          sx={{ width: 125 }}
+          color="error"
+          onClick={resetFilter}
+          startIcon={<FilterAltOff />}
+        >
+          Xoá bộ lọc
+        </Button>
+      </Box>
+    </Stack>
   );
 }
 
 export default function TableReviews({
-  setReviewCount,
-  bookId,
-  userId,
-  mini = false,
+  shop,
+  handleOpenEdit,
+  pending,
+  setPending,
 }) {
   //#region construct
-  const { roles } = useAuth();
-  const isAdmin = useState(
-    roles?.find((role) => ["ROLE_ADMIN"].includes(role)),
-  );
   const [selected, setSelected] = useState([]);
   const [deselected, setDeseletected] = useState([]);
   const [selectedAll, setSelectedAll] = useState(false);
   const [dense, setDense] = useState(true);
-  const [isEmployees, setIsEmployees] = useState(false);
+  const [filters, setFilters] = useState({
+    keyword: "",
+    cate: "",
+    pubIds: [],
+    types: [],
+  });
   const [pagination, setPagination] = useState({
-    currPage: 0,
-    pageSize: mini ? 5 : 10,
+    number: 0,
+    size: 10,
     totalPages: 0,
     sortBy: "id",
-    sortDir: "asc",
-  });
-  const { data, isLoading, isSuccess, isError, error } = useGetReviewsQuery({
-    page: pagination.number,
-    size: pagination.size,
-    sortBy: pagination.sortBy,
-    sortDir: pagination.sortDir,
-    bookId: bookId,
-    userId: userId,
+    sortDir: "desc",
   });
 
+  //Actions
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [contextId, setContextId] = useState(null); //Current select product's id
+  const openContext = Boolean(anchorEl);
+
   //Delete hook
-  const [deleteReview, { isLoading: deleting }] = useDeleteReviewMutation();
-  const [deleteMultipleReviews, { isLoading: deletingMultiple }] =
-    useDeleteReviewsMutation();
+  const [deleteReview] = useDeleteReviewsMutation();
+  const [deleteReviews] = useDeleteReviewsMutation();
+  // const [deleteReviewsInverse] = useDeleteReviewsInverseMutation();
+  const [deleteAll] = useDeleteAllReviewsMutation();
+
+  //Fetch books
+  const { data, isLoading, isSuccess, isError, error } = useGetReviewsQuery({
+    page: pagination?.number,
+    size: pagination?.size,
+    sortBy: pagination?.sortBy,
+    sortDir: pagination?.sortDir,
+    rating: filters?.rating,
+    keyword: filters?.keyword,
+  });
 
   //Set pagination after fetch
   useEffect(() => {
@@ -162,12 +216,15 @@ export default function TableReviews({
       setPagination({
         ...pagination,
         totalPages: data?.page?.totalPages,
-        currPage: data?.page?.number,
-        pageSize: data?.page?.size,
+        number: data?.page?.number,
+        size: data?.page?.size,
       });
-      if (setReviewCount) setReviewCount(data?.page?.totalElements);
     }
   }, [data]);
+
+  useDeepEffect(() => {
+    handleChangePage(0);
+  }, [filters]);
 
   const handleRequestSort = (e, property) => {
     const isAsc =
@@ -189,6 +246,7 @@ export default function TableReviews({
     setSelectedAll(false);
   };
 
+  //Select
   const handleClick = (e, id) => {
     if (selectedAll) {
       //Set unselected elements for reverse
@@ -204,7 +262,7 @@ export default function TableReviews({
       } else if (deselectedIndex > 0) {
         newDeselected = newDeselected.concat(
           deselected.slice(0, deselectedIndex),
-          deselected.slice(deselectedIndex + 1),
+          deselected.slice(deselectedIndex + 1)
         );
       }
 
@@ -227,7 +285,7 @@ export default function TableReviews({
       } else if (selectedIndex > 0) {
         newSelected = newSelected.concat(
           selected.slice(0, selectedIndex),
-          selected.slice(selectedIndex + 1),
+          selected.slice(selectedIndex + 1)
         );
       }
 
@@ -239,23 +297,36 @@ export default function TableReviews({
     }
   };
 
-  const handleChangePage = (page) => {
-    setPagination({ ...pagination, currPage: page });
-  };
+  //Pagination
+  const handleChangePage = useCallback(
+    (page) => {
+      setPagination({ ...pagination, number: page });
+    },
+    [pagination]
+  );
 
-  const handleChangeRowsPerPage = (size) => {
-    handleChangePage(0);
-    const newValue = parseInt(size, 10);
-    setPagination({ ...pagination, pageSize: newValue });
-  };
+  const handleChangeRowsPerPage = useCallback(
+    (size) => {
+      handleChangePage(0);
+      const newValue = parseInt(size, 10);
+      setPagination({ ...pagination, size: newValue });
+    },
+    [pagination]
+  );
 
-  const handleChangeDense = (e) => {
+  const handleChangeDense = useCallback((e) => {
     setDense(e.target.checked);
+  }, []);
+
+  //Actions
+  const handleOpenContext = (e, product) => {
+    setAnchorEl(e.currentTarget);
+    setContextId(product);
   };
 
-  const handleChangeFilter = (e) => {
-    handleChangePage(0);
-    setIsEmployees(e.target.checked);
+  const handleCloseContext = () => {
+    setAnchorEl(null);
+    setContextId(null);
   };
 
   const handleDelete = async (id) => {
@@ -263,11 +334,11 @@ export default function TableReviews({
     setPending(true);
     const { enqueueSnackbar } = await import("notistack");
 
-    deleteReview({ id })
+    deleteBook(id)
       .unwrap()
       .then((data) => {
         //Unselected
-        const selectedIndex = selected?.indexOf(id);
+        const selectedIndex = selected.indexOf(id);
         let newSelected = [];
 
         if (selectedIndex === 0) {
@@ -298,54 +369,114 @@ export default function TableReviews({
     setPending(true);
     const { enqueueSnackbar } = await import("notistack");
 
-    deleteMultipleReviews({ ids: selected })
-      .unwrap()
-      .then((data) => {
-        //Unselected
-        setSelected([]);
-        setSelectedAll(false);
-        enqueueSnackbar("Đã xoá đánh giá!", { variant: "success" });
-        setPending(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        if (!err?.status) {
-          enqueueSnackbar("Server không phản hồi!", { variant: "error" });
-        } else if (err?.status === 409) {
-          enqueueSnackbar(err?.data?.message, { variant: "error" });
-        } else if (err?.status === 400) {
-          enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
-        } else {
-          enqueueSnackbar("Xoá đánh giá thất bại!", { variant: "error" });
-        }
-        setPending(false);
-      });
+    if (selectedAll) {
+      if (deselected.length == 0) {
+        //Delete all
+        deleteAll(shop)
+          .unwrap()
+          .then((data) => {
+            //Unselected
+            setSelected([]);
+            setDeseletected([]);
+            setSelectedAll(false);
+            enqueueSnackbar("Đã xoá đánh giá!", { variant: "success" });
+            setPending(false);
+          })
+          .catch((err) => {
+            console.error(err);
+            if (!err?.status) {
+              enqueueSnackbar("Server không phản hồi!", { variant: "error" });
+            } else if (err?.status === 409) {
+              enqueueSnackbar(err?.data?.message, { variant: "error" });
+            } else if (err?.status === 400) {
+              enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
+            } else {
+              enqueueSnackbar("Xoá đánh giá thất bại!", { variant: "error" });
+            }
+            setPending(false);
+          });
+      } else {
+        //Delete books inverse
+        deleteBooksInverse({
+          shopId: shop ?? "",
+          keyword: filters.keyword,
+          cateId: filters.cate,
+          types: filters.types,
+          pubIds: filters.pubIds,
+          amount: 0,
+          ids: deselected,
+        })
+          .unwrap()
+          .then((data) => {
+            //Unselected
+            setSelected([]);
+            setDeseletected([]);
+            setSelectedAll(false);
+            enqueueSnackbar("Đã xoá đánh giá!", { variant: "success" });
+            setPending(false);
+          })
+          .catch((err) => {
+            console.error(err);
+            if (!err?.status) {
+              enqueueSnackbar("Server không phản hồi!", { variant: "error" });
+            } else if (err?.status === 409) {
+              enqueueSnackbar(err?.data?.message, { variant: "error" });
+            } else if (err?.status === 400) {
+              enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
+            } else {
+              enqueueSnackbar("Xoá đánh giá thất bại!", { variant: "error" });
+            }
+            setPending(false);
+          });
+      }
+    } else {
+      //Delete books
+      deleteBooks(selected)
+        .unwrap()
+        .then((data) => {
+          //Unselected
+          setSelected([]);
+          setDeseletected([]);
+          setSelectedAll(false);
+          enqueueSnackbar("Đã xoá đánh giá!", { variant: "success" });
+          setPending(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          if (!err?.status) {
+            enqueueSnackbar("Server không phản hồi!", { variant: "error" });
+          } else if (err?.status === 409) {
+            enqueueSnackbar(err?.data?.message, { variant: "error" });
+          } else if (err?.status === 400) {
+            enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
+          } else {
+            enqueueSnackbar("Xoá đánh giá thất bại!", { variant: "error" });
+          }
+          setPending(false);
+        });
+    }
   };
 
   const isSelected = (id) =>
-    selected?.indexOf(id) !== -1 ||
+    (!selectedAll && selected?.indexOf(id) !== -1) ||
     (selectedAll && deselected?.indexOf(id) === -1);
-  const numSelected = () =>
-    selectedAll
-      ? data?.page?.totalElements - deselected?.length
-      : selected?.length;
-  const colSpan = () =>
-    mini
-      ? headCells.filter((h) => !h.hideOnMinimize).length
-      : headCells.length + 1;
+  const numSelected = selectedAll
+    ? data?.page?.totalElements - deselected?.length
+    : selected?.length;
+  const colSpan = headCells.length + 1;
   //#endregion
 
-  let reviewsRows;
+  let reviewRows;
 
   if (isLoading) {
-    reviewsRows = (
+    reviewRows = (
       <TableRow>
         <TableCell
           scope="row"
           padding="none"
           align="center"
-          colSpan={colSpan()}
-          sx={{ position: "relative", height: "40dvh" }}
+          colSpan={colSpan}
+          sx={{ position: "relative", height: 300 }}
         >
           <Progress color="primary" />
         </TableCell>
@@ -354,7 +485,7 @@ export default function TableReviews({
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    reviewsRows = ids?.length ? (
+    reviewRows = ids?.length ? (
       ids?.map((id, index) => {
         const review = entities[id];
         const isItemSelected = isSelected(id);
@@ -362,42 +493,37 @@ export default function TableReviews({
         const date = new Date(review.date);
 
         return (
-          <TableRow
-            hover
-            aria-checked={isItemSelected}
-            tabIndex={-1}
-            key={id}
-            selected={isItemSelected}
-          >
-            {!mini && (
-              <>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    color="primary"
-                    onChange={(event) => handleClick(event, id)}
-                    checked={isItemSelected}
-                    inputProps={{
-                      "aria-labelledby": labelId,
-                    }}
-                  />
-                </TableCell>
-                <TableCell
-                  component="th"
-                  id={labelId}
-                  scope="row"
-                  padding="none"
-                  align="center"
-                >
-                  {idFormatter(id)}
-                </TableCell>
-              </>
-            )}
+          <TableRow hover aria-checked={isItemSelected} tabIndex={-1} key={id}>
+            <TableCell padding="checkbox">
+              <Checkbox
+                color="primary"
+                onChange={(e) => handleClick(e, review.id)}
+                checked={isItemSelected}
+                inputProps={{
+                  "aria-labelledby": labelId,
+                }}
+              />
+            </TableCell>
+            <TableCell
+              component="th"
+              id={labelId}
+              scope="row"
+              padding="none"
+              align="center"
+            >
+              {idFormatter(id)}
+            </TableCell>
             <TableCell align="left">
               <Link
                 to={`/user/${review.userId}`}
                 style={{ display: "flex", alignItems: "center" }}
               >
-                <Avatar sx={{ marginRight: 1 }}>
+                <Avatar
+                  sx={{ marginRight: 1 }}
+                  src={
+                    review?.userImage ? review.userImage + "?size=tiny" : null
+                  }
+                >
                   {review?.username?.charAt(0) ?? ""}
                 </Avatar>
                 <Box>
@@ -411,8 +537,8 @@ export default function TableReviews({
             <TableCell align="left">
               <Box>
                 <ItemTitle>
-                  Đánh giá: {review.rating}{" "}
-                  <Star fontSize="15px" color="primary" />
+                  Đánh giá: {review.rating}
+                  <Star fontSize="15px" color="warning" />
                 </ItemTitle>
                 <ItemTitle className="review">{review.content}</ItemTitle>
               </Box>
@@ -431,13 +557,11 @@ export default function TableReviews({
                 </ItemTitle>
               </Link>
             </TableCell>
-            {!mini && isAdmin && (
-              <TableCell align="right">
-                <IconButton onClick={(e) => handleDelete(id)}>
-                  <DeleteIcon />
-                </IconButton>
-              </TableCell>
-            )}
+            <TableCell align="right">
+              <IconButton onClick={(e) => handleOpenContext(e, id)}>
+                <MoreHoriz />
+              </IconButton>
+            </TableCell>
           </TableRow>
         );
       })
@@ -447,22 +571,22 @@ export default function TableReviews({
           scope="row"
           padding="none"
           align="center"
-          colSpan={colSpan()}
-          sx={{ height: "40dvh" }}
+          colSpan={colSpan}
+          sx={{ height: 300 }}
         >
           <Box>Không tìm thấy đánh giá nào!</Box>
         </TableCell>
       </TableRow>
     );
   } else if (isError) {
-    reviewsRows = (
+    reviewRows = (
       <TableRow>
         <TableCell
           scope="row"
           padding="none"
           align="center"
-          colSpan={colSpan()}
-          sx={{ height: "40dvh" }}
+          colSpan={colSpan}
+          sx={{ height: 300 }}
         >
           <Box>{error?.error || "Đã xảy ra lỗi"}</Box>
         </TableCell>
@@ -471,39 +595,32 @@ export default function TableReviews({
   }
 
   return (
-    <TableContainer component={Paper}>
+    <Paper sx={{ width: "100%", height: "100%" }} elevation={3}>
       <Toolbar>
-        <FilterContent />
+        <ReviewFilters {...{ filters, setFilters }} />
       </Toolbar>
-      <TableContainer sx={{ maxHeight: mini ? 330 : "auto" }}>
-        <Table
-          stickyHeader
-          sx={{ minWidth: mini ? 500 : 750 }}
-          aria-labelledby="tableTitle"
-          size={dense ? "small" : "medium"}
-        >
+      <TableContainer component={Paper}>
+        <Table stickyHeader size={dense ? "small" : "medium"}>
           <CustomTableHead
             headCells={headCells}
-            numSelected={numSelected()}
+            numSelected={numSelected}
             sortBy={pagination.sortBy}
             sortDir={pagination.sortDir}
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={handleRequestSort}
+            onSubmitDelete={handleDeleteMultiples}
             selectedAll={selectedAll}
-            mini={mini}
           />
-          <TableBody>{reviewsRows}</TableBody>
+          <TableBody>{reviewRows}</TableBody>
         </Table>
       </TableContainer>
       <FooterContainer>
-        {mini ? (
-          <Link to={"/review"}>Xem tất cả</Link>
-        ) : (
+        <Box pl={2}>
           <FormControlLabel
             control={<Switch checked={dense} onChange={handleChangeDense} />}
             label={<FooterLabel>Thu gọn</FooterLabel>}
           />
-        )}
+        </Box>
         <CustomTablePagination
           pagination={pagination}
           onPageChange={handleChangePage}
@@ -511,6 +628,14 @@ export default function TableReviews({
           count={data?.page?.totalElements ?? 0}
         />
       </FooterContainer>
-    </TableContainer>
+      <Menu open={openContext} onClose={handleCloseContext} anchorEl={anchorEl}>
+        <MenuItem onClick={() => handleDelete(contextId)}>
+          <ListItemIcon>
+            <Delete color="error" fontSize="small" />
+          </ListItemIcon>
+          <ListItemText color="error">Xoá</ListItemText>
+        </MenuItem>
+      </Menu>
+    </Paper>
   );
 }

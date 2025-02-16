@@ -21,12 +21,18 @@ export const genderTypeItems = [
   },
 ];
 
-export const roleType = ["ROLE_USER", "ROLE_SELLER", "ROLE_ADMIN"];
+export const roleType = [
+  "ROLE_USER",
+  "ROLE_SELLER",
+  "ROLE_ADMIN",
+  "ROLE_GUEST",
+];
 
 export const roleTypes = {
   ROLE_USER: { label: "Thành viên", color: "default" },
   ROLE_SELLER: { label: "Nhân viên", color: "info" },
   ROLE_ADMIN: { label: "Admin", color: "primary" },
+  ROLE_GUEST: { label: "Khách", color: "warning" },
   1: { label: "Thành viên", color: "default" },
   2: { label: "Nhân viên", color: "info" },
   3: { label: "Admin", color: "primary" },
@@ -44,5 +50,9 @@ export const roleTypeItems = [
   {
     value: 3,
     label: "Admin",
+  },
+  {
+    value: 4,
+    label: "Khách",
   },
 ];

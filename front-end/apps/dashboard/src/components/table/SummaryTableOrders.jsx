@@ -17,7 +17,6 @@ import { ItemTitle, LinkButton, Title } from "../custom/Components";
 import { currencyFormat, idFormatter, numFormat } from "@ring/shared";
 import { useGetSummariesQuery } from "../../features/orders/ordersApiSlice";
 import { Progress } from "@ring/ui";
-import { useAuth } from "@ring/auth";
 
 const headCells = [
   {
@@ -37,12 +36,6 @@ const headCells = [
 ];
 
 export default function SummaryTableOrders({ title, shopId, bookId }) {
-  //#region construct
-  const { roles } = useAuth();
-  const isAdmin = useState(
-    roles?.find((role) => ["ROLE_ADMIN"].includes(role)),
-  );
-
   //Fetch order summaries
   const { data, isLoading, isSuccess, isError, error } = useGetSummariesQuery({
     size: 5,
@@ -64,7 +57,7 @@ export default function SummaryTableOrders({ title, shopId, bookId }) {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ position: "relative", height: "40dvh" }}
+          sx={{ position: "relative", height: 300 }}
         >
           <Progress color="primary" />
         </TableCell>
@@ -123,7 +116,7 @@ export default function SummaryTableOrders({ title, shopId, bookId }) {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: "40dvh" }}
+          sx={{ height: 300 }}
         >
           <Box>Không tìm thấy đơn hàng nào!</Box>
         </TableCell>
@@ -137,7 +130,7 @@ export default function SummaryTableOrders({ title, shopId, bookId }) {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: "40dvh" }}
+          sx={{ height: 300 }}
         >
           <Box>{error?.error || "Đã xảy ra lỗi"}</Box>
         </TableCell>

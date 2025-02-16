@@ -32,7 +32,7 @@ public class AddressController {
 
     //Get current user's addresses
     @GetMapping("/saved")
-    @PreAuthorize("hasAnyRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','SELLER','ADMIN')")
     public ResponseEntity<?> getProfileAddresses(@CurrentAccount Account currUser) {
         List<AddressDTO> addresses = addressService.getMyAddresses(currUser);
         return new ResponseEntity<>(addresses, HttpStatus.OK);
@@ -40,7 +40,7 @@ public class AddressController {
 
     //Get address by {id}
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getAddressById(@PathVariable("id") Long id) {
         return new ResponseEntity<>(addressService.getAddress(id), HttpStatus.OK);
     }
@@ -48,7 +48,7 @@ public class AddressController {
 
     //Add new address
     @PostMapping()
-    @PreAuthorize("hasAnyRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','SELLER','ADMIN')")
     public ResponseEntity<?> addAddress(@Valid @RequestBody AddressRequest request,
                                      @CurrentAccount Account currUser) {
         return new ResponseEntity<>(addressService.addAddress(request, currUser), HttpStatus.CREATED);
@@ -56,7 +56,7 @@ public class AddressController {
 
     //Update new address
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','SELLER','ADMIN')")
     public ResponseEntity<?> updateAddress(@PathVariable("id") Long id,
                                         @Valid @RequestBody AddressRequest request,
                                         @CurrentAccount Account currUser) {
@@ -65,7 +65,7 @@ public class AddressController {
 
     //Delete address by {id}
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','SELLER','ADMIN')")
     public ResponseEntity<?> deleteAddress(@PathVariable("id") Long id,
                                         @CurrentAccount Account currUser) {
         return new ResponseEntity<>(addressService.deleteAddress(id, currUser), HttpStatus.OK);
