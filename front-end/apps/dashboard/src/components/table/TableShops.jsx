@@ -170,8 +170,8 @@ function ShopFilters({ userId, isAdmin, filters, setFilters }) {
 export default function TableShops({ handleOpenEdit, pending, setPending }) {
   //#region construct
   const { id, roles } = useAuth();
-  const isAdmin = useState(
-    roles?.find((role) => ["ROLE_ADMIN"].includes(role))
+  const isAdmin = roles.find((role) =>
+    ["ROLE_ADMIN", "ROLE_GUEST"]?.includes(role)
   );
   const [selected, setSelected] = useState([]);
   const [deselected, setDeseletected] = useState([]);
@@ -298,15 +298,21 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
   };
 
   //Pagination
-  const handleChangePage = useCallback((page) => {
-    setPagination({ ...pagination, number: page });
-  }, []);
+  const handleChangePage = useCallback(
+    (page) => {
+      setPagination({ ...pagination, number: page });
+    },
+    [pagination]
+  );
 
-  const handleChangeRowsPerPage = useCallback((size) => {
-    handleChangePage(0);
-    const newValue = parseInt(size, 10);
-    setPagination({ ...pagination, size: newValue });
-  }, []);
+  const handleChangeRowsPerPage = useCallback(
+    (size) => {
+      handleChangePage(0);
+      const newValue = parseInt(size, 10);
+      setPagination({ ...pagination, size: newValue });
+    },
+    [pagination]
+  );
 
   const handleChangeDense = useCallback((e) => {
     setDense(e.target.checked);
@@ -470,7 +476,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ position: "relative", height: "40dvh" }}
+          sx={{ position: "relative", height: 300 }}
         >
           <Progress color="primary" />
         </TableCell>
@@ -560,7 +566,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: "40dvh" }}
+          sx={{ height: 300 }}
         >
           <Box>Không tìm thấy sản phẩm nào!</Box>
         </TableCell>
@@ -574,7 +580,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: "40dvh" }}
+          sx={{ height: 300 }}
         >
           <Box>{error?.error || "Đã xảy ra lỗi"}</Box>
         </TableCell>

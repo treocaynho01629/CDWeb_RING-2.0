@@ -98,8 +98,28 @@ public class Account extends Auditable implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRoleName().name())).collect(Collectors.toList());
+		return getGrantedAuthorities(getPrivileges());
+	}
+
+	private List<String> getPrivileges() {
+		List<String> privileges = new ArrayList<>();
+		List<Privilege> collection = new ArrayList<>();
+		for (Role role : this.roles) {
+			privileges.add(role.getRoleName().name());
+			collection.addAll(role.getPrivileges());
+		}
+		for (Privilege item : collection) {
+			privileges.add(item.getPrivilegeName().name());
+		}
+		return privileges;
+	}
+
+	private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
+		List<GrantedAuthority> authorities = new ArrayList<>();
+		for (String privilege : privileges) {
+			authorities.add(new SimpleGrantedAuthority(privilege));
+		}
+		return authorities;
 	}
 
 	@Override

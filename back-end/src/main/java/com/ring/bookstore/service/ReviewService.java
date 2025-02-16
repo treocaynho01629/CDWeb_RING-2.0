@@ -16,6 +16,7 @@ public interface ReviewService {
     Page<ReviewDTO> getReviews(Long bookId,
                                Long userId,
                                Integer rating,
+                               String keyword,
                                Integer pageNo,
                                Integer pageSize,
                                String sortBy,

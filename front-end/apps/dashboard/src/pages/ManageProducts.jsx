@@ -16,7 +16,7 @@ import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 import ProductsShowcase from "../components/product/ProductsShowcase";
 
 const ProductFormDialog = lazy(
-  () => import("../components/dialog/ProductFormDialog"),
+  () => import("../components/dialog/ProductFormDialog")
 );
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 
@@ -39,14 +39,6 @@ const ManageProducts = () => {
     shopId: shop ?? "",
   });
   const [getBook, { isLoading }] = booksApiSlice.useLazyGetBookQuery();
-
-  // const { data: fav, isLoading: loadFav, isSuccess: doneFav, isError: errorFav } = useGetBooksQuery({
-  //   size: 6,
-  //   sortBy: 'rating',
-  //   sortDir: 'desc',
-  //   amount: 0,
-  //   shopId: shop ?? ''
-  // });
 
   //Set title
   useTitle("Sản phẩm");
@@ -118,28 +110,6 @@ const ManageProducts = () => {
             />
           </Grid>
         )}
-
-        {/* {loadingFav ? null
-          :
-          <Grid item xs={12} lg={6}>
-            <Paper elevation={3} sx={{ padding: '5px 15px' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center' }}><Star />Top 5 sách được yêu thích</h3>
-              <Stack>
-                {fav?.content?.map((book) => (
-                  <Paper elevation={1}
-                    onClick={() => navigate(`/detail/${book.id}`)}
-                    sx={{ width: '100%', display: 'flex', my: '5px', padding: 1, cursor: 'pointer' }}>
-                    <LazyLoadImage src={book.image} style={imageStyle} />
-                    <div>
-                      <BookTitle>{book.title}</BookTitle>
-                      <BookPrice>{book.price.toLocaleString()} đ</BookPrice>
-                    </div>
-                  </Paper>
-                ))}
-              </Stack>
-            </Paper>
-          </Grid>
-        } */}
       </Grid>
       <TableProducts {...{ shop, handleOpenEdit, pending, setPending }} />
       <Suspense fallback={null}>

@@ -45,7 +45,15 @@ function App() {
                 element: <PageLayout />,
                 children: [
                   {
-                    element: <RequireAuth allowedRoles={["ROLE_SELLER"]} />,
+                    element: (
+                      <RequireAuth
+                        allowedRoles={[
+                          "ROLE_SELLER",
+                          "ROLE_ADMIN",
+                          "ROLE_GUEST",
+                        ]}
+                      />
+                    ),
                     children: [
                       {
                         path: "",
@@ -82,8 +90,19 @@ function App() {
                       {
                         path: "event",
                         lazy: async () => {
-                          let ManageShops = await import("./pages/ManageShops");
-                          return { Component: ManageShops.default };
+                          let ManageEvents = await import(
+                            "./pages/ManageEvents"
+                          );
+                          return { Component: ManageEvents.default };
+                        },
+                      },
+                      {
+                        path: "coupon",
+                        lazy: async () => {
+                          let ManageCoupons = await import(
+                            "./pages/ManageCoupons"
+                          );
+                          return { Component: ManageCoupons.default };
                         },
                       },
                       {
@@ -107,7 +126,11 @@ function App() {
                     ],
                   },
                   {
-                    element: <RequireAuth allowedRoles={["ROLE_ADMIN"]} />,
+                    element: (
+                      <RequireAuth
+                        allowedRoles={["ROLE_ADMIN", "ROLE_GUEST"]}
+                      />
+                    ),
                     children: [
                       {
                         path: "user",
@@ -123,6 +146,15 @@ function App() {
                             "./pages/DetailAccount"
                           );
                           return { Component: DetailAccount.default };
+                        },
+                      },
+                      {
+                        path: "auth",
+                        lazy: async () => {
+                          let ManageAuthorities = await import(
+                            "./pages/ManageAuthorities"
+                          );
+                          return { Component: ManageAuthorities.default };
                         },
                       },
                       {
@@ -150,7 +182,7 @@ function App() {
         v7_skipActionStatusRevalidation: true,
         v7_skipActionErrorRevalidation: true,
       },
-    },
+    }
   );
 
   return (

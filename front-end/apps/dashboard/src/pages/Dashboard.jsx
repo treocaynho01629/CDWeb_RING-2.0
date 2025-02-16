@@ -54,11 +54,13 @@ const TopProducts = ({ shop }) => {
 
 const Dashboard = () => {
   const { roles, username, shop } = useAuth();
-  const isAdmin = roles?.length >= 3;
   const { data: bookAnalytics } = useGetBookAnalyticsQuery(shop ?? null);
   const { data: salesAnalytics } = useGetSalesAnalyticsQuery(shop ?? null);
   const { data: userAnalytics } = useGetUserAnalyticsQuery();
   const { data: shopAnalytics } = useGetShopAnalyticsQuery();
+  const isAdmin = roles?.find((role) =>
+    ["ROLE_ADMIN", "ROLE_GUEST"].includes(role)
+  );
 
   //Set title
   useTitle("Dashboard");

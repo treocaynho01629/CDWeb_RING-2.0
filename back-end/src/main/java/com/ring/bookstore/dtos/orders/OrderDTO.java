@@ -14,6 +14,7 @@ public record OrderDTO(Long id,
                        Double totalDiscount,
                        Double shippingFee,
                        Double shippingDiscount,
+                       Integer totalItems,
                        OrderStatus status,
                        List<OrderItemDTO> items) {
 

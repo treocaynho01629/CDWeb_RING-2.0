@@ -116,6 +116,8 @@ public class AuthenticationService {
 							authRequest.getUsername(),
 							authRequest.getPass())
 					);
+			System.out.println(authentication);
+
 			SecurityContextHolder.getContext().setAuthentication(authentication); //All good >> security context
 			user = (Account) authentication.getPrincipal();
 		} catch (Exception e) {

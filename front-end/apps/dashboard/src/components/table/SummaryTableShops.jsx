@@ -68,7 +68,7 @@ export default function SummaryTableShops() {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ position: "relative", height: "40dvh" }}
+          sx={{ position: "relative", height: 300 }}
         >
           <Progress color="primary" />
         </TableCell>
@@ -150,7 +150,7 @@ export default function SummaryTableShops() {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: "40dvh" }}
+          sx={{ height: 300 }}
         >
           <Box>Không tìm thấy cửa hàng nào!</Box>
         </TableCell>
@@ -164,7 +164,7 @@ export default function SummaryTableShops() {
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: "40dvh" }}
+          sx={{ height: 300 }}
         >
           <Box>{error?.error || "Đã xảy ra lỗi"}</Box>
         </TableCell>

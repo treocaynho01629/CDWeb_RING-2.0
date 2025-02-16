@@ -64,7 +64,7 @@ public class CategoryController {
 
     //Update category by id
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('UPDATE_PRIVILEGE')")
     public ResponseEntity<?> updateCategory(@PathVariable("id") Integer id,
                                             @Valid @RequestPart("request") CategoryRequest request) {
         return new ResponseEntity<>(cateService.updateCategory(id, request), HttpStatus.CREATED);
@@ -72,7 +72,7 @@ public class CategoryController {
 
     //Delete category
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteCategory(@PathVariable("id") Integer id) {
         cateService.deleteCategory(id);
         return new ResponseEntity<>("Category deleted!", HttpStatus.OK);
@@ -80,7 +80,7 @@ public class CategoryController {
 
     //Delete multiples categories in a lists of {ids}
     @DeleteMapping("/delete-multiples")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteCategories(@RequestParam(value = "parentId", required = false) Integer parentId,
                                               @RequestParam("ids") List<Integer> ids,
                                               @RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse
@@ -91,7 +91,7 @@ public class CategoryController {
 
     //Delete all categories
     @DeleteMapping("/delete-all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteAllCategories() {
         cateService.deleteAllCategories();
         return new ResponseEntity<>("All categories deleted successfully!", HttpStatus.OK);

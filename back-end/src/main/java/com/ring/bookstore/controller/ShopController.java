@@ -37,7 +37,7 @@ public class ShopController {
 
     //Get shops
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getShops(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
@@ -50,7 +50,7 @@ public class ShopController {
     }
 
     @GetMapping("/preview")
-    @PreAuthorize("hasRole('SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getPreviewShops(@CurrentAccount Account currUser) {
         return new ResponseEntity<>(shopService.getShopsPreview(currUser), HttpStatus.OK);
     }
@@ -64,21 +64,21 @@ public class ShopController {
 
     //Get shop by {id}
     @GetMapping("/detail/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getShopDetail(@PathVariable("id") Long id,
                                          @CurrentAccount Account currUser) {
         return new ResponseEntity<>(shopService.getShopDetail(id, currUser), HttpStatus.OK);
     }
 
     @GetMapping("/analytics")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getShopAnalytics() {
         return new ResponseEntity<>(shopService.getAnalytics(), HttpStatus.OK);
     }
 
     //Follow
     @PutMapping("/follow/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
     public ResponseEntity<?> followShop(@PathVariable("id") Long id,
                                         @CurrentAccount Account currUser) {
         shopService.follow(id, currUser);
@@ -87,7 +87,7 @@ public class ShopController {
 
     //Unfollow
     @PutMapping("/unfollow/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
     public ResponseEntity<?> unfollowShop(@PathVariable("id") Long id,
                                         @CurrentAccount Account currUser) {
         shopService.unfollow(id, currUser);
@@ -96,7 +96,7 @@ public class ShopController {
 
     //Add shop
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('CREATE_PRIVILEGE')")
     public ResponseEntity<?> createShop(@Valid @RequestPart("request") ShopRequest request,
                                         @RequestPart(name = "image", required = false) MultipartFile file,
                                         @CurrentAccount Account currUser) throws ImageResizerException, IOException {
@@ -105,7 +105,7 @@ public class ShopController {
 
     //Update shop by id
     @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('UPDATE_PRIVILEGE')")
     public ResponseEntity<?> updateShop(@PathVariable("id") Long id,
                                         @Valid @RequestPart("request") ShopRequest request,
                                         @RequestPart(name = "image", required = false) MultipartFile file,
@@ -115,14 +115,14 @@ public class ShopController {
 
     //Delete shop
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteShop(@PathVariable("id") Long id, @CurrentAccount Account currUser) {
         return new ResponseEntity<>(shopService.deleteShop(id, currUser), HttpStatus.OK);
     }
 
     //Delete multiples shops in a lists of {ids}
     @DeleteMapping("/delete-multiples")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteShops(@RequestParam(value = "keyword", defaultValue = "") String keyword,
                                          @RequestParam(value = "ownerId", required = false) Long ownerId,
                                          @RequestParam("ids") List<Long> ids,
@@ -135,7 +135,7 @@ public class ShopController {
 
     //Delete all shops
     @DeleteMapping("/delete-all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteAllShops() {
         shopService.deleteAllShops();
         return new ResponseEntity<>("All shops deleted successfully!", HttpStatus.OK);

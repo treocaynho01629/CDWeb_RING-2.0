@@ -69,28 +69,4 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
         where a.resetToken = :token
     """)
 	void clearResetToken(String token);
-
-//	@Query(value ="""
-//		select t.username as name, coalesce(t.rv, 0) as reviews, coalesce(t2.od, 0) as orders, coalesce(t2.sp, 0) as spends
-//		from
-//		(select a.username, r.user_id, count(r.id) as rv
-//		from review r join account a on a.id = r.user_id
-//		group by a.username, r.user_id order by rv desc) t
-//		left join
-//		(select o2.user_id, sum(o.amount) as od, sum(o.amount * o.price) as sp\s
-//		from order_receipt o2 join order_detail o on o2.id = o.order_id
-//		group by o2.user_id order by od DESC) t2\s
-//		on t.user_id = t2.user_id
-//		order by orders desc limit 7
-//	""", nativeQuery = true)
-//	List<Map<String,Object>> getTopUser(); //Top 7 users base on receipts and reviews
-//
-//	@Query("""
-//		select a.username as name, coalesce(sum(o.quantity), 0) as books, coalesce(sum(o.quantity * o.price), 0) as sales
-//		from Account a join Book b on a.id = b.shop.owner.id
-//		left join OrderItem o on b.id = o.book.id
-//		group by a.username
-//		order by sales desc
-//	""")
-//	List<Map<String,Object>> getTopSeller(); //Top sellers base on sale (username, total amount sold, total sales)
 }

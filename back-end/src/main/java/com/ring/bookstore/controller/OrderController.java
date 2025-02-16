@@ -33,7 +33,7 @@ public class OrderController {
 
     //Calculate price
     @PostMapping("/calculate")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
     public ResponseEntity<CalculateDTO> calculate(@RequestBody @Valid CalculateRequest request) {
         CalculateDTO calculateResult = orderService.calculate(request);
         return new ResponseEntity<>(calculateResult, HttpStatus.CREATED);
@@ -41,7 +41,7 @@ public class OrderController {
 
     //Commit order
     @PostMapping
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
     public ResponseEntity<ReceiptDTO> checkout(@RequestBody @Valid OrderRequest checkRequest,
                                                HttpServletRequest request,
                                                @CurrentAccount Account currUser) {
@@ -49,22 +49,9 @@ public class OrderController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    //Get all orders
-    @GetMapping("/receipts")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> getAllOrders(@RequestParam(value = "shopId", required = false) Long shopId,
-                                          @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
-                                          @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                          @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-                                          @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
-                                          @CurrentAccount Account currUser) {
-        Page<ReceiptDTO> orders = orderService.getAllReceipts(currUser, shopId, pageNo, pageSize, sortBy, sortDir);
-        return new ResponseEntity<>(orders, HttpStatus.OK);
-    }
-
     //Get summaries
     @GetMapping("/summaries")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getSummaries(@RequestParam(value = "shopId", required = false) Long shopId,
                                           @RequestParam(value = "bookId", required = false) Long bookId,
                                           @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
@@ -76,9 +63,24 @@ public class OrderController {
         return new ResponseEntity<>(summaries, HttpStatus.OK);
     }
 
+    //Get all
+    @GetMapping("/receipts")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
+    public ResponseEntity<?> getAllReceipts(@RequestParam(value = "shopId", required = false) Long shopId,
+                                            @RequestParam(value = "status", defaultValue = "") OrderStatus status,
+                                            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                            @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+                                            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                                            @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+                                            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+                                            @CurrentAccount Account currUser) {
+        Page<ReceiptDTO> orders = orderService.getAllReceipts(currUser, shopId, status, keyword, pageNo, pageSize, sortBy, sortDir);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
+
     //Get order by {id}
     @GetMapping("/receipts/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getReceipt(@PathVariable("id") Long id) {
         ReceiptDTO receipt = orderService.getReceipt(id);
         return new ResponseEntity<>(receipt, HttpStatus.OK);
@@ -86,7 +88,7 @@ public class OrderController {
 
     //Get order by {id}
     @GetMapping("/detail/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
     public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id) {
         OrderDetailDTO order = orderService.getOrderDetail(id);
         return new ResponseEntity<>(order, HttpStatus.OK);
@@ -94,7 +96,7 @@ public class OrderController {
 
     //Get orders from user
     @GetMapping("/user")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
     public ResponseEntity<?> getOrdersByUser(@RequestParam(value = "status", defaultValue = "") OrderStatus status,
                                              @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                              @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
@@ -106,7 +108,7 @@ public class OrderController {
 
     //Get orders for book's {id}
     @GetMapping("/book/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getOrdersByBookId(@PathVariable("id") Long id,
                                                @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
                                                @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
@@ -117,7 +119,7 @@ public class OrderController {
     }
 
     @GetMapping("/analytics")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getUserAnalytics(@RequestParam(value = "shopId", required = false) Long shopId,
                                               @CurrentAccount Account currUser) {
         return new ResponseEntity<>(orderService.getAnalytics(currUser, shopId), HttpStatus.OK);
@@ -125,7 +127,7 @@ public class OrderController {
 
     //Get orders chart
     @GetMapping("/sales")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getMonthlySales(@RequestParam(value = "shopId", required = false) Long shopId,
                                              @RequestParam(value = "year", required = false) Integer year,
                                              @CurrentAccount Account currUser) {

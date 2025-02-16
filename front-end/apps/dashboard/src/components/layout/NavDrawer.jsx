@@ -1,17 +1,6 @@
 import styled from "@emotion/styled";
 import { useState } from "react";
-import {
-  ExpandLess,
-  ExpandMore,
-  Speed,
-  AutoStoriesOutlined,
-  CategoryOutlined,
-  TrendingUpOutlined,
-  StarBorder,
-  GroupOutlined,
-  EventOutlined,
-  Storefront,
-} from "@mui/icons-material";
+import { ExpandLess, ExpandMore, Speed } from "@mui/icons-material";
 import {
   ListItem,
   ListItemButton,
@@ -27,7 +16,7 @@ import { useAuth } from "@ring/auth";
 import { navigationList } from "../../ultils/navigate";
 import MuiDrawer from "@mui/material/Drawer";
 
-//#region preStyled
+//#region styled
 const drawerWidth = 250;
 
 const openedMixin = (theme) => ({
@@ -130,7 +119,9 @@ const StyledListItemIcon = styled(ListItemIcon)(({ theme }) => ({
 const NavDrawer = ({ open, setOpen, mobileMode }) => {
   const { roles } = useAuth();
   const [openList, setOpenList] = useState(true);
-  const isAdmin = roles?.length >= 3;
+  const isAdmin = roles?.find((role) =>
+    ["ROLE_ADMIN", "ROLE_GUEST"].includes(role)
+  );
 
   const handleClick = (e, id) => {
     setOpenList((prevState) => ({ ...prevState, [id]: !prevState[id] }));
@@ -254,7 +245,7 @@ const NavDrawer = ({ open, setOpen, mobileMode }) => {
                   </>
                 )}
               </NavLink>
-            ),
+            )
         )}
       </List>
     </>

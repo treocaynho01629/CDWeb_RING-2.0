@@ -88,7 +88,16 @@ function App() {
                     },
                   },
                   {
-                    element: <RequireAuth allowedRoles={["ROLE_USER"]} />,
+                    element: (
+                      <RequireAuth
+                        allowedRoles={[
+                          "ROLE_USER",
+                          "ROLE_SELLER",
+                          "ROLE_ADMIN",
+                          "ROLE_GUEST",
+                        ]}
+                      />
+                    ),
                     children: [
                       {
                         path: "checkout",
@@ -146,7 +155,7 @@ function App() {
         v7_skipActionStatusRevalidation: true,
         v7_skipActionErrorRevalidation: true,
       },
-    },
+    }
   );
 
   return (

@@ -41,7 +41,7 @@ public class PublisherController {
 
 	//Add publisher
 	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN') and hasAuthority('CREATE_PRIVILEGE')")
 	public ResponseEntity<?> createPublisher(@RequestParam @NotBlank(message = "Tên nhà xuất bản không được bỏ trống!")
 		 @Size(min = 1, max = 50, message = "Tên nhà xuất bản dài từ 1-50 kí tự!") String name,
 		 @RequestPart(name = "image", required = false) MultipartFile file) throws ImageResizerException, IOException {
@@ -50,7 +50,7 @@ public class PublisherController {
 
 	//Update publisher by id
 	@PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN') and hasAuthority('UPDATE_PRIVILEGE')")
 	public ResponseEntity<?> updatePublisher(@PathVariable("id") Integer id,
 		 @RequestParam @NotBlank(message = "Tên nhà xuất bản không được bỏ trống!")
 		 @Size(min = 1, max = 50, message = "Tên nhà xuất bản dài từ 1-50 kí tự!") String name,
@@ -60,7 +60,7 @@ public class PublisherController {
 
 	//Delete publisher
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
 	public ResponseEntity<?> deletePublisher(@PathVariable("id") Integer id) {
 		pubService.deletePublisher(id);
 		return new ResponseEntity<>("Publisher deleted!", HttpStatus.OK);
@@ -68,7 +68,7 @@ public class PublisherController {
 
 	//Delete multiples publishers in a lists of {ids}
 	@DeleteMapping("/delete-multiples")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
 	public ResponseEntity<?> deletePublishers(@RequestParam("ids") List<Integer> ids,
 											  @RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse
 	) {
@@ -78,7 +78,7 @@ public class PublisherController {
 
 	//Delete all publishers
 	@DeleteMapping("/delete-all")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
 	public ResponseEntity<?> deleteAllPublishers() {
 		pubService.deleteAllPublishers();
 		return new ResponseEntity<>("All publishers deleted successfully!", HttpStatus.OK);

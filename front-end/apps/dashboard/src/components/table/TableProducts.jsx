@@ -266,7 +266,7 @@ function ProductFilters({ filters, setFilters }) {
             onClose: handleApplyPubs,
             renderValue: (selected) => {
               const filteredName = selected?.map(
-                (id) => pubs?.entities[id]?.name,
+                (id) => pubs?.entities[id]?.name
               );
               return filteredName.join(", ");
             },
@@ -337,7 +337,7 @@ function ProductFilters({ filters, setFilters }) {
           cateList.push(
             <MenuItem key={`cate-${id}-${index}`} value={id}>
               {cate?.name}
-            </MenuItem>,
+            </MenuItem>
           );
           {
             cate?.children?.map((child, childIndex) => {
@@ -348,7 +348,7 @@ function ProductFilters({ filters, setFilters }) {
                   value={child?.id}
                 >
                   {child?.name}
-                </MenuItem>,
+                </MenuItem>
               );
             });
           }
@@ -532,7 +532,7 @@ export default function TableProducts({
       } else if (deselectedIndex > 0) {
         newDeselected = newDeselected.concat(
           deselected.slice(0, deselectedIndex),
-          deselected.slice(deselectedIndex + 1),
+          deselected.slice(deselectedIndex + 1)
         );
       }
 
@@ -555,7 +555,7 @@ export default function TableProducts({
       } else if (selectedIndex > 0) {
         newSelected = newSelected.concat(
           selected.slice(0, selectedIndex),
-          selected.slice(selectedIndex + 1),
+          selected.slice(selectedIndex + 1)
         );
       }
 
@@ -568,15 +568,21 @@ export default function TableProducts({
   };
 
   //Pagination
-  const handleChangePage = useCallback((page) => {
-    setPagination({ ...pagination, number: page });
-  }, []);
+  const handleChangePage = useCallback(
+    (page) => {
+      setPagination({ ...pagination, number: page });
+    },
+    [pagination]
+  );
 
-  const handleChangeRowsPerPage = useCallback((size) => {
-    handleChangePage(0);
-    const newValue = parseInt(size, 10);
-    setPagination({ ...pagination, size: newValue });
-  }, []);
+  const handleChangeRowsPerPage = useCallback(
+    (size) => {
+      handleChangePage(0);
+      const newValue = parseInt(size, 10);
+      setPagination({ ...pagination, size: newValue });
+    },
+    [pagination]
+  );
 
   const handleChangeDense = useCallback((e) => {
     setDense(e.target.checked);
@@ -740,7 +746,7 @@ export default function TableProducts({
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ position: "relative", height: "40dvh" }}
+          sx={{ position: "relative", height: 300 }}
         >
           <Progress color="primary" />
         </TableCell>
@@ -857,7 +863,7 @@ export default function TableProducts({
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: "40dvh" }}
+          sx={{ height: 300 }}
         >
           <Box>Không tìm thấy sản phẩm nào!</Box>
         </TableCell>
@@ -871,7 +877,7 @@ export default function TableProducts({
           padding="none"
           align="center"
           colSpan={colSpan}
-          sx={{ height: "40dvh" }}
+          sx={{ height: 300 }}
         >
           <Box>{error?.error || "Đã xảy ra lỗi"}</Box>
         </TableCell>

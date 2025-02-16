@@ -17,6 +17,8 @@ public interface OrderService {
 	
 	Page<ReceiptDTO> getAllReceipts(Account user,
 									Long shopId,
+									OrderStatus status,
+									String keyword,
 									Integer pageNo,
 									Integer pageSize,
 									String sortBy,

@@ -27,12 +27,14 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
     }),
     getReceipts: builder.query({
       query: (args) => {
-        const { shopId, bookId, page, size, sortBy, sortDir } = args || {};
+        const { status, keyword, shopId, page, size, sortBy, sortDir } =
+          args || {};
 
         //Params
         const params = new URLSearchParams();
         if (shopId) params.append("shopId", shopId);
-        if (page) params.append("bookId", bookId);
+        if (status) params.append("status", status);
+        if (keyword) params.append("keyword", keyword);
         if (page) params.append("pageNo", page);
         if (size) params.append("pSize", size);
         if (sortBy) params.append("sortBy", sortBy);
@@ -52,7 +54,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       providesTags: (result, error, arg) => {
@@ -89,7 +91,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       providesTags: (result, error, arg) => {
@@ -128,7 +130,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       providesTags: (result, error, arg) => {
@@ -186,7 +188,7 @@ export const selectReceiptsResult =
 
 const selectReceiptsData = createSelector(
   selectReceiptsResult,
-  (receiptsResult) => receiptsResult.data, // normalized state object with ids & entities
+  (receiptsResult) => receiptsResult.data // normalized state object with ids & entities
 );
 
 export const {
@@ -195,5 +197,5 @@ export const {
   selectIds: selectReceiptIds,
   selectEntities: selectReceiptEntities,
 } = ordersAdapter.getSelectors(
-  (state) => selectReceiptsData(state) ?? initialState,
+  (state) => selectReceiptsData(state) ?? initialState
 );
