@@ -1,6 +1,9 @@
 import styled from "@emotion/styled";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import { useGetOrdersByUserQuery } from "../../features/orders/ordersApiSlice";
+import {
+  useCancelOrderMutation,
+  useGetOrdersByUserQuery,
+} from "../../features/orders/ordersApiSlice";
 import { KeyboardArrowLeft, Receipt, Search } from "@mui/icons-material";
 import { CircularProgress, DialogContent, TextField } from "@mui/material";
 import { StyledDialogTitle } from "../custom/ProfileComponents";
@@ -89,7 +92,7 @@ const StyledEmptyIcon = styled(EmptyIcon)`
 
 const defaultSize = 5;
 
-const OrdersList = () => {
+const OrdersList = ({ pending, setPending, setContextOrder, confirm }) => {
   const { addProduct } = useCart();
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
@@ -114,7 +117,9 @@ const OrdersList = () => {
       size: pagination?.size,
       loadMore: pagination?.isMore,
     });
-  const [getBought] = booksApiSlice.useLazyGetBooksByIdsQuery();
+  const [getBought, { isLoading: fetching }] =
+    booksApiSlice.useLazyGetBooksByIdsQuery();
+  const [cancel, { isLoading: canceling }] = useCancelOrderMutation();
 
   useDeepEffect(() => {
     updatePath();
@@ -165,6 +170,11 @@ const OrdersList = () => {
 
   //Rebuy
   const handleAddToCart = async (detail) => {
+    if (canceling || fetching || pending) return;
+    setPending(true);
+
+    const { enqueueSnackbar } = await import("notistack");
+
     const ids = detail?.items?.map((item) => item.bookId);
     getBought(ids) //Fetch books with new info
       .unwrap()
@@ -177,15 +187,43 @@ const OrdersList = () => {
             //Check for stock
             addProduct(book, 1);
           } else {
-            async function alert() {
-              const { enqueueSnackbar } = await import("notistack");
-              enqueueSnackbar("Sản phẩm đã hết hàng!", { variant: "error" });
-            }
-            alert();
+            enqueueSnackbar("Sản phẩm đã hết hàng!", { variant: "error" });
           }
         });
+        setPending(false);
       })
-      .catch((rejected) => console.error(rejected));
+      .catch((rejected) => {
+        console.error(rejected);
+        enqueueSnackbar("Mua lại sản phẩm thất bại!", { variant: "error" });
+        setPending(false);
+      });
+  };
+
+  //Cancel
+  const handleCancelOrder = async (order) => {
+    setContextOrder(order);
+    const confirmation = await confirm();
+    if (confirmation) {
+      if (canceling || fetching || pending) return;
+      setPending(true);
+
+      const { enqueueSnackbar } = await import("notistack");
+
+      cancel(order?.id)
+        .unwrap()
+        .then((data) => {
+          enqueueSnackbar("Huỷ đơn hàng thành công!", { variant: "success" });
+          setPending(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          enqueueSnackbar("Huỷ đơn hàng thất bại!", { variant: "error" });
+          setPending(false);
+        });
+    } else {
+      setContextOrder(null);
+      console.log("Cancel");
+    }
   };
 
   //Show more
@@ -239,7 +277,7 @@ const OrdersList = () => {
 
         return (
           <Fragment key={`order-${id}-${index}`}>
-            <OrderItem {...{ order, handleAddToCart }} />
+            <OrderItem {...{ order, handleAddToCart, handleCancelOrder }} />
           </Fragment>
         );
       })
@@ -275,6 +313,7 @@ const OrdersList = () => {
           variant="scrollable"
           scrollButtons={false}
         >
+          <CustomTab label="Tất cả" value="" />
           {orderItems.map((tab, index) => (
             <CustomTab
               key={`tab-${index}`}

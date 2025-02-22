@@ -117,8 +117,6 @@ const ResetPassComponent = ({ pending, setPending }) => {
             mt={2}
             spacing={1.5}
             direction="column"
-            a
-            lignItems={{ xs: "center", md: "start" }}
             minHeight={"70dvh"}
             maxWidth={380}
           >

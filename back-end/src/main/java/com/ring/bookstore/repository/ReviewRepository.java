@@ -28,17 +28,27 @@ public interface ReviewRepository extends JpaRepository<Review, Long>{
 		and (coalesce(:rating) is null or  r.rating = :rating)
 		and concat (r.rContent, u.username) ilike %:keyword%
 	""")
-	public Page<IReview> findReviews(Long bookId, Long userId, Integer rating, String keyword, Pageable pageable);
+	Page<IReview> findReviews(Long bookId,
+							  Long userId,
+							  Integer rating,
+							  String keyword,
+							  Pageable pageable);
 
 	@Query("""
 		select r.id from Review r
+		join r.user u
 		where (coalesce(:userId) is null or r.user.id = :userId)
 		and (coalesce(:bookId) is null or r.book.id = :bookId)
 		and (coalesce(:rating) is null or  r.rating = :rating)
+		and concat (r.rContent, u.username) ilike %:keyword%
 		and r.id not in :ids
 		group by r.id
 	""")
-	List<Long> findInverseIds(Long bookId, Long userId, Integer rating, List<Long> ids);
+	List<Long> findInverseIds(Long bookId,
+							  Long userId,
+							  Integer rating,
+							  String keyword,
+							  List<Long> ids);
 
 	@Query("""
 		select r as review, u.id as userId, u.username as username, i.name as image,
@@ -48,6 +58,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>{
 		left join u.profile p
 		left join p.image i
 		where b.id = :id
+		and r.isHidden = false
 		and (coalesce(:rating) is null or  r.rating = :rating)
 	""")
 	Page<IReview> findReviewsByBookId(Long id, Integer rating, Pageable pageable); //Get reviews from book's {id}

@@ -63,4 +63,7 @@ public class Review extends Auditable {
     @JsonIgnore
     private Account user;
 
+    @JsonIgnore
+    @Column(columnDefinition = "boolean default false")
+    private boolean isHidden = false;
 }

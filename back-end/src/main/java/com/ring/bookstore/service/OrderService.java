@@ -14,38 +14,62 @@ import com.ring.bookstore.model.Account;
 import com.ring.bookstore.request.OrderRequest;
 
 public interface OrderService {
-	
-	Page<ReceiptDTO> getAllReceipts(Account user,
-									Long shopId,
-									OrderStatus status,
-									String keyword,
-									Integer pageNo,
-									Integer pageSize,
-									String sortBy,
-									String sortDir);
-	Page<ReceiptSummaryDTO> getSummariesWithFilter(Account user,
-												   Long shopId,
-												   Long bookId,
-												   Integer pageNo,
-												   Integer pageSize,
-												   String sortBy,
-												   String sortDir);
-	Page<OrderDTO> getOrdersByBookId(Long id,
-									 Integer pageNo,
-									 Integer pageSize,
-									 String sortBy,
-									 String sortDir);
-	Page<OrderDTO> getOrdersByUser(Account user,
-								   OrderStatus status,
-								   String keyword,
-								   Integer pageNo,
-								   Integer pageSize);
-	ReceiptDTO getReceipt(Long id);
-	OrderDetailDTO getOrderDetail(Long id);
-	StatDTO getAnalytics(Account user, Long shopId);
-	CalculateDTO calculate(CalculateRequest request);
-	ReceiptDTO checkout(OrderRequest checkRequest,
-						HttpServletRequest request,
-						Account user);
-	List<ChartDTO> getMonthlySales(Account user, Long shopId, Integer year);
+
+    Page<ReceiptDTO> getAllReceipts(Account user,
+                                    Long shopId,
+                                    OrderStatus status,
+                                    String keyword,
+                                    Integer pageNo,
+                                    Integer pageSize,
+                                    String sortBy,
+                                    String sortDir);
+
+    Page<ReceiptSummaryDTO> getSummariesWithFilter(Account user,
+                                                   Long shopId,
+                                                   Long bookId,
+                                                   Integer pageNo,
+                                                   Integer pageSize,
+                                                   String sortBy,
+                                                   String sortDir);
+
+    Page<OrderDTO> getOrdersByBookId(Long id,
+                                     Integer pageNo,
+                                     Integer pageSize,
+                                     String sortBy,
+                                     String sortDir);
+
+    Page<OrderDTO> getOrdersByUser(Account user,
+                                   OrderStatus status,
+                                   String keyword,
+                                   Integer pageNo,
+                                   Integer pageSize);
+
+    ReceiptDTO getReceipt(Long id);
+
+    OrderDetailDTO getOrderDetail(Long id,
+                                  Account user);
+
+    StatDTO getAnalytics(Account user,
+                         Long shopId);
+
+    CalculateDTO calculate(CalculateRequest request);
+
+    ReceiptDTO checkout(OrderRequest checkRequest,
+                        HttpServletRequest request,
+                        Account user);
+
+    void cancel(Long id,
+                Account user);
+
+    void refund(Long id,
+                Account user);
+
+    void confirm(Long id,
+                 Account user);
+
+    void changeStatus(Long id,
+                      OrderStatus status,
+                      Account user);
+
+    List<ChartDTO> getMonthlySales(Account user, Long shopId, Integer year);
 }

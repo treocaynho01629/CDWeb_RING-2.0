@@ -12,10 +12,10 @@ import Placeholder from "@ring/ui/Placeholder";
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 const ProfileDetail = lazy(() => import("../components/profile/ProfileDetail"));
 const AddressComponent = lazy(
-  () => import("../components/address/AddressComponent"),
+  () => import("../components/address/AddressComponent")
 );
 const ResetPassComponent = lazy(
-  () => import("../components/profile/ResetPassComponent"),
+  () => import("../components/profile/ResetPassComponent")
 );
 
 //#region styled
@@ -98,7 +98,11 @@ const Profile = () => {
           scroll={"paper"}
           maxWidth={"md"}
           fullWidth
-          PaperProps={{ elevation: 0 }}
+          slotProps={{
+            paper: {
+              elevation: 0,
+            },
+          }}
         >
           {content}
         </Dialog>

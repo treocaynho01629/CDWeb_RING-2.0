@@ -120,7 +120,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                 where b.id in :ids
                 and b.shop.owner.id = :ownerId
             """)
-    List<Long> findBookIdsByInIdsAndSeller(List<Long> ids, Long ownerId);
+    List<Long> findBookIdsByInIdsAndOwner(List<Long> ids, Long ownerId);
 
     @Query("""
                 select b.id
@@ -140,17 +140,17 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                 and b.id not in :ids
                 group by b, rv.rating, s.id, s.name
             """)
-    List<Long> findBookIdsInverse(String keyword,
-                                  Integer cateId,
-                                  List<Integer> pubIds,
-                                  List<BookType> types,
-                                  Long shopId,
-                                  Long userId,
-                                  Double fromRange,
-                                  Double toRange,
-                                  Integer rating,
-                                  Integer amount,
-                                  List<Long> ids);
+    List<Long> findInverseIds(String keyword,
+                              Integer cateId,
+                              List<Integer> pubIds,
+                              List<BookType> types,
+                              Long shopId,
+                              Long userId,
+                              Double fromRange,
+                              Double toRange,
+                              Integer rating,
+                              Integer amount,
+                              List<Long> ids);
 
     @Query("""
                 select count(b.id) as total,

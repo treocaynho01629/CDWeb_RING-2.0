@@ -17,7 +17,8 @@ import java.util.Optional;
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
 
     @Query("""
-       select od from OrderDetail od join fetch od.order o
+       select od from OrderDetail od
+       join fetch od.order o
        where od.id = :id
     """)
     Optional<OrderDetail> findDetailById(Long id);

@@ -200,8 +200,8 @@ const CouponMessage = styled.span`
 
 const CouponPreview = ({ shopId }) => {
   const { data, isLoading, isSuccess, isError } = useGetCouponsQuery(
-    { shop: shopId, size: 4 },
-    { skip: !shopId },
+    { shopId, size: 4 },
+    { skip: !shopId }
   );
   const [anchorEl, setAnchorEl] = useState(undefined);
   const [contextCoupon, setContextCoupon] = useState(null);

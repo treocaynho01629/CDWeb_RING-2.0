@@ -33,26 +33,23 @@ export const roleTypes = {
   ROLE_SELLER: { label: "Nhân viên", color: "info" },
   ROLE_ADMIN: { label: "Admin", color: "primary" },
   ROLE_GUEST: { label: "Khách", color: "warning" },
-  1: { label: "Thành viên", color: "default" },
-  2: { label: "Nhân viên", color: "info" },
-  3: { label: "Admin", color: "primary" },
 };
 
 export const roleTypeItems = [
   {
-    value: 1,
+    value: "ROLE_USER",
     label: "Thành viên",
   },
   {
-    value: 2,
+    value: "ROLE_SELLER",
     label: "Nhân viên",
   },
   {
-    value: 3,
+    value: "ROLE_ADMIN",
     label: "Admin",
   },
   {
-    value: 4,
+    value: "ROLE_GUEST",
     label: "Khách",
   },
 ];

@@ -1,6 +1,7 @@
 package com.ring.bookstore.controller;
 
 import com.ring.bookstore.config.CurrentAccount;
+import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.request.ShopRequest;
@@ -78,20 +79,20 @@ public class ShopController {
 
     //Follow
     @PutMapping("/follow/{id}")
-    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> followShop(@PathVariable("id") Long id,
                                         @CurrentAccount Account currUser) {
         shopService.follow(id, currUser);
-        return new ResponseEntity<>("Theo dõi thành công", HttpStatus.CREATED);
+        return new ResponseEntity<>("Shop followed successfully!", HttpStatus.CREATED);
     }
 
     //Unfollow
     @PutMapping("/unfollow/{id}")
-    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> unfollowShop(@PathVariable("id") Long id,
                                         @CurrentAccount Account currUser) {
         shopService.unfollow(id, currUser);
-        return new ResponseEntity<>("Bỏ theo dõi thành công", HttpStatus.CREATED);
+        return new ResponseEntity<>("Shop unfollowed successfully!", HttpStatus.CREATED);
     }
 
     //Add shop
@@ -123,21 +124,33 @@ public class ShopController {
     //Delete multiples shops in a lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
-    public ResponseEntity<?> deleteShops(@RequestParam(value = "keyword", defaultValue = "") String keyword,
-                                         @RequestParam(value = "ownerId", required = false) Long ownerId,
-                                         @RequestParam("ids") List<Long> ids,
-                                         @RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse,
-                                         @CurrentAccount Account currUser
+    public ResponseEntity<?> deleteCoupons(@RequestParam("ids") List<Long> ids,
+                                           @CurrentAccount Account currUser
     ) {
-        shopService.deleteShops(keyword, ownerId, ids, isInverse, currUser);
+        shopService.deleteShops(ids, currUser);
+        return new ResponseEntity<>("Shops deleted successfully!", HttpStatus.OK);
+    }
+
+    //Delete multiple shops not in lists of {ids}
+    @DeleteMapping("/delete-inverse")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
+    public ResponseEntity<?> deleteCouponsInverse(@RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                                  @RequestParam(value = "userId", required = false) Long userId,
+                                                  @RequestParam("ids") List<Long> ids,
+                                                  @CurrentAccount Account currUser) {
+        shopService.deleteShopsInverse(
+                keyword,
+                userId,
+                ids,
+                currUser);
         return new ResponseEntity<>("Shops deleted successfully!", HttpStatus.OK);
     }
 
     //Delete all shops
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
-    public ResponseEntity<?> deleteAllShops() {
-        shopService.deleteAllShops();
+    public ResponseEntity<?> deleteAllShops(@CurrentAccount Account currUser) {
+        shopService.deleteAllShops(currUser);
         return new ResponseEntity<>("All shops deleted successfully!", HttpStatus.OK);
     }
 }

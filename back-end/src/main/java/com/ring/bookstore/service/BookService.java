@@ -75,7 +75,7 @@ public interface BookService {
                             Double fromRange,
                             Double toRange,
                             List<Long> ids,
-                     Account user);
+                            Account user);
 
     void deleteAllBooks(Long shopId, Account user);
 }

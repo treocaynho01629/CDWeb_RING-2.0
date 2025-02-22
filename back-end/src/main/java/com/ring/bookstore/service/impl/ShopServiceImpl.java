@@ -223,23 +223,30 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Transactional
-    public void deleteShops(String keyword, Long ownerId, List<Long> ids, Boolean isInverse, Account user) {
-        List<Long> listDelete = ids;
-        if (isInverse) listDelete = shopRepo.findInverseIds(keyword, ownerId, ids);
+    public void deleteShops(List<Long> ids, Account user) {
+        List<Long> deleteIds = isAuthAdmin() ? ids : shopRepo.findShopIdsByInIdsAndOwner(ids, user.getId());
+        shopRepo.deleteAllById(deleteIds);
+    }
 
-        //Loop and delete
-        for (Long id : listDelete) {
-            Shop shop = shopRepo.findById(id).orElseThrow(() ->
-                    new ResourceNotFoundException("Shop not found"));
-            //Check if correct seller or admin
-            if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
-            shopRepo.deleteById(id); //Delete from database
-        }
+    @Transactional
+    public void deleteShopsInverse(String keyword,
+                                   Long userId,
+                                   List<Long> ids,
+                                   Account user) {
+        List<Long> deleteIds = shopRepo.findInverseIds(
+                keyword,
+                isAuthAdmin() ? userId : user.getId(),
+                ids);
+        shopRepo.deleteAllById(deleteIds);
     }
 
     @Override
-    public void deleteAllShops() {
-        shopRepo.deleteAll();
+    public void deleteAllShops(Account user) {
+        if (isAuthAdmin()) {
+            shopRepo.deleteAll();
+        } else {
+            shopRepo.deleteAllByOwner(user);
+        }
     }
 
     //Check valid role function

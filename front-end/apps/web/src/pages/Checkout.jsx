@@ -252,7 +252,7 @@ const Checkout = () => {
             //Get selected items in redux store
             //Find or create shop
             let detail = result.cart.find(
-              (shopItem) => shopItem.shopId === shopId,
+              (shopItem) => shopItem.shopId === shopId
             );
 
             if (!detail) {
@@ -286,7 +286,7 @@ const Checkout = () => {
           shippingType: delivery,
           coupon: coupon?.code,
           cart: [],
-        },
+        }
       );
 
       return checkoutCart;
@@ -425,7 +425,7 @@ const Checkout = () => {
   //Separate by shop
   const reduceCart = () => {
     let selectedCart = cartProducts.filter((product) =>
-      selected.includes(product.id),
+      selected.includes(product.id)
     );
     let resultCart = selectedCart.reduce((result, item) => {
       if (!result[item.shopId]) {
@@ -483,7 +483,7 @@ const Checkout = () => {
     setContextState(
       shopId
         ? checkState?.details[shopId]
-        : { value: checkState?.value, quantity: checkState?.quantity },
+        : { value: checkState?.value, quantity: checkState?.quantity }
     );
     setContextCoupon(shopId ? shopCoupon[shopId] : coupon);
   };

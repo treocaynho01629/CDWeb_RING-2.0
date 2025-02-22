@@ -26,7 +26,7 @@ const ProfilePopover = ({
 }) => {
   return (
     <Menu
-      id="profile-menu"
+      id="mouse-over-popover-profile"
       open={open}
       anchorEl={anchorEl}
       onClose={handleClose}

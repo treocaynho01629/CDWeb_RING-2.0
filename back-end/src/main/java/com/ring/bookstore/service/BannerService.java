@@ -30,12 +30,15 @@ public interface BannerService {
     Banner deleteBanner(Long id,
                         Account user);
 
-    void deleteBanners(String keyword,
-                       Long shopId,
-                       Boolean byShop,
-                       List<Long> ids,
-                       boolean isInverse,
+    void deleteBanners(List<Long> ids,
                        Account user);
 
-    void deleteAllBanners();
+    void deleteBannersInverse(String keyword,
+                              Long shopId,
+                              Boolean byShop,
+                              List<Long> ids,
+                              Account user);
+
+    void deleteAllBanners(Long shopId,
+                          Account user);
 }

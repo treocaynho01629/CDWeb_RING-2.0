@@ -84,25 +84,25 @@ const CouponDialog = ({
     isError: errorShipping,
   } = useGetCouponsQuery(
     {
-      shop: shopId,
+      shopId,
       types: ["SHIPPING"],
       byShop: shopId != null,
       cValue: checkState?.value,
       cQuantity: checkState?.quantity,
       size: 4,
     },
-    { skip: !shopId && !selectMode },
+    { skip: !shopId && !selectMode }
   );
   const { data, isLoading, isSuccess, isError } = useGetCouponsQuery(
     {
-      shop: shopId,
+      shopId,
       types: ["MIN_VALUE", "MIN_AMOUNT"],
       byShop: shopId != null,
       cValue: checkState?.value,
       cQuantity: checkState?.quantity,
       size: 4,
     },
-    { skip: !shopId && !selectMode },
+    { skip: !shopId && !selectMode }
   );
 
   //Fetch coupon with code
@@ -117,7 +117,7 @@ const CouponDialog = ({
       cValue: checkState?.value,
       cQuantity: checkState?.quantity,
     },
-    { skip: !couponInput || !selectMode },
+    { skip: !couponInput || !selectMode }
   );
 
   //Reset stuff

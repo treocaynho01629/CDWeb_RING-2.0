@@ -4,12 +4,15 @@ import com.ring.bookstore.dtos.banners.BannerDTO;
 import com.ring.bookstore.dtos.mappers.BannerMapper;
 import com.ring.bookstore.dtos.banners.IBanner;
 import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.exception.HttpResponseException;
+import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.Banner;
 import com.ring.bookstore.model.Shop;
 import com.ring.bookstore.repository.BannerRepository;
 import com.ring.bookstore.request.BannerRequest;
 import com.ring.bookstore.service.BannerService;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -55,16 +58,47 @@ public class BannerServiceImpl implements BannerService {
 
     @Override
     public Banner deleteBanner(Long id, Account user) {
-        return null;
+        Banner banner = bannerRepo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Banner not found"));
+        //Check if correct seller or admin
+        if (!isOwnerValid(banner.getShop(), user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+
+        bannerRepo.deleteById(id); //Delete from database
+        return banner;
     }
 
     @Override
-    public void deleteBanners(String keyword, Long shopId, Boolean byShop,
-                              List<Long> ids, boolean isInverse, Account user) {
+    public void deleteBanners(List<Long> ids, Account user) {
+        List<Long> deleteIds = isAuthAdmin() ? ids : bannerRepo.findBannerIdsByInIdsAndOwner(ids, user.getId());
+        bannerRepo.deleteAllById(deleteIds);
     }
 
     @Override
-    public void deleteAllBanners() {
+    public void deleteBannersInverse(String keyword, Long shopId, Boolean byShop, List<Long> ids, Account user) {
+        List<Long> deleteIds = bannerRepo.findInverseIds(
+                keyword,
+                shopId,
+                byShop,
+                isAuthAdmin() ? null : user.getId(),
+                ids);
+        bannerRepo.deleteAllById(deleteIds);
+    }
+
+    @Override
+    public void deleteAllBanners(Long shopId, Account user) {
+        if (isAuthAdmin()) {
+            if (shopId != null) {
+                bannerRepo.deleteAllByShopId(shopId);
+            } else {
+                bannerRepo.deleteAll();
+            }
+        } else {
+            if (shopId != null) {
+                bannerRepo.deleteAllByShopIdAndShop_Owner(shopId, user);
+            } else {
+                bannerRepo.deleteAllByShop_Owner(user);
+            }
+        }
     }
 
     //Check valid role function

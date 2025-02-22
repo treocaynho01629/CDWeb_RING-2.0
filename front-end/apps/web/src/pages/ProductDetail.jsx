@@ -1,4 +1,4 @@
-import { useState, useRef, lazy, Suspense } from "react";
+import { useState, useRef, lazy, Suspense, useEffect } from "react";
 import { Box, Skeleton, Stack, useMediaQuery, useTheme } from "@mui/material";
 import { useParams, Navigate, NavLink, useSearchParams } from "react-router";
 import {
@@ -15,16 +15,16 @@ import LazyLoad from "react-lazyload";
 
 const PendingModal = lazy(() => import("@ring/ui"));
 const ProductsSlider = lazy(
-  () => import("../components/product/ProductsSlider"),
+  () => import("../components/product/ProductsSlider")
 );
 const ShopDisplay = lazy(
-  () => import("../components/product/detail/ShopDisplay"),
+  () => import("../components/product/detail/ShopDisplay")
 );
 const ProductDetailContainer = lazy(
-  () => import("../components/product/detail/ProductDetailContainer"),
+  () => import("../components/product/detail/ProductDetailContainer")
 );
 const ReviewComponent = lazy(
-  () => import("../components/review/ReviewComponent"),
+  () => import("../components/review/ReviewComponent")
 );
 
 const createCrumbs = (cate) => {
@@ -43,10 +43,10 @@ const createCrumbs = (cate) => {
 };
 
 const ProductDetail = () => {
-  const { slug, id } = useParams(); //Book ids
+  const { slug, id } = useParams(); //Book id/slug
   const [searchParams, setSearchParams] = useSearchParams();
   const [isReview, setIsReview] = useState(
-    searchParams.get("review") ?? undefined,
+    searchParams.get("review") ?? undefined
   ); //Is open review tab
   const [pending, setPending] = useState(false); //For reviewing & changing address
   const reviewRef = useRef(null); //Ref for scroll
@@ -67,6 +67,10 @@ const ProductDetail = () => {
 
   //Set title
   useTitle(`${data?.title ?? "RING - Bookstore!"}`);
+
+  useEffect(() => {
+    if (isReview) scrollIntoTab();
+  }, [isReview]);
 
   //Toggle review
   const handleToggleReview = (value) => {

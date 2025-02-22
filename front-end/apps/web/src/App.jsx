@@ -129,6 +129,15 @@ function App() {
                             },
                           },
                           {
+                            path: "profile/order/detail/:id",
+                            lazy: async () => {
+                              let OrderDetail = await import(
+                                "./pages/OrderDetail"
+                              );
+                              return { Component: OrderDetail.default };
+                            },
+                          },
+                          {
                             path: "profile/review",
                             lazy: async () => {
                               let Reviews = await import("./pages/Reviews");

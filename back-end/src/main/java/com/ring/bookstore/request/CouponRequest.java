@@ -38,7 +38,7 @@ public class CouponRequest {
 	private Double maxDiscount;
 
 	@DecimalMin(value = "0.0", inclusive = false)
-	@Digits(integer=5, fraction=4)
+	@Digits(integer=1, fraction=4)
 	private BigDecimal discount;
 
 	private Long shopId;

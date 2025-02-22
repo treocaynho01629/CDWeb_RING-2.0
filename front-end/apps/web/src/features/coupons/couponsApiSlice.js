@@ -26,7 +26,7 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
         if (cQuantity) params.append("cQuantity", cQuantity);
 
         return {
-          url: `/api/coupons/${code}?${params.toString()}`,
+          url: `/api/coupons/code/${code}?${params.toString()}`,
           validateStatus: (response, result) => {
             return response.status === 200 && !result?.isError;
           },
@@ -40,9 +40,10 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
       query: (args) => {
         const {
           types,
-          shop,
+          shopId,
           byShop,
           showExpired,
+          keyword,
           cValue,
           cQuantity,
           page,
@@ -53,10 +54,11 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
 
         //Params
         const params = new URLSearchParams();
-        if (types) params.append("types", types);
-        if (shop) params.append("shopId", shop);
-        if (byShop != null) params.append("byShop", byShop);
-        if (showExpired != null) params.append("showExpired", showExpired);
+        if (types?.length > 0) params.append("types", types);
+        if (shopId) params.append("shopId", shopId);
+        if (byShop) params.append("byShop", byShop);
+        if (showExpired) params.append("showExpired", showExpired);
+        if (keyword) params.append("keyword", keyword);
         if (page) params.append("pageNo", page);
         if (size) params.append("pSize", size);
         if (sortBy) params.append("sortBy", sortBy);
@@ -78,7 +80,7 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
@@ -111,7 +113,7 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
         currentCache.page = newItems.page;
         couponsAdapter.upsertMany(
           currentCache,
-          couponsSelector.selectAll(newItems),
+          couponsSelector.selectAll(newItems)
         );
       },
       forceRefetch: ({ currentArg, previousArg }) => {
@@ -171,7 +173,7 @@ export const selectCouponsResult =
 
 const selectCouponsData = createSelector(
   selectCouponsResult,
-  (couponsResult) => couponsResult.data,
+  (couponsResult) => couponsResult.data
 );
 
 export const {
@@ -180,5 +182,5 @@ export const {
   selectIds: selectCouponIds,
   selectEntities: selectCouponEntities,
 } = couponsAdapter.getSelectors(
-  (state) => selectCouponsData(state) ?? initialState,
+  (state) => selectCouponsData(state) ?? initialState
 );

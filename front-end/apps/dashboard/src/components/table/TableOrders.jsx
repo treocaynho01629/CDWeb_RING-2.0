@@ -32,9 +32,11 @@ import { Link } from "react-router";
 import { useGetReceiptsQuery } from "../../features/orders/ordersApiSlice";
 import {
   currencyFormat,
+  dateFormatter,
   idFormatter,
   orderItems,
   orderTypes,
+  timeFormatter,
 } from "@ring/shared";
 import { Progress } from "@ring/ui";
 import { FooterContainer, FooterLabel, ItemTitle } from "../custom/Components";
@@ -148,7 +150,9 @@ function OrderFilters({ filters, setFilters }) {
         size="small"
         value={filters.status || ""}
         onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+        sx={{ maxWidth: { xs: "auto", md: 200 } }}
       >
+        <MenuItem value="">Tất cả</MenuItem>
         {orderItems.map((tab, index) => (
           <MenuItem key={`tab-${index}`} value={tab.value}>
             {tab.label}
@@ -252,8 +256,8 @@ function OrderRow({
         </TableCell>
         <TableCell align="left">
           <Box>
-            <ItemTitle>{`${("0" + date.getDate()).slice(-2)}-${("0" + (date.getMonth() + 1)).slice(-2)}-${date.getFullYear()}`}</ItemTitle>
-            <ItemTitle className="secondary">{`${("0" + date?.getHours()).slice(-2)}:${("0" + date?.getMinutes()).slice(-2)}`}</ItemTitle>
+            <ItemTitle>{dateFormatter(date)}</ItemTitle>
+            <ItemTitle className="secondary">{timeFormatter(date)}</ItemTitle>
           </Box>
         </TableCell>
         <TableCell align="left">

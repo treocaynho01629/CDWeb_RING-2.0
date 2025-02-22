@@ -1,6 +1,7 @@
 package com.ring.bookstore.dtos.mappers;
 
 import com.ring.bookstore.dtos.coupons.CouponDTO;
+import com.ring.bookstore.dtos.coupons.CouponDetailDTO;
 import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.model.Coupon;
 import com.ring.bookstore.model.CouponDetail;
@@ -11,10 +12,9 @@ import java.util.Locale;
 import java.util.function.Function;
 
 @Service
-public class CouponMapper implements Function<Coupon, CouponDTO> {
+public class CouponMapper {
 
-    @Override
-    public CouponDTO apply(Coupon coupon) {
+    public CouponDTO couponToDTO(Coupon coupon) {
         CouponDetail detail = coupon.getDetail();
 
         //Detail stuff
@@ -37,6 +37,20 @@ public class CouponMapper implements Function<Coupon, CouponDTO> {
                 condition,
                 detail.getUsage(),
                 detail.getExpDate(),
+                coupon.getShop() != null ? coupon.getShop().getId() : null);
+    }
+
+    public CouponDetailDTO couponToDetailDTO(Coupon coupon) {
+        CouponDetail detail = coupon.getDetail();
+
+        return new CouponDetailDTO(coupon.getId(),
+                coupon.getCode(),
+                detail.getType(),
+                detail.getAttribute(),
+                detail.getMaxDiscount(),
+                detail.getDiscount(),
+                detail.getExpDate(),
+                detail.getUsage(),
                 coupon.getShop() != null ? coupon.getShop().getId() : null);
     }
 }

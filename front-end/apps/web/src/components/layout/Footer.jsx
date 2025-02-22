@@ -176,7 +176,7 @@ const ListItem = styled.li`
   transition: all 0.25s ease;
 
   &:hover {
-    color: ${(props) => props.theme.palette.primary.main};
+    color: ${(props) => props.theme.palette.primary.dark};
   }
 `;
 

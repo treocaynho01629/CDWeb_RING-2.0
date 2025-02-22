@@ -1,5 +1,6 @@
 import { Button, Skeleton, Paper, alpha } from "@mui/material";
 import styled from "@emotion/styled";
+import { dateFormatter } from "@ring/shared";
 
 //#region styledc
 const Wrapper = styled.div`
@@ -283,12 +284,7 @@ const CouponItem = ({
               <p>{coupon?.condition}</p>
               <Expire>
                 <ExpText color={date <= warnDate && "error"} className="date">
-                  &nbsp;
-                  {date.toLocaleDateString("en-GB", {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                  })}
+                  &nbsp;{dateFormatter(date)}
                 </ExpText>
                 {coupon?.usage < 100 && (
                   <ExpText color="error">&nbsp;{coupon?.usage} lượt</ExpText>

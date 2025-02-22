@@ -169,28 +169,53 @@ public class OrderMapper {
                 book.getTitle());
     }
 
-    public OrderDetailDTO detailToDTO(OrderDetail detail) {
-        List<OrderItem> orderItems = detail.getItems();
-        List<OrderItemDTO> itemDTOS = orderItems.stream().map(this::itemToDTO).collect(Collectors.toList());
-        OrderReceipt order = detail.getOrder();
-        Address address = order.getAddress();
-        Shop shop = detail.getShop();
-
-        return new OrderDetailDTO(order.getId(),
-                order.getEmail(),
-                address.getCompanyName() != null ? address.getCompanyName() : address.getName(),
-                address.getPhone(),
-                address.getCity() + ", " + address.getAddress(),
-                order.getOrderMessage(),
-                order.getLastModifiedDate(),
-                detail.getId(),
-                shop.getId(),
-                shop.getName(),
-                detail.getTotalPrice(),
-                detail.getDiscount(),
-                detail.getShippingFee(),
-                detail.getShippingDiscount(),
+    public OrderDetailDTO detailItemsToDTO(List<IOrderDetailItem> items) {
+        IOrderDetailItem firstItem = items.get(0);
+        ArrayList<OrderItemDTO> itemDTOS = new ArrayList<>();
+        OrderDetailDTO result = new OrderDetailDTO(firstItem.getOrderId(),
+                firstItem.getCompanyName() != null ? firstItem.getCompanyName() : firstItem.getName(),
+                firstItem.getPhone(),
+                firstItem.getCity() + ", " + firstItem.getAddress(),
+                firstItem.getMessage(),
+                firstItem.getOrderedDate(),
+                firstItem.getDate(),
+                firstItem.getDetailId(),
+                firstItem.getShopId(),
+                firstItem.getShopName(),
+                firstItem.getTotalPrice(),
+                firstItem.getDiscount(),
+                firstItem.getShippingFee(),
+                firstItem.getShippingDiscount(),
+                firstItem.getShippingType(),
+                firstItem.getPaymentType(),
+                firstItem.getStatus(),
                 itemDTOS);
+
+        for (IOrderDetailItem projectedItem : items) {
+            OrderItem item = projectedItem.getItem(); //Get Item
+
+            String fileDownloadUri = projectedItem.getImage() != null ?
+                    ServletUriComponentsBuilder
+                            .fromCurrentContextPath()
+                            .path("/api/images/")
+                            .path(projectedItem.getImage())
+                            .toUriString()
+                    : null;
+
+            var newItem = OrderItemDTO.builder().id(item.getId())
+                    .quantity(item.getQuantity())
+                    .price(item.getPrice())
+                    .discount(item.getDiscount())
+                    .bookId(projectedItem.getBookId())
+                    .bookTitle(projectedItem.getTitle())
+                    .bookSlug(projectedItem.getSlug())
+                    .image(fileDownloadUri)
+                    .build();
+
+            result.items().add(newItem);
+        }
+
+        return result;
     }
 
     public ReceiptSummaryDTO summaryToDTO(IReceiptSummary projection) {

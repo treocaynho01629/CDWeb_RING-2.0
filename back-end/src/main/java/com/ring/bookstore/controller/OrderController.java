@@ -8,13 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.ring.bookstore.config.CurrentAccount;
 import com.ring.bookstore.model.Account;
@@ -33,7 +27,7 @@ public class OrderController {
 
     //Calculate price
     @PostMapping("/calculate")
-    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CalculateDTO> calculate(@RequestBody @Valid CalculateRequest request) {
         CalculateDTO calculateResult = orderService.calculate(request);
         return new ResponseEntity<>(calculateResult, HttpStatus.CREATED);
@@ -41,7 +35,7 @@ public class OrderController {
 
     //Commit order
     @PostMapping
-    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ReceiptDTO> checkout(@RequestBody @Valid OrderRequest checkRequest,
                                                HttpServletRequest request,
                                                @CurrentAccount Account currUser) {
@@ -88,15 +82,16 @@ public class OrderController {
 
     //Get order by {id}
     @GetMapping("/detail/{id}")
-    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
-    public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id) {
-        OrderDetailDTO order = orderService.getOrderDetail(id);
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id,
+                                            @CurrentAccount Account currUser) {
+        OrderDetailDTO order = orderService.getOrderDetail(id, currUser);
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
 
     //Get orders from user
     @GetMapping("/user")
-    @PreAuthorize("hasAnyRole('USER','ADMIN','SELLER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getOrdersByUser(@RequestParam(value = "status", defaultValue = "") OrderStatus status,
                                              @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                              @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
@@ -116,6 +111,43 @@ public class OrderController {
                                                @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
         Page<OrderDTO> orders = orderService.getOrdersByBookId(id, pageNo, pageSize, sortBy, sortDir);
         return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
+
+    //Cancel
+    @PutMapping("/cancel/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> cancelOrder(@PathVariable("id") Long id,
+                                         @CurrentAccount Account currUser) {
+        orderService.cancel(id, currUser);
+        return new ResponseEntity<>("Order canceled successfully!", HttpStatus.CREATED);
+    }
+
+    //Refund
+    @PutMapping("/refund/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> refundOrder(@PathVariable("id") Long id,
+                                         @CurrentAccount Account currUser) {
+        orderService.refund(id, currUser);
+        return new ResponseEntity<>("Order refunded successfully!", HttpStatus.CREATED);
+    }
+
+    //Confirm
+    @PutMapping("/confirm/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> confirmOrder(@PathVariable("id") Long id,
+                                          @CurrentAccount Account currUser) {
+        orderService.confirm(id, currUser);
+        return new ResponseEntity<>("Order confirmed successfully!", HttpStatus.CREATED);
+    }
+
+    //Update order status
+    @PutMapping("/status/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('UPDATE_PRIVILEGE')")
+    public ResponseEntity<?> changeOrderStatus(@PathVariable("id") Long id,
+                                               @RequestParam(value = "status", defaultValue = "COMPLETED") OrderStatus status,
+                                               @CurrentAccount Account currUser) {
+        orderService.changeStatus(id, status, currUser);
+        return new ResponseEntity<>("Order status changed successfully!", HttpStatus.CREATED);
     }
 
     @GetMapping("/analytics")

@@ -34,12 +34,29 @@ public class CouponController {
                                         @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                         @RequestParam(value = "sortBy", defaultValue = "detail.discount") String sortBy,
                                         @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
-        return new ResponseEntity<>(couponService.getCoupons(pageNo, pageSize, sortBy, sortDir,
-                types, keyword, shopId, byShop, showExpired, checkValue, checkQuantity), HttpStatus.OK);
+        return new ResponseEntity<>(couponService.getCoupons(
+                pageNo,
+                pageSize,
+                sortBy,
+                sortDir,
+                types,
+                keyword,
+                shopId,
+                byShop,
+                showExpired,
+                checkValue,
+                checkQuantity), HttpStatus.OK);
+    }
+
+    //Get coupon by {id}
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
+    public ResponseEntity<?> getCoupon(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(couponService.getCoupon(id), HttpStatus.OK);
     }
 
     //Get coupon by {code}
-    @GetMapping("/{code}")
+    @GetMapping("/code/{code}")
     public ResponseEntity<?> getCoupon(@PathVariable("code") String code,
                                        @RequestParam(value = "cValue", required = false) Double checkValue,
                                        @RequestParam(value = "cQuantity", required = false) Integer checkQuantity) {
@@ -52,10 +69,16 @@ public class CouponController {
         return new ResponseEntity<>(couponService.recommendCoupons(shopIds), HttpStatus.OK);
     }
 
+    @GetMapping("/analytics")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
+    public ResponseEntity<?> getCouponAnalytics(@RequestParam(value = "shopId", required = false) Long shopId) {
+        return new ResponseEntity<>(couponService.getAnalytics(shopId), HttpStatus.OK);
+    }
+
     //Add coupon
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('CREATE_PRIVILEGE')")
-    public ResponseEntity<?> createCoupon(@Valid @RequestPart("request") CouponRequest request,
+    public ResponseEntity<?> createCoupon(@RequestBody @Valid CouponRequest request,
                                           @CurrentAccount Account currUser) {
         return new ResponseEntity<>(couponService.addCoupon(request, currUser), HttpStatus.CREATED);
     }
@@ -64,7 +87,7 @@ public class CouponController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('UPDATE_PRIVILEGE')")
     public ResponseEntity<?> updateCoupon(@PathVariable("id") Long id,
-                                          @Valid @RequestPart("request") CouponRequest request,
+                                          @RequestBody @Valid CouponRequest request,
                                           @CurrentAccount Account currUser) {
         return new ResponseEntity<>(couponService.updateCoupon(id, request, currUser), HttpStatus.CREATED);
     }
@@ -79,24 +102,40 @@ public class CouponController {
     //Delete multiples coupons in a lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
-    public ResponseEntity<?> deleteCoupons(@RequestParam(value = "types", required = false) List<CouponType> types,
-                                           @RequestParam(value = "shopId", required = false) Long shopId,
-                                           @RequestParam(value = "byShop", required = false) Boolean byShop,
-                                           @RequestParam(value = "showExpired", required = false) Boolean showExpired,
-                                           @RequestParam(value = "keyword", required = false) String keyword,
-                                           @RequestParam("ids") List<Long> ids,
-                                           @RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse,
+    public ResponseEntity<?> deleteCoupons(@RequestParam("ids") List<Long> ids,
                                            @CurrentAccount Account currUser
     ) {
-        couponService.deleteCoupons(types, keyword, shopId, byShop, showExpired, ids, isInverse, currUser);
+        couponService.deleteCoupons(ids, currUser);
+        return new ResponseEntity<>("Coupons deleted successfully!", HttpStatus.OK);
+    }
+
+    //Delete multiple coupons not in lists of {ids}
+    @DeleteMapping("/delete-inverse")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
+    public ResponseEntity<?> deleteCouponsInverse(@RequestParam(value = "types", required = false) List<CouponType> types,
+                                                  @RequestParam(value = "shopId", required = false) Long shopId,
+                                                  @RequestParam(value = "byShop", required = false) Boolean byShop,
+                                                  @RequestParam(value = "showExpired", required = false) Boolean showExpired,
+                                                  @RequestParam(value = "keyword", required = false) String keyword,
+                                                  @RequestParam("ids") List<Long> ids,
+                                                  @CurrentAccount Account currUser) {
+        couponService.deleteCouponsInverse(
+                types,
+                keyword,
+                shopId,
+                byShop,
+                showExpired,
+                ids,
+                currUser);
         return new ResponseEntity<>("Coupons deleted successfully!", HttpStatus.OK);
     }
 
     //Delete all coupons
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
-    public ResponseEntity<?> deleteAllCoupons() {
-        couponService.deleteAllCoupons();
+    public ResponseEntity<?> deleteAllCoupons(@RequestParam(value = "shopId", required = false) Long shopId,
+                                              @CurrentAccount Account currUser) {
+        couponService.deleteAllCoupons(shopId, currUser);
         return new ResponseEntity<>("All coupons deleted successfully!", HttpStatus.OK);
     }
 }
