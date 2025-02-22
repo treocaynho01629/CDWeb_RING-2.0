@@ -1,6 +1,8 @@
 package com.ring.bookstore.dtos.accounts;
 
-import java.time.LocalDate;
+import com.ring.bookstore.model.Role;
+
+import java.util.List;
 
 public interface IAccount {
     Long getId();
@@ -15,5 +17,5 @@ public interface IAccount {
 
     String getPhone();
 
-    Short getRoles();
+    List<Role> getRoles();
 }

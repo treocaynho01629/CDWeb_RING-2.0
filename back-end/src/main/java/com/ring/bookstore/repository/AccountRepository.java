@@ -1,9 +1,11 @@
 package com.ring.bookstore.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.ring.bookstore.dtos.accounts.IAccount;
 import com.ring.bookstore.dtos.dashboard.IStat;
+import com.ring.bookstore.enums.RoleName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -39,6 +41,16 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	Optional<Account> findByResetToken(String token);
 
 	@Query("""
+		select a.id from Account a
+		join a.roles r
+		where concat (a.email, a.username) ilike %:keyword%
+		and (coalesce(:role) is null or r.roleName = :role)
+		and a.id not in :ids
+		group by a.id
+	""")
+	List<Long> findInverseIds(String keyword, RoleName role, List<Long> ids);
+
+	@Query("""
         select t.currentMonth as total, t.currentMonth as currentMonth, t.lastMonth as lastMonth
         from (select count(a.id) as total,
 			count(case when a.createdDate >= date_trunc('month', current date) then 1 end) as currentMonth,
@@ -52,15 +64,15 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 
 	@Query("""
 		select a.id as id, a.username as username, i.name as image,
-		a.email as email, p.name as name, p.phone as phone,
-		size(a.roles) as roles
+		a.email as email, p.name as name, p.phone as phone, a.roles as roles
 		from Account a
 		left join a.profile p
 		left join p.image i
+		join a.roles r
 		where concat (a.email, a.username) ilike %:keyword%
-		and (coalesce(:roles) is null or size(a.roles) = :roles)
+		and (coalesce(:role) is null or r.roleName = :role)
 	""")
-	Page<IAccount> findAccountsWithFilter(String keyword, Short roles, Pageable pageable);
+	Page<IAccount> findAccountsWithFilter(String keyword, RoleName role, Pageable pageable);
 
 	@Modifying
 	@Query("""

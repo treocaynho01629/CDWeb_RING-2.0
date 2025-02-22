@@ -127,6 +127,27 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error) => [{ type: "Shop", id: "LIST" }],
     }),
+    deleteShopsInverse: builder.mutation({
+      query: (args) => {
+        const { keyword, userId, ids } = args || {};
+
+        //Params
+        const params = new URLSearchParams();
+        if (keyword) params.append("keyword", keyword);
+        if (userId) params.append("userId", userId);
+        if (ids?.length) params.append("ids", ids);
+
+        return {
+          url: `/api/shops/delete-inverse?${params.toString()}`,
+          method: "DELETE",
+          validateStatus: (response, result) => {
+            return response.status === 200 && !result?.isError;
+          },
+          responseHandler: "text",
+        };
+      },
+      invalidatesTags: (result, error) => [{ type: "Shop", id: "LIST" }],
+    }),
     deleteAllShops: builder.mutation({
       query: () => ({
         url: "/api/shops/delete-all",
@@ -146,6 +167,7 @@ export const {
   useUpdateShopMutation,
   useDeleteShopMutation,
   useDeleteShopsMutation,
+  useDeleteShopsInverseMutation,
   useDeleteAllShopsMutation,
   usePrefetch: usePrefetchShops,
 } = shopsApiSlice;

@@ -78,7 +78,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
@@ -111,7 +111,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         currentCache.page = newItems.page;
         booksAdapter.upsertMany(
           currentCache,
-          booksSelector.selectAll(newItems),
+          booksSelector.selectAll(newItems)
         );
       },
       forceRefetch: ({ currentArg, previousArg }) => {
@@ -203,7 +203,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
           if (value[0] != 0) params.append("fromRange", value[0]);
           if (value[1] != 10000000) params.append("toRange", value[1]);
         }
-        if (pubIds?.length) params.append("ids", ids);
+        if (ids?.length) params.append("ids", ids);
 
         return {
           url: `/api/books/delete-inverse?${params.toString()}`,
@@ -244,7 +244,7 @@ export const selectBooksResult = booksApiSlice.endpoints.getBooks.select();
 
 const selectBooksData = createSelector(
   selectBooksResult,
-  (booksResult) => booksResult.data, // normalized state object with ids & entities
+  (booksResult) => booksResult.data // normalized state object with ids & entities
 );
 
 export const {
@@ -253,5 +253,5 @@ export const {
   selectIds: selectBookIds,
   selectEntities: selectBookEntities,
 } = booksAdapter.getSelectors(
-  (state) => selectBooksData(state) ?? initialState,
+  (state) => selectBooksData(state) ?? initialState
 );

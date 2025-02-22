@@ -1,7 +1,9 @@
 package com.ring.bookstore.service;
 
 import com.ring.bookstore.dtos.coupons.CouponDTO;
+import com.ring.bookstore.dtos.coupons.CouponDetailDTO;
 import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
+import com.ring.bookstore.dtos.dashboard.StatDTO;
 import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.Coupon;
@@ -27,6 +29,8 @@ public interface CouponService {
                                Double cValue,
                                Integer cQuantity);
 
+    CouponDetailDTO getCoupon(Long id);
+
     CouponDTO getCouponByCode(String code,
                               Double cValue,
                               Integer cQuantity);
@@ -35,6 +39,8 @@ public interface CouponService {
 
     CouponDTO recommendCoupon(Long shopId,
                               CartStateRequest state);
+
+    StatDTO getAnalytics(Long shopId);
 
     Coupon addCoupon(CouponRequest request,
                      Account user);
@@ -54,14 +60,16 @@ public interface CouponService {
 
     boolean isExpired(Coupon coupon);
 
-    void deleteCoupons(List<CouponType> types,
-                       String keyword,
-                       Long shopId,
-                       Boolean byShop,
-                       Boolean showExpired,
-                       List<Long> ids,
-                       Boolean isInverse,
+    void deleteCoupons(List<Long> ids,
                        Account user);
 
-    void deleteAllCoupons();
+    void deleteCouponsInverse(List<CouponType> types,
+                              String keyword,
+                              Long shopId,
+                              Boolean byShop,
+                              Boolean showExpired,
+                              List<Long> ids,
+                              Account user);
+
+    void deleteAllCoupons(Long shopId, Account user);
 }

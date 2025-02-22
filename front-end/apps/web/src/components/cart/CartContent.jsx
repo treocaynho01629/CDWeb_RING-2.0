@@ -218,7 +218,7 @@ const CartContent = ({ confirm }) => {
   } = useGetRecommendCouponsQuery({ shopIds }, { skip: !shopIds.length });
 
   //For get similar
-  const [getBook] = booksApiSlice.useLazyGetBookQuery();
+  const [getBook] = booksApiSlice.useLazyGetBooksQuery();
 
   //Estimate/calculate price
   const [estimated, setEstimated] = useState({
@@ -271,7 +271,7 @@ const CartContent = ({ confirm }) => {
             //Get selected items in redux store
             //Find or create shop
             let detail = result.cart.find(
-              (shopItem) => shopItem.shopId === shopId,
+              (shopItem) => shopItem.shopId === shopId
             );
 
             if (!detail) {
@@ -285,7 +285,7 @@ const CartContent = ({ confirm }) => {
 
           return result;
         },
-        { coupon: coupon?.code, cart: [] },
+        { coupon: coupon?.code, cart: [] }
       );
 
       handleEstimate(selectedCart); //Estimate price
@@ -379,7 +379,7 @@ const CartContent = ({ confirm }) => {
           }
         });
     }, 500),
-    [],
+    []
   );
 
   //Sync cart between client and server
@@ -492,7 +492,7 @@ const CartContent = ({ confirm }) => {
     setContextState(
       shopId
         ? checkState?.details[shopId]
-        : { value: checkState?.value, quantity: checkState?.quantity },
+        : { value: checkState?.value, quantity: checkState?.quantity }
     );
     setContextCoupon(shopId ? shopCoupon[shopId] : coupon);
   };
@@ -535,7 +535,7 @@ const CartContent = ({ confirm }) => {
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
+        selected.slice(selectedIndex + 1)
       );
     }
 
@@ -553,7 +553,7 @@ const CartContent = ({ confirm }) => {
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
+        selected.slice(selectedIndex + 1)
       );
     }
 
@@ -629,7 +629,7 @@ const CartContent = ({ confirm }) => {
       .unwrap()
       .then((book) =>
         navigate(`/store/${book?.category?.slug}?cate=${book?.category?.id}
-                &pubs=${book?.publisher?.id}&types=${book?.type}`),
+                &pubs=${book?.publisher?.id}&types=${book?.type}`)
       )
       .catch((rejected) => console.error(rejected));
     handleClose();

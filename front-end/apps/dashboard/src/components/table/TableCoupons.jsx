@@ -11,7 +11,6 @@ import {
   IconButton,
   FormControlLabel,
   Switch,
-  Skeleton,
   TextField,
   MenuItem,
   Menu,
@@ -20,33 +19,33 @@ import {
   Stack,
   Toolbar,
   Button,
-  Avatar,
+  Chip,
 } from "@mui/material";
 import {
   Search,
   MoreHoriz,
+  Edit,
   Delete,
   FilterAltOff,
-  Star,
 } from "@mui/icons-material";
-import { Link } from "react-router";
 import { ItemTitle, FooterContainer, FooterLabel } from "../custom/Components";
 import {
-  dateFormatter,
   idFormatter,
-  timeFormatter,
   useDeepEffect,
+  couponTypes,
+  couponTypeItems,
+  dateFormatter,
 } from "@ring/shared";
-import {
-  useDeleteAllReviewsMutation,
-  useDeleteReviewsMutation,
-  useDeleteReviewMutation,
-  useGetReviewsQuery,
-  useDeleteReviewsInverseMutation,
-} from "../../features/reviews/reviewsApiSlice";
 import { Progress } from "@ring/ui";
 import CustomTableHead from "./CustomTableHead";
 import CustomTablePagination from "./CustomTablePagination";
+import {
+  useGetCouponsQuery,
+  useDeleteAllCouponsMutation,
+  useDeleteCouponMutation,
+  useDeleteCouponsInverseMutation,
+  useDeleteCouponsMutation,
+} from "../../features/coupons/couponsApiSlice";
 
 const headCells = [
   {
@@ -58,51 +57,63 @@ const headCells = [
     label: "ID",
   },
   {
-    id: "user.username",
+    id: "code",
     align: "left",
-    width: "200px",
+    width: "130px",
     disablePadding: false,
     sortable: true,
-    label: "Thành viên",
+    label: "Mã",
   },
   {
-    id: "rating",
+    id: "detail.discount",
     align: "left",
+    width: "450px",
     disablePadding: false,
     sortable: true,
-    label: "Đánh giá",
+    label: "Điều kiện",
   },
   {
-    id: "rDate",
+    id: "detail.expDate",
     align: "left",
-    width: "150px",
+    width: "120px",
     disablePadding: false,
     sortable: true,
-    label: "Thời gian",
+    label: "Hạn sử dụng",
   },
   {
-    id: "book.title",
+    id: "detail.type",
     align: "left",
+    width: "75px",
     disablePadding: false,
     sortable: true,
-    label: "Sản phẩm",
+    label: "Thể loại",
   },
   {
     id: "action",
-    width: "35px",
+    width: "24px",
     disablePadding: false,
     sortable: false,
-    label: "",
   },
 ];
 
-function ReviewFilters({ filters, setFilters }) {
+function CouponFilters({ filters, setFilters }) {
   const inputRef = useRef();
+  const [types, setTypes] = useState(filters.types);
+
+  const handleChangeTypes = useCallback((e) => {
+    const value = e.target.value;
+    if (!types?.includes(value)) setTypes(value);
+  }, []);
+
   const handleChangeKeyword = useCallback((e) => {
     e.preventDefault();
     if (inputRef)
       setFilters((prev) => ({ ...prev, keyword: inputRef.current.value }));
   }, []);
+
+  const handleApplyTypes = () => {
+    setFilters((prev) => ({ ...prev, types: types }));
+  };
 
   const resetFilter = useCallback(() => {
     setFilters({
@@ -111,7 +122,6 @@ function ReviewFilters({ filters, setFilters }) {
       pubIds: [],
       types: [],
     });
-    setPubIds([]);
     setTypes([]);
     if (inputRef) inputRef.current.value = "";
   }, []);
@@ -124,23 +134,59 @@ function ReviewFilters({ filters, setFilters }) {
       direction={{ xs: "column", md: "row" }}
     >
       <TextField
-        label="Đánh giá"
+        label="Lọc theo"
+        value={filters.userId || ""}
+        onChange={(e) =>
+          setFilters({ ...filters, showExpired: e.target.value })
+        }
         select
-        defaultValue=""
-        fullWidth
         size="small"
-        value={filters.rating || ""}
-        onChange={(e) => setFilters({ ...filters, rating: e.target.value })}
+        fullWidth
         sx={{ maxWidth: { xs: "auto", md: 200 } }}
       >
-        <MenuItem value="">
-          <em>Tất cả</em>
-        </MenuItem>
-        <MenuItem value={5}>5</MenuItem>
-        <MenuItem value={4}>4</MenuItem>
-        <MenuItem value={3}>3</MenuItem>
-        <MenuItem value={2}>2</MenuItem>
-        <MenuItem value={1}>1</MenuItem>
+        <MenuItem value="">Còn hạn</MenuItem>
+        <MenuItem value={true}>Tất cả</MenuItem>
+      </TextField>
+      <TextField
+        label="Thể loại"
+        select
+        size="small"
+        fullWidth
+        slotProps={{
+          select: {
+            multiple: true,
+            value: types,
+            onChange: (e) => handleChangeTypes(e),
+            onClose: handleApplyTypes,
+            renderValue: (selected) => {
+              const filteredLabel = selected?.map(
+                (value) => couponTypes[value].label
+              );
+              return filteredLabel.join(", ");
+            },
+            MenuProps: {
+              slotProps: {
+                paper: {
+                  style: {
+                    maxHeight: 250,
+                  },
+                },
+              },
+            },
+          },
+        }}
+        sx={{ maxWidth: { xs: "auto", md: 200 } }}
+      >
+        {couponTypeItems.map((type, index) => (
+          <MenuItem key={`type-${type.value}-${index}`} value={type.value}>
+            <Checkbox
+              sx={{ py: 0.5, pr: 1, pl: 0 }}
+              disableRipple
+              checked={types?.includes(type.value)}
+            />
+            <ListItemText primary={type.label} />
+          </MenuItem>
+        ))}
       </TextField>
       <form style={{ width: "100%" }} onSubmit={handleChangeKeyword}>
         <TextField
@@ -171,7 +217,7 @@ function ReviewFilters({ filters, setFilters }) {
   );
 }
 
-export default function TableReviews({
+export default function TableCoupons({
   shop,
   handleOpenEdit,
   pending,
@@ -184,9 +230,8 @@ export default function TableReviews({
   const [dense, setDense] = useState(true);
   const [filters, setFilters] = useState({
     keyword: "",
-    cate: "",
-    pubIds: [],
     types: [],
+    showExpired: null,
   });
   const [pagination, setPagination] = useState({
     number: 0,
@@ -202,19 +247,21 @@ export default function TableReviews({
   const openContext = Boolean(anchorEl);
 
   //Delete hook
-  const [deleteReview] = useDeleteReviewsMutation();
-  const [deleteReviews] = useDeleteReviewsMutation();
-  const [deleteReviewsInverse] = useDeleteReviewsInverseMutation();
-  const [deleteAll] = useDeleteAllReviewsMutation();
+  const [deleteCoupon] = useDeleteCouponMutation();
+  const [deleteCoupons] = useDeleteCouponsMutation();
+  const [deleteCouponsInverse] = useDeleteCouponsInverseMutation();
+  const [deleteAll] = useDeleteAllCouponsMutation();
 
-  //Fetch reviews
-  const { data, isLoading, isSuccess, isError, error } = useGetReviewsQuery({
+  //Fetch coupons
+  const { data, isLoading, isSuccess, isError, error } = useGetCouponsQuery({
     page: pagination?.number,
     size: pagination?.size,
     sortBy: pagination?.sortBy,
     sortDir: pagination?.sortDir,
-    rating: filters?.rating,
-    keyword: filters?.keyword,
+    shopId: shop ?? "",
+    keyword: filters.keyword,
+    showExpired: filters.showExpired,
+    types: filters.types ?? "",
   });
 
   //Set pagination after fetch
@@ -341,7 +388,7 @@ export default function TableReviews({
     setPending(true);
     const { enqueueSnackbar } = await import("notistack");
 
-    deleteBook(id)
+    deleteCoupon(id)
       .unwrap()
       .then((data) => {
         //Unselected
@@ -353,7 +400,7 @@ export default function TableReviews({
           setSelected(newSelected);
         }
 
-        enqueueSnackbar("Đã xoá đánh giá!", { variant: "success" });
+        enqueueSnackbar("Đã xoá mã giảm giá!", { variant: "success" });
         setPending(false);
       })
       .catch((err) => {
@@ -365,7 +412,7 @@ export default function TableReviews({
         } else if (err?.status === 400) {
           enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
         } else {
-          enqueueSnackbar("Xoá đánh giá thất bại!", { variant: "error" });
+          enqueueSnackbar("Xoá mã giảm giá thất bại!", { variant: "error" });
         }
         setPending(false);
       });
@@ -379,14 +426,14 @@ export default function TableReviews({
     if (selectedAll) {
       if (deselected.length == 0) {
         //Delete all
-        deleteAll()
+        deleteAll(shop)
           .unwrap()
           .then((data) => {
             //Unselected
             setSelected([]);
             setDeseletected([]);
             setSelectedAll(false);
-            enqueueSnackbar("Đã xoá đánh giá!", { variant: "success" });
+            enqueueSnackbar("Đã xoá mã giảm giá!", { variant: "success" });
             setPending(false);
           })
           .catch((err) => {
@@ -398,15 +445,19 @@ export default function TableReviews({
             } else if (err?.status === 400) {
               enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
             } else {
-              enqueueSnackbar("Xoá đánh giá thất bại!", { variant: "error" });
+              enqueueSnackbar("Xoá mã giảm giá thất bại!", {
+                variant: "error",
+              });
             }
             setPending(false);
           });
       } else {
-        //Delete reviews inverse
-        deleteReviewsInverse({
-          rating: filters?.rating,
-          keyword: filters?.keyword,
+        //Delete coupons inverse
+        deleteCouponsInverse({
+          shopId: shop ?? "",
+          keyword: filters.keyword,
+          showExpired: filters.showExpired,
+          types: filters.types ?? "",
           ids: deselected,
         })
           .unwrap()
@@ -415,7 +466,7 @@ export default function TableReviews({
             setSelected([]);
             setDeseletected([]);
             setSelectedAll(false);
-            enqueueSnackbar("Đã xoá đánh giá!", { variant: "success" });
+            enqueueSnackbar("Đã xoá mã giảm giá!", { variant: "success" });
             setPending(false);
           })
           .catch((err) => {
@@ -427,21 +478,23 @@ export default function TableReviews({
             } else if (err?.status === 400) {
               enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
             } else {
-              enqueueSnackbar("Xoá đánh giá thất bại!", { variant: "error" });
+              enqueueSnackbar("Xoá mã giảm giá thất bại!", {
+                variant: "error",
+              });
             }
             setPending(false);
           });
       }
     } else {
-      //Delete reviews
-      deleteReviews(selected)
+      //Delete coupons
+      deleteCoupons(selected)
         .unwrap()
         .then((data) => {
           //Unselected
           setSelected([]);
           setDeseletected([]);
           setSelectedAll(false);
-          enqueueSnackbar("Đã xoá đánh giá!", { variant: "success" });
+          enqueueSnackbar("Đã xoá mã giảm giá!", { variant: "success" });
           setPending(false);
         })
         .catch((err) => {
@@ -453,7 +506,7 @@ export default function TableReviews({
           } else if (err?.status === 400) {
             enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
           } else {
-            enqueueSnackbar("Xoá đánh giá thất bại!", { variant: "error" });
+            enqueueSnackbar("Xoá mã giảm giá thất bại!", { variant: "error" });
           }
           setPending(false);
         });
@@ -469,10 +522,10 @@ export default function TableReviews({
   const colSpan = headCells.length + 1;
   //#endregion
 
-  let reviewRows;
+  let bookRows;
 
   if (isLoading) {
-    reviewRows = (
+    bookRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -488,19 +541,20 @@ export default function TableReviews({
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    reviewRows = ids?.length ? (
+    bookRows = ids?.length ? (
       ids?.map((id, index) => {
-        const review = entities[id];
+        const coupon = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
-        const date = new Date(review.date);
+        const date = new Date(coupon?.expDate);
+        const couponItem = couponTypes[coupon?.type];
 
         return (
           <TableRow hover aria-checked={isItemSelected} tabIndex={-1} key={id}>
             <TableCell padding="checkbox">
               <Checkbox
                 color="primary"
-                onChange={(e) => handleClick(e, review.id)}
+                onChange={(e) => handleClick(e, coupon.id)}
                 checked={isItemSelected}
                 inputProps={{
                   "aria-labelledby": labelId,
@@ -516,51 +570,24 @@ export default function TableReviews({
             >
               {idFormatter(id)}
             </TableCell>
+            <TableCell align="left">{coupon?.code}</TableCell>
             <TableCell align="left">
-              <Link
-                to={`/user/${review.userId}`}
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <Avatar
-                  sx={{ marginRight: 1 }}
-                  src={
-                    review?.userImage ? review.userImage + "?size=tiny" : null
-                  }
-                >
-                  {review?.username?.charAt(0) ?? ""}
-                </Avatar>
-                <Box>
-                  <ItemTitle>{review.username}</ItemTitle>
-                  <ItemTitle className="secondary">
-                    ID: {idFormatter(review.userId)}
-                  </ItemTitle>
-                </Box>
-              </Link>
+              <ItemTitle>{coupon?.summary}</ItemTitle>
+              <ItemTitle className="secondary">{coupon?.condition}</ItemTitle>
             </TableCell>
             <TableCell align="left">
-              <Box>
-                <ItemTitle>
-                  Đánh giá: {review.rating}
-                  <Star fontSize="15px" color="warning" />
-                </ItemTitle>
-                <ItemTitle className="review">{review.content}</ItemTitle>
-              </Box>
+              <ItemTitle>HSD: {dateFormatter(date)}</ItemTitle>
+              <ItemTitle className="secondary">
+                Còn {coupon?.usage} lần
+              </ItemTitle>
             </TableCell>
             <TableCell align="left">
-              <Box>
-                <ItemTitle>{dateFormatter(date)}</ItemTitle>
-                <ItemTitle className="secondary">
-                  {timeFormatter(date)}
-                </ItemTitle>
-              </Box>
-            </TableCell>
-            <TableCell align="left">
-              <Link to={`/product/${review.bookId}`}>
-                <ItemTitle>{review.bookTitle}</ItemTitle>
-                <ItemTitle className="secondary">
-                  ID: {idFormatter(review.bookId)}
-                </ItemTitle>
-              </Link>
+              <Chip
+                variant="outlined"
+                label={couponItem?.label}
+                color={couponItem?.color}
+                sx={{ fontWeight: "bold" }}
+              />
             </TableCell>
             <TableCell align="right">
               <IconButton onClick={(e) => handleOpenContext(e, id)}>
@@ -579,12 +606,12 @@ export default function TableReviews({
           colSpan={colSpan}
           sx={{ height: 300 }}
         >
-          <Box>Không tìm thấy đánh giá nào!</Box>
+          <Box>Không tìm thấy mã giảm giá nào!</Box>
         </TableCell>
       </TableRow>
     );
   } else if (isError) {
-    reviewRows = (
+    bookRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -602,7 +629,7 @@ export default function TableReviews({
   return (
     <Paper sx={{ width: "100%", height: "100%" }} elevation={3}>
       <Toolbar>
-        <ReviewFilters {...{ filters, setFilters }} />
+        <CouponFilters {...{ filters, setFilters }} />
       </Toolbar>
       <TableContainer component={Paper}>
         <Table stickyHeader size={dense ? "small" : "medium"}>
@@ -616,7 +643,7 @@ export default function TableReviews({
             onSubmitDelete={handleDeleteMultiples}
             selectedAll={selectedAll}
           />
-          <TableBody>{reviewRows}</TableBody>
+          <TableBody>{bookRows}</TableBody>
         </Table>
       </TableContainer>
       <FooterContainer>
@@ -634,6 +661,12 @@ export default function TableReviews({
         />
       </FooterContainer>
       <Menu open={openContext} onClose={handleCloseContext} anchorEl={anchorEl}>
+        <MenuItem onClick={() => handleOpenEdit(contextId)}>
+          <ListItemIcon>
+            <Edit fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Thay đổi</ListItemText>
+        </MenuItem>
         <MenuItem onClick={() => handleDelete(contextId)}>
           <ListItemIcon>
             <Delete color="error" fontSize="small" />

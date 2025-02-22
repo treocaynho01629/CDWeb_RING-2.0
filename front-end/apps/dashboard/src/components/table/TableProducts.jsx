@@ -460,7 +460,7 @@ export default function TableProducts({
   const [contextId, setContextId] = useState(null); //Current select product's id
   const openContext = Boolean(anchorEl);
 
-  //Delete hook
+  //Delete hooks
   const [deleteBook] = useDeleteBookMutation();
   const [deleteBooks] = useDeleteBooksMutation();
   const [deleteBooksInverse] = useDeleteBooksInverseMutation();

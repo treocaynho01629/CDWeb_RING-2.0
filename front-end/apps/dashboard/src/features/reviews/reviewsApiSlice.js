@@ -71,6 +71,29 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error) => [{ type: "Review", id: "LIST" }],
     }),
+    deleteReviewsInverse: builder.mutation({
+      query: (args) => {
+        const { rating, keyword, bookId, userId, ids } = args || {};
+
+        //Params
+        const params = new URLSearchParams();
+        if (rating) params.append("rating", rating);
+        if (keyword) params.append("keyword", keyword);
+        if (bookId) params.append("bookId", bookId);
+        if (userId) params.append("userId", userId);
+        if (ids?.length) params.append("ids", ids);
+
+        return {
+          url: `/api/reviews/delete-inverse?${params.toString()}`,
+          method: "DELETE",
+          validateStatus: (response, result) => {
+            return response.status === 200 && !result?.isError;
+          },
+          responseHandler: "text",
+        };
+      },
+      invalidatesTags: (result, error) => [{ type: "Review", id: "LIST" }],
+    }),
     deleteAllReviews: builder.mutation({
       query: () => ({
         url: "/api/reviews/delete-all",
@@ -85,6 +108,7 @@ export const {
   useGetReviewsQuery,
   useDeleteReviewMutation,
   useDeleteReviewsMutation,
+  useDeleteReviewsInverseMutation,
   useDeleteAllReviewsMutation,
   usePrefetch: usePrefetchReviews,
 } = reviewsApiSlice;

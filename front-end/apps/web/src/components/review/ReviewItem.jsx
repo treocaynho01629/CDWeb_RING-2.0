@@ -8,6 +8,7 @@ import {
   BorderColorOutlined,
 } from "@mui/icons-material";
 import { Avatar, Rating, Skeleton } from "@mui/material";
+import { dateFormatter, timeFormatter } from "@ring/shared";
 import { Link } from "react-router";
 
 //#region styled
@@ -180,10 +181,7 @@ const ReviewItem = ({ review, username, isPreview, handleClick }) => {
                     color: "primary.main",
                   }}
                 />
-                {date.toLocaleTimeString("en-GB", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {timeFormatter(date)}
               </RatingInfo>
               <RatingInfo>
                 <CalendarMonth
@@ -193,11 +191,7 @@ const ReviewItem = ({ review, username, isPreview, handleClick }) => {
                     color: "primary.main",
                   }}
                 />
-                {date.toLocaleDateString("en-GB", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                })}
+                {dateFormatter(date)}
               </RatingInfo>
               {(username && username === review?.username) || isPreview ? (
                 <ActionButton className="mobile" onClick={handleClick}>

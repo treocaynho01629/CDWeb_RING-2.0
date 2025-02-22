@@ -49,11 +49,17 @@ public interface ReviewService {
 
     void deleteReview(Long id);
 
-    void deleteReviews(Long bookId,
-                       Long userId,
-                       Integer rating,
-                       List<Long> ids,
-                       Boolean isInverse);
+    void deleteReviews(List<Long> ids);
+
+    void deleteReviewsInverse(Long bookId,
+                              Long userId,
+                              Integer rating,
+                              String keyword,
+                              List<Long> ids);
 
     void deleteAllReviews();
+
+    void hideReview(Long id);
+
+    void unhideReview(Long id);
 }

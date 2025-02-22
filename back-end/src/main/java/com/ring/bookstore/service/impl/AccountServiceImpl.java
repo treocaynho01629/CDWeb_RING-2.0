@@ -58,11 +58,11 @@ public class AccountServiceImpl implements AccountService {
                                            String sortBy,
                                            String sortDir,
                                            String keyword,
-                                           Short roles) {
+                                           RoleName role) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
-        Page<IAccount> accountsList = accountRepo.findAccountsWithFilter(keyword, roles, pageable);
+        Page<IAccount> accountsList = accountRepo.findAccountsWithFilter(keyword, role, pageable);
         return accountsList.map(accountMapper::projectionToDTO);
     }
 
@@ -191,37 +191,25 @@ public class AccountServiceImpl implements AccountService {
         return updatedAccount; //Return updated account
     }
 
-    //Delete account (ADMIN)
+    //Delete account
     @Transactional
     public void deleteAccount(Long id) {
-        //Check if account exists?
-        Account account = accountRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("User not found!"));
-
-        //Remove relationship with related Table
-        account.removeAllOrders();
-        account.removeAllReviews();
-        account.removeAllRoles();
-
-        Account savedAccount = accountRepo.save(account); //Firstly save to database
-        accountRepo.delete(savedAccount); //Delete from database
+        accountRepo.deleteById(id);
     }
 
-    //Delete multiples accounts (ADMIN)
+    //Delete multiples accounts
     @Transactional
     public void deleteAccounts(List<Long> ids) {
-        //Loop through and delete from lists
-        for (Long id : ids) {
-            Account account = accountRepo.findById(id).orElseThrow(
-                    () -> new ResourceNotFoundException("User not found!"));
+        accountRepo.deleteAllById(ids);
+    }
 
-            //Remove relationship
-            account.removeAllOrders();
-            account.removeAllReviews();
-            account.removeAllRoles();
-
-            accountRepo.deleteById(id); //Delete from database
-        }
+    @Override
+    public void deleteAccountsInverse(String keyword, RoleName role, List<Long> ids) {
+        List<Long> deleteIds = accountRepo.findInverseIds(
+                keyword,
+                role,
+                ids);
+        accountRepo.deleteAllById(deleteIds);
     }
 
     //Delete all accounts (ADMIN)

@@ -79,12 +79,12 @@ const ActionContainer = styled.div`
 const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
   return (
     <Popover
-      id="mouse-over-popover"
-      tabIndex={-1}
+      id="mouse-over-popover-cart"
       open={openCart}
       anchorEl={anchorElCart}
       onClose={handleClose}
       onClick={handleClose}
+      disableRestoreFocus
       disableScrollLock
       transitionDuration={200}
       transformOrigin={{ horizontal: "right", vertical: "top" }}

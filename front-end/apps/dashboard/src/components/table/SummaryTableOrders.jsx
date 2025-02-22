@@ -14,7 +14,12 @@ import {
 } from "@mui/material";
 import { Link } from "react-router";
 import { ItemTitle, LinkButton, Title } from "../custom/Components";
-import { currencyFormat, idFormatter, numFormat } from "@ring/shared";
+import {
+  currencyFormat,
+  dateFormatter,
+  idFormatter,
+  numFormat,
+} from "@ring/shared";
 import { useGetSummariesQuery } from "../../features/orders/ordersApiSlice";
 import { Progress } from "@ring/ui";
 
@@ -90,11 +95,7 @@ export default function SummaryTableOrders({ title, shopId, bookId }) {
                     <ItemTitle>{idFormatter(order.id)}</ItemTitle>
                     <ItemTitle className="secondary">
                       &emsp;
-                      {date.toLocaleDateString("en-GB", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      })}
+                      {dateFormatter(date)}
                     </ItemTitle>
                   </Box>
                 </Box>

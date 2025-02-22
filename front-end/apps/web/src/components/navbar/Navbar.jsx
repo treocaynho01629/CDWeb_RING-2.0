@@ -194,7 +194,7 @@ const StyledAppBar = styled(AppBar)`
       filter: drop-shadow(
         0px -1000px 0 ${(props) => props.theme.palette.text.primary}
       );
-      transform: translateY(110vh);
+      transform: translateY(1000px);
     }
   }
 
@@ -311,7 +311,7 @@ const Navbar = () => {
     debounce(() => {
       setAnchorElCart(null);
     }, 500),
-    [anchorElCart],
+    [anchorElCart]
   );
   const handleProfilePopover = (e) => {
     handleProfileClose.cancel();
@@ -321,7 +321,7 @@ const Navbar = () => {
     debounce(() => {
       setAnchorEl(null);
     }, 500),
-    [anchorEl],
+    [anchorEl]
   );
 
   //Toggle drawer open state
@@ -524,7 +524,9 @@ const Navbar = () => {
                         <IconText>Thông báo</IconText>
                       </StyledIconButton>
                       <Box
-                        aria-owns={openCart ? "mouse-over-popover" : undefined}
+                        aria-owns={
+                          openCart ? "mouse-over-popover-cart" : undefined
+                        }
                         aria-haspopup="true"
                         onMouseEnter={hanldeCartPopover}
                         onMouseLeave={handleCartClose}
@@ -544,7 +546,7 @@ const Navbar = () => {
                             <IconText>Giỏ hàng</IconText>
                           </StyledIconButton>
                         </Link>
-                        <Suspense fallback={<></>}>
+                        <Suspense fallback={null}>
                           {anchorElCart !== undefined && (
                             <MiniCart
                               {...{
@@ -559,7 +561,9 @@ const Navbar = () => {
                       </Box>
                       {username ? (
                         <Box
-                          aria-owns={open ? "mouse-over-popover" : undefined}
+                          aria-owns={
+                            open ? "mouse-over-popover-profile" : undefined
+                          }
                           aria-haspopup="true"
                           onMouseEnter={handleProfilePopover}
                           onMouseLeave={handleProfileClose}

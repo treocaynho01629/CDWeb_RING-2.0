@@ -15,7 +15,12 @@ import {
 import { Link } from "react-router";
 import { ItemTitle, LinkButton, Title } from "../custom/Components";
 import { useGetShopsQuery } from "../../features/shops/shopsApiSlice";
-import { currencyFormat, idFormatter, numFormat } from "@ring/shared";
+import {
+  currencyFormat,
+  dateFormatter,
+  idFormatter,
+  numFormat,
+} from "@ring/shared";
 import { Progress } from "@ring/ui";
 
 const headCells = [
@@ -99,11 +104,7 @@ export default function SummaryTableShops() {
                   <ItemTitle>{shop.name}</ItemTitle>
                   <Box display="flex">
                     <ItemTitle className="secondary">
-                      {date.toLocaleDateString("en-GB", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      })}
+                      {dateFormatter(date)}
                     </ItemTitle>
                     <ItemTitle>
                       &emsp;Lượt theo dõi: {shop.totalFollowers}

@@ -56,11 +56,13 @@ public interface ShopService {
     Shop deleteShop(Long id,
                     Account user);
 
-    void deleteShops(String keyword,
-                     Long ownerId,
-                     List<Long> ids,
-                     Boolean isInverse,
+    void deleteShops(List<Long> ids,
                      Account user);
 
-    void deleteAllShops();
+    void deleteShopsInverse(String keyword,
+                     Long userId,
+                     List<Long> ids,
+                     Account user);
+
+    void deleteAllShops(Account user);
 }

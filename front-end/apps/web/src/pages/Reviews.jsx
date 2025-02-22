@@ -21,7 +21,11 @@ const Orders = () => {
           scroll={"paper"}
           maxWidth={"md"}
           fullWidth
-          PaperProps={{ elevation: 0 }}
+          slotProps={{
+            paper: {
+              elevation: 0,
+            },
+          }}
         >
           <ReviewsList mobileMode={mobileMode} />
         </Dialog>

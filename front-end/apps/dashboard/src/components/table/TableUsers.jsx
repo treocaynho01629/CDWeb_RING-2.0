@@ -34,7 +34,9 @@ import {
 } from "@mui/icons-material";
 import { Link } from "react-router";
 import {
+  useDeleteAllUsersMutation,
   useDeleteUserMutation,
+  useDeleteUsersInverseMutation,
   useDeleteUsersMutation,
   useGetUsersQuery,
 } from "../../features/users/usersApiSlice";
@@ -102,7 +104,7 @@ function UserFilters({ filters, setFilters }) {
   const resetFilter = useCallback(() => {
     setFilters({
       keyword: "",
-      roles: "",
+      role: "",
     });
     if (inputRef) inputRef.current.value = "";
   }, []);
@@ -116,20 +118,20 @@ function UserFilters({ filters, setFilters }) {
     >
       <TextField
         label="Quyền"
-        value={filters.roles || ""}
-        onChange={(e) => setFilters({ ...filters, roles: e.target.value })}
+        value={filters.role || ""}
+        onChange={(e) => setFilters({ ...filters, role: e.target.value })}
         select
         defaultValue=""
         size="small"
         fullWidth
-        sx={{ maxWidth: 200 }}
+        sx={{ maxWidth: { xs: "auto", md: 200 } }}
       >
         <MenuItem value="">
           <em>--Tất cả--</em>
         </MenuItem>
-        {roleTypeItems.map((roles, index) => (
-          <MenuItem key={`type-${roles.value}-${index}`} value={roles.value}>
-            {roles.label}
+        {roleTypeItems.map((role, index) => (
+          <MenuItem key={`type-${role.value}-${index}`} value={role.value}>
+            {role.label}
           </MenuItem>
         ))}
       </TextField>
@@ -170,7 +172,7 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
   const [dense, setDense] = useState(true);
   const [filters, setFilters] = useState({
     keyword: "",
-    roles: "",
+    role: "",
   });
   const [pagination, setPagination] = useState({
     number: 0,
@@ -185,10 +187,11 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
   const [contextId, setContextId] = useState(null); //Current select product's id
   const openContext = Boolean(anchorEl);
 
-  //Delete hook
-  const [deleteUser, { isLoading: deleting }] = useDeleteUserMutation();
-  const [deleteMultipleUsers, { isLoading: deletingMultiple }] =
-    useDeleteUsersMutation();
+  //Delete hooks
+  const [deleteUser] = useDeleteUserMutation();
+  const [deleteUsers] = useDeleteUsersMutation();
+  const [deleteUsersInverse] = useDeleteUsersInverseMutation();
+  const [deleteAll] = useDeleteAllUsersMutation();
 
   const { isLoading, isSuccess, isError, error, data } = useGetUsersQuery({
     page: pagination.number,
@@ -196,7 +199,7 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
     sortBy: pagination.sortBy,
     sortDir: pagination.sortDir,
     keyword: filters.keyword,
-    roles: filters.roles,
+    role: filters.role,
   });
 
   //Set pagination after fetch
@@ -353,40 +356,92 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
   };
 
   const handleDeleteMultiples = async () => {
+    if (pending) return;
+    setPending(true);
+    const { enqueueSnackbar } = await import("notistack");
+
     if (selectedAll) {
       if (deselected.length == 0) {
-        console.log("Delete all");
+        //Delete all
+        deleteAll()
+          .unwrap()
+          .then((data) => {
+            //Unselected
+            setSelected([]);
+            setDeseletected([]);
+            setSelectedAll(false);
+            enqueueSnackbar("Đã xoá thành viên!", { variant: "success" });
+            setPending(false);
+          })
+          .catch((err) => {
+            console.error(err);
+            if (!err?.status) {
+              enqueueSnackbar("Server không phản hồi!", { variant: "error" });
+            } else if (err?.status === 409) {
+              enqueueSnackbar(err?.data?.message, { variant: "error" });
+            } else if (err?.status === 400) {
+              enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
+            } else {
+              enqueueSnackbar("Xoá thành viên thất bại!", { variant: "error" });
+            }
+            setPending(false);
+          });
       } else {
-        console.log("Delete multiples reverse: " + deselected);
+        //Delete users inverse
+        deleteUsersInverse({
+          keyword: filters.keyword,
+          role: filters.role,
+          ids: deselected,
+        })
+          .unwrap()
+          .then((data) => {
+            //Unselected
+            setSelected([]);
+            setDeseletected([]);
+            setSelectedAll(false);
+            enqueueSnackbar("Đã xoá thành viên!", { variant: "success" });
+            setPending(false);
+          })
+          .catch((err) => {
+            console.error(err);
+            if (!err?.status) {
+              enqueueSnackbar("Server không phản hồi!", { variant: "error" });
+            } else if (err?.status === 409) {
+              enqueueSnackbar(err?.data?.message, { variant: "error" });
+            } else if (err?.status === 400) {
+              enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
+            } else {
+              enqueueSnackbar("Xoá thành viên thất bại!", { variant: "error" });
+            }
+            setPending(false);
+          });
       }
     } else {
-      console.log("Delete multiples: " + selected);
+      //Delete users
+      deleteUsers(selected)
+        .unwrap()
+        .then((data) => {
+          //Unselected
+          setSelected([]);
+          setDeseletected([]);
+          setSelectedAll(false);
+          enqueueSnackbar("Đã xoá thành viên!", { variant: "success" });
+          setPending(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          if (!err?.status) {
+            enqueueSnackbar("Server không phản hồi!", { variant: "error" });
+          } else if (err?.status === 409) {
+            enqueueSnackbar(err?.data?.message, { variant: "error" });
+          } else if (err?.status === 400) {
+            enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
+          } else {
+            enqueueSnackbar("Xoá thành viên thất bại!", { variant: "error" });
+          }
+          setPending(false);
+        });
     }
-    // if (pending) return;
-    // setPending(true);
-    // const { enqueueSnackbar } = await import('notistack');
-
-    // deleteMultipleUsers({ ids: selected }).unwrap()
-    //   .then((data) => {
-    //     //Unselected
-    //     setSelected([]);
-    //     setSelectedAll(false);
-    //     enqueueSnackbar('Đã xoá thành viên!', { variant: 'success' });
-    //     setPending(false);
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //     if (!err?.status) {
-    //       enqueueSnackbar('Server không phản hồi!', { variant: 'error' });
-    //     } else if (err?.status === 409) {
-    //       enqueueSnackbar(err?.data?.message, { variant: 'error' });
-    //     } else if (err?.status === 400) {
-    //       enqueueSnackbar('Id không hợp lệ!', { variant: 'error' });
-    //     } else {
-    //       enqueueSnackbar('Xoá thành viên thất bại!', { variant: 'error' });
-    //     }
-    //     setPending(false);
-    //   })
   };
 
   const isSelected = (id) =>
@@ -422,7 +477,7 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
         const user = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
-        const roleItem = roleTypes[user.roles];
+        const roleItem = roleTypes[user.role];
 
         return (
           <TableRow hover aria-checked={isItemSelected} tabIndex={-1} key={id}>

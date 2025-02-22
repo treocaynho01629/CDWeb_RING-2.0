@@ -2,6 +2,7 @@ package com.ring.bookstore.repository;
 
 import com.ring.bookstore.dtos.dashboard.IStat;
 import com.ring.bookstore.dtos.shops.*;
+import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.Shop;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -62,6 +63,13 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
 	@Query("""
 		select s.id from Shop s
+		where s.id in :ids
+		and s.owner.id = :ownerId
+	""")
+	List<Long> findShopIdsByInIdsAndOwner(List<Long> ids, Long ownerId);
+
+	@Query("""
+		select s.id from Shop s
 		where concat (s.name, s.owner.username) ilike %:keyword%
 		and (coalesce(:ownerId) is null or s.owner.id = :ownerId)
 		and s.id not in :ids
@@ -103,6 +111,8 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 		group by s.id, s.owner.username, s.owner.id, i.id, a.id
 	""")
 	Optional<IShopDetail> findShopDetailById(Long id, Long userId);
+
+	void deleteAllByOwner(Account owner);
 
 	@Query("""
         select count(s.id) as total,

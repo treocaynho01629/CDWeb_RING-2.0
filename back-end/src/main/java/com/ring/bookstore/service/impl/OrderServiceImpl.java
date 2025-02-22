@@ -1,5 +1,7 @@
 package com.ring.bookstore.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -580,6 +582,81 @@ public class OrderServiceImpl implements OrderService {
         return receiptDTO;
     }
 
+    @Transactional
+    public void cancel(Long id, Account user) {
+        OrderDetail detail = detailRepo.findDetailById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Order detail not found"));
+
+        //Check if correct user
+        if (!isUserValid(detail.getOrder(), user)) {
+            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid user!");
+        }
+
+        //Check valid status for cancel
+        OrderStatus currStatus = detail.getStatus();
+        if (!(currStatus.equals(OrderStatus.SHIPPING) || currStatus.equals(OrderStatus.PENDING))) {
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid order status!");
+        }
+
+        detail.setStatus(OrderStatus.CANCELED);
+        detailRepo.save(detail);
+    }
+
+    @Transactional
+    public void refund(Long id, Account user) {
+        OrderDetail detail = detailRepo.findDetailById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Order detail not found"));
+
+        //Check if correct user
+        if (!isUserValid(detail.getOrder(), user))
+            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid user!");
+
+        //Check valid status for cancel
+        OrderStatus currStatus = detail.getStatus();
+        if (!currStatus.equals(OrderStatus.COMPLETED))
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid order status!");
+
+        if (detail.getOrder().getLastModifiedDate()
+                .plus(1, ChronoUnit.WEEKS).isAfter(LocalDateTime.now()))
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid date!");
+
+        detail.setStatus(OrderStatus.PENDING_REFUND);
+        detailRepo.save(detail);
+    }
+
+    @Transactional
+    public void confirm(Long id, Account user) {
+        OrderDetail detail = detailRepo.findDetailById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Order detail not found"));
+
+        //Check if correct user
+        if (!isUserValid(detail.getOrder(), user))
+            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid user!");
+
+        //Check valid status for cancel
+        OrderStatus currStatus = detail.getStatus();
+        if (!(currStatus.equals(OrderStatus.SHIPPING)
+                || currStatus.equals(OrderStatus.PENDING))) {
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid order status!");
+        }
+
+        detail.setStatus(OrderStatus.COMPLETED);
+        detailRepo.save(detail);
+    }
+
+    @Transactional
+    public void changeStatus(Long id, OrderStatus status, Account user) {
+        OrderDetail detail = detailRepo.findDetailById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Order detail not found"));
+
+        //Check if correct user
+        if (!isOwnerValid(detail.getShop(), user))
+            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+
+        detail.setStatus(status);
+        detailRepo.save(detail);
+    }
+
     //Get all orders
     @Transactional
     public Page<ReceiptDTO> getAllReceipts(Account user, Long shopId, OrderStatus status,
@@ -624,7 +701,11 @@ public class OrderServiceImpl implements OrderService {
 
     //Get order with book's {id}
     @Override
-    public Page<OrderDTO> getOrdersByBookId(Long id, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+    public Page<OrderDTO> getOrdersByBookId(Long id,
+                                            Integer pageNo,
+                                            Integer pageSize,
+                                            String sortBy,
+                                            String sortDir) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
@@ -643,7 +724,11 @@ public class OrderServiceImpl implements OrderService {
 
     //Get current user's orders
     @Transactional
-    public Page<OrderDTO> getOrdersByUser(Account user, OrderStatus status, String keyword, Integer pageNo, Integer pageSize) {
+    public Page<OrderDTO> getOrdersByUser(Account user,
+                                          OrderStatus status,
+                                          String keyword,
+                                          Integer pageNo,
+                                          Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize); //Pagination
 
         //Get list ids with pagination (avoid applying in memory warning from Fetch Join)
@@ -668,10 +753,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     //Get detail order by {detail's id}
-    @Override
-    public OrderDetailDTO getOrderDetail(Long id) {
-        OrderDetail orderDetail = detailRepo.findDetailById(id).orElseThrow(() -> new ResourceNotFoundException("Detail not found!"));
-        OrderDetailDTO detailDTO = orderMapper.detailToDTO(orderDetail); //Map to DTO
+    @Transactional
+    public OrderDetailDTO getOrderDetail(Long id, Account user) {
+        List<IOrderDetailItem> itemsList = itemRepo.findOrderDetailItems(id, isAuthAdmin() ? null : user.getId());
+        if (itemsList.isEmpty()) throw new ResourceNotFoundException("Detail not found!");
+        OrderDetailDTO detailDTO = orderMapper.detailItemsToDTO(itemsList); //Map to DTO
         return detailDTO;
     }
 
@@ -698,5 +784,20 @@ public class OrderServiceImpl implements OrderService {
     protected boolean isAuthAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
         return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+    }
+
+    //Check valid role function
+    protected boolean isOwnerValid(Shop shop, Account user) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
+        boolean isAdmin = (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+        //Check if is admin or valid owner id
+        return shop.getOwner().getId().equals(user.getId()) || isAdmin;
+    }
+
+    protected boolean isUserValid(OrderReceipt receipt, Account user) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
+        boolean isAdmin = (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+        //Check if is admin or valid owner id
+        return receipt.getUser().getId().equals(user.getId()) || isAdmin;
     }
 }

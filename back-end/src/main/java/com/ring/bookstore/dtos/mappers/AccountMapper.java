@@ -28,7 +28,7 @@ public class AccountMapper {
                 projection.getName(),
                 projection.getPhone(),
                 fileDownloadUri,
-                projection.getRoles());
+                projection.getRoles().get(projection.getRoles().size() - 1).getRoleName());
     }
 
     public AccountDetailDTO projectionToDetailDTO(IAccountDetail projection) {

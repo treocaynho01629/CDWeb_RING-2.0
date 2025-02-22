@@ -27,17 +27,6 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         { type: "Book", id: result ? result.id : "LIST" },
       ],
     }),
-    getBook: builder.query({
-      query: (id) => ({
-        url: `/api/books/${id}`,
-        validateStatus: (response, result) => {
-          return response.status === 200 && !result?.isError;
-        },
-      }),
-      providesTags: (result, error) => [
-        { type: "Book", id: result ? result.id : "LIST" },
-      ],
-    }),
     getBooks: builder.query({
       query: (args) => {
         const {
@@ -89,7 +78,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
@@ -122,7 +111,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         currentCache.page = newItems.page;
         booksAdapter.upsertMany(
           currentCache,
-          booksSelector.selectAll(newItems),
+          booksSelector.selectAll(newItems)
         );
       },
       forceRefetch: ({ currentArg, previousArg }) => {
@@ -199,7 +188,6 @@ export const booksApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useGetBookDetailQuery,
-  useGetBookQuery,
   useGetBooksQuery,
   useGetBooksByIdsQuery,
   useGetRandomBooksQuery,
@@ -210,7 +198,7 @@ export const selectBooksResult = booksApiSlice.endpoints.getBooks.select();
 
 const selectBooksData = createSelector(
   selectBooksResult,
-  (booksResult) => booksResult.data, // normalized state object with ids & entities
+  (booksResult) => booksResult.data // normalized state object with ids & entities
 );
 
 export const {
@@ -219,5 +207,5 @@ export const {
   selectIds: selectBookIds,
   selectEntities: selectBookEntities,
 } = booksAdapter.getSelectors(
-  (state) => selectBooksData(state) ?? initialState,
+  (state) => selectBooksData(state) ?? initialState
 );

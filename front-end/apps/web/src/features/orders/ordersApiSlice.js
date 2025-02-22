@@ -16,6 +16,15 @@ const initialState = ordersAdapter.getInitialState({
 
 export const ordersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    getOrderDetail: builder.query({
+      query: (id) => ({
+        url: `/api/orders/detail/${id}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result?.isError;
+        },
+      }),
+      providesTags: (result, error, { id }) => [{ type: "Order", id }],
+    }),
     getOrdersByUser: builder.query({
       query: (args) => {
         const { status, keyword, page, size } = args || {};
@@ -41,7 +50,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
@@ -74,7 +83,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
         currentCache.page = newItems.page;
         ordersAdapter.upsertMany(
           currentCache,
-          ordersSelector.selectAll(newItems),
+          ordersSelector.selectAll(newItems)
         );
       },
       forceRefetch: ({ currentArg, previousArg }) => {
@@ -111,13 +120,44 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Order", id: "LIST" }],
     }),
+    cancelOrder: builder.mutation({
+      query: (id) => ({
+        url: `/api/orders/cancel/${id}`,
+        method: "PUT",
+        credentials: "include",
+        responseHandler: "text",
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "Order", id }],
+    }),
+    refundOrder: builder.mutation({
+      query: (id) => ({
+        url: `/api/orders/confirm/${id}`,
+        method: "PUT",
+        credentials: "include",
+        responseHandler: "text",
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "Order", id }],
+    }),
+    confirmOrder: builder.mutation({
+      query: (id) => ({
+        url: `/api/orders/confirm/${id}`,
+        method: "PUT",
+        credentials: "include",
+        responseHandler: "text",
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "Order", id }],
+    }),
   }),
 });
 
 export const {
+  useGetOrderDetailQuery,
   useGetOrdersByUserQuery,
   useCalculateMutation,
   useCheckoutMutation,
+  useCancelOrderMutation,
+  useRefundOrderMutation,
+  useConfirmOrderMutation,
 } = ordersApiSlice;
 
 export const selectOrdersResult =
@@ -125,7 +165,7 @@ export const selectOrdersResult =
 
 const selectOrdersData = createSelector(
   selectOrdersResult,
-  (ordersResult) => ordersResult.data, // normalized state object with ids & entities
+  (ordersResult) => ordersResult.data // normalized state object with ids & entities
 );
 
 export const {
@@ -134,5 +174,5 @@ export const {
   selectIds: selectOrderIds,
   selectEntities: selectOrderEntities,
 } = ordersAdapter.getSelectors(
-  (state) => selectOrdersData(state) ?? initialState,
+  (state) => selectOrdersData(state) ?? initialState
 );

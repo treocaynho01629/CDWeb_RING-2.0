@@ -30,7 +30,7 @@ import {
 import { NavLink } from "react-router";
 import { MobileExtendButton } from "@ring/ui/Components";
 import { useAuth } from "@ring/auth";
-import { numFormat, roleTypes } from "@ring/shared";
+import { numFormat, orderTypes, roleTypes } from "@ring/shared";
 
 //#region styled
 const ListContainer = styled.div`
@@ -226,7 +226,7 @@ const NavWrapper = styled.div`
   justify-content: space-around;
 `;
 
-const NavItem = styled.div`
+const NavItem = styled(NavLink)`
   width: 25%;
   padding: 4px 0;
   font-size: 14px;
@@ -252,6 +252,29 @@ const NavItem = styled.div`
   }
 `;
 //#endregion
+
+const items = [
+  {
+    label: "Đang xử lý",
+    icon: <PendingOutlined />,
+    url: `/profile/order?status=${orderTypes.PENDING.value}`,
+  },
+  {
+    label: "Đang vận chuyển",
+    icon: <LocalShippingOutlined />,
+    url: `/profile/order?status=${orderTypes.SHIPPING.value}`,
+  },
+  {
+    label: "Đã giao",
+    icon: <DomainVerification />,
+    url: `/profile/order?status=${orderTypes.COMPLETED.value}`,
+  },
+  {
+    label: "Đổi trả",
+    icon: <Replay />,
+    url: `/profile/order?status=${orderTypes.REFUNDED.value}`,
+  },
+];
 
 const ProfileTabsList = ({ profile, loading, tabletMode }) => {
   const { username, image, roles } = useAuth();
@@ -406,7 +429,7 @@ const ProfileTabsList = ({ profile, loading, tabletMode }) => {
             </Collapse>
           </>
         )}
-        <NavLink to={"/profile/order"} end>
+        <NavLink to={"/profile/order"}>
           {({ isActive }) => (
             <StyledListItemButton selected={isActive} tabIndex={-1}>
               <ItemText>
@@ -421,22 +444,12 @@ const ProfileTabsList = ({ profile, loading, tabletMode }) => {
         </NavLink>
         {tabletMode && (
           <NavWrapper>
-            <NavItem>
-              <PendingOutlined />
-              <p>Đang xử lý</p>
-            </NavItem>
-            <NavItem>
-              <LocalShippingOutlined />
-              <p>Đang vận chuyển</p>
-            </NavItem>
-            <NavItem>
-              <DomainVerification />
-              <p>Đã giao</p>
-            </NavItem>
-            <NavItem>
-              <Replay />
-              <p>Đổi trả</p>
-            </NavItem>
+            {items.map((item, index) => (
+              <NavItem key={`tab-${index}`} to={item?.url}>
+                {item?.icon}
+                <p>{item?.label}</p>
+              </NavItem>
+            ))}
           </NavWrapper>
         )}
         <Divider />

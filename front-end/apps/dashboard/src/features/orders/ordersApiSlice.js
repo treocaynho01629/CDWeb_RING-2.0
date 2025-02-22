@@ -171,6 +171,15 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
       },
       providesTags: [{ type: "Order", id: "LIST" }],
     }),
+    changeOrderStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/api/orders/status/${id}?status=${status}`,
+        method: "PUT",
+        credentials: "include",
+        responseHandler: "text",
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: "Order", id }],
+    }),
   }),
 });
 
@@ -181,6 +190,7 @@ export const {
   useGetSummariesQuery,
   useGetSalesAnalyticsQuery,
   useGetSalesQuery,
+  useChangeOrderStatusMutation,
 } = ordersApiSlice;
 
 export const selectReceiptsResult =

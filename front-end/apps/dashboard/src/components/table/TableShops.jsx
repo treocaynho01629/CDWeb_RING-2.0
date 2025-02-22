@@ -32,15 +32,20 @@ import {
   Add,
 } from "@mui/icons-material";
 import { Link } from "react-router";
-import {
-  useDeleteAllBooksMutation,
-  useDeleteBookMutation,
-  useDeleteBooksInverseMutation,
-  useDeleteBooksMutation,
-} from "../../features/books/booksApiSlice";
 import { ItemTitle, FooterContainer, FooterLabel } from "../custom/Components";
-import { currencyFormat, idFormatter, numFormat } from "@ring/shared";
-import { useGetShopsQuery } from "../../features/shops/shopsApiSlice";
+import {
+  currencyFormat,
+  dateFormatter,
+  idFormatter,
+  numFormat,
+} from "@ring/shared";
+import {
+  useDeleteAllShopsMutation,
+  useDeleteShopMutation,
+  useDeleteShopsInverseMutation,
+  useDeleteShopsMutation,
+  useGetShopsQuery,
+} from "../../features/shops/shopsApiSlice";
 import { Progress } from "@ring/ui";
 import { useDeepEffect } from "@ring/shared";
 import { useAuth } from "@ring/auth";
@@ -133,6 +138,7 @@ function ShopFilters({ userId, isAdmin, filters, setFilters }) {
               },
             },
           }}
+          sx={{ maxWidth: { xs: "auto", md: 200 } }}
         >
           <MenuItem value="">Tất cả</MenuItem>
           <MenuItem value={userId}>Sở hữu</MenuItem>
@@ -195,10 +201,10 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
   const openContext = Boolean(anchorEl);
 
   //Delete hook
-  const [deleteBook] = useDeleteBookMutation();
-  const [deleteBooks] = useDeleteBooksMutation();
-  const [deleteBooksInverse] = useDeleteBooksInverseMutation();
-  const [deleteAll] = useDeleteAllBooksMutation();
+  const [deleteShop] = useDeleteShopMutation();
+  const [deleteShops] = useDeleteShopsMutation();
+  const [deleteShopsInverse] = useDeleteShopsInverseMutation();
+  const [deleteAll] = useDeleteAllShopsMutation();
 
   //Fetch shops
   const { data, isLoading, isSuccess, isError, error } = useGetShopsQuery({
@@ -334,7 +340,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
     setPending(true);
     const { enqueueSnackbar } = await import("notistack");
 
-    deleteBook(id)
+    deleteShop(id)
       .unwrap()
       .then((data) => {
         //Unselected
@@ -346,7 +352,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
           setSelected(newSelected);
         }
 
-        enqueueSnackbar("Đã xoá sản phẩm!", { variant: "success" });
+        enqueueSnackbar("Đã xoá cửa hàng!", { variant: "success" });
         setPending(false);
       })
       .catch((err) => {
@@ -358,7 +364,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
         } else if (err?.status === 400) {
           enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
         } else {
-          enqueueSnackbar("Xoá sản phẩm thất bại!", { variant: "error" });
+          enqueueSnackbar("Xoá cửa hàng thất bại!", { variant: "error" });
         }
         setPending(false);
       });
@@ -379,7 +385,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
             setSelected([]);
             setDeseletected([]);
             setSelectedAll(false);
-            enqueueSnackbar("Đã xoá sản phẩm!", { variant: "success" });
+            enqueueSnackbar("Đã xoá cửa hàng!", { variant: "success" });
             setPending(false);
           })
           .catch((err) => {
@@ -391,19 +397,15 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
             } else if (err?.status === 400) {
               enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
             } else {
-              enqueueSnackbar("Xoá sản phẩm thất bại!", { variant: "error" });
+              enqueueSnackbar("Xoá cửa hàng thất bại!", { variant: "error" });
             }
             setPending(false);
           });
       } else {
-        //Delete books inverse
-        deleteBooksInverse({
-          shopId: shop ?? "",
+        //Delete shops inverse
+        deleteShopsInverse({
           keyword: filters.keyword,
-          cateId: filters.cate,
-          types: filters.types,
-          pubIds: filters.pubIds,
-          amount: 0,
+          userId: filters.userId,
           ids: deselected,
         })
           .unwrap()
@@ -412,7 +414,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
             setSelected([]);
             setDeseletected([]);
             setSelectedAll(false);
-            enqueueSnackbar("Đã xoá sản phẩm!", { variant: "success" });
+            enqueueSnackbar("Đã xoá cửa hàng!", { variant: "success" });
             setPending(false);
           })
           .catch((err) => {
@@ -424,21 +426,21 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
             } else if (err?.status === 400) {
               enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
             } else {
-              enqueueSnackbar("Xoá sản phẩm thất bại!", { variant: "error" });
+              enqueueSnackbar("Xoá cửa hàng thất bại!", { variant: "error" });
             }
             setPending(false);
           });
       }
     } else {
-      //Delete books
-      deleteBooks(selected)
+      //Delete shops
+      deleteShops(selected)
         .unwrap()
         .then((data) => {
           //Unselected
           setSelected([]);
           setDeseletected([]);
           setSelectedAll(false);
-          enqueueSnackbar("Đã xoá sản phẩm!", { variant: "success" });
+          enqueueSnackbar("Đã xoá cửa hàng!", { variant: "success" });
           setPending(false);
         })
         .catch((err) => {
@@ -450,7 +452,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
           } else if (err?.status === 400) {
             enqueueSnackbar("Id không hợp lệ!", { variant: "error" });
           } else {
-            enqueueSnackbar("Xoá sản phẩm thất bại!", { variant: "error" });
+            enqueueSnackbar("Xoá cửa hàng thất bại!", { variant: "error" });
           }
           setPending(false);
         });
@@ -466,10 +468,10 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
   const colSpan = headCells.length + 1;
   //#endregion
 
-  let bookRows;
+  let shopRows;
 
   if (isLoading) {
-    bookRows = (
+    shopRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -485,7 +487,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    bookRows = ids?.length ? (
+    shopRows = ids?.length ? (
       ids?.map((id, index) => {
         const shop = entities[id];
         const isItemSelected = isSelected(id);
@@ -528,11 +530,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
                   <ItemTitle>{shop.name}</ItemTitle>
                   <Box display="flex">
                     <ItemTitle className="secondary">
-                      {date.toLocaleDateString("en-GB", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      })}
+                      {dateFormatter(date)}
                     </ItemTitle>
                     <ItemTitle>
                       &emsp;Lượt theo dõi: {shop.totalFollowers}
@@ -568,12 +566,12 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
           colSpan={colSpan}
           sx={{ height: 300 }}
         >
-          <Box>Không tìm thấy sản phẩm nào!</Box>
+          <Box>Không tìm thấy cửa hàng nào!</Box>
         </TableCell>
       </TableRow>
     );
   } else if (isError) {
-    bookRows = (
+    shopRows = (
       <TableRow>
         <TableCell
           scope="row"
@@ -605,7 +603,7 @@ export default function TableShops({ handleOpenEdit, pending, setPending }) {
             onSubmitDelete={handleDeleteMultiples}
             selectedAll={selectedAll}
           />
-          <TableBody>{bookRows}</TableBody>
+          <TableBody>{shopRows}</TableBody>
         </Table>
       </TableContainer>
       <FooterContainer>

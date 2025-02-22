@@ -289,13 +289,7 @@ public class BookServiceImpl implements BookService {
     //Delete multiples books (SELLER)
     @Transactional
     public void deleteBooks(List<Long> ids, Account user) {
-        List<Long> deleteIds = null;
-
-        if (isAuthAdmin()) {
-            deleteIds = ids;
-        } else {
-            deleteIds = bookRepo.findBookIdsByInIdsAndSeller(ids, user.getId());
-        }
+        List<Long> deleteIds = isAuthAdmin() ? ids : bookRepo.findBookIdsByInIdsAndOwner(ids, user.getId());
         bookRepo.deleteAllById(deleteIds);
     }
 
@@ -313,32 +307,17 @@ public class BookServiceImpl implements BookService {
                                    Double toRange,
                                    List<Long> ids,
                                    Account user) {
-        List<Long> deleteIds = null;
-        if (isAuthAdmin()) {
-            deleteIds = bookRepo.findBookIdsInverse(keyword,
-                    cateId,
-                    pubIds,
-                    types,
-                    shopId,
-                    userId,
-                    fromRange,
-                    toRange,
-                    rating,
-                    amount,
-                    ids);
-        } else {
-            deleteIds = bookRepo.findBookIdsInverse(keyword,
-                    cateId,
-                    pubIds,
-                    types,
-                    shopId,
-                    user.getId(),
-                    fromRange,
-                    toRange,
-                    rating,
-                    amount,
-                    ids);
-        }
+        List<Long> deleteIds = bookRepo.findInverseIds(keyword,
+                cateId,
+                pubIds,
+                types,
+                shopId,
+                isAuthAdmin() ? userId : user.getId(),
+                fromRange,
+                toRange,
+                rating,
+                amount,
+                ids);
         bookRepo.deleteAllById(deleteIds);
     }
 

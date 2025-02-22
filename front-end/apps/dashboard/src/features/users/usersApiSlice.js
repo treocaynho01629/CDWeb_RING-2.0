@@ -24,7 +24,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     }),
     getUsers: builder.query({
       query: (args) => {
-        const { page, size, sortBy, sortDir, keyword, roles } = args || {};
+        const { page, size, sortBy, sortDir, keyword, role } = args || {};
 
         //Params
         const params = new URLSearchParams();
@@ -33,7 +33,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         if (sortBy) params.append("sortBy", sortBy);
         if (sortDir) params.append("sortDir", sortDir);
         if (keyword) params.append("keyword", keyword);
-        if (roles) params.append("roles", roles);
+        if (role) params.append("role", role);
 
         return {
           url: `/api/accounts?${params.toString()}`,
@@ -49,7 +49,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       providesTags: (result, error, arg) => {
@@ -126,6 +126,27 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error) => [{ type: "User", id: "LIST" }],
     }),
+    deleteUsersInverse: builder.mutation({
+      query: (args) => {
+        const { keyword, role, ids } = args || {};
+
+        //Params
+        const params = new URLSearchParams();
+        if (keyword) params.append("keyword", keyword);
+        if (role) params.append("role", role);
+        if (ids?.length) params.append("ids", ids);
+
+        return {
+          url: `/api/accounts/delete-inverse?${params.toString()}`,
+          method: "DELETE",
+          validateStatus: (response, result) => {
+            return response.status === 200 && !result?.isError;
+          },
+          responseHandler: "text",
+        };
+      },
+      invalidatesTags: (result, error) => [{ type: "User", id: "LIST" }],
+    }),
     deleteAllUsers: builder.mutation({
       query: () => ({
         url: "/api/accounts/delete-all",
@@ -147,6 +168,7 @@ export const {
   useUpdateUserMutation,
   useDeleteUserMutation,
   useDeleteUsersMutation,
+  useDeleteUsersInverseMutation,
   useDeleteAllUsersMutation,
   usePrefetch: usePrefetchUsers,
 } = usersApiSlice;
@@ -155,7 +177,7 @@ export const selectUsersResult = usersApiSlice.endpoints.getUsers.select();
 
 const selectUsersData = createSelector(
   selectUsersResult,
-  (usersResult) => usersResult.data,
+  (usersResult) => usersResult.data
 );
 
 export const {
@@ -164,5 +186,5 @@ export const {
   selectIds: selectUserIds,
   selectEntities: selectUserEntities,
 } = usersAdapter.getSelectors(
-  (state) => selectUsersData(state) ?? initialState,
+  (state) => selectUsersData(state) ?? initialState
 );

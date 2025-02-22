@@ -59,22 +59,31 @@ public class BannerController {
     //Delete multiples banners in a lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
-    public ResponseEntity<?> deleteBanners(@RequestParam(value = "shopId", required = false) Long shopId,
-                                           @RequestParam(value = "byShop", required=false) Boolean byShop,
-                                           @RequestParam(value = "keyword", defaultValue = "") String keyword,
-                                           @RequestParam("ids") List<Long> ids,
-                                           @RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse,
+    public ResponseEntity<?> deleteBanners(@RequestParam("ids") List<Long> ids,
                                            @CurrentAccount Account currUser
     ) {
-        bannerService.deleteBanners(keyword, shopId, byShop, ids, isInverse, currUser);
+        bannerService.deleteBanners(ids, currUser);
+        return new ResponseEntity<>("Banners deleted successfully!", HttpStatus.OK);
+    }
+
+    //Delete multiple banners not in lists of {ids}
+    @DeleteMapping("/delete-inverse")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
+    public ResponseEntity<?> deleteCouponsInverse(@RequestParam(value = "shopId", required = false) Long shopId,
+                                                  @RequestParam(value = "byShop", required=false) Boolean byShop,
+                                                  @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                                  @RequestParam("ids") List<Long> ids,
+                                                  @CurrentAccount Account currUser) {
+        bannerService.deleteBannersInverse(keyword, shopId, byShop, ids, currUser);
         return new ResponseEntity<>("Banners deleted successfully!", HttpStatus.OK);
     }
 
     //Delete all banners
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
-    public ResponseEntity<?> deleteAllBanners() {
-        bannerService.deleteAllBanners();
+    public ResponseEntity<?> deleteAllBanners(@RequestParam(value = "shopId", required = false) Long shopId,
+                                              @CurrentAccount Account currUser) {
+        bannerService.deleteAllBanners(shopId, currUser);
         return new ResponseEntity<>("All banners deleted successfully!", HttpStatus.OK);
     }
 }
