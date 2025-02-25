@@ -12,7 +12,7 @@ const Wrapper = styled.div`
 
 const CouponEdge = styled(Paper)`
   position: absolute;
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
   border-left: none;
   border-bottom: none;
   width: 30px;
@@ -22,7 +22,7 @@ const CouponEdge = styled(Paper)`
   top: calc(50% - 15px);
   z-index: 1;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     width: 20px;
     height: 20px;
     top: calc(50% - 10px);
@@ -46,7 +46,7 @@ const CouponContent = styled.div`
   padding: 0 10px;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: 0 5px;
   }
 `;
@@ -55,12 +55,12 @@ const CouponAction = styled.div`
   display: flex;
   position: relative;
   height: 100%;
-  border: 0.5px dashed ${(props) => props.theme.palette.primary.main};
+  border: 0.5px dashed ${({ theme }) => theme.palette.primary.main};
   justify-content: space-around;
   align-items: center;
   margin: 0 10px 5px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     position: absolute;
     padding: 0;
     right: 2%;
@@ -97,10 +97,10 @@ const CouponMain = styled.div`
   p {
     font-size: 14px;
     margin: 5px 0;
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     h2 {
       font-size: 14px;
       text-transform: none;
@@ -127,15 +127,15 @@ const ExpText = styled.span`
   font-size: 14px;
   margin-right: 10px;
   font-weight: 450;
-  color: ${(props) =>
-    props.theme.palette[props.color]?.main || props.theme.palette.text.primary};
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.main || theme.palette.text.primary};
 
   &::before {
     content: "Còn:";
   }
 
   &.date {
-    color: ${(props) => props.theme.palette.info.light};
+    color: ${({ theme }) => theme.palette.info.light};
     font-weight: normal;
 
     &::before {
@@ -143,7 +143,7 @@ const ExpText = styled.span`
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;
     &::before {
       content: "";
@@ -154,13 +154,11 @@ const ExpText = styled.span`
 const CouponIcon = styled.div`
   width: 80px;
   height: 80px;
-  background-color: ${(props) =>
-    props.theme.palette[props.color]?.light ||
-    props.theme.palette.primary.light};
-  color: ${(props) =>
-    props.theme.palette[props.color]?.contrastText ||
-    props.theme.palette.primary.contrastText};
-  border-right: 5px dotted ${(props) => props.theme.palette.background.default};
+  background-color: ${({ theme, color }) =>
+    theme.palette[color]?.light || theme.palette.primary.light};
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.contrastText || theme.palette.primary.contrastText};
+  border-right: 5px dotted ${({ theme }) => theme.palette.background.default};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -171,7 +169,7 @@ const CouponIcon = styled.div`
     font-size: 40px;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     width: 70px;
     height: 70px;
     margin: 5px;
@@ -184,7 +182,7 @@ const CouponCode = styled.span`
   flex-grow: 1;
   margin-left: 10px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     display: none;
   }
 `;
@@ -194,17 +192,16 @@ const CouponContainer = styled.div`
   border-radius: 5px;
   padding: 5px;
   height: 100%;
-  background-color: ${(props) => props.theme.palette.background.default};
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
-  box-shadow: ${(props) => props.theme.shadows[1]};
+  background-color: ${({ theme }) => theme.palette.background.default};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  box-shadow: ${({ theme }) => theme.shadows[1]};
 
   &.active {
-    background-color: ${(props) =>
-      alpha(props.theme.palette.primary.light, 0.1)};
-    border-color: ${(props) => props.theme.palette.primary.main};
+    background-color: ${({ theme }) => alpha(theme.palette.primary.light, 0.1)};
+    border-color: ${({ theme }) => theme.palette.primary.main};
 
     ${CouponEdge} {
-      border-color: ${(props) => props.theme.palette.primary.main};
+      border-color: ${({ theme }) => theme.palette.primary.main};
     }
 
     ${CouponIcon} {
@@ -227,15 +224,15 @@ const CouponContainer = styled.div`
       text-align: center;
       display: flex;
       align-items: center;
-      background-color: ${(props) => props.theme.palette.background.default};
-      color: ${(props) => props.theme.palette.text.disabled};
-      border: 1px solid ${(props) => props.theme.palette.divider};
+      background-color: ${({ theme }) => theme.palette.background.default};
+      color: ${({ theme }) => theme.palette.text.disabled};
+      border: 1px solid ${({ theme }) => theme.palette.divider};
       border-radius: 6px;
       transform: rotate(-10deg);
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: 5px 2px;
 
     &.disabled {

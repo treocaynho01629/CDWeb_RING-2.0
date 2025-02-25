@@ -152,69 +152,67 @@ const CheckoutDialog = ({
             </CheckoutStack>
           </>
         ) : tabletMode ? (
-          <>
-            <CheckoutBox className="sticky">
-              <CheckoutStack>
-                <CouponButton onClick={() => handleOpenDialog()}>
-                  <span>
-                    <LocalActivityOutlined color="error" />
-                    &nbsp;
-                    {coupon && discount && numSelected > 0
-                      ? `Đã giảm ${currencyFormat.format(discount)}`
-                      : `Chọn mã giảm giá ${coupon != null ? "khác" : ""}`}
-                  </span>
-                  <MiniCouponContainer>
-                    <Suspense fallback={null}>
-                      {coupon && numSelected > 0 && (
-                        <CouponDisplay coupon={coupon} />
-                      )}
-                    </Suspense>
-                    <KeyboardArrowRight fontSize="small" />
-                  </MiniCouponContainer>
-                </CouponButton>
-              </CheckoutStack>
-              <CheckoutStack>
-                <CheckoutPriceContainer>
-                  <PriceContainer>
-                    <CheckoutText>
-                      Tổng thanh toán: ({numSelected} Sản phẩm)&emsp;
-                    </CheckoutText>
-                    {numSelected && <SubText>(Đã bao gồm VAT)</SubText>}
-                  </PriceContainer>
-                  <PriceContainer>
-                    <CheckoutPrice onClick={() => toggleDrawer(true)}>
-                      <NumberFlow
-                        value={displayInfo.total}
-                        format={{ style: "currency", currency: "VND" }}
-                        locales={"vi-VN"}
-                        aria-hidden="true"
-                        respectMotionPreference={false}
-                        willChange
-                      />
-                    </CheckoutPrice>
-                    &emsp;
-                    {!calculating && displayInfo.totalDiscount > 0 && (
-                      <SavePrice>
-                        Tiết kiệm{" "}
-                        {currencyFormat.format(displayInfo.totalDiscount)}
-                      </SavePrice>
+          <CheckoutBox className="sticky">
+            <CheckoutStack>
+              <CouponButton onClick={() => handleOpenDialog()}>
+                <span>
+                  <LocalActivityOutlined color="error" />
+                  &nbsp;
+                  {coupon && discount && numSelected > 0
+                    ? `Đã giảm ${currencyFormat.format(discount)}`
+                    : `Chọn mã giảm giá ${coupon != null ? "khác" : ""}`}
+                </span>
+                <MiniCouponContainer>
+                  <Suspense fallback={null}>
+                    {coupon && numSelected > 0 && (
+                      <CouponDisplay coupon={coupon} />
                     )}
-                  </PriceContainer>
-                </CheckoutPriceContainer>
-                <CheckoutButton
-                  variant="contained"
-                  size="large"
-                  fullWidth
-                  sx={{ maxWidth: "35%" }}
-                  disabled={!numSelected || calculating}
-                  onClick={() => navigate("/checkout", { state: checkoutCart })}
-                  startIcon={<ShoppingCartCheckout />}
-                >
-                  {loggedIn ? "Thanh toán" : "Đăng nhập"}
-                </CheckoutButton>
-              </CheckoutStack>
-            </CheckoutBox>
-          </>
+                  </Suspense>
+                  <KeyboardArrowRight fontSize="small" />
+                </MiniCouponContainer>
+              </CouponButton>
+            </CheckoutStack>
+            <CheckoutStack>
+              <CheckoutPriceContainer>
+                <PriceContainer>
+                  <CheckoutText>
+                    Tổng thanh toán: ({numSelected} Sản phẩm)&emsp;
+                  </CheckoutText>
+                  {numSelected > 0 && <SubText>(Đã bao gồm VAT)</SubText>}
+                </PriceContainer>
+                <PriceContainer>
+                  <CheckoutPrice onClick={() => toggleDrawer(true)}>
+                    <NumberFlow
+                      value={displayInfo.total}
+                      format={{ style: "currency", currency: "VND" }}
+                      locales={"vi-VN"}
+                      aria-hidden="true"
+                      respectMotionPreference={false}
+                      willChange
+                    />
+                  </CheckoutPrice>
+                  &emsp;
+                  {!calculating && displayInfo.totalDiscount > 0 && (
+                    <SavePrice>
+                      Tiết kiệm{" "}
+                      {currencyFormat.format(displayInfo.totalDiscount)}
+                    </SavePrice>
+                  )}
+                </PriceContainer>
+              </CheckoutPriceContainer>
+              <CheckoutButton
+                variant="contained"
+                size="large"
+                fullWidth
+                sx={{ maxWidth: "35%" }}
+                disabled={!numSelected || calculating}
+                onClick={() => navigate("/checkout", { state: checkoutCart })}
+                startIcon={<ShoppingCartCheckout />}
+              >
+                {loggedIn ? "Thanh toán" : "Đăng nhập"}
+              </CheckoutButton>
+            </CheckoutStack>
+          </CheckoutBox>
         ) : (
           <>
             <CheckoutBox>

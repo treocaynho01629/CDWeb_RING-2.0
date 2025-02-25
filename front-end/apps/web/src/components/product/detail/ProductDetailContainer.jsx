@@ -18,17 +18,17 @@ const SwipeableDrawer = lazy(() => import("@mui/material/SwipeableDrawer"));
 const DetailContainer = styled.div`
   height: 100%;
   padding: 10px 20px;
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     padding: 0 12px;
   }
 `;
 
 const ProductsContainer = styled.div`
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 `;
 
 const DescriptionContainer = styled.div`
@@ -56,7 +56,7 @@ const Description = styled.p`
       -webkit-box-orient: vertical;
     }
 
-    ${(props) => props.theme.breakpoints.down("md")} {
+    ${({ theme }) => theme.breakpoints.down("md")} {
       @supports (-webkit-line-clamp: 5) {
         overflow: hidden;
         white-space: initial;
@@ -83,7 +83,7 @@ const InfoText = styled.p`
   font-size: 14px;
 
   &.secondary {
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
   }
 `;
 
@@ -111,7 +111,7 @@ const ProductDetailContainer = ({ loading, book, tabletMode }) => {
       cateId: book?.category?.id,
       size: 4,
     },
-    { skip: !book?.category?.id },
+    { skip: !book?.category?.id }
   );
 
   useLayoutEffect(() => {

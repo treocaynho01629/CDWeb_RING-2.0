@@ -46,17 +46,17 @@ const InfoText = styled.span`
     margin-left: 15px;
     text-decoration: underline;
     cursor: pointer;
-    color: ${(props) => props.theme.palette.primary.main};
+    color: ${({ theme }) => theme.palette.primary.main};
   }
 
   &.disabled {
     pointer-events: none;
-    color: ${(props) => props.theme.palette.action.disabled};
+    color: ${({ theme }) => theme.palette.action.disabled};
   }
 `;
 
 const InfoRow = styled.tr`
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 15px;
   }
 `;
@@ -88,7 +88,7 @@ const InfoStackContainer = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 48px;
   }
 `;
@@ -103,9 +103,9 @@ const BadgeButton = styled.span`
   aspect-ratio: 1/1;
   font-size: 13px;
   justify-content: flex-end;
-  color: ${(props) => props.theme.palette.common.black};
-  background-color: ${(props) => props.theme.palette.grey[300]};
-  border: 2px solid ${(props) => props.theme.palette.background.paper};
+  color: ${({ theme }) => theme.palette.common.black};
+  background-color: ${({ theme }) => theme.palette.grey[300]};
+  border: 2px solid ${({ theme }) => theme.palette.background.paper};
   cursor: pointer;
 
   svg {
@@ -115,13 +115,13 @@ const BadgeButton = styled.span`
 
   &.edit {
     &:hover {
-      color: ${(props) => props.theme.palette.primary.main};
+      color: ${({ theme }) => theme.palette.primary.main};
     }
   }
 
   &:hover {
-    color: ${(props) => props.theme.palette.error.main};
-    background-color: ${(props) => props.theme.palette.grey[200]};
+    color: ${({ theme }) => theme.palette.error.main};
+    background-color: ${({ theme }) => theme.palette.grey[200]};
     transition: 0.25s ease;
   }
 `;
@@ -145,7 +145,7 @@ const ProfileDetail = ({
   const [err, setErr] = useState([]);
   const [name, setName] = useState(profile?.name || "");
   const [dob, setDob] = useState(
-    profile?.dob ? dayjs(profile?.dob) : dayjs("1970-01-01"),
+    profile?.dob ? dayjs(profile?.dob) : dayjs("1970-01-01")
   );
   const [gender, setGender] = useState(profile?.gender || "");
   const [phone, setPhone] = useState(profile?.phone || "");
@@ -156,7 +156,7 @@ const ProfileDetail = ({
   const [file, setFile] = useState(null);
   const [ConfirmationDialog, confirm] = useConfirm(
     "Gỡ ảnh đại diện?",
-    "Gỡ bỏ anh đại diện hiện tại?",
+    "Gỡ bỏ anh đại diện hiện tại?"
   );
 
   //Update profile hook
@@ -386,7 +386,7 @@ const ProfileDetail = ({
                     <InfoText>
                       {profile?.email.replace(
                         /(\w{3})[\w.-]+@([\w.]+\w)/,
-                        "$1***@$2",
+                        "$1***@$2"
                       )}
                     </InfoText>
                   )}

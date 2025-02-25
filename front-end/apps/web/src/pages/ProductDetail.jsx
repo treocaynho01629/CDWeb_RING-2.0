@@ -42,6 +42,14 @@ const createCrumbs = (cate) => {
   }
 };
 
+const RandomList = () => {
+  const { data, isLoading, isFetching, isSuccess, isError } =
+    useGetRandomBooksQuery({ amount: 10 });
+  return (
+    <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
+  );
+};
+
 const ProductDetail = () => {
   const { slug, id } = useParams(); //Book id/slug
   const [searchParams, setSearchParams] = useSearchParams();
@@ -54,12 +62,6 @@ const ProductDetail = () => {
   const tabletMode = useMediaQuery(theme.breakpoints.down("md"));
 
   //Fetch data
-  const {
-    data: randomBooks,
-    isLoading: loadRandom,
-    isSuccess: doneRandom,
-    isError: errorRandom,
-  } = useGetRandomBooksQuery({ amount: 10 });
   const { data, isLoading, isFetching, isSuccess, isError, error } =
     useGetBookDetailQuery(slug ? { slug } : id ? { id } : null, {
       skip: !slug && !id,
@@ -221,7 +223,7 @@ const ProductDetail = () => {
         </Stack>
         <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
         <LazyLoad
-          offset={50}
+          offset={100}
           placeholder={
             <Placeholder
               sx={{
@@ -235,14 +237,7 @@ const ProductDetail = () => {
           }
         >
           <Suspense fallback={null}>
-            <ProductsSlider
-              {...{
-                loading: loadRandom,
-                data: randomBooks,
-                isSuccess: doneRandom,
-                isError: errorRandom,
-              }}
-            />
+            <RandomList />
           </Suspense>
         </LazyLoad>
       </Box>

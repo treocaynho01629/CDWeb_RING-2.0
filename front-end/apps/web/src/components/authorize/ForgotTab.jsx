@@ -28,24 +28,24 @@ const NotificationContent = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 0.5px solid ${(props) => props.theme.palette.primary.main};
-  padding: ${(props) => props.theme.spacing(1)};
+  border: 0.5px solid ${({ theme }) => theme.palette.primary.main};
+  padding: ${({ theme }) => theme.spacing(1)};
   animation: ${expand} 0.5s ease;
   overflow: hidden;
 
   svg {
     font-size: 80px;
-    color: ${(props) => props.theme.palette.primary.main};
+    color: ${({ theme }) => theme.palette.primary.main};
   }
 
   b {
-    margin: ${(props) => props.theme.spacing(2)};
+    margin: ${({ theme }) => theme.spacing(2)};
   }
 
   p {
     margin: 0;
-    margin-bottom: ${(props) => props.theme.spacing(1)};
-    color: ${(props) => props.theme.palette.text.secondary};
+    margin-bottom: ${({ theme }) => theme.spacing(1)};
+    color: ${({ theme }) => theme.palette.text.secondary};
     font-size: 14px;
   }
 `;
@@ -53,7 +53,7 @@ const NotificationContent = styled.div`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  padding-top: ${(props) => props.theme.spacing(2)};
+  padding-top: ${({ theme }) => theme.spacing(2)};
 `;
 //#endregion
 

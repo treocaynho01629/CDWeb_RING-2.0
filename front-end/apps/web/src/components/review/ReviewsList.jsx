@@ -1,4 +1,4 @@
-import { Fragment, Suspense, useCallback, useState, lazy } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { KeyboardArrowLeft, Try } from "@mui/icons-material";
 import { useGetMyReviewsQuery } from "../../features/reviews/reviewsApiSlice";
 import { Message, Title } from "@ring/ui/Components";
@@ -10,7 +10,6 @@ import { useAuth } from "@ring/auth";
 import ReviewItem from "./ReviewItem";
 import styled from "@emotion/styled";
 
-const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 const ReviewForm = lazy(() => import("./ReviewForm"));
 
 //#region styled
@@ -22,11 +21,11 @@ const MessageContainer = styled.span`
 `;
 
 const ReviewsContainer = styled.div`
-  padding-bottom: ${(props) => props.theme.spacing(2)};
+  padding-bottom: ${({ theme }) => theme.spacing(2)};
 `;
 
 const PlaceholderContainer = styled.div`
-  padding: ${(props) => props.theme.spacing(16)};
+  padding: ${({ theme }) => theme.spacing(16)};
 `;
 
 const LoadContainer = styled.div`
@@ -34,22 +33,21 @@ const LoadContainer = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-bottom: ${(props) => props.theme.spacing(2)};
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
 `;
 
 const StyledEmptyIcon = styled(EmptyIcon)`
   height: 70px;
   width: 70px;
-  margin: ${(props) => props.theme.spacing(1)} 0;
-  fill: ${(props) => props.theme.palette.text.icon};
+  margin: ${({ theme }) => theme.spacing(1)} 0;
+  fill: ${({ theme }) => theme.palette.text.icon};
 `;
 //#endregion
 
 const defaultSize = 5;
 
-const ReviewsList = ({ mobileMode }) => {
+const ReviewsList = ({ mobileMode, pending, setPending }) => {
   const { username } = useAuth();
-  const [pending, setPending] = useState(false);
   const [openForm, setOpenForm] = useState(undefined);
   const [contextReview, setContextReview] = useState(null);
   const [pagination, setPagination] = useState({
@@ -155,11 +153,6 @@ const ReviewsList = ({ mobileMode }) => {
 
   return (
     <>
-      {pending && (
-        <Suspense fallBack={null}>
-          <PendingModal open={pending} message="Đang gửi yêu cầu..." />
-        </Suspense>
-      )}
       <Title color="primary">
         <Link to={"/profile/detail"}>
           <KeyboardArrowLeft />

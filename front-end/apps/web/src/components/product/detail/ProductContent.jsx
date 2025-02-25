@@ -24,27 +24,27 @@ import ProductAction from "./ProductAction";
 const CouponPreview = lazy(() => import("../../coupon/CouponPreview"));
 const AddressPreview = lazy(() => import("../../address/AddressPreview"));
 const AddressSelectDialog = lazy(
-  () => import("../../address/AddressSelectDialog"),
+  () => import("../../address/AddressSelectDialog")
 );
 const ProductPolicies = lazy(() => import("./ProductPolicies"));
 
 //#region styled
 const InfoContainer = styled.div`
   height: 100%;
-  padding: ${(props) => props.theme.spacing(2.5)};
+  padding: ${({ theme }) => theme.spacing(2.5)};
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: ${(props) => props.theme.palette.background.paper};
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
 
   a {
-    color: ${(props) => props.theme.palette.info.main};
+    color: ${({ theme }) => theme.palette.info.main};
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
-    padding: 0 ${(props) => props.theme.spacing(1.5)};
-    padding-bottom: ${(props) => props.theme.spacing(1)};
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    padding: 0 ${({ theme }) => theme.spacing(1.5)};
+    padding-bottom: ${({ theme }) => theme.spacing(1)};
     border-top: none;
   }
 `;
@@ -52,8 +52,8 @@ const InfoContainer = styled.div`
 const ImageContainer = styled.div`
   border: none;
 
-  ${(props) => props.theme.breakpoints.up("md")} {
-    border: 0.5px solid ${(props) => props.theme.palette.divider};
+  ${({ theme }) => theme.breakpoints.up("md")} {
+    border: 0.5px solid ${({ theme }) => theme.palette.divider};
   }
 `;
 
@@ -75,7 +75,7 @@ const BookTitle = styled.h2`
     -webkit-box-orient: vertical;
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 16px;
     margin: 10px 0;
   }
@@ -92,7 +92,7 @@ const Detail = styled.span`
   margin-right: 10px;
   flex-grow: 1;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     margin: 3px 0;
   }
 `;
@@ -102,11 +102,11 @@ const UserInfoContainer = styled.div`
   position: relative;
   height: 100%;
   align-items: center;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
   cursor: pointer;
 
   &.active {
-    color: ${(props) => props.theme.palette.warning.light};
+    color: ${({ theme }) => theme.palette.warning.light};
   }
 `;
 
@@ -123,7 +123,7 @@ const StyledRating = muiStyled(Rating)(({ theme }) => ({
 }));
 
 const UserInfoText = styled.strong`
-  color: ${(props) => props.theme.palette.text.primary};
+  color: ${({ theme }) => theme.palette.text.primary};
   font-size: 15px;
 
   &.rate {
@@ -133,17 +133,17 @@ const UserInfoText = styled.strong`
   &.end {
     flex: 1;
     text-align: end;
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 14px;
     &.hide-on-mobile {
       display: none;
     }
   }
 
-  ${(props) => props.theme.breakpoints.up("md")} {
+  ${({ theme }) => theme.breakpoints.up("md")} {
     &.mobile {
       display: none;
     }
@@ -155,7 +155,7 @@ const PriceContainer = styled.div`
   align-items: center;
   margin: 5px 0;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     margin: 0;
   }
 `;
@@ -163,9 +163,9 @@ const PriceContainer = styled.div`
 const Price = styled.h2`
   margin: 0;
   font-size: 24px;
-  color: ${(props) => props.theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.main};
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 21px;
   }
 `;
@@ -175,10 +175,10 @@ const Discount = styled.p`
   margin-left: 10px;
   font-size: 18px;
   font-weight: 400;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
   text-decoration: line-through;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 16px;
     margin-left: 5px;
   }
@@ -189,10 +189,10 @@ const Percentage = styled.span`
   padding: 2px 5px;
   margin-left: 10px;
   font-weight: bold;
-  color: ${(props) => props.theme.palette.primary.contrastText};
-  background-color: ${(props) => alpha(props.theme.palette.primary.light, 0.8)};
+  color: ${({ theme }) => theme.palette.primary.contrastText};
+  background-color: ${({ theme }) => alpha(theme.palette.primary.light, 0.8)};
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 13px;
   }
 `;
@@ -306,7 +306,7 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
   //Fetch address
   const { data: address, isLoading: loadAddress } = useGetMyAddressQuery(
     {},
-    { skip: !username },
+    { skip: !username }
   );
 
   const handleViewReview = (value) => {
@@ -588,7 +588,12 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
               addressPlaceholder
             )}
           </Box>
-          <Box className="product-action" display="flex" flexDirection="column">
+          <Box
+            className="product-action"
+            display="flex"
+            flexDirection="column"
+            position="relative"
+          >
             <ProductAction book={book} />
             <Divider sx={{ my: 1 }} />
             {book ? (

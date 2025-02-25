@@ -7,15 +7,15 @@ import { Badge } from "@mui/material";
 //#region styled
 const getColor = (props) => {
   if (props.isDragAccept) {
-    return props.theme.palette.success.main;
+    return theme.palette.success.main;
   }
   if (props.isDragReject) {
-    return props.theme.palette.error.main;
+    return theme.palette.error.main;
   }
   if (props.isFocused) {
-    return props.theme.palette.info.main;
+    return theme.palette.info.main;
   }
-  return props.theme.palette.divider;
+  return theme.palette.divider;
 };
 
 const CustomBadge = styled(Badge)`
@@ -33,8 +33,8 @@ const ImagePlaceholder = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: inherit;
-  background-color: ${(props) => props.theme.palette.action.focus};
-  color: ${(props) => props.theme.palette.text.secondary};
+  background-color: ${({ theme }) => theme.palette.action.focus};
+  color: ${({ theme }) => theme.palette.text.secondary};
   font-size: 14px;
   opacity: 0.8;
   transition: all 0.2s ease;
@@ -65,7 +65,7 @@ const ImageContainer = styled.div`
   position: relative;
   height: 150px;
   width: 150px;
-  padding: ${(props) => props.theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(1)};
   border-radius: 50%;
   border: 1px dashed;
   border-color: ${(props) => getColor(props)};
@@ -74,7 +74,7 @@ const ImageContainer = styled.div`
   &:hover {
     ${ImagePlaceholder} {
       opacity: 1;
-      background-color: ${(props) => props.theme.palette.action.hover};
+      background-color: ${({ theme }) => theme.palette.action.hover};
     }
 
     ${Image} {
@@ -87,7 +87,7 @@ const Instruction = styled.p`
   width: 100%;
   margin-bottom: 0;
   font-size: 14px;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
   text-align: center;
 `;
 
@@ -101,8 +101,8 @@ const BadgeButton = styled.span`
   aspect-ratio: 1/1;
   font-size: 13px;
   justify-content: flex-end;
-  background-color: ${(props) => props.theme.palette.background.paper};
-  border: 3px solid ${(props) => props.theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 3px solid ${({ theme }) => theme.palette.divider};
   z-index: 3;
   cursor: pointer;
 
@@ -112,7 +112,7 @@ const BadgeButton = styled.span`
   }
 
   &:hover {
-    color: ${(props) => props.theme.palette.error.main};
+    color: ${({ theme }) => theme.palette.error.main};
     transition: 0.2s ease;
   }
 `;

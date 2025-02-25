@@ -7,15 +7,15 @@ import { Button, IconButton, Tooltip } from "@mui/material";
 //#region styled
 const getColor = (props) => {
   if (props.isDragAccept) {
-    return props.theme.palette.success.main;
+    return theme.palette.success.main;
   }
   if (props.isDragReject) {
-    return props.theme.palette.error.main;
+    return theme.palette.error.main;
   }
   if (props.isFocused) {
-    return props.theme.palette.info.main;
+    return theme.palette.info.main;
   }
-  return props.theme.palette.primary.main;
+  return theme.palette.primary.main;
 };
 
 const DropZoneContainer = styled.div`
@@ -23,7 +23,7 @@ const DropZoneContainer = styled.div`
   justify-content: center;
   align-items: center;
   height: 250px;
-  background-color: ${(props) => props.theme.palette.action.focus};
+  background-color: ${({ theme }) => theme.palette.action.focus};
   border: 2.75px dashed;
   border-color: ${(props) => getColor(props)};
   cursor: pointer;
@@ -35,7 +35,7 @@ const DropZoneContent = styled.div`
   justify-content: center;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 14px;
   }
 `;
@@ -56,7 +56,7 @@ const ThumbContainer = styled.aside`
 
 const Thumb = styled.div`
   display: flex;
-  border: 0.5 solid ${(props) => props.theme.palette.action.focus};
+  border: 0.5 solid ${({ theme }) => theme.palette.action.focus};
   height: 80px;
   width: 80px;
   margin-right: 5px;
@@ -75,28 +75,28 @@ const Thumb = styled.div`
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    color: ${(props) => props.theme.palette.grey[800]};
+    color: ${({ theme }) => theme.palette.grey[800]};
   }
 
   &.file {
-    border: 3px solid ${(props) => props.theme.palette.warning.main};
+    border: 3px solid ${({ theme }) => theme.palette.warning.main};
 
     &:before {
       background-image: linear-gradient(
         0deg,
-        ${(props) => props.theme.palette.warning.main},
+        ${({ theme }) => theme.palette.warning.main},
         transparent 100%
       ) !important;
     }
   }
 
   &.remove {
-    border: 3px solid ${(props) => props.theme.palette.error.main};
+    border: 3px solid ${({ theme }) => theme.palette.error.main};
 
     &:before {
       background-image: linear-gradient(
         0deg,
-        ${(props) => props.theme.palette.error.main},
+        ${({ theme }) => theme.palette.error.main},
         transparent 100%
       ) !important;
     }
@@ -107,13 +107,13 @@ const Thumb = styled.div`
       content: "<Thumbnail>";
       background-image: linear-gradient(
         0deg,
-        ${(props) => props.theme.palette.success.main},
+        ${({ theme }) => theme.palette.success.main},
         transparent 100%
       );
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 55px;
     width: 55px;
 
@@ -168,7 +168,7 @@ const Title = styled.h3`
 const ErrMsg = styled.b`
   display: flex;
   align-items: center;
-  color: ${(props) => props.theme.palette.error.main};
+  color: ${({ theme }) => theme.palette.error.main};
 `;
 
 const ButtonContainer = styled.div`
@@ -205,8 +205,8 @@ const CustomDropZone = ({
         acceptedFiles.map((file) =>
           Object.assign(file, {
             preview: URL.createObjectURL(file),
-          }),
-        ),
+          })
+        )
       );
     },
   });
@@ -223,7 +223,7 @@ const CustomDropZone = ({
       return newFiles.map((file) =>
         Object.assign(file, {
           preview: URL.createObjectURL(file),
-        }),
+        })
       );
     });
   };
@@ -237,7 +237,7 @@ const CustomDropZone = ({
       return newFiles.map((file) =>
         Object.assign(file, {
           preview: URL.createObjectURL(file),
-        }),
+        })
       );
     });
   };
@@ -253,7 +253,7 @@ const CustomDropZone = ({
     } else if (removeIndex > 0) {
       newRemove = newRemove.concat(
         remove.slice(0, removeIndex),
-        remove.slice(removeIndex + 1),
+        remove.slice(removeIndex + 1)
       );
     }
 
@@ -278,7 +278,7 @@ const CustomDropZone = ({
     } else if (removeIndex > 0) {
       newRemove = newRemove.concat(
         remove.slice(0, removeIndex),
-        remove.slice(removeIndex + 1),
+        remove.slice(removeIndex + 1)
       );
     }
 
@@ -309,7 +309,7 @@ const CustomDropZone = ({
               <ThumbImage src={`${thumbnail.url}?size=small`} />
             </ThumbInner>
           </Thumb>
-        </Tooltip>,
+        </Tooltip>
       );
   }
 
@@ -343,7 +343,7 @@ const CustomDropZone = ({
               />
             </ThumbInner>
           </Thumb>
-        </Tooltip>,
+        </Tooltip>
       );
     });
   }
@@ -372,7 +372,7 @@ const CustomDropZone = ({
                 <ThumbImage src={`${image.url}?size=small`} />
               </ThumbInner>
             </Thumb>
-          </Tooltip>,
+          </Tooltip>
         );
       }
     });

@@ -54,8 +54,8 @@ const PlaceholderContainer = styled.div`
 const StyledEmptyIcon = styled(EmptyIcon)`
   height: 70px;
   width: 70px;
-  margin: ${(props) => props.theme.spacing(1)} 0;
-  fill: ${(props) => props.theme.palette.text.icon};
+  margin: ${({ theme }) => theme.spacing(1)} 0;
+  fill: ${({ theme }) => theme.palette.text.icon};
 `;
 //#endregion
 
@@ -84,13 +84,13 @@ const AddressSelectDialog = ({
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [ConfirmationDialog, confirm] = useConfirm(
     "Xoá địa chỉ?",
-    "Xoá địa chỉ khỏi sổ địa chỉ?",
+    "Xoá địa chỉ khỏi sổ địa chỉ?"
   );
 
   //Fetch addresses
   const { data, isLoading, isSuccess, isError, error } = useGetMyAddressesQuery(
     {},
-    { skip: !loggedIn },
+    { skip: !loggedIn }
   );
 
   //Update address
@@ -176,7 +176,7 @@ const AddressSelectDialog = ({
   const handleCreateAddress = async (
     address,
     isDefault = false,
-    isTemp = false,
+    isTemp = false
   ) => {
     if (pending || creating || updating || deleting) return;
     setPending(true);
@@ -220,7 +220,7 @@ const AddressSelectDialog = ({
               setErrMsg("Sai định dạng thông tin!");
             } else if (err?.status === 409) {
               setErrMsg(
-                "Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!",
+                "Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!"
               );
             } else {
               setErrMsg("Thêm địa chỉ thất bại");
@@ -359,7 +359,7 @@ const AddressSelectDialog = ({
               setErrMsg("Sai định dạng thông tin!");
             } else if (err?.status === 409) {
               setErrMsg(
-                "Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!",
+                "Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!"
               );
             } else {
               setErrMsg("Cập nhật địa chỉ thất bại");
@@ -421,7 +421,7 @@ const AddressSelectDialog = ({
               setErrMsg("Sai định dạng thông tin!");
             } else if (err?.status === 409) {
               setErrMsg(
-                "Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!",
+                "Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!"
               );
             } else {
               setErrMsg("Thêm địa chỉ thất bại");
@@ -455,7 +455,7 @@ const AddressSelectDialog = ({
       setAddressInfo(address);
     } else if (`${selectedValue}`.startsWith("s-")) {
       setAddressInfo(
-        storeAddresses.filter((item) => item.id == selectedValue)[0],
+        storeAddresses.filter((item) => item.id == selectedValue)[0]
       );
     } else if (data?.ids?.length) {
       setAddressInfo(data?.entities[selectedValue]);

@@ -12,8 +12,7 @@ import { addressTypes, shippingItems, currencyFormat } from "@ring/shared";
 
 //#region styled
 const Title = styled.h4`
-  margin: ${(props) => props.theme.spacing(1.5)}
-    ${(props) => props.theme.spacing(1)};
+  margin: ${({ theme }) => `${theme.spacing(1.5)} ${theme.spacing(1)}`};
   font-weight: 420;
 `;
 
@@ -22,23 +21,23 @@ const AddressDisplayContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 0.5px solid ${(props) => props.theme.palette.action.focus};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  background-color: ${({ theme }) => theme.palette.background.paper};
   padding: 20px;
 
   &.error {
-    border-color: ${(props) => props.theme.palette.error.main};
+    border-color: ${({ theme }) => theme.palette.error.main};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    padding: ${(props) => props.theme.spacing(1)};
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: ${({ theme }) => theme.spacing(1)};
     border-left: none;
     border-right: none;
   }
 `;
 
 const UserInfo = styled.b`
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 13px;
   }
 `;
@@ -48,13 +47,12 @@ const FormContent = styled.div`
 `;
 
 const StyledForm = styled(FormControlLabel)`
-  padding: ${(props) => props.theme.spacing(1.5)}
-    ${(props) => props.theme.spacing(2)};
+  padding: ${({ theme }) => `${theme.spacing(1.5)} ${theme.spacing(2)}`};
   padding-left: 0;
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
   min-width: 50%;
-  margin: ${(props) => props.theme.spacing(0.5)} 0;
+  margin: ${({ theme }) => theme.spacing(0.5)} 0;
 
   .MuiFormControlLabel-label {
     position: relative;
@@ -62,12 +60,11 @@ const StyledForm = styled(FormControlLabel)`
   }
 
   &:has(input[type="radio"]:checked) {
-    border-color: ${(props) => props.theme.palette.primary.main};
-    background-color: ${(props) =>
-      alpha(props.theme.palette.primary.light, 0.1)};
+    border-color: ${({ theme }) => theme.palette.primary.main};
+    background-color: ${({ theme }) => alpha(theme.palette.primary.light, 0.1)};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     border-left: none;
     border-right: none;
   }
@@ -82,8 +79,8 @@ const ItemContent = styled.div`
 
 const PriceTag = styled.span`
   font-weight: 450;
-  color: ${(props) =>
-    props.theme.palette[props.color]?.dark || props.theme.palette.text.primary};
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.dark || theme.palette.text.primary};
 `;
 
 const ItemTitle = styled.div`
@@ -92,13 +89,13 @@ const ItemTitle = styled.div`
 
   svg {
     font-size: 24px;
-    margin-right: ${(props) => props.theme.spacing(0.5)};
+    margin-right: ${({ theme }) => theme.spacing(0.5)};
   }
 `;
 
 const Estimate = styled.span`
   font-size: 12px;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
 `;
 
 const AddressContainer = styled.div`
@@ -108,29 +105,28 @@ const AddressContainer = styled.div`
 
 const AddressContent = styled.div`
   display: flex;
-  margin-right: ${(props) => props.theme.spacing(2)};
+  margin-right: ${({ theme }) => theme.spacing(2)};
   white-space: nowrap;
 `;
 
 const Address = styled.span`
   font-size: 16px;
   line-height: 1.75em;
-  margin-top: ${(props) => props.theme.spacing(1)};
-  color: ${(props) => props.theme.palette.text.secondary};
+  margin-top: ${({ theme }) => theme.spacing(1)};
+  color: ${({ theme }) => theme.palette.text.secondary};
 `;
 
 const AddressTag = styled.span`
   font-size: 12px;
   font-weight: bold;
-  margin-right: ${(props) => props.theme.spacing(0.5)};
-  padding: ${(props) => props.theme.spacing(0.5)}
-    ${(props) => props.theme.spacing(1)};
-  border: 0.5px solid ${(props) => props.theme.palette.primary.main};
-  color: ${(props) => props.theme.palette.primary.main};
+  margin-right: ${({ theme }) => theme.spacing(0.5)};
+  padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(1)}`};
+  border: 0.5px solid ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.main};
 
   &.info {
-    color: ${(props) => props.theme.palette.info.main};
-    border-color: ${(props) => props.theme.palette.info.main};
+    color: ${({ theme }) => theme.palette.info.main};
+    border-color: ${({ theme }) => theme.palette.info.main};
   }
 `;
 //#endregion

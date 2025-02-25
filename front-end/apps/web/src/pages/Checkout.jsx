@@ -72,7 +72,7 @@ const Title = styled.h3`
   align-items: center;
   text-align: center;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: 20px 10px;
   }
 `;
@@ -90,15 +90,14 @@ const SemiTitle = styled.h4`
     text-align: end;
     direction: rtl;
 
-    ${(props) => props.theme.breakpoints.down("md_lg")} {
+    ${({ theme }) => theme.breakpoints.down("md_lg")} {
       display: none;
     }
   }
 `;
 
 const MiniTitle = styled.h4`
-  margin: ${(props) => props.theme.spacing(1.5)}
-    ${(props) => props.theme.spacing(1)};
+  margin: ${({ theme }) => `${theme.spacing(1.5)} ${theme.spacing(1)}`};
   font-weight: 420;
 `;
 

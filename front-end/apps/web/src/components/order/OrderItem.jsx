@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import {
   DeliveryDiningOutlined,
   KeyboardArrowRight,
@@ -11,10 +11,8 @@ import {
   ItemTitle,
   Shop,
   ShopTag,
-  StatusTag,
   DetailText,
   ContentContainer,
-  StuffContainer,
   HeadContainer,
   BodyContainer,
   StyledLazyImage,
@@ -22,14 +20,36 @@ import {
 } from "../custom/OrderComponents";
 
 //#region styled
+const StatusTag = styled(Typography)`
+  text-transform: uppercase;
+  font-weight: 450;
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    font-size: 14px;
+  }
+`;
+
 const Amount = styled.span`
   font-size: 14px;
   font-weight: 450;
-  margin-right: ${(props) => props.theme.spacing(2)};
-  color: ${(props) => props.theme.palette.text.secondary};
+  margin-right: ${({ theme }) => theme.spacing(2)};
+  color: ${({ theme }) => theme.palette.text.secondary};
 
   b {
-    color: ${(props) => props.theme.palette.warning.main};
+    color: ${({ theme }) => theme.palette.warning.main};
+  }
+`;
+
+const StuffContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    align-items: flex-end;
+  }
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    flex-direction: row-reverse;
   }
 `;
 
@@ -39,17 +59,17 @@ const Price = styled.p`
   font-size: 16px;
   font-weight: 450;
   text-align: left;
-  color: ${(props) => props.theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.main};
   margin: 0;
 
   &.total {
-    color: ${(props) => props.theme.palette.warning.light};
+    color: ${({ theme }) => theme.palette.warning.light};
   }
 `;
 
 const Discount = styled.p`
   font-size: 12px;
-  color: ${(props) => props.theme.palette.text.disabled};
+  color: ${({ theme }) => theme.palette.text.disabled};
   margin: 0;
   display: flex;
   flex-wrap: wrap;
@@ -60,22 +80,30 @@ const Discount = styled.p`
 
 const OrderItemContainer = styled.div`
   border: 0.5px solid;
-  border-color: ${(props) => props.theme.palette.action.focus};
-  margin-bottom: ${(props) => props.theme.spacing(2)};
+  border-color: ${({ theme }) => theme.palette.action.focus};
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
 `;
 
 const BotContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: ${(props) => props.theme.spacing(2)};
+  padding: ${({ theme }) => theme.spacing(2)};
   border-top: 0.5px solid;
-  border-color: ${(props) => props.theme.palette.action.focus};
+  border-color: ${({ theme }) => theme.palette.action.focus};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    padding: ${(props) => props.theme.spacing(1)};
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: ${({ theme }) => theme.spacing(1)};
     font-size: 14px;
     align-items: flex-start;
+  }
+`;
+
+const MainButton = styled(Button)`
+  min-width: 200px;
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    min-width: 150px;
   }
 `;
 //#endregion
@@ -163,27 +191,29 @@ const OrderItem = ({ order, handleAddToCart, handleCancelOrder }) => {
             <p style={{ margin: 0 }}>Thành tiền:</p>
             <Price className="total">
               &nbsp;
-              {currencyFormat.format(order?.totalPrice - order?.totalDiscount)}
+              {currencyFormat.format(
+                order?.totalPrice + order?.shippingFee - order?.totalDiscount
+              )}
             </Price>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
             {order?.status == orderTypes.PENDING.value ||
             order?.status == orderTypes.SHIPPING.value ? (
-              <Button
+              <MainButton
                 variant="outlined"
                 color="error"
                 onClick={() => handleCancelOrder(order)}
               >
                 Huỷ đơn hàng
-              </Button>
+              </MainButton>
             ) : (
-              <Button
+              <MainButton
                 variant="contained"
                 color="primary"
                 onClick={() => handleAddToCart(order)}
               >
                 Mua lại
-              </Button>
+              </MainButton>
             )}
           </Box>
         </Box>

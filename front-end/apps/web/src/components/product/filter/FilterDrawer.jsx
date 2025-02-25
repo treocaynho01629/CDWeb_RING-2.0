@@ -37,7 +37,7 @@ const DrawerContainer = styled.div`
   flex-direction: column;
   max-width: 550px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     max-width: 350px;
   }
 `;
@@ -84,7 +84,7 @@ const SliderContainer = styled.div`
 const StyledButton = styled.span`
   width: 48%;
   padding: 6px;
-  background-color: ${(props) => props.theme.palette.action.focus};
+  background-color: ${({ theme }) => theme.palette.action.focus};
   border: 1px solid transparent;
   position: relative;
   display: flex;
@@ -94,31 +94,31 @@ const StyledButton = styled.span`
   transition: width 0.2s ease;
 
   &:hover {
-    background-color: ${(props) => props.theme.palette.action.hover};
+    background-color: ${({ theme }) => theme.palette.action.hover};
   }
 
   &.filled {
-    width: calc(96% + ${(props) => props.theme.spacing(1)});
+    width: calc(96% + ${({ theme }) => theme.spacing(1)});
   }
 
   &.expanded {
-    width: calc(96% + ${(props) => props.theme.spacing(1)});
-    border-color: ${(props) => props.theme.palette.primary.main};
-    background-color: ${(props) => props.theme.palette.action.hover};
+    width: calc(96% + ${({ theme }) => theme.spacing(1)});
+    border-color: ${({ theme }) => theme.palette.primary.main};
+    background-color: ${({ theme }) => theme.palette.action.hover};
   }
 
   &.checked {
-    color: ${(props) => props.theme.palette.primary.dark};
-    background-color: ${(props) => props.theme.palette.action.selected};
-    border-color: ${(props) => props.theme.palette.primary.main};
+    color: ${({ theme }) => theme.palette.primary.dark};
+    background-color: ${({ theme }) => theme.palette.action.selected};
+    border-color: ${({ theme }) => theme.palette.primary.main};
     border-style: dashed;
     font-weight: 450;
   }
 
   &.active {
-    color: ${(props) => props.theme.palette.primary.dark};
-    background-color: ${(props) => props.theme.palette.action.selected};
-    border-color: ${(props) => props.theme.palette.primary.main};
+    color: ${({ theme }) => theme.palette.primary.dark};
+    background-color: ${({ theme }) => theme.palette.action.selected};
+    border-color: ${({ theme }) => theme.palette.primary.main};
     font-weight: 450;
   }
 `;
@@ -131,10 +131,10 @@ const Showmore = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${(props) => props.theme.palette.info.main};
+  color: ${({ theme }) => theme.palette.info.main};
   cursor: pointer;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     margin-top: 0;
   }
 `;
@@ -382,7 +382,7 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selectedPub.slice(0, selectedIndex),
-        selectedPub.slice(selectedIndex + 1),
+        selectedPub.slice(selectedIndex + 1)
       );
     }
 
@@ -578,7 +578,7 @@ const TypeFilter = memo(({ types, onChangeType }) => {
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selectedType.slice(0, selectedIndex),
-        selectedType.slice(selectedIndex + 1),
+        selectedType.slice(selectedIndex + 1)
       );
     }
 

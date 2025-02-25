@@ -47,10 +47,10 @@ const ItemTitle = styled.p`
   }
 
   &.error {
-    color: ${(props) => props.theme.palette.error.light};
+    color: ${({ theme }) => theme.palette.error.light};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 13px;
 
     @supports (-webkit-line-clamp: 1) {
@@ -69,13 +69,13 @@ const Shop = styled.span`
   white-space: nowrap;
   display: flex;
   align-items: center;
-  color: ${(props) => props.theme.palette.primary.dark};
+  color: ${({ theme }) => theme.palette.primary.dark};
 
   svg {
     font-size: 18px;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 14px;
     margin: 8px 0;
   }
@@ -97,7 +97,7 @@ const CouponButton = styled.b`
     white-space: nowrap;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 14px;
     margin: 8px 0;
   }
@@ -113,18 +113,18 @@ const Price = styled.p`
   font-size: 14px;
   font-weight: 400;
   text-align: left;
-  color: ${(props) => props.theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.main};
   margin: 0;
-  margin-right: ${(props) => props.theme.spacing(1)};
+  margin-right: ${({ theme }) => theme.spacing(1)};
 
   &.total {
-    color: ${(props) => props.theme.palette.warning.light};
+    color: ${({ theme }) => theme.palette.warning.light};
   }
 `;
 
 const Discount = styled.p`
   font-size: 12px;
-  color: ${(props) => props.theme.palette.text.disabled};
+  color: ${({ theme }) => theme.palette.text.disabled};
   margin: 0;
   display: flex;
   flex-wrap: wrap;
@@ -143,9 +143,9 @@ const StyledLazyImage = styled(LazyLoadImage)`
   display: inline-block;
   height: 50px;
   width: 50px;
-  border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 45px;
     width: 45px;
   }
@@ -156,7 +156,7 @@ const StyledSkeleton = styled(Skeleton)`
   height: 50px;
   width: 50px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 45px;
     width: 45px;
   }
@@ -191,7 +191,7 @@ function ItemRow({ product, index }) {
               >
                 <Price>
                   {currencyFormat.format(
-                    product.price * (1 - (product?.discount || 0)),
+                    product.price * (1 - (product?.discount || 0))
                   )}
                 </Price>
                 <Discount>
@@ -221,7 +221,7 @@ function ItemRow({ product, index }) {
       >
         <Price>
           {currencyFormat.format(
-            product.price * (1 - (product?.discount || 0)),
+            product.price * (1 - (product?.discount || 0))
           )}
         </Price>
         {product?.discount > 0 && (
@@ -242,7 +242,7 @@ function ItemRow({ product, index }) {
       >
         <Price className="total">
           {currencyFormat.format(
-            product.price * (1 - (product?.discount || 0)) * product.quantity,
+            product.price * (1 - (product?.discount || 0)) * product.quantity
           )}
         </Price>
       </StyledTableCell>

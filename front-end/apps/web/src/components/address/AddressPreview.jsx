@@ -15,7 +15,7 @@ const PreviewWrapper = styled.div`
   position: relative;
   margin: 20px 0;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     margin: 0;
   }
 `;
@@ -32,7 +32,7 @@ const DetailTitle = styled.h4`
   font-size: 16px;
   font-weight: 600;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     display: none;
   }
 `;
@@ -51,7 +51,7 @@ const AddressInfo = styled.span`
   white-space: nowrap;
   cursor: pointer;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     overflow: hidden;
     text-overflow: ellipsis;
     align-items: center;

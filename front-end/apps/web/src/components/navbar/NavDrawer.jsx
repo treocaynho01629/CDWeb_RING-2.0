@@ -37,8 +37,8 @@ const DrawerLogo = styled.div`
 `;
 
 const DrawerContainer = styled(Box)`
-  padding-left: ${(props) => props.theme.spacing(1.5)};
-  padding-right: ${(props) => props.theme.spacing(1.5)};
+  padding-left: ${({ theme }) => theme.spacing(1.5)};
+  padding-right: ${({ theme }) => theme.spacing(1.5)};
   width: auto;
 
   @media (min-width: 450px) {

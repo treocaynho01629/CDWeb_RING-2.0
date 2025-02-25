@@ -19,7 +19,7 @@ const MessageContainer = styled.div`
 `;
 
 const TitleContainer = styled.div`
-  padding: 0 ${(props) => `${props.theme.spacing(1)} ${props.theme.spacing(1)}`};
+  padding: 0 ${({ theme }) => `${theme.spacing(1)} ${theme.spacing(1)}`};
 `;
 
 const Rank = styled.span`
@@ -30,19 +30,19 @@ const Rank = styled.span`
   justify-content: center;
   width: 25px;
   aspect-ratio: 1/1;
-  margin-right: ${(props) => props.theme.spacing(2)};
+  margin-right: ${({ theme }) => theme.spacing(2)};
   border-radius: 50%;
   border: 0.5px solid currentColor;
 
   &.first {
-    color: ${(props) => props.theme.palette.success.light};
+    color: ${({ theme }) => theme.palette.success.light};
   }
 
   &.second {
-    color: ${(props) => props.theme.palette.warning.light};
+    color: ${({ theme }) => theme.palette.warning.light};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;
   }
 `;
@@ -51,11 +51,11 @@ const ProductContainer = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 0 ${(props) => props.theme.spacing(1)};
+  padding: 0 ${({ theme }) => theme.spacing(1)};
 
-  ${(props) => props.theme.breakpoints.up("md_lg")} {
+  ${({ theme }) => theme.breakpoints.up("md_lg")} {
     &.selected {
-      border-right: 3px solid ${(props) => props.theme.palette.primary.main};
+      border-right: 3px solid ${({ theme }) => theme.palette.primary.main};
     }
   }
 `;
@@ -77,7 +77,7 @@ const ProductTitle = styled.span`
     -webkit-box-orient: vertical;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 13px;
   }
 `;
@@ -86,7 +86,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
   display: inline-block;
   height: 45px;
   width: 45px;
-  border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
 `;
 
 const StyledSkeleton = styled(Skeleton)`
@@ -125,10 +125,10 @@ const TextMore = styled.b`
   margin-left: 5px;
   padding-left: 5px;
   font-size: 12px;
-  color: ${(props) => props.theme.palette.info.main};
+  color: ${({ theme }) => theme.palette.info.main};
 
   &:last-of-type {
-    border-left: 0.5px solid ${(props) => props.theme.palette.action.focus};
+    border-left: 0.5px solid ${({ theme }) => theme.palette.action.focus};
   }
 `;
 
@@ -140,9 +140,9 @@ const StyledRating = styled(Rating)`
 
 const ProductShop = styled.span`
   font-size: 14px;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;
   }
 `;

@@ -6,12 +6,12 @@ import { useEffect, useState } from "react";
 const Indicator = styled.span`
   height: 3px;
   width: 36px;
-  margin-right: ${(props) => props.theme.spacing(1)};
+  margin-right: ${({ theme }) => theme.spacing(1)};
   background-color: currentColor !important;
 
   &.empty {
-    background-color: ${(props) => props.theme.palette.action.hover};
-    outline: 0.5px solid ${(props) => props.theme.palette.divider};
+    background-color: ${({ theme }) => theme.palette.action.hover};
+    outline: 0.5px solid ${({ theme }) => theme.palette.divider};
   }
 `;
 
@@ -19,13 +19,13 @@ const EvaluateLabel = styled.p`
   color: inherit;
   font-size: 16px;
   font-weight: 450;
-  margin: ${(props) => props.theme.spacing(0.5)} 0;
+  margin: ${({ theme }) => theme.spacing(0.5)} 0;
 `;
 
 const EvaluateHelperText = styled.span`
   font-size: 12px;
   line-height: 0.5;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
 `;
 //#endregion
 

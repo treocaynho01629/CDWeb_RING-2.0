@@ -3,12 +3,16 @@ import ProfileTabsList from "../profile/ProfileTabsList";
 import { Outlet, useMatch } from "react-router";
 import { useGetProfileQuery } from "../../features/users/usersApiSlice";
 import { useMediaQuery, useTheme } from "@mui/material";
+import { Suspense, lazy, useState } from "react";
+
+const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 
 export default function ProfileLayout() {
   const showTabs = useMatch("/profile/detail");
   const theme = useTheme();
   const tabletMode = useMediaQuery(theme.breakpoints.down("md"));
   const mobileMode = useMediaQuery(theme.breakpoints.down("sm"));
+  const [pending, setPending] = useState(false);
 
   //Fetch current profile
   const { data, isLoading, isSuccess, error } = useGetProfileQuery();
@@ -31,6 +35,11 @@ export default function ProfileLayout() {
         </Grid>
       )}
       <Grid size="grow">
+        {pending && (
+          <Suspense fallBack={null}>
+            <PendingModal open={pending} message="Đang gửi yêu cầu..." />
+          </Suspense>
+        )}
         <Outlet
           context={{
             profile: data,
@@ -39,6 +48,8 @@ export default function ProfileLayout() {
             error,
             tabletMode,
             mobileMode,
+            pending,
+            setPending,
           }}
         />
       </Grid>

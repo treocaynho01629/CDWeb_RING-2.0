@@ -17,7 +17,7 @@ const PoliciesContainer = styled.div`
   flex-direction: column;
   overflow: hidden;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     flex-direction: row;
   }
 `;
@@ -29,7 +29,7 @@ const DetailTitle = styled.h4`
   display: flex;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     display: none;
   }
 `;
@@ -42,7 +42,7 @@ const PolicyTitle = styled.span`
   padding-right: 20px;
   white-space: nowrap;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     margin: 3px 0;
   }
 `;

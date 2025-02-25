@@ -44,10 +44,10 @@ const ImageLogo = styled.img`
   height: 40px;
   padding: 0;
   transition: all 0.25s ease;
-  margin: ${(props) => props.theme.spacing(0, 1)};
+  margin: ${({ theme }) => theme.spacing(0, 1)};
 
   &.open {
-    margin: ${(props) => props.theme.spacing(0, 3)};
+    margin: ${({ theme }) => theme.spacing(0, 3)};
   }
 `;
 
@@ -55,7 +55,7 @@ const DrawerHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  ${(props) => props.theme.mixins.toolbar};
+  ${({ theme }) => theme.mixins.toolbar};
 `;
 
 const StyledDrawer = styled(MuiDrawer, {

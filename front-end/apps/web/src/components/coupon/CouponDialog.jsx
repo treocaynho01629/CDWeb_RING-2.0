@@ -37,18 +37,16 @@ const DetailTitle = styled.h4`
   font-size: 17px;
   font-weight: 600;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     margin: 5px 0 5px 10px;
   }
 `;
 
 const CouponContainer = styled.div`
-  padding: ${(props) => props.theme.spacing(1)}
-    ${(props) => props.theme.spacing(3)};
+  padding: ${({ theme }) => `${theme.spacing(1)} ${theme.spacing(3)}`};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    padding: ${(props) => props.theme.spacing(1)}
-      ${(props) => props.theme.spacing(1)};
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: ${({ theme }) => `${theme.spacing(1)} ${theme.spacing(3)}`};
   }
 `;
 

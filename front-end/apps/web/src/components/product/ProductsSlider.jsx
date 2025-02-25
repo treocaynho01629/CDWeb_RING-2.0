@@ -12,13 +12,13 @@ const Container = styled.div`
   position: relative;
   min-height: 302px;
   max-height: 380px;
-  padding: ${(props) => props.theme.spacing(0.25)} 0;
+  padding: ${({ theme }) => theme.spacing(0.25)} 0;
 
   .react-multi-carousel-list {
     position: unset !important;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm_md")} {
+  ${({ theme }) => theme.breakpoints.down("sm_md")} {
     padding: 5px;
   }
 `;
@@ -44,8 +44,8 @@ const CustomArrowButton = styled.div`
   top: 0;
   bottom: 0;
   margin: auto;
-  background-color: ${(props) => props.theme.palette.background.paper};
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
   border-radius: 50%;
   height: 30px;
   width: 30px;
@@ -61,7 +61,7 @@ const CustomArrowButton = styled.div`
   &:hover {
     opacity: 1;
     transform: scale(1.1);
-    background-color: ${(props) => props.theme.palette.background.default};
+    background-color: ${({ theme }) => theme.palette.background.default};
   }
 
   &.left {
@@ -163,7 +163,7 @@ const ProductsSlider = ({
         responsive={responsive}
         customLeftArrow={<CustomArrow direction="left" />}
         customRightArrow={<CustomArrow direction="right" />}
-        removeArrowOnDeviceType={["mobile"]}
+        removeArrowOnDeviceType={["tablet", "mobile"]}
         transitionDuration={200}
         minimumTouchDrag={80}
       >

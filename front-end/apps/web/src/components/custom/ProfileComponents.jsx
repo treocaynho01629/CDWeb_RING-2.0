@@ -8,22 +8,25 @@ export const StyledDialogTitle = styled(DialogTitle)`
   align-items: center;
   text-align: center;
   font-size: 18px;
-  margin-bottom: ${(props) => props.theme.spacing(2)};
-  padding: ${(props) => props.theme.spacing(1.5)} 0px;
-  border-bottom: 0.5px solid ${(props) => props.theme.palette.divider};
-  color: ${(props) => props.theme.palette.primary.main};
-  border-color: ${(props) => props.theme.palette.primary.main};
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
+  padding: ${({ theme }) => theme.spacing(1.5)} 0px;
+  border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
+  color: ${({ theme }) => theme.palette.primary.main};
+  border-color: ${({ theme }) => theme.palette.primary.main};
   width: 100%;
 
   a {
     display: none;
     align-items: center;
-    color: ${(props) => props.theme.palette.text.primary};
+    color: ${({ theme }) => theme.palette.text.primary};
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     font-size: 16px;
-    padding: ${(props) => props.theme.spacing(2)} 10px;
+  }
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    padding: ${({ theme }) => theme.spacing(2)} 10px;
     margin-bottom: 0;
 
     a {
@@ -34,12 +37,12 @@ export const StyledDialogTitle = styled(DialogTitle)`
 
 export const TabContentContainer = styled.div`
   position: relative;
-  padding: 0 ${(props) => props.theme.spacing(2)};
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  padding: 0 ${({ theme }) => theme.spacing(2)};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
   min-height: 60dvh;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     padding: 0;
     border: none;
   }

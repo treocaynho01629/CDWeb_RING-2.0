@@ -3,8 +3,8 @@ import styled from "@emotion/styled";
 export const Instruction = styled.p`
   font-size: 14px;
   font-style: italic;
-  color: ${(props) => props.theme.palette.error.main};
-  display: ${(props) => props.display};
+  color: ${({ theme }) => theme.palette.error.main};
+  display: ${({ display }) => display};
 `;
 
 export const LogoImage = styled.img`
@@ -17,15 +17,15 @@ export const LogoTitle = styled.span`
   font-size: 27px;
   text-transform: uppercase;
   font-weight: 500;
-  color: ${(props) => props.theme.palette.primary.main};
-  text-shadow: 1.5px 1.5px ${(props) => props.theme.palette.background.paper};
+  color: ${({ theme }) => theme.palette.primary.main};
+  text-shadow: 1.5px 1.5px ${({ theme }) => theme.palette.background.paper};
   margin-left: 10px;
   white-space: nowrap;
   transition: width 0.25s ease;
 `;
 
 export const LogoSubtitle = styled(LogoTitle)`
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
   margin-left: 0;
 `;
 
@@ -43,11 +43,9 @@ export const MobileExtendButton = styled.div`
   max-height: 30px;
   font-size: 14px;
   cursor: pointer;
-  color: ${(props) =>
-    props.disabled
-      ? props.theme.palette.text.disabled
-      : props.theme.palette.text.secondary};
-  pointer-events: ${(props) => (props.disabled ? "none" : "all")};
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.palette.text.disabled : theme.palette.text.secondary};
+  pointer-events: ${({ theme, disabled }) => (disabled ? "none" : "all")};
   overflow: hidden;
   z-index: 1;
 
@@ -60,15 +58,15 @@ export const MobileExtendButton = styled.div`
     height: 104%;
     background-image: linear-gradient(
       to left,
-      ${(props) => props.theme.palette.background.paper},
-      ${(props) => props.theme.palette.background.paper} 5%,
+      ${({ theme }) => theme.palette.background.paper},
+      ${({ theme }) => theme.palette.background.paper} 5%,
       transparent 15%,
       transparent 100%
     );
     z-index: -1;
   }
 
-  ${(props) => props.theme.breakpoints.up("md")} {
+  ${({ theme }) => theme.breakpoints.up("md")} {
     display: none;
   }
 `;
@@ -83,21 +81,20 @@ export const Title = styled.h3`
   margin: 0 0 20px;
   padding: 15px 0;
   border-bottom: 0.5px solid
-    ${(props) =>
-      props.theme.palette[props.color]?.main || props.theme.palette.divider};
-  color: ${(props) =>
-    props.theme.palette[props.color]?.main || props.theme.palette.text.primary};
-  border-color: ${(props) =>
-    props.theme.palette[props.color]?.main || props.theme.palette.primary.main};
+    ${({ theme, color }) => theme.palette[color]?.main || theme.palette.divider};
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.main || theme.palette.text.primary};
+  border-color: ${({ theme, color }) =>
+    theme.palette[color]?.main || theme.palette.primary.main};
   width: 100%;
 
   a {
     display: none;
     align-items: center;
-    color: ${(props) => props.theme.palette.text.primary};
+    color: ${({ theme }) => theme.palette.text.primary};
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 16px;
     margin: 0 0 15px;
     text-transform: none;
@@ -117,7 +114,7 @@ export const Showmore = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${(props) => props.theme.palette.info.main};
+  color: ${({ theme }) => theme.palette.info.main};
   cursor: pointer;
 
   &::after {
@@ -129,12 +126,12 @@ export const Showmore = styled.div`
     height: 100%;
     width: 100%;
     pointer-events: none;
-    border-bottom: 0.5px solid ${(props) => props.theme.palette.divider};
+    border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
     background-image: linear-gradient(
       180deg,
       transparent,
       transparent 60%,
-      ${(props) => props.theme.palette.background.paper} 100%
+      ${({ theme }) => theme.palette.background.paper} 100%
     );
   }
 
@@ -146,7 +143,7 @@ export const Showmore = styled.div`
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     margin-top: 0;
   }
 `;
@@ -159,6 +156,6 @@ export const Message = styled.span`
   justify-content: center;
   text-align: center;
   white-space: wrap;
-  color: ${(props) =>
-    props.theme.palette[props.color]?.main || props.theme.palette.text.primary};
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.main || theme.palette.text.primary};
 `;

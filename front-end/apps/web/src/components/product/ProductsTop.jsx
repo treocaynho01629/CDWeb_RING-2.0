@@ -39,28 +39,28 @@ const Rank = styled.span`
     display: flex;
     align-items: center;
     justify-content: center;
-    color: ${(props) => props.theme.palette.grey[900]};
+    color: ${({ theme }) => theme.palette.grey[900]};
     z-index: 1;
   }
 
   svg {
     font-size: 40px;
-    color: ${(props) => props.theme.palette.grey[400]};
+    color: ${({ theme }) => theme.palette.grey[400]};
   }
 
   &.first {
     svg {
-      color: ${(props) => props.theme.palette.success.light};
+      color: ${({ theme }) => theme.palette.success.light};
     }
   }
 
   &.second {
     svg {
-      color: ${(props) => props.theme.palette.warning.light};
+      color: ${({ theme }) => theme.palette.warning.light};
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;
 
     * {
@@ -73,21 +73,21 @@ const Rank = styled.span`
 const ProductContainer = styled.div`
   display: flex;
   cursor: pointer;
-  padding-right: ${(props) => props.theme.spacing(1)};
+  padding-right: ${({ theme }) => theme.spacing(1)};
 
-  ${(props) => props.theme.breakpoints.up("md_lg")} {
+  ${({ theme }) => theme.breakpoints.up("md_lg")} {
     &.selected {
-      border-right: 3px solid ${(props) => props.theme.palette.primary.main};
+      border-right: 3px solid ${({ theme }) => theme.palette.primary.main};
     }
   }
 `;
 
 const DisplayContainer = styled.div`
   width: 110%;
-  padding: ${(props) => props.theme.spacing(1)};
-  border-left: 0.5px solid ${(props) => props.theme.palette.divider};
+  padding: ${({ theme }) => theme.spacing(1)};
+  border-left: 0.5px solid ${({ theme }) => theme.palette.divider};
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     display: none;
   }
 `;
@@ -95,16 +95,16 @@ const DisplayContainer = styled.div`
 const Display = styled.div`
   position: relative;
   display: flex;
-  border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
 `;
 
 const InfoWrapper = styled.div`
   position: absolute;
   bottom: 0;
   width: 100%;
-  padding: ${(props) => props.theme.spacing(1)};
-  background-color: ${(props) =>
-    alpha(props.theme.palette.background.default, 0.5)};
+  padding: ${({ theme }) => theme.spacing(1)};
+  background-color: ${({ theme }) =>
+    alpha(theme.palette.background.default, 0.5)};
 `;
 
 const ProductTitle = styled.span`
@@ -124,7 +124,7 @@ const ProductTitle = styled.span`
     -webkit-box-orient: vertical;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 13px;
   }
 `;
@@ -138,9 +138,9 @@ const StyledLazyImage = styled(LazyLoadImage)`
   display: inline-block;
   height: 90px;
   width: 90px;
-  border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 80px;
     width: 80px;
   }
@@ -151,7 +151,7 @@ const StyledSkeleton = styled(Skeleton)`
   height: 90px;
   width: 90px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 80px;
     width: 80px;
   }
@@ -177,7 +177,7 @@ const StyledDisplaySkeleton = styled(Skeleton)`
 const Price = styled.span`
   font-size: 18px;
   font-weight: 420;
-  color: ${(props) => props.theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.main};
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -187,7 +187,7 @@ const Price = styled.span`
 
 const DiscountContainer = styled.span`
   font-size: 14px;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
   display: flex;
   align-items: center;
 `;
@@ -203,9 +203,9 @@ const Percentage = styled.span`
   margin-left: 10px;
   font-size: 14px;
   font-weight: bold;
-  background-color: ${(props) => alpha(props.theme.palette.success.light, 0.8)};
+  background-color: ${({ theme }) => alpha(theme.palette.success.light, 0.8)};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     margin-left: 5px;
     font-size: 10px;
   }
@@ -215,7 +215,7 @@ const Description = styled.div`
   height: 200px;
   font-size: 15px;
   overflow-y: scroll;
-  scrollbar-color: ${(props) => props.theme.palette.action.disabled} transparent;
+  scrollbar-color: ${({ theme }) => theme.palette.action.disabled} transparent;
   scrollbar-width: thin;
 `;
 
@@ -243,8 +243,8 @@ const TextMore = styled.b`
   margin-left: 5px;
   padding-left: 5px;
   font-size: 12px;
-  border-left: 0.5px solid ${(props) => props.theme.palette.action.focus};
-  color: ${(props) => props.theme.palette.info.main};
+  border-left: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  color: ${({ theme }) => theme.palette.info.main};
 `;
 
 const StyledRating = styled(Rating)`
@@ -255,9 +255,9 @@ const StyledRating = styled(Rating)`
 
 const ProductShop = styled.span`
   font-size: 14px;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;
   }
 `;
@@ -428,7 +428,7 @@ const ProductsTop = ({
               <ProductShop>{selectedBook?.shopName}</ProductShop>
               <Price>
                 {currencyFormat.format(
-                  selectedBook?.price * (1 - selectedBook?.discount),
+                  selectedBook?.price * (1 - selectedBook?.discount)
                 )}
               </Price>
               <DiscountContainer>

@@ -10,9 +10,9 @@ const Container = styled.div`
 
 const StyledButton = styled(IconButton)`
   border-radius: 0;
-  padding: ${(props) => props.theme.spacing(0.8)};
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  padding: ${({ theme }) => theme.spacing(0.8)};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 
   &:last-child {
     border-left: none;
@@ -21,10 +21,10 @@ const StyledButton = styled(IconButton)`
 
 const Count = styled.span`
   font-size: 16px;
-  margin-right: ${(props) => props.theme.spacing(1)};
+  margin-right: ${({ theme }) => theme.spacing(1)};
 
   b {
-    color: ${(props) => props.theme.palette.warning.light};
+    color: ${({ theme }) => theme.palette.warning.light};
   }
 `;
 //#endregion

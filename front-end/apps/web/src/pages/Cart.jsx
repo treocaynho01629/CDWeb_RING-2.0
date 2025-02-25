@@ -28,9 +28,9 @@ const Wrapper = styled.div`
 const StyledEmptyIcon = styled(EmptyIcon)`
   height: 250px;
   width: 250px;
-  fill: ${(props) => props.theme.palette.text.icon};
+  fill: ${({ theme }) => theme.palette.text.icon};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     width: 200px;
     height: 200px;
   }
@@ -41,7 +41,7 @@ const Cart = () => {
   const { cartProducts } = useCart();
   const [ConfirmationDialog, confirm] = useConfirm(
     "Xoá khỏi giỏ?",
-    "Xoá sản phẩm đã chọn khỏi giỏ?",
+    "Xoá sản phẩm đã chọn khỏi giỏ?"
   );
   useTitle("Giỏ hàng"); //Set title
 

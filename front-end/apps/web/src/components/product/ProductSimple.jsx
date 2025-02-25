@@ -18,13 +18,13 @@ const Container = styled.div`
   align-items: center;
   position: relative;
   overflow: hidden;
-  border: 0.5px solid ${(props) => props.theme.palette.action.hover};
-  background-color: ${(props) => props.theme.palette.background.paper};
-  margin: 0 ${(props) => props.theme.spacing(0.1)};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.hover};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  margin: 0 ${({ theme }) => theme.spacing(0.1)};
 
   &:hover {
-    border-color: ${(props) => props.theme.palette.action.focus};
-    box-shadow: ${(props) => props.theme.shadows[1]};
+    border-color: ${({ theme }) => theme.palette.action.focus};
+    box-shadow: ${({ theme }) => theme.shadows[1]};
   }
 `;
 
@@ -54,11 +54,11 @@ const Title = styled("h5")`
 const Price = styled.span`
   font-size: 16px;
   font-weight: 400;
-  color: ${(props) => props.theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.main};
   display: flex;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 14px;
   }
 `;
@@ -67,10 +67,10 @@ const Percentage = styled.span`
   padding: 1px 5px;
   margin-left: 10px;
   font-size: 14px;
-  color: ${(props) => props.theme.palette.text.primary};
-  background-color: ${(props) => props.theme.palette.action.focus};
+  color: ${({ theme }) => theme.palette.text.primary};
+  background-color: ${({ theme }) => theme.palette.action.focus};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     margin-left: 5px;
     font-size: 10px;
   }
@@ -82,7 +82,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
   object-fit: contain;
   margin: 5px 0;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     margin: 0;
   }
 `;

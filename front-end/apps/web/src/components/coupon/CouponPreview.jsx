@@ -18,7 +18,7 @@ const DetailTitle = styled.h4`
   display: flex;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     display: none;
   }
 `;
@@ -47,7 +47,7 @@ const Wrapper = styled.div`
     display: none;
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     padding: 2px 0;
   }
 `;
@@ -76,21 +76,18 @@ const CouponIcon = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
   border-right: none;
-  background-color: ${(props) =>
-    props.theme.palette[props.color]?.light ||
-    props.theme.palette.primary.light};
-  color: ${(props) =>
-    props.theme.palette[props.color]?.contrastText ||
-    props.theme.palette.primary.contrastText};
+  background-color: ${({ theme, color }) =>
+    theme.palette[color]?.light || theme.palette.primary.light};
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.contrastText || theme.palette.primary.contrastText};
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     width: 22px;
     height: 22px;
-    color: ${(props) =>
-      props.theme.palette[props.color]?.dark ||
-      props.theme.palette.primary.dark};
+    color: ${({ theme, color }) =>
+      theme.palette[color]?.dark || theme.palette.primary.dark};
 
     svg {
       font-size: 15px;
@@ -107,15 +104,15 @@ const CouponContent = styled.div`
   align-items: center;
   border-radius: 6px;
   padding: 0 10px;
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
   border-left: none;
 
   &::before,
   &::after {
     content: "";
     position: absolute;
-    background-color: ${(props) => props.theme.palette.background.default};
-    border: 0.5px solid ${(props) => props.theme.palette.divider};
+    background-color: ${({ theme }) => theme.palette.background.default};
+    border: 0.5px solid ${({ theme }) => theme.palette.divider};
     height: 10px;
     width: 10px;
     border-radius: 100%;
@@ -131,7 +128,7 @@ const CouponContent = styled.div`
     left: -5px;
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     height: 22px;
     max-width: 120px;
 
@@ -152,7 +149,7 @@ const CouponContent = styled.div`
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     &::before,
     &::after {
       display: none;
@@ -167,7 +164,7 @@ const CouponTitle = styled.div`
   font-weight: 450;
   font-size: 14px;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 12px;
     font-weight: 350;
     text-transform: uppercase;
@@ -179,20 +176,18 @@ const MoreButton = styled.span`
   font-weight: 500;
   display: flex;
   align-items: end;
-  color: ${(props) =>
-    props.disabled
-      ? props.theme.palette.text.disabled
-      : props.theme.palette.info.main};
-  pointer-events: ${(props) => (props.disabled ? "none" : "all")};
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.palette.text.disabled : theme.palette.info.main};
+  pointer-events: ${({ disabled }) => (disabled ? "none" : "all")};
   cursor: pointer;
 `;
 
 const CouponMessage = styled.span`
   display: flex;
   align-items: center;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 14px;
   }
 `;

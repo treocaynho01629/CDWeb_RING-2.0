@@ -24,24 +24,24 @@ const Wrapper = styled.div`
     background: radial-gradient(
         circle,
         transparent 25%,
-        ${(props) => props.theme.palette.background.default} 26%
+        ${({ theme }) => theme.palette.background.default} 26%
       ),
       linear-gradient(
         45deg,
         transparent 46%,
-        ${(props) => props.theme.palette.primary.light} 47%,
-        ${(props) => props.theme.palette.primary.light} 52%,
+        ${({ theme }) => theme.palette.primary.light} 47%,
+        ${({ theme }) => theme.palette.primary.light} 52%,
         transparent 53%
       ),
       linear-gradient(
         135deg,
         transparent 46%,
-        ${(props) => props.theme.palette.primary.light} 47%,
-        ${(props) => props.theme.palette.primary.light} 52%,
+        ${({ theme }) => theme.palette.primary.light} 47%,
+        ${({ theme }) => theme.palette.primary.light} 52%,
         transparent 53%
       );
     background-size: 4em 4em;
-    background-color: ${(props) => props.theme.palette.background.default};
+    background-color: ${({ theme }) => theme.palette.background.default};
     opacity: 0.3;
   }
 `;
@@ -52,7 +52,7 @@ const Content = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: ${(props) => props.theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(1)};
 
   h2 {
     font-size: 2.25em;
@@ -66,10 +66,10 @@ const Content = styled.div`
 
   p {
     margin: 0;
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;
 
     p {
@@ -83,21 +83,21 @@ const ErrorCode = styled.h1`
   display: flex;
   align-items: center;
   font-size: 13em;
-  color: ${(props) => props.theme.palette.background.default};
+  color: ${({ theme }) => theme.palette.background.default};
   margin: 0;
   text-shadow:
-    3px 3px 0 ${(props) => props.theme.palette.warning.main},
-    -3px 3px 0 ${(props) => props.theme.palette.warning.main},
-    -3px -3px 0 ${(props) => props.theme.palette.warning.main},
-    3px -3px 0 ${(props) => props.theme.palette.warning.main};
-  border-bottom: 0.02em solid ${(props) => props.theme.palette.primary.main};
+    3px 3px 0 ${({ theme }) => theme.palette.warning.main},
+    -3px 3px 0 ${({ theme }) => theme.palette.warning.main},
+    -3px -3px 0 ${({ theme }) => theme.palette.warning.main},
+    3px -3px 0 ${({ theme }) => theme.palette.warning.main};
+  border-bottom: 0.02em solid ${({ theme }) => theme.palette.primary.main};
 
   svg {
     font-size: 0.9em;
 
     path {
       fill: none;
-      stroke: ${(props) => props.theme.palette.warning.main};
+      stroke: ${({ theme }) => theme.palette.warning.main};
       stroke-width: 0.4px;
       stroke-linejoin: round;
     }

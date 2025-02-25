@@ -28,8 +28,8 @@ import { useState } from "react";
 
 //#region styled
 const TooltipContainer = styled.div`
-  background-color: ${(props) => props.theme.palette.background.default};
-  border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+  background-color: ${({ theme }) => theme.palette.background.default};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
   padding: 10px;
 `;
 

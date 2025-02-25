@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   overflow: hidden;
   height: 100dvh;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     flex-direction: column-reverse;
   }
 `;
@@ -27,8 +27,8 @@ const Container = styled.div`
   height: 100%;
   width: 100%;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
-    margin-top: -${(props) => props.theme.spacing(8)};
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    margin-top: -${({ theme }) => theme.spacing(8)};
   }
 `;
 

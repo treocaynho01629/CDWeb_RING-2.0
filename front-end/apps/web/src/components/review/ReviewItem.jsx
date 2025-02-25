@@ -13,7 +13,7 @@ import { Link } from "react-router";
 
 //#region styled
 const ReviewContainer = styled.div`
-  margin-bottom: ${(props) => props.theme.spacing(1)};
+  margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 const Profile = styled.div`
@@ -24,29 +24,29 @@ const Profile = styled.div`
   padding: 15px 0 5px;
 
   &.active {
-    border-color: ${(props) => props.theme.palette.primary.main};
+    border-color: ${({ theme }) => theme.palette.primary.main};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: 10px 0 5px;
   }
 `;
 
 const RateContent = styled.div`
-  margin: ${(props) => props.theme.spacing(1)} 0
-    ${(props) => props.theme.spacing(2)};
+  margin: ${({ theme }) => theme.spacing(1)} 0
+    ${({ theme }) => theme.spacing(2)};
   font-size: 15px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    margin: ${(props) => props.theme.spacing(0.5)} 0
-      ${(props) => props.theme.spacing(2)};
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    margin: ${({ theme }) => theme.spacing(0.5)} 0
+      ${({ theme }) => theme.spacing(2)};
   }
 `;
 
 const ActionButton = styled.span`
   display: flex;
   align-items: center;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
   opacity: 0.9;
   font-size: 14px;
   cursor: pointer;
@@ -56,19 +56,19 @@ const ActionButton = styled.span`
   }
 
   svg {
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
     font-size: 20px;
   }
 
   &:hover {
-    color: ${(props) => props.theme.palette.warning.main};
+    color: ${({ theme }) => theme.palette.warning.main};
 
     svg {
-      color: ${(props) => props.theme.palette.warning.main};
+      color: ${({ theme }) => theme.palette.warning.main};
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     display: none;
     &.mobile {
       display: flex;
@@ -80,12 +80,12 @@ const RatingInfo = styled.p`
   font-size: 14px;
   padding: 0;
   margin: 0;
-  margin-right: ${(props) => props.theme.spacing(1)};
+  margin-right: ${({ theme }) => theme.spacing(1)};
   font-weight: 400;
   display: flex;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     max-width: 95px;
     &.time {
       display: none;
@@ -109,10 +109,10 @@ const TimeContainer = styled.div`
 
 const ProductContent = styled.div`
   font-size: 14px;
-  padding: ${(props) => props.theme.spacing(0.5)};
-  margin-bottom: ${(props) => props.theme.spacing(2)};
-  color: ${(props) => props.theme.palette.text.secondary};
-  border: 0.5px solid ${(props) => props.theme.palette.warning.main};
+  padding: ${({ theme }) => theme.spacing(0.5)};
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
+  color: ${({ theme }) => theme.palette.text.secondary};
+  border: 0.5px solid ${({ theme }) => theme.palette.warning.main};
 `;
 //#endregion
 

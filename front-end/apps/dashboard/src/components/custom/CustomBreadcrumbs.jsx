@@ -8,11 +8,11 @@ const BreadcrumbsContainer = styled.div`
   a.active {
     font-weight: 450;
     text-decoration: underline;
-    color: ${(props) => props.theme.palette.primary.dark};
+    color: ${({ theme }) => theme.palette.primary.dark};
     pointer-events: none;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     display: none;
   }
 `;

@@ -52,14 +52,14 @@ const ItemTitle = styled.p`
   }
 
   &.error {
-    color: ${(props) => props.theme.palette.error.light};
+    color: ${({ theme }) => theme.palette.error.light};
   }
 
   &:hover {
-    color: ${(props) => props.theme.palette.info.main};
+    color: ${({ theme }) => theme.palette.info.main};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 13px;
 
     @supports (-webkit-line-clamp: 1) {
@@ -80,10 +80,10 @@ const Shop = styled.b`
   align-items: center;
 
   svg {
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 14px;
     margin: 8px 0;
   }
@@ -106,15 +106,15 @@ const CouponButton = styled.b`
     white-space: nowrap;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 14px;
     margin: 8px 0;
   }
 `;
 
 const ShopTag = styled.span`
-  background-color: ${(props) => props.theme.palette.primary.main};
-  color: ${(props) => props.theme.palette.primary.contrastText};
+  background-color: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.contrastText};
   padding: 2px 10px;
   margin-right: 8px;
 `;
@@ -129,17 +129,17 @@ const Price = styled.p`
   font-size: 16px;
   font-weight: 450;
   text-align: left;
-  color: ${(props) => props.theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.main};
   margin: 0;
 
   &.total {
-    color: ${(props) => props.theme.palette.warning.light};
+    color: ${({ theme }) => theme.palette.warning.light};
   }
 `;
 
 const Discount = styled.p`
   font-size: 12px;
-  color: ${(props) => props.theme.palette.text.disabled};
+  color: ${({ theme }) => theme.palette.text.disabled};
   margin: 0;
   display: flex;
   flex-wrap: wrap;
@@ -151,16 +151,16 @@ const Discount = styled.p`
 const AmountLeft = styled.span`
   font-size: 12px;
   text-align: center;
-  color: ${(props) => props.theme.palette.error.light};
+  color: ${({ theme }) => theme.palette.error.light};
 `;
 
 const StyledLazyImage = styled(LazyLoadImage)`
   display: inline-block;
   height: 90px;
   width: 90px;
-  border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 80px;
     width: 80px;
   }
@@ -171,7 +171,7 @@ const StyledSkeleton = styled(Skeleton)`
   height: 90px;
   width: 90px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 80px;
     width: 80px;
   }
@@ -182,7 +182,7 @@ const StyledIconButton = styled(IconButton)`
   right: 4px;
   top: 4px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     right: 0;
     bottom: 0;
     top: auto;
@@ -254,7 +254,7 @@ function ItemRow({
               >
                 <Price>
                   {currencyFormat.format(
-                    product.price * (1 - (product?.discount || 0)),
+                    product.price * (1 - (product?.discount || 0))
                   )}
                 </Price>
                 <Discount>
@@ -296,7 +296,7 @@ function ItemRow({
       >
         <Price>
           {currencyFormat.format(
-            product.price * (1 - (product?.discount || 0)),
+            product.price * (1 - (product?.discount || 0))
           )}
         </Price>
         {product?.discount > 0 && (
@@ -329,7 +329,7 @@ function ItemRow({
       >
         <Price className="total">
           {currencyFormat.format(
-            product.price * (1 - (product?.discount || 0)) * product.quantity,
+            product.price * (1 - (product?.discount || 0)) * product.quantity
           )}
         </Price>
       </StyledTableCell>

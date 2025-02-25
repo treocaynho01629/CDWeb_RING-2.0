@@ -118,7 +118,7 @@ const ResetPassComponent = ({ pending, setPending }) => {
             spacing={1.5}
             direction="column"
             minHeight={"70dvh"}
-            maxWidth={380}
+            maxWidth={{ xs: "100%", md: 380 }}
           >
             <PasswordInput
               label="Nhập mật khẩu hiện tại"
@@ -168,6 +168,7 @@ const ResetPassComponent = ({ pending, setPending }) => {
               <Button
                 variant="contained"
                 color="primary"
+                size="large"
                 onClick={handleChangePassword}
                 disabled={!validReset || pending || changing}
                 startIcon={<Check />}

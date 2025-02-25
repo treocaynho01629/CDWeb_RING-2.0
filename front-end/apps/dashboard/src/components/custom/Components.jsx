@@ -18,7 +18,7 @@ export const ItemTitle = styled.p`
   }
 
   &.secondary {
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
   }
 `;
 
@@ -26,10 +26,10 @@ export const HeaderContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: ${(props) => props.theme.spacing(4)};
+  margin-bottom: ${({ theme }) => theme.spacing(4)};
 
-  ${(props) => props.theme.breakpoints.down("sm_md")} {
-    padding: 0 ${(props) => props.theme.spacing(1)};
+  ${({ theme }) => theme.breakpoints.down("sm_md")} {
+    padding: 0 ${({ theme }) => theme.spacing(1)};
   }
 `;
 
@@ -38,7 +38,7 @@ export const FooterContainer = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     flex-direction: column-reverse;
     align-items: flex-end;
   }
@@ -59,7 +59,7 @@ export const Title = styled.span`
   align-items: center;
   font-size: 18px;
   font-weight: 400;
-  margin: ${(props) => props.theme.spacing(1.5)} 0;
+  margin: ${({ theme }) => theme.spacing(1.5)} 0;
 `;
 
 export const Label = styled.p`
@@ -67,7 +67,7 @@ export const Label = styled.p`
 
   span {
     font-weight: 350;
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
   }
 `;
 
@@ -78,7 +78,7 @@ export const ButtonContainer = styled.div`
 `;
 
 export const LinkButton = styled.span`
-  color: ${(props) => props.theme.palette.info.main};
+  color: ${({ theme }) => theme.palette.info.main};
   font-size: 14px;
 `;
 

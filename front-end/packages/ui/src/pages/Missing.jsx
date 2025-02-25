@@ -21,7 +21,7 @@ const RandomShape = styled.span`
   width: 50%;
   opacity: 0.7;
   background: hsl(
-    from ${(props) => props.theme.palette.primary.main} h s l / 0.4
+    from ${({ theme }) => theme.palette.primary.main} h s l / 0.4
   );
   z-index: -1;
   transform: translate(60%, 0%) rotate(25deg);
@@ -34,7 +34,7 @@ const RandomShape = styled.span`
     height: 100dvh;
     width: 100%;
     background: hsl(
-      from ${(props) => props.theme.palette.primary.main} calc(h + 30) s l / 0.3
+      from ${({ theme }) => theme.palette.primary.main} calc(h + 30) s l / 0.3
     );
     transform: translate(-80%, -60%) rotate(85deg);
   }
@@ -47,13 +47,13 @@ const RandomShape = styled.span`
     height: 100%;
     width: 200%;
     background: hsl(
-      from ${(props) => props.theme.palette.primary.main} calc(h - 30) s l / 0.2
+      from ${({ theme }) => theme.palette.primary.main} calc(h - 30) s l / 0.2
     );
     transform: rotate(-130deg) translate(-35%, -60%);
     z-index: -5;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     transform: translate(75%, 5%) rotate(25deg);
   }
 `;
@@ -64,7 +64,7 @@ const Content = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: ${(props) => props.theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(1)};
 
   h2 {
     font-size: 2.25em;
@@ -78,10 +78,10 @@ const Content = styled.div`
 
   p {
     margin: 0;
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;
 
     p {
@@ -94,22 +94,22 @@ const Content = styled.div`
 const StyledEmptyIcon = styled(EmptyIcon)`
   height: 0.75em;
   width: 0.75em;
-  fill: ${(props) => props.theme.palette.background.default};
-  stroke: ${(props) => props.theme.palette.error.main};
+  fill: ${({ theme }) => theme.palette.background.default};
+  stroke: ${({ theme }) => theme.palette.error.main};
   stroke-width: 10px;
   overflow: visible;
 `;
 
 const ErrorCode = styled.h1`
   font-size: 13em;
-  color: ${(props) => props.theme.palette.background.default};
+  color: ${({ theme }) => theme.palette.background.default};
   margin: 0;
   text-shadow:
-    3px 3px 0 ${(props) => props.theme.palette.error.main},
-    -3px 3px 0 ${(props) => props.theme.palette.error.main},
-    -3px -3px 0 ${(props) => props.theme.palette.error.main},
-    3px -3px 0 ${(props) => props.theme.palette.error.main};
-  border-bottom: 0.02em solid ${(props) => props.theme.palette.primary.main};
+    3px 3px 0 ${({ theme }) => theme.palette.error.main},
+    -3px 3px 0 ${({ theme }) => theme.palette.error.main},
+    -3px -3px 0 ${({ theme }) => theme.palette.error.main},
+    3px -3px 0 ${({ theme }) => theme.palette.error.main};
+  border-bottom: 0.02em solid ${({ theme }) => theme.palette.primary.main};
 `;
 
 const ErrorContainer = styled("div")(({ theme }) => ({

@@ -13,12 +13,12 @@ const StyledLazyImage = styled(LazyLoadImage)`
   width: 65px;
   object-fit: contain;
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     height: 55px;
     width: 55px;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 45px;
     width: 45px;
   }
@@ -29,12 +29,12 @@ const StyledSkeleton = styled(Skeleton)`
   height: 65px;
   width: 65px;
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     height: 55px;
     width: 55px;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 45px;
     width: 45px;
   }
@@ -54,20 +54,20 @@ const ItemContainer = styled.div`
 
   &:hover {
     transform: translateY(-1px);
-    border-color: ${(props) => props.theme.palette.action.focus};
-    box-shadow: ${(props) => props.theme.shadows[1]};
+    border-color: ${({ theme }) => theme.palette.action.focus};
+    box-shadow: ${({ theme }) => theme.shadows[1]};
     ${StyledLazyImage} {
       filter: saturate(120%);
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     width: 90px;
     height: 100px;
     font-size: 13px;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: 2px;
     width: 70px;
     height: 95px;
@@ -80,7 +80,7 @@ const CateContainer = styled.div`
   display: flex;
   justify-content: space-between;
   overflow: hidden;
-  background-color: ${(props) => props.theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 
   &:hover {
     .button-container {
@@ -120,7 +120,7 @@ const Wrapper = styled.div`
     display: none;
   }
 
-  ${(props) => props.theme.breakpoints.up("md")} {
+  ${({ theme }) => theme.breakpoints.up("md")} {
     ${ItemWrapper}:first-of-type {
       margin-left: 20px;
     }
@@ -137,8 +137,8 @@ const ButtonContainer = styled.div`
   height: 100%;
   background-image: linear-gradient(
     to left,
-    ${(props) => props.theme.palette.background.paper},
-    ${(props) => props.theme.palette.background.paper} 80%,
+    ${({ theme }) => theme.palette.background.paper},
+    ${({ theme }) => theme.palette.background.paper} 80%,
     transparent 100%
   );
   display: flex;
@@ -153,7 +153,7 @@ const ButtonContainer = styled.div`
     visibility: visible;
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     display: none;
   }
 `;
