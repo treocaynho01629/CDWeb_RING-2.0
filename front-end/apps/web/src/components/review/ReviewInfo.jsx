@@ -10,10 +10,10 @@ const ReviewsInfoContainer = styled.div`
   margin-top: 15px;
   text-transform: none;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     padding-bottom: 10px;
     justify-content: center;
-    border-bottom: 0.5px solid ${(props) => props.theme.palette.divider};
+    border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
   }
 `;
 
@@ -24,7 +24,7 @@ const ScoreContainer = styled.div`
   align-items: center;
   padding: 0 20px;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     padding: 0;
   }
 `;
@@ -37,7 +37,7 @@ const ProgressContainer = styled.div`
   margin-left: 10px;
   max-width: 600px;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     padding: 0;
   }
 `;
@@ -48,7 +48,7 @@ const ButtonContainer = styled.div`
   align-items: center;
   flex-grow: 1;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     display: none;
   }
 `;
@@ -59,7 +59,7 @@ const Score = styled.h1`
     font-size: 30px;
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 40px;
     b {
       display: none;
@@ -70,7 +70,7 @@ const Score = styled.h1`
 const TotalLabel = styled.span`
   margin: 5px 0;
   font-size: 14px;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
 `;
 
 const ProgressLabel = styled.span`
@@ -92,7 +92,7 @@ const ProgressLabelContainer = styled.div`
 const ProgressBarContainer = styled.div`
   width: 100%;
   margin-right: 6px;
-  color: ${(props) => props.theme.palette.warning.light};
+  color: ${({ theme }) => theme.palette.warning.light};
 `;
 //#endregion
 
@@ -193,7 +193,7 @@ const ReviewInfo = ({ handleClick, book, disabled, editable }) => {
                 my: { xs: "8px", md: "10px" },
               }}
             />
-          ),
+          )
         )}
       </ProgressContainer>
       <ButtonContainer>

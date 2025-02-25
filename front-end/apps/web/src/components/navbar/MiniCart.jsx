@@ -45,7 +45,7 @@ const ProductPrice = styled.span`
   width: 100%;
   font-size: 16px;
   font-weight: 400;
-  color: ${(props) => props.theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.main};
   display: flex;
   flex-wrap: wrap;
   align-items: center;

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Skeleton, Typography } from "@mui/material";
+import { Skeleton } from "@mui/material";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
 export const ItemTitle = styled.p`
@@ -19,10 +19,10 @@ export const ItemTitle = styled.p`
   }
 
   &:hover {
-    color: ${(props) => props.theme.palette.info.main};
+    color: ${({ theme }) => theme.palette.info.main};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 13px;
 
     @supports (-webkit-line-clamp: 1) {
@@ -42,25 +42,21 @@ export const Shop = styled.b`
   display: flex;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 14px;
-    margin: 8px 0;
+    margin: ${({ theme }) => theme.spacing(0.5)} 0;
   }
 `;
 
 export const ShopTag = styled.span`
-  background-color: ${(props) => props.theme.palette.primary.main};
-  color: ${(props) => props.theme.palette.primary.contrastText};
+  background-color: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.contrastText};
   padding: 2px 10px;
   margin-right: 8px;
-`;
 
-export const StatusTag = styled(Typography)`
-  text-transform: uppercase;
-  font-weight: 450;
-
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    font-size: 14px;
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    font-size: 12px;
+    padding: 2px 8px;
   }
 `;
 
@@ -71,7 +67,7 @@ export const DetailText = styled.p`
   align-items: center;
   justify-content: flex-end;
   text-decoration: underline;
-  color: ${(props) => props.theme.palette.primary.dark};
+  color: ${({ theme }) => theme.palette.primary.dark};
 `;
 
 export const ContentContainer = styled.div`
@@ -79,30 +75,17 @@ export const ContentContainer = styled.div`
   width: 100%;
 `;
 
-export const StuffContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-
-  ${(props) => props.theme.breakpoints.down("md")} {
-    align-items: flex-end;
-  }
-
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    flex-direction: row-reverse;
-  }
-`;
-
 export const HeadContainer = styled.div`
   position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: ${(props) => props.theme.spacing(2)};
+  padding: ${({ theme }) => theme.spacing(2)};
   border-bottom: 0.5px solid;
-  border-color: ${(props) => props.theme.palette.action.focus};
+  border-color: ${({ theme }) => theme.palette.action.focus};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    padding: ${(props) => props.theme.spacing(1)};
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: ${({ theme }) => theme.spacing(1)};
   }
 `;
 
@@ -110,10 +93,10 @@ export const BodyContainer = styled.div`
   position: relative;
   width: 100%;
   display: flex;
-  padding: ${(props) => props.theme.spacing(2)};
+  padding: ${({ theme }) => theme.spacing(2)};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    padding: ${(props) => props.theme.spacing(1)};
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: ${({ theme }) => theme.spacing(1)};
   }
 
   &.disabled {
@@ -126,9 +109,9 @@ export const StyledLazyImage = styled(LazyLoadImage)`
   display: inline-block;
   height: 90px;
   width: 90px;
-  border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 80px;
     width: 80px;
   }
@@ -139,8 +122,31 @@ export const StyledSkeleton = styled(Skeleton)`
   height: 90px;
   width: 90px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 80px;
     width: 80px;
   }
+`;
+
+export const ToggleArrow = styled.span`
+  color: white;
+  margin-left: ${({ theme }) => theme.spacing(1)};
+  display: none;
+  align-items: center;
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    display: flex;
+  }
+`;
+
+export const PlaceholderContainer = styled.div`
+  padding: ${({ theme }) => theme.spacing(16)};
+`;
+
+export const LoadContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
 `;

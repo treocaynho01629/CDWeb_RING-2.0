@@ -6,10 +6,10 @@ const InputContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
   height: 30px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 25px;
   }
 `;
@@ -36,17 +36,15 @@ const StyledButton = styled.span`
   align-items: center;
   justify-content: center;
   padding: 0 5px;
-  color: ${(props) =>
-    props.disabled
-      ? props.theme.palette.text.disabled
-      : props.theme.palette.text.secondary};
-  pointer-events: ${(props) => (props.disabled ? "none" : "all")};
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.palette.text.disabled : theme.palette.text.secondary};
+  pointer-events: ${({ disabled }) => (disabled ? "none" : "all")};
 
   &:hover {
-    color: ${(props) => props.theme.palette.text.primary};
+    color: ${({ theme }) => theme.palette.text.primary};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: 0 2px;
   }
 `;

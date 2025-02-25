@@ -22,8 +22,8 @@ const StyledTableCell = styled(TableCell)`
   white-space: nowrap;
 
   &.${tableCellClasses.head} {
-    padding-top: ${(props) => props.theme.spacing(1)};
-    padding-bottom: ${(props) => props.theme.spacing(1)};
+    padding-top: ${({ theme }) => theme.spacing(1)};
+    padding-bottom: ${({ theme }) => theme.spacing(1)};
   }
 `;
 
@@ -64,7 +64,7 @@ const CountLabel = styled.span`
   margin: auto;
   z-index: 1;
   visibility: visible;
-  color: ${(props) => props.theme.palette.text.primary} !important;
+  color: ${({ theme }) => theme.palette.text.primary} !important;
   transition: all 0.2s ease;
 
   &.hidden {

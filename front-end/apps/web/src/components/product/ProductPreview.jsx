@@ -16,19 +16,19 @@ const Container = styled.div`
   align-items: center;
   position: relative;
   overflow: hidden;
-  border: 0.5px solid ${(props) => props.theme.palette.background.paper};
-  margin: ${(props) => props.theme.spacing(0.1)} 0;
+  border: 0.5px solid ${({ theme }) => theme.palette.background.paper};
+  margin: ${({ theme }) => theme.spacing(0.1)} 0;
 
   &:hover {
-    border-color: ${(props) => props.theme.palette.action.focus};
-    box-shadow: ${(props) => props.theme.shadows[1]};
+    border-color: ${({ theme }) => theme.palette.action.focus};
+    box-shadow: ${({ theme }) => theme.shadows[1]};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     min-width: 110px;
     max-width: 120px;
     padding: 0;
-    margin: 0 ${(props) => props.theme.spacing(0.1)};
+    margin: 0 ${({ theme }) => theme.spacing(0.1)};
   }
 `;
 
@@ -36,7 +36,7 @@ const Info = styled.div`
   width: 100%;
   z-index: 4;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: 0 5px 5px;
   }
 `;
@@ -58,7 +58,7 @@ const Title = styled("h5")`
     -webkit-box-orient: vertical;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;
   }
 `;
@@ -66,11 +66,11 @@ const Title = styled("h5")`
 const Price = styled.span`
   font-size: 16px;
   font-weight: 400;
-  color: ${(props) => props.theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.main};
   display: flex;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;
   }
 `;
@@ -79,10 +79,10 @@ const Percentage = styled.span`
   padding: 1px 5px;
   margin-left: 10px;
   font-size: 14px;
-  color: ${(props) => props.theme.palette.text.primary};
-  background-color: ${(props) => props.theme.palette.action.focus};
+  color: ${({ theme }) => theme.palette.text.primary};
+  background-color: ${({ theme }) => theme.palette.action.focus};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     margin-left: 5px;
     padding: 1px 2px;
     font-size: 9px;

@@ -5,36 +5,36 @@ export const CheckoutContainer = styled.div`
   position: relative;
   height: 100%;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     position: fixed;
     bottom: 0;
     left: 0;
     max-height: 100px;
     width: 100%;
-    z-index: ${(props) => props.theme.zIndex.appBar};
-    border-top: 0.5px solid ${(props) => props.theme.palette.divider};
-    box-shadow: ${(props) => props.theme.shadows[12]};
-    background-color: ${(props) => props.theme.palette.background.paper};
+    z-index: ${({ theme }) => theme.zIndex.appBar};
+    border-top: 0.5px solid ${({ theme }) => theme.palette.divider};
+    box-shadow: ${({ theme }) => theme.shadows[12]};
+    background-color: ${({ theme }) => theme.palette.background.paper};
   }
 `;
 
 export const CheckoutBox = styled.div`
-  border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
   padding: 20px 16px;
-  margin-bottom: ${(props) => props.theme.spacing(2)};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 
   &.sticky {
     margin-bottom: -0.5px;
     position: sticky;
-    top: ${(props) => props.theme.mixins.toolbar.minHeight + 15}px;
-    bottom: ${(props) => props.theme.spacing(2)};
+    top: ${({ theme }) => theme.mixins.toolbar.minHeight + 15}px;
+    bottom: ${({ theme }) => theme.spacing(2)};
     z-index: 1;
   }
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     margin: 0;
-    padding-top: ${(props) => props.theme.spacing(1)};
+    padding-top: ${({ theme }) => theme.spacing(1)};
   }
 `;
 
@@ -45,12 +45,12 @@ export const CheckoutStack = styled.div`
   justify-content: space-between;
 
   &:first-of-type {
-    border-bottom: 0.5px dashed ${(props) => props.theme.palette.divider};
-    margin-bottom: ${(props) => props.theme.spacing(1)};
-    padding-bottom: ${(props) => props.theme.spacing(1)};
+    border-bottom: 0.5px dashed ${({ theme }) => theme.palette.divider};
+    margin-bottom: ${({ theme }) => theme.spacing(1)};
+    padding-bottom: ${({ theme }) => theme.spacing(1)};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     width: 100%;
     height: 50px;
 
@@ -64,7 +64,7 @@ export const CheckoutStack = styled.div`
 export const CheckoutPriceContainer = styled.div`
   position: relative;
   width: 100%;
-  margin-right: ${(props) => props.theme.spacing(2)};
+  margin-right: ${({ theme }) => theme.spacing(2)};
 `;
 
 export const AltCheckoutBox = styled.div`
@@ -84,7 +84,7 @@ export const CheckoutTitle = styled.span`
 
   span {
     font-size: 12px;
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
     font-style: italic;
   }
 `;
@@ -93,15 +93,15 @@ export const CheckoutRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 4px 0;
+  padding: ${({ theme }) => theme.spacing(0.5)} 0;
 `;
 
 export const CheckoutText = styled.span`
   font-size: 14px;
   font-weight: 400;
   white-space: nowrap;
-  color: ${(props) =>
-    props.theme.palette[props.color]?.main || props.theme.palette.text.primary};
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.main || theme.palette.text.primary};
 `;
 
 export const PriceContainer = styled.div`
@@ -111,12 +111,12 @@ export const PriceContainer = styled.div`
   flex-direction: column;
   align-items: end;
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     flex-direction: row;
     align-items: center;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     flex-direction: column;
     align-items: end;
   }
@@ -128,15 +128,15 @@ export const CheckoutPrice = styled.span`
   font-weight: bold;
   display: flex;
   justify-content: space-between;
-  color: ${(props) => props.theme.palette.error.main};
+  color: ${({ theme }) => theme.palette.error.main};
   cursor: pointer;
 
   b {
     font-size: 14px;
-    color: ${(props) => props.theme.palette.text.primary};
+    color: ${({ theme }) => theme.palette.text.primary};
   }
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     font-size: 16px;
   }
 `;
@@ -146,20 +146,20 @@ export const SavePrice = styled.span`
   font-weight: 450;
   width: 100%;
   text-align: right;
-  color: ${(props) => props.theme.palette.success.dark};
+  color: ${({ theme }) => theme.palette.success.dark};
 `;
 
 export const SubText = styled.span`
   font-size: 12px;
   width: 100%;
   text-align: right;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
 `;
 
 export const DetailContainer = styled.div`
   padding: 10px 0;
   margin-bottom: 10px;
-  border-bottom: 0.5px dashed ${(props) => props.theme.palette.divider};
+  border-bottom: 0.5px dashed ${({ theme }) => theme.palette.divider};
 `;
 
 export const CouponButton = styled.b`
@@ -176,7 +176,7 @@ export const CouponButton = styled.b`
     align-items: center;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 14px;
     margin: 0;
     width: 100%;
@@ -196,7 +196,7 @@ export const CheckoutButton = styled(Button)`
 export const StyledCheckbox = styled(Checkbox)`
   margin-left: 8px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     margin-left: 0;
   }
 `;

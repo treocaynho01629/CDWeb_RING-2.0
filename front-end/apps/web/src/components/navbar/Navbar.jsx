@@ -43,25 +43,25 @@ const ProfilePopover = lazy(() => import("./ProfilePopover"));
 const Wrapper = styled.div`
   padding: 5px 10px;
 
-  ${(props) => props.theme.breakpoints.up("sm_md")} {
+  ${({ theme }) => theme.breakpoints.up("sm_md")} {
     padding: 5px 20px;
     width: 750px;
     margin-left: auto;
     margin-right: auto;
   }
 
-  ${(props) => props.theme.breakpoints.up("md_lg")} {
+  ${({ theme }) => theme.breakpoints.up("md_lg")} {
     width: 970px;
   }
 
-  ${(props) => props.theme.breakpoints.up("lg")} {
+  ${({ theme }) => theme.breakpoints.up("lg")} {
     width: 1170px;
   }
 `;
 
 const TopHeader = styled.div`
   padding: 0 30px;
-  background-color: ${(props) => props.theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.divider};
   justify-content: space-between;
   font-size: 15px;
   font-weight: bold;
@@ -69,7 +69,7 @@ const TopHeader = styled.div`
   align-items: center;
   margin-bottom: -1px;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     display: none;
   }
 `;
@@ -79,7 +79,7 @@ const ContactContainer = styled.div`
   align-items: center;
   justify-content: flex-start;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     justify-content: center;
   }
 `;
@@ -89,7 +89,7 @@ const SocialContainer = styled.div`
   align-items: center;
   justify-content: flex-end;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     justify-content: center;
   }
 `;
@@ -105,11 +105,11 @@ const Contact = styled.p`
   align-items: center;
   text-align: center;
   justify-content: center;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
 `;
 
 const Social = styled.p`
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
   background-color: "transparent";
   font-size: 14px;
   display: flex;
@@ -122,7 +122,7 @@ const Social = styled.p`
   cursor: pointer;
 
   &:hover {
-    background-color: #${(props) => props.color};
+    background-color: #${({ color }) => color};
     color: white;
   }
 `;
@@ -133,7 +133,7 @@ const Left = styled.div`
   align-items: center;
   justify-content: flex-start;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     justify-content: space-between;
   }
 `;
@@ -144,7 +144,7 @@ const Right = styled.div`
   justify-content: flex-end;
   display: flex;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     justify-content: space-evenly;
     display: none;
   }
@@ -160,12 +160,12 @@ const Logo = styled.h2`
   transition: width 0.25s ease;
 
   &.active {
-    ${(props) => props.theme.breakpoints.down("md")} {
+    ${({ theme }) => theme.breakpoints.down("md")} {
       width: 0;
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     margin: 5px 0px 5px 0px;
   }
 `;
@@ -181,8 +181,8 @@ const StyledAppBar = styled(AppBar)`
   position: sticky;
   top: -0.5px;
   margin-bottom: 2px;
-  background-color: ${(props) => props.theme.palette.background.paper};
-  border-bottom: 0.5px solid ${(props) => props.theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
   box-shadow: none;
   transition: all 0.15s ease;
 
@@ -192,13 +192,13 @@ const StyledAppBar = styled(AppBar)`
 
     ${Logo} {
       filter: drop-shadow(
-        0px -1000px 0 ${(props) => props.theme.palette.text.primary}
+        0px -1000px 0 ${({ theme }) => theme.palette.text.primary}
       );
       transform: translateY(1000px);
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     margin-bottom: 0;
   }
 `;
@@ -232,7 +232,7 @@ const IconText = styled.p`
   white-space: nowrap;
   text-overflow: ellipsis;
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     height: 0;
   }
 `;
@@ -242,7 +242,7 @@ const StyledSearchForm = styled.form`
   display: flex;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     flex-direction: row-reverse;
   }
 `;

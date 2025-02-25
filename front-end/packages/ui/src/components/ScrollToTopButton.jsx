@@ -7,12 +7,12 @@ import styled from "@emotion/styled";
 //#region styled
 const ButtonContainer = styled.div`
   position: fixed;
-  bottom: ${(props) => props.theme.spacing(3)};
-  right: ${(props) => props.theme.spacing(3)};
-  transition: ${(props) =>
-    props.theme.transitions.create(["transform"], {
-      duration: props.theme.transitions.duration.shortest,
-      easing: props.theme.transitions.easing.easeInOut,
+  bottom: ${({ theme }) => theme.spacing(3)};
+  right: ${({ theme }) => theme.spacing(3)};
+  transition: ${({ theme }) =>
+    theme.transitions.create(["transform"], {
+      duration: theme.transitions.duration.shortest,
+      easing: theme.transitions.easing.easeInOut,
     })};
   z-index: 10;
 
@@ -20,31 +20,32 @@ const ButtonContainer = styled.div`
     transform: scale(0);
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
-    &.medium {
-      bottom: ${(props) => props.theme.spacing(8)};
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    &.medium,
+    &.high {
+      bottom: ${({ theme }) => theme.spacing(8)};
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm_md")} {
-    bottom: ${(props) => props.theme.spacing(2)};
-    right: ${(props) => props.theme.spacing(2)};
+  ${({ theme }) => theme.breakpoints.down("sm_md")} {
+    bottom: ${({ theme }) => theme.spacing(2)};
+    right: ${({ theme }) => theme.spacing(2)};
 
     &.high {
-      bottom: ${(props) => props.theme.spacing(17)};
+      bottom: ${({ theme }) => theme.spacing(17)};
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    bottom: ${(props) => props.theme.spacing(1.5)};
-    right: ${(props) => props.theme.spacing(1.5)};
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    bottom: ${({ theme }) => theme.spacing(1.5)};
+    right: ${({ theme }) => theme.spacing(1.5)};
 
     &.medium {
-      bottom: ${(props) => props.theme.spacing(7.5)};
+      bottom: ${({ theme }) => theme.spacing(7.5)};
     }
 
     &.high {
-      bottom: ${(props) => props.theme.spacing(14)};
+      bottom: ${({ theme }) => theme.spacing(14)};
     }
   }
 `;
@@ -55,8 +56,8 @@ const StyledButton = styled.button`
   outline: none;
   width: 48px;
   height: 48px;
-  color: ${(props) => props.theme.palette.primary.contrastText};
-  background-color: ${(props) => props.theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.contrastText};
+  background-color: ${({ theme }) => theme.palette.primary.main};
   text-align: center;
   display: flex;
   align-items: center;
@@ -64,11 +65,11 @@ const StyledButton = styled.button`
   cursor: pointer;
 
   &:hover {
-    background-color: ${(props) => props.theme.palette.grey[300]};
-    color: ${(props) => props.theme.palette.text.primary};
+    background-color: ${({ theme }) => theme.palette.grey[300]};
+    color: ${({ theme }) => theme.palette.text.primary};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     width: 35px;
     height: 35px;
     opacity: 0.9;

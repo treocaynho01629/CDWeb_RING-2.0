@@ -44,12 +44,12 @@ const TitleContainer = styled.div`
 `;
 
 const Filter = styled.div`
-  padding: ${(props) => props.theme.spacing(2)} 0px;
+  padding: ${({ theme }) => theme.spacing(2)} 0px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  scroll-margin: ${(props) => props.theme.mixins.toolbar.minHeight};
+  scroll-margin: ${({ theme }) => theme.mixins.toolbar.minHeight};
 `;
 
 const FilterText = styled.h3`
@@ -69,7 +69,7 @@ const LabelText = styled.span`
   overflow: hidden;
 
   svg {
-    color: ${(props) => props.theme.palette.warning.light};
+    color: ${({ theme }) => theme.palette.warning.light};
     font-size: 18px;
   }
 `;
@@ -81,20 +81,20 @@ const StyledListItemButton = styled(ListItemButton)`
   &.secondary {
     padding-left: 16px;
     font-size: 13px;
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
 
     &.Mui-selected {
-      color: ${(props) => props.theme.palette.primary.main};
+      color: ${({ theme }) => theme.palette.primary.main};
     }
   }
 
   &.Mui-selected {
-    color: ${(props) => props.theme.palette.primary.main};
+    color: ${({ theme }) => theme.palette.primary.main};
   }
 `;
 
 const CheckPlaceholder = styled.div`
-  padding: ${(props) => props.theme.spacing(1)} 0;
+  padding: ${({ theme }) => theme.spacing(1)} 0;
 `;
 
 const Showmore = styled.div`
@@ -105,10 +105,10 @@ const Showmore = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${(props) => props.theme.palette.info.main};
+  color: ${({ theme }) => theme.palette.info.main};
   cursor: pointer;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     margin-top: 0;
   }
 `;

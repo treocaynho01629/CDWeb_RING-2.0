@@ -4,7 +4,7 @@ import { getPaymentContent, paymentItems } from "@ring/shared";
 
 //#region styled
 const StyledForm = styled(FormControlLabel)`
-  padding: ${(props) => props.theme.spacing(1)} 0;
+  padding: ${({ theme }) => theme.spacing(1)} 0;
   min-width: 50%;
 
   .MuiFormControlLabel-label {
@@ -23,29 +23,29 @@ const ItemTitle = styled.div`
 
   svg {
     font-size: 24px;
-    margin-right: ${(props) => props.theme.spacing(0.5)};
+    margin-right: ${({ theme }) => theme.spacing(0.5)};
   }
 `;
 
 const Description = styled.span`
   font-size: 12px;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
 `;
 
 const RadioContainer = styled.div`
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    padding: 0 ${(props) => props.theme.spacing(1)};
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: 0 ${({ theme }) => theme.spacing(1)};
   }
 `;
 
 const PaymentContainer = styled.div`
-  padding: ${(props) => props.theme.spacing(2)};
-  margin-top: ${(props) => props.theme.spacing(1)};
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  padding: ${({ theme }) => theme.spacing(2)};
+  margin-top: ${({ theme }) => theme.spacing(1)};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    padding: ${(props) => props.theme.spacing(1)};
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: ${({ theme }) => theme.spacing(1)};
   }
 `;
 //#endregion

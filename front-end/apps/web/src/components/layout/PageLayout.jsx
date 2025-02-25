@@ -8,7 +8,7 @@ const LayoutWrapper = styled.div`
   position: relative;
   min-height: 60dvh;
 
-  ${(props) => props.theme.breakpoints.up("sm_md")} {
+  ${({ theme }) => theme.breakpoints.up("sm_md")} {
     padding-right: 15px;
     padding-left: 15px;
     margin-right: auto;
@@ -16,11 +16,11 @@ const LayoutWrapper = styled.div`
     width: 750px;
   }
 
-  ${(props) => props.theme.breakpoints.up("md_lg")} {
+  ${({ theme }) => theme.breakpoints.up("md_lg")} {
     width: 970px;
   }
 
-  ${(props) => props.theme.breakpoints.up("lg")} {
+  ${({ theme }) => theme.breakpoints.up("lg")} {
     width: 1170px;
   }
 `;

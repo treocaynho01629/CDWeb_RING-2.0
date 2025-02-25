@@ -5,11 +5,13 @@ import { useTitle } from "@ring/shared";
 import ReviewsList from "../components/review/ReviewsList";
 
 const Orders = () => {
-  const { tabletMode, mobileMode } = useOutletContext();
+  const { tabletMode, mobileMode, pending, setPending } = useOutletContext();
   const navigate = useNavigate();
 
   //Set title
   useTitle("Đánh giá");
+
+  let content = <ReviewsList {...{ mobileMode, pending, setPending }} />;
 
   return (
     <div>
@@ -27,12 +29,10 @@ const Orders = () => {
             },
           }}
         >
-          <ReviewsList mobileMode={mobileMode} />
+          {content}
         </Dialog>
       ) : (
-        <TabContentContainer>
-          <ReviewsList mobileMode={mobileMode} />
-        </TabContentContainer>
+        <TabContentContainer>{content}</TabContentContainer>
       )}
     </div>
   );

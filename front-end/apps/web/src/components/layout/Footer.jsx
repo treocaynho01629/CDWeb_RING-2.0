@@ -11,13 +11,13 @@ import {
   ExpandLess,
   ExpandMore,
 } from "@mui/icons-material";
-import { Grid2 as Grid } from "@mui/material";
+import { Grid2 as Grid, Collapse } from "@mui/material";
 import { useState } from "react";
 
 //#region styled
 const Container = styled.div`
-  background-color: ${(props) => props.theme.palette.divider};
-  border-top: 2px solid ${(props) => props.theme.palette.primary.main};
+  background-color: ${({ theme }) => theme.palette.divider};
+  border-top: 2px solid ${({ theme }) => theme.palette.primary.main};
   margin-top: 15dvh;
   padding-top: 20px;
   width: 100%;
@@ -45,12 +45,12 @@ const Wrapper = styled.div`
 const BotFooter = styled.div`
   height: 35px;
   padding: 0 30px;
-  background-color: ${(props) => props.theme.palette.action.focus};
+  background-color: ${({ theme }) => theme.palette.action.focus};
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: 0 15px;
     justify-content: center;
   }
@@ -62,11 +62,11 @@ const Logo = styled.img`
   object-fit: contain;
   object-position: left;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     max-height: 55px;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     max-height: 40px;
     margin: 10px 0;
   }
@@ -76,7 +76,7 @@ const Description = styled.p`
   margin: 14px 0px;
   font-size: 13px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     text-align: center;
     margin: 5px 0;
   }
@@ -92,8 +92,8 @@ const SocialIcon = styled.div`
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  color: ${(props) => props.theme.palette.common.white};
-  background-color: #${(props) => props.color};
+  color: ${({ theme }) => theme.palette.common.white};
+  background-color: #${({ color }) => color};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -117,15 +117,15 @@ const AddressContainer = styled.div`
   flex-direction: column;
   padding: 30px 0px;
 
-  ${(props) => props.theme.breakpoints.down("lg")} {
+  ${({ theme }) => theme.breakpoints.down("lg")} {
     align-items: center;
     padding: 10px;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     padding-top: 0;
     margin-bottom: 5px;
-    border-bottom: 0.5px solid ${(props) => props.theme.palette.divider};
+    border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
   }
 `;
 
@@ -138,9 +138,9 @@ const Title = styled.h4`
     display: none;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     margin: 5px 10px;
-    color: ${(props) => props.theme.palette.primary.dark};
+    color: ${({ theme }) => theme.palette.primary.dark};
 
     svg {
       display: block;
@@ -153,7 +153,7 @@ const List = styled.ul`
   padding: 0;
   list-style: none;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     display: none;
   }
 `;
@@ -163,7 +163,7 @@ const MobileList = styled.ul`
   list-style: none;
   display: none;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     display: block;
   }
 `;
@@ -176,7 +176,7 @@ const ListItem = styled.li`
   transition: all 0.25s ease;
 
   &:hover {
-    color: ${(props) => props.theme.palette.primary.dark};
+    color: ${({ theme }) => theme.palette.primary.dark};
   }
 `;
 
@@ -196,11 +196,11 @@ const Payment = styled.div`
   font-size: 11px;
   margin-right: 3px;
   margin-bottom: 3px;
-  border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
 
   &:hover {
-    background-color: ${(props) => props.theme.palette.primary.light};
-    color: ${(props) => props.theme.palette.primary.contrastText};
+    background-color: ${({ theme }) => theme.palette.primary.light};
+    color: ${({ theme }) => theme.palette.primary.contrastText};
     transform: translateX(5px);
   }
 `;
@@ -227,7 +227,7 @@ const BotText = styled.p`
     -webkit-box-orient: vertical;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     width: 100%;
     margin: 0;
     font-size: 11px;
@@ -239,7 +239,7 @@ const Name = styled.b`
   margin: 0 10px;
   text-decoration: underline;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     display: none;
   }
 `;
@@ -339,7 +339,9 @@ const Footer = () => {
                 HỖ TRỢ {open["support"] ? <ExpandLess /> : <ExpandMore />}
               </Title>
               <List>{support}</List>
-              {open["support"] && <MobileList>{support}</MobileList>}
+              <Collapse in={open["support"]} timeout="auto" unmountOnExit>
+                <MobileList>{support}</MobileList>
+              </Collapse>
             </Grid>
             <Grid size={{ xs: 12, sm: 3 }}>
               <Title onClick={() => handleClick("information")}>
@@ -347,21 +349,27 @@ const Footer = () => {
                 {open["information"] ? <ExpandLess /> : <ExpandMore />}
               </Title>
               <List>{information}</List>
-              {open["information"] && <MobileList>{information}</MobileList>}
+              <Collapse in={open["information"]} timeout="auto" unmountOnExit>
+                <MobileList>{information}</MobileList>
+              </Collapse>
             </Grid>
             <Grid size={{ xs: 12, sm: 3 }}>
               <Title onClick={() => handleClick("services")}>
                 DỊCH VỤ {open["services"] ? <ExpandLess /> : <ExpandMore />}
               </Title>
               <List>{services}</List>
-              {open["services"] && <MobileList>{information}</MobileList>}
+              <Collapse in={open["services"]} timeout="auto" unmountOnExit>
+                <MobileList>{services}</MobileList>
+              </Collapse>
             </Grid>
             <Grid size={{ xs: 12, sm: 3 }}>
               <Title onClick={() => handleClick("payments")}>
                 THANH TOÁN {open["payments"] ? <ExpandLess /> : <ExpandMore />}
               </Title>
               <List>{payments}</List>
-              {open["payments"] && <MobileList>{payments}</MobileList>}
+              <Collapse in={open["payments"]} timeout="auto" unmountOnExit>
+                <MobileList>{payments}</MobileList>
+              </Collapse>
             </Grid>
           </Grid>
         </Grid>

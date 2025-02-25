@@ -21,11 +21,11 @@ const InfoWrapper = styled.div`
   bottom: auto;
   width: 100%;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     position: absolute;
     bottom: 0;
-    background-color: ${(props) =>
-      alpha(props.theme.palette.background.default, 0.5)};
+    background-color: ${({ theme }) =>
+      alpha(theme.palette.background.default, 0.5)};
   }
 `;
 
@@ -34,7 +34,7 @@ const InfoContainer = styled.div`
   align-items: center;
   justify-content: center;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: 40px 20px;
   }
 `;
@@ -56,11 +56,11 @@ const Title = styled.h2`
     -webkit-box-orient: vertical;
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     margin: 0;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 22px;
   }
 `;
@@ -82,7 +82,7 @@ const Description = styled.p`
     -webkit-box-orient: vertical;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 16px;
   }
 `;
@@ -92,8 +92,8 @@ const CustomArrowButton = styled.div`
   top: 0;
   bottom: 0;
   margin: auto;
-  background-color: ${(props) => props.theme.palette.background.paper};
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
   border-radius: 50%;
   height: 30px;
   width: 30px;
@@ -109,7 +109,7 @@ const CustomArrowButton = styled.div`
   &:hover {
     opacity: 1;
     transform: scale(1.1);
-    background-color: ${(props) => props.theme.palette.background.default};
+    background-color: ${({ theme }) => theme.palette.background.default};
   }
 
   &.left {

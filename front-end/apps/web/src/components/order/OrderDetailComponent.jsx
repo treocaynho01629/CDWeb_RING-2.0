@@ -1,36 +1,39 @@
 import styled from "@emotion/styled";
+import { Suspense, lazy } from "react";
 import { StyledDialogTitle } from "../custom/ProfileComponents";
-import { Button, DialogContent, Box } from "@mui/material";
 import {
+  Button,
+  DialogContent,
+  Box,
+  Typography,
+  Grid2 as Grid,
+  Skeleton,
+  Dialog,
+} from "@mui/material";
+import {
+  Close,
+  Inbox,
   KeyboardArrowLeft,
   KeyboardArrowRight,
+  KeyboardReturn,
   Receipt,
   Sell,
-  Storefront,
 } from "@mui/icons-material";
 import {
   currencyFormat,
   dateFormatter,
   idFormatter,
   orderTypes,
+  shippingTypes,
   timeFormatter,
 } from "@ring/shared";
 import { Link } from "react-router";
 import { useCancelOrderMutation } from "../../features/orders/ordersApiSlice";
 import { booksApiSlice } from "../../features/books/booksApiSlice";
-import {
-  ItemTitle,
-  Shop,
-  ShopTag,
-  StatusTag,
-  ContentContainer,
-  StuffContainer,
-  HeadContainer,
-  BodyContainer,
-  StyledLazyImage,
-  StyledSkeleton,
-} from "../custom/OrderComponents";
-import OrderProgress from "./OrderProgress";
+import OrderReceipt from "./OrderReceipt";
+import { MobileExtendButton } from "@ring/ui/Components";
+
+const OrderProgress = lazy(() => import("./OrderProgress"));
 
 //#region styled
 const TitleContainer = styled.div`
@@ -42,162 +45,176 @@ const TitleContainer = styled.div`
 const SubTitle = styled.span`
   font-size: 16px;
   font-weight: 400;
-  margin-left: ${(props) => props.theme.spacing(2)};
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     display: none;
   }
 `;
 
-const ErrorText = styled.span`
-  font-size: 18px;
-  text-transform: uppercase;
-  color: ${(props) => props.theme.palette.error.main};
-`;
-
 const SubText = styled.p`
   font-size: 16px;
-  color: ${(props) => props.theme.palette.text.secondary};
-  margin: ${(props) => props.theme.spacing(1)} 0;
+  color: ${({ theme }) => theme.palette.text.secondary};
+  margin: ${({ theme }) => theme.spacing(1)} 0;
 `;
 
 const SummaryContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  border-top: 0.5px dashed ${(props) => props.theme.palette.divider};
-  padding: ${(props) => props.theme.spacing(2)} 0;
+  border-top: 0.5px dashed ${({ theme }) => theme.palette.divider};
+  border-bottom: 0.5px dashed ${({ theme }) => theme.palette.divider};
+  padding: ${({ theme }) => theme.spacing(2)} 0;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    padding: ${(props) => props.theme.spacing(1)} 0;
-    font-size: 14px;
-    align-items: flex-start;
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    display: none;
   }
-`;
-
-const OrderItemContainer = styled.div`
-  border: 0.5px solid;
-  border-color: ${(props) => props.theme.palette.action.focus};
-  margin-bottom: ${(props) => props.theme.spacing(2)};
-
-  ${(props) => props.theme.breakpoints.down("md")} {
-    border-left: none;
-    border-right: none;
-    margin-left: ${(props) => props.theme.spacing(-1)};
-    margin-right: ${(props) => props.theme.spacing(-1)};
-  }
-`;
-
-const InfoContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  border-top: 0.5px dashed ${(props) => props.theme.palette.divider};
-  padding: ${(props) => props.theme.spacing(2)} 0;
 `;
 
 const Title = styled.h3`
-  margin: 0 0 ${(props) => props.theme.spacing(1)};
+  margin: 0 0 ${({ theme }) => theme.spacing(1)};
   font-size: 16px;
   font-weight: 450;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   text-align: center;
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    margin-left: ${({ theme }) => theme.spacing(1)};
+  }
 `;
 
 const Name = styled.p`
   font-size: 17px;
   font-weight: 450;
-  margin: 0 0 ${(props) => props.theme.spacing(1)};
+  margin: 0 0 ${({ theme }) => theme.spacing(1)};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 15px;
   }
 `;
 
-const AddressContainer = styled.div`
-  border: 0.5px solid ${(props) => props.theme.palette.action.hover};
-  padding: ${(props) => props.theme.spacing(2)};
+const ShippingTag = styled.span`
+  display: flex;
+  align-items: center;
+  font-weight: 450;
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.dark || theme.palette.primary.dark};
 `;
 
-const AddressContent = styled.div``;
-
-const Address = styled.span`
-  font-size: 16px;
-  line-height: 1.75em;
-  margin-top: ${(props) => props.theme.spacing(1)};
-  color: ${(props) => props.theme.palette.text.secondary};
-`;
-
-const ItemsContainer = styled.div``;
-
-const CheckoutRow = styled.div`
+const StuffContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  padding: 4px 0;
-`;
 
-const CheckoutText = styled.span`
-  font-size: 14px;
-  font-weight: 400;
-  white-space: nowrap;
-  color: ${(props) =>
-    props.theme.palette[props.color]?.main || props.theme.palette.text.primary};
-`;
-
-const PriceContainer = styled.div`
-  ${(props) => props.theme.breakpoints.down("md")} {
-    display: flex;
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    align-items: flex-end;
   }
 `;
 
-const Price = styled.p`
-  font-size: 15px;
-  font-weight: 450;
-  text-align: left;
-  color: ${(props) => props.theme.palette.primary.main};
-  margin: 0;
+const ContentWrapper = styled.div`
+  padding: ${({ theme }) => theme.spacing(2)} 0;
 
-  &.total {
-    color: ${(props) => props.theme.palette.warning.light};
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: ${({ theme }) => theme.spacing(1)} 0;
   }
 `;
 
-const Discount = styled.p`
-  font-size: 12px;
-  color: ${(props) => props.theme.palette.text.disabled};
-  margin: 0;
+const InfoContainer = styled.div`
+  height: 100%;
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  padding: ${({ theme }) => theme.spacing(2)};
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: ${({ theme }) => theme.spacing(1)};
+  }
+`;
+
+const InfoText = styled.span`
+  font-size: 16px;
+  line-height: 1.75em;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  text-align: center;
-  text-decoration: line-through;
+  margin-top: ${({ theme }) => theme.spacing(0.5)};
+  color: ${({ theme }) => theme.palette.text.secondary};
 
-  ${(props) => props.theme.breakpoints.down("md")} {
-    margin-left: ${(props) => props.theme.spacing(1)};
+  &.price {
+    margin: 0;
+  }
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    font-size: 14px;
+
+    &.price {
+      display: none;
+    }
   }
 `;
 
-const Amount = styled.span`
-  font-size: 14px;
-  font-weight: 350;
-  color: ${(props) => props.theme.palette.text.secondary};
+const StatusTag = styled(Typography)`
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 450;
+  border-radius: 20px;
+  border: 0.5px solid currentColor;
+  padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(1)}`};
 
-  b {
-    color: ${(props) => props.theme.palette.warning.main};
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
+    display: none;
+  }
+`;
+
+const MainButton = styled(Button)`
+  min-width: 200px;
+`;
+
+const ButtonContainer = styled.div`
+  padding: 0 ${({ theme }) => theme.spacing(1)};
+  margin: ${({ theme }) => `${theme.spacing(1)} 0 ${theme.spacing(6)}`};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+`;
+
+const MobileButton = styled.div`
+  position: relative;
+  padding: ${({ theme }) => theme.spacing(1)} 0;
+
+  span {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
   }
 
-  &.mobile {
+  ${({ theme }) => theme.breakpoints.up("md")} {
     display: none;
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
-    display: none;
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    display: 15px;
+  }
+`;
 
-    &.mobile {
-      display: block;
-    }
+const MainButtonContainer = styled.div`
+  position: fixed;
+  bottom: 0;
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border-bottom: none;
+  padding: ${({ theme }) => `${theme.spacing(2.5)} ${theme.spacing(2)}`};
+  margin-left: ${({ theme }) => `calc(${theme.spacing(-1.5)} - 0.5px)`};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  display: flex;
+  width: 100%;
+  z-index: 2;
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    left: 0;
+    height: 50px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: ${({ theme }) => theme.shadows[12]};
+    align-items: flex-end;
+  }
+
+  ${({ theme }) => theme.breakpoints.up("sm_md")} {
+    width: 720px;
   }
 `;
 //#endregion
@@ -218,28 +235,35 @@ function getDetailSummary(detail) {
       };
     case orderTypes.PENDING_REFUND.value:
       return {
-        step: 2,
+        step: 3,
         summary: "Đang chờ hoàn trả hàng.",
       };
     case orderTypes.COMPLETED.value:
       return {
         step: 4,
-        summary: "Cảm ơn bạn đã mua hàng.",
+        summary: "Cảm ơn bạn đã mua hàng!",
       };
     case orderTypes.CANCELED.value:
       return {
-        step: 0,
+        step: 1,
         summary: `Đã huỷ đơn vào ${timeFormatter(date)} ${dateFormatter(date)}.`,
       };
     case orderTypes.REFUNDED.value:
       return {
-        step: 3,
+        step: 4,
         summary: `Đã hoàn trả ${currencyFormat.format(detail?.totalPrice - detail?.totalDiscount)} vào tài khoản vào ${timeFormatter(date)} ${dateFormatter(date)}.`,
       };
   }
 }
 
-const OrderDetailComponent = ({ order, pending, setPending }) => {
+const OrderDetailComponent = ({
+  order,
+  pending,
+  setPending,
+  isLoading,
+  tabletMode,
+  mobileMode,
+}) => {
   const detailStatus = orderTypes[order?.status];
   const [getBought, { isLoading: fetching }] =
     booksApiSlice.useLazyGetBooksByIdsQuery();
@@ -299,6 +323,7 @@ const OrderDetailComponent = ({ order, pending, setPending }) => {
   const detailSummary = getDetailSummary(order);
   const orderedDate = new Date(order?.orderedDate);
   const date = new Date(order?.date);
+  const shippingSummary = shippingTypes[order?.shippingType];
 
   return (
     <>
@@ -308,178 +333,279 @@ const OrderDetailComponent = ({ order, pending, setPending }) => {
             <KeyboardArrowLeft />
           </Link>
           <Receipt />
-          &nbsp;Mã vận đơn {idFormatter(order?.orderId)}
-          <SubTitle>
-            {timeFormatter(orderedDate)}&nbsp;{dateFormatter(orderedDate)}
-          </SubTitle>
+          &nbsp;Mã vận đơn&nbsp;
+          {isLoading ? (
+            <Skeleton variant="text" width={100} />
+          ) : (
+            idFormatter(order?.orderId)
+          )}
+          &emsp;
+          {isLoading ? (
+            <StatusTag color="secondary">Đang tải</StatusTag>
+          ) : (
+            <StatusTag color={detailStatus?.color}>
+              {detailStatus?.label}
+            </StatusTag>
+          )}
         </TitleContainer>
-        <StatusTag color={detailStatus?.color}>{detailStatus?.label}</StatusTag>
+        <SubTitle>
+          {isLoading ? (
+            <Skeleton variant="text" width={130} />
+          ) : (
+            `${timeFormatter(orderedDate)} ${dateFormatter(orderedDate)}`
+          )}
+        </SubTitle>
       </StyledDialogTitle>
-      <DialogContent sx={{ p: { xs: 1, sm: 2, md: 0 }, mt: { xs: 1, md: 0 } }}>
-        <OrderProgress {...{ order, detailSummary, orderedDate, date }} />
-        <SummaryContainer>
-          <Box>
-            {order?.status == orderTypes.CANCELED.value ||
-              (order?.status == orderTypes.REFUNDED.value && (
-                <ErrorText>
-                  {order?.status == orderTypes.CANCELED.value
-                    ? "Đã huỷ đơn hàng"
-                    : "Đã hoàn tiền"}
-                </ErrorText>
-              ))}
-            <SubText>{detailSummary?.summary}</SubText>
-          </Box>
-          <Box>
-            {order?.status == orderTypes.PENDING.value ||
-            order?.status == orderTypes.SHIPPING.value ? (
-              <>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => handleCancelOrder(order)}
-                >
-                  Đã nhận hàng
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  sx={{ mt: 1 }}
-                  onClick={() => handleCancelOrder(order)}
-                >
-                  Huỷ đơn hàng
-                </Button>
-              </>
+      <DialogContent sx={{ px: { xs: 0, sm: 2, md: 0 }, mt: { xs: 1, md: 0 } }}>
+        {isLoading ? (
+          <Skeleton
+            variant="rectangular"
+            sx={{
+              height: { xs: 71, md: 169 },
+              width: { xs: "90%", md: "100%" },
+              mt: { xs: 1, md: 0 },
+              mx: "auto",
+              mb: 1,
+            }}
+          />
+        ) : (
+          <Suspense
+            fallback={
+              <Skeleton
+                variant="rectangular"
+                sx={{
+                  height: { xs: 71, md: 169 },
+                  width: { xs: "90%", md: "100%" },
+                  mt: { xs: 1, md: 0 },
+                  mx: "auto",
+                  mb: 1,
+                }}
+              />
+            }
+          >
+            <OrderProgress
+              {...{
+                order,
+                detailSummary,
+                detailStatus,
+                orderedDate,
+                date,
+                tabletMode,
+              }}
+            />
+          </Suspense>
+        )}
+        {tabletMode ? (
+          <MainButtonContainer>
+            {isLoading ? (
+              <MainButton
+                disabled
+                variant="contained"
+                color="secondary"
+                size="large"
+                fullWidth
+              >
+                Đang tải
+              </MainButton>
+            ) : order?.status == orderTypes.PENDING.value ||
+              order?.status == orderTypes.SHIPPING.value ? (
+              <MainButton
+                variant="contained"
+                color="success"
+                size="large"
+                fullWidth
+                onClick={() => handleCancelOrder(order)}
+              >
+                Đã nhận hàng
+              </MainButton>
             ) : (
-              <>
-                <Button
+              <MainButton
+                variant="contained"
+                color="primary"
+                size="large"
+                fullWidth
+                onClick={() => handleAddToCart(order)}
+              >
+                Mua lại
+              </MainButton>
+            )}
+          </MainButtonContainer>
+        ) : (
+          <SummaryContainer>
+            <Box>
+              <SubText>
+                {isLoading ? (
+                  <Skeleton variant="text" width={280} />
+                ) : (
+                  detailSummary?.summary
+                )}
+              </SubText>
+            </Box>
+            <Box>
+              {isLoading ? (
+                <MainButton
+                  disabled
                   variant="contained"
-                  color="primary"
+                  color="secondary"
+                  size="large"
                   fullWidth
-                  onClick={() => handleAddToCart(order)}
                 >
-                  Mua lại
-                </Button>
-                {order?.status == orderTypes.COMPLETED.value && (
-                  <Button
+                  Đang tải
+                </MainButton>
+              ) : order?.status == orderTypes.PENDING.value ||
+                order?.status == orderTypes.SHIPPING.value ? (
+                <>
+                  <MainButton
+                    variant="contained"
+                    color="success"
+                    size="large"
+                    fullWidth
+                    onClick={() => handleCancelOrder(order)}
+                  >
+                    Đã nhận hàng
+                  </MainButton>
+                  <MainButton
                     variant="outlined"
-                    color="warning"
+                    color="error"
+                    size="large"
+                    fullWidth
                     sx={{ mt: 1 }}
+                    onClick={() => handleCancelOrder(order)}
+                  >
+                    Huỷ đơn hàng
+                  </MainButton>
+                </>
+              ) : (
+                <>
+                  <MainButton
+                    variant="contained"
+                    color="primary"
+                    size="large"
                     fullWidth
                     onClick={() => handleAddToCart(order)}
                   >
-                    Hoàn trả hàng
-                  </Button>
-                )}
-              </>
+                    Mua lại
+                  </MainButton>
+                  {order?.status == orderTypes.COMPLETED.value && (
+                    <MainButton
+                      variant="outlined"
+                      color="warning"
+                      size="large"
+                      fullWidth
+                      sx={{ mt: 1 }}
+                      onClick={() => handleAddToCart(order)}
+                    >
+                      Hoàn trả hàng
+                    </MainButton>
+                  )}
+                </>
+              )}
+            </Box>
+          </SummaryContainer>
+        )}
+        <ContentWrapper>
+          <Title>
+            <Sell />
+            &nbsp;Địa chỉ người nhận
+          </Title>
+          <Grid container spacing={1}>
+            <Grid size={{ xs: 12, md_lg: 6 }}>
+              <InfoContainer>
+                <div>
+                  <Name>
+                    {isLoading ? (
+                      <Skeleton variant="text" width={150} />
+                    ) : (
+                      (order?.companyName ?? order?.name) + " "
+                    )}
+                  </Name>
+                  <InfoText>
+                    {isLoading ? (
+                      <Skeleton variant="text" width={140} />
+                    ) : (
+                      `(+84) ${order?.phone}`
+                    )}
+                  </InfoText>
+                </div>
+                <InfoText>
+                  {isLoading ? (
+                    <Box width="100%">
+                      <Skeleton variant="text" width="100%" />
+                      <Skeleton variant="text" width="30%" />
+                    </Box>
+                  ) : (
+                    (order?.address ?? "Không xác định")
+                  )}
+                </InfoText>
+              </InfoContainer>
+            </Grid>
+            <Grid size={{ xs: 12, md_lg: 6 }}>
+              <InfoContainer>
+                <Box mb={1}>
+                  <Name>Hình thức giao hàng:</Name>
+                  <InfoText>
+                    {isLoading ? (
+                      <Skeleton variant="text" width={200} />
+                    ) : (
+                      <>
+                        <ShippingTag color={shippingSummary?.color}>
+                          {shippingSummary?.icon} {shippingSummary?.label}:
+                        </ShippingTag>
+                        &nbsp;{shippingSummary?.description}
+                      </>
+                    )}
+                  </InfoText>
+                  <InfoText className="price">
+                    {isLoading ? (
+                      <Skeleton variant="text" width={190} />
+                    ) : (
+                      `Phí vận chuyển ${currencyFormat.format(shippingSummary?.price)}`
+                    )}
+                  </InfoText>
+                </Box>
+              </InfoContainer>
+            </Grid>
+            {order?.message && (
+              <Grid size={12}>
+                <InfoContainer>
+                  <Name>Ghi chú:</Name>
+                  <InfoText>{order?.message}</InfoText>
+                </InfoContainer>
+              </Grid>
             )}
-          </Box>
-        </SummaryContainer>
-        <InfoContainer>
-          <div>
-            <Title>
-              <Sell />
-              &nbsp;ĐỊA CHỈ NGƯỜI NHẬN
-            </Title>
-            <AddressContainer>
-              <AddressContent>
-                <Name>{order?.companyName ?? order?.name}&nbsp;</Name>
-                <Address>{`(+84) ${order?.phone}`}</Address>
-              </AddressContent>
-              <Address>{order?.address ?? "Không xác định"}</Address>
-              <p>Hình thức vận:</p>
-            </AddressContainer>
-          </div>
-          <div>
-            <Title>CHI TIẾT VẬN HÀNG</Title>
-            step tùm lum
-          </div>
-        </InfoContainer>
-        <ItemsContainer>
-          <OrderItemContainer>
-            <HeadContainer>
-              <Link to={`/store/${order?.shopId}`}>
-                <Shop>
-                  <ShopTag>Đối tác</ShopTag>
-                  <Storefront />
-                  &nbsp;{order?.shopName}
+          </Grid>
+        </ContentWrapper>
+        <Title>
+          <Inbox />
+          &nbsp;Kiện hàng
+        </Title>
+        <OrderReceipt {...{ order, isLoading, tabletMode }} />
+        <ButtonContainer>
+          {order?.status == orderTypes.PENDING.value ||
+          order?.status == orderTypes.SHIPPING.value ? (
+            <MobileButton>
+              <span>
+                <Close fontSize="small" color="error" />
+                &nbsp;Huỷ đơn hàng
+              </span>
+              <MobileExtendButton>
+                <KeyboardArrowRight fontSize="small" />
+              </MobileExtendButton>
+            </MobileButton>
+          ) : (
+            order?.status == orderTypes.COMPLETED.value && (
+              <MobileButton>
+                <span>
+                  <KeyboardReturn fontSize="small" color="warning" />
+                  &nbsp;Hoàn trả đơn hàng
+                </span>
+                <MobileExtendButton>
                   <KeyboardArrowRight fontSize="small" />
-                </Shop>
-              </Link>
-            </HeadContainer>
-            {order?.items?.map((item, itemIndex) => (
-              <Link
-                key={`item-${item?.id}-${itemIndex}`}
-                to={`/product/${item?.bookSlug}`}
-              >
-                <BodyContainer
-                  className={
-                    order?.status == orderTypes.CANCELED.value ||
-                    order?.status == orderTypes.REFUNDED.value
-                      ? "disabled"
-                      : ""
-                  }
-                >
-                  <StyledLazyImage
-                    src={`${item?.image}?size=small`}
-                    alt={`${item?.bookTitle} Order item`}
-                    placeholder={
-                      <StyledSkeleton variant="rectangular" animation={false} />
-                    }
-                  />
-                  <ContentContainer>
-                    <ItemTitle>{item?.bookTitle}</ItemTitle>
-                    <StuffContainer>
-                      <div>
-                        <Amount>
-                          Số lượng: <b>{item?.quantity}</b>
-                        </Amount>
-                        {order?.status == orderTypes.COMPLETED.value && (
-                          <Link to={`/product/${item?.bookSlug}?review=true`}>
-                            <Button
-                              variant="outlined"
-                              color="info"
-                              size="small"
-                              sx={{ mt: 0.5 }}
-                            >
-                              Đánh giá
-                            </Button>
-                          </Link>
-                        )}
-                      </div>
-                      <div>
-                        <PriceContainer>
-                          <Price>
-                            {currencyFormat.format(
-                              item.price * (1 - (item?.discount || 0))
-                            )}
-                          </Price>
-                          <Discount>
-                            {item?.discount > 0
-                              ? currencyFormat.format(item.price)
-                              : ""}
-                          </Discount>
-                        </PriceContainer>
-                        <Amount className="mobile">
-                          SL: <b>{item?.quantity}</b>
-                        </Amount>
-                      </div>
-                    </StuffContainer>
-                  </ContentContainer>
-                </BodyContainer>
-              </Link>
-            ))}
-          </OrderItemContainer>
-          <Box>
-            <CheckoutRow>
-              <CheckoutText>Tiền hàng:</CheckoutText>
-              <CheckoutText>{currencyFormat.format(30000)}</CheckoutText>
-            </CheckoutRow>
-            <CheckoutRow>
-              <CheckoutText>Phí vận chuyển:</CheckoutText>
-              <CheckoutText>{currencyFormat.format(30000)}</CheckoutText>
-            </CheckoutRow>
-          </Box>
-        </ItemsContainer>
+                </MobileExtendButton>
+              </MobileButton>
+            )
+          )}
+        </ButtonContainer>
       </DialogContent>
     </>
   );

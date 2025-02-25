@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { useState, lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { Dialog, Skeleton } from "@mui/material";
 import {
   StyledDialogTitle,
@@ -9,7 +9,6 @@ import { useNavigate, useOutletContext, useParams } from "react-router";
 import { useTitle } from "@ring/shared";
 import Placeholder from "@ring/ui/Placeholder";
 
-const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 const ProfileDetail = lazy(() => import("../components/profile/ProfileDetail"));
 const AddressComponent = lazy(
   () => import("../components/address/AddressComponent")
@@ -40,9 +39,15 @@ const tempLoad = (
 
 const Profile = () => {
   const { tab } = useParams();
-  const { profile, loading, isSuccess, tabletMode, mobileMode } =
-    useOutletContext();
-  const [pending, setPending] = useState(false);
+  const {
+    profile,
+    loading,
+    isSuccess,
+    tabletMode,
+    mobileMode,
+    pending,
+    setPending,
+  } = useOutletContext();
   const navigate = useNavigate();
 
   //Set title
@@ -53,43 +58,28 @@ const Profile = () => {
   switch (tab ? tab : tabletMode ? "" : "info") {
     case "info":
       content = (
-        <Suspense fallback={tempLoad}>
-          <ProfileDetail
-            {...{
-              pending,
-              setPending,
-              profile,
-              loading,
-              isSuccess,
-              tabletMode,
-            }}
-          />
-        </Suspense>
+        <ProfileDetail
+          {...{
+            pending,
+            setPending,
+            profile,
+            loading,
+            isSuccess,
+            tabletMode,
+          }}
+        />
       );
       break;
     case "address":
-      content = (
-        <Suspense fallback={tempLoad}>
-          <AddressComponent {...{ pending, setPending }} />
-        </Suspense>
-      );
+      content = <AddressComponent {...{ pending, setPending, mobileMode }} />;
       break;
     case "password":
-      content = (
-        <Suspense fallback={tempLoad}>
-          <ResetPassComponent {...{ pending, setPending }} />
-        </Suspense>
-      );
+      content = <ResetPassComponent {...{ pending, setPending }} />;
       break;
   }
 
   return (
     <>
-      {pending && (
-        <Suspense fallBack={null}>
-          <PendingModal open={pending} message="Đang gửi yêu cầu..." />
-        </Suspense>
-      )}
       {tabletMode ? (
         <Dialog
           open={tab ? true : tabletMode ? false : true}
@@ -104,10 +94,12 @@ const Profile = () => {
             },
           }}
         >
-          {content}
+          <Suspense fallback={tempLoad}>{content}</Suspense>
         </Dialog>
       ) : (
-        <TabContentContainer>{content}</TabContentContainer>
+        <TabContentContainer>
+          <Suspense fallback={tempLoad}>{content}</Suspense>
+        </TabContentContainer>
       )}
     </>
   );

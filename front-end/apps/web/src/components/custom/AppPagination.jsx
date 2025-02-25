@@ -13,17 +13,17 @@ const Container = styled.div`
   justify-content: space-between;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     justify-content: center;
   }
 `;
 
 const StyledPageItem = styled(PaginationItem)`
-  background-color: ${(props) => props.theme.palette.action.focus};
+  background-color: ${({ theme }) => theme.palette.action.focus};
 
   &:hover {
-    background-color: ${(props) => props.theme.palette.primary.light};
-    color: ${(props) => props.theme.palette.primary.contrastText};
+    background-color: ${({ theme }) => theme.palette.primary.light};
+    color: ${({ theme }) => theme.palette.primary.contrastText};
   }
 
   &.Mui-disabled {

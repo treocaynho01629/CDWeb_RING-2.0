@@ -32,10 +32,10 @@ import BannersSlider from "../components/other/BannersSlider";
 import LazyLoad from "react-lazyload";
 
 const ProductsSlider = lazy(
-  () => import("../components/product/ProductsSlider"),
+  () => import("../components/product/ProductsSlider")
 );
 const BigProductsSlider = lazy(
-  () => import("../components/product/BigProductsSlider"),
+  () => import("../components/product/BigProductsSlider")
 );
 const Products = lazy(() => import("../components/product/Products"));
 const Publishers = lazy(() => import("../components/other/Publishers"));
@@ -44,29 +44,29 @@ const ProductsTop = lazy(() => import("../components/product/ProductsTop"));
 
 //#region styled
 const Wrapper = styled.div`
-  ${(props) => props.theme.breakpoints.down("md")} {
-    margin-top: -${(props) => props.theme.mixins.toolbar.minHeight + 11}px;
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    margin-top: -${({ theme }) => theme.mixins.toolbar.minHeight + 11}px;
   }
 `;
 
 const ToggleGroupContainer = styled.div`
   width: 100%;
-  background-color: ${(props) => props.theme.palette.background.paper};
-  border-bottom: 1px solid ${(props) => props.theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
   white-space: nowrap;
   padding: 0 10px;
   position: sticky;
-  top: ${(props) => props.theme.mixins.toolbar.minHeight + 16.5}px;
+  top: ${({ theme }) => theme.mixins.toolbar.minHeight + 16.5}px;
   z-index: 2;
 
   &.border {
     &::after {
-      border-top: 0.5px solid ${(props) => props.theme.palette.divider};
+      border-top: 0.5px solid ${({ theme }) => theme.palette.divider};
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    top: ${(props) => props.theme.mixins.toolbar.minHeight + 4.5}px;
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    top: ${({ theme }) => theme.mixins.toolbar.minHeight + 4.5}px;
   }
 
   &:before {
@@ -76,7 +76,7 @@ const ToggleGroupContainer = styled.div`
     top: -16px;
     width: 100%;
     height: calc(100% + 16px);
-    background-color: ${(props) => props.theme.palette.background.default};
+    background-color: ${({ theme }) => theme.palette.background.default};
     z-index: -1;
   }
 
@@ -87,10 +87,10 @@ const ToggleGroupContainer = styled.div`
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: ${(props) => props.theme.palette.action.hover};
+    background-color: ${({ theme }) => theme.palette.action.hover};
     z-index: -1;
 
-    ${(props) => props.theme.breakpoints.down("sm")} {
+    ${({ theme }) => theme.breakpoints.down("sm")} {
       border-left: none;
       border-right: none;
       border-top: none;
@@ -103,17 +103,16 @@ const TitleContainer = styled.div`
   width: 100%;
   font-size: 18px;
   font-weight: 450;
-  background-color: ${(props) => props.theme.palette.background.paper};
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
   display: flex;
   align-items: center;
   justify-content: space-between;
   white-space: nowrap;
-  padding: ${(props) => props.theme.spacing(1.25)}
-    ${(props) => props.theme.spacing(2)};
+  padding: ${({ theme }) => `${theme.spacing(1.25)} ${theme.spacing(2)}`};
   z-index: 3;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     border-left: none;
     border-right: none;
     margin-bottom: 0px;
@@ -124,19 +123,19 @@ const TitleContainer = styled.div`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
-  margin: ${(props) => props.theme.spacing(2.5)} 0;
+  margin: ${({ theme }) => theme.spacing(2.5)} 0;
 `;
 
 const MoreButton = styled.span`
   font-size: 12px;
   font-weight: 450;
-  color: ${(props) => props.theme.palette.info.light};
+  color: ${({ theme }) => theme.palette.info.light};
   cursor: pointer;
   display: flex;
   align-items: center;
 
   &.error {
-    color: ${(props) => props.theme.palette.error.main};
+    color: ${({ theme }) => theme.palette.error.main};
   }
 `;
 
@@ -145,28 +144,28 @@ const ContainerTitle = styled.span`
   font-weight: 450;
   display: flex;
   align-items: center;
-  color: ${(props) =>
-    props.theme.palette[props.color]?.main || props.theme.palette.text.primary};
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.main || theme.palette.text.primary};
 
   svg {
     color: inherit;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 16px;
   }
 `;
 
 const Container = styled.div`
-  margin: ${(props) => props.theme.spacing(2)} 0;
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  margin: ${({ theme }) => theme.spacing(2)} 0;
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 
   ${TitleContainer} {
     border: none;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     border-left: none;
     border-right: none;
   }
@@ -174,9 +173,9 @@ const Container = styled.div`
 
 const SaleContainer = styled.div`
   position: relative;
-  padding: ${(props) => props.theme.spacing(2.5)} 0;
-  margin: ${(props) => props.theme.spacing(1)} 0;
-  margin-bottom: ${(props) => props.theme.spacing(4)};
+  padding: ${({ theme }) => theme.spacing(2.5)} 0;
+  margin: ${({ theme }) => theme.spacing(1)} 0;
+  margin-bottom: ${({ theme }) => theme.spacing(4)};
 
   &::before {
     content: "";
@@ -186,17 +185,16 @@ const SaleContainer = styled.div`
     width: 99vw;
     height: 100%;
     transform: translateX(-50%);
-    border: 1px solid ${(props) => props.theme.palette.success.light};
+    border: 1px solid ${({ theme }) => theme.palette.success.light};
     background-image: repeating-linear-gradient(
       45deg,
-      ${(props) => alpha(props.theme.palette.primary.main, 0.2)} 0,
-      ${(props) => alpha(props.theme.palette.primary.main, 0.2)} 10px,
+      ${({ theme }) => alpha(theme.palette.primary.main, 0.2)} 0,
+      ${({ theme }) => alpha(theme.palette.primary.main, 0.2)} 10px,
       transparent 0,
       transparent 50%
     );
     background-size: 4em 4em;
-    background-color: ${(props) =>
-      alpha(props.theme.palette.success.light, 0.1)};
+    background-color: ${({ theme }) => alpha(theme.palette.success.light, 0.1)};
     border-left: none;
     border-right: none;
   }
@@ -335,7 +333,6 @@ const ProductsList = ({ tabs, value, title }) => {
         key={tabValue}
         {...{ isLoading, isFetching, data, isSuccess, isError }}
       />
-      {/* <ProductsSliderTest {...{ isLoading, isFetching, data, isSuccess, isError }} /> */}
     </Container>
   );
 };
@@ -392,7 +389,7 @@ const TopList = ({ categories }) => {
         sortBy: "totalOrders",
         sortDir: "desc",
       },
-      { skip: !categories },
+      { skip: !categories }
     );
 
   useEffect(() => {
@@ -545,9 +542,7 @@ const Home = () => {
       <Suggest />
       <CustomDivider>TIÊU ĐIỂM</CustomDivider>
       <SaleContainer>
-        <Loadable key={"top"}>
-          <SaleList />
-        </Loadable>
+        <SaleList />
       </SaleContainer>
       <Loadable key={"toriyama"}>
         <ProductsList

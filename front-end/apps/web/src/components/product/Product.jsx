@@ -18,9 +18,9 @@ const StyledLazyImage = styled(LazyLoadImage)`
   object-fit: contain;
   transition: filter 0.25s ease;
   z-index: -1;
-  background-color: ${(props) => props.theme.palette.action.disabledBackground};
+  background-color: ${({ theme }) => theme.palette.action.disabledBackground};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     margin-bottom: 0;
   }
 `;
@@ -51,20 +51,20 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   position: relative;
-  border: 0.5px solid ${(props) => props.theme.palette.action.hover};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.hover};
+  background-color: ${({ theme }) => theme.palette.background.paper};
   overflow: hidden;
   transition: all 0.25s ease;
 
   &:hover {
-    border-color: ${(props) => props.theme.palette.action.focus};
-    box-shadow: ${(props) => props.theme.shadows[1]};
+    border-color: ${({ theme }) => theme.palette.action.focus};
+    box-shadow: ${({ theme }) => theme.shadows[1]};
     ${ImageContainer} {
       filter: saturate(120%);
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     min-height: 317px;
   }
 `;
@@ -128,7 +128,7 @@ const PriceContainer = styled.div`
   display: flex;
   margin-bottom: 5px;
 
-  ${(props) => props.theme.breakpoints.up("sm")} {
+  ${({ theme }) => theme.breakpoints.up("sm")} {
     flex-direction: column;
   }
 `;
@@ -136,21 +136,21 @@ const PriceContainer = styled.div`
 const Price = styled.span`
   font-size: 16px;
   font-weight: bold;
-  color: ${(props) => props.theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.main};
   margin-right: 5px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 14px;
   }
 `;
 
 const DiscountContainer = styled.span`
   font-size: 14px;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
   display: flex;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 13px;
   }
 `;
@@ -166,10 +166,10 @@ const Percentage = styled.span`
   margin-left: 10px;
   font-size: 14px;
   font-weight: bold;
-  color: ${(props) => props.theme.palette.primary.contrastText};
-  background-color: ${(props) => props.theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.contrastText};
+  background-color: ${({ theme }) => theme.palette.primary.main};
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     margin-left: 5px;
     font-size: 10px;
   }
@@ -186,11 +186,11 @@ const AddToCart = styled.p`
 
   &.disabled {
     pointer-events: none;
-    color: ${(props) => props.theme.palette.text.disabled};
+    color: ${({ theme }) => theme.palette.text.disabled};
   }
 
   &:hover {
-    color: ${(props) => props.theme.palette.primary.main};
+    color: ${({ theme }) => theme.palette.primary.main};
   }
   &:after {
     content: " THÊM VÀO GIỎ";
@@ -215,10 +215,10 @@ const TextMore = styled.b`
   margin-left: 5px;
   padding-left: 5px;
   font-size: 12px;
-  border-left: 0.5px solid ${(props) => props.theme.palette.action.focus};
+  border-left: 0.5px solid ${({ theme }) => theme.palette.action.focus};
 
   &.secondary {
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
   }
 `;
 
@@ -230,14 +230,13 @@ const StyledRating = styled(Rating)`
 
 const ProductTag = styled.span`
   position: absolute;
-  top: ${(props) => props.theme.spacing(1)};
-  left: ${(props) => props.theme.spacing(1)};
-  padding: ${(props) => props.theme.spacing(0.25)}
-    ${(props) => props.theme.spacing(1)};
-  background-color: ${(props) =>
-    props.theme.palette[props.color]?.light || props.theme.palette.info.light};
-  color: ${(props) =>
-    props.theme.palette[props.color]?.dark || props.theme.palette.info.dark};
+  top: ${({ theme }) => theme.spacing(1)};
+  left: ${({ theme }) => theme.spacing(1)};
+  padding: ${({ theme }) => `${theme.spacing(0.25)} ${theme.spacing(1)}`};
+  background-color: ${({ theme, color }) =>
+    theme.palette[color]?.light || theme.palette.info.light};
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.dark || theme.palette.info.dark};
   font-size: 12px;
   font-weight: 500px;
   z-index: 1;
@@ -281,7 +280,7 @@ const Product = ({ book, scrollPosition }) => {
                     <PriceContainer>
                       <Price>
                         {currencyFormat.format(
-                          book.price * (1 - book.discount),
+                          book.price * (1 - book.discount)
                         )}
                       </Price>
                       <DiscountContainer>

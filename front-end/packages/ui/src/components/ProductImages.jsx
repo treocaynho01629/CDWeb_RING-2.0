@@ -11,16 +11,16 @@ const LightboxImages = lazy(() => import("./LightboxImages"));
 //#region styled
 const ImgContainer = styled.div`
   text-align: center;
-  background-color: ${(props) => props.theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 
   .react-multi-carousel-list {
     position: unset !important;
   }
 
-  ${(props) => props.theme.breakpoints.up("md")} {
+  ${({ theme }) => theme.breakpoints.up("md")} {
     width: 100%;
     position: sticky;
-    top: ${(props) => props.theme.mixins.toolbar.minHeight + 15}px;
+    top: ${({ theme }) => theme.mixins.toolbar.minHeight + 15}px;
   }
 `;
 
@@ -32,15 +32,15 @@ const ImageNumber = styled.span`
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: 50px;
-  top: ${(props) => props.theme.spacing(3)};
-  left: ${(props) => props.theme.spacing(3)};
+  top: ${({ theme }) => theme.spacing(3)};
+  left: ${({ theme }) => theme.spacing(3)};
   opacity: 0.9;
   z-index: 5;
   pointer-events: none;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
-    bottom: ${(props) => props.theme.spacing(3)};
-    right: ${(props) => props.theme.spacing(3)};
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    bottom: ${({ theme }) => theme.spacing(3)};
+    right: ${({ theme }) => theme.spacing(3)};
     top: auto;
     left: auto;
   }
@@ -49,15 +49,15 @@ const ImageNumber = styled.span`
 const MoreImageContainer = styled.div`
   padding: 10px;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     padding: 5px;
   }
 `;
 
 const CustomArrowButton = styled.div`
   position: absolute;
-  background-color: ${(props) => props.theme.palette.background.paper};
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
   border-radius: 50%;
   height: 30px;
   width: 30px;
@@ -97,7 +97,7 @@ const ImageSlide = styled.div`
   aspect-ratio: 1/1;
   background-clip: content-box;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     padding: 0;
     border: none;
   }
@@ -120,21 +120,21 @@ const StyledSkeleton = styled(Skeleton)`
 
 const SmallImageSlide = styled.div`
   display: flex;
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
   opacity: 0.5;
   aspect-ratio: 1/1;
   max-height: 85px;
-  margin-right: ${(props) => props.theme.spacing(0.5)};
+  margin-right: ${({ theme }) => theme.spacing(0.5)};
   cursor: pointer;
   transition: opacity 0.25s ease;
 
   &.active {
-    border: 3px solid ${(props) => props.theme.palette.primary.main};
+    border: 3px solid ${({ theme }) => theme.palette.primary.main};
     opacity: 1;
   }
 
   &:hover {
-    border: 1px solid ${(props) => props.theme.palette.primary.light};
+    border: 1px solid ${({ theme }) => theme.palette.primary.light};
     opacity: 1;
   }
 `;
@@ -145,7 +145,7 @@ const StyledSmallLazyImage = styled(LazyLoadImage)`
   width: 100%;
   aspect-ratio: 1/1;
   max-height: 85px;
-  background-color: ${(props) => props.theme.palette.action.disabledBackground};
+  background-color: ${({ theme }) => theme.palette.action.disabledBackground};
 `;
 
 const StyledSmallSkeleton = styled(Skeleton)`

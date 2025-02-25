@@ -8,9 +8,9 @@ const Container = styled.div`
   position: relative;
   max-height: 100%;
   width: 200px;
-  background-color: ${(props) => props.theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     width: auto;
   }
 `;
@@ -21,13 +21,13 @@ const SliderContainer = styled.div`
   -ms-overflow-style: none;
   scrollbar-width: none;
   display: flex;
-  flex-direction: ${(props) => props.direction || "column"};
+  flex-direction: ${({ direction }) => direction || "column"};
 
   &::-webkit-scrollbar {
     display: none;
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     width: 100%;
     flex-direction: row;
     overflow-y: hidden;

@@ -42,21 +42,20 @@ const DialogContent = lazy(() => import("@mui/material/DialogContent"));
 //#region styled
 const ReviewsWrapper = styled.div`
   position: relative;
-  padding: ${(props) => props.theme.spacing(1)}
-    ${(props) => props.theme.spacing(2.5)};
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  padding: ${({ theme }) => `${theme.spacing(1)} ${theme.spacing(2.5)}`};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 
-  ${(props) => props.theme.breakpoints.down("md")} {
-    padding: 0 ${(props) => props.theme.spacing(1.5)};
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    padding: 0 ${({ theme }) => theme.spacing(1.5)};
   }
 `;
 
 const ReviewsContainer = styled.div`
   position: relative;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
-    margin-bottom: ${(props) => props.theme.spacing(2.5)};
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    margin-bottom: ${({ theme }) => theme.spacing(2.5)};
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -80,19 +79,19 @@ const Label = styled.span`
   font-size: 14px;
   display: flex;
   align-items: center;
-  color: ${(props) => props.theme.palette.warning.light};
+  color: ${({ theme }) => theme.palette.warning.light};
 
   &.secondary {
     font-size: 14px;
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
   }
 `;
 
 const StyledEmptyIcon = styled(EmptyIcon)`
   height: 70px;
   width: 70px;
-  margin: ${(props) => props.theme.spacing(1)} 0;
-  fill: ${(props) => props.theme.palette.text.icon};
+  margin: ${({ theme }) => theme.spacing(1)} 0;
+  fill: ${({ theme }) => theme.palette.text.icon};
 `;
 //#endregion
 
@@ -127,7 +126,7 @@ const ReviewComponent = ({
     error: errorReview,
   } = useGetReviewByBookIdQuery(
     book?.id, //User's review of this product
-    { skip: !username || !book },
+    { skip: !username || !book }
   );
   const {
     data,
@@ -146,7 +145,7 @@ const ReviewComponent = ({
       sortDir: "desc",
       rating: filterBy === "all" ? null : filterBy,
     },
-    { skip: !haveReviews },
+    { skip: !haveReviews }
   );
   const loading = isLoading || isFetching || isError || isUninitialized;
 
@@ -201,7 +200,7 @@ const ReviewComponent = ({
           ...Array(
             productReviewsCount > pagination?.size
               ? pagination?.size
-              : productReviewsCount,
+              : productReviewsCount
           ),
         ].map((item, index) => (
           <Fragment key={`temp-review-${index}`}>

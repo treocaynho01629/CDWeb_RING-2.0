@@ -37,7 +37,7 @@ const ListContainer = styled.div`
   position: relative;
   width: 100%;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     padding: 10px 12px;
   }
 `;
@@ -46,7 +46,7 @@ const ProfileContainer = styled.div`
   position: relative;
   padding: 15px 10px;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     padding: 10px 2px;
     padding-top: 0;
   }
@@ -56,13 +56,13 @@ const MainProfile = styled.div`
   display: flex;
   width: 100%;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
-    margin-bottom: ${(props) => props.theme.spacing(1.5)};
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    margin-bottom: ${({ theme }) => theme.spacing(1.5)};
   }
 `;
 
 const InfoContainer = styled.div`
-  margin-left: ${(props) => props.theme.spacing(1)};
+  margin-left: ${({ theme }) => theme.spacing(1)};
   overflow: hidden;
   width: 100%;
 `;
@@ -71,7 +71,7 @@ const StyledAvatar = styled(Avatar)`
   width: 45px;
   height: 45px;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     width: 55px;
     height: 55px;
   }
@@ -97,7 +97,7 @@ const Name = styled.p`
   margin-bottom: -2px;
   font-size: 16px;
   font-weight: 400;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -106,13 +106,13 @@ const Name = styled.p`
 const Role = styled.span`
   font-weight: 450;
   padding: 2px 6px;
-  margin-left: ${(props) => props.theme.spacing(1)};
+  margin-left: ${({ theme }) => theme.spacing(1)};
   font-size: 12px;
   border-radius: 15px;
   white-space: nowrap;
   border: 1px solid;
-  border-color: ${(props) => props.theme.palette[props.color]?.main};
-  color: ${(props) => props.theme.palette[props.color]?.main};
+  border-color: ${({ theme, color }) => theme.palette[color]?.main};
+  color: ${({ theme, color }) => theme.palette[color]?.main};
 `;
 
 const EditButton = styled.span`
@@ -125,9 +125,9 @@ const EditButton = styled.span`
   aspect-ratio: 1/1;
   font-size: 13px;
   justify-content: flex-end;
-  color: ${(props) => props.theme.palette.common.black};
-  background-color: ${(props) => props.theme.palette.grey[300]};
-  border: 2px solid ${(props) => props.theme.palette.background.default};
+  color: ${({ theme }) => theme.palette.common.black};
+  background-color: ${({ theme }) => theme.palette.grey[300]};
+  border: 2px solid ${({ theme }) => theme.palette.background.default};
   cursor: pointer;
 
   svg {
@@ -136,12 +136,12 @@ const EditButton = styled.span`
   }
 
   &:hover {
-    color: ${(props) => props.theme.palette.primary.main};
-    background-color: ${(props) => props.theme.palette.grey[200]};
+    color: ${({ theme }) => theme.palette.primary.main};
+    background-color: ${({ theme }) => theme.palette.grey[200]};
     transition: 0.25s ease;
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     display: flex;
   }
 `;
@@ -159,32 +159,31 @@ const ItemText = styled.h3`
 
 const StyledListItemButton = styled(ListItemButton)`
   justify-content: space-between;
-  padding: ${(props) => props.theme.spacing(0.5)}
-    ${(props) => props.theme.spacing(2)};
+  padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(2)}`};
 
   &.secondary {
     padding: 0;
     padding-left: 48px;
-    color: ${(props) => props.theme.palette.text.secondary};
+    color: ${({ theme }) => theme.palette.text.secondary};
   }
 
   &:hover {
-    color: ${(props) => props.theme.palette.primary.main};
-    background-color: ${(props) => props.theme.palette.background.default};
+    color: ${({ theme }) => theme.palette.primary.main};
+    background-color: ${({ theme }) => theme.palette.background.default};
   }
 
   &.Mui-selected {
-    color: ${(props) => props.theme.palette.primary.light};
+    color: ${({ theme }) => theme.palette.primary.light};
     background-color: transparent;
     text-decoration: underline;
 
     &:hover {
-      background-color: ${(props) => props.theme.palette.action.hover};
+      background-color: ${({ theme }) => theme.palette.action.hover};
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    padding: ${(props) => props.theme.spacing(0.5)} 0;
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: ${({ theme }) => theme.spacing(0.5)} 0;
 
     ${ItemText} {
       font-size: 14px;
@@ -195,7 +194,7 @@ const StyledListItemButton = styled(ListItemButton)`
 const AdditionalInfo = styled.div`
   width: 100%;
   display: flex;
-  gap: ${(props) => props.theme.spacing(1)};
+  gap: ${({ theme }) => theme.spacing(1)};
 `;
 
 const Additional = styled.span`
@@ -212,10 +211,10 @@ const Additional = styled.span`
 
   b {
     margin-left: 5px;
-    color: ${(props) => props.theme.palette.warning.main};
+    color: ${({ theme }) => theme.palette.warning.main};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;
   }
 `;
@@ -246,9 +245,8 @@ const NavItem = styled(NavLink)`
     padding: 5px;
     border-radius: 5px;
     font-size: 2.6rem;
-    color: ${(props) => props.theme.palette.primary.dark};
-    background-color: ${(props) =>
-      alpha(props.theme.palette.primary.light, 0.3)};
+    color: ${({ theme }) => theme.palette.primary.dark};
+    background-color: ${({ theme }) => alpha(theme.palette.primary.light, 0.3)};
   }
 `;
 //#endregion

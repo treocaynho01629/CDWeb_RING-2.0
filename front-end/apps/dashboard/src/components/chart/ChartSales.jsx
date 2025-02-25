@@ -19,9 +19,9 @@ import { useState } from "react";
 
 //#region styled
 const TooltipContainer = styled.div`
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
-  background-color: ${(props) => props.theme.palette.background.default};
-  padding: ${(props) => props.theme.spacing(1.5)};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.default};
+  padding: ${({ theme }) => theme.spacing(1.5)};
 `;
 
 const TooltipLabel = styled.p`
@@ -38,19 +38,19 @@ const TooltipValue = styled.p`
   width: 100%;
 
   span {
-    color: ${(props) => props.color};
+    color: ${({ props }) => color};
   }
 `;
 
 const TitleContainer = styled.div`
-  padding: 0 ${(props) => props.theme.spacing(2)};
+  padding: 0 ${({ theme }) => theme.spacing(2)};
   display: flex;
   align-items: center;
   justify-content: space-between;
 `;
 
 const LegendLabel = styled.span`
-  color: ${(props) => props.theme.palette.text.primary};
+  color: ${({ theme }) => theme.palette.text.primary};
   h3 {
     font-weight: 400;
     font-size: 18px;
@@ -72,7 +72,7 @@ function YearsSelect({ year, setYear }) {
     yearsSelect.push(
       <MenuItem key={`year-${i}`} value={i}>
         {i}
-      </MenuItem>,
+      </MenuItem>
     );
   }
 
@@ -135,7 +135,7 @@ const ChartSales = () => {
       result[1] += data?.sales;
       return result;
     },
-    [0, 0],
+    [0, 0]
   );
 
   return (

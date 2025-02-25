@@ -17,15 +17,15 @@ const ItemContainer = styled.div`
     padding: 5px;
     border-radius: 5px;
     font-size: 2.6rem;
-    color: ${(props) => props.theme.palette.common.white};
-    background-color: ${(props) => props.color};
+    color: ${({ theme }) => theme.palette.common.white};
+    background-color: ${({ color }) => color};
   }
 
   &:hover {
     transform: translateY(-1px);
   }
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     font-size: 12px;
 
     svg {
@@ -33,7 +33,7 @@ const ItemContainer = styled.div`
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: 2px;
     width: 70px;
     height: 70px;
@@ -47,7 +47,7 @@ const ItemContainer = styled.div`
 
 const ItemWrapper = styled.div`
   display: flex;
-  background-color: ${(props) => props.theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 `;
 
 const ItemName = styled.span`
@@ -60,16 +60,16 @@ const ItemName = styled.span`
 
 const Wrapper = styled.div`
   position: relative;
-  padding: ${(props) => props.theme.spacing(1)} 0;
-  margin-top: ${(props) => props.theme.spacing(2)};
-  background-color: ${(props) => props.theme.palette.background.paper};
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  padding: ${({ theme }) => theme.spacing(1)} 0;
+  margin-top: ${({ theme }) => theme.spacing(2)};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     margin-top: 0;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     border-left: none;
     border-right: none;
   }

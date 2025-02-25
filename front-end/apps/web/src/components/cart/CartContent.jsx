@@ -55,12 +55,12 @@ const TitleContainer = styled.div`
     text-align: end;
     direction: rtl;
 
-    ${(props) => props.theme.breakpoints.down("md_lg")} {
+    ${({ theme }) => theme.breakpoints.down("md_lg")} {
       display: none;
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: 20px 10px;
   }
 `;

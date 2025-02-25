@@ -7,7 +7,7 @@ const InfoWrapper = styled(Paper)`
   display: flex;
   position: relative;
   justify-content: space-between;
-  padding: ${(props) => props.theme.spacing(2.5)};
+  padding: ${({ theme }) => theme.spacing(2.5)};
   overflow: hidden;
   height: 100%;
   z-index: 1;
@@ -19,9 +19,8 @@ const InfoWrapper = styled(Paper)`
     left: -50px;
     height: 110%;
     aspect-ratio: 1/1;
-    background-color: ${(props) =>
-      props.theme.palette[props.color]?.light ||
-      props.theme.palette.primary.light};
+    background-color: ${({ props }) =>
+      theme.palette[color]?.light || theme.palette.primary.light};
     opacity: 0.3;
     transform: rotate(45deg);
     z-index: -1;
@@ -45,7 +44,7 @@ const InfoContainer = styled.div`
 
   svg {
     font-size: 2.75em;
-    margin-bottom: ${(props) => props.theme.spacing(1)};
+    margin-bottom: ${({ theme }) => theme.spacing(1)};
   }
 `;
 
@@ -53,7 +52,7 @@ const Diff = styled.span`
   display: flex;
   justify-content: flex-end;
   font-size: 14px;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
   width: 0;
   overflow: visible;
 

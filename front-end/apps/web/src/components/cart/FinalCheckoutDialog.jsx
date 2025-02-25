@@ -34,9 +34,9 @@ const SwipeableDrawer = lazy(() => import("@mui/material/SwipeableDrawer"));
 //#region styled
 const UserInfo = styled.b`
   font-size: 14px;
-  margin: ${(props) => props.theme.spacing(1)} 0;
+  margin: ${({ theme }) => theme.spacing(1)} 0;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 13px;
   }
 `;
@@ -53,53 +53,52 @@ const AddressContent = styled.div`
   display: flex;
   text-overflow: ellipsis;
   overflow: hidden;
-  margin-right: ${(props) => props.theme.spacing(2)};
+  margin-right: ${({ theme }) => theme.spacing(2)};
   white-space: nowrap;
 `;
 
 const Address = styled.span`
   font-size: 14px;
   line-height: 1.75em;
-  margin-top: ${(props) => props.theme.spacing(1)};
-  color: ${(props) => props.theme.palette.text.secondary};
+  margin-top: ${({ theme }) => theme.spacing(1)};
+  color: ${({ theme }) => theme.palette.text.secondary};
 `;
 
 const AddressTag = styled.span`
   font-size: 12px;
   font-weight: bold;
-  margin-right: ${(props) => props.theme.spacing(0.5)};
-  padding: ${(props) => props.theme.spacing(0.5)}
-    ${(props) => props.theme.spacing(1)};
-  border: 0.5px solid ${(props) => props.theme.palette.primary.main};
-  color: ${(props) => props.theme.palette.primary.main};
+  margin-right: ${({ theme }) => theme.spacing(0.5)};
+  padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(1)}`};
+  border: 0.5px solid ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.main};
 
   &.info {
-    color: ${(props) => props.theme.palette.info.main};
-    border-color: ${(props) => props.theme.palette.info.main};
+    color: ${({ theme }) => theme.palette.info.main};
+    border-color: ${({ theme }) => theme.palette.info.main};
   }
 `;
 
 const EditButton = styled.div`
   font-size: 12px;
-  color: ${(props) => props.theme.palette.info.main};
+  color: ${({ theme }) => theme.palette.info.main};
   display: flex;
   align-items: center;
   cursor: pointer;
 
   svg {
     font-size: 16px;
-    margin-right: ${(props) => props.theme.spacing(0.5)};
+    margin-right: ${({ theme }) => theme.spacing(0.5)};
   }
 
   &:hover {
-    color: ${(props) => props.theme.palette.info.light};
+    color: ${({ theme }) => theme.palette.info.light};
   }
 `;
 
 const AddressDivider = styled.div`
   width: 100%;
-  margin: ${(props) => props.theme.spacing(1)} 0;
-  border-bottom: 0.5px dashed ${(props) => props.theme.palette.divider};
+  margin: ${({ theme }) => theme.spacing(1)} 0;
+  border-bottom: 0.5px dashed ${({ theme }) => theme.palette.divider};
 `;
 //#endregion
 

@@ -28,12 +28,12 @@ import { numFormat } from "@ring/shared";
 //#region styled
 const ShopContainer = styled.div`
   padding: 20px;
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
   display: flex;
   flex-wrap: wrap;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     padding: 10px 12px;
   }
 `;
@@ -41,10 +41,10 @@ const ShopContainer = styled.div`
 const ShopInfo = styled.div`
   display: flex;
   align-items: center;
-  border-right: 0.5px solid ${(props) => props.theme.palette.divider};
+  border-right: 0.5px solid ${({ theme }) => theme.palette.divider};
   padding-right: 15px;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     border: none;
     padding-right: 0;
   }
@@ -54,7 +54,7 @@ const ShopName = styled.h3`
   margin: 0;
   white-space: nowrap;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 15px;
   }
 `;
@@ -63,7 +63,7 @@ const Verified = styled.p`
   font-size: 13px;
   margin: 0;
   display: flex;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
 `;
 
 const ShopDetail = styled.span`
@@ -80,10 +80,10 @@ const ShopDetail = styled.span`
 
   b {
     margin-left: 10px;
-    color: ${(props) => props.theme.palette.warning.main};
+    color: ${({ theme }) => theme.palette.warning.main};
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 12px;
     width: auto;
     justify-content: center;

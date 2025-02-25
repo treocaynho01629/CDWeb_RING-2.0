@@ -14,6 +14,7 @@ import { debounce } from "lodash-es";
 import { ReactComponent as EmptyIcon } from "@ring/shared/assets/empty";
 import { Message } from "@ring/ui/Components";
 import { useDeepEffect, orderItems } from "@ring/shared";
+import { LoadContainer, PlaceholderContainer } from "../custom/OrderComponents";
 import useCart from "../../hooks/useCart";
 import OrderItem from "./OrderItem";
 
@@ -31,14 +32,14 @@ const OrdersContainer = styled.div`
 
 const ToggleGroupContainer = styled.div`
   width: 100%;
-  background-color: ${(props) => props.theme.palette.background.paper};
-  border-bottom: 1px solid ${(props) => props.theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
   white-space: nowrap;
   position: sticky;
-  top: ${(props) => props.theme.mixins.toolbar.minHeight + 16.5}px;
+  top: ${({ theme }) => theme.mixins.toolbar.minHeight + 16.5}px;
   z-index: 1;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     top: 0;
 
     &::before,
@@ -54,7 +55,7 @@ const ToggleGroupContainer = styled.div`
     top: -16px;
     width: 100%;
     height: calc(100% + 16px);
-    background-color: ${(props) => props.theme.palette.background.paper};
+    background-color: ${({ theme }) => theme.palette.background.paper};
     z-index: -1;
   }
 
@@ -65,28 +66,16 @@ const ToggleGroupContainer = styled.div`
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: ${(props) => props.theme.palette.action.hover};
+    background-color: ${({ theme }) => theme.palette.action.hover};
     z-index: -1;
   }
-`;
-
-const PlaceholderContainer = styled.div`
-  padding: ${(props) => props.theme.spacing(16)};
-`;
-
-const LoadContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin-bottom: ${(props) => props.theme.spacing(2)};
 `;
 
 const StyledEmptyIcon = styled(EmptyIcon)`
   height: 70px;
   width: 70px;
-  margin: ${(props) => props.theme.spacing(1)} 0;
-  fill: ${(props) => props.theme.palette.text.icon};
+  margin: ${({ theme }) => theme.spacing(1)} 0;
+  fill: ${({ theme }) => theme.palette.text.icon};
 `;
 //#endregion
 
@@ -329,7 +318,7 @@ const OrdersList = ({ pending, setPending, setContextOrder, confirm }) => {
       >
         <form ref={scrollRef} onSubmit={handleChangeKeyword}>
           <TextField
-            placeholder="Tìm kiếm theo mã đơn hàng, Tên Shop hoặc Tên sản phẩm"
+            placeholder="Tìm theo Mã, Tên Shop hoặc Tên sản phẩm"
             autoComplete="order"
             id="order"
             size="small"

@@ -13,8 +13,6 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  useTheme,
-  useMediaQuery,
   DialogContent,
 } from "@mui/material";
 import {
@@ -61,25 +59,25 @@ const PlaceholderContainer = styled.div`
 const StyledEmptyIcon = styled(EmptyIcon)`
   height: 70px;
   width: 70px;
-  margin: ${(props) => props.theme.spacing(1)} 0;
-  fill: ${(props) => props.theme.palette.text.icon};
+  margin: ${({ theme }) => theme.spacing(1)} 0;
+  fill: ${({ theme }) => theme.palette.text.icon};
 `;
 
 const StyledAddButton = styled.span`
   font-size: 12px;
   display: flex;
   align-items: flex-start;
-  color: ${(props) => props.theme.palette.success.main};
+  color: ${({ theme }) => theme.palette.success.main};
   cursor: pointer;
 
   svg {
-    margin-left: ${(props) => props.theme.spacing(0.5)};
+    margin-left: ${({ theme }) => theme.spacing(0.5)};
     font-size: 20px;
   }
 `;
 //#endregion
 
-const AddressComponent = ({ pending, setPending }) => {
+const AddressComponent = ({ pending, setPending, mobileMode }) => {
   const {
     addresses: storeAddresses,
     addNewAddress,
@@ -91,11 +89,9 @@ const AddressComponent = ({ pending, setPending }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [contextAddress, setContextAddress] = useState(null);
   const openContext = Boolean(anchorEl);
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [ConfirmationDialog, confirm] = useConfirm(
     "Xoá địa chỉ?",
-    "Xoá địa chỉ khỏi sổ địa chỉ?",
+    "Xoá địa chỉ khỏi sổ địa chỉ?"
   );
 
   //Fetch addresses
@@ -178,7 +174,7 @@ const AddressComponent = ({ pending, setPending }) => {
   const handleCreateAddress = async (
     address,
     isDefault = false,
-    isTemp = false,
+    isTemp = false
   ) => {
     if (pending || creating || updating || deleting) return;
     setPending(true);
@@ -222,7 +218,7 @@ const AddressComponent = ({ pending, setPending }) => {
               setErrMsg("Sai định dạng thông tin!");
             } else if (err?.status === 409) {
               setErrMsg(
-                "Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!",
+                "Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!"
               );
             } else {
               setErrMsg("Thêm địa chỉ thất bại");
@@ -361,7 +357,7 @@ const AddressComponent = ({ pending, setPending }) => {
               setErrMsg("Sai định dạng thông tin!");
             } else if (err?.status === 409) {
               setErrMsg(
-                "Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!",
+                "Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!"
               );
             } else {
               setErrMsg("Cập nhật địa chỉ thất bại");
@@ -423,7 +419,7 @@ const AddressComponent = ({ pending, setPending }) => {
               setErrMsg("Sai định dạng thông tin!");
             } else if (err?.status === 409) {
               setErrMsg(
-                "Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!",
+                "Vượt quá số lượng cho phép (5), vui lòng xoá bớt hoặc tạm lưu vào bộ nhớ!"
               );
             } else {
               setErrMsg("Thêm địa chỉ thất bại");
@@ -534,7 +530,7 @@ const AddressComponent = ({ pending, setPending }) => {
         maxWidth={"sm"}
         fullWidth
         onClose={handleClose}
-        fullScreen={fullScreen}
+        fullScreen={mobileMode}
       >
         <AddressForm
           {...{

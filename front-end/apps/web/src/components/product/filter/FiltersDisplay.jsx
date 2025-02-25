@@ -29,15 +29,12 @@ const ChipsContainer = styled.div`
 
 const FilterChip = styled.span`
   padding: 6px 10px;
-  margin: ${(props) => props.theme.spacing(0.5)} 0;
-  margin-right: ${(props) => props.theme.spacing(1)};
+  margin: ${({ theme }) => theme.spacing(0.5)} 0;
+  margin-right: ${({ theme }) => theme.spacing(1)};
   border: 1px solid
-    ${(props) =>
-      props.theme.palette[props.color]?.main ||
-      props.theme.palette.warning.main};
-  color: ${(props) =>
-    props.theme.palette[props.color]?.light ||
-    props.theme.palette.warning.light};
+    ${({ theme }) => theme.palette[color]?.main || theme.palette.warning.main};
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.light || theme.palette.warning.light};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -46,19 +43,14 @@ const FilterChip = styled.span`
   cursor: pointer;
 
   &:hover {
-    border-color: ${(props) =>
-      props.theme.palette[props.color]?.light ||
-      props.theme.palette.warning.light};
-    background-color: ${(props) =>
-      alpha(
-        props.theme.palette[props.color]?.light ||
-          props.theme.palette.warning.light,
-        0.1,
-      )};
+    border-color: ${({ theme }) =>
+      theme.palette[color]?.light || theme.palette.warning.light};
+    background-color: ${({ theme }) =>
+      alpha(theme.palette[color]?.light || theme.palette.warning.light, 0.1)};
   }
 
   svg {
-    margin-left: ${(props) => props.theme.spacing(1)};
+    margin-left: ${({ theme }) => theme.spacing(1)};
   }
 `;
 
@@ -68,7 +60,7 @@ const Keyword = styled.div`
   margin: 10px 0;
 
   b {
-    color: ${(props) => props.theme.palette.warning.main};
+    color: ${({ theme }) => theme.palette.warning.main};
   }
 `;
 //#endregion
@@ -125,7 +117,7 @@ const FiltersDisplay = memo(
             <FilterChip key={"chip-pubs"} onClick={scrollToPubs}>
               Nhà xuất bản ({filters.pubIds.length})
               <Close onClick={handleRemovePubs} />
-            </FilterChip>,
+            </FilterChip>
           );
         }
         if (!isEqual(filters.types, defaultFilters.types)) {
@@ -133,7 +125,7 @@ const FiltersDisplay = memo(
             <FilterChip key={"chip-types"} onClick={scrollToTypes}>
               Hình thức bìa ({[].concat([], filters.types).length})
               <Close onClick={handleRemoveTypes} />
-            </FilterChip>,
+            </FilterChip>
           );
         }
         if (!isEqual(filters.value, defaultFilters.value)) {
@@ -142,7 +134,7 @@ const FiltersDisplay = memo(
               Giá:{" "}
               {`${currencyFormat.format(filters.value[0])} - ${currencyFormat.format(filters.value[1])}`}
               <Close onClick={handleRemoveValue} />
-            </FilterChip>,
+            </FilterChip>
           );
         }
         if (filters.rating != defaultFilters.rating) {
@@ -151,7 +143,7 @@ const FiltersDisplay = memo(
               Đánh giá:{" "}
               {`${filters.rating < 5 ? "Từ" : ""} ${filters.rating} sao`}
               <Close onClick={handleRemoveRating} />
-            </FilterChip>,
+            </FilterChip>
           );
         }
       }
@@ -184,7 +176,7 @@ const FiltersDisplay = memo(
         </ChipsWrapper>
       </DisplayContainer>
     );
-  },
+  }
 );
 
 export default FiltersDisplay;

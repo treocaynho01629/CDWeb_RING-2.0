@@ -15,49 +15,49 @@ import {
 
 //#region styled
 const Message = styled.span`
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 14px;
   }
 `;
 
 const Title = styled.h4`
-  margin: ${(props) => props.theme.spacing(1.5)} 0;
+  margin: ${({ theme }) => theme.spacing(1.5)} 0;
   margin-top: 0;
   font-weight: 420;
 `;
 
 const CardContainer = styled.div`
-  border: 0.5px solid ${(props) => props.theme.palette.info.dark};
-  padding: ${(props) => props.theme.spacing(1)};
+  border: 0.5px solid ${({ theme }) => theme.palette.info.dark};
+  padding: ${({ theme }) => theme.spacing(1)};
   transition: all 0.2s ease;
   cursor: pointer;
 
   &:hover {
-    border-color: ${(props) => props.theme.palette.info.light};
+    border-color: ${({ theme }) => theme.palette.info.light};
   }
 `;
 
 const CardTitle = styled.span`
   font-size: 18px;
-  margin: ${(props) => props.theme.spacing(1)} 0;
+  margin: ${({ theme }) => theme.spacing(1)} 0;
   display: flex;
   justify-content: space-between;
 
   svg {
-    color: ${(props) => props.theme.palette.info.main};
+    color: ${({ theme }) => theme.palette.info.main};
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 14px;
   }
 `;
 
 const CardDeal = styled.p`
   font-style: italic;
-  color: ${(props) => props.theme.palette.text.secondary};
-  margin: ${(props) => props.theme.spacing(1)} 0;
+  color: ${({ theme }) => theme.palette.text.secondary};
+  margin: ${({ theme }) => theme.spacing(1)} 0;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;
   }
 `;
@@ -166,6 +166,29 @@ export const paymentType = [
   "DEBIT_CARD",
   "ONLINE_PAYMENT",
 ];
+
+export const paymentTypes = {
+  CASH: {
+    label: "Thanh toán tiền mặt",
+    description: "",
+    icon: <LocalAtm />,
+  },
+  CREDIT_CARD: {
+    label: "Thẻ tín dụng",
+    description: "",
+    icon: <CreditCard />,
+  },
+  DEBIT_CARD: {
+    label: "Thẻ ATM",
+    description: "Hỗ trợ Internet Banking",
+    icon: <Payments />,
+  },
+  ONLINE_PAYMENT: {
+    label: "Ví Online",
+    description: "Quét Mã QR từ ứng dụng",
+    icon: <BookOnline />,
+  },
+};
 
 export const paymentItems = [
   {

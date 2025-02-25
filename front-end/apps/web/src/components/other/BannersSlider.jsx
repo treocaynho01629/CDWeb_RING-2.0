@@ -43,8 +43,8 @@ const CustomArrowButton = styled.div`
   top: 0;
   bottom: 0;
   margin: auto;
-  background-color: ${(props) => props.theme.palette.background.paper};
-  border: 0.5px solid ${(props) => props.theme.palette.divider};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.palette.divider};
   border-radius: 50%;
   height: 24px;
   width: 24px;
@@ -60,7 +60,7 @@ const CustomArrowButton = styled.div`
   &:hover {
     opacity: 1;
     transform: scale(1.1);
-    background-color: ${(props) => props.theme.palette.background.default};
+    background-color: ${({ theme }) => theme.palette.background.default};
   }
 
   &.left {
@@ -84,7 +84,7 @@ const BackdropContainer = styled.div`
   display: none;
   z-index: -1;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     display: block;
     overflow: hidden;
   }
@@ -98,7 +98,7 @@ const BackdropImage = styled(LazyLoadImage)`
   width: 110%;
   height: 100%;
   object-fit: fill;
-  background-color: ${(props) => props.theme.palette.action.disabledBackground};
+  background-color: ${({ theme }) => theme.palette.action.disabledBackground};
 `;
 
 const BackdropPlaceholder = styled(Skeleton)`
@@ -118,8 +118,8 @@ const SlideItemContainer = styled.div`
   justify-content: center;
   overflow-y: visible;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
-    padding-top: ${(props) => props.theme.mixins.toolbar.minHeight + 10}px;
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    padding-top: ${({ theme }) => theme.mixins.toolbar.minHeight + 10}px;
   }
 `;
 
@@ -127,11 +127,11 @@ const StyledLazyImage = styled(LazyLoadImage)`
   width: 100%;
   height: 100%;
   object-fit: fill;
-  background-color: ${(props) => props.theme.palette.action.disabledBackground};
+  background-color: ${({ theme }) => theme.palette.action.disabledBackground};
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     width: 90%;
-    background-color: ${(props) => props.theme.palette.grey[400]};
+    background-color: ${({ theme }) => theme.palette.grey[400]};
   }
 `;
 
@@ -140,16 +140,16 @@ const StyledSkeleton = styled(Skeleton)`
   height: 100%;
   aspect-ratio: 13/5;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     width: 90%;
-    background-color: ${(props) => props.theme.palette.grey[400]};
+    background-color: ${({ theme }) => theme.palette.grey[400]};
   }
 `;
 
 const ExtraContainer = styled.div`
   position: relative;
   width: 100%;
-  height: calc(50% - ${(props) => props.theme.spacing(0.5)});
+  height: calc(50% - ${({ theme }) => theme.spacing(0.5)});
   animation: ${fadeIn} 0.5s ease;
 `;
 //#endregion
@@ -281,14 +281,14 @@ const BannersSlider = () => {
             key={`banner-${banner?.id}-${index}`}
             banner={banner}
             index={index}
-          />,
+          />
         );
         extraBanners.push(
           <Fragment key={`extra-${banner?.id}-${index}`}>
             <ExtraItem
               {...{ banner, index, length: ids?.length, slideIndex }}
             />
-          </Fragment>,
+          </Fragment>
         );
       });
     } else {
@@ -326,7 +326,7 @@ const BannersSlider = () => {
                 ? nextSlide - 6
                 : nextSlide < 2
                   ? nextSlide + 2
-                  : nextSlide - 2,
+                  : nextSlide - 2
             );
           }}
           pauseOnHover

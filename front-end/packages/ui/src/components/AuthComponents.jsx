@@ -8,27 +8,26 @@ export const AuthTitle = styled.h1`
 
 export const TermText = styled.p`
   font-size: 12px;
-  margin: ${(props) => props.theme.spacing(1)} 0;
+  margin: ${({ theme }) => theme.spacing(1)} 0;
   text-align: center;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
 `;
 
 export const AuthText = styled.p`
   margin: 0;
-  margin-top: ${(props) => props.theme.spacing(8)};
+  margin-top: ${({ theme }) => theme.spacing(8)};
   text-align: center;
 `;
 
 export const AuthHighlight = styled.span`
   text-decoration: underline;
-  color: ${(props) =>
-    props.theme.palette[props.color]?.main || props.theme.palette.primary.main};
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.main || theme.palette.primary.main};
   cursor: pointer;
 
   &:hover {
-    color: ${(props) =>
-      props.theme.palette[props.color]?.dark ||
-      props.theme.palette.primary.dark};
+    color: ${({ theme, color }) =>
+      theme.palette[color]?.dark || theme.palette.primary.dark};
   }
 `;
 

@@ -16,16 +16,16 @@ const AddressItemContainer = styled.div`
   justify-content: space-between;
   width: 100%;
   padding: 20px;
-  border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
 
   &.active {
-    border-color: ${(props) => props.theme.palette.primary.main};
+    border-color: ${({ theme }) => theme.palette.primary.main};
   }
   &.temp {
-    border-color: ${(props) => props.theme.palette.info.dark};
+    border-color: ${({ theme }) => theme.palette.info.dark};
   }
   &.error {
-    border-color: ${(props) => props.theme.palette.error.main};
+    border-color: ${({ theme }) => theme.palette.error.main};
   }
 `;
 
@@ -38,18 +38,18 @@ const AddressTag = styled.div`
   padding: 2px 10px;
   border-right: 0.5px solid;
   border-bottom: 0.5px solid;
-  border-color: ${(props) => props.theme.palette.primary.main};
-  color: ${(props) => props.theme.palette.primary.dark};
+  border-color: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.dark};
   pointer-events: none;
 
   &.temp {
-    border-color: ${(props) => props.theme.palette.info.dark};
-    color: ${(props) => props.theme.palette.info.dark};
+    border-color: ${({ theme }) => theme.palette.info.dark};
+    color: ${({ theme }) => theme.palette.info.dark};
   }
 
   &.error {
-    border-color: ${(props) => props.theme.palette.error.main};
-    color: ${(props) => props.theme.palette.error.dark};
+    border-color: ${({ theme }) => theme.palette.error.main};
+    color: ${({ theme }) => theme.palette.error.dark};
   }
 `;
 
@@ -70,7 +70,7 @@ const UserInfo = styled.b`
     -webkit-box-orient: vertical;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 13px;
   }
 `;

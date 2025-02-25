@@ -19,11 +19,11 @@ import AmountInput from "../../custom/AmountInput";
 const AmountCount = styled.span`
   font-size: 14px;
   margin-left: 20px;
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
   white-space: nowrap;
 
   &.error {
-    color: ${(props) => props.theme.palette.error.main};
+    color: ${({ theme }) => theme.palette.error.main};
     text-decoration: underline;
     font-weight: bold;
   }
@@ -35,7 +35,7 @@ const FilterContainer = styled.div`
   width: 100%;
   display: block;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     display: none;
   }
 `;
@@ -43,17 +43,27 @@ const FilterContainer = styled.div`
 const AltFilterContainer = styled.div`
   position: fixed;
   bottom: 0;
-  left: 0;
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border-bottom: none;
+  padding: ${({ theme }) => `${theme.spacing(2.5)} ${theme.spacing(2)}`};
+  margin-left: ${({ theme }) => `calc(${theme.spacing(-1.5)} - 0.5px)`};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  display: flex;
   width: 100%;
-  height: 50px;
-  z-index: ${(props) => props.theme.zIndex.appBar};
-  box-shadow: ${(props) => props.theme.shadows[12]};
-  background-color: ${(props) => props.theme.palette.background.paper};
-  align-items: flex-end;
-  display: none;
+  z-index: 2;
 
-  ${(props) => props.theme.breakpoints.down("md")} {
-    display: flex;
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    left: 0;
+    height: 50px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: ${({ theme }) => theme.shadows[12]};
+    align-items: flex-end;
+  }
+
+  ${({ theme }) => theme.breakpoints.up("sm_md")} {
+    width: 720px;
   }
 `;
 
@@ -67,13 +77,17 @@ const BuyButton = styled(Button)`
   margin-top: 15px;
   height: 100%;
   line-height: 1.5;
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    margin-top: 0;
+  }
 `;
 
 const StyledImage = styled.img`
   object-fit: contain;
   width: 115px;
   height: 115px;
-  border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
 `;
 
 const ProductDetailContainer = styled.div`
@@ -84,13 +98,13 @@ const ProductDetailContainer = styled.div`
 `;
 
 const Price = styled.span`
-  color: ${(props) => props.theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.main};
   margin: 10px 20px;
   margin-right: 0;
 `;
 
 const Discount = styled(Price)`
-  color: ${(props) => props.theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.text.secondary};
   text-decoration: line-through;
   margin-left: 10px;
 `;
@@ -112,7 +126,7 @@ const ProductAction = ({ book }) => {
         ? 1
         : prev + n > (book?.amount ?? 199)
           ? (book?.amount ?? 199)
-          : prev + n,
+          : prev + n
     );
   };
 
@@ -149,178 +163,184 @@ const ProductAction = ({ book }) => {
     navigate("/cart");
   };
 
-  return tabletMode ? (
+  return (
     <>
-      <AltFilterContainer>
-        <BuyButton
-          variant="contained"
-          color="secondary"
-          fullWidth
-          sx={{ maxWidth: "35%" }}
-          disabled={!book || book?.amount == 0}
-          onClick={handleOpen}
-        >
-          <AddShoppingCart />
-        </BuyButton>
-        <BuyButton
-          variant="contained"
-          size="large"
-          fullWidth
-          disabled={!book || book?.amount == 0}
-          onClick={handleOpenNow}
-        >
-          {!book
-            ? "Đang tải"
-            : book?.amount == 0
-              ? "Hết hàng"
-              : `Mua ngay (${currencyFormat.format(book?.price * (1 - book?.discount) * amountIndex)})`}
-        </BuyButton>
-      </AltFilterContainer>
-      <SwipeableDrawer
-        anchor="bottom"
-        open={open || openNow}
-        onOpen={handleOpen}
-        onClose={handleClose}
-        disableBackdropTransition
-        disableSwipeToOpen={true}
-      >
-        <ProductDetailContainer>
-          <StyledImage
-            src={book?.image}
-            alt={`${book?.title} preview image`}
-            sizes="250px"
-          />
-          <Box>
-            <Box display="flex">
-              <Price>
-                {currencyFormat.format(book?.price * (1 - book?.discount))}
-              </Price>
-              {book?.discount > 0 && (
-                <Discount>{currencyFormat.format(book?.price)}</Discount>
+      {tabletMode ? (
+        <>
+          <AltFilterContainer>
+            <BuyButton
+              variant="contained"
+              color="secondary"
+              size="large"
+              fullWidth
+              sx={{ maxWidth: { xs: "35%", sm: "45%" }, mr: { xs: 0, sm: 1 } }}
+              disabled={!book || book?.amount == 0}
+              onClick={handleOpen}
+              startIcon={<AddShoppingCart />}
+            >
+              <Box display={{ xs: "none", sm: "block" }}>Thêm vào giỏ</Box>
+            </BuyButton>
+            <BuyButton
+              variant="contained"
+              size="large"
+              fullWidth
+              disabled={!book || book?.amount == 0}
+              onClick={handleOpenNow}
+            >
+              {!book
+                ? "Đang tải"
+                : book?.amount == 0
+                  ? "Hết hàng"
+                  : `Mua ngay (${currencyFormat.format(book?.price * (1 - book?.discount) * amountIndex)})`}
+            </BuyButton>
+          </AltFilterContainer>
+          <SwipeableDrawer
+            anchor="bottom"
+            open={open || openNow}
+            onOpen={handleOpen}
+            onClose={handleClose}
+            disableBackdropTransition
+            disableSwipeToOpen={true}
+          >
+            <ProductDetailContainer>
+              <StyledImage
+                src={book?.image}
+                alt={`${book?.title} preview image`}
+                sizes="250px"
+              />
+              <Box>
+                <Box display="flex">
+                  <Price>
+                    {currencyFormat.format(book?.price * (1 - book?.discount))}
+                  </Price>
+                  {book?.discount > 0 && (
+                    <Discount>{currencyFormat.format(book?.price)}</Discount>
+                  )}
+                </Box>
+                <AmountCount className={book?.amount > 0 ? "" : "error"}>
+                  {book?.amount > 0
+                    ? `(${book?.amount}) sản phẩm còn lại`
+                    : "Tạm thời hết hàng"}
+                </AmountCount>
+              </Box>
+            </ProductDetailContainer>
+            <Divider sx={{ my: 2 }} />
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent={"space-between"}
+              padding={"0 10px"}
+            >
+              <DetailTitle>Số lượng:</DetailTitle>
+              <AmountInput
+                disabled={!book || book?.amount == 0}
+                size="small"
+                max={book?.amount}
+                value={amountIndex}
+                error={1 > amountIndex > (book?.amount ?? 199)}
+                onChange={(e) => handleChangeAmount(e.target.valueAsNumber)}
+                handleDecrease={() => changeAmount(-1)}
+                handleIncrease={() => changeAmount(1)}
+              />
+            </Box>
+            {openNow ? (
+              <BuyButton
+                variant="outlined"
+                color="warning"
+                size="large"
+                sx={{ margin: "5px" }}
+                onClick={() => handleBuyNow(book)}
+              >
+                {!book
+                  ? "Đang tải"
+                  : book?.amount == 0
+                    ? "Hết hàng"
+                    : `Mua ngay (${currencyFormat.format(book?.price * (1 - book?.discount) * amountIndex)})`}
+              </BuyButton>
+            ) : (
+              <BuyButton
+                variant="outlined"
+                color="primary"
+                size="large"
+                sx={{ margin: "5px" }}
+                onClick={() => handleAddToCart(book)}
+              >
+                {!book
+                  ? "Đang tải"
+                  : book?.amount == 0
+                    ? "Hết hàng"
+                    : `Thêm vào giỏ (${currencyFormat.format(book?.price * (1 - book?.discount) * amountIndex)})`}
+              </BuyButton>
+            )}
+          </SwipeableDrawer>
+        </>
+      ) : (
+        <FilterContainer>
+          <Box display="flex" alignItems="center" flexWrap="wrap">
+            <DetailTitle style={{ marginRight: 20 }}>Số lượng:</DetailTitle>
+            <Box display="flex" alignItems="center" my={1}>
+              <AmountInput
+                disabled={!book || book?.amount == 0}
+                size="small"
+                max={book?.amount}
+                value={amountIndex}
+                error={1 > amountIndex > (book?.amount ?? 199)}
+                onChange={(e) => handleChangeAmount(e.target.valueAsNumber)}
+                handleDecrease={() => changeAmount(-1)}
+                handleIncrease={() => changeAmount(1)}
+              />
+              {book ? (
+                <AmountCount className={book?.amount > 0 ? "" : "error"}>
+                  {book?.amount > 0
+                    ? `(${book?.amount}) sản phẩm còn lại`
+                    : "Tạm thời hết hàng"}
+                </AmountCount>
+              ) : (
+                <Skeleton
+                  variant="text"
+                  sx={{ fontSize: "14px", marginLeft: 2 }}
+                  width={200}
+                />
               )}
             </Box>
-            <AmountCount className={book?.amount > 0 ? "" : "error"}>
-              {book?.amount > 0
-                ? `(${book?.amount}) sản phẩm còn lại`
-                : "Tạm thời hết hàng"}
-            </AmountCount>
           </Box>
-        </ProductDetailContainer>
-        <Divider sx={{ my: 2 }} />
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent={"space-between"}
-          padding={"0 10px"}
-        >
-          <DetailTitle>Số lượng:</DetailTitle>
-          <AmountInput
-            disabled={!book || book?.amount == 0}
-            size="small"
-            max={book?.amount}
-            value={amountIndex}
-            error={1 > amountIndex > (book?.amount ?? 199)}
-            onChange={(e) => handleChangeAmount(e.target.valueAsNumber)}
-            handleDecrease={() => changeAmount(-1)}
-            handleIncrease={() => changeAmount(1)}
-          />
-        </Box>
-        {openNow ? (
-          <BuyButton
-            variant="outlined"
-            color="warning"
-            size="large"
-            sx={{ margin: "5px" }}
-            onClick={() => handleBuyNow(book)}
+          <Box
+            position="sticky"
+            height={55}
+            bottom={16}
+            bgcolor={"background.paper"}
           >
-            {!book
-              ? "Đang tải"
-              : book?.amount == 0
-                ? "Hết hàng"
-                : `Mua ngay (${currencyFormat.format(book?.price * (1 - book?.discount) * amountIndex)})`}
-          </BuyButton>
-        ) : (
-          <BuyButton
-            variant="outlined"
-            color="primary"
-            size="large"
-            sx={{ margin: "5px" }}
-            onClick={() => handleAddToCart(book)}
-          >
-            {!book
-              ? "Đang tải"
-              : book?.amount == 0
-                ? "Hết hàng"
-                : `Thêm vào giỏ (${currencyFormat.format(book?.price * (1 - book?.discount) * amountIndex)})`}
-          </BuyButton>
-        )}
-      </SwipeableDrawer>
+            <Box display="flex" alignItems="center" height={47}>
+              <BuyButton
+                variant="contained"
+                size="large"
+                fullWidth
+                sx={{ maxWidth: "40%", marginRight: 1 }}
+                disabled={!book || book?.amount == 0}
+                onClick={() => handleBuyNow(book)}
+              >
+                Mua ngay
+              </BuyButton>
+              <BuyButton
+                variant="outlined"
+                color="secondary"
+                size="large"
+                fullWidth
+                disabled={!book || book?.amount == 0}
+                onClick={() => handleAddToCart(book)}
+                startIcon={<AddShoppingCart fontSize="small" />}
+              >
+                {!book
+                  ? "Đang tải"
+                  : book?.amount == 0
+                    ? "Hết hàng"
+                    : `Thêm vào giỏ (${currencyFormat.format(book?.price * (1 - book?.discount) * amountIndex)})`}
+              </BuyButton>
+            </Box>
+          </Box>
+        </FilterContainer>
+      )}
     </>
-  ) : (
-    <FilterContainer>
-      <Box display="flex" alignItems="center" flexWrap="wrap">
-        <DetailTitle style={{ marginRight: 20 }}>Số lượng:</DetailTitle>
-        <Box display="flex" alignItems="center" my={1}>
-          <AmountInput
-            disabled={!book || book?.amount == 0}
-            size="small"
-            max={book?.amount}
-            value={amountIndex}
-            error={1 > amountIndex > (book?.amount ?? 199)}
-            onChange={(e) => handleChangeAmount(e.target.valueAsNumber)}
-            handleDecrease={() => changeAmount(-1)}
-            handleIncrease={() => changeAmount(1)}
-          />
-          {book ? (
-            <AmountCount className={book?.amount > 0 ? "" : "error"}>
-              {book?.amount > 0
-                ? `(${book?.amount}) sản phẩm còn lại`
-                : "Tạm thời hết hàng"}
-            </AmountCount>
-          ) : (
-            <Skeleton
-              variant="text"
-              sx={{ fontSize: "14px", marginLeft: 2 }}
-              width={200}
-            />
-          )}
-        </Box>
-      </Box>
-      <Box
-        position="sticky"
-        height={55}
-        bottom={16}
-        bgcolor={"background.paper"}
-      >
-        <Box display="flex" alignItems="center" height={47}>
-          <BuyButton
-            variant="contained"
-            size="large"
-            fullWidth
-            sx={{ maxWidth: "40%", marginRight: 1 }}
-            disabled={!book || book?.amount == 0}
-            onClick={() => handleBuyNow(book)}
-          >
-            Mua ngay
-          </BuyButton>
-          <BuyButton
-            variant="outlined"
-            color="secondary"
-            size="large"
-            fullWidth
-            disabled={!book || book?.amount == 0}
-            onClick={() => handleAddToCart(book)}
-            startIcon={<AddShoppingCart fontSize="small" />}
-          >
-            {!book
-              ? "Đang tải"
-              : book?.amount == 0
-                ? "Hết hàng"
-                : `Thêm vào giỏ (${currencyFormat.format(book?.price * (1 - book?.discount) * amountIndex)})`}
-          </BuyButton>
-        </Box>
-      </Box>
-    </FilterContainer>
   );
 };
 

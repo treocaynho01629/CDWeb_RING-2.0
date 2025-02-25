@@ -13,7 +13,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
   width: 100px;
   object-fit: contain;
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     height: 80px;
     width: 80px;
   }
@@ -24,7 +24,7 @@ const StyledSkeleton = styled(Skeleton)`
   height: 100px;
   width: 100px;
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     height: 80px;
     width: 80px;
   }
@@ -32,7 +32,7 @@ const StyledSkeleton = styled(Skeleton)`
 
 const ItemContainer = styled.div`
   padding: 4px;
-  margin-right: ${(props) => props.theme.spacing(2)};
+  margin-right: ${({ theme }) => theme.spacing(2)};
 `;
 
 const PubContainer = styled.div`
@@ -40,7 +40,7 @@ const PubContainer = styled.div`
   display: flex;
   justify-content: space-between;
   overflow: hidden;
-  background-color: ${(props) => props.theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 
   &:hover {
     .button-container {
@@ -67,7 +67,7 @@ const Wrapper = styled.div`
     display: none;
   }
 
-  ${(props) => props.theme.breakpoints.up("md")} {
+  ${({ theme }) => theme.breakpoints.up("md")} {
     ${ItemContainer}:first-of-type {
       margin-left: 20px;
     }
@@ -84,8 +84,8 @@ const ButtonContainer = styled.div`
   height: 100%;
   background-image: linear-gradient(
     to left,
-    ${(props) => props.theme.palette.background.paper},
-    ${(props) => props.theme.palette.background.paper} 80%,
+    ${({ theme }) => theme.palette.background.paper},
+    ${({ theme }) => theme.palette.background.paper} 80%,
     transparent 100%
   );
   display: flex;
@@ -100,7 +100,7 @@ const ButtonContainer = styled.div`
     visibility: visible;
   }
 
-  ${(props) => props.theme.breakpoints.down("md")} {
+  ${({ theme }) => theme.breakpoints.down("md")} {
     display: none;
   }
 `;

@@ -26,7 +26,7 @@ export const StyledTableCell = styled(TableCell)`
     opacity: 0;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     &.${tableCellClasses.body} {
       padding: 8px 8px 8px 4px;
     }
@@ -53,7 +53,7 @@ export const StyledTableCell = styled(TableCell)`
       padding: 0;
     }
 
-    ${(props) => props.theme.breakpoints.down("sm")} {
+    ${({ theme }) => theme.breakpoints.down("sm")} {
       &.${tableCellClasses.body} {
         padding: 8px 8px 8px 4px;
       }
@@ -85,8 +85,8 @@ export const ActionTableCell = styled(TableCell)`
 
 export const StyledTableHead = styled(TableHead)`
   position: sticky;
-  top: ${(props) => props.theme.mixins.toolbar.minHeight + 16}px;
-  background-color: ${(props) => props.theme.palette.background.default};
+  top: ${({ theme }) => theme.mixins.toolbar.minHeight + 16}px;
+  background-color: ${({ theme }) => theme.palette.background.default};
   z-index: 2;
 
   &:before {
@@ -96,7 +96,7 @@ export const StyledTableHead = styled(TableHead)`
     top: -16px;
     width: calc(100% + 20px);
     height: calc(100% + 16px);
-    background-color: ${(props) => props.theme.palette.background.default};
+    background-color: ${({ theme }) => theme.palette.background.default};
     z-index: -1;
   }
 
@@ -107,15 +107,15 @@ export const StyledTableHead = styled(TableHead)`
     top: 0;
     width: calc(100% + 0.5px);
     height: 100%;
-    border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+    border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
 
-    ${(props) => props.theme.breakpoints.down("sm")} {
+    ${({ theme }) => theme.breakpoints.down("sm")} {
       border-left: none;
       border-right: none;
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm_md")} {
+  ${({ theme }) => theme.breakpoints.down("sm_md")} {
     &:before {
       width: 100%;
     }
@@ -124,8 +124,8 @@ export const StyledTableHead = styled(TableHead)`
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    top: ${(props) => props.theme.mixins.toolbar.minHeight + 4}px;
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    top: ${({ theme }) => theme.mixins.toolbar.minHeight + 4}px;
 
     &:before {
       display: none;
@@ -146,11 +146,11 @@ export const StyledTableRow = styled(TableRow)`
     top: 0;
     width: 100%;
     height: 100%;
-    border: 0.5px solid ${(props) => props.theme.palette.action.focus};
-    background-color: ${(props) => props.theme.palette.background.paper};
+    border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+    background-color: ${({ theme }) => theme.palette.background.paper};
     z-index: -1;
 
-    ${(props) => props.theme.breakpoints.down("sm")} {
+    ${({ theme }) => theme.breakpoints.down("sm")} {
       border-left: none;
       border-right: none;
     }
@@ -173,20 +173,20 @@ export const StyledItemTableRow = styled(TableRow)`
     top: 0;
     width: 100%;
     height: 100%;
-    border: 0.5px solid ${(props) => props.theme.palette.action.focus};
+    border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
     border-top: none;
     border-bottom: none;
-    background-color: ${(props) => props.theme.palette.background.paper};
+    background-color: ${({ theme }) => theme.palette.background.paper};
     z-index: -1;
 
-    ${(props) => props.theme.breakpoints.down("sm")} {
+    ${({ theme }) => theme.breakpoints.down("sm")} {
       border: none;
     }
   }
 
   &.error {
     &:after {
-      border: 0.5px solid ${(props) => props.theme.palette.error.light};
+      border: 0.5px solid ${({ theme }) => theme.palette.error.light};
     }
   }
 `;
@@ -194,7 +194,7 @@ export const StyledItemTableRow = styled(TableRow)`
 export const SpaceTableRow = styled(TableRow)`
   height: 16px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 8px;
   }
 `;

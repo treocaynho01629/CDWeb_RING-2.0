@@ -16,8 +16,8 @@ const QuickPagination = lazy(() => import("../../custom/QuickPagination"));
 //#region styled
 const Container = styled.div`
   position: sticky;
-  top: ${(props) => props.theme.mixins.toolbar.minHeight + 16}px;
-  background-color: ${(props) => props.theme.palette.background.default};
+  top: ${({ theme }) => theme.mixins.toolbar.minHeight + 16}px;
+  background-color: ${({ theme }) => theme.palette.background.default};
   margin: 20px 0;
   z-index: 2;
 
@@ -28,19 +28,19 @@ const Container = styled.div`
     top: -16px;
     width: calc(100% + 20px);
     height: calc(100% + 16px);
-    background-color: ${(props) => props.theme.palette.background.default};
+    background-color: ${({ theme }) => theme.palette.background.default};
     z-index: -1;
   }
 
-  ${(props) => props.theme.breakpoints.down("sm_md")} {
+  ${({ theme }) => theme.breakpoints.down("sm_md")} {
     &:before {
       width: 100%;
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
-    top: ${(props) => props.theme.mixins.toolbar.minHeight + 4}px;
-    border-bottom: 0.5px solid ${(props) => props.theme.palette.divider};
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    top: ${({ theme }) => theme.mixins.toolbar.minHeight + 4}px;
+    border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
     margin: 0 0 20px;
 
     &:before {
@@ -59,7 +59,7 @@ const MainContainer = styled.div`
   display: flex;
   align-items: center;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     width: 100%;
   }
 `;
@@ -69,7 +69,7 @@ const AltContainer = styled.div`
   display: flex;
   justify-content: flex-end;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     display: none;
   }
 `;
@@ -79,14 +79,14 @@ const FilterTitle = styled.span`
   margin-right: 15px;
   font-weight: 450;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     display: none;
   }
 `;
 
 const StyledInput = styled(TextField)`
-  margin-right: ${(props) => props.theme.spacing(1)};
-  background-color: ${(props) => props.theme.palette.background.paper};
+  margin-right: ${({ theme }) => theme.spacing(1)};
+  background-color: ${({ theme }) => theme.palette.background.paper};
 
   &.sort {
     .MuiSelect-select {
@@ -94,7 +94,7 @@ const StyledInput = styled(TextField)`
     }
   }
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     margin-right: 0;
 
     .MuiSelect-select {
@@ -112,9 +112,9 @@ const StyledSortButton = styled(Button)`
   padding-right: 0;
   display: none;
   max-width: 100px;
-  color: ${(props) => props.theme.palette.text.primary};
+  color: ${({ theme }) => theme.palette.text.primary};
 
-  ${(props) => props.theme.breakpoints.down("md_lg")} {
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
     display: flex;
   }
 `;

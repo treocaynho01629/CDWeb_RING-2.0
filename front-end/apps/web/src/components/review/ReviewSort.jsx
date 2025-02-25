@@ -13,7 +13,7 @@ const SortContainer = styled.div`
 const SortLabel = styled.b`
   margin-right: 16px;
 
-  ${(props) => props.theme.breakpoints.down("sm")} {
+  ${({ theme }) => theme.breakpoints.down("sm")} {
     display: none;
   }
 `;
