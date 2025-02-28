@@ -49,6 +49,9 @@ const StyledButton = styled.span`
   }
 `;
 
+const MIN_VALUE = 1;
+const MAX_VALUE = 199;
+
 export default function AmountInput(props) {
   const { handleDecrease, handleIncrease, disabled, min, max, ...otherProps } =
     props;
@@ -69,14 +72,14 @@ export default function AmountInput(props) {
         sx={{ textAlign: "center" }}
         slotProps={{
           input: {
-            min: min ?? 1,
-            max: max ?? 199,
+            min: min ?? MIN_VALUE,
+            max: max ?? MAX_VALUE,
             type: "number",
             style: { fontSize: 13, textAlign: "center", padding: 0 },
           },
           htmlInput: {
-            min: min ?? 1,
-            max: max ?? 199,
+            min: min ?? MIN_VALUE1,
+            max: max ?? MAX_VALUE,
             type: "number",
           },
         }}

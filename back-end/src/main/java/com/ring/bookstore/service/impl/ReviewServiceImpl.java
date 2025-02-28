@@ -43,7 +43,7 @@ public class ReviewServiceImpl implements ReviewService {
         Book book = bookRepo.findById(id).orElseThrow(()
                 -> new ResourceNotFoundException("Book not found"));
         //Check if user had bought it yet
-        if (!orderRepo.hasUserBoughtBook(id, user.getUsername())) throw new HttpResponseException(
+        if (!orderRepo.hasUserBoughtBook(id, user.getId())) throw new HttpResponseException(
                 HttpStatus.FORBIDDEN,
                 "User have not bought the product!",
                 "Hãy mua sản phẩm để có thể đánh giá!"
@@ -113,7 +113,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     //Get review by book
     public ReviewDTO getReviewByBook(Long id, Account user) {
-        if (!orderRepo.hasUserBoughtBook(id, user.getUsername()))
+        if (!orderRepo.hasUserBoughtBook(id, user.getId()))
             throw new HttpResponseException(
                     HttpStatus.FORBIDDEN,
                     "User have not bought the product!",

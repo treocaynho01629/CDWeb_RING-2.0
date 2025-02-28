@@ -45,7 +45,7 @@ const ConfirmDialog = ({
           onClick={handleConfirm}
           startIcon={<Check />}
         >
-          OK
+          Đồng ý
         </Button>
       </DialogActions>
     </Dialog>

@@ -128,11 +128,12 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
     totalElements: 0,
   });
 
-  const { data, isLoading, isSuccess, isError } = useGetCategoriesQuery({
-    include: "children",
-    page: pagination?.number,
-    loadMore: pagination?.isMore,
-  });
+  const { data, isLoading, isFetching, isSuccess, isError } =
+    useGetCategoriesQuery({
+      include: "children",
+      page: pagination?.number,
+      loadMore: pagination?.isMore,
+    });
 
   useEffect(() => {
     if (data && !isLoading && isSuccess) {
@@ -156,7 +157,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
     e.stopPropagation();
   };
 
-  const handleShowmore = () => {
+  const handleShowMore = () => {
     let currPage = (pagination?.number || 0) + 1;
     if (pagination?.totalPages <= currPage) {
       setShowmore((prev) => !prev);
@@ -178,9 +179,11 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
   if (isLoading || isError) {
     catesContent = [...Array(LIMIT_CATES)].map((item, index) => (
       <Fragment key={`temp-cate-${index}`}>
-        <ListItemButton>
-          <Skeleton variant="text" sx={{ fontSize: "14px" }} width="70%" />
-        </ListItemButton>
+        <StyledListItemButton>
+          <FilterText>
+            <Skeleton variant="text" width={120} />
+          </FilterText>
+        </StyledListItemButton>
       </Fragment>
     ));
   } else if (isSuccess) {
@@ -256,14 +259,11 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
     } else {
       catesContent = [...Array(LIMIT_CATES)].map((item, index) => (
         <Fragment key={`cate-${index}`}>
-          <ListItemButton>
-            <Skeleton
-              variant="text"
-              sx={{ fontSize: "16px" }}
-              width="70%"
-              animation={false}
-            />
-          </ListItemButton>
+          <StyledListItemButton>
+            <FilterText>
+              <Skeleton variant="text" width={120} animation={false} />
+            </FilterText>
+          </StyledListItemButton>
         </Fragment>
       ));
     }
@@ -283,9 +283,16 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
         aria-labelledby="nested-list-categories"
       >
         {catesContent}
+        {isFetching && !isLoading && (
+          <StyledListItemButton>
+            <FilterText>
+              <Skeleton variant="text" width={120} />
+            </FilterText>
+          </StyledListItemButton>
+        )}
       </List>
-      {isCollapsable && (
-        <Showmore onClick={handleShowmore}>
+      {!isFetching && isCollapsable && (
+        <Showmore onClick={handleShowMore}>
           {!showmore || isMore ? (
             <>
               Xem thêm
@@ -318,10 +325,11 @@ const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
     totalElements: 0,
   });
 
-  const { data, isLoading, isSuccess, isError } = useGetPublishersQuery({
-    page: pagination?.number,
-    loadMore: pagination?.isMore,
-  });
+  const { data, isLoading, isFetching, isSuccess, isError } =
+    useGetPublishersQuery({
+      page: pagination?.number,
+      loadMore: pagination?.isMore,
+    });
 
   useEffect(() => {
     setSelectedPub(pubs);
@@ -364,7 +372,7 @@ const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
     if (onChangePub) onChangePub(newSelected);
   };
 
-  const handleShowmore = () => {
+  const handleShowMore = () => {
     let currPage = (pagination?.number || 0) + 1;
     if (pagination?.totalPages <= currPage) {
       setShowmore((prev) => !prev);
@@ -451,9 +459,16 @@ const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
       <TitleContainer>
         <FilterText>Nhà xuất bản</FilterText>
       </TitleContainer>
-      <FormGroup sx={{ padding: 0, width: "100%" }}>{pubsContent}</FormGroup>
-      {isCollapsable && (
-        <Showmore onClick={handleShowmore}>
+      <FormGroup sx={{ padding: 0, width: "100%" }}>
+        {pubsContent}
+        {isFetching && !isLoading && (
+          <CheckPlaceholder>
+            <Skeleton variant="text" sx={{ fontSize: "14px" }} width={200} />
+          </CheckPlaceholder>
+        )}
+      </FormGroup>
+      {!isFetching && isCollapsable && (
+        <Showmore onClick={handleShowMore}>
           {!showmore || isMore ? (
             <>
               Xem thêm

@@ -12,6 +12,7 @@ import {
 import { apiSlice, authReducer } from "@ring/redux";
 import cartReducer from "../features/cart/cartReducer";
 import addressReducer from "../features/addresses/addressReducer";
+import couponReducer from "../features/coupons/couponReducer";
 import storage from "redux-persist/lib/storage";
 
 const authPersistConfig = {
@@ -32,12 +33,19 @@ const addressPersistConfig = {
   storage,
 };
 
+const couponPersistConfig = {
+  key: "coupon",
+  version: 1,
+  storage,
+};
+
 export const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,
     auth: persistReducer(authPersistConfig, authReducer), //AUTH
     cart: persistReducer(cartPersistConfig, cartReducer), //CART
     address: persistReducer(addressPersistConfig, addressReducer), //ADDRESS
+    coupon: persistReducer(couponPersistConfig, couponReducer), //COUPON
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

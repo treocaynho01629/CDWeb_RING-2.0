@@ -110,6 +110,9 @@ const Discount = styled(Price)`
 `;
 //#endregion
 
+const MIN_VALUE = 1;
+const MAX_VALUE = 199;
+
 const ProductAction = ({ book }) => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -122,18 +125,20 @@ const ProductAction = ({ book }) => {
   //Change add amount
   const changeAmount = (n) => {
     setAmountIndex((prev) =>
-      prev + n < 1
-        ? 1
-        : prev + n > (book?.amount ?? 199)
-          ? (book?.amount ?? 199)
+      prev + n < MIN_VALUE
+        ? MIN_VALUE
+        : prev + n > (book?.amount ?? MAX_VALUE)
+          ? (book?.amount ?? MAX_VALUE)
           : prev + n
     );
   };
 
   const handleChangeAmount = (value) => {
     let newValue = value;
-    if (newValue < 1 || !Number.isInteger(newValue)) newValue = 1;
-    if (newValue > (book?.amount ?? 199)) newValue = book?.amount ?? 199;
+    if (newValue < MIN_VALUE || !Number.isInteger(newValue))
+      newValue = MIN_VALUE;
+    if (newValue > (book?.amount ?? MAX_VALUE))
+      newValue = book?.amount ?? MAX_VALUE;
     setAmountIndex(newValue);
   };
 
@@ -235,9 +240,10 @@ const ProductAction = ({ book }) => {
               <AmountInput
                 disabled={!book || book?.amount == 0}
                 size="small"
-                max={book?.amount}
+                min={MIN_VALUE}
+                max={book?.amount ?? MAX_VALUE}
                 value={amountIndex}
-                error={1 > amountIndex > (book?.amount ?? 199)}
+                error={1 > amountIndex > (book?.amount ?? MAX_VALUE)}
                 onChange={(e) => handleChangeAmount(e.target.valueAsNumber)}
                 handleDecrease={() => changeAmount(-1)}
                 handleIncrease={() => changeAmount(1)}
@@ -282,9 +288,10 @@ const ProductAction = ({ book }) => {
               <AmountInput
                 disabled={!book || book?.amount == 0}
                 size="small"
-                max={book?.amount}
+                min={MIN_VALUE}
+                max={book?.amount ?? MAX_VALUE}
                 value={amountIndex}
-                error={1 > amountIndex > (book?.amount ?? 199)}
+                error={1 > amountIndex > (book?.amount ?? MAX_VALUE)}
                 onChange={(e) => handleChangeAmount(e.target.valueAsNumber)}
                 handleDecrease={() => changeAmount(-1)}
                 handleIncrease={() => changeAmount(1)}

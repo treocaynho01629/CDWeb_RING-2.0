@@ -47,7 +47,7 @@ public class OrderReceipt extends Auditable {
     @JsonIgnore
     private Address address;
 
-    @Column(length = 1000)
+    @Column(length = 300)
     @Nationalized 
     private String orderMessage;
 

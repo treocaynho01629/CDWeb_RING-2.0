@@ -1,91 +1,49 @@
-import styled from "@emotion/styled";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
-  useCancelOrderMutation,
-  useGetOrdersByUserQuery,
-} from "../../features/orders/ordersApiSlice";
+  Fragment,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  lazy,
+} from "react";
+import { useGetOrdersByUserQuery } from "../../features/orders/ordersApiSlice";
 import { KeyboardArrowLeft, Receipt, Search } from "@mui/icons-material";
-import { CircularProgress, DialogContent, TextField } from "@mui/material";
-import { StyledDialogTitle } from "../custom/ProfileComponents";
+import {
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  TextField,
+} from "@mui/material";
+import {
+  MainContainer,
+  StyledDialogTitle,
+  StyledEmptyIcon,
+  ToggleGroupContainer,
+  MessageContainer,
+  LoadContainer,
+  PlaceholderContainer,
+} from "../custom/ProfileComponents";
 import { Link, useSearchParams } from "react-router";
 import { booksApiSlice } from "../../features/books/booksApiSlice";
 import { CustomTab, CustomTabs } from "../custom/CustomTabs";
 import { debounce } from "lodash-es";
-import { ReactComponent as EmptyIcon } from "@ring/shared/assets/empty";
 import { Message } from "@ring/ui/Components";
 import { useDeepEffect, orderItems } from "@ring/shared";
-import { LoadContainer, PlaceholderContainer } from "../custom/OrderComponents";
 import useCart from "../../hooks/useCart";
 import OrderItem from "./OrderItem";
 
-//#region styled
-const MessageContainer = styled.div`
-  min-height: 60dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const OrdersContainer = styled.div`
-  min-height: 70dvh;
-`;
-
-const ToggleGroupContainer = styled.div`
-  width: 100%;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
-  white-space: nowrap;
-  position: sticky;
-  top: ${({ theme }) => theme.mixins.toolbar.minHeight + 16.5}px;
-  z-index: 1;
-
-  ${({ theme }) => theme.breakpoints.down("md")} {
-    top: 0;
-
-    &::before,
-    ::after {
-      display: none;
-    }
-  }
-
-  &:before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: -16px;
-    width: 100%;
-    height: calc(100% + 16px);
-    background-color: ${({ theme }) => theme.palette.background.paper};
-    z-index: -1;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: ${({ theme }) => theme.palette.action.hover};
-    z-index: -1;
-  }
-`;
-
-const StyledEmptyIcon = styled(EmptyIcon)`
-  height: 70px;
-  width: 70px;
-  margin: ${({ theme }) => theme.spacing(1)} 0;
-  fill: ${({ theme }) => theme.palette.text.icon};
-`;
-//#endregion
+const CancelRefundForm = lazy(() => import("./CancelRefundForm"));
 
 const defaultSize = 5;
 
-const OrdersList = ({ pending, setPending, setContextOrder, confirm }) => {
+const OrdersList = ({ pending, setPending, mobileMode }) => {
   const { addProduct } = useCart();
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [open, setOpen] = useState(false);
+  const [contextOrder, setContextOrder] = useState(null);
   const [filters, setFilters] = useState({
     status: searchParams.get("status") ?? "",
     keyword: searchParams.get("q") ?? "",
@@ -100,15 +58,14 @@ const OrdersList = ({ pending, setPending, setContextOrder, confirm }) => {
   //Fetch orders
   const { data, isLoading, isFetching, isSuccess, isError, error } =
     useGetOrdersByUserQuery({
-      status: filters?.status,
-      keyword: filters?.keyword,
-      page: pagination?.number,
-      size: pagination?.size,
-      loadMore: pagination?.isMore,
+      status: filters.status,
+      keyword: filters.keyword,
+      page: pagination.number,
+      size: pagination.size,
+      loadMore: pagination.isMore,
     });
   const [getBought, { isLoading: fetching }] =
     booksApiSlice.useLazyGetBooksByIdsQuery();
-  const [cancel, { isLoading: canceling }] = useCancelOrderMutation();
 
   useDeepEffect(() => {
     updatePath();
@@ -189,30 +146,14 @@ const OrdersList = ({ pending, setPending, setContextOrder, confirm }) => {
   };
 
   //Cancel
-  const handleCancelOrder = async (order) => {
+  const handleCancelOrder = (order) => {
     setContextOrder(order);
-    const confirmation = await confirm();
-    if (confirmation) {
-      if (canceling || fetching || pending) return;
-      setPending(true);
+    setOpen(true);
+  };
 
-      const { enqueueSnackbar } = await import("notistack");
-
-      cancel(order?.id)
-        .unwrap()
-        .then((data) => {
-          enqueueSnackbar("Huỷ đơn hàng thành công!", { variant: "success" });
-          setPending(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          enqueueSnackbar("Huỷ đơn hàng thất bại!", { variant: "error" });
-          setPending(false);
-        });
-    } else {
-      setContextOrder(null);
-      console.log("Cancel");
-    }
+  const handleClose = () => {
+    setContextOrder(false);
+    setOpen(false);
   };
 
   //Show more
@@ -266,7 +207,13 @@ const OrdersList = ({ pending, setPending, setContextOrder, confirm }) => {
 
         return (
           <Fragment key={`order-${id}-${index}`}>
-            <OrderItem {...{ order, handleAddToCart, handleCancelOrder }} />
+            <OrderItem
+              {...{
+                order,
+                handleAddToCart,
+                handleCancelOrder,
+              }}
+            />
           </Fragment>
         );
       })
@@ -300,7 +247,7 @@ const OrdersList = ({ pending, setPending, setContextOrder, confirm }) => {
           value={filters.status}
           onChange={handleChangeStatus}
           variant="scrollable"
-          scrollButtons={false}
+          scrollButtons="auto"
         >
           <CustomTab label="Tất cả" value="" />
           {orderItems.map((tab, index) => (
@@ -334,7 +281,7 @@ const OrdersList = ({ pending, setPending, setContextOrder, confirm }) => {
             }}
           />
         </form>
-        <OrdersContainer>
+        <MainContainer>
           {ordersContent}
           {pagination.number > 0 && isFetching && (
             <LoadContainer>
@@ -345,8 +292,29 @@ const OrdersList = ({ pending, setPending, setContextOrder, confirm }) => {
             data?.ids?.length == data?.page?.totalElements && (
               <Message color="warning">Không còn đơn hàng nào!</Message>
             )}
-        </OrdersContainer>
+        </MainContainer>
       </DialogContent>
+      <Dialog
+        maxWidth={"sm"}
+        fullWidth
+        open={open}
+        onClose={handleClose}
+        fullScreen={mobileMode}
+        aria-labelledby="cancel-dialog"
+      >
+        {open && (
+          <Suspense fallback={null}>
+            <CancelRefundForm
+              {...{
+                pending,
+                setPending,
+                id: contextOrder?.id,
+                handleClose,
+              }}
+            />
+          </Suspense>
+        )}
+      </Dialog>
     </>
   );
 };

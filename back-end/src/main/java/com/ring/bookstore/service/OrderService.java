@@ -52,16 +52,18 @@ public interface OrderService {
     StatDTO getAnalytics(Account user,
                          Long shopId);
 
-    CalculateDTO calculate(CalculateRequest request);
+    CalculateDTO calculate(CalculateRequest request, Account user);
 
     ReceiptDTO checkout(OrderRequest checkRequest,
                         HttpServletRequest request,
                         Account user);
 
     void cancel(Long id,
+                String reason,
                 Account user);
 
     void refund(Long id,
+                String reason,
                 Account user);
 
     void confirm(Long id,

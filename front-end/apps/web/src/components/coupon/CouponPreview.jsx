@@ -69,8 +69,8 @@ const Coupon = styled.div`
 
 const CouponIcon = styled.div`
   float: left;
-  width: 40px;
   height: 40px;
+  aspect-ratio: 1/1;
   position: relative;
   display: flex;
   align-items: center;
@@ -84,7 +84,6 @@ const CouponIcon = styled.div`
     theme.palette[color]?.contrastText || theme.palette.primary.contrastText};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
-    width: 22px;
     height: 22px;
     color: ${({ theme, color }) =>
       theme.palette[color]?.dark || theme.palette.primary.dark};
@@ -193,9 +192,11 @@ const CouponMessage = styled.span`
 `;
 //#endregion
 
+const defaultSize = 4;
+
 const CouponPreview = ({ shopId }) => {
   const { data, isLoading, isSuccess, isError } = useGetCouponsQuery(
-    { shopId, size: 4 },
+    { shopId, size: defaultSize },
     { skip: !shopId }
   );
   const [anchorEl, setAnchorEl] = useState(undefined);

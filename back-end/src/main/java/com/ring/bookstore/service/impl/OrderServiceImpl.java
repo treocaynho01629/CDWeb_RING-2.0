@@ -61,7 +61,7 @@ public class OrderServiceImpl implements OrderService {
     private final ApplicationEventPublisher eventPublisher;
 
     //Calculate
-    public CalculateDTO calculate(CalculateRequest request) {
+    public CalculateDTO calculate(CalculateRequest request, Account user) {
         List<CartDetailRequest> cart = request.getCart();
 
         //Create receipt
@@ -201,7 +201,8 @@ public class OrderServiceImpl implements OrderService {
                                     detailTotal - discountDeal,
                                     shippingFee,
                                     detailQuantity
-                            )
+                            ),
+                            user
                     );
 
                     if (discountFromCoupon != null) {
@@ -259,7 +260,8 @@ public class OrderServiceImpl implements OrderService {
                     new CartStateRequest(
                             value,
                             shipping,
-                            totalQuantity)
+                            totalQuantity),
+                    user
             );
 
             if (discountAll != null) {
@@ -462,7 +464,8 @@ public class OrderServiceImpl implements OrderService {
                                     detailTotal - discountDeal,
                                     shippingFee,
                                     detailQuantity
-                            )
+                            ),
+                            user
                     );
 
                     if (discountFromCoupon != null) {
@@ -523,7 +526,8 @@ public class OrderServiceImpl implements OrderService {
                             value,
                             shipping,
                             totalQuantity
-                    )
+                    ),
+                    user
             );
 
             if (discountAll != null) {
@@ -583,7 +587,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Transactional
-    public void cancel(Long id, Account user) {
+    public void cancel(Long id, String reason, Account user) {
         OrderDetail detail = detailRepo.findDetailById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Order detail not found"));
 
@@ -603,7 +607,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Transactional
-    public void refund(Long id, Account user) {
+    public void refund(Long id, String reason, Account user) {
         OrderDetail detail = detailRepo.findDetailById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Order detail not found"));
 

@@ -318,7 +318,11 @@ const ProductsList = ({ tabs, value, title }) => {
       )}
       {tabs && (
         <ToggleGroupContainer className={title ? "" : "border"}>
-          <CustomTabs value={tabValue} onChange={handleChangeValue}>
+          <CustomTabs
+            value={tabValue}
+            onChange={handleChangeValue}
+            scrollButtons="auto"
+          >
             {(!tabs?.length ? [...Array(1)] : tabs)?.map((tab, index) => (
               <CustomTab
                 key={`${title}-tabs-${tab?.label}-${index}`}
@@ -451,7 +455,11 @@ const TopList = ({ categories }) => {
       </TitleContainer>
       {categories && (
         <ToggleGroupContainer>
-          <CustomTabs value={tabValue} onChange={handleChangeValue}>
+          <CustomTabs
+            value={tabValue}
+            onChange={handleChangeValue}
+            scrollButtons="auto"
+          >
             {tabs}
           </CustomTabs>
         </ToggleGroupContainer>

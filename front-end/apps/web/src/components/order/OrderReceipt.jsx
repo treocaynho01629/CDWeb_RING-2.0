@@ -226,18 +226,16 @@ const OrderReceipt = ({ order, isLoading, tabletMode }) => {
           </PlaceholderContainer>
         ) : (
           order?.items?.map((item, itemIndex) => (
-            <Link
+            <BodyContainer
               key={`item-${item?.id}-${itemIndex}`}
-              to={`/product/${item?.bookSlug}`}
+              className={
+                order?.status == orderTypes.CANCELED.value ||
+                order?.status == orderTypes.REFUNDED.value
+                  ? "disabled"
+                  : ""
+              }
             >
-              <BodyContainer
-                className={
-                  order?.status == orderTypes.CANCELED.value ||
-                  order?.status == orderTypes.REFUNDED.value
-                    ? "disabled"
-                    : ""
-                }
-              >
+              <Link to={`/product/${item?.bookSlug}`}>
                 <StyledLazyImage
                   src={`${item?.image}?size=small`}
                   alt={`${item?.bookTitle} Order item`}
@@ -245,51 +243,53 @@ const OrderReceipt = ({ order, isLoading, tabletMode }) => {
                     <StyledSkeleton variant="rectangular" animation={false} />
                   }
                 />
-                <ContentContainer>
+              </Link>
+              <ContentContainer>
+                <Link to={`/product/${item?.bookSlug}`}>
                   <ItemTitle>{item?.bookTitle}</ItemTitle>
-                  <StuffContainer>
-                    {order?.status == orderTypes.COMPLETED.value ? (
-                      <div>
-                        <Amount>
-                          Số lượng: <b>{item?.quantity}</b>
-                        </Amount>
-                        <Link to={`/product/${item?.bookSlug}?review=true`}>
-                          <Button
-                            variant="outlined"
-                            color="info"
-                            size="small"
-                            sx={{ mt: 0.5, minWidth: 100 }}
-                          >
-                            Đánh giá
-                          </Button>
-                        </Link>
-                      </div>
-                    ) : (
+                </Link>
+                <StuffContainer>
+                  {order?.status == orderTypes.COMPLETED.value ? (
+                    <div>
                       <Amount>
                         Số lượng: <b>{item?.quantity}</b>
                       </Amount>
-                    )}
-                    <div>
-                      <Amount className="mobile">
-                        SL: <b>{item?.quantity}</b>
-                      </Amount>
-                      <PriceContainer>
-                        <Price>
-                          {currencyFormat.format(
-                            item.price * (1 - (item?.discount || 0))
-                          )}
-                        </Price>
-                        <Discount>
-                          {item?.discount > 0
-                            ? currencyFormat.format(item.price)
-                            : ""}
-                        </Discount>
-                      </PriceContainer>
+                      <Link to={`/product/${item?.bookSlug}?review=true`}>
+                        <Button
+                          variant="outlined"
+                          color="info"
+                          size="small"
+                          sx={{ mt: 0.5, minWidth: 100 }}
+                        >
+                          Đánh giá
+                        </Button>
+                      </Link>
                     </div>
-                  </StuffContainer>
-                </ContentContainer>
-              </BodyContainer>
-            </Link>
+                  ) : (
+                    <Amount>
+                      Số lượng: <b>{item?.quantity}</b>
+                    </Amount>
+                  )}
+                  <div>
+                    <Amount className="mobile">
+                      SL: <b>{item?.quantity}</b>
+                    </Amount>
+                    <PriceContainer>
+                      <Price>
+                        {currencyFormat.format(
+                          item.price * (1 - (item?.discount || 0))
+                        )}
+                      </Price>
+                      <Discount>
+                        {item?.discount > 0
+                          ? currencyFormat.format(item.price)
+                          : ""}
+                      </Discount>
+                    </PriceContainer>
+                  </div>
+                </StuffContainer>
+              </ContentContainer>
+            </BodyContainer>
           ))
         )}
         <BotContainer>

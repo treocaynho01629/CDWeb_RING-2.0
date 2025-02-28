@@ -105,10 +105,10 @@ function CouponFilters({ filters, setFilters }) {
     if (!types?.includes(value)) setTypes(value);
   }, []);
 
-  const handleChangeKeyword = useCallback((e) => {
+  const handleChangeCode = useCallback((e) => {
     e.preventDefault();
     if (inputRef)
-      setFilters((prev) => ({ ...prev, keyword: inputRef.current.value }));
+      setFilters((prev) => ({ ...prev, code: inputRef.current.value }));
   }, []);
 
   const handleApplyTypes = () => {
@@ -117,7 +117,7 @@ function CouponFilters({ filters, setFilters }) {
 
   const resetFilter = useCallback(() => {
     setFilters({
-      keyword: "",
+      code: "",
       cate: "",
       pubIds: [],
       types: [],
@@ -134,8 +134,8 @@ function CouponFilters({ filters, setFilters }) {
       direction={{ xs: "column", md: "row" }}
     >
       <TextField
-        label="Lọc theo"
-        value={filters.userId || ""}
+        label="Lọc theo hạn"
+        value={filters.showExpired || ""}
         onChange={(e) =>
           setFilters({ ...filters, showExpired: e.target.value })
         }
@@ -145,7 +145,20 @@ function CouponFilters({ filters, setFilters }) {
         sx={{ maxWidth: { xs: "auto", md: 200 } }}
       >
         <MenuItem value="">Còn hạn</MenuItem>
-        <MenuItem value={true}>Tất cả</MenuItem>
+        <MenuItem value="all">Tất cả (Bao gồm hết hạn)</MenuItem>
+      </TextField>
+      <TextField
+        label="Lọc theo sở hữu"
+        value={filters.byShop || ""}
+        onChange={(e) => setFilters({ ...filters, byShop: e.target.value })}
+        select
+        size="small"
+        fullWidth
+        sx={{ maxWidth: { xs: "auto", md: 200 } }}
+      >
+        <MenuItem value="">Tất cả</MenuItem>
+        <MenuItem value="ring">RING!</MenuItem>
+        <MenuItem value="shop">Cửa hàng</MenuItem>
       </TextField>
       <TextField
         label="Thể loại"
@@ -188,7 +201,7 @@ function CouponFilters({ filters, setFilters }) {
           </MenuItem>
         ))}
       </TextField>
-      <form style={{ width: "100%" }} onSubmit={handleChangeKeyword}>
+      <form style={{ width: "100%" }} onSubmit={handleChangeCode}>
         <TextField
           placeholder="Tìm kiếm"
           autoComplete="products"
@@ -229,9 +242,10 @@ export default function TableCoupons({
   const [selectedAll, setSelectedAll] = useState(false);
   const [dense, setDense] = useState(true);
   const [filters, setFilters] = useState({
-    keyword: "",
+    code: "",
     types: [],
-    showExpired: null,
+    showExpired: "",
+    byShop: "",
   });
   const [pagination, setPagination] = useState({
     number: 0,
@@ -259,8 +273,10 @@ export default function TableCoupons({
     sortBy: pagination?.sortBy,
     sortDir: pagination?.sortDir,
     shopId: shop ?? "",
-    keyword: filters.keyword,
-    showExpired: filters.showExpired,
+    code: filters.code,
+    showExpired: filters.showExpired == "all" ? true : null,
+    byShop:
+      filters.byShop == "ring" ? false : filters.byShop == "shop" ? true : null,
     types: filters.types ?? "",
   });
 
@@ -455,7 +471,7 @@ export default function TableCoupons({
         //Delete coupons inverse
         deleteCouponsInverse({
           shopId: shop ?? "",
-          keyword: filters.keyword,
+          code: filters.code,
           showExpired: filters.showExpired,
           types: filters.types ?? "",
           ids: deselected,

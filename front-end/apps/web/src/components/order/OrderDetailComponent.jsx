@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useState } from "react";
 import { StyledDialogTitle } from "../custom/ProfileComponents";
 import {
   Button,
@@ -26,14 +26,17 @@ import {
   orderTypes,
   shippingTypes,
   timeFormatter,
+  useConfirm,
 } from "@ring/shared";
 import { Link } from "react-router";
-import { useCancelOrderMutation } from "../../features/orders/ordersApiSlice";
 import { booksApiSlice } from "../../features/books/booksApiSlice";
-import OrderReceipt from "./OrderReceipt";
 import { MobileExtendButton } from "@ring/ui/Components";
+import { useConfirmOrderMutation } from "../../features/orders/ordersApiSlice";
+import OrderReceipt from "./OrderReceipt";
+import useCart from "../../hooks/useCart";
 
 const OrderProgress = lazy(() => import("./OrderProgress"));
+const CancelRefundForm = lazy(() => import("./CancelRefundForm"));
 
 //#region styled
 const TitleContainer = styled.div`
@@ -164,12 +167,20 @@ const StatusTag = styled(Typography)`
 
 const MainButton = styled(Button)`
   min-width: 200px;
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    height: 100%;
+  }
 `;
 
 const ButtonContainer = styled.div`
   padding: 0 ${({ theme }) => theme.spacing(1)};
-  margin: ${({ theme }) => `${theme.spacing(1)} 0 ${theme.spacing(6)}`};
+  margin: ${({ theme }) => `${theme.spacing(1)} 0 ${theme.spacing(2)}`};
   border: 0.5px solid ${({ theme }) => theme.palette.divider};
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    margin-bottom: ${({ theme }) => theme.spacing(5)};
+  }
 `;
 
 const MobileButton = styled.div`
@@ -192,18 +203,18 @@ const MobileButton = styled.div`
 `;
 
 const MainButtonContainer = styled.div`
-  position: fixed;
-  bottom: 0;
+  position: sticky;
+  bottom: ${({ theme }) => `calc(${theme.spacing(-2.5)} - 1px)`};
   border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
-  border-bottom: none;
   padding: ${({ theme }) => `${theme.spacing(2.5)} ${theme.spacing(2)}`};
-  margin-left: ${({ theme }) => `calc(${theme.spacing(-1.5)} - 0.5px)`};
   background-color: ${({ theme }) => theme.palette.background.paper};
   display: flex;
   width: 100%;
   z-index: 2;
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
+    position: fixed;
+    bottom: 0;
     left: 0;
     height: 50px;
     margin: 0;
@@ -211,10 +222,6 @@ const MainButtonContainer = styled.div`
     border: none;
     box-shadow: ${({ theme }) => theme.shadows[12]};
     align-items: flex-end;
-  }
-
-  ${({ theme }) => theme.breakpoints.up("sm_md")} {
-    width: 720px;
   }
 `;
 //#endregion
@@ -264,19 +271,27 @@ const OrderDetailComponent = ({
   tabletMode,
   mobileMode,
 }) => {
+  const { addProduct } = useCart();
+  const [openCancel, setOpenCancel] = useState(undefined);
+  const [openRefund, setOpenRefund] = useState(undefined);
+  const open = Boolean(openCancel || openRefund);
   const detailStatus = orderTypes[order?.status];
   const [getBought, { isLoading: fetching }] =
     booksApiSlice.useLazyGetBooksByIdsQuery();
-  const [cancel, { isLoading: canceling }] = useCancelOrderMutation();
+  const [confirmOrder, { isLoading: confirming }] = useConfirmOrderMutation();
+  const [ConfirmationDialog, confirm] = useConfirm(
+    "Xác nhận đơn hàng",
+    `Xác nhận đã nhận đơn hàng ${idFormatter(order?.id)}?`
+  );
 
   //Rebuy
-  const handleAddToCart = async (detail) => {
-    if (canceling || fetching || pending) return;
+  const handleAddToCart = async () => {
+    if (fetching || pending) return;
     setPending(true);
 
     const { enqueueSnackbar } = await import("notistack");
 
-    const ids = detail?.items?.map((item) => item.bookId);
+    const ids = order?.items?.map((item) => item.bookId);
     getBought(ids) //Fetch books with new info
       .unwrap()
       .then((books) => {
@@ -300,24 +315,45 @@ const OrderDetailComponent = ({
       });
   };
 
+  //Confirm
+  const handleConfirmOrder = async () => {
+    const confirmation = await confirm();
+    if (confirmation) {
+      if (confirming || pending) return;
+      setPending(true);
+
+      const { enqueueSnackbar } = await import("notistack");
+
+      confirmOrder(order?.id)
+        .unwrap()
+        .then((data) => {
+          enqueueSnackbar("Xác nhận đơn hàng thành công!", {
+            variant: "success",
+          });
+          setPending(false);
+        })
+        .catch((err) => {
+          enqueueSnackbar("Xác nhận đơn hàng thất bại!", { variant: "error" });
+          setPending(false);
+        });
+    } else {
+      console.log("Cancel");
+    }
+  };
+
   //Cancel
-  const handleCancelOrder = async (detail) => {
-    if (canceling || fetching || pending) return;
-    setPending(true);
+  const handleCancelOrder = () => {
+    setOpenCancel(true);
+  };
 
-    const { enqueueSnackbar } = await import("notistack");
+  //Refund
+  const handleRefundOrder = () => {
+    setOpenRefund(true);
+  };
 
-    cancel(detail?.id)
-      .unwrap()
-      .then((data) => {
-        enqueueSnackbar("Huỷ đơn hàng thành công!", { variant: "success" });
-        setPending(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        enqueueSnackbar("Huỷ đơn hàng thất bại!", { variant: "error" });
-        setPending(false);
-      });
+  const handleClose = () => {
+    setOpenCancel(false);
+    setOpenRefund(false);
   };
 
   const detailSummary = getDetailSummary(order);
@@ -395,42 +431,7 @@ const OrderDetailComponent = ({
             />
           </Suspense>
         )}
-        {tabletMode ? (
-          <MainButtonContainer>
-            {isLoading ? (
-              <MainButton
-                disabled
-                variant="contained"
-                color="secondary"
-                size="large"
-                fullWidth
-              >
-                Đang tải
-              </MainButton>
-            ) : order?.status == orderTypes.PENDING.value ||
-              order?.status == orderTypes.SHIPPING.value ? (
-              <MainButton
-                variant="contained"
-                color="success"
-                size="large"
-                fullWidth
-                onClick={() => handleCancelOrder(order)}
-              >
-                Đã nhận hàng
-              </MainButton>
-            ) : (
-              <MainButton
-                variant="contained"
-                color="primary"
-                size="large"
-                fullWidth
-                onClick={() => handleAddToCart(order)}
-              >
-                Mua lại
-              </MainButton>
-            )}
-          </MainButtonContainer>
-        ) : (
+        {!tabletMode && (
           <SummaryContainer>
             <Box>
               <SubText>
@@ -460,7 +461,7 @@ const OrderDetailComponent = ({
                     color="success"
                     size="large"
                     fullWidth
-                    onClick={() => handleCancelOrder(order)}
+                    onClick={handleConfirmOrder}
                   >
                     Đã nhận hàng
                   </MainButton>
@@ -470,7 +471,7 @@ const OrderDetailComponent = ({
                     size="large"
                     fullWidth
                     sx={{ mt: 1 }}
-                    onClick={() => handleCancelOrder(order)}
+                    onClick={handleCancelOrder}
                   >
                     Huỷ đơn hàng
                   </MainButton>
@@ -482,7 +483,7 @@ const OrderDetailComponent = ({
                     color="primary"
                     size="large"
                     fullWidth
-                    onClick={() => handleAddToCart(order)}
+                    onClick={handleAddToCart}
                   >
                     Mua lại
                   </MainButton>
@@ -493,7 +494,7 @@ const OrderDetailComponent = ({
                       size="large"
                       fullWidth
                       sx={{ mt: 1 }}
-                      onClick={() => handleAddToCart(order)}
+                      onClick={handleRefundOrder}
                     >
                       Hoàn trả hàng
                     </MainButton>
@@ -581,9 +582,16 @@ const OrderDetailComponent = ({
         </Title>
         <OrderReceipt {...{ order, isLoading, tabletMode }} />
         <ButtonContainer>
-          {order?.status == orderTypes.PENDING.value ||
-          order?.status == orderTypes.SHIPPING.value ? (
+          {isLoading ? (
             <MobileButton>
+              <Skeleton variant="text" width={150} />
+              <MobileExtendButton>
+                <KeyboardArrowRight fontSize="small" />
+              </MobileExtendButton>
+            </MobileButton>
+          ) : order?.status == orderTypes.PENDING.value ||
+            order?.status == orderTypes.SHIPPING.value ? (
+            <MobileButton onClick={handleCancelOrder}>
               <span>
                 <Close fontSize="small" color="error" />
                 &nbsp;Huỷ đơn hàng
@@ -594,7 +602,7 @@ const OrderDetailComponent = ({
             </MobileButton>
           ) : (
             order?.status == orderTypes.COMPLETED.value && (
-              <MobileButton>
+              <MobileButton onClick={handleRefundOrder}>
                 <span>
                   <KeyboardReturn fontSize="small" color="warning" />
                   &nbsp;Hoàn trả đơn hàng
@@ -606,7 +614,66 @@ const OrderDetailComponent = ({
             )
           )}
         </ButtonContainer>
+        {tabletMode && (
+          <MainButtonContainer>
+            {isLoading ? (
+              <MainButton
+                disabled
+                variant="contained"
+                color="secondary"
+                size="large"
+                fullWidth
+              >
+                Đang tải
+              </MainButton>
+            ) : order?.status == orderTypes.PENDING.value ||
+              order?.status == orderTypes.SHIPPING.value ? (
+              <MainButton
+                variant="contained"
+                color="success"
+                size="large"
+                fullWidth
+                onClick={handleConfirmOrder}
+              >
+                Đã nhận hàng
+              </MainButton>
+            ) : (
+              <MainButton
+                variant="contained"
+                color="primary"
+                size="large"
+                fullWidth
+                onClick={handleAddToCart}
+              >
+                Mua lại
+              </MainButton>
+            )}
+          </MainButtonContainer>
+        )}
       </DialogContent>
+      <Dialog
+        maxWidth={"sm"}
+        fullWidth
+        open={open}
+        onClose={handleClose}
+        fullScreen={mobileMode}
+        aria-labelledby="cancel-refund-dialog"
+      >
+        {open && (
+          <Suspense fallback={null}>
+            <CancelRefundForm
+              {...{
+                pending,
+                setPending,
+                id: order?.id,
+                handleClose,
+                isRefund: openRefund,
+              }}
+            />
+          </Suspense>
+        )}
+      </Dialog>
+      <ConfirmationDialog />
     </>
   );
 };

@@ -19,6 +19,7 @@ import {
   MenuItem,
   TextField,
   DialogTitle,
+  TextareaAutosize,
 } from "@mui/material";
 import { Instruction } from "@ring/ui/Components";
 import { PHONE_REGEX, addressItems, location } from "@ring/shared";
@@ -384,8 +385,13 @@ const AddressForm = ({
                 fullWidth
                 size="small"
                 multiline
-                rows={2}
+                minRows={2}
                 slotProps={{
+                  inputComponent: TextareaAutosize,
+                  inputProps: {
+                    minRows: 2,
+                    style: { resize: "auto" },
+                  },
                   input: {
                     endAdornment: <HomeIcon style={{ color: "gray" }} />,
                   },
