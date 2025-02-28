@@ -168,7 +168,7 @@ function ProductFilters({ filters, setFilters }) {
     }
   };
 
-  const handleShowmorePubs = () => {
+  const handleShowMorePubs = () => {
     let currPage = (pubsPagination?.number || 0) + 1;
     if (!pubsPagination?.totalPages <= currPage) {
       getPublishers({
@@ -188,7 +188,7 @@ function ProductFilters({ filters, setFilters }) {
     }
   };
 
-  const handleShowmoreCates = () => {
+  const handleShowMoreCates = () => {
     let currPage = (catesPagination?.number || 0) + 1;
     if (!catesPagination?.totalPages <= currPage) {
       getCategories({
@@ -298,7 +298,7 @@ function ProductFilters({ filters, setFilters }) {
         })}
         {pubsPagination?.totalPages > pubsPagination?.number + 1 && (
           <Box display="flex" justifyContent="center">
-            <Button onClick={handleShowmorePubs} endIcon={<Add />} fullWidth>
+            <Button onClick={handleShowMorePubs} endIcon={<Add />} fullWidth>
               Tải thêm
             </Button>
           </Box>
@@ -357,7 +357,7 @@ function ProductFilters({ filters, setFilters }) {
         })}
         {catesPagination?.totalPages > catesPagination?.number + 1 && (
           <Box display="flex" justifyContent="center">
-            <Button onClick={handleShowmoreCates} endIcon={<Add />} fullWidth>
+            <Button onClick={handleShowMoreCates} endIcon={<Add />} fullWidth>
               Tải thêm
             </Button>
           </Box>

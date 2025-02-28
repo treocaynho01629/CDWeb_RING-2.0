@@ -190,6 +190,9 @@ const StyledIconButton = styled(IconButton)`
 `;
 //#endregion
 
+const MIN_VALUE = 1;
+const MAX_VALUE = 199;
+
 function ItemRow({
   product,
   handleSelect,
@@ -267,9 +270,10 @@ function ItemRow({
                 <AmountInput
                   disabled={isDisabled}
                   size="small"
-                  max={product.amount}
+                  min={MIN_VALUE}
+                  max={product.amount ?? MAX_VALUE}
                   value={product.quantity}
-                  error={1 > product.quantity > (product.amount ?? 199)}
+                  error={1 > product.quantity > (product.amount ?? MAX_VALUE)}
                   onChange={(e) =>
                     handleChangeQuantity(e.target.valueAsNumber, product.id)
                   }
@@ -310,9 +314,10 @@ function ItemRow({
         <AmountInput
           disabled={isDisabled}
           size="small"
-          max={product.amount}
+          min={MIN_VALUE}
+          max={product.amount ?? MAX_VALUE}
           value={product.quantity}
-          error={1 > product.quantity > (product.amount ?? 199)}
+          error={1 > product.quantity > (product.amount ?? MAX_VALUE)}
           onChange={(e) =>
             handleChangeQuantity(e.target.valueAsNumber, product.id)
           }

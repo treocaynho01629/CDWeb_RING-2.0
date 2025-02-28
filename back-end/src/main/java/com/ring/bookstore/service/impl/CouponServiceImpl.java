@@ -50,7 +50,8 @@ public class CouponServiceImpl implements CouponService {
                                       String sortBy,
                                       String sortDir,
                                       List<CouponType> types,
-                                      String keyword,
+                                      List<String> codes,
+                                      String code,
                                       Long shopId,
                                       Boolean byShop,
                                       Boolean showExpired,
@@ -63,7 +64,8 @@ public class CouponServiceImpl implements CouponService {
         //Fetch from database
         Page<Coupon> couponsList = couponRepo.findCoupon(
                 types,
-                keyword,
+                codes,
+                code,
                 shopId,
                 byShop,
                 showExpired,
@@ -213,10 +215,18 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public void deleteCouponsInverse(List<CouponType> types, String keyword, Long shopId, Boolean byShop, Boolean showExpired, List<Long> ids, Account user) {
+    public void deleteCouponsInverse(List<CouponType> types,
+                                     List<String> codes,
+                                     String code,
+                                     Long shopId,
+                                     Boolean byShop,
+                                     Boolean showExpired,
+                                     List<Long> ids,
+                                     Account user) {
         List<Long> deleteIds = couponRepo.findInverseIds(
                 types,
-                keyword,
+                codes,
+                code,
                 shopId,
                 byShop,
                 showExpired,
@@ -242,10 +252,12 @@ public class CouponServiceImpl implements CouponService {
         }
     }
 
-    public CouponDiscountDTO applyCoupon(Coupon coupon, CartStateRequest request) {
+    public CouponDiscountDTO applyCoupon(Coupon coupon, CartStateRequest request, Account user) {
         CouponDetail couponDetail = coupon.getDetail();
         CouponType type = couponDetail.getType();
         BigDecimal discount = couponDetail.getDiscount();
+
+        if (couponRepo.hasUserUsedCoupon(coupon.getId(), user.getId())) return null;
 
         //Current
         double currValue = request.getValue();

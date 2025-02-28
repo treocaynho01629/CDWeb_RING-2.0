@@ -1,4 +1,4 @@
-import { styled } from "@mui/material";
+import { styled, tabClasses, tabsClasses } from "@mui/material";
 import { Tab, Tabs } from "@mui/material";
 
 const StyledTab = styled((props) => <Tab {...props} />)(({ theme }) => ({
@@ -13,13 +13,13 @@ const StyledTab = styled((props) => <Tab {...props} />)(({ theme }) => ({
     }),
   },
 
-  "&.MuiTab-root": {
+  [`&.${tabClasses.root}`]: {
     minHeight: 44,
     height: 44,
   },
 
   [theme.breakpoints.down("sm")]: {
-    "&.MuiTab-root": {
+    [`&.${tabClasses.root}`]: {
       minHeight: 40,
       height: 40,
     },
@@ -27,11 +27,11 @@ const StyledTab = styled((props) => <Tab {...props} />)(({ theme }) => ({
 }));
 
 const StyledTabs = styled((props) => <Tabs {...props} />)(({ theme }) => ({
-  "&.MuiTabs-root": {
+  [`&.${tabsClasses.root}`]: {
     minHeight: 44,
     height: 44,
   },
-  "& .MuiTabs-indicator": {
+  [`.${tabsClasses.indicator}`]: {
     height: "2.5px",
 
     ...theme.applyStyles("light", {
@@ -39,8 +39,14 @@ const StyledTabs = styled((props) => <Tabs {...props} />)(({ theme }) => ({
     }),
   },
 
+  [`.${tabsClasses.scrollButtons}`]: {
+    "&.Mui-disabled": {
+      width: 0,
+    },
+  },
+
   [theme.breakpoints.down("sm")]: {
-    "&.MuiTabs-root": {
+    [`&.${tabsClasses.root}`]: {
       minHeight: 40,
       height: 40,
     },

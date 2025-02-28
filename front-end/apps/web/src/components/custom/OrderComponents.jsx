@@ -138,15 +138,3 @@ export const ToggleArrow = styled.span`
     display: flex;
   }
 `;
-
-export const PlaceholderContainer = styled.div`
-  padding: ${({ theme }) => theme.spacing(16)};
-`;
-
-export const LoadContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin-bottom: ${({ theme }) => theme.spacing(2)};
-`;

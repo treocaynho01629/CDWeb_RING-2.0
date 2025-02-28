@@ -2,16 +2,16 @@ import { useTitle } from "@ring/shared";
 import { Dialog } from "@mui/material";
 import { useNavigate, useOutletContext } from "react-router";
 import { TabContentContainer } from "../components/custom/ProfileComponents";
-import OrdersList from "../components/order/OrdersList";
+import CouponsList from "../components/coupon/CouponsList";
 
-const Orders = () => {
-  const { tabletMode, mobileMode, pending, setPending } = useOutletContext();
+const Coupons = () => {
+  const { tabletMode, mobileMode } = useOutletContext();
   const navigate = useNavigate();
 
   //Set title
-  useTitle("Đơn hàng");
+  useTitle("Mã giảm giá");
 
-  let content = <OrdersList {...{ pending, setPending, mobileMode }} />;
+  let content = <CouponsList />;
 
   return (
     <>
@@ -38,4 +38,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default Coupons;

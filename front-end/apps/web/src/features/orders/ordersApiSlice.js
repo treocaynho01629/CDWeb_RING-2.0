@@ -23,7 +23,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
           return response.status === 200 && !result?.isError;
         },
       }),
-      providesTags: (result, error, { id }) => [{ type: "Order", id }],
+      providesTags: (result, error, id) => [{ type: "Order", id }],
     }),
     getOrdersByUser: builder.query({
       query: (args) => {
@@ -121,8 +121,8 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: "Order", id: "LIST" }],
     }),
     cancelOrder: builder.mutation({
-      query: (id) => ({
-        url: `/api/orders/cancel/${id}`,
+      query: ({ id, reason }) => ({
+        url: `/api/orders/cancel/${id}?reason=${reason}`,
         method: "PUT",
         credentials: "include",
         responseHandler: "text",
@@ -130,8 +130,8 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, { id }) => [{ type: "Order", id }],
     }),
     refundOrder: builder.mutation({
-      query: (id) => ({
-        url: `/api/orders/confirm/${id}`,
+      query: ({ id, reason }) => ({
+        url: `/api/orders/refund/${id}?reason=${reason}`,
         method: "PUT",
         credentials: "include",
         responseHandler: "text",
@@ -145,7 +145,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
         credentials: "include",
         responseHandler: "text",
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: "Order", id }],
+      invalidatesTags: (result, error, id) => [{ type: "Order", id }],
     }),
   }),
 });

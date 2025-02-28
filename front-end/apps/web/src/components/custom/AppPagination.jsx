@@ -2,9 +2,9 @@ import styled from "@emotion/styled";
 import {
   Pagination,
   PaginationItem,
-  Stack,
   MenuItem,
   TextField,
+  paginationItemClasses,
 } from "@mui/material";
 
 //#region styled
@@ -12,9 +12,17 @@ const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin: ${({ theme }) => theme.spacing(5)} 0;
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
+    flex-direction: column;
     justify-content: center;
+  }
+`;
+
+const MoreContainer = styled.div`
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    margin-top: ${({ theme }) => theme.spacing(1)};
   }
 `;
 
@@ -30,7 +38,7 @@ const StyledPageItem = styled(PaginationItem)`
     display: none;
   }
 
-  &.MuiPaginationItem-ellipsis {
+  &.${paginationItemClasses.ellipsis} {
     background-color: transparent;
     font-weight: bold;
   }
@@ -59,27 +67,26 @@ const AppPagination = ({
 
   return (
     <Container>
-      <Stack spacing={2} sx={{ my: 5 }}>
-        <Pagination
-          page={currPage ?? 1}
-          count={totalPages}
-          shape="rounded"
-          color="primary"
-          onChange={handlePageChange}
-          renderItem={(item) => <StyledPageItem {...item} />}
-        />
-      </Stack>
-      <TextField
-        size="small"
-        select
-        value={pagination?.size}
-        onChange={handleChangeSize}
-        sx={{ display: { xs: "none", sm: "block" } }}
-      >
-        <MenuItem value={12}>Hiển thị 12</MenuItem>
-        <MenuItem value={24}>Hiển thị 24</MenuItem>
-        <MenuItem value={48}>Hiển thị 48</MenuItem>
-      </TextField>
+      <Pagination
+        page={currPage ?? 1}
+        count={totalPages}
+        shape="rounded"
+        color="primary"
+        onChange={handlePageChange}
+        renderItem={(item) => <StyledPageItem {...item} />}
+      />
+      <MoreContainer>
+        <TextField
+          size="small"
+          select
+          value={pagination?.size}
+          onChange={handleChangeSize}
+        >
+          <MenuItem value={12}>Hiển thị 12</MenuItem>
+          <MenuItem value={24}>Hiển thị 24</MenuItem>
+          <MenuItem value={48}>Hiển thị 48</MenuItem>
+        </TextField>
+      </MoreContainer>
     </Container>
   );
 };

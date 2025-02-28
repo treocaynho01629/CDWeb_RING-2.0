@@ -17,19 +17,40 @@ const StyledButton = styled(IconButton)`
   &:last-child {
     border-left: none;
   }
+
+  &.Mui-disabled {
+    background-color: ${({ theme }) => theme.palette.background.default};
+  }
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    width: 30px;
+    height: 30px;
+  }
 `;
 
 const Count = styled.span`
   font-size: 16px;
   margin-right: ${({ theme }) => theme.spacing(1)};
+  cursor: pointer;
 
   b {
     color: ${({ theme }) => theme.palette.warning.light};
   }
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    font-size: 12px;
+    background-color: ${({ theme }) => theme.palette.background.paper};
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 `;
 //#endregion
 
-const QuickPagination = ({ pagination, onPageChange }) => {
+const QuickPagination = ({ pagination, onPageChange, onOpenPagination }) => {
   const currPage = pagination?.number;
   const totalPages = pagination?.totalPages;
 
@@ -40,7 +61,7 @@ const QuickPagination = ({ pagination, onPageChange }) => {
   return (
     <Container>
       {totalPages > 0 && (
-        <Count>
+        <Count onClick={onOpenPagination}>
           <b>{currPage + 1}</b>
           {totalPages && `/${totalPages}`}
         </Count>

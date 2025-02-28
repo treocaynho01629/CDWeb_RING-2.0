@@ -22,10 +22,10 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         from OrderReceipt o
         join o.details od
         join od.items oi
-        where o.user.username = :username and oi.book.id = :id
+        where o.user.id = :userId and oi.book.id = :id
         and od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
     """)
-    boolean hasUserBoughtBook(Long id, String username); //Check if user have bought this book before
+    boolean hasUserBoughtBook(Long id, Long userId); //Check if user have bought this book before
 
     @Query(value = """
         select distinct o.id as id, i.name as image, a.name as name,

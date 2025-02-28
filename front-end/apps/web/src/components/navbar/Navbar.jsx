@@ -452,10 +452,7 @@ const Navbar = () => {
                   }
                   flexDirection={{ xs: "row-reverse", md: "row" }}
                 >
-                  <Link
-                    onClick={(e) => handleNavigateStore(e, "")}
-                    title="Duyệt cửa hàng"
-                  >
+                  <Link to={"/store"} title="Duyệt cửa hàng">
                     <StyledIconButton aria-label="explore">
                       <Storefront sx={{ fontSize: "26px" }} />
                     </StyledIconButton>

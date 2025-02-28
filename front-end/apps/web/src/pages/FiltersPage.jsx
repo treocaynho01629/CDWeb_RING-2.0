@@ -25,13 +25,16 @@ import SortList from "../components/product/filter/SortList";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 
 const FilterList = lazy(
-  () => import("../components/product/filter/FilterList"),
+  () => import("../components/product/filter/FilterList")
 );
 const FilterDrawer = lazy(
-  () => import("../components/product/filter/FilterDrawer"),
+  () => import("../components/product/filter/FilterDrawer")
 );
 const FiltersDisplay = lazy(
-  () => import("../components/product/filter/FiltersDisplay"),
+  () => import("../components/product/filter/FiltersDisplay")
+);
+const JumpPagination = lazy(
+  () => import("../components/custom/JumpPagination")
 );
 
 //#region styled
@@ -103,6 +106,8 @@ const FiltersPage = () => {
   const mobileMode = useMediaQuery(theme.breakpoints.down("sm"));
   const tabletMode = useMediaQuery(theme.breakpoints.down("md_lg"));
   const navigate = useNavigate();
+  const [openPagination, setOpenPagination] = useState(undefined); //Pagination
+  const [open, setOpen] = useState(undefined); //Filter
   const [searchParams, setSearchParams] = useSearchParams();
 
   //Filter & pagination
@@ -134,7 +139,7 @@ const FiltersPage = () => {
   //Fetch data
   const { data: currCate, isLoading: loadCate } = useGetCategoryQuery(
     { slug: filters.cate.slug, include: "parent" },
-    { skip: !filters.cate.id || !filters.cate.slug },
+    { skip: !filters.cate.id || !filters.cate.slug }
   );
   const {
     data,
@@ -159,9 +164,6 @@ const FiltersPage = () => {
     pubIds: filters.pubIds,
     value: filters.value,
   });
-
-  //Dialog open state
-  const [open, setOpen] = useState(undefined);
 
   //Set pagination after fetch
   useEffect(() => {
@@ -258,7 +260,7 @@ const FiltersPage = () => {
     const newPath = `/store${filters?.cate.slug ? `/${filters?.cate.slug}` : ""}`;
     navigate(
       { pathname: newPath, search: searchParams.toString() },
-      { replace: true },
+      { replace: true }
     );
   }, [filters, pagination]);
 
@@ -284,6 +286,13 @@ const FiltersPage = () => {
   };
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleOpenPagination = () => {
+    setOpenPagination(true);
+  };
+  const handleClosePagination = () => {
+    setOpenPagination(false);
   };
   //#endregion
 
@@ -375,6 +384,7 @@ const FiltersPage = () => {
           )}
           <SortList
             {...{ filters, pagination, mobileMode, setOpen, isChanged }}
+            onOpenPagination={handleOpenPagination}
             onChangeOrder={handleChangeOrder}
             onChangeDir={handleChangeDir}
             onChangeAmount={handleChangeAmount}
@@ -386,6 +396,18 @@ const FiltersPage = () => {
             onPageChange={handleChangePage}
             onSizeChange={handleChangeSize}
           />
+          <Suspense fallback={null}>
+            {openPagination != undefined && (
+              <JumpPagination
+                {...{
+                  pagination,
+                  onPageChange: handleChangePage,
+                  open: openPagination,
+                  handleClose: handleClosePagination,
+                }}
+              />
+            )}
+          </Suspense>
         </Grid>
       </Grid>
     </Wrapper>

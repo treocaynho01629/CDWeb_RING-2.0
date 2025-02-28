@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import { Suspense, lazy } from "react";
 import {
   Button,
   MenuItem,
@@ -10,8 +9,7 @@ import {
 } from "@mui/material";
 import { Sort, Straight } from "@mui/icons-material";
 import { sortBy } from "@ring/shared";
-
-const QuickPagination = lazy(() => import("../../custom/QuickPagination"));
+import QuickPagination from "../../custom/QuickPagination";
 
 //#region styled
 const Container = styled.div`
@@ -70,7 +68,9 @@ const AltContainer = styled.div`
   justify-content: flex-end;
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
-    display: none;
+    position: fixed;
+    bottom: ${({ theme }) => theme.spacing(1)};
+    left: ${({ theme }) => theme.spacing(1)};
   }
 `;
 
@@ -123,6 +123,7 @@ const StyledSortButton = styled(Button)`
 const SortList = ({
   mobileMode,
   pagination,
+  onOpenPagination,
   onChangeOrder,
   onChangeDir,
   onChangeAmount,
@@ -211,13 +212,11 @@ const SortList = ({
             Lọc
           </StyledSortButton>
         </MainContainer>
-        {!mobileMode && (
-          <Suspense fallback={null}>
-            <AltContainer>
-              <QuickPagination {...{ pagination, onPageChange }} />
-            </AltContainer>
-          </Suspense>
-        )}
+        <AltContainer>
+          <QuickPagination
+            {...{ pagination, onPageChange, onOpenPagination }}
+          />
+        </AltContainer>
       </SortContainer>
     </Container>
   );

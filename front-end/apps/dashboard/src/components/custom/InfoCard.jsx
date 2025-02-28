@@ -19,7 +19,7 @@ const InfoWrapper = styled(Paper)`
     left: -50px;
     height: 110%;
     aspect-ratio: 1/1;
-    background-color: ${({ props }) =>
+    background-color: ${({ theme, color }) =>
       theme.palette[color]?.light || theme.palette.primary.light};
     opacity: 0.3;
     transform: rotate(45deg);

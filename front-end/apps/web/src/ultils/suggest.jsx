@@ -28,7 +28,7 @@ export const suggest = [
     icon: <Loyalty />,
     color: "#87c86d",
     label: "Mã giảm giá",
-    url: "/",
+    url: "/profile/coupon",
   },
   {
     icon: <NewReleases />,

@@ -22,7 +22,8 @@ public interface CouponService {
                                String sortBy,
                                String sortDir,
                                List<CouponType> types,
-                               String keyword,
+                               List<String> codes,
+                               String code,
                                Long shopId,
                                Boolean byShop,
                                Boolean showExpired,
@@ -53,7 +54,8 @@ public interface CouponService {
                         Account user);
 
     CouponDiscountDTO applyCoupon(Coupon coupon,
-                                  CartStateRequest request);
+                                  CartStateRequest request,
+                                  Account user);
 
     Coupon markUsable(Coupon coupon,
                       CartStateRequest request);
@@ -64,7 +66,8 @@ public interface CouponService {
                        Account user);
 
     void deleteCouponsInverse(List<CouponType> types,
-                              String keyword,
+                              List<String> codes,
+                              String code,
                               Long shopId,
                               Boolean byShop,
                               Boolean showExpired,

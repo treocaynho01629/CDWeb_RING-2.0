@@ -144,6 +144,13 @@ function App() {
                               return { Component: Reviews.default };
                             },
                           },
+                          {
+                            path: "profile/coupon",
+                            lazy: async () => {
+                              let Coupons = await import("./pages/Coupons");
+                              return { Component: Coupons.default };
+                            },
+                          },
                         ],
                       },
                     ],

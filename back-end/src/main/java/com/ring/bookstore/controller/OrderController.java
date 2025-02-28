@@ -4,6 +4,8 @@ import com.ring.bookstore.dtos.orders.*;
 import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.request.CalculateRequest;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +30,9 @@ public class OrderController {
     //Calculate price
     @PostMapping("/calculate")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<CalculateDTO> calculate(@RequestBody @Valid CalculateRequest request) {
-        CalculateDTO calculateResult = orderService.calculate(request);
+    public ResponseEntity<CalculateDTO> calculate(@RequestBody @Valid CalculateRequest request,
+                                                  @CurrentAccount Account currUser) {
+        CalculateDTO calculateResult = orderService.calculate(request, currUser);
         return new ResponseEntity<>(calculateResult, HttpStatus.CREATED);
     }
 
@@ -117,8 +120,11 @@ public class OrderController {
     @PutMapping("/cancel/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> cancelOrder(@PathVariable("id") Long id,
+                                         @RequestParam(value = "reason")
+                                         @NotBlank(message = "Lý do không được bỏ trống!")
+                                         @Size(max = 300, message = "Lý do không quá quá 300 kí tự!") String reason,
                                          @CurrentAccount Account currUser) {
-        orderService.cancel(id, currUser);
+        orderService.cancel(id, reason, currUser);
         return new ResponseEntity<>("Order canceled successfully!", HttpStatus.CREATED);
     }
 
@@ -126,8 +132,11 @@ public class OrderController {
     @PutMapping("/refund/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> refundOrder(@PathVariable("id") Long id,
+                                         @RequestParam(value = "reason")
+                                         @NotBlank(message = "Lý do không được bỏ trống!")
+                                         @Size(max = 300, message = "Lý do không quá quá 300 kí tự!") String reason,
                                          @CurrentAccount Account currUser) {
-        orderService.refund(id, currUser);
+        orderService.refund(id, reason, currUser);
         return new ResponseEntity<>("Order refunded successfully!", HttpStatus.CREATED);
     }
 

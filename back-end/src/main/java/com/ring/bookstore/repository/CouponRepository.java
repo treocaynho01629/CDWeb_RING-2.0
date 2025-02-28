@@ -17,9 +17,19 @@ import java.util.Optional;
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     @Query("""
+        select case when count(*) > 0 then true else false end
+        from OrderReceipt o
+        join o.details od
+        where o.coupon.id = :id or od.coupon.id = :id
+        and o.user.id = :userId
+    """)
+    boolean hasUserUsedCoupon(Long id, Long userId);
+
+    @Query("""
             	select c from Coupon c join fetch c.detail cd
             	where (coalesce(:showExpired) is null or (cd.expDate > current date and cd.usage > 0))
-            	and (coalesce(:keyword) is null or c.code = :keyword)
+            	and (coalesce(:codes) is null or c.code in :codes)
+            	and (coalesce(:code) is null or c.code = :code)
             	and (coalesce(:types) is null or cd.type in :types)
             	and (coalesce(:shopId) is null or c.shop.id = :shopId)
             	and (coalesce(:byShop) is null or case when :byShop = true
@@ -27,7 +37,8 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
             	group by c.id, cd.id
             """)
     Page<Coupon> findCoupon(List<CouponType> types,
-                            String keyword,
+                            List<String> codes,
+                            String code,
                             Long shopId,
                             Boolean byShop,
                             Boolean showExpired,
@@ -43,7 +54,8 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     @Query("""
             	select c.id from Coupon c join c.detail cd 
             	where (coalesce(:showExpired) is null or (cd.expDate > current date and cd.usage > 0))
-            	and (coalesce(:keyword) is null or c.code = :keyword)
+                and (coalesce(:codes) is null or c.code in :codes)
+            	and (coalesce(:code) is null or c.code = :code)
             	and (coalesce(:types) is null or cd.type in :types)
             	and (coalesce(:shopId) is null or c.shop.id = :shopId)
                 and (coalesce(:userId) is null or c.shop.owner.id = :userId)
@@ -53,7 +65,8 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
             	group by c.id, cd.id
             """)
     List<Long> findInverseIds(List<CouponType> types,
-                              String keyword,
+                              List<String> codes,
+                              String code,
                               Long shopId,
                               Boolean byShop,
                               Boolean showExpired,

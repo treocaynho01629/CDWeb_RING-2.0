@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   Check,
   Close,
+  ExpandMore,
   LocalActivityOutlined,
   Loyalty,
 } from "@mui/icons-material";
@@ -16,6 +17,7 @@ import {
   Skeleton,
   TextField,
   useTheme,
+  CircularProgress,
 } from "@mui/material";
 import {
   useGetCouponQuery,
@@ -55,7 +57,25 @@ const InputContainer = styled.div`
 `;
 
 const CouponsContainer = styled.div``;
+
+const Showmore = styled.div`
+  font-size: 14px;
+  font-weight: 500;
+  padding-top: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.palette.info.main};
+  cursor: pointer;
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    margin-top: 0;
+  }
+`;
 //#endregion
+
+const defaultSize = 4;
 
 const CouponDialog = ({
   numSelected,
@@ -73,11 +93,24 @@ const CouponDialog = ({
   const [couponInput, setCouponInput] = useState("");
   const [currCoupon, setCurrCoupon] = useState(selectedCoupon);
   const [tempCoupon, setTempCoupon] = useState(selectedCoupon);
+  const [shipPagination, setShipPagination] = useState({
+    number: 0,
+    size: defaultSize,
+    totalPages: 0,
+    isMore: true,
+  });
+  const [pagination, setPagination] = useState({
+    number: 0,
+    size: defaultSize,
+    totalPages: 0,
+    isMore: true,
+  });
 
   //Fetch coupons
   const {
     data: shipping,
     isLoading: loadShipping,
+    isFetching: fetchShipping,
     isSuccess: doneShipping,
     isError: errorShipping,
   } = useGetCouponsQuery(
@@ -87,21 +120,26 @@ const CouponDialog = ({
       byShop: shopId != null,
       cValue: checkState?.value,
       cQuantity: checkState?.quantity,
-      size: 4,
+      size: shipPagination.size,
+      page: shipPagination.number,
+      loadMore: shipPagination.isMore,
     },
     { skip: !shopId && !selectMode }
   );
-  const { data, isLoading, isSuccess, isError } = useGetCouponsQuery(
-    {
-      shopId,
-      types: ["MIN_VALUE", "MIN_AMOUNT"],
-      byShop: shopId != null,
-      cValue: checkState?.value,
-      cQuantity: checkState?.quantity,
-      size: 4,
-    },
-    { skip: !shopId && !selectMode }
-  );
+  const { data, isLoading, isFetching, isSuccess, isError } =
+    useGetCouponsQuery(
+      {
+        shopId,
+        types: ["MIN_VALUE", "MIN_AMOUNT"],
+        byShop: shopId != null,
+        cValue: checkState?.value,
+        cQuantity: checkState?.quantity,
+        size: pagination.size,
+        page: pagination.number,
+        loadMore: pagination.isMore,
+      },
+      { skip: !shopId && !selectMode }
+    );
 
   //Fetch coupon with code
   const {
@@ -133,6 +171,26 @@ const CouponDialog = ({
     }
   }, [code, loadCode, selectedCoupon]);
 
+  useEffect(() => {
+    if (data && !isLoading && isSuccess) {
+      setPagination({
+        ...pagination,
+        number: data.page.number,
+        totalPages: data.page.totalPages,
+      });
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (shipping && !loadShipping && doneShipping) {
+      setShipPagination({
+        ...shipPagination,
+        number: shipping.page.number,
+        totalPages: shipping.page.totalPages,
+      });
+    }
+  }, [shipping]);
+
   const handleChangeInput = () => {
     setCouponInput(inputRef?.current?.value);
   };
@@ -141,10 +199,45 @@ const CouponDialog = ({
     handleClose();
   };
 
+  const handleShowMoreShipping = () => {
+    if (
+      fetchShipping ||
+      typeof shipping?.page?.number !== "number" ||
+      shipping?.page?.number < shipPagination?.number
+    )
+      return;
+    const nextPage = shipping?.page?.number + 1;
+    if (nextPage < shipping?.page?.totalPages)
+      setShipPagination((prev) => ({ ...prev, number: nextPage }));
+  };
+
+  const handleShowMore = () => {
+    if (
+      isFetching ||
+      typeof data?.page?.number !== "number" ||
+      data?.page?.number < pagination?.number
+    )
+      return;
+    const nextPage = data?.page?.number + 1;
+    if (nextPage < data?.page?.totalPages)
+      setPagination((prev) => ({ ...prev, number: nextPage }));
+  };
+
   //Display contents
   let coupons;
   let shippingCoupons;
   let topCoupon;
+
+  let loadingComponent = (
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height={{ xs: 85, sm: 155 }}
+    >
+      <CircularProgress color="primary" />
+    </Box>
+  );
 
   if (loadShipping || errorShipping) {
     shippingCoupons = (
@@ -157,15 +250,7 @@ const CouponDialog = ({
           }}
           width="30%"
         />
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          sx={{
-            margin: "5px 0",
-            borderRadius: "5px",
-            height: { xs: 85, sm: 155 },
-          }}
-        />
+        {loadingComponent}
       </>
     );
   } else if (doneShipping) {
@@ -209,33 +294,7 @@ const CouponDialog = ({
           }}
           width="30%"
         />
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          sx={{
-            margin: "5px 0",
-            borderRadius: "5px",
-            height: { xs: 85, sm: 155 },
-          }}
-        />
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          sx={{
-            margin: "5px 0",
-            borderRadius: "5px",
-            height: { xs: 85, sm: 155 },
-          }}
-        />
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          sx={{
-            margin: "5px 0",
-            borderRadius: "5px",
-            height: { xs: 85, sm: 155 },
-          }}
-        />
+        {loadingComponent}
       </>
     );
   } else if (isSuccess) {
@@ -273,10 +332,6 @@ const CouponDialog = ({
     const isDisabled =
       selectMode && (!currCoupon?.isUsable || currCoupon?.shopId != shopId);
     const isSelected = tempCoupon?.id == currCoupon?.id;
-
-    // console.log(currCoupon)
-
-    // console.log(selectMode && (!currCoupon?.isUsable || currCoupon?.shopId != shopId))
 
     topCoupon = (
       <CouponItem
@@ -350,7 +405,22 @@ const CouponDialog = ({
       <DialogContent sx={{ pt: 0, px: { xs: 1, sm: 3 }, height: "100dvh" }}>
         <CouponsContainer>
           {shippingCoupons}
+          {!loadShipping &&
+            shipPagination.totalPages > shipPagination.number + 1 && (
+              <Showmore onClick={handleShowMoreShipping}>
+                Xem thêm
+                <ExpandMore />
+              </Showmore>
+            )}
+          {fetchShipping && !loadShipping && loadingComponent}
           {coupons}
+          {!isLoading && pagination.totalPages > pagination.number + 1 && (
+            <Showmore onClick={handleShowMore}>
+              Xem thêm
+              <ExpandMore />
+            </Showmore>
+          )}
+          {isFetching && !isLoading && loadingComponent}
           {!coupons && !shippingCoupons && (
             <Box display="flex" alignItems="center" justifyContent="center">
               Hiện không có khuyến mãi

@@ -109,10 +109,10 @@ const TimeContainer = styled.div`
 
 const ProductContent = styled.div`
   font-size: 14px;
-  padding: ${({ theme }) => theme.spacing(0.5)};
+  padding: ${({ theme }) => theme.spacing(1)};
   margin-bottom: ${({ theme }) => theme.spacing(2)};
   color: ${({ theme }) => theme.palette.text.secondary};
-  border: 0.5px solid ${({ theme }) => theme.palette.warning.main};
+  border: 0.5px dashed ${({ theme }) => theme.palette.warning.main};
 `;
 //#endregion
 

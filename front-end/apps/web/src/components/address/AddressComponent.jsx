@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Fragment, useState } from "react";
+import { Fragment, useState, lazy, Suspense } from "react";
 import {
   useCreateAddressMutation,
   useDeleteAddressMutation,
@@ -28,8 +28,9 @@ import { ReactComponent as EmptyIcon } from "@ring/shared/assets/empty";
 import { Link } from "react-router";
 import { Message } from "@ring/ui/Components";
 import AddressItem from "./AddressItem";
-import AddressForm from "./AddressForm";
 import useAddress from "../../hooks/useAddress";
+
+const AddressForm = lazy(() => import("./AddressForm"));
 
 //#region styled
 const TitleContainer = styled.div`
@@ -83,7 +84,7 @@ const AddressComponent = ({ pending, setPending, mobileMode }) => {
     addNewAddress,
     removeAddress,
   } = useAddress();
-  const [open, setOpen] = useState(false); //Dialog open state
+  const [open, setOpen] = useState(undefined);
   const [err, setErr] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
@@ -532,24 +533,28 @@ const AddressComponent = ({ pending, setPending, mobileMode }) => {
         onClose={handleClose}
         fullScreen={mobileMode}
       >
-        <AddressForm
-          {...{
-            open,
-            handleClose,
-            addressInfo: contextAddress,
-            err,
-            errMsg,
-            setErrMsg,
-            addNewAddress,
-            pending,
-            setPending,
-            handleConvertAddress,
-            handleSetDefault,
-            handleCreateAddress,
-            handleClickRemove,
-            handleUpdateAddress,
-          }}
-        />
+        {open != undefined && (
+          <Suspense fallBack={null}>
+            <AddressForm
+              {...{
+                open,
+                handleClose,
+                addressInfo: contextAddress,
+                err,
+                errMsg,
+                setErrMsg,
+                addNewAddress,
+                pending,
+                setPending,
+                handleConvertAddress,
+                handleSetDefault,
+                handleCreateAddress,
+                handleClickRemove,
+                handleUpdateAddress,
+              }}
+            />
+          </Suspense>
+        )}
       </Dialog>
       <Menu
         open={openContext}

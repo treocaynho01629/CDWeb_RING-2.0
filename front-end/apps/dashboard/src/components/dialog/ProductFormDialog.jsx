@@ -228,7 +228,7 @@ const ProductFormDialog = ({
     setOpenShop(true);
   };
 
-  const handleShowmorePubs = () => {
+  const handleShowMorePubs = () => {
     let currPage = (pubsPagination?.number || 0) + 1;
     if (!pubsPagination?.totalPages <= currPage) {
       getPublishers({
@@ -248,7 +248,7 @@ const ProductFormDialog = ({
     }
   };
 
-  const handleShowmoreCates = () => {
+  const handleShowMoreCates = () => {
     let currPage = (catesPagination?.number || 0) + 1;
     if (!catesPagination?.totalPages <= currPage) {
       getCategories({
@@ -539,7 +539,7 @@ const ProductFormDialog = ({
                 {catesPagination?.totalPages > catesPagination?.number + 1 && (
                   <Box display="flex" justifyContent="center">
                     <Button
-                      onClick={handleShowmoreCates}
+                      onClick={handleShowMoreCates}
                       endIcon={<Add />}
                       fullWidth
                     >
@@ -594,7 +594,7 @@ const ProductFormDialog = ({
                 {pubsPagination?.totalPages > pubsPagination?.number + 1 && (
                   <Box display="flex" justifyContent="center">
                     <Button
-                      onClick={handleShowmorePubs}
+                      onClick={handleShowMorePubs}
                       endIcon={<Add />}
                       fullWidth
                     >
@@ -708,7 +708,6 @@ const ProductFormDialog = ({
                 required
                 id="pages"
                 label="Số trang"
-                type="number"
                 fullWidth
                 variant="outlined"
                 value={pages}

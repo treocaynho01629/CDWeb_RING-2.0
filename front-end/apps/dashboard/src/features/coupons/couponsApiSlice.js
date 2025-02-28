@@ -34,7 +34,8 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
           shopId,
           byShop,
           showExpired,
-          keyword,
+          codes,
+          code,
           cValue,
           cQuantity,
           page,
@@ -47,9 +48,10 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
         const params = new URLSearchParams();
         if (types?.length > 0) params.append("types", types);
         if (shopId) params.append("shopId", shopId);
-        if (byShop) params.append("byShop", byShop);
+        if (byShop != null) params.append("byShop", byShop);
         if (showExpired) params.append("showExpired", showExpired);
-        if (keyword) params.append("keyword", keyword);
+        if (codes?.length > 0) params.append("codes", codes);
+        if (code) params.append("code", code);
         if (page) params.append("pageNo", page);
         if (size) params.append("pSize", size);
         if (sortBy) params.append("sortBy", sortBy);
@@ -172,15 +174,17 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
     }),
     deleteCouponsInverse: builder.mutation({
       query: (args) => {
-        const { types, shopId, byShop, showExpired, keyword, ids } = args || {};
+        const { types, shopId, byShop, showExpired, codes, code, ids } =
+          args || {};
 
         //Params
         const params = new URLSearchParams();
         if (types) params.append("types", types);
         if (shopId) params.append("shopId", shopId);
-        if (byShop) params.append("byShop", byShop);
+        if (byShop != null) params.append("byShop", byShop);
         if (showExpired) params.append("showExpired", showExpired);
-        if (keyword) params.append("keyword", keyword);
+        if (codes?.length > 0) params.append("codes", codes);
+        if (code) params.append("code", code);
         if (ids?.length) params.append("ids", ids);
 
         return {

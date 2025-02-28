@@ -154,11 +154,12 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
     totalElements: 0,
   });
 
-  const { data, isLoading, isSuccess, isError } = useGetCategoriesQuery({
-    include: "children",
-    page: pagination?.number,
-    loadMore: pagination?.isMore,
-  });
+  const { data, isLoading, isFetching, isSuccess, isError } =
+    useGetCategoriesQuery({
+      include: "children",
+      page: pagination?.number,
+      loadMore: pagination?.isMore,
+    });
 
   useEffect(() => {
     if (data && !isLoading && isSuccess) {
@@ -181,7 +182,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
     e.stopPropagation();
   };
 
-  const handleShowmore = () => {
+  const handleShowMore = () => {
     let currPage = (pagination?.number || 0) + 1;
     if (pagination?.totalPages <= currPage) {
       setShowmore((prev) => !prev);
@@ -313,9 +314,15 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
       </TitleContainer>
       <Stack spacing={{ xs: 1 }} direction="row" useFlexGap flexWrap="wrap">
         {catesContent}
+        {isFetching && !isLoading && (
+          <>
+            <Skeleton variant="rectangular" height={38} width="48%" />
+            <Skeleton variant="rectangular" height={38} width="48%" />
+          </>
+        )}
       </Stack>
-      {isCollapsable && (
-        <Showmore onClick={handleShowmore}>
+      {!isFetching && isCollapsable && (
+        <Showmore onClick={handleShowMore}>
           {!showmore || isMore ? (
             <>
               Xem thêm
@@ -348,10 +355,11 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
     totalElements: 0,
   });
 
-  const { data, isLoading, isSuccess, isError } = useGetPublishersQuery({
-    page: pagination?.number,
-    loadMore: pagination?.isMore,
-  });
+  const { data, isLoading, isFetching, isSuccess, isError } =
+    useGetPublishersQuery({
+      page: pagination?.number,
+      loadMore: pagination?.isMore,
+    });
 
   useEffect(() => {
     setSelectedPub(pubs);
@@ -394,7 +402,7 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
     if (onChangePub) onChangePub(newSelected);
   };
 
-  const handleShowmore = () => {
+  const handleShowMore = () => {
     let currPage = (pagination?.number || 0) + 1;
     if (pagination?.totalPages <= currPage) {
       setShowmore((prev) => !prev);
@@ -486,9 +494,15 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
       </TitleContainer>
       <Stack spacing={{ xs: 1 }} direction="row" useFlexGap flexWrap="wrap">
         {pubsContent}
+        {isFetching && !isLoading && (
+          <>
+            <Skeleton variant="rectangular" height={38} width="48%" />
+            <Skeleton variant="rectangular" height={38} width="48%" />
+          </>
+        )}
       </Stack>
-      {isCollapsable && (
-        <Showmore onClick={handleShowmore}>
+      {!isFetching && isCollapsable && (
+        <Showmore onClick={handleShowMore}>
           {!showmore || isMore ? (
             <>
               Xem thêm

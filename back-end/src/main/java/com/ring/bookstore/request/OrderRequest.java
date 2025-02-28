@@ -7,6 +7,7 @@ import com.ring.bookstore.enums.ShippingType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class OrderRequest { //Request body when order
 
 	private String coupon;
 
+	@Size(max = 300, message = "Ghi chú không quá quá 300 kí tự!")
 	private String message;
 
 	@NotNull(message = "Hình thức giao hàng không được bỏ trống!")

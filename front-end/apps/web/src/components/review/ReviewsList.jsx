@@ -1,46 +1,24 @@
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, Suspense, useCallback, useState, lazy } from "react";
 import { KeyboardArrowLeft, Try } from "@mui/icons-material";
 import { useGetMyReviewsQuery } from "../../features/reviews/reviewsApiSlice";
 import { Message, Title } from "@ring/ui/Components";
 import { Link } from "react-router";
-import { ReactComponent as EmptyIcon } from "@ring/shared/assets/empty";
 import { CircularProgress, DialogContent } from "@mui/material";
 import { debounce } from "lodash-es";
 import { useAuth } from "@ring/auth";
+import {
+  LoadContainer,
+  PlaceholderContainer,
+  StyledEmptyIcon,
+} from "../custom/ProfileComponents";
 import ReviewItem from "./ReviewItem";
 import styled from "@emotion/styled";
 
 const ReviewForm = lazy(() => import("./ReviewForm"));
 
 //#region styled
-const MessageContainer = styled.span`
-  min-height: 60dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
 const ReviewsContainer = styled.div`
   padding-bottom: ${({ theme }) => theme.spacing(2)};
-`;
-
-const PlaceholderContainer = styled.div`
-  padding: ${({ theme }) => theme.spacing(16)};
-`;
-
-const LoadContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin-bottom: ${({ theme }) => theme.spacing(2)};
-`;
-
-const StyledEmptyIcon = styled(EmptyIcon)`
-  height: 70px;
-  width: 70px;
-  margin: ${({ theme }) => theme.spacing(1)} 0;
-  fill: ${({ theme }) => theme.palette.text.icon};
 `;
 //#endregion
 
