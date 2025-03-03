@@ -5,6 +5,8 @@ import { useGetCouponsQuery } from "../../features/coupons/couponsApiSlice";
 import { Skeleton } from "@mui/material";
 import { couponTypes } from "@ring/shared";
 import { MobileExtendButton } from "@ring/ui/Components";
+import { trackWindowScroll } from "react-lazy-load-image-component";
+import useCoupon from "../../hooks/useCoupon";
 
 const Popover = lazy(() => import("@mui/material/Popover"));
 const CouponItem = lazy(() => import("./CouponItem"));
@@ -194,7 +196,8 @@ const CouponMessage = styled.span`
 
 const defaultSize = 4;
 
-const CouponPreview = ({ shopId }) => {
+const CouponPreview = ({ shopId, scrollPosition }) => {
+  const { coupons: savedCoupons } = useCoupon();
   const { data, isLoading, isSuccess, isError } = useGetCouponsQuery(
     { shopId, size: defaultSize },
     { skip: !shopId }
@@ -268,6 +271,8 @@ const CouponPreview = ({ shopId }) => {
     );
   }
 
+  let isSaved = savedCoupons?.indexOf(contextCoupon?.code) != -1;
+
   return (
     <CouponWrapper>
       <DetailTitle>
@@ -281,7 +286,7 @@ const CouponPreview = ({ shopId }) => {
         <Wrapper draggable={true}>
           <ItemsContainer>
             {coupons}
-            <Suspense fallback={<></>}>
+            <Suspense fallback={null}>
               {anchorEl !== undefined && (
                 <Popover
                   id={id}
@@ -309,7 +314,12 @@ const CouponPreview = ({ shopId }) => {
                   }}
                   anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
                 >
-                  <CouponItem coupon={contextCoupon} summary={contextSummary} />
+                  <CouponItem
+                    coupon={contextCoupon}
+                    summary={contextSummary}
+                    isSaved={isSaved}
+                    scrollPosition={scrollPosition}
+                  />
                 </Popover>
               )}
             </Suspense>
@@ -330,4 +340,4 @@ const CouponPreview = ({ shopId }) => {
   );
 };
 
-export default CouponPreview;
+export default trackWindowScroll(CouponPreview);

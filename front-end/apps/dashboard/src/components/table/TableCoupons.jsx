@@ -67,15 +67,22 @@ const headCells = [
   {
     id: "detail.discount",
     align: "left",
-    width: "450px",
     disablePadding: false,
     sortable: true,
     label: "Điều kiện",
   },
   {
-    id: "detail.expDate",
+    id: "shop.id",
     align: "left",
     width: "120px",
+    disablePadding: false,
+    sortable: true,
+    label: "Shop",
+  },
+  {
+    id: "detail.expDate",
+    align: "left",
+    width: "110px",
     disablePadding: false,
     sortable: true,
     label: "Hạn sử dụng",
@@ -83,7 +90,7 @@ const headCells = [
   {
     id: "detail.type",
     align: "left",
-    width: "75px",
+    width: "105px",
     disablePadding: false,
     sortable: true,
     label: "Thể loại",
@@ -590,6 +597,9 @@ export default function TableCoupons({
             <TableCell align="left">
               <ItemTitle>{coupon?.summary}</ItemTitle>
               <ItemTitle className="secondary">{coupon?.condition}</ItemTitle>
+            </TableCell>
+            <TableCell align="left">
+              <ItemTitle>{coupon?.shopName}</ItemTitle>
             </TableCell>
             <TableCell align="left">
               <ItemTitle>HSD: {dateFormatter(date)}</ItemTitle>

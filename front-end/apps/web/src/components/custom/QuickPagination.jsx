@@ -58,29 +58,35 @@ const QuickPagination = ({ pagination, onPageChange, onOpenPagination }) => {
     if (onPageChange) onPageChange(page);
   };
 
+  const handleOpenPagination = () => {
+    if (onOpenPagination) onOpenPagination();
+  };
+
   return (
-    <Container>
-      {totalPages > 0 && (
-        <Count onClick={onOpenPagination}>
-          <b>{currPage + 1}</b>
-          {totalPages && `/${totalPages}`}
-        </Count>
-      )}
-      <StyledButton
-        aria-label="prev-page"
-        disabled={currPage == 0}
-        onClick={() => handlePageChange(currPage)}
-      >
-        <KeyboardArrowLeft />
-      </StyledButton>
-      <StyledButton
-        aria-label="next-page"
-        disabled={!totalPages || currPage + 1 == totalPages}
-        onClick={() => handlePageChange(currPage + 2)}
-      >
-        <KeyboardArrowRight />
-      </StyledButton>
-    </Container>
+    <>
+      {totalPages > 1 ? (
+        <Container>
+          <Count onClick={handleOpenPagination}>
+            <b>{currPage + 1}</b>
+            {totalPages && `/${totalPages}`}
+          </Count>
+          <StyledButton
+            aria-label="prev-page"
+            disabled={currPage == 0}
+            onClick={() => handlePageChange(currPage)}
+          >
+            <KeyboardArrowLeft />
+          </StyledButton>
+          <StyledButton
+            aria-label="next-page"
+            disabled={!totalPages || currPage + 1 == totalPages}
+            onClick={() => handlePageChange(currPage + 2)}
+          >
+            <KeyboardArrowRight />
+          </StyledButton>
+        </Container>
+      ) : null}
+    </>
   );
 };
 

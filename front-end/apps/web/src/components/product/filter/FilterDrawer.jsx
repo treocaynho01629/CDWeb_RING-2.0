@@ -25,9 +25,10 @@ import {
   ExpandLess,
   ExpandMore,
 } from "@mui/icons-material";
-import { suggestPrices, bookTypeItems } from "@ring/shared";
+import { bookTypeItems } from "@ring/shared";
 import { useGetCategoriesQuery } from "../../../features/categories/categoriesApiSlice";
 import { useGetPublishersQuery } from "../../../features/publishers/publishersApiSlice";
+import { suggestPrices } from "../../../ultils/filters";
 import PriceRangeSlider from "./PriceRangeSlider";
 
 //#region styled

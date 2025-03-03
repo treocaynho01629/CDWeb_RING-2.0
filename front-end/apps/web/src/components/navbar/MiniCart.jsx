@@ -8,19 +8,26 @@ import { currencyFormat } from "@ring/shared";
 //#region styled
 const MiniCartContainer = styled.div`
   width: 400px;
-  padding: 10px 20px;
+  padding: ${({ theme }) => theme.spacing(2)};
 `;
 
-const CartTitleContainer = styled.div`
-  margin: 15px 0;
+const CartTitle = styled.span`
+  font-size: 16px;
+  font-weight: 450;
+  text-transform: capitalize;
 `;
 
-const EmptyCartContainer = styled.div`
+const ItemsContainer = styled.div`
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  text-align: cneter;
   height: 250px;
+  margin: ${({ theme }) => theme.spacing(1)} 0;
+
+  &.empty {
+    justify-content: center;
+    text-align: center;
+  }
 `;
 
 const ProductTitle = styled.span`
@@ -56,7 +63,7 @@ const ProductPrice = styled.span`
 const ItemContainer = styled.div`
   display: flex;
   align-items: center;
-  margin: 10px 0;
+  margin: ${({ theme }) => theme.spacing(1)} 0;
 `;
 
 const ItemInfo = styled.div`
@@ -64,12 +71,11 @@ const ItemInfo = styled.div`
   flex-direction: column;
   position: relative;
   width: 100%;
-  margin-left: 10px;
+  margin-left: ${({ theme }) => theme.spacing(1)};
 `;
 
 const ActionContainer = styled.div`
-  margin: 10px 0;
-  padding: 5px 0;
+  margin-top: ${({ theme }) => theme.spacing(1)};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -120,17 +126,15 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
         }}
       />
       <MiniCartContainer>
-        <CartTitleContainer>
-          <b>Sản phẩm trong giỏ hàng</b>
-        </CartTitleContainer>
-        {products?.length == 0 ? (
-          <EmptyCartContainer>
-            <RemoveShoppingCartIcon sx={{ fontSize: "50px" }} />
-            <b>GIỎ HÀNG TRỐNG</b>
-          </EmptyCartContainer>
-        ) : (
-          <>
-            {products?.slice(0, 5).map((product, index) => (
+        <CartTitle>Sản phẩm trong giỏ hàng</CartTitle>
+        <ItemsContainer className={products?.length == 0 ? "empty" : ""}>
+          {products?.length == 0 ? (
+            <>
+              <RemoveShoppingCartIcon sx={{ fontSize: "50px" }} />
+              <b>GIỎ HÀNG TRỐNG</b>
+            </>
+          ) : (
+            products?.slice(0, 5).map((product, index) => (
               <ItemContainer key={`cartitem-${index}-${product?.id}`}>
                 <LazyLoadImage
                   width={50}
@@ -154,22 +158,24 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
                   </ProductPrice>
                 </ItemInfo>
               </ItemContainer>
-            ))}
-            <ActionContainer>
-              <span>
-                {products?.length <= 5 ? (
-                  <>&nbsp;</>
-                ) : (
-                  `Còn lại ${products?.length - 5} trong giỏ`
-                )}
-              </span>
-              <Link to={"/cart"}>
-                <Button variant="contained" color="primary" size="medium">
-                  Xem giỏ hàng
-                </Button>
-              </Link>
-            </ActionContainer>
-          </>
+            ))
+          )}
+        </ItemsContainer>
+        {products?.length != 0 && (
+          <ActionContainer>
+            <span>
+              {products?.length <= 5 ? (
+                <>&nbsp;</>
+              ) : (
+                `Còn lại ${products?.length - 5} trong giỏ`
+              )}
+            </span>
+            <Link to={"/cart"}>
+              <Button variant="outlined" color="info" size="medium">
+                Xem giỏ hàng
+              </Button>
+            </Link>
+          </ActionContainer>
         )}
       </MiniCartContainer>
     </Popover>

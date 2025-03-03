@@ -12,7 +12,6 @@ export * from "./ultils/address";
 export * from "./ultils/book";
 export * from "./ultils/coupon";
 export * from "./ultils/convert";
-export * from "./ultils/filters";
 export * from "./ultils/order";
 export * from "./ultils/payment";
 export * from "./ultils/regex";

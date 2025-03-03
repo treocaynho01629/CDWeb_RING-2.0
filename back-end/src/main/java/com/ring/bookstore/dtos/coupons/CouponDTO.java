@@ -13,6 +13,8 @@ public record CouponDTO(Long id,
                         String condition,
                         Short usage,
                         LocalDate expDate,
-                        Long shopId) {
+                        Long shopId,
+                        String shopName,
+                        String shopImage) {
 
 }

@@ -2,6 +2,7 @@ package com.ring.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.ring.bookstore.dtos.coupons.CouponDTO;
 import com.ring.bookstore.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -72,6 +73,9 @@ public class OrderDetail {
     //For mapping result
     @Transient
     private Double couponDiscount;
+
+    @Transient
+    private CouponDTO couponDTO;
 
     public void addOrderItem(OrderItem item) {
         items.add(item);

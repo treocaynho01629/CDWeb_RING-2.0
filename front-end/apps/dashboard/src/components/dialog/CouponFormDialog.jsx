@@ -56,7 +56,7 @@ const NumericFormatCustom = forwardRef(
 NumericFormatCustom.propTypes = { onChange: PropTypes.func.isRequired };
 
 const CouponFormDialog = ({
-  product: coupon = null,
+  coupon = null,
   open,
   handleClose,
   shop,
@@ -81,7 +81,7 @@ const CouponFormDialog = ({
   //Fetch
   const { data: shops, isLoading: loadShops } = useGetPreviewShopsQuery(
     {},
-    { skip: !currShop && !openShop }
+    { skip: coupon != null || (!currShop && !openShop) }
   );
   const [createCoupon, { isLoading: creating }] = useCreateCouponMutation();
   const [updateCoupon, { isLoading: updating }] = useUpdateCouponMutation();
@@ -150,7 +150,6 @@ const CouponFormDialog = ({
       type,
       attribute,
       maxDiscount,
-      discount,
       expireDate: expireDate.format("YYYY-MM-DD"),
       shopId: coupon ? coupon?.shopId : currShop,
     };
@@ -398,6 +397,14 @@ const CouponFormDialog = ({
                 <MenuItem disabled>
                   <em>--Cửa hàng--</em>
                 </MenuItem>
+                {coupon && (
+                  <MenuItem
+                    key={`shop-${coupon?.shopId}`}
+                    value={coupon?.shopId}
+                  >
+                    {coupon?.shopName}
+                  </MenuItem>
+                )}
                 {shops?.ids?.map((id, index) => {
                   const shop = shops?.entities[id];
 

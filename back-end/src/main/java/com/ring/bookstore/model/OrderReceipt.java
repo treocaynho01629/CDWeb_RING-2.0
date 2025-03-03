@@ -1,5 +1,6 @@
 package com.ring.bookstore.model;
 
+import com.ring.bookstore.dtos.coupons.CouponDTO;
 import com.ring.bookstore.enums.PaymentType;
 import com.ring.bookstore.enums.ShippingType;
 import jakarta.persistence.*;
@@ -97,6 +98,9 @@ public class OrderReceipt extends Auditable {
 
     @Transient
     private Double couponDiscount;
+
+    @Transient
+    private CouponDTO couponDTO;
 
     public void addOrderDetail(OrderDetail detail) {
         details.add(detail);

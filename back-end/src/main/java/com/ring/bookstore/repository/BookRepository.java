@@ -162,6 +162,18 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             """)
     IStat getBookAnalytics(Long shopId);
 
+    @Query(value= """
+            select t.keyword
+            from (
+            	select distinct substring(left(lower(regexp_replace(b.title, CONCAT('^.*?(\\S*', :keyword, '\\S*)'), '\\1', 'i')) || ' ', 24) from '.*\\s') as keyword
+            	from book b
+            	where b.title ilike concat('%', :keyword, '%')
+            ) t
+            order by case when t.keyword ilike concat('%', :keyword, '%') then 1 else 2 end, t.keyword
+            limit 9
+            """, nativeQuery = true)
+    List<String> findSuggestion(String keyword);
+
     void deleteAllByShopId(Long shopId);
 
     void deleteAllByShop_Owner(Account owner);

@@ -18,7 +18,9 @@ public interface ShopService {
                                          Integer pageSize,
                                          String sortBy,
                                          String sortDir,
-                                         String keyword);
+                                         String keyword,
+                                         Boolean followed,
+                                         Account user);
 
     Page<ShopDTO> getShops(Integer pageNo,
                            Integer pageSize,
@@ -31,10 +33,10 @@ public interface ShopService {
     List<ShopPreviewDTO> getShopsPreview(Account user);
 
     ShopInfoDTO getShopInfo(Long id,
-                                Account user);
+                            Account user);
 
     ShopDetailDTO getShopDetail(Long id,
-                                  Account user);
+                                Account user);
 
     StatDTO getAnalytics();
 
@@ -60,9 +62,9 @@ public interface ShopService {
                      Account user);
 
     void deleteShopsInverse(String keyword,
-                     Long userId,
-                     List<Long> ids,
-                     Account user);
+                            Long userId,
+                            List<Long> ids,
+                            Account user);
 
     void deleteAllShops(Account user);
 }

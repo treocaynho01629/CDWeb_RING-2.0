@@ -50,13 +50,16 @@ public class ShopServiceImpl implements ShopService {
                                                 Integer pageSize,
                                                 String sortBy,
                                                 String sortDir,
-                                                String keyword) {
+                                                String keyword,
+                                                Boolean followed,
+                                                Account user) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
+        Long userId = user != null ? user.getId() : null;
 
         //Fetch from database
-        Page<IShopDisplay> shopsList = shopRepo.findShopsDisplay(keyword, pageable);
+        Page<IShopDisplay> shopsList = shopRepo.findShopsDisplay(keyword, followed, userId, pageable);
         Page<ShopDisplayDTO> shopDTOS = shopsList.map(shopMapper::displayToDTO);
         return shopDTOS;
     }

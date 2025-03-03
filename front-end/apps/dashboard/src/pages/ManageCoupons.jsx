@@ -20,7 +20,7 @@ const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 
 const ManageCoupons = () => {
   const { shop } = useAuth();
-  const [contextProduct, setContextCoupon] = useState(null);
+  const [contextCoupon, setContextCoupon] = useState(null);
   const [open, setOpen] = useState(undefined);
   const [pending, setPending] = useState(false);
   const { data: couponAnalytics } = useGetCouponAnalyticsQuery(shop ?? null);
@@ -84,7 +84,7 @@ const ManageCoupons = () => {
               open,
               handleClose,
               shop,
-              product: contextProduct,
+              coupon: contextCoupon,
               pending,
               setPending,
             }}

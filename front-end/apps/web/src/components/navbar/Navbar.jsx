@@ -1,6 +1,5 @@
 import { lazy, Suspense, useCallback, useState } from "react";
 import {
-  Search,
   Mail,
   Phone,
   Facebook,
@@ -10,7 +9,6 @@ import {
   Menu,
   LockOutlined,
   Storefront,
-  Close,
   ShoppingCartOutlined,
   NotificationsOutlined,
 } from "@mui/icons-material";
@@ -21,19 +19,19 @@ import {
   Avatar,
   Box,
   Grid2 as Grid,
-  TextField,
   AppBar,
   useMediaQuery,
   useTheme,
   useScrollTrigger,
   useColorScheme,
 } from "@mui/material";
-import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
+import { Link, useLocation } from "react-router";
 import { LogoImage } from "@ring/ui/Components";
 import { debounce } from "lodash-es";
 import { useLogout, useAuth } from "@ring/auth";
 import useCart from "../../hooks/useCart";
 import styled from "@emotion/styled";
+import SearchInput from "./SearchInput";
 
 const NavDrawer = lazy(() => import("./NavDrawer"));
 const MiniCart = lazy(() => import("./MiniCart"));
@@ -120,6 +118,10 @@ const Social = styled.p`
   height: 35px;
   transition: all 0.5s ease;
   cursor: pointer;
+
+  svg {
+    font-size: 18px;
+  }
 
   &:hover {
     background-color: #${({ color }) => color};
@@ -236,44 +238,12 @@ const IconText = styled.p`
     height: 0;
   }
 `;
-
-const StyledSearchForm = styled.form`
-  width: 100%;
-  display: flex;
-  align-items: center;
-
-  ${({ theme }) => theme.breakpoints.down("md")} {
-    flex-direction: row-reverse;
-  }
-`;
-
-const StyledSearchInput = styled(TextField)(({ theme }) => ({
-  color: "inherit",
-  background: theme.palette.background.paper,
-
-  [theme.breakpoints.down("md")]: {
-    width: "100%",
-  },
-  "& .MuiInputBase-input": {
-    background: theme.palette.background.paper,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-
-    [theme.breakpoints.up("md")]: {
-      width: "12ch",
-      "&:focus": {
-        width: "20ch",
-      },
-    },
-  },
-}));
 //#endregion
 
 const Navbar = () => {
   //#region construct
   const { cartProducts } = useCart();
   const { mode, setMode } = useColorScheme();
-  const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const theme = useTheme();
   const tabletMode = useMediaQuery(theme.breakpoints.down("md"));
@@ -284,17 +254,16 @@ const Navbar = () => {
     threshold: 20,
   });
 
-  //Drawer open state
-  const [openDrawer, setOpenDrawer] = useState(undefined);
-
   //Search field expand
   const [searchField, setSearchField] = useState("");
   const [focus, setFocus] = useState(false);
   const [toggle, setToggle] = useState(searchField !== "");
 
+  //Drawer open state
+  const [openDrawer, setOpenDrawer] = useState(undefined);
+
   //Other
   const { username, image } = useAuth();
-  const navigate = useNavigate();
   const signOut = useLogout();
 
   //Anchor for popoever & open state
@@ -328,9 +297,6 @@ const Navbar = () => {
   const handleToggleDrawer = (value) => {
     setOpenDrawer(value);
   };
-  const toggleSearch = () => {
-    setToggle((prev) => !prev);
-  };
 
   //Toggle color mode
   const toggleMode = () => {
@@ -343,21 +309,6 @@ const Navbar = () => {
     } else if (mode === "dark") {
       setMode("system");
     }
-  };
-
-  //Confirm search
-  const handleNavigateStore = (e, value) => {
-    e.preventDefault();
-    let { pathname } = location;
-    let search;
-    if (!pathname.startsWith("/store")) {
-      pathname = "/store";
-      search = value != "" ? `?q=${value}` : "";
-    } else {
-      value != "" ? searchParams.set("q", value) : searchParams.delete("q");
-      search = searchParams.toString();
-    }
-    navigate({ pathname, search });
   };
   //#endregion
 
@@ -382,16 +333,16 @@ const Navbar = () => {
           <Grid size={{ xs: 12, md: 6 }}>
             <SocialContainer>
               <Social color="3B5999">
-                <Facebook sx={{ fontSize: 18 }} />
+                <Facebook />
               </Social>
               <Social color="FF0000">
-                <YouTube sx={{ fontSize: 18 }} />
+                <YouTube />
               </Social>
               <Social color="0A66C2">
-                <LinkedIn sx={{ fontSize: 18 }} />
+                <LinkedIn />
               </Social>
               <Social color="55ACEE">
-                <Twitter sx={{ fontSize: 18 }} />
+                <Twitter />
               </Social>
             </SocialContainer>
           </Grid>
@@ -419,11 +370,12 @@ const Navbar = () => {
                         <Menu sx={{ fontSize: 26 }} />
                       </IconButton>
                     </Box>
-                    <Suspense fallback={<></>}>
+                    <Suspense fallback={null}>
                       <NavDrawer
                         {...{
                           openDrawer,
                           username,
+                          image,
                           location,
                           products: cartProducts,
                           signOut,
@@ -457,38 +409,15 @@ const Navbar = () => {
                       <Storefront sx={{ fontSize: "26px" }} />
                     </StyledIconButton>
                   </Link>
-                  <StyledSearchForm
-                    onSubmit={(e) => handleNavigateStore(e, searchField)}
-                  >
-                    {isToggleSearch && (
-                      <StyledSearchInput
-                        placeholder="Tìm kiếm... "
-                        autoFocus
-                        autoComplete="search"
-                        onFocus={() => setFocus(true)}
-                        onBlur={() => setFocus(false)}
-                        onChange={(e) => setSearchField(e.target.value)}
-                        value={searchField}
-                        id="search"
-                        size="small"
-                        slotProps={{
-                          input: {
-                            startAdornment: <Search sx={{ marginRight: 1 }} />,
-                          },
-                        }}
-                      />
-                    )}
-                    <StyledIconButton
-                      aria-label="search toggle"
-                      onClick={() => toggleSearch()}
-                    >
-                      {isToggleSearch ? (
-                        <Close sx={{ fontSize: "26px" }} />
-                      ) : (
-                        <Search sx={{ fontSize: "26px" }} />
-                      )}
-                    </StyledIconButton>
-                  </StyledSearchForm>
+                  <SearchInput
+                    {...{
+                      searchField,
+                      setSearchField,
+                      setToggle,
+                      setFocus,
+                      isToggleSearch,
+                    }}
+                  />
                 </Box>
               </Left>
             </Grid>

@@ -17,17 +17,23 @@ import java.util.Optional;
 public interface ShopRepository extends JpaRepository<Shop, Long> {
 
     @Query("""
-		select s.owner.id as ownerId, s.id as id, s.name as name, i.name as image,
-		count(r.id) as totalReviews, count(b.id) as totalProducts, size(s.followers) as totalFollowers,
-		s.createdDate as joinedDate
-		from Shop s
-		left join s.image i
-		left join s.books b
-		left join b.bookReviews r
-		where concat (s.name, s.owner.username) ilike %:keyword%
-		group by s.id, s.owner.id, i.name
-	""")
-    Page<IShopDisplay> findShopsDisplay(String keyword, Pageable pageable);
+            	select s.owner.id as ownerId, s.id as id, s.name as name, i.name as image,
+            	count(r.id) as totalReviews, count(b.id) as totalProducts, size(s.followers) as totalFollowers,
+            	s.createdDate as joinedDate, case when f.id is null then false else true end as followed
+            	from Shop s
+            	left join s.image i
+            	left join s.followers f on f.id = :userId
+            	left join s.books b
+            	left join b.bookReviews r
+            	where concat (s.name, s.owner.username) ilike %:keyword%
+            	and (coalesce(:followed) is null or case when :followed = true
+                       		then f.id is not null else f.id is null end)
+            	group by s.id, s.owner.id, i.name, f.id
+            """)
+    Page<IShopDisplay> findShopsDisplay(String keyword,
+										Boolean followed,
+										Long userId,
+										Pageable pageable);
 
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
@@ -45,7 +51,9 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 		and (coalesce(:userId) is null or s.owner.id = :userId)
 		group by s.id, s.owner.id, s.owner.username, i.name
 	""")
-	Page<IShop> findShops(String keyword, Long userId, Pageable pageable);
+	Page<IShop> findShops(String keyword,
+						  Long userId,
+						  Pageable pageable);
 
 	@Query("""
 		select s.id as id, s.name as name, i.name as image
@@ -66,7 +74,8 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 		where s.id in :ids
 		and s.owner.id = :ownerId
 	""")
-	List<Long> findShopIdsByInIdsAndOwner(List<Long> ids, Long ownerId);
+	List<Long> findShopIdsByInIdsAndOwner(List<Long> ids,
+										  Long ownerId);
 
 	@Query("""
 		select s.id from Shop s
@@ -75,21 +84,25 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 		and s.id not in :ids
 		group by s.id
 	""")
-	List<Long> findInverseIds(String keyword, Long ownerId, List<Long> ids);
+	List<Long> findInverseIds(String keyword,
+							  Long ownerId,
+							  List<Long> ids);
 
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
 			s.name as name, s.description as description, i.name as image, s.createdDate as joinedDate,
 			count(r.id) as totalReviews, count(b.id) as totalProducts, size(s.followers) as totalFollowers,
 			case when f.id is null then false else true end as followed
-		from Shop s left join Image i on i.id = s.image.id
+		from Shop s
+		left join Image i on i.id = s.image.id
 		left join s.followers f on f.id = :userId
 		left join Book b on s.id = b.shop.id
 		left join Review r on b.id = r.book.id
 		where s.id = :id
 		group by s.id, s.owner.username, s.owner.id, i.id, f.id
 	""")
-    Optional<IShopInfo> findShopInfoById(Long id, Long userId);
+    Optional<IShopInfo> findShopInfoById(Long id,
+										 Long userId);
 
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
@@ -110,7 +123,8 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 		and (coalesce(:userId) is null or s.owner.id = :userId)
 		group by s.id, s.owner.username, s.owner.id, i.id, a.id
 	""")
-	Optional<IShopDetail> findShopDetailById(Long id, Long userId);
+	Optional<IShopDetail> findShopDetailById(Long id,
+											 Long userId);
 
 	void deleteAllByOwner(Account owner);
 

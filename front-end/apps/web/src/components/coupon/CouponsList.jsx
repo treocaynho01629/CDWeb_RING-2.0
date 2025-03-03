@@ -25,6 +25,7 @@ import { debounce } from "lodash-es";
 import { Message } from "@ring/ui/Components";
 import { useDeepEffect, couponTypes, couponTypeItems } from "@ring/shared";
 import { useGetCouponsQuery } from "../../features/coupons/couponsApiSlice";
+import { trackWindowScroll } from "react-lazy-load-image-component";
 import CouponItem from "./CouponItem";
 import useCoupon from "../../hooks/useCoupon";
 
@@ -59,8 +60,8 @@ couponTypeItems.forEach((item) => {
   });
 });
 
-const CouponsList = () => {
-  const { coupons } = useCoupon();
+const CouponsList = ({ scrollPosition }) => {
+  const { coupons: savedCoupons } = useCoupon();
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -84,7 +85,11 @@ const CouponsList = () => {
       byShop: filters.byShop,
       code: filters.code,
       types: filters.types ?? "",
-      codes: filters.saved ? coupons : [],
+      codes: filters.saved
+        ? savedCoupons?.length > 0
+          ? savedCoupons
+          : ["temp"]
+        : [],
       page: pagination?.number,
       size: pagination?.size,
       loadMore: pagination?.isMore,
@@ -192,12 +197,18 @@ const CouponsList = () => {
       ids?.map((id, index) => {
         const coupon = entities[id];
         const summary = couponTypes[coupon?.type];
-        const isSaved = coupons?.indexOf(coupon?.code) != -1;
+        const isSaved = savedCoupons?.indexOf(coupon?.code) != -1;
 
         return (
           <Grid key={`coupon-${id}-${index}`} size={{ xs: 12, md_lg: 6 }}>
             <CouponItem
-              {...{ coupon, summary, isSaved, className: "display" }}
+              {...{
+                coupon,
+                summary,
+                isSaved,
+                className: "display",
+                scrollPosition,
+              }}
             />
           </Grid>
         );
@@ -285,4 +296,4 @@ const CouponsList = () => {
   );
 };
 
-export default CouponsList;
+export default trackWindowScroll(CouponsList);

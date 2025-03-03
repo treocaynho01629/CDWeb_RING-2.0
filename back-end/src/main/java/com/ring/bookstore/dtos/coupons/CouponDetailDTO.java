@@ -13,6 +13,7 @@ public record CouponDetailDTO(Long id,
                               BigDecimal discount,
                               LocalDate expDate,
                               Short usage,
-                              Long shopId) {
+                              Long shopId,
+                              String shopName) {
 
 }

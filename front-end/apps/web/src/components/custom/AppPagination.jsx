@@ -6,6 +6,7 @@ import {
   TextField,
   paginationItemClasses,
 } from "@mui/material";
+import { pageSizes } from "../../ultils/filters";
 
 //#region styled
 const Container = styled.div`
@@ -45,12 +46,7 @@ const StyledPageItem = styled(PaginationItem)`
 `;
 //#endregion
 
-const AppPagination = ({
-  mobileMode,
-  pagination,
-  onPageChange,
-  onSizeChange,
-}) => {
+const AppPagination = ({ pagination, onPageChange, onSizeChange, sizes }) => {
   //Initial value
   const currPage = pagination?.number + 1;
   const totalPages = pagination?.totalPages;
@@ -82,9 +78,11 @@ const AppPagination = ({
           value={pagination?.size}
           onChange={handleChangeSize}
         >
-          <MenuItem value={12}>Hiển thị 12</MenuItem>
-          <MenuItem value={24}>Hiển thị 24</MenuItem>
-          <MenuItem value={48}>Hiển thị 48</MenuItem>
+          {(sizes ?? pageSizes).map((option, index) => (
+            <MenuItem value={option} key={`option-${index}`}>
+              Hiển thị {option}
+            </MenuItem>
+          ))}
         </TextField>
       </MoreContainer>
     </Container>

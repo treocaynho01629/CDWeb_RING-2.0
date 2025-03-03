@@ -91,6 +91,7 @@ const ShopDetail = styled.span`
     b {
       margin-left: 5px;
     }
+
     &.hide-on-mobile {
       display: none;
     }
@@ -273,7 +274,8 @@ const ShopDisplay = ({ id, name }) => {
                 </ShopDetail>
                 <ShopDetail>
                   <PersonAddAlt1 color="warning" />
-                  Người theo dõi:<b>{numFormat.format(data?.totalFollowers)}</b>
+                  Theo dõi:
+                  <b>{numFormat.format(data?.totalFollowers)}</b>
                 </ShopDetail>
                 <ShopDetail className="hide-on-mobile">
                   <Today color="warning" />

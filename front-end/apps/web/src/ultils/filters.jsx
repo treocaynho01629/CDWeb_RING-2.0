@@ -1,3 +1,4 @@
+//Books
 export const marks = [
   {
     value: 0,
@@ -44,7 +45,7 @@ export const suggestPrices = [
   },
 ];
 
-export const sortBy = [
+export const sortBooksBy = [
   {
     value: "createdDate",
     label: "Mới nhất",
@@ -63,6 +64,50 @@ export const sortBy = [
   },
 ];
 
+export const booksAmount = [
+  {
+    value: 1,
+    label: "Còn hàng",
+  },
+  {
+    value: 0,
+    label: "Tất cả",
+  },
+];
+
+//Shops
+export const sortShopsBy = [
+  {
+    value: "totalFollowers",
+    label: "Nổi bật",
+  },
+  {
+    value: "joinedDate",
+    label: "Mới tham gia",
+  },
+  {
+    value: "totalReviews",
+    label: "Yêu thích",
+  },
+];
+
+export const filterShopsBy = [
+  {
+    value: "ALL",
+    label: "Tất cả",
+  },
+  {
+    value: "FOLLOWED",
+    label: "Đang theo dõi",
+  },
+];
+
+export const filterShopsValue = {
+  ALL: null,
+  FOLLOWED: true,
+};
+
+//Reviews
 export const rateLabels = {
   1: "Cực tệ",
   2: "Tệ",
@@ -70,3 +115,6 @@ export const rateLabels = {
   4: "Hài lòng",
   5: "Cực hài lòng",
 };
+
+//Other
+export const pageSizes = [12, 24, 48];

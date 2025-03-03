@@ -53,6 +53,7 @@ const NavDrawer = ({
   handleOpen,
   handleClose,
   username,
+  image,
   products,
   signOut,
   mode,
@@ -135,7 +136,10 @@ const NavDrawer = ({
                 <Link to={"/profile/detail"}>
                   <ListItemButton onClick={handleClose}>
                     <ListItemIcon>
-                      <Avatar />
+                      <Avatar
+                        sx={{ width: 32, height: 32, ml: -0.5 }}
+                        src={image ? image + "?size=tiny" : null}
+                      />
                     </ListItemIcon>
                     <ListItemText primary={username} />
                   </ListItemButton>

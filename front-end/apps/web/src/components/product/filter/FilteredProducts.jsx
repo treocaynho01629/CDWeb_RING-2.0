@@ -42,7 +42,7 @@ const FilteredProducts = memo(({ data, error, loading, scrollPosition }) => {
         minHeight: "90dvh",
       }}
     >
-      {loading && <Progress color={`${error ? "error" : "primary"}`} />}
+      {loading && <Progress color={error ? "error" : "primary"} />}
       <Grid container spacing={0.5} size="grow">
         {productsContent}
       </Grid>

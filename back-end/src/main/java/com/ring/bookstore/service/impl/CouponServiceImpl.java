@@ -3,6 +3,7 @@ package com.ring.bookstore.service.impl;
 import com.ring.bookstore.dtos.coupons.CouponDTO;
 import com.ring.bookstore.dtos.coupons.CouponDetailDTO;
 import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
+import com.ring.bookstore.dtos.coupons.ICoupon;
 import com.ring.bookstore.dtos.dashboard.StatDTO;
 import com.ring.bookstore.dtos.mappers.CouponMapper;
 import com.ring.bookstore.dtos.mappers.DashboardMapper;
@@ -62,7 +63,7 @@ public class CouponServiceImpl implements CouponService {
                 Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<Coupon> couponsList = couponRepo.findCoupon(
+        Page<ICoupon> couponsList = couponRepo.findCoupon(
                 types,
                 codes,
                 code,
@@ -73,8 +74,12 @@ public class CouponServiceImpl implements CouponService {
 
         //Check usable
         if (cValue != null || cQuantity != null) {
-            CartStateRequest request = CartStateRequest.builder().value(cValue).quantity(cQuantity).build();
-            couponsList = couponsList.map(coupon -> markUsable(coupon, request));
+            CartStateRequest request = CartStateRequest.builder()
+                    .value(cValue)
+                    .quantity(cQuantity)
+                    .build();
+            Page<CouponDTO> couponDTOS = couponsList.map((coupon) -> couponMapper.couponToDTO(coupon, request));
+            return couponDTOS;
         }
 
         Page<CouponDTO> couponDTOS = couponsList.map(couponMapper::couponToDTO);
@@ -82,31 +87,34 @@ public class CouponServiceImpl implements CouponService {
     }
 
     public CouponDetailDTO getCoupon(Long id) {
-        Coupon coupon = couponRepo.findCouponById(id).orElseThrow(() ->
+        ICoupon coupon = couponRepo.findCouponById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Coupon not found!"));
         return couponMapper.couponToDetailDTO(coupon);
     }
 
     @Override
     public CouponDTO getCouponByCode(String code, Double cValue, Integer cQuantity) {
-        Coupon coupon = couponRepo.findCouponByCode(code).orElseThrow(() ->
+        ICoupon coupon = couponRepo.findCouponByCode(code).orElseThrow(() ->
                 new ResourceNotFoundException("Coupon not found!"));
         if (cValue != null || cQuantity != null) {
-            CartStateRequest request = CartStateRequest.builder().value(cValue).quantity(cQuantity).build();
-            coupon = markUsable(coupon, request);
+            CartStateRequest request = CartStateRequest.builder()
+                    .value(cValue)
+                    .quantity(cQuantity)
+                    .build();
+            return couponMapper.couponToDTO(coupon, request);
         }
         return couponMapper.couponToDTO(coupon);
     }
 
     public List<CouponDTO> recommendCoupons(List<Long> shopIds) {
-        List<Coupon> couponsList = couponRepo.recommendCoupons(shopIds);
+        List<ICoupon> couponsList = couponRepo.recommendCoupons(shopIds);
         List<CouponDTO> couponDTOS = couponsList.stream().map(couponMapper::couponToDTO).collect(Collectors.toList()); //Return books
         return couponDTOS;
     }
 
     @Override
     public CouponDTO recommendCoupon(Long shopId, CartStateRequest state) {
-        Coupon coupon = couponRepo.recommendCoupon(shopId, state.getValue(), state.getQuantity()).orElse(null);
+        ICoupon coupon = couponRepo.recommendCoupon(shopId, state.getValue(), state.getQuantity()).orElse(null);
         if (coupon == null) return null;
         return couponMapper.couponToDTO(coupon);
     }
@@ -159,7 +167,7 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public Coupon updateCoupon(Long id, CouponRequest request, Account user) {
         //Get original coupon
-        Coupon coupon = couponRepo.findCouponById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
+        Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
 
         //Check if correct seller or admin
         if (!isOwnerValid(coupon.getShop(), user))
@@ -294,26 +302,6 @@ public class CouponServiceImpl implements CouponService {
     public boolean isExpired(Coupon coupon) {
         CouponDetail couponDetail = coupon.getDetail();
         return (couponDetail.getUsage() <= 0 || couponDetail.getExpDate().isBefore(LocalDate.now()));
-    }
-
-    public Coupon markUsable(Coupon coupon, CartStateRequest request) {
-        CouponDetail couponDetail = coupon.getDetail();
-        CouponType type = couponDetail.getType();
-        double attribute = couponDetail.getAttribute();
-
-        //Current
-        double currValue = request.getValue() != null ? request.getValue() : -1;
-        int currQuantity = request.getQuantity() != null ? request.getQuantity() : -1;
-
-        //Check conditions & apply
-        if (type.equals(CouponType.MIN_AMOUNT) && currValue > -1) {
-            coupon.setIsUsable(currQuantity >= attribute);
-        } else if (currValue > -1 &&
-                (type.equals(CouponType.MIN_VALUE) || type.equals(CouponType.SHIPPING))) {
-            coupon.setIsUsable(currValue >= attribute);
-        }
-
-        return coupon;
     }
 
     //Check valid role function

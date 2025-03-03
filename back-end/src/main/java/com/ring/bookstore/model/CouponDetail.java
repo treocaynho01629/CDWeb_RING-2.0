@@ -1,7 +1,7 @@
 package com.ring.bookstore.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ring.bookstore.dtos.coupons.CouponDTO;
 import com.ring.bookstore.enums.CouponType;
 import jakarta.persistence.*;
 import lombok.*;

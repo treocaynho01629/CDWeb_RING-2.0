@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { MenuItem, TextField } from "@mui/material";
-import { rateLabels } from "@ring/shared";
 import { Star } from "@mui/icons-material";
+import { rateLabels } from "../../ultils/filters";
 
 //#region styled
 const SortContainer = styled.div`
