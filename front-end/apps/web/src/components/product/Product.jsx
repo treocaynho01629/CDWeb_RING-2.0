@@ -40,7 +40,7 @@ const ImageContainer = styled.div`
   margin-bottom: 10px;
 `;
 
-const Container = styled.div`
+const Wrapper = styled.div`
   min-width: 172px;
   min-height: 350px;
   max-width: 290px;
@@ -69,7 +69,7 @@ const Container = styled.div`
   }
 `;
 
-const Wrapper = styled.div`
+const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -250,8 +250,8 @@ const Product = ({ book, scrollPosition }) => {
   };
 
   return (
-    <Container>
-      <Wrapper>
+    <Wrapper>
+      <Container>
         {book ? (
           <Link
             to={`/product/${book.slug}`}
@@ -348,7 +348,7 @@ const Product = ({ book, scrollPosition }) => {
             </Info>
           </>
         )}
-      </Wrapper>
+      </Container>
       <Info className="extra">
         <Divider />
         <AddToCart
@@ -359,7 +359,7 @@ const Product = ({ book, scrollPosition }) => {
           &nbsp;
         </AddToCart>
       </Info>
-    </Container>
+    </Wrapper>
   );
 };
 

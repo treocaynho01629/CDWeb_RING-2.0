@@ -13,7 +13,6 @@
     "./book": "./src/ultils/book.jsx",
     "./convert": "./src/ultils/convert.jsx",
     "./coupon": "./src/ultils/coupon.jsx",
-    "./filters": "./src/ultils/filters.jsx",
     "./order": "./src/ultils/order.jsx",
     "./payment": "./src/ultils/payment.jsx",
     "./regex": "./src/ultils/regex.jsx",

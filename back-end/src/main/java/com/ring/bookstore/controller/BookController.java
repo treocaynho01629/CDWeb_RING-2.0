@@ -108,6 +108,13 @@ public class BookController {
         return new ResponseEntity<>(bookService.getBookDetail(slug), HttpStatus.OK);
     }
 
+    //Get suggestion
+    @GetMapping("/suggest")
+    public ResponseEntity<?> getBooksSuggestion(@RequestParam(value = "keyword", defaultValue = "") String keyword) {
+        List<String> options = bookService.getBooksSuggestion(keyword);
+        return new ResponseEntity<>(options, HttpStatus.OK);
+    }
+
     @GetMapping("/analytics")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER','GUEST') and hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<?> getBookAnalytics(@RequestParam(value = "shopId", required = false) Long shopId) {

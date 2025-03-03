@@ -130,6 +130,11 @@ public class BookServiceImpl implements BookService {
         return bookDetailDTO;
     }
 
+    @Override
+    public List<String> getBooksSuggestion(String keyword) {
+        return bookRepo.findSuggestion(keyword);
+    }
+
     //Add book (SELLER)
     @Transactional
     public BookResponseDTO addBook(BookRequest request,

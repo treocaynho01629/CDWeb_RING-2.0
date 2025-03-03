@@ -3,6 +3,7 @@ package com.ring.bookstore.service;
 import com.ring.bookstore.dtos.coupons.CouponDTO;
 import com.ring.bookstore.dtos.coupons.CouponDetailDTO;
 import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
+import com.ring.bookstore.dtos.coupons.ICoupon;
 import com.ring.bookstore.dtos.dashboard.StatDTO;
 import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.model.Account;
@@ -56,9 +57,6 @@ public interface CouponService {
     CouponDiscountDTO applyCoupon(Coupon coupon,
                                   CartStateRequest request,
                                   Account user);
-
-    Coupon markUsable(Coupon coupon,
-                      CartStateRequest request);
 
     boolean isExpired(Coupon coupon);
 

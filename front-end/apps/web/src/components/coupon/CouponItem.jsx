@@ -1,7 +1,10 @@
 import styled from "@emotion/styled";
 import { Button, Skeleton, Paper, alpha } from "@mui/material";
 import { dateFormatter } from "@ring/shared";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 import useCoupon from "../../hooks/useCoupon";
+import { Storefront } from "@mui/icons-material";
+import { Link } from "react-router";
 
 //#region styled
 const Wrapper = styled.div`
@@ -182,6 +185,7 @@ const CouponIcon = styled.div`
     theme.palette[color]?.contrastText || theme.palette.primary.contrastText};
   border-right: 5px dotted ${({ theme }) => theme.palette.background.default};
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   margin: 10px;
@@ -194,6 +198,28 @@ const CouponIcon = styled.div`
   ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 75px;
     margin: 5px;
+  }
+`;
+
+const ShopImage = styled(LazyLoadImage)`
+  height: 40px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+`;
+
+const ShopName = styled.span`
+  font-size: 11px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+
+  @supports (-webkit-line-clamp: 1) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: initial;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
   }
 `;
 
@@ -232,7 +258,6 @@ const CouponContainer = styled.div`
 
   &.disabled {
     filter: grayscale(1);
-    pointer-events: none;
 
     &::after {
       content: "CHƯA THOẢ ĐIỀU KIỆN";
@@ -250,6 +275,10 @@ const CouponContainer = styled.div`
       border: 1px solid ${({ theme }) => theme.palette.divider};
       border-radius: 6px;
       transform: rotate(-10deg);
+    }
+
+    ${CouponAction} {
+      pointer-events: none;
     }
   }
 
@@ -355,6 +384,7 @@ const CouponItem = ({
   selectMode,
   onClickApply,
   className,
+  scrollPosition,
 }) => {
   const { addCoupon, removeCoupon } = useCoupon();
   const date = new Date(coupon?.expDate);
@@ -368,6 +398,22 @@ const CouponItem = ({
   const handleSave = () => {
     isSaved ? removeCoupon(coupon?.code) : addCoupon(coupon?.code);
   };
+
+  let shopIcon = (
+    <CouponIcon color={summary?.color}>
+      {coupon?.shopImage ? (
+        <ShopImage
+          src={`${coupon.shopImage}?size=small`}
+          alt={`Shop: ${coupon?.shopName}`}
+          scrollPosition={scrollPosition}
+          placeholder={<Storefront />}
+        />
+      ) : (
+        summary?.icon
+      )}
+      {coupon?.shopName && <ShopName>{coupon?.shopName}</ShopName>}
+    </CouponIcon>
+  );
 
   return (
     <Wrapper className={className}>
@@ -390,14 +436,21 @@ const CouponItem = ({
             className="right"
           />
           <CouponContent>
-            <CouponIcon color={summary?.color}>{summary?.icon}</CouponIcon>
+            {coupon?.shopId ? (
+              <Link to={`/shop/${coupon?.shopId}`}>{shopIcon}</Link>
+            ) : (
+              shopIcon
+            )}
             <CouponMain>
               <div>
                 <h2>{coupon?.summary}</h2>
                 <p>{coupon?.condition}</p>
               </div>
               <Expire>
-                <ExpText color={date <= warnDate && "error"} className="date">
+                <ExpText
+                  color={date <= warnDate ? "error" : ""}
+                  className="date"
+                >
                   &nbsp;{dateFormatter(date)}
                 </ExpText>
                 {coupon?.usage < 100 && (

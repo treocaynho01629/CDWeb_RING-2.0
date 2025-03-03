@@ -32,7 +32,8 @@ const FilterChip = styled.span`
   margin: ${({ theme }) => theme.spacing(0.5)} 0;
   margin-right: ${({ theme }) => theme.spacing(1)};
   border: 1px solid
-    ${({ theme }) => theme.palette[color]?.main || theme.palette.warning.main};
+    ${({ theme, color }) =>
+      theme.palette[color]?.main || theme.palette.warning.main};
   color: ${({ theme, color }) =>
     theme.palette[color]?.light || theme.palette.warning.light};
   display: flex;
@@ -43,9 +44,9 @@ const FilterChip = styled.span`
   cursor: pointer;
 
   &:hover {
-    border-color: ${({ theme }) =>
+    border-color: ${({ theme, color }) =>
       theme.palette[color]?.light || theme.palette.warning.light};
-    background-color: ${({ theme }) =>
+    background-color: ${({ theme, color }) =>
       alpha(theme.palette[color]?.light || theme.palette.warning.light, 0.1)};
   }
 
@@ -54,13 +55,30 @@ const FilterChip = styled.span`
   }
 `;
 
+const ClearButton = styled.div`
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 24px;
+
+  &:hover {
+    color: ${({ theme }) => theme.palette.error.main};
+  }
+`;
+
 const Keyword = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
   margin: 10px 0;
 
-  b {
-    color: ${({ theme }) => theme.palette.warning.main};
+  span {
+    display: flex;
+    align-items: center;
+
+    b {
+      color: ${({ theme }) => theme.palette.warning.main};
+    }
   }
 `;
 //#endregion
@@ -106,6 +124,9 @@ const FiltersDisplay = memo(
     };
     const handleRemoveRating = () => {
       setFilters((prev) => ({ ...prev, rating: defaultFilters.rating }));
+    };
+    const handleRemoveKeyword = () => {
+      setFilters((prev) => ({ ...prev, keyword: defaultFilters.keyword }));
     };
 
     const createChips = () => {
@@ -156,8 +177,13 @@ const FiltersDisplay = memo(
       <DisplayContainer>
         {keyword && (
           <Keyword>
-            <Search />
-            &nbsp;Kết quả từ khoá: '<b>{keyword}</b>'
+            <span>
+              <Search />
+              &nbsp;Kết quả từ khoá: '<b>{keyword}</b>'
+            </span>
+            <ClearButton onClick={handleRemoveKeyword}>
+              <Close />
+            </ClearButton>
           </Keyword>
         )}
         <ChipsWrapper>

@@ -29,10 +29,11 @@ import {
   StarBorder,
   CategoryOutlined,
 } from "@mui/icons-material";
-import { suggestPrices, bookTypeItems } from "@ring/shared";
+import { bookTypeItems } from "@ring/shared";
 import { useGetCategoriesQuery } from "../../../features/categories/categoriesApiSlice";
 import { useGetPublishersQuery } from "../../../features/publishers/publishersApiSlice";
 import { debounce } from "lodash-es";
+import { suggestPrices } from "../../../ultils/filters";
 import CustomDivider from "../../custom/CustomDivider";
 import PriceRangeSlider from "./PriceRangeSlider";
 

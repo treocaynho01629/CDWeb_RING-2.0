@@ -45,6 +45,8 @@ public interface BookService {
 
     BookDetailDTO getBookDetail(String slug);
 
+    List<String> getBooksSuggestion(String keyword);
+
     BookResponseDTO addBook(BookRequest request,
                     MultipartFile thumbnail,
                     MultipartFile[] images,

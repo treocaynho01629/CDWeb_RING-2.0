@@ -9,7 +9,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
+import com.ring.bookstore.dtos.coupons.ICoupon;
 import com.ring.bookstore.dtos.dashboard.StatDTO;
+import com.ring.bookstore.dtos.mappers.CouponMapper;
 import com.ring.bookstore.dtos.mappers.DashboardMapper;
 import com.ring.bookstore.dtos.orders.*;
 import com.ring.bookstore.dtos.dashboard.ChartDTO;
@@ -57,6 +59,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final CalculateMapper calculateMapper;
     private final DashboardMapper dashMapper;
+    private final CouponMapper couponMapper;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -96,8 +99,8 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toMap(Shop::getId, Function.identity()));
         Map<Long, Book> books = bookRepo.findBooksInIds(bookIds).stream()
                 .collect(Collectors.toMap(Book::getId, Function.identity()));
-        Map<String, Coupon> coupons = couponRepo.findCouponInCodes(couponCodes).stream()
-                .collect(Collectors.toMap(Coupon::getCode, Function.identity()));
+        Map<String, ICoupon> coupons = couponRepo.findCouponInCodes(couponCodes).stream()
+                .collect(Collectors.toMap((coupon) -> coupon.getCoupon().getCode(), Function.identity()));
 
         //Create order details
         for (CartDetailRequest detail : cart) {
@@ -188,15 +191,15 @@ public class OrderServiceImpl implements OrderService {
                 }
 
                 //Coupon
-                Coupon shopCoupon = detail.getCoupon() == null ? null //Not select any
+                ICoupon shopCoupon = detail.getCoupon() == null ? null //Not select any
                         : coupons.containsKey(detail.getCoupon()) ? coupons.get(detail.getCoupon())
                         : (couponRepo.recommendCoupon(shop.getId(), detailTotal - discountDeal, detailQuantity)
                         .orElse(null));
                 if (shopCoupon != null
-                        && shopCoupon.getShop().getId().equals(shop.getId())
-                        && !couponService.isExpired(shopCoupon)) {
+                        && shopCoupon.getCoupon().getShop().getId().equals(shop.getId())
+                        && !couponService.isExpired(shopCoupon.getCoupon())) {
                     //Apply coupon (must use price with deal discount)
-                    CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(shopCoupon,
+                    CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(shopCoupon.getCoupon(),
                             new CartStateRequest(
                                     detailTotal - discountDeal,
                                     shippingFee,
@@ -206,7 +209,7 @@ public class OrderServiceImpl implements OrderService {
                     );
 
                     if (discountFromCoupon != null) {
-                        shopCoupon.setIsUsable(true);
+                        shopCoupon.getCoupon().setIsUsable(true);
                         discountCoupon = discountFromCoupon.discountValue();
                         discountShipping = discountFromCoupon.discountShipping();
                     }
@@ -224,6 +227,7 @@ public class OrderServiceImpl implements OrderService {
                 totalQuantity += detailQuantity;
                 totalShippingFee += shippingFee;
                 totalCouponDiscount += discountCoupon;
+                totalShippingDiscount += discountShipping;
                 totalDealDiscount += discountDeal;
 
                 //Set more detail
@@ -231,7 +235,7 @@ public class OrderServiceImpl implements OrderService {
                 orderDetail.setDiscount(discountValue);
                 orderDetail.setShippingFee(shippingFee);
                 orderDetail.setShippingDiscount(discountShipping);
-                orderDetail.setCoupon(shopCoupon);
+                orderDetail.setCouponDTO(shopCoupon != null ? couponMapper.couponToDTO(shopCoupon) : null);
                 orderDetail.setTotalPrice(detailTotal);
                 orderDetail.setShippingFee(shippingFee);
 
@@ -244,19 +248,20 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //Main coupon
-        Coupon coupon = request.getCoupon() == null ? null //Not select any
+        ICoupon coupon = request.getCoupon() == null ? null //Not select any
                 : coupons.containsKey(request.getCoupon()) ? coupons.get(request.getCoupon())
                 : (couponRepo.recommendCoupon(null, totalPrice - totalDealDiscount, totalQuantity)
                 .orElse(null));
 
-        if (coupon != null && coupon.getShop() == null && !couponService.isExpired(coupon)) {
+        if (coupon != null && coupon.getCoupon().getShop() == null
+                && !couponService.isExpired(coupon.getCoupon())) {
             double discountValue = 0.0;
             double shippingDiscount = 0.0;
             double value = totalPrice - totalDealDiscount - totalCouponDiscount;
             double shipping = totalShippingFee - totalShippingDiscount;
 
             //Apply coupon (must use price with all discount)
-            CouponDiscountDTO discountAll = couponService.applyCoupon(coupon,
+            CouponDiscountDTO discountAll = couponService.applyCoupon(coupon.getCoupon(),
                     new CartStateRequest(
                             value,
                             shipping,
@@ -265,7 +270,7 @@ public class OrderServiceImpl implements OrderService {
             );
 
             if (discountAll != null) {
-                coupon.setIsUsable(true);
+                coupon.getCoupon().setIsUsable(true);
                 discountValue = discountAll.discountValue();
                 shippingDiscount = discountAll.discountShipping();
 
@@ -297,7 +302,7 @@ public class OrderServiceImpl implements OrderService {
         totalDiscount = totalCouponDiscount + totalDealDiscount + totalShippingDiscount;
 
         //Set value for receipt & return
-        orderReceipt.setCoupon(coupon);
+        orderReceipt.setCouponDTO(coupon != null ? couponMapper.couponToDTO(coupon) : null);
         orderReceipt.setTotal(totalPrice + totalShippingFee);
         orderReceipt.setTotalDiscount(totalDiscount);
 
@@ -373,8 +378,8 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toMap(Shop::getId, Function.identity()));
         Map<Long, Book> books = bookRepo.findBooksInIds(bookIds).stream()
                 .collect(Collectors.toMap(Book::getId, Function.identity()));
-        Map<String, Coupon> coupons = couponRepo.findCouponInCodes(couponCodes).stream()
-                .collect(Collectors.toMap(Coupon::getCode, Function.identity()));
+        Map<String, ICoupon> coupons = couponRepo.findCouponInCodes(couponCodes).stream()
+                .collect(Collectors.toMap((coupon) -> coupon.getCoupon().getCode(), Function.identity()));
 
         //Create order details
         for (CartDetailRequest detail : cart) {
@@ -451,15 +456,15 @@ public class OrderServiceImpl implements OrderService {
                 }
 
                 //Coupon
-                Coupon shopCoupon = coupons.get(detail.getCoupon());
+                ICoupon shopCoupon = coupons.get(detail.getCoupon());
                 if (detail.getCoupon() != null && shopCoupon == null)
                     throw new ResourceNotFoundException("Coupon not found!");
 
                 if (shopCoupon != null
-                        && shopCoupon.getShop().getId().equals(shop.getId())
-                        && !couponService.isExpired(shopCoupon)) {
+                        && shopCoupon.getCoupon().getShop().getId().equals(shop.getId())
+                        && !couponService.isExpired(shopCoupon.getCoupon())) {
                     //Apply coupon (must use price with deal discount)
-                    CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(shopCoupon,
+                    CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(shopCoupon.getCoupon(),
                             new CartStateRequest(
                                     detailTotal - discountDeal,
                                     shippingFee,
@@ -469,7 +474,7 @@ public class OrderServiceImpl implements OrderService {
                     );
 
                     if (discountFromCoupon != null) {
-                        couponRepo.decreaseUsage(shopCoupon.getId()); //Decrease usage
+                        couponRepo.decreaseUsage(shopCoupon.getCoupon().getId()); //Decrease usage
                         discountCoupon = discountFromCoupon.discountValue();
                         discountShipping = discountFromCoupon.discountShipping();
                     } else {
@@ -493,6 +498,7 @@ public class OrderServiceImpl implements OrderService {
                 totalQuantity += detailQuantity;
                 totalShippingFee += shippingFee;
                 totalCouponDiscount += discountCoupon;
+                totalShippingDiscount += discountShipping;
                 totalDealDiscount += discountDeal;
 
                 //Set more detail
@@ -500,7 +506,7 @@ public class OrderServiceImpl implements OrderService {
                 orderDetail.setDiscount(discountValue);
                 orderDetail.setShippingFee(shippingFee);
                 orderDetail.setShippingDiscount(discountShipping);
-                orderDetail.setCoupon(shopCoupon);
+                orderDetail.setCoupon(shopCoupon != null ? shopCoupon.getCoupon() : null);
                 orderDetail.setTotalPrice(detailTotal);
                 orderDetail.setShippingFee(shippingFee);
 
@@ -510,18 +516,19 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //Main coupon
-        Coupon coupon = coupons.get(checkRequest.getCoupon());
+        ICoupon coupon = coupons.get(checkRequest.getCoupon());
         if (checkRequest.getCoupon() != null && coupon == null)
             throw new ResourceNotFoundException("Coupon not found!");
 
-        if (coupon != null && coupon.getShop() == null && !couponService.isExpired(coupon)) {
+        if (coupon != null && coupon.getCoupon().getShop() == null
+                && !couponService.isExpired(coupon.getCoupon())) {
             double discountValue = 0.0;
             double shippingDiscount = 0.0;
             double value = totalPrice - totalDealDiscount - totalCouponDiscount;
             double shipping = totalShippingFee - totalShippingDiscount;
 
             //Apply coupon (must use price with all discount)
-            CouponDiscountDTO discountAll = couponService.applyCoupon(coupon,
+            CouponDiscountDTO discountAll = couponService.applyCoupon(coupon.getCoupon(),
                     new CartStateRequest(
                             value,
                             shipping,
@@ -531,7 +538,7 @@ public class OrderServiceImpl implements OrderService {
             );
 
             if (discountAll != null) {
-                couponRepo.decreaseUsage(coupon.getId());
+                couponRepo.decreaseUsage(coupon.getCoupon().getId());
                 discountValue = discountAll.discountValue();
                 shippingDiscount = discountAll.discountShipping();
 
@@ -569,7 +576,7 @@ public class OrderServiceImpl implements OrderService {
         totalDiscount = totalCouponDiscount + totalDealDiscount + totalShippingDiscount;
 
         //Set value for receipt & return
-        orderReceipt.setCoupon(coupon);
+        orderReceipt.setCoupon(coupon != null ? coupon.getCoupon() : null);
         orderReceipt.setTotal(totalPrice + totalShippingFee);
         orderReceipt.setTotalDiscount(totalDiscount);
 

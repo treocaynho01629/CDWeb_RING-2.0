@@ -2,7 +2,8 @@ import PropTypes from "prop-types";
 import { Button, TextField, Box } from "@mui/material";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { NumberFormatBase } from "react-number-format";
-import { currencyFormat, marks } from "@ring/shared";
+import { currencyFormat } from "@ring/shared";
+import { marks } from "../../../ultils/filters";
 import CustomSlider from "../../custom/CustomSlider";
 
 const NumericFormatCustom = forwardRef(
@@ -35,7 +36,7 @@ const NumericFormatCustom = forwardRef(
         format={format}
       />
     );
-  },
+  }
 );
 
 NumericFormatCustom.propTypes = { onChange: PropTypes.func.isRequired };
@@ -74,7 +75,7 @@ const PriceRangeSlider = ({ value, onChange, disabledLabel }) => {
   const firstValue = useMemo(() => reverseCalculateValue(value[0]), [value[0]]);
   const secondValue = useMemo(
     () => reverseCalculateValue(value[1]),
-    [value[1]],
+    [value[1]]
   );
   const inputValue = useRef([...value]);
   const [rangeValue, setRangeValue] = useState([firstValue, secondValue]);

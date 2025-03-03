@@ -32,8 +32,17 @@ public class ShopController {
             @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
-        return new ResponseEntity<>(shopService.getDisplayShops(pageNo, pageSize, sortBy, sortDir, keyword), HttpStatus.OK);
+            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+            @RequestParam(value = "followed", required = false) Boolean followed,
+            @CurrentAccount Account currUser) {
+        return new ResponseEntity<>(shopService.getDisplayShops(
+                pageNo,
+                pageSize,
+                sortBy,
+                sortDir,
+                keyword,
+                followed,
+                currUser), HttpStatus.OK);
     }
 
     //Get shops
@@ -47,7 +56,14 @@ public class ShopController {
             @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
             @RequestParam(value = "userId", required = false) Long userId,
             @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(shopService.getShops(pageNo, pageSize, sortBy, sortDir, keyword, userId, currUser), HttpStatus.OK);
+        return new ResponseEntity<>(shopService.getShops(
+                pageNo,
+                pageSize,
+                sortBy,
+                sortDir,
+                keyword,
+                userId,
+                currUser), HttpStatus.OK);
     }
 
     @GetMapping("/preview")

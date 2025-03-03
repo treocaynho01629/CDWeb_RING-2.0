@@ -17,11 +17,12 @@ import { NavLink, useNavigate, useParams, useSearchParams } from "react-router";
 import { useGetCategoryQuery } from "../features/categories/categoriesApiSlice";
 import { useGetBooksQuery } from "../features/books/booksApiSlice";
 import { isEqual } from "lodash-es";
-import { useTitle, useDeepEffect, sortBy } from "@ring/shared";
+import { useTitle, useDeepEffect } from "@ring/shared";
+import { booksAmount, pageSizes, sortBooksBy } from "../ultils/filters";
 import AppPagination from "../components/custom/AppPagination";
 import CustomDivider from "../components/custom/CustomDivider";
 import FilteredProducts from "../components/product/filter/FilteredProducts";
-import SortList from "../components/product/filter/SortList";
+import FilterSortList from "../components/product/filter/FilterSortList";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 
 const FilterList = lazy(
@@ -71,11 +72,11 @@ const DEFAULT_FILTERS = {
 };
 const DEFAULT_PAGINATION = {
   number: 0,
-  size: 24,
+  size: pageSizes[1],
   totalPages: 0,
-  sortBy: sortBy[0].value,
+  sortBy: sortBooksBy[0].value,
   sortDir: "desc",
-  amount: 1,
+  amount: booksAmount[0].value,
 };
 
 const createCrumbs = (cate) => {
@@ -180,7 +181,13 @@ const FiltersPage = () => {
   //Go to first page on change + update path
   useDeepEffect(() => {
     handleChangePage(1);
-  }, [filters]);
+  }, [
+    filters,
+    pagination.size,
+    pagination.sortBy,
+    pagination.sortDir,
+    pagination.amount,
+  ]);
   useEffect(() => {
     updatePath();
   }, [pagination]);
@@ -304,7 +311,7 @@ const FiltersPage = () => {
       <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
         {!loadCate ? (
           [
-            <NavLink to={"/store/"} end key={"store"}>
+            <NavLink to={"/store"} end key={"store"}>
               Danh mục sản phẩm
             </NavLink>,
             cSlug && createCrumbs(currCate),
@@ -363,7 +370,7 @@ const FiltersPage = () => {
           position="relative"
         >
           <CustomDivider sx={{ display: { xs: "none", md: "flex" } }}>
-            DANH MỤC SẢN PHẨM{" "}
+            DANH MỤC SẢN PHẨM
           </CustomDivider>
           {!tabletMode && (
             <Suspense fallback={null}>
@@ -382,8 +389,8 @@ const FiltersPage = () => {
               />
             </Suspense>
           )}
-          <SortList
-            {...{ filters, pagination, mobileMode, setOpen, isChanged }}
+          <FilterSortList
+            {...{ pagination, mobileMode, setOpen, isChanged }}
             onOpenPagination={handleOpenPagination}
             onChangeOrder={handleChangeOrder}
             onChangeDir={handleChangeDir}
@@ -392,7 +399,7 @@ const FiltersPage = () => {
           />
           <FilteredProducts {...{ data, error, loading }} />
           <AppPagination
-            {...{ pagination, mobileMode }}
+            pagination={pagination}
             onPageChange={handleChangePage}
             onSizeChange={handleChangeSize}
           />
