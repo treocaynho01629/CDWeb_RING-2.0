@@ -109,7 +109,7 @@ const ProductDetailContainer = ({ loading, book, tabletMode }) => {
   } = useGetBooksQuery(
     {
       cateId: book?.category?.id,
-      size: 4,
+      size: 8,
     },
     { skip: !book?.category?.id }
   );

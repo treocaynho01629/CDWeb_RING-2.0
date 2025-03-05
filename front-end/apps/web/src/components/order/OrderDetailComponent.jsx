@@ -267,7 +267,6 @@ const OrderDetailComponent = ({
   order,
   pending,
   setPending,
-  isLoading,
   tabletMode,
   mobileMode,
 }) => {
@@ -370,13 +369,13 @@ const OrderDetailComponent = ({
           </Link>
           <Receipt />
           &nbsp;Mã vận đơn&nbsp;
-          {isLoading ? (
+          {!order ? (
             <Skeleton variant="text" width={100} />
           ) : (
             idFormatter(order?.orderId)
           )}
           &emsp;
-          {isLoading ? (
+          {!order ? (
             <StatusTag color="secondary">Đang tải</StatusTag>
           ) : (
             <StatusTag color={detailStatus?.color}>
@@ -385,7 +384,7 @@ const OrderDetailComponent = ({
           )}
         </TitleContainer>
         <SubTitle>
-          {isLoading ? (
+          {!order ? (
             <Skeleton variant="text" width={130} />
           ) : (
             `${timeFormatter(orderedDate)} ${dateFormatter(orderedDate)}`
@@ -393,7 +392,7 @@ const OrderDetailComponent = ({
         </SubTitle>
       </StyledDialogTitle>
       <DialogContent sx={{ px: { xs: 0, sm: 2, md: 0 }, mt: { xs: 1, md: 0 } }}>
-        {isLoading ? (
+        {!order ? (
           <Skeleton
             variant="rectangular"
             sx={{
@@ -435,7 +434,7 @@ const OrderDetailComponent = ({
           <SummaryContainer>
             <Box>
               <SubText>
-                {isLoading ? (
+                {!order ? (
                   <Skeleton variant="text" width={280} />
                 ) : (
                   detailSummary?.summary
@@ -443,7 +442,7 @@ const OrderDetailComponent = ({
               </SubText>
             </Box>
             <Box>
-              {isLoading ? (
+              {!order ? (
                 <MainButton
                   disabled
                   variant="contained"
@@ -514,14 +513,14 @@ const OrderDetailComponent = ({
               <InfoContainer>
                 <div>
                   <Name>
-                    {isLoading ? (
+                    {!order ? (
                       <Skeleton variant="text" width={150} />
                     ) : (
                       (order?.companyName ?? order?.name) + " "
                     )}
                   </Name>
                   <InfoText>
-                    {isLoading ? (
+                    {!order ? (
                       <Skeleton variant="text" width={140} />
                     ) : (
                       `(+84) ${order?.phone}`
@@ -529,7 +528,7 @@ const OrderDetailComponent = ({
                   </InfoText>
                 </div>
                 <InfoText>
-                  {isLoading ? (
+                  {!order ? (
                     <Box width="100%">
                       <Skeleton variant="text" width="100%" />
                       <Skeleton variant="text" width="30%" />
@@ -545,7 +544,7 @@ const OrderDetailComponent = ({
                 <Box mb={1}>
                   <Name>Hình thức giao hàng:</Name>
                   <InfoText>
-                    {isLoading ? (
+                    {!order ? (
                       <Skeleton variant="text" width={200} />
                     ) : (
                       <>
@@ -557,7 +556,7 @@ const OrderDetailComponent = ({
                     )}
                   </InfoText>
                   <InfoText className="price">
-                    {isLoading ? (
+                    {!order ? (
                       <Skeleton variant="text" width={190} />
                     ) : (
                       `Phí vận chuyển ${currencyFormat.format(shippingSummary?.price)}`
@@ -580,9 +579,9 @@ const OrderDetailComponent = ({
           <Inbox />
           &nbsp;Kiện hàng
         </Title>
-        <OrderReceipt {...{ order, isLoading, tabletMode }} />
+        <OrderReceipt {...{ order, tabletMode }} />
         <ButtonContainer>
-          {isLoading ? (
+          {!order ? (
             <MobileButton>
               <Skeleton variant="text" width={150} />
               <MobileExtendButton>
@@ -616,7 +615,7 @@ const OrderDetailComponent = ({
         </ButtonContainer>
         {tabletMode && (
           <MainButtonContainer>
-            {isLoading ? (
+            {!order ? (
               <MainButton
                 disabled
                 variant="contained"

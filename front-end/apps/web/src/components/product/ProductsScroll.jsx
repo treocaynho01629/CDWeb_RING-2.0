@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import Progress from "@ring/ui/Progress";
 import ProductPreview from "./ProductPreview";
 import { trackWindowScroll } from "react-lazy-load-image-component";
+import { Fragment } from "react";
 
 //#region styled
 const Container = styled.div`
@@ -12,16 +13,17 @@ const Container = styled.div`
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     width: auto;
+    padding: 0 ${({ theme }) => theme.spacing(1)};
   }
 `;
-
-const ProductContainer = styled.div``;
 
 const SliderContainer = styled.div`
   -ms-overflow-style: none;
   scrollbar-width: none;
   display: flex;
   flex-direction: ${({ direction }) => direction || "column"};
+  max-height: 950px;
+  overflow-y: hidden;
 
   &::-webkit-scrollbar {
     display: none;
@@ -30,7 +32,6 @@ const SliderContainer = styled.div`
   ${({ theme }) => theme.breakpoints.down("md")} {
     width: 100%;
     flex-direction: row;
-    overflow-y: hidden;
   }
 `;
 //#endregion
@@ -66,9 +67,9 @@ const ProductsScroll = ({
             const book = entities[id];
 
             return (
-              <ProductContainer key={`${id}-${index}`}>
+              <div key={`${id}-${index}`}>
                 <ProductPreview {...{ book, scrollPosition }} />
-              </ProductContainer>
+              </div>
             );
           }),
         ]

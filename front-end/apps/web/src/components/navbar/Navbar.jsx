@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useState } from "react";
+import { lazy, Suspense, useCallback, useRef, useState } from "react";
 import {
   Mail,
   Phone,
@@ -24,6 +24,7 @@ import {
   useTheme,
   useScrollTrigger,
   useColorScheme,
+  alpha,
 } from "@mui/material";
 import { Link, useLocation } from "react-router";
 import { LogoImage } from "@ring/ui/Components";
@@ -39,7 +40,7 @@ const ProfilePopover = lazy(() => import("./ProfilePopover"));
 
 //#region styled
 const Wrapper = styled.div`
-  padding: 5px 10px;
+  padding: 5px;
 
   ${({ theme }) => theme.breakpoints.up("sm_md")} {
     padding: 5px 20px;
@@ -186,18 +187,9 @@ const StyledAppBar = styled(AppBar)`
   background-color: ${({ theme }) => theme.palette.background.paper};
   border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
   box-shadow: none;
-  transition: all 0.15s ease;
 
-  &.top {
-    background-color: transparent;
-    border-color: transparent;
-
-    ${Logo} {
-      filter: drop-shadow(
-        0px -1000px 0 ${({ theme }) => theme.palette.text.primary}
-      );
-      transform: translateY(1000px);
-    }
+  ${Logo} {
+    filter: brightness(0) invert(1);
   }
 
   ${({ theme }) => theme.breakpoints.down("md")} {
@@ -205,27 +197,27 @@ const StyledAppBar = styled(AppBar)`
   }
 `;
 
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  borderRadius: 0,
+const StyledIconButton = styled(IconButton)`
+  border-radius: 0;
 
-  "&:hover": {
-    backgroundColor: "transparent",
-    color: theme.palette.primary.main,
-  },
+  &:hover {
+    background-color: transparent;
+    color: ${({ theme }) => theme.palette.primary.main};
+  }
 
-  "&.nav": {
-    display: "flex",
-    width: "90px",
-    justifyContent: "flex-start",
+  &.nav {
+    display: flex;
+    width: 90px;
+    justify-content: flex-start;
 
-    [theme.breakpoints.down("md_lg")]: {
-      justifyContent: "center",
-      flexDirection: "column",
-      width: "70px",
-      transform: "translateY(-5px)",
-    },
-  },
-}));
+    ${({ theme }) => theme.breakpoints.down("md_lg")} {
+      justify-content: center;
+      flex-direction: column;
+      width: 70px;
+      transform: translateY(-5px);
+    }
+  }
+`;
 
 const IconText = styled.p`
   font-size: 13px;
@@ -249,6 +241,10 @@ const Navbar = () => {
   const tabletMode = useMediaQuery(theme.breakpoints.down("md"));
 
   //Transparent trigger
+  const opacityRef = useRef(0);
+  const testRef = useRef(null);
+  const logoRef = useRef(null);
+  const [triggerValue, setTriggerValue] = useState(0);
   const trigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 20,
@@ -310,6 +306,38 @@ const Navbar = () => {
       setMode("system");
     }
   };
+
+  const handleWindowScroll = (e) => {
+    let body = document.body; //IE 'quirks'
+    let element = document.documentElement; //IE with doctype
+    element = element.clientHeight ? element : body;
+
+    let opacity = element.scrollTop / 300;
+
+    if (opacity < 1) {
+      opacityRef.current = opacity;
+    } else {
+      opacityRef.current = 1;
+    }
+
+    if (true) {
+      if (testRef.current) {
+        const currValue = opacityRef.current;
+        testRef.current.style.backgroundColor = alpha(
+          theme.palette.background.paper,
+          currValue
+        );
+        testRef.current.style.borderColor = alpha(
+          theme.palette.divider,
+          currValue * 0.12
+        );
+        logoRef.current.style.filter = `brightness(${currValue}) invert(${1 - currValue})`;
+      }
+    }
+  };
+
+  const windowScrollListener = useCallback(handleWindowScroll, []);
+  window.addEventListener("scroll", windowScrollListener);
   //#endregion
 
   const isToggleSearch = focus || toggle;
@@ -349,8 +377,10 @@ const Navbar = () => {
         </Grid>
       </TopHeader>
       <StyledAppBar
-        className={!tabletMode || trigger ? "" : "top"}
+        // className={!tabletMode || trigger ? "" : "top"}
         elevation={0}
+        // opacity={triggerValue}
+        ref={testRef}
       >
         <Wrapper>
           <Grid container size="grow">
@@ -389,7 +419,10 @@ const Navbar = () => {
                   </>
                 )}
                 <Link to={`/`}>
-                  <Logo className={isToggleSearch ? "active" : ""}>
+                  <Logo
+                    className={isToggleSearch ? "active" : ""}
+                    ref={logoRef}
+                  >
                     <LogoImage src="/full-logo.svg" alt="RING! logo" />
                   </Logo>
                 </Link>
@@ -413,6 +446,7 @@ const Navbar = () => {
                     {...{
                       searchField,
                       setSearchField,
+                      toggle,
                       setToggle,
                       setFocus,
                       isToggleSearch,
