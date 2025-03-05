@@ -10,7 +10,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import { Paper, LinearProgress } from "@mui/material";
+import { Paper } from "@mui/material";
 import { SsidChart } from "@mui/icons-material";
 import { useGetSalesQuery } from "../../features/orders/ordersApiSlice";
 import { currencyFormat } from "@ring/shared";

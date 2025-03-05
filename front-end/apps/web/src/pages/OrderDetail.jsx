@@ -1,5 +1,10 @@
 import { idFormatter, useTitle } from "@ring/shared";
-import { useNavigate, useOutletContext, useParams } from "react-router";
+import {
+  Navigate,
+  useNavigate,
+  useOutletContext,
+  useParams,
+} from "react-router";
 import { TabContentContainer } from "../components/custom/ProfileComponents";
 import { useGetOrderDetailQuery } from "../features/orders/ordersApiSlice";
 import { Dialog } from "@mui/material";
@@ -11,7 +16,8 @@ const OrderDetail = () => {
   const { tabletMode, mobileMode } = useOutletContext();
   const navigate = useNavigate();
   const [pending, setPending] = useState(false);
-  const { data, isLoading, isError, error } = useGetOrderDetailQuery(id);
+  const { data, isLoading, isSuccess, isError, error } =
+    useGetOrderDetailQuery(id);
 
   //Set title
   useTitle(`Chi tiết đơn hàng ${idFormatter(id)}`);
@@ -23,11 +29,48 @@ const OrderDetail = () => {
         pending,
         setPending,
         isLoading,
+        isError,
+        error,
         tabletMode,
         mobileMode,
       }}
     />
   );
+
+  if (isLoading) {
+    content = (
+      <OrderDetailComponent
+        {...{
+          tabletMode,
+          mobileMode,
+        }}
+      />
+    );
+  } else if (isSuccess) {
+    content = (
+      <OrderDetailComponent
+        {...{
+          order: data,
+          pending,
+          setPending,
+          isLoading,
+          tabletMode,
+          mobileMode,
+        }}
+      />
+    );
+  } else if (isError && error?.status === 404) {
+    content = <Navigate to={"/missing"} replace />;
+  } else {
+    content = (
+      <OrderDetailComponent
+        {...{
+          tabletMode,
+          mobileMode,
+        }}
+      />
+    );
+  }
 
   return (
     <div>

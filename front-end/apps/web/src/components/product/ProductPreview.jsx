@@ -24,11 +24,16 @@ const Container = styled.div`
     box-shadow: ${({ theme }) => theme.shadows[1]};
   }
 
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    min-width: 142px;
+    padding: 0 4px 4px;
+    margin: 0 ${({ theme }) => theme.spacing(0.1)};
+  }
+
   ${({ theme }) => theme.breakpoints.down("sm")} {
     min-width: 110px;
     max-width: 120px;
     padding: 0;
-    margin: 0 ${({ theme }) => theme.spacing(0.1)};
   }
 `;
 

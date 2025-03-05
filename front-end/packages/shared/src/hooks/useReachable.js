@@ -8,14 +8,14 @@ const useReachable = () => {
     });
     const request = fetch(import.meta.env.VITE_API_URL + "/api/v1/ping");
     return Promise.race([timeout, request])
-      .then((response) => {
+      .then(async (response) => {
         console.log("Connected");
       })
       .catch(async (error) => {
         const { enqueueSnackbar } = await import("notistack");
-        enqueueSnackbar("Server có thể mất một lúc để khởi động!", {
+        enqueueSnackbar("Mất kết nối với Server!", {
           variant: "warning",
-          autoHideDuration: 30000,
+          persist: true,
           preventDuplicate: true,
         });
       });

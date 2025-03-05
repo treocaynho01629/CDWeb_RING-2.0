@@ -10,10 +10,7 @@ const Snackbar = forwardRef(({ id, ...props }, ref) => {
   }, [id, closeSnackbar]);
 
   return (
-    <SnackbarContent
-      ref={ref}
-      style={{ width: "100%", backgroundColor: "red" }}
-    >
+    <SnackbarContent ref={ref}>
       <Alert
         onClose={handleCloseSnackbar}
         severity={props.variant ?? "success"}

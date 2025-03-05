@@ -72,7 +72,7 @@ export const theme = createTheme({
                   thumb: theme.palette.action.disabled,
                   active: theme.palette.text.primary,
                 }
-              : undefined,
+              : undefined
           ),
           scrollbarWidth: "thin",
         },

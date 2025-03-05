@@ -30,10 +30,12 @@ import {
   StyledLazyImage,
   StyledSkeleton,
   ToggleArrow,
-  PlaceholderContainer,
-  LoadContainer,
 } from "../custom/OrderComponents";
 import { useState } from "react";
+import {
+  LoadContainer,
+  PlaceholderContainer,
+} from "../custom/ProfileComponents";
 
 //#region styled
 const OrderItemContainer = styled.div`
@@ -181,7 +183,7 @@ const Amount = styled.span`
 `;
 //#endregion
 
-const OrderReceipt = ({ order, isLoading, tabletMode }) => {
+const OrderReceipt = ({ order, tabletMode }) => {
   const [open, setOpen] = useState(false);
   const paymentSummary = paymentTypes[order?.paymentType];
 
@@ -193,7 +195,7 @@ const OrderReceipt = ({ order, isLoading, tabletMode }) => {
     <ItemsContainer>
       <OrderItemContainer>
         <HeadContainer>
-          {isLoading ? (
+          {!order ? (
             <>
               <Shop>
                 <Skeleton variant="text" width={200} />
@@ -218,7 +220,7 @@ const OrderReceipt = ({ order, isLoading, tabletMode }) => {
             </>
           )}
         </HeadContainer>
-        {isLoading ? (
+        {!order ? (
           <PlaceholderContainer>
             <LoadContainer>
               <CircularProgress color="primary" />
@@ -298,7 +300,7 @@ const OrderReceipt = ({ order, isLoading, tabletMode }) => {
               <PriceRow>
                 <PriceText className="secondary">Tiền hàng:</PriceText>
                 <PriceText>
-                  {isLoading ? (
+                  {!order ? (
                     <Skeleton variant="text" width={90} />
                   ) : (
                     currencyFormat.format(order?.totalPrice)
@@ -308,7 +310,7 @@ const OrderReceipt = ({ order, isLoading, tabletMode }) => {
               <PriceRow>
                 <PriceText className="secondary">Phí vận chuyển:</PriceText>
                 <PriceText>
-                  {isLoading ? (
+                  {!order ? (
                     <Skeleton variant="text" width={85} />
                   ) : (
                     currencyFormat.format(order?.shippingFee)
@@ -342,7 +344,7 @@ const OrderReceipt = ({ order, isLoading, tabletMode }) => {
             <PriceRow onClick={togglePrice}>
               <PriceText>Tổng:</PriceText>
               <FinalPrice color="primary">
-                {isLoading ? (
+                {!order ? (
                   <Skeleton variant="text" width={90} />
                 ) : (
                   currencyFormat.format(
@@ -366,7 +368,7 @@ const OrderReceipt = ({ order, isLoading, tabletMode }) => {
                   Hình thức thanh toán:
                 </PriceText>
                 <PriceText color="warning">
-                  {isLoading ? (
+                  {!order ? (
                     <Skeleton variant="text" width={150} />
                   ) : (
                     paymentSummary?.label

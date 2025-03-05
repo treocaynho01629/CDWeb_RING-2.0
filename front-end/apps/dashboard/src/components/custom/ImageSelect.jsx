@@ -7,15 +7,15 @@ import { Badge } from "@mui/material";
 //#region styled
 const getColor = (props) => {
   if (props.isDragAccept) {
-    return theme.palette.success.main;
+    return props.theme.palette.success.main;
   }
   if (props.isDragReject) {
-    return theme.palette.error.main;
+    return props.theme.palette.error.main;
   }
   if (props.isFocused) {
-    return theme.palette.info.main;
+    return props.theme.palette.info.main;
   }
-  return theme.palette.divider;
+  return props.theme.palette.divider;
 };
 
 const CustomBadge = styled(Badge)`
