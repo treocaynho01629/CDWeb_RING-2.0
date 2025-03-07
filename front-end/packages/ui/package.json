@@ -15,7 +15,6 @@
     "./PasswordInput": "./src/components/PasswordInput.jsx",
     "./Placeholder": "./src/components/Placeholder.jsx",
     "./Progress": "./src/components/Progress.jsx",
-    "./ScrollToTopButton": "./src/components/ScrollToTopButton.jsx",
     "./Snackbar": "./src/components/Snackbar.jsx",
     "./FallbackLogo": "./src/layout/FallbackLogo.jsx",
     "./Layout": "./src/layout/Layout.jsx",
@@ -29,17 +28,18 @@
     "./ThemeContextProvider": "./src/provider/ThemeContextProvider.jsx"
   },
   "scripts": {
-    "lint": "eslint \"**/*.{ts,tsx,js,jsx}\""
+    "lint": "eslint \"**/*.{ts,tsx,js,jsx}\"",
+    "update-dependencies": "npx npm-check-updates -u"
   },
   "dependencies": {
-    "@mui/styles": "^6.4.6",
-    "@mui/x-date-pickers": "^7.15.0",
+    "@mui/styles": "^6.4.7",
+    "@mui/x-date-pickers": "^7.27.1",
     "@ring/shared": "*",
     "yet-another-react-lightbox": "^3.21.7"
   },
   "devDependencies": {
     "@ring/eslint-config": "*",
-    "eslint": "^8.57.0"
+    "eslint": "^9.21.0"
   },
   "peerDependencies": {
     "@emotion/react": "^11.11.4",

@@ -1,4 +1,4 @@
-import { useMediaQuery, useTheme } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
 import Lightbox from "yet-another-react-lightbox";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
@@ -8,8 +8,7 @@ import "yet-another-react-lightbox/plugins/thumbnails.css";
 import "yet-another-react-lightbox/plugins/counter.css";
 
 const LightboxImages = ({ images, open, handleClose }) => {
-  const theme = useTheme();
-  const mobileMode = useMediaQuery(theme.breakpoints.down("sm"));
+  const mobileMode = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
   return (
     <Lightbox

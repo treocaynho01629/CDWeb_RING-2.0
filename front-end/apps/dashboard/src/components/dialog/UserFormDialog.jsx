@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, useMediaQuery, useTheme } from "@mui/material";
+import { Button, useMediaQuery } from "@mui/material";
 import {
   TextField,
   Dialog,
@@ -27,8 +27,7 @@ import ImageSelect from "../custom/ImageSelect";
 
 const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
   //#region construct
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const fullScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const [file, setFile] = useState([]);
   const [pic, setPic] = useState(user?.image || null);
   const [username, setUserName] = useState(user?.username || "");

@@ -24,7 +24,7 @@ const ReviewsContainer = styled.div`
 
 const defaultSize = 5;
 
-const ReviewsList = ({ mobileMode, pending, setPending }) => {
+const ReviewsList = ({ mobileMode, tabletMode, pending, setPending }) => {
   const { username } = useAuth();
   const [openForm, setOpenForm] = useState(undefined);
   const [contextReview, setContextReview] = useState(null);
@@ -78,9 +78,20 @@ const ReviewsList = ({ mobileMode, pending, setPending }) => {
   const windowScrollListener = useCallback(debounce(handleWindowScroll, 500), [
     data,
   ]);
+
   const scrollListener = useCallback(debounce(handleScroll, 500), [data]);
 
-  window.addEventListener("scroll", windowScrollListener);
+  useEffect(() => {
+    if (tabletMode) {
+      window.removeEventListener("scroll", windowScrollListener);
+    } else {
+      window.addEventListener("scroll", windowScrollListener);
+    }
+
+    return () => {
+      window.removeEventListener("scroll", windowScrollListener);
+    };
+  }, [tabletMode]);
 
   let reviewsContent;
 
@@ -132,7 +143,7 @@ const ReviewsList = ({ mobileMode, pending, setPending }) => {
   return (
     <>
       <Title color="primary">
-        <Link to={"/profile/detail"}>
+        <Link to={-1}>
           <KeyboardArrowLeft />
         </Link>
         <Try />
@@ -140,7 +151,7 @@ const ReviewsList = ({ mobileMode, pending, setPending }) => {
       </Title>
       <DialogContent
         sx={{ py: 0, px: { xs: 1, sm: 2, md: 0 } }}
-        onScroll={scrollListener}
+        onScroll={tabletMode ? scrollListener : undefined}
       >
         <ReviewsContainer>
           {reviewsContent}

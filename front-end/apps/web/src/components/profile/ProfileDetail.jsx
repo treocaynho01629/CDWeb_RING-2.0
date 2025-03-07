@@ -275,7 +275,7 @@ const ProfileDetail = ({
   return (
     <>
       <StyledDialogTitle>
-        <Link to={"/profile/detail"}>
+        <Link to={-1}>
           <KeyboardArrowLeft />
         </Link>
         <Person />

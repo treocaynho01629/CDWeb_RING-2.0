@@ -57,8 +57,8 @@ const ShopSelect = ({ open, anchorEl, handleClose, shop, setShop, data }) => {
             ml: -0.5,
           },
         },
+        list: { sx: { padding: 0.5 } },
       }}
-      MenuListProps={{ sx: { padding: 0.5 } }}
       transformOrigin={{ horizontal: "left", vertical: "top" }}
       anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
     >

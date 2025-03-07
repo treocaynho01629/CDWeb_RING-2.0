@@ -1,4 +1,11 @@
-import { lazy, Suspense, useCallback, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Mail,
   Phone,
@@ -11,6 +18,8 @@ import {
   Storefront,
   ShoppingCartOutlined,
   NotificationsOutlined,
+  Search,
+  KeyboardArrowLeft,
 } from "@mui/icons-material";
 import {
   Stack,
@@ -21,8 +30,6 @@ import {
   Grid2 as Grid,
   AppBar,
   useMediaQuery,
-  useTheme,
-  useScrollTrigger,
   useColorScheme,
   alpha,
 } from "@mui/material";
@@ -160,7 +167,6 @@ const Logo = styled.h2`
   margin: 5px 10px 5px 15px;
   white-space: nowrap;
   overflow: hidden;
-  transition: width 0.25s ease;
 
   &.active {
     ${({ theme }) => theme.breakpoints.down("md")} {
@@ -180,20 +186,16 @@ const NavItem = styled.div`
   margin-left: 15px;
 `;
 
-const StyledAppBar = styled(AppBar)`
-  position: sticky;
-  top: -0.5px;
-  margin-bottom: 2px;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
-  box-shadow: none;
+const SearchContainer = styled.div`
+  display: flex;
+  width: 40ch;
 
-  ${Logo} {
-    filter: brightness(0) invert(1);
+  ${({ theme }) => theme.breakpoints.down("lg")} {
+    width: 35ch;
   }
 
   ${({ theme }) => theme.breakpoints.down("md")} {
-    margin-bottom: 0;
+    width: 100%;
   }
 `;
 
@@ -219,6 +221,51 @@ const StyledIconButton = styled(IconButton)`
   }
 `;
 
+const StyledAppBar = styled(AppBar)`
+  --scroll-progress: 1;
+
+  position: sticky;
+  top: -0.5px;
+  margin-bottom: 2px;
+  border-bottom: 0.5px solid;
+  border-color: ${({ theme }) => theme.palette.action.focus};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  box-shadow: none;
+
+  svg {
+    font-size: 26px;
+  }
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    margin-bottom: 0;
+    border-color: ${({ theme }) =>
+      `rgb(from ${theme.palette.action.focus} r g b / calc(var(--scroll-progress) * ${theme.palette.action.focusOpacity}))`};
+    background-color: ${({ theme }) =>
+      `rgb(from ${theme.palette.background.paper} r g b / var(--scroll-progress))`};
+  }
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    ${Logo} {
+      filter: ${({ theme }) =>
+        `drop-shadow(0px -1000px 0 rgb(from ${theme.palette.text.primary} r g b / calc(1 - var(--scroll-progress))))`};
+      transform: translateY(calc((1 - round(var(--scroll-progress))) * 1000px));
+    }
+
+    ${StyledIconButton} {
+      border-radius: 50%;
+      background-color: ${({ theme }) =>
+        alpha(
+          theme.palette.background.paper,
+          theme.palette.action.activatedOpacity
+        )};
+
+      svg {
+        font-size: 22px;
+      }
+    }
+  }
+`;
+
 const IconText = styled.p`
   font-size: 13px;
   margin: 0;
@@ -237,23 +284,16 @@ const Navbar = () => {
   const { cartProducts } = useCart();
   const { mode, setMode } = useColorScheme();
   const location = useLocation();
-  const theme = useTheme();
-  const tabletMode = useMediaQuery(theme.breakpoints.down("md"));
+  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md"));
 
-  //Transparent trigger
-  const opacityRef = useRef(0);
-  const testRef = useRef(null);
-  const logoRef = useRef(null);
-  const [triggerValue, setTriggerValue] = useState(0);
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 20,
-  });
-
-  //Search field expand
+  //Search
   const [searchField, setSearchField] = useState("");
   const [focus, setFocus] = useState(false);
   const [toggle, setToggle] = useState(searchField !== "");
+
+  const toggleSearch = () => {
+    setToggle((prev) => !prev);
+  };
 
   //Drawer open state
   const [openDrawer, setOpenDrawer] = useState(undefined);
@@ -307,6 +347,10 @@ const Navbar = () => {
     }
   };
 
+  //Transparent trigger
+  const opacityRef = useRef(0);
+  const navRef = useRef(null);
+
   const handleWindowScroll = (e) => {
     let body = document.body; //IE 'quirks'
     let element = document.documentElement; //IE with doctype
@@ -320,24 +364,34 @@ const Navbar = () => {
       opacityRef.current = 1;
     }
 
-    if (true) {
-      if (testRef.current) {
-        const currValue = opacityRef.current;
-        testRef.current.style.backgroundColor = alpha(
-          theme.palette.background.paper,
-          currValue
-        );
-        testRef.current.style.borderColor = alpha(
-          theme.palette.divider,
-          currValue * 0.12
-        );
-        logoRef.current.style.filter = `brightness(${currValue}) invert(${1 - currValue})`;
-      }
+    handleChangeStyles();
+  };
+
+  const handleChangeStyles = () => {
+    if (navRef.current) {
+      navRef.current.style.setProperty("--scroll-progress", opacityRef.current);
+    }
+  };
+
+  const handleResetStyles = () => {
+    if (navRef.current) {
+      navRef.current.style.setProperty("--scroll-progress", "1");
     }
   };
 
   const windowScrollListener = useCallback(handleWindowScroll, []);
-  window.addEventListener("scroll", windowScrollListener);
+
+  useEffect(() => {
+    if (tabletMode) {
+      window.addEventListener("scroll", windowScrollListener);
+    } else {
+      window.removeEventListener("scroll", windowScrollListener);
+    }
+    handleResetStyles();
+    return () => {
+      window.removeEventListener("scroll", windowScrollListener);
+    };
+  }, [tabletMode]);
   //#endregion
 
   const isToggleSearch = focus || toggle;
@@ -376,12 +430,7 @@ const Navbar = () => {
           </Grid>
         </Grid>
       </TopHeader>
-      <StyledAppBar
-        // className={!tabletMode || trigger ? "" : "top"}
-        elevation={0}
-        // opacity={triggerValue}
-        ref={testRef}
-      >
+      <StyledAppBar elevation={0} ref={navRef} enableColorOnDark>
         <Wrapper>
           <Grid container size="grow">
             <Grid
@@ -396,9 +445,11 @@ const Navbar = () => {
                       flex={1}
                       alignItems="center"
                     >
-                      <IconButton onClick={() => handleToggleDrawer(true)}>
+                      <StyledIconButton
+                        onClick={() => handleToggleDrawer(true)}
+                      >
                         <Menu sx={{ fontSize: 26 }} />
-                      </IconButton>
+                      </StyledIconButton>
                     </Box>
                     <Suspense fallback={null}>
                       <NavDrawer
@@ -418,11 +469,8 @@ const Navbar = () => {
                     </Suspense>
                   </>
                 )}
-                <Link to={`/`}>
-                  <Logo
-                    className={isToggleSearch ? "active" : ""}
-                    ref={logoRef}
-                  >
+                <Link to={"/"}>
+                  <Logo className={isToggleSearch ? "active" : ""}>
                     <LogoImage src="/full-logo.svg" alt="RING! logo" />
                   </Logo>
                 </Link>
@@ -439,19 +487,26 @@ const Navbar = () => {
                 >
                   <Link to={"/store"} title="Duyệt cửa hàng">
                     <StyledIconButton aria-label="explore">
-                      <Storefront sx={{ fontSize: "26px" }} />
+                      <Storefront />
                     </StyledIconButton>
                   </Link>
-                  <SearchInput
-                    {...{
-                      searchField,
-                      setSearchField,
-                      toggle,
-                      setToggle,
-                      setFocus,
-                      isToggleSearch,
-                    }}
-                  />
+                  {isToggleSearch && (
+                    <SearchContainer>
+                      <SearchInput
+                        {...{
+                          searchField,
+                          setSearchField,
+                        }}
+                      />
+                    </SearchContainer>
+                  )}
+                  <StyledIconButton
+                    aria-label="search toggle"
+                    onClick={toggleSearch}
+                    sx={{ mr: { xs: 0.3, md: 0 } }}
+                  >
+                    {isToggleSearch ? <KeyboardArrowLeft /> : <Search />}
+                  </StyledIconButton>
                 </Box>
               </Left>
             </Grid>

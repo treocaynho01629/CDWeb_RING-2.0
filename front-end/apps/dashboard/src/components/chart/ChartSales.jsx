@@ -38,7 +38,7 @@ const TooltipValue = styled.p`
   width: 100%;
 
   span {
-    color: ${({ props }) => color};
+    color: ${({ color }) => color};
   }
 `;
 
@@ -89,9 +89,7 @@ function YearsSelect({ year, setYear }) {
   );
 }
 
-const CustomTooltip = ({ active, payload, label }) => {
-  const theme = useTheme();
-
+const CustomTooltip = ({ active, payload, label, theme }) => {
   if (active && payload && payload.length) {
     const discount = payload[0];
     const sales = payload[1];
@@ -105,7 +103,7 @@ const CustomTooltip = ({ active, payload, label }) => {
         <TooltipValue color={discount.color}>
           Giảm giá:&emsp;<span>{currencyFormat.format(-discount.value)}</span>
         </TooltipValue>
-        <TooltipValue color={theme.palette.error.main}>
+        <TooltipValue color={theme.palette.primary.main}>
           Tổng:&emsp;
           <span>{currencyFormat.format(sales.value - discount.value)}</span>
         </TooltipValue>
@@ -191,7 +189,7 @@ const ChartSales = () => {
             tickFormatter={(label) => `${axisFormat.format(label)}`}
             tick={{ fontSize: 11 }}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip theme={theme} />} />
           <Legend
             verticalAlign="top"
             align="left"

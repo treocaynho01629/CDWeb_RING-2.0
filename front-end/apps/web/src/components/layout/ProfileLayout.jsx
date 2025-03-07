@@ -2,16 +2,15 @@ import Grid from "@mui/material/Grid2";
 import ProfileTabsList from "../profile/ProfileTabsList";
 import { Outlet, useMatch } from "react-router";
 import { useGetProfileQuery } from "../../features/users/usersApiSlice";
-import { useMediaQuery, useTheme } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
 import { Suspense, lazy, useState } from "react";
 
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 
 export default function ProfileLayout() {
   const showTabs = useMatch("/profile/detail");
-  const theme = useTheme();
-  const tabletMode = useMediaQuery(theme.breakpoints.down("md"));
-  const mobileMode = useMediaQuery(theme.breakpoints.down("sm"));
+  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md"));
+  const mobileMode = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const [pending, setPending] = useState(false);
 
   //Fetch current profile

@@ -116,7 +116,7 @@ const StyledListItemIcon = styled(ListItemIcon)(({ theme }) => ({
 }));
 //#endregion
 
-const NavDrawer = ({ open, setOpen, mobileMode }) => {
+const NavDrawer = ({ open, setOpen, tabletMode }) => {
   const { roles } = useAuth();
   const [openList, setOpenList] = useState(true);
   const isAdmin = roles?.find((role) =>
@@ -253,7 +253,7 @@ const NavDrawer = ({ open, setOpen, mobileMode }) => {
 
   return (
     <>
-      {mobileMode ? (
+      {tabletMode ? (
         <Drawer
           variant="temporary"
           open={open}

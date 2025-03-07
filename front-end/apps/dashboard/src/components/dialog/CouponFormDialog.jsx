@@ -7,7 +7,6 @@ import {
   DialogTitle,
   Grid2 as Grid,
   MenuItem,
-  useTheme,
   useMediaQuery,
   Button,
 } from "@mui/material";
@@ -64,7 +63,6 @@ const CouponFormDialog = ({
   setPending,
 }) => {
   //#region construct
-  const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [code, setCode] = useState("");
   const [attribute, setAttribute] = useState(0);

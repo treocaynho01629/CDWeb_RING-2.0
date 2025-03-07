@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Outlet } from "react-router";
-import { useMediaQuery, useTheme } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
+import ScrollToTop from "@ring/ui/ScrollToTop";
 import Navbar from "./Navbar";
 import NavDrawer from "./NavDrawer";
 import styled from "@emotion/styled";
@@ -39,15 +40,15 @@ const LayoutContainer = styled.div`
 //#endregion
 
 export default function PageLayout() {
-  const theme = useTheme();
-  const mobileMode = useMediaQuery(theme.breakpoints.down("md"));
+  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md"));
   const [open, setOpen] = useState(false);
 
   return (
     <LayoutWrapper>
-      <NavDrawer {...{ open, setOpen, mobileMode }} />
+      <ScrollToTop />
+      <NavDrawer {...{ open, setOpen, tabletMode }} />
       <MainContainer component="main">
-        <Navbar {...{ open, setOpen, mobileMode }} />
+        <Navbar {...{ open, setOpen }} />
         <LayoutContainer>
           <Outlet />
         </LayoutContainer>

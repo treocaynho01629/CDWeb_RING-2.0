@@ -11,14 +11,16 @@ const Orders = () => {
   //Set title
   useTitle("Đánh giá");
 
-  let content = <ReviewsList {...{ mobileMode, pending, setPending }} />;
+  let content = (
+    <ReviewsList {...{ mobileMode, tabletMode, pending, setPending }} />
+  );
 
   return (
     <div>
       {tabletMode ? (
         <Dialog
           open={tabletMode}
-          onClose={() => navigate("/profile/detail")}
+          onClose={() => navigate(-1)}
           fullScreen={mobileMode}
           scroll={"paper"}
           maxWidth={"md"}

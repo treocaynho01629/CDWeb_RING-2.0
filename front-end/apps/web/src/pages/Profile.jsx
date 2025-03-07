@@ -83,7 +83,7 @@ const Profile = () => {
       {tabletMode ? (
         <Dialog
           open={tab ? true : tabletMode ? false : true}
-          onClose={() => navigate("/profile/detail")}
+          onClose={() => navigate(-1)}
           fullScreen={mobileMode}
           scroll={"paper"}
           maxWidth={"md"}

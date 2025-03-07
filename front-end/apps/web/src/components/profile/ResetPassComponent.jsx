@@ -102,7 +102,7 @@ const ResetPassComponent = ({ pending, setPending }) => {
   return (
     <div>
       <StyledDialogTitle>
-        <Link to={"/profile/detail/info"}>
+        <Link to={-1}>
           <KeyboardArrowLeft />
         </Link>
         <Password />

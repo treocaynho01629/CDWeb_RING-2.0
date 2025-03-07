@@ -9,12 +9,13 @@
     ".": "./src/index.js"
   },
   "scripts": {
-    "lint": "eslint \"**/*.{ts,tsx,js,jsx}\""
+    "lint": "eslint \"**/*.{ts,tsx,js,jsx}\"",
+    "update-dependencies": "npx npm-check-updates -u"
   },
   "dependencies": {},
   "devDependencies": {
     "@ring/eslint-config": "*",
-    "eslint": "^8.57.0"
+    "eslint": "^9.21.0"
   },
   "peerDependencies": {
     "@reduxjs/toolkit": "^2.4.0"

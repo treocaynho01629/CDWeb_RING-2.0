@@ -6,6 +6,7 @@ import {
   Suspense,
   lazy,
   useCallback,
+  useRef,
 } from "react";
 import {
   Delete as DeleteIcon,
@@ -28,7 +29,7 @@ import {
 import { Link, useNavigate } from "react-router";
 import { booksApiSlice } from "../../features/books/booksApiSlice";
 import { useCalculateMutation } from "../../features/orders/ordersApiSlice";
-import { debounce } from "lodash-es";
+import { debounce, isEqual } from "lodash-es";
 import { useGetRecommendCouponsQuery } from "../../features/coupons/couponsApiSlice";
 import {
   ActionTableCell,
@@ -42,6 +43,7 @@ import useCart from "../../hooks/useCart";
 import CheckoutDialog from "./CheckoutDialog";
 import PropTypes from "prop-types";
 import CartDetailRow from "./CartDetailRow";
+import useCheckout from "../../hooks/useCheckout";
 
 const Menu = lazy(() => import("@mui/material/Menu"));
 const CouponDialog = lazy(() => import("../coupon/CouponDialog"));
@@ -87,8 +89,6 @@ const StyledDeleteButton = styled(Button)`
   }
 `;
 //#endregion
-
-const tempShippingFee = 10000;
 
 function EnhancedTableHead({
   onSelectAllClick,
@@ -182,14 +182,14 @@ EnhancedTableHead.propTypes = {
 const CartContent = ({ confirm }) => {
   const {
     cartProducts,
-    replaceProduct,
     removeProduct,
-    removeShopProduct,
     clearCart,
     decreaseAmount,
     increaseAmount,
     changeAmount,
   } = useCart();
+  const prevPayload = useRef();
+  const { estimateCart, syncCart } = useCheckout();
   const { username } = useAuth();
   const [selected, setSelected] = useState([]);
   const [shopIds, setShopIds] = useState([]);
@@ -298,73 +298,38 @@ const CartContent = ({ confirm }) => {
     }
   };
 
-  const handleClearSelect = () => {
+  const handleClearSelect = useCallback(() => {
     setSelected([]);
     setCalculated(null);
-  };
+  }, []);
 
   //Estimate before receive caculated price from server
-  const handleEstimate = (cart) => {
-    let estimate = { deal: 0, subTotal: 0, shipping: 0, total: 0 }; //Initial value
-    let cartDetails = {};
-
-    if (cart?.cart?.length) {
-      let totalDeal = 0;
-      let subTotal = 0;
-      let totalQuantity = 0;
-      const shipping = tempShippingFee * (cart?.cart?.length || 0);
-
-      //Loop & calculate
-      cart?.cart?.forEach((detail) => {
-        let deal = 0;
-        let productTotal = 0;
-        let quantity = 0;
-
-        detail?.items?.forEach((item) => {
-          const discount = Math.round(item.price * item.discount);
-
-          //Both deal & total price
-          deal += item.quantity * discount;
-          productTotal += item.quantity * item.price;
-          quantity += item.quantity;
-        });
-
-        //Set value & cart state
-        totalDeal += deal;
-        subTotal += productTotal;
-        totalQuantity += quantity;
-        cartDetails[detail?.shopId] = { value: productTotal - deal, quantity };
-      });
-
-      //Set values
-      estimate = {
-        deal: totalDeal,
-        subTotal,
-        shipping,
-        total: subTotal + shipping - totalDeal,
-      };
-
-      //Set cart state
-      setCheckState({
-        value: subTotal - totalDeal,
-        quantity: totalQuantity,
-        details: cartDetails,
-      });
-    }
-
-    setEstimated(estimate);
-  };
+  const handleEstimate = useCallback(
+    (cart) => {
+      const result = estimateCart(cart);
+      setCheckState(result.checkState);
+      setEstimated(result.estimated);
+    },
+    [cartProducts]
+  );
 
   //Calculate server side
   const handleCalculate = useCallback(
     debounce(async (cart) => {
-      if (calculating || cart == null || !username) return;
+      if (
+        calculating ||
+        cart == null ||
+        isEqual(prevPayload.current, cart) ||
+        !username
+      )
+        return;
 
       calculate(cart)
         .unwrap()
         .then((data) => {
           setCalculated(data);
-          syncCart(data);
+          handleSyncCart(data);
+          prevPayload.current = cart;
         })
         .catch((err) => {
           console.error(err);
@@ -383,57 +348,16 @@ const CartContent = ({ confirm }) => {
   );
 
   //Sync cart between client and server
-  const syncCart = (cart) => {
-    if (!cartProducts?.length) return;
-    const details = cart?.details;
-
-    details.forEach((detail, index) => {
-      if (detail.shopName != null) {
-        //Replace all items from that shop
-        const items = detail?.items;
-
-        items.forEach((item, index) => {
-          if (item.title != null) {
-            //Replace old item in cart
-            const newItem = {
-              ...item,
-              shopId: detail.shopId,
-              shopName: detail.shopName,
-            };
-
-            replaceProduct(newItem);
-          } else {
-            //Remove invalid item
-            handleClearSelect();
-            removeProduct(item.id);
-          }
-        });
-
-        //Replace recommended coupons
-        const discountValue = detail?.couponDiscount + detail?.shippingDiscount;
-        setShopDiscount((prev) => ({
-          ...prev,
-          [detail?.shopId]: discountValue,
-        }));
-        if (detail?.coupon != null && shopCoupon[detail?.shopId] !== null) {
-          setShopCoupon((prev) => ({
-            ...prev,
-            [detail?.shopId]: { ...detail.coupon, isUsable: discountValue > 0 },
-          }));
-        }
-      } else {
-        //Remove all items of the invalid Shop
-        handleClearSelect();
-        removeShopProduct(detail.shopId);
-      }
-    });
-
-    //Replace recommend coupon
-    const discountValue = cart?.couponDiscount + cart?.shippingDiscount;
-    setDiscount(discountValue);
-    if (cart?.coupon != null && coupon !== null) {
-      setCoupon({ ...cart.coupon, isUsable: discountValue > 0 });
-    }
+  const handleSyncCart = (cart) => {
+    syncCart(
+      cart,
+      setDiscount,
+      setShopDiscount,
+      coupon,
+      setCoupon,
+      shopCoupon,
+      setShopCoupon
+    );
   };
 
   //Separate by shop
@@ -750,7 +674,9 @@ const CartContent = ({ confirm }) => {
           <Menu
             open={open}
             onClose={handleClose}
-            MenuListProps={{ "aria-labelledby": "basic-button" }}
+            slotProps={{
+              list: { "aria-labelledby": "basic-button" },
+            }}
             anchorEl={anchorEl}
           >
             <MenuItem onClick={handleDeleteContext}>

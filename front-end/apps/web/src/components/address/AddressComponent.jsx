@@ -498,7 +498,7 @@ const AddressComponent = ({ pending, setPending, mobileMode }) => {
     <>
       <StyledDialogTitle>
         <TitleContainer>
-          <Link to={"/profile/detail/info"}>
+          <Link to={-1}>
             <KeyboardArrowLeft />
           </Link>
           <LocationOn />
@@ -561,8 +561,8 @@ const AddressComponent = ({ pending, setPending, mobileMode }) => {
         onClose={handleCloseContext}
         anchorEl={anchorEl}
         sx={{ display: { xs: "none", sm: "block" } }}
-        MenuListProps={{
-          "aria-labelledby": "basic-button",
+        slotProps={{
+          list: { "aria-labelledby": "basic-button" },
         }}
       >
         <MenuItem

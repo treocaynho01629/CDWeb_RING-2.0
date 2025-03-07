@@ -53,10 +53,10 @@ public class OrderReceipt extends Auditable {
     private String orderMessage;
 
     @Column
-    private Double total;
+    private Double total; //Products price - deal + shipping fee
 
     @Column
-    private Double totalDiscount;
+    private Double totalDiscount; //Coupon discount + deal + shipping discount
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -83,7 +83,7 @@ public class OrderReceipt extends Auditable {
     @Column(length = 30)
     private PaymentType paymentType;
 
-    //For mapping result
+    //For mapping DTO result
     @Transient
     private Double productsPrice;
 
@@ -94,7 +94,7 @@ public class OrderReceipt extends Auditable {
     private Double shippingDiscount;
 
     @Transient
-    private Double dealDiscount;
+    private Double dealDiscount; //Product's discount * price
 
     @Transient
     private Double couponDiscount;

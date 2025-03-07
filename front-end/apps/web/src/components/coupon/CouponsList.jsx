@@ -60,7 +60,7 @@ couponTypeItems.forEach((item) => {
   });
 });
 
-const CouponsList = ({ scrollPosition }) => {
+const CouponsList = ({ scrollPosition, tabletMode }) => {
   const { coupons: savedCoupons } = useCoupon();
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
@@ -145,7 +145,7 @@ const CouponsList = ({ scrollPosition }) => {
     filters?.code == ""
       ? searchParams.delete("q")
       : searchParams.set("q", filters.code);
-    setSearchParams(searchParams);
+    setSearchParams(searchParams, { replace: true });
   };
 
   //Show more
@@ -176,9 +176,20 @@ const CouponsList = ({ scrollPosition }) => {
   const windowScrollListener = useCallback(debounce(handleWindowScroll, 500), [
     data,
   ]);
+
   const scrollListener = useCallback(debounce(handleScroll, 500), [data]);
 
-  window.addEventListener("scroll", windowScrollListener);
+  useEffect(() => {
+    if (tabletMode) {
+      window.removeEventListener("scroll", windowScrollListener);
+    } else {
+      window.addEventListener("scroll", windowScrollListener);
+    }
+
+    return () => {
+      window.removeEventListener("scroll", windowScrollListener);
+    };
+  }, [tabletMode]);
 
   let couponsContent;
 
@@ -232,7 +243,7 @@ const CouponsList = ({ scrollPosition }) => {
   return (
     <>
       <StyledDialogTitle>
-        <Link to={"/profile/detail"}>
+        <Link to={-1}>
           <KeyboardArrowLeft />
         </Link>
         <Loyalty />
@@ -253,7 +264,7 @@ const CouponsList = ({ scrollPosition }) => {
       </ToggleGroupContainer>
       <DialogContent
         sx={{ py: 0, px: { xs: 0, sm: 2, md: 0 } }}
-        onScroll={scrollListener}
+        onScroll={tabletMode ? scrollListener : undefined}
       >
         <form ref={scrollRef} onSubmit={handleChangeCode}>
           <TextField

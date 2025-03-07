@@ -364,7 +364,7 @@ const OrderDetailComponent = ({
     <>
       <StyledDialogTitle>
         <TitleContainer>
-          <Link to={"/profile/order"}>
+          <Link to={-1}>
             <KeyboardArrowLeft />
           </Link>
           <Receipt />

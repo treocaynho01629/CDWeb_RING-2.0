@@ -7,12 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  useTheme,
-  useMediaQuery,
-  Grid2 as Grid,
-  Skeleton,
-} from "@mui/material";
+import { useMediaQuery, Grid2 as Grid, Skeleton } from "@mui/material";
 import { NavLink, useNavigate, useParams, useSearchParams } from "react-router";
 import { useGetCategoryQuery } from "../features/categories/categoriesApiSlice";
 import { useGetBooksQuery } from "../features/books/booksApiSlice";
@@ -103,9 +98,8 @@ const FiltersPage = () => {
   const valueRef = useRef(null);
   const typesRef = useRef(null);
   const rateRef = useRef(null);
-  const theme = useTheme();
-  const mobileMode = useMediaQuery(theme.breakpoints.down("sm"));
-  const tabletMode = useMediaQuery(theme.breakpoints.down("md_lg"));
+  const mobileMode = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md_lg"));
   const navigate = useNavigate();
   const [openPagination, setOpenPagination] = useState(undefined); //Pagination
   const [open, setOpen] = useState(undefined); //Filter
@@ -366,7 +360,7 @@ const FiltersPage = () => {
         <Grid
           ref={scrollRef}
           size={{ xs: 12, md_lg: 9.2 }}
-          sx={{ scrollMargin: theme.mixins.toolbar.minHeight }}
+          sx={(theme) => ({ scrollMargin: theme.mixins.toolbar.minHeight })}
           position="relative"
         >
           <CustomDivider sx={{ display: { xs: "none", md: "flex" } }}>

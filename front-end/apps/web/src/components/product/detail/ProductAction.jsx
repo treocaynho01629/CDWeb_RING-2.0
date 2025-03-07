@@ -4,16 +4,16 @@ import {
   Button,
   Box,
   Divider,
-  useTheme,
   useMediaQuery,
   Skeleton,
   SwipeableDrawer,
 } from "@mui/material";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { currencyFormat } from "@ring/shared";
 import useCart from "../../../hooks/useCart";
 import AmountInput from "../../custom/AmountInput";
+import useOffset from "../../../hooks/useOffset";
 
 //#region styled
 const AmountCount = styled.span`
@@ -114,9 +114,9 @@ const MIN_VALUE = 1;
 const MAX_VALUE = 199;
 
 const ProductAction = ({ book }) => {
-  const theme = useTheme();
+  const overlapRef = useRef(null);
   const navigate = useNavigate();
-  const tabletMode = useMediaQuery(theme.breakpoints.down("md"));
+  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md"));
   const [amountIndex, setAmountIndex] = useState(1); //Amount add to cart
   const [open, setOpen] = useState(false);
   const [openNow, setOpenNow] = useState(false);
@@ -168,11 +168,14 @@ const ProductAction = ({ book }) => {
     navigate("/cart");
   };
 
+  //Prevent overlap
+  useOffset(overlapRef);
+
   return (
     <>
       {tabletMode ? (
         <>
-          <AltFilterContainer>
+          <AltFilterContainer ref={overlapRef}>
             <BuyButton
               variant="contained"
               color="secondary"
