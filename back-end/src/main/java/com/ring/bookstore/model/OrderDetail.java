@@ -33,7 +33,7 @@ public class OrderDetail {
     private Long id;
 
     @Column
-    private Double totalPrice;
+    private Double totalPrice; //Product's price
 
     @Column
     private Double shippingFee;
@@ -42,7 +42,7 @@ public class OrderDetail {
     private Double shippingDiscount;
 
     @Column
-    private Double discount;
+    private Double discount; //Coupon discount + deal
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
@@ -70,9 +70,15 @@ public class OrderDetail {
     @JsonIgnore
     private List<OrderItem> items;
 
-    //For mapping result
+    //For mapping DTO result
     @Transient
     private Double couponDiscount;
+
+    @Transient
+    private Double dealDiscount; //Product's discount * price
+
+    @Transient
+    private Integer totalQuantity;
 
     @Transient
     private CouponDTO couponDTO;

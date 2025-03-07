@@ -37,7 +37,7 @@ const CancelRefundForm = lazy(() => import("./CancelRefundForm"));
 
 const defaultSize = 5;
 
-const OrdersList = ({ pending, setPending, mobileMode }) => {
+const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
   const { addProduct } = useCart();
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
@@ -111,12 +111,12 @@ const OrdersList = ({ pending, setPending, mobileMode }) => {
     filters?.keyword == ""
       ? searchParams.delete("q")
       : searchParams.set("q", filters.keyword);
-    setSearchParams(searchParams);
+    setSearchParams(searchParams, { replace: true });
   };
 
   //Rebuy
   const handleAddToCart = async (detail) => {
-    if (canceling || fetching || pending) return;
+    if (fetching || pending) return;
     setPending(true);
 
     const { enqueueSnackbar } = await import("notistack");
@@ -184,9 +184,20 @@ const OrdersList = ({ pending, setPending, mobileMode }) => {
   const windowScrollListener = useCallback(debounce(handleWindowScroll, 500), [
     data,
   ]);
+
   const scrollListener = useCallback(debounce(handleScroll, 500), [data]);
 
-  window.addEventListener("scroll", windowScrollListener);
+  useEffect(() => {
+    if (tabletMode) {
+      window.removeEventListener("scroll", windowScrollListener);
+    } else {
+      window.addEventListener("scroll", windowScrollListener);
+    }
+
+    return () => {
+      window.removeEventListener("scroll", windowScrollListener);
+    };
+  }, [tabletMode]);
 
   let ordersContent;
 
@@ -236,7 +247,7 @@ const OrdersList = ({ pending, setPending, mobileMode }) => {
   return (
     <>
       <StyledDialogTitle>
-        <Link to={"/profile/detail"}>
+        <Link to={-1}>
           <KeyboardArrowLeft />
         </Link>
         <Receipt />
@@ -261,7 +272,7 @@ const OrdersList = ({ pending, setPending, mobileMode }) => {
       </ToggleGroupContainer>
       <DialogContent
         sx={{ py: 0, px: { xs: 0, sm: 2, md: 0 } }}
-        onScroll={scrollListener}
+        onScroll={tabletMode ? scrollListener : undefined}
       >
         <form ref={scrollRef} onSubmit={handleChangeKeyword}>
           <TextField

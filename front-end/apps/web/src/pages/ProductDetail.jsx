@@ -1,5 +1,5 @@
 import { useState, useRef, lazy, Suspense, useEffect } from "react";
-import { Box, Skeleton, Stack, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Skeleton, Stack, useMediaQuery } from "@mui/material";
 import { useParams, Navigate, NavLink, useSearchParams } from "react-router";
 import {
   useGetBookDetailQuery,
@@ -58,8 +58,7 @@ const ProductDetail = () => {
   ); //Is open review tab
   const [pending, setPending] = useState(false); //For reviewing & changing address
   const reviewRef = useRef(null); //Ref for scroll
-  const theme = useTheme();
-  const tabletMode = useMediaQuery(theme.breakpoints.down("md"));
+  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md"));
 
   //Fetch data
   const { data, isLoading, isFetching, isSuccess, isError, error } =
@@ -79,11 +78,10 @@ const ProductDetail = () => {
     setIsReview(value);
     if (!value) {
       searchParams.delete("review");
-      setSearchParams(searchParams);
     } else {
       searchParams.set("review", true);
-      setSearchParams(searchParams);
     }
+    setSearchParams(searchParams, { replace: true });
     scrollIntoTab();
   };
 
@@ -190,7 +188,9 @@ const ProductDetail = () => {
           </Stack>
           <Box
             ref={reviewRef}
-            sx={{ scrollMargin: theme.mixins.toolbar.minHeight }}
+            sx={(theme) => ({
+              scrollMargin: theme.mixins.toolbar.minHeight,
+            })}
           >
             <LazyLoad
               offset={50}

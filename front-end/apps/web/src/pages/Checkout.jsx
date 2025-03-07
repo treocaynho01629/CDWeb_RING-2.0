@@ -50,6 +50,8 @@ import AddressSelectDialog from "../components/address/AddressSelectDialog";
 import PreviewDetailRow from "../components/cart/PreviewDetailRow";
 import FinalCheckoutDialog from "../components/cart/FinalCheckoutDialog";
 import useCart from "../hooks/useCart";
+import useCheckout from "../hooks/useCheckout";
+import { isEqual } from "lodash-es";
 
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 const ReCaptcha = lazy(() => import("@ring/auth/ReCaptcha"));
@@ -137,11 +139,10 @@ const StyledStepContent = styled(StepContent)(({ theme }) => ({
 }));
 //#endregion
 
-const tempShippingFee = 10000;
-
 const Checkout = () => {
   //#region construct
   const scrollRef = useRef(null);
+  const prevPayload = useRef();
   const [activeStep, setActiveStep] = useState(0);
   const [delivery, setDelivery] = useState(shippingType[0]);
   const [payment, setPayment] = useState(paymentType[0]);
@@ -150,13 +151,8 @@ const Checkout = () => {
   const maxSteps = 3;
 
   //Cart
-  const {
-    cartProducts,
-    replaceProduct,
-    removeProduct,
-    removeShopProduct,
-    clearCart,
-  } = useCart();
+  const { cartProducts, clearCart } = useCart();
+  const { estimateCart, syncCart } = useCheckout();
   const { state: checkoutState } = useLocation();
   const selected = checkoutState?.selected;
 
@@ -240,6 +236,7 @@ const Checkout = () => {
     }
   };
 
+  //Filter out unusable coupons
   const getCheckoutCart = () => {
     if (selected.length > 0 && cartProducts.length > 0) {
       //Reduce cart
@@ -283,7 +280,7 @@ const Checkout = () => {
             : null,
           paymentMethod: payment,
           shippingType: delivery,
-          coupon: coupon?.code,
+          coupon: coupon?.isUsable ? coupon?.code : null,
           cart: [],
         }
       );
@@ -294,66 +291,25 @@ const Checkout = () => {
     }
   };
 
-  const handleEstimate = (cart) => {
-    let estimate = { deal: 0, subTotal: 0, shipping: 0, total: 0 }; //Initial value
-    let cartDetails = {};
-
-    if (cart?.cart?.length) {
-      let totalDeal = 0;
-      let subTotal = 0;
-      let totalQuantity = 0;
-      const shipping = tempShippingFee * (cart?.cart?.length || 0);
-
-      //Loop & calculate
-      cart?.cart?.forEach((detail) => {
-        let deal = 0;
-        let productTotal = 0;
-        let quantity = 0;
-
-        detail?.items?.forEach((item) => {
-          const discount = Math.round(item.price * item.discount);
-
-          //Both deal & total price
-          deal += item.quantity * discount;
-          productTotal += item.quantity * item.price;
-          quantity += item.quantity;
-        });
-
-        //Set value & cart state
-        totalDeal += deal;
-        subTotal += productTotal;
-        totalQuantity += quantity;
-        cartDetails[detail?.shopId] = { value: productTotal - deal, quantity };
-      });
-
-      //Set values
-      estimate = {
-        deal: totalDeal,
-        subTotal,
-        shipping,
-        total: subTotal + shipping - totalDeal,
-      };
-
-      //Set cart state
-      setCheckState({
-        value: subTotal - totalDeal,
-        quantity: totalQuantity,
-        details: cartDetails,
-      });
-    }
-
-    setEstimated(estimate);
-  };
+  const handleEstimate = useCallback(
+    (cart) => {
+      const result = estimateCart(cart);
+      setCheckState(result.checkState);
+      setEstimated(result.estimated);
+    },
+    [cartProducts]
+  );
 
   //Calculate server side
   const handleCalculate = useCallback(async (cart) => {
-    if (isLoading || cart == null) return;
+    if (isLoading || cart == null || isEqual(prevPayload.current, cart)) return;
 
     calculate(cart)
       .unwrap()
       .then((data) => {
         setCalculated(data);
-        syncCart(data);
+        handleSyncCart(data);
+        prevPayload.current = cart;
       })
       .catch((err) => {
         console.error(err);
@@ -370,55 +326,16 @@ const Checkout = () => {
   }, []);
 
   //Sync checkout cart between client and server
-  const syncCart = (cart) => {
-    if (!cartProducts?.length) return;
-    const details = cart?.details;
-
-    details.forEach((detail, index) => {
-      if (detail.shopName != null) {
-        //Replace all items of that shop
-        const items = detail?.items;
-
-        items.forEach((item, index) => {
-          if (item.title != null) {
-            //Replace old item in cart
-            const newItem = {
-              ...item,
-              shopId: detail.shopId,
-              shopName: detail.shopName,
-            };
-
-            replaceProduct(newItem);
-          } else {
-            //Remove invalid item
-            removeProduct(item.id);
-          }
-        });
-
-        //Replace recommended coupons
-        const discountValue = detail?.couponDiscount + detail?.shippingDiscount;
-        setShopDiscount((prev) => ({
-          ...prev,
-          [detail?.shopId]: discountValue,
-        }));
-        if (detail?.coupon != null && shopCoupon[detail?.shopId] !== null) {
-          setShopCoupon((prev) => ({
-            ...prev,
-            [detail?.shopId]: { ...detail.coupon, isUsable: discountValue > 0 },
-          }));
-        }
-      } else {
-        //Remove all items of the invalid Shop
-        removeShopProduct(detail.shopId);
-      }
-    });
-
-    //Replace recommend coupon
-    const discountValue = cart?.couponDiscount + cart?.shippingDiscount;
-    setDiscount(discountValue);
-    if (cart?.coupon != null && coupon !== null) {
-      setCoupon({ ...cart.coupon, isUsable: discountValue > 0 });
-    }
+  const handleSyncCart = (cart) => {
+    syncCart(
+      cart,
+      setDiscount,
+      setShopDiscount,
+      coupon,
+      setCoupon,
+      shopCoupon,
+      setShopCoupon
+    );
   };
 
   //Separate by shop
@@ -559,6 +476,7 @@ const Checkout = () => {
         setPending(false);
       })
       .catch((err) => {
+        enqueueSnackbar("Đặt hàng thất bại!", { variant: "error" });
         console.error(err);
         setErr(err);
         if (!err?.status) {
@@ -613,10 +531,10 @@ const Checkout = () => {
               >
                 <Step key={0}>
                   <StepLabel
-                    error={errMsg !== "" && !err?.status}
+                    error={errMsg !== "" && err?.status}
                     optional={
                       errMsg !== "" &&
-                      !err?.status && (
+                      err?.status && (
                         <Typography variant="caption" color="error">
                           {errMsg}
                         </Typography>

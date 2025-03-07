@@ -1,12 +1,12 @@
 import { Outlet } from "react-router";
-import ScrollToTopButton from "@ring/ui/ScrollToTopButton";
+import ScrollToTop from "@ring/ui/ScrollToTop";
 import Navbar from "../navbar/Navbar";
 import Footer from "./Footer";
 import styled from "@emotion/styled";
 
 const LayoutWrapper = styled.div`
   position: relative;
-  min-height: 60dvh;
+  min-height: 80dvh;
 
   ${({ theme }) => theme.breakpoints.up("sm_md")} {
     padding-right: 15px;
@@ -25,17 +25,11 @@ const LayoutWrapper = styled.div`
   }
 `;
 
-const buttonHeightMap = {
-  "/cart": "high",
-  "/checkout": "high",
-  "/product": "medium",
-};
-
 export default function PageLayout() {
   return (
     <>
       <Navbar />
-      <ScrollToTopButton heightMap={buttonHeightMap} />
+      <ScrollToTop />
       <LayoutWrapper>
         <Outlet />
       </LayoutWrapper>

@@ -62,6 +62,11 @@ export const theme = createTheme({
     borderRadius: 0,
   },
   components: {
+    MuiUseMediaQuery: {
+      defaultProps: {
+        noSsr: true,
+      },
+    },
     MuiCssBaseline: {
       styleOverrides: (theme) => ({
         html: {

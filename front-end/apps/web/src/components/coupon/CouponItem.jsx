@@ -208,6 +208,7 @@ const ShopImage = styled(LazyLoadImage)`
 `;
 
 const ShopName = styled.span`
+  max-width: 90%;
   font-size: 11px;
   text-overflow: ellipsis;
   overflow: hidden;

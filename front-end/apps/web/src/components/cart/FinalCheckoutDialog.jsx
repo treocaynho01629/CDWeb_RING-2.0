@@ -16,18 +16,19 @@ import {
   SavePrice,
   SubText,
 } from "../custom/CartComponents";
-import { useMediaQuery, useTheme } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
 import {
   Edit,
   KeyboardArrowRight,
   KeyboardDoubleArrowDown,
   LocalActivityOutlined,
 } from "@mui/icons-material";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
 import { currencyFormat, addressTypes } from "@ring/shared";
 import CouponDisplay from "../coupon/CouponDisplay";
 import PriceDisplay from "./PriceDisplay";
 import NumberFlow from "@number-flow/react";
+import useOffset from "../../hooks/useOffset";
 
 const SwipeableDrawer = lazy(() => import("@mui/material/SwipeableDrawer"));
 
@@ -117,9 +118,9 @@ const FinalCheckoutDialog = ({
   handleSubmit,
   reCaptchaLoaded,
 }) => {
-  const theme = useTheme();
-  const mobileMode = useMediaQuery(theme.breakpoints.down("sm"));
-  const tabletMode = useMediaQuery(theme.breakpoints.down("md_lg"));
+  const overlapRef = useRef(null);
+  const mobileMode = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md_lg"));
   const fullAddress = [addressInfo?.city, addressInfo?.address].join(", ");
   const [open, setOpen] = useState(undefined);
 
@@ -127,6 +128,9 @@ const FinalCheckoutDialog = ({
     setOpen(newOpen);
   };
   const address = addressInfo?.type ? addressTypes[addressInfo.type] : null;
+
+  //Prevent overlap
+  useOffset(overlapRef);
 
   //Component stuff
   let checkoutDetail = (
@@ -163,7 +167,7 @@ const FinalCheckoutDialog = ({
     <>
       <CheckoutContainer>
         {mobileMode ? (
-          <>
+          <div ref={overlapRef}>
             <CheckoutStack>
               <CouponButton onClick={handleOpenDialog}>
                 <span>
@@ -228,79 +232,77 @@ const FinalCheckoutDialog = ({
                 </CheckoutButton>
               )}
             </CheckoutStack>
-          </>
+          </div>
         ) : tabletMode ? (
-          <>
-            <CheckoutBox className="sticky">
-              <CheckoutStack>
-                <CouponButton onClick={handleOpenDialog}>
-                  <span>
-                    <LocalActivityOutlined color="error" />
-                    &nbsp;
-                    {coupon && discount
-                      ? `Đã giảm ${currencyFormat.format(discount)}`
-                      : `Chọn mã giảm giá ${coupon != null ? "khác" : ""}`}
-                  </span>
-                  <MiniCouponContainer>
-                    <Suspense fallback={null}>
-                      {coupon && <CouponDisplay coupon={coupon} />}
-                    </Suspense>
-                    <KeyboardArrowRight fontSize="small" />
-                  </MiniCouponContainer>
-                </CouponButton>
-              </CheckoutStack>
-              <CheckoutStack>
-                <CheckoutPriceContainer>
-                  <PriceContainer>
-                    <CheckoutText>Tổng thanh toán:</CheckoutText>
-                  </PriceContainer>
-                  <PriceContainer>
-                    <CheckoutPrice onClick={() => toggleDrawer(true)}>
-                      <NumberFlow
-                        value={displayInfo.total}
-                        format={{ style: "currency", currency: "VND" }}
-                        locales={"vi-VN"}
-                        aria-hidden="true"
-                        respectMotionPreference={false}
-                        willChange
-                      />
-                    </CheckoutPrice>
-                    &emsp;
-                    {!calculating && displayInfo.totalDiscount > 0 && (
-                      <SavePrice>
-                        Tiết kiệm{" "}
-                        {currencyFormat.format(displayInfo.totalDiscount)}
-                      </SavePrice>
-                    )}
-                  </PriceContainer>
-                </CheckoutPriceContainer>
-                {activeStep < 2 ? (
-                  <CheckoutButton
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    sx={{ maxWidth: "35%" }}
-                    onClick={handleNext}
-                    disabled={!isValid || calculating}
-                    endIcon={<KeyboardDoubleArrowDown />}
-                  >
-                    Tiếp tục ({activeStep + 1}/{maxSteps})
-                  </CheckoutButton>
-                ) : (
-                  <CheckoutButton
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    sx={{ maxWidth: "35%" }}
-                    disabled={calculating || !reCaptchaLoaded}
-                    onClick={handleSubmit}
-                  >
-                    Đặt hàng
-                  </CheckoutButton>
-                )}
-              </CheckoutStack>
-            </CheckoutBox>
-          </>
+          <CheckoutBox className="sticky" ref={overlapRef}>
+            <CheckoutStack>
+              <CouponButton onClick={handleOpenDialog}>
+                <span>
+                  <LocalActivityOutlined color="error" />
+                  &nbsp;
+                  {coupon && discount
+                    ? `Đã giảm ${currencyFormat.format(discount)}`
+                    : `Chọn mã giảm giá ${coupon != null ? "khác" : ""}`}
+                </span>
+                <MiniCouponContainer>
+                  <Suspense fallback={null}>
+                    {coupon && <CouponDisplay coupon={coupon} />}
+                  </Suspense>
+                  <KeyboardArrowRight fontSize="small" />
+                </MiniCouponContainer>
+              </CouponButton>
+            </CheckoutStack>
+            <CheckoutStack>
+              <CheckoutPriceContainer>
+                <PriceContainer>
+                  <CheckoutText>Tổng thanh toán:</CheckoutText>
+                </PriceContainer>
+                <PriceContainer>
+                  <CheckoutPrice onClick={() => toggleDrawer(true)}>
+                    <NumberFlow
+                      value={displayInfo.total}
+                      format={{ style: "currency", currency: "VND" }}
+                      locales={"vi-VN"}
+                      aria-hidden="true"
+                      respectMotionPreference={false}
+                      willChange
+                    />
+                  </CheckoutPrice>
+                  &emsp;
+                  {!calculating && displayInfo.totalDiscount > 0 && (
+                    <SavePrice>
+                      Tiết kiệm{" "}
+                      {currencyFormat.format(displayInfo.totalDiscount)}
+                    </SavePrice>
+                  )}
+                </PriceContainer>
+              </CheckoutPriceContainer>
+              {activeStep < 2 ? (
+                <CheckoutButton
+                  variant="contained"
+                  size="large"
+                  fullWidth
+                  sx={{ maxWidth: "35%" }}
+                  onClick={handleNext}
+                  disabled={!isValid || calculating}
+                  endIcon={<KeyboardDoubleArrowDown />}
+                >
+                  Tiếp tục ({activeStep + 1}/{maxSteps})
+                </CheckoutButton>
+              ) : (
+                <CheckoutButton
+                  variant="contained"
+                  size="large"
+                  fullWidth
+                  sx={{ maxWidth: "35%" }}
+                  disabled={calculating || !reCaptchaLoaded}
+                  onClick={handleSubmit}
+                >
+                  Đặt hàng
+                </CheckoutButton>
+              )}
+            </CheckoutStack>
+          </CheckoutBox>
         ) : (
           <>
             {activeStep > 0 && addressInfo && (

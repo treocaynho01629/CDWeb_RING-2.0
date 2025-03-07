@@ -7,7 +7,6 @@ export { default as DatePicker } from "./components/DatePicker";
 export { default as PasswordInput } from "./components/PasswordInput";
 export { default as Placeholder } from "./components/Placeholder";
 export { default as Progress } from "./components/Progress";
-export { default as ScrollToTopButton } from "./components/ScrollToTopButton";
 export { default as Snackbar } from "./components/Snackbar";
 
 // Layout

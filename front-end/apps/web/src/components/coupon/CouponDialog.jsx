@@ -18,7 +18,6 @@ import {
   Box,
   Skeleton,
   TextField,
-  useTheme,
   CircularProgress,
 } from "@mui/material";
 import {
@@ -99,8 +98,7 @@ const CouponDialog = ({
   scrollPosition,
 }) => {
   const { coupons: savedCoupons } = useCoupon();
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const fullScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const inputRef = useRef(null);
   const [couponInput, setCouponInput] = useState("");
   const [currCoupon, setCurrCoupon] = useState(selectedCoupon);

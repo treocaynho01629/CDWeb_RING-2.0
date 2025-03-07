@@ -11,14 +11,14 @@ const Coupons = () => {
   //Set title
   useTitle("Mã giảm giá");
 
-  let content = <CouponsList />;
+  let content = <CouponsList tabletMode={tabletMode} />;
 
   return (
     <>
       {tabletMode ? (
         <Dialog
           open={tabletMode}
-          onClose={() => navigate("/profile/detail")}
+          onClose={() => navigate(-1)}
           fullScreen={mobileMode}
           scroll={"paper"}
           maxWidth={"md"}

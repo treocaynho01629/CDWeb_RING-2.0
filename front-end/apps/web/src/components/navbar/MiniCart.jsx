@@ -21,7 +21,7 @@ const ItemsContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 250px;
+  min-height: 250px;
   margin: ${({ theme }) => theme.spacing(1)} 0;
 
   &.empty {
@@ -61,6 +61,7 @@ const ProductPrice = styled.span`
 `;
 
 const ItemContainer = styled.div`
+  width: 100%;
   display: flex;
   align-items: center;
   margin: ${({ theme }) => theme.spacing(1)} 0;

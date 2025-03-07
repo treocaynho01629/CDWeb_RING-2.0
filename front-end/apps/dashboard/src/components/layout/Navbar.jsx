@@ -19,10 +19,10 @@ import {
 } from "@mui/icons-material";
 import { useGetPreviewShopsQuery } from "../../features/shops/shopsApiSlice";
 import { useAuth } from "@ring/auth";
+import { roleTypes } from "@ring/shared";
 import MuiAppBar from "@mui/material/AppBar";
 import NavSetting from "./NavSetting";
 import styled from "@emotion/styled";
-import { roleTypes } from "@ring/shared";
 
 const ShopSelect = lazy(() => import("./ShopSelect"));
 

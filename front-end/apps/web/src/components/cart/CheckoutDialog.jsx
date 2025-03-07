@@ -1,4 +1,4 @@
-import { lazy, useState, Suspense } from "react";
+import { lazy, useState, Suspense, useRef } from "react";
 import {
   AltCheckoutBox,
   CheckoutBox,
@@ -21,10 +21,11 @@ import {
   LocalActivityOutlined,
   KeyboardArrowRight,
 } from "@mui/icons-material";
-import { useMediaQuery, useTheme } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
 import { currencyFormat } from "@ring/shared";
 import NumberFlow from "@number-flow/react";
 import PriceDisplay from "./PriceDisplay";
+import useOffset from "../../hooks/useOffset";
 
 const SwipeableDrawer = lazy(() => import("@mui/material/SwipeableDrawer"));
 const CouponDisplay = lazy(() => import("../coupon/CouponDisplay"));
@@ -40,9 +41,9 @@ const CheckoutDialog = ({
   displayInfo,
   loggedIn,
 }) => {
-  const theme = useTheme();
-  const mobileMode = useMediaQuery(theme.breakpoints.down("sm"));
-  const tabletMode = useMediaQuery(theme.breakpoints.down("md_lg"));
+  const overlapRef = useRef(null);
+  const mobileMode = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md_lg"));
   const [open, setOpen] = useState(undefined);
   const numSelected = selected?.length;
   const checkoutCart = {
@@ -50,6 +51,9 @@ const CheckoutDialog = ({
     coupon,
     shopCoupon,
   };
+
+  //Prevent overlap
+  useOffset(overlapRef);
 
   const toggleDrawer = (newOpen) => {
     setOpen(newOpen);
@@ -91,7 +95,7 @@ const CheckoutDialog = ({
     <>
       <CheckoutContainer>
         {mobileMode ? (
-          <>
+          <div ref={overlapRef}>
             <CheckoutStack>
               <CouponButton onClick={() => handleOpenDialog()}>
                 <span>
@@ -150,9 +154,9 @@ const CheckoutDialog = ({
                 {loggedIn ? `Thanh toán (${numSelected})` : "Đăng nhập"}
               </CheckoutButton>
             </CheckoutStack>
-          </>
+          </div>
         ) : tabletMode ? (
-          <CheckoutBox className="sticky">
+          <CheckoutBox className="sticky" ref={overlapRef}>
             <CheckoutStack>
               <CouponButton onClick={() => handleOpenDialog()}>
                 <span>

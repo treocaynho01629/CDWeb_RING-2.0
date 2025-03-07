@@ -10,9 +10,9 @@
     "update-dependencies": "turbo update-dependencies && npx npm-check-updates -u"
   },
   "devDependencies": {
-    "eslint": "^8.57.0",
-    "prettier": "^3.2.5",
-    "turbo": "^2.3.3"
+    "eslint": "^9.21.0",
+    "prettier": "^3.5.3",
+    "turbo": "^2.4.4"
   },
   "packageManager": "npm@10.4.0",
   "workspaces": [

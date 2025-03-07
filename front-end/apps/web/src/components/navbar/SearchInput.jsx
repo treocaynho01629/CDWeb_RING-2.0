@@ -1,12 +1,10 @@
 import styled from "@emotion/styled";
-import { Search, Close, KeyboardArrowLeft } from "@mui/icons-material";
+import { Search, Close } from "@mui/icons-material";
 import {
-  Autocomplete,
   Button,
   IconButton,
   inputBaseClasses,
   Paper,
-  Popper,
   TextField,
   useAutocomplete,
 } from "@mui/material";
@@ -14,17 +12,12 @@ import { useNavigate, useSearchParams } from "react-router";
 
 //#region styled
 const StyledSearchForm = styled.form`
-  width: 40ch;
+  width: 100%;
   display: flex;
   align-items: center;
   position: relative;
 
-  ${({ theme }) => theme.breakpoints.down("lg")} {
-    width: 35ch;
-  }
-
   ${({ theme }) => theme.breakpoints.down("md")} {
-    width: 100%;
     flex-direction: row-reverse;
     justify-content: space-between;
   }
@@ -126,14 +119,7 @@ const SearchButton = styled(Button)`
 `;
 //#endregion
 
-const SearchInput = ({
-  searchField,
-  setSearchField,
-  toggle,
-  setToggle,
-  setFocus,
-  isToggleSearch,
-}) => {
+const SearchInput = ({ searchField, setSearchField }) => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
@@ -162,10 +148,6 @@ const SearchInput = ({
     freeSolo: true,
     openOnFocus: true,
   });
-
-  const toggleSearch = () => {
-    setToggle((prev) => !prev);
-  };
 
   //Confirm search
   const handleNavigateStore = (e, value) => {
@@ -201,62 +183,38 @@ const SearchInput = ({
 
   return (
     <StyledSearchForm onSubmit={(e) => handleNavigateStore(e, searchField)}>
-      {isToggleSearch && (
-        <AutocompleteContainer {...getRootProps()}>
-          <StyledSearchInput
-            {...getInputProps()}
-            autoFocus
-            placeholder="Tìm kiếm..."
-            size="small"
-            slotProps={{
-              input: {
-                endAdornment: endAdornment,
-              },
-            }}
-          />
-          {groupedOptions.length > 0 ? (
-            <ListBoxContainer elevation={7}>
-              <Listbox {...getListboxProps()}>
-                {groupedOptions.map((option, index) => {
-                  const { key, ...optionProps } = getOptionProps({
-                    option,
-                    index,
-                  });
-                  return (
-                    <ListItem key={key} {...optionProps}>
-                      {option}
-                    </ListItem>
-                  );
-                })}
-              </Listbox>
-            </ListBoxContainer>
-          ) : null}
-        </AutocompleteContainer>
-      )}
-      <StyledIconButton aria-label="search toggle" onClick={toggleSearch}>
-        {isToggleSearch ? (
-          <KeyboardArrowLeft sx={{ fontSize: "26px" }} />
-        ) : (
-          <Search sx={{ fontSize: "26px" }} />
-        )}
-      </StyledIconButton>
-      {/* <StyledSearchInput
-              {...params}
-              placeholder="Tìm kiếm... "
-              autoFocus
-              autoComplete="search"
-              onFocus={() => setFocus(true)}
-              onBlur={() => setFocus(false)}
-              onChange={(e) => setSearchField(e.target.value)}
-              value={searchField}
-              id="search"
-              size="small"
-              slotProps={{
-                input: {
-                  startAdornment: <Search sx={{ marginRight: 1 }} />,
-                },
-              }}
-            /> */}
+      <AutocompleteContainer {...getRootProps()}>
+        <StyledSearchInput
+          autoFocus
+          placeholder="Tìm kiếm..."
+          size="small"
+          slotProps={{
+            input: {
+              endAdornment: endAdornment,
+            },
+            htmlInput: {
+              ...getInputProps(),
+            },
+          }}
+        />
+        {groupedOptions.length > 0 ? (
+          <ListBoxContainer elevation={7}>
+            <Listbox {...getListboxProps()}>
+              {groupedOptions.map((option, index) => {
+                const { key, ...optionProps } = getOptionProps({
+                  option,
+                  index,
+                });
+                return (
+                  <ListItem key={key} {...optionProps}>
+                    {option}
+                  </ListItem>
+                );
+              })}
+            </Listbox>
+          </ListBoxContainer>
+        ) : null}
+      </AutocompleteContainer>
     </StyledSearchForm>
   );
 };

@@ -260,7 +260,9 @@ public class CouponServiceImpl implements CouponService {
         }
     }
 
-    public CouponDiscountDTO applyCoupon(Coupon coupon, CartStateRequest request, Account user) {
+    public CouponDiscountDTO applyCoupon(Coupon coupon,
+                                         CartStateRequest request,
+                                         Account user) {
         CouponDetail couponDetail = coupon.getDetail();
         CouponType type = couponDetail.getType();
         BigDecimal discount = couponDetail.getDiscount();

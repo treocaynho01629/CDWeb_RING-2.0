@@ -7,7 +7,6 @@ import {
   DialogTitle,
   Grid2 as Grid,
   MenuItem,
-  useTheme,
   useMediaQuery,
   Button,
   TextareaAutosize,
@@ -58,8 +57,7 @@ const splitAddress = (addressInfo) => {
 
 const ShopFormDialog = ({ open, handleClose, shop, pending, setPending }) => {
   //#region construct
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const fullScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const [file, setFile] = useState([]);
   const [pic, setPic] = useState(shop?.image || null);
   const [name, setName] = useState("");

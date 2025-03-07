@@ -9,13 +9,7 @@ import {
 } from "react";
 import { NavLink, useSearchParams } from "react-router";
 import { Search, Close } from "@mui/icons-material";
-import {
-  Box,
-  Grid2 as Grid,
-  TextField,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, Grid2 as Grid, TextField, useMediaQuery } from "@mui/material";
 import {
   useFollowShopMutation,
   useGetDisplayShopsQuery,
@@ -98,8 +92,7 @@ const DEFAULT_PAGINATION = {
 const Shops = () => {
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
-  const theme = useTheme();
-  const mobileMode = useMediaQuery(theme.breakpoints.down("sm"));
+  const mobileMode = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const [searchParams, setSearchParams] = useSearchParams();
   const [openPagination, setOpenPagination] = useState(undefined); //Pagination
   const [keyword, setKeyword] = useState("");
@@ -179,7 +172,7 @@ const Shops = () => {
     pagination.followed == DEFAULT_PAGINATION.followed
       ? searchParams.delete("followed")
       : searchParams.set("followed", pagination.followed);
-    setSearchParams(searchParams);
+    setSearchParams(searchParams, { replace: true });
   }, [keyword, pagination]);
 
   //Handle change

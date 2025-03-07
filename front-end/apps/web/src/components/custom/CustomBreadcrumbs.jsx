@@ -5,6 +5,7 @@ import styled from "@emotion/styled";
 const BreadcrumbsContainer = styled.div`
   margin: 20px 10px;
   display: block;
+  z-index: 3;
 
   a.active {
     font-weight: 450;

@@ -11,7 +11,6 @@ import {
   MenuItem,
   useMediaQuery,
   DialogTitle,
-  useTheme,
   CircularProgress,
 } from "@mui/material";
 import {
@@ -80,8 +79,7 @@ const AddressSelectDialog = ({
   const [contextAddress, setContextAddress] = useState(null);
   const [selectedValue, setSelectedValue] = useState(-1);
   const openContext = Boolean(anchorEl);
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const fullScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const [ConfirmationDialog, confirm] = useConfirm(
     "Xoá địa chỉ?",
     "Xoá địa chỉ khỏi sổ địa chỉ?"
@@ -617,8 +615,8 @@ const AddressSelectDialog = ({
             onClose={handleCloseContext}
             anchorEl={anchorEl}
             sx={{ display: { xs: "none", sm: "block" } }}
-            MenuListProps={{
-              "aria-labelledby": "basic-button",
+            slotProps={{
+              list: { "aria-labelledby": "basic-button" },
             }}
           >
             <MenuItem
