@@ -1,5 +1,9 @@
 import styled from "@emotion/styled";
-import { Close, FilterAltOff, Search } from "@mui/icons-material";
+import {
+  Close,
+  FilterAltOff,
+  TipsAndUpdatesOutlined,
+} from "@mui/icons-material";
 import { isEqual } from "lodash-es";
 import { memo, useMemo } from "react";
 import { alpha } from "@mui/material";
@@ -86,9 +90,13 @@ const Keyword = styled.div`
 const FiltersDisplay = memo(
   ({
     filters,
-    setFilters,
+    onResetFilters,
+    onChangeKeyword,
+    onChangePubs,
+    onChangeInputRange,
+    onChangeTypes,
+    onChangeRating,
     defaultFilters,
-    resetFilter,
     isChanged,
     pubsRef,
     typesRef,
@@ -113,20 +121,25 @@ const FiltersDisplay = memo(
     };
 
     //Remove
-    const handleRemovePubs = () => {
-      setFilters((prev) => ({ ...prev, pubIds: defaultFilters.pubIds }));
+    const handleRemovePubs = (e) => {
+      e.stopPropagation();
+      if (onChangePubs) onChangePubs(defaultFilters.pubIds);
     };
-    const handleRemoveTypes = () => {
-      setFilters((prev) => ({ ...prev, types: defaultFilters.types }));
+    const handleRemoveTypes = (e) => {
+      e.stopPropagation();
+      if (onChangeTypes) onChangeTypes(defaultFilters.types);
     };
-    const handleRemoveValue = () => {
-      setFilters((prev) => ({ ...prev, value: defaultFilters.value }));
+    const handleRemoveValue = (e) => {
+      e.stopPropagation();
+      if (onChangeInputRange) onChangeInputRange(defaultFilters.value);
     };
-    const handleRemoveRating = () => {
-      setFilters((prev) => ({ ...prev, rating: defaultFilters.rating }));
+    const handleRemoveRating = (e) => {
+      e.stopPropagation();
+      if (onChangeRating) onChangeRating(defaultFilters.value);
     };
-    const handleRemoveKeyword = () => {
-      setFilters((prev) => ({ ...prev, keyword: defaultFilters.keyword }));
+    const handleRemoveKeyword = (e) => {
+      e.stopPropagation();
+      if (onChangeKeyword) onChangeKeyword(defaultFilters.keyword);
     };
 
     const createChips = () => {
@@ -178,7 +191,7 @@ const FiltersDisplay = memo(
         {keyword && (
           <Keyword>
             <span>
-              <Search />
+              <TipsAndUpdatesOutlined />
               &nbsp;Kết quả từ khoá: '<b>{keyword}</b>'
             </span>
             <ClearButton onClick={handleRemoveKeyword}>
@@ -192,7 +205,7 @@ const FiltersDisplay = memo(
               <FilterTitle>Lọc theo</FilterTitle>
               <ChipsContainer>
                 {filtersApplied}
-                <FilterChip color="error" onClick={resetFilter}>
+                <FilterChip color="error" onClick={onResetFilters}>
                   Xoá bộ lọc
                   <FilterAltOff />
                 </FilterChip>

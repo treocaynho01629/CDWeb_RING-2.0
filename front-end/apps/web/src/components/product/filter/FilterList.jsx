@@ -1,12 +1,5 @@
 import styled from "@emotion/styled";
-import {
-  useState,
-  useEffect,
-  Fragment,
-  memo,
-  useCallback,
-  useRef,
-} from "react";
+import { useState, useEffect, Fragment, memo, useRef } from "react";
 import {
   Button,
   Divider,
@@ -32,13 +25,22 @@ import {
 import { bookTypeItems } from "@ring/shared";
 import { useGetCategoriesQuery } from "../../../features/categories/categoriesApiSlice";
 import { useGetPublishersQuery } from "../../../features/publishers/publishersApiSlice";
-import { debounce } from "lodash-es";
 import { suggestPrices } from "../../../ultils/filters";
-import CustomDivider from "../../custom/CustomDivider";
 import PriceRangeSlider from "./PriceRangeSlider";
+import SimpleBar from "simplebar-react";
 
 //#region styled
-const FilterWrapper = styled.div``;
+const FilterWrapper = styled.div`
+  position: sticky;
+  top: ${({ theme }) => theme.mixins.toolbar.minHeight}px;
+  overflow: hidden;
+`;
+
+const StyledSimpleBar = styled(SimpleBar)`
+  padding: ${({ theme }) => `0 ${theme.spacing(2)} 0 ${theme.spacing(0.5)}`};
+  max-height: ${({ theme }) =>
+    `calc(100dvh - ${theme.mixins.toolbar.minHeight}px)`};
+`;
 
 const TitleContainer = styled.div`
   width: 100%;
@@ -112,6 +114,14 @@ const Showmore = styled.div`
   ${({ theme }) => theme.breakpoints.down("md")} {
     margin-top: 0;
   }
+`;
+
+const ButtonContainer = styled.div`
+  position: sticky;
+  bottom: 0;
+  margin-top: ${({ theme }) => theme.spacing(1)};
+  padding-bottom: ${({ theme }) => theme.spacing(2)};
+  background-color: ${({ theme }) => theme.palette.background.default};
 `;
 //#endregion
 
@@ -316,7 +326,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
   );
 });
 
-const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
+const PublisherFilter = memo(({ pubs, onChangePubs, pubsRef }) => {
   const [selectedPub, setSelectedPub] = useState(pubs || []);
   const [showmore, setShowmore] = useState(false);
   const [pagination, setPagination] = useState({
@@ -370,7 +380,7 @@ const PublisherFilter = memo(({ pubs, onChangePub, pubsRef }) => {
   };
 
   const handleUpdatePubs = (newSelected) => {
-    if (onChangePub) onChangePub(newSelected);
+    if (onChangePubs) onChangePubs(newSelected);
   };
 
   const handleShowMore = () => {
@@ -559,7 +569,7 @@ const RangeFilter = memo(
   }
 );
 
-const TypeFilter = memo(({ types, onChangeType, typesRef }) => {
+const TypeFilter = memo(({ types, onChangeTypes, typesRef }) => {
   const [selectedType, setSelectedType] = useState(types || []);
 
   useEffect(() => {
@@ -588,7 +598,7 @@ const TypeFilter = memo(({ types, onChangeType, typesRef }) => {
   };
 
   const handleUpdateType = (newSelected) => {
-    if (onChangeType) onChangeType(newSelected);
+    if (onChangeTypes) onChangeTypes(newSelected);
   };
   const isSelected = (type) => selectedType.indexOf(type) !== -1;
 
@@ -625,10 +635,10 @@ const TypeFilter = memo(({ types, onChangeType, typesRef }) => {
   );
 });
 
-const RateFilter = memo(({ rating, onChangeRate, rateRef }) => {
+const RateFilter = memo(({ rating, onChangeRating, rateRef }) => {
   const handleChangeRate = (e) => {
     let newValue = e.target.value;
-    if (onChangeRate) onChangeRate(newValue);
+    if (onChangeRating) onChangeRating(newValue);
   };
 
   return (
@@ -647,7 +657,7 @@ const RateFilter = memo(({ rating, onChangeRate, rateRef }) => {
                 <Radio
                   value={index + 1}
                   checked={isItemSelected}
-                  onChange={handleChangeRate}
+                  onClick={handleChangeRate}
                   disableRipple
                   name={`${index + 1} Star${index + 1 !== 1 ? "s" : ""}`}
                   color="primary"
@@ -674,84 +684,65 @@ const RateFilter = memo(({ rating, onChangeRate, rateRef }) => {
   );
 });
 
-const FilterList = ({
-  filters,
-  setFilters,
-  resetFilter,
-  pubsRef,
-  typesRef,
-  valueRef,
-  rateRef,
-}) => {
-  const onChangeCate = useCallback((newValue) => {
-    setFilters((prev) => ({
-      ...prev,
-      cate: prev.cate.id == newValue?.id ? { id: "", slug: "" } : newValue,
-    }));
-  }, []);
-  const onChangePub = useCallback(
-    debounce((newValue) => {
-      setFilters((prev) => ({ ...prev, pubIds: newValue }));
-    }, 500),
-    []
-  );
-  const onChangeInputRange = useCallback((newValue) => {
-    setFilters((prev) => ({ ...prev, value: newValue }));
-  }, []);
-  const onChangeRange = useCallback(
-    debounce((newValue) => {
-      setFilters((prev) => ({ ...prev, value: newValue }));
-    }, 1000),
-    []
-  );
-  const onChangeType = useCallback(
-    debounce((newValue) => {
-      setFilters((prev) => ({ ...prev, types: newValue }));
-    }, 500),
-    []
-  );
-  const onChangeRate = useCallback((newValue) => {
-    setFilters((prev) => ({
-      ...prev,
-      rating: prev.rating == newValue ? "" : newValue,
-    }));
-  }, []);
-
-  return (
-    <FilterWrapper>
-      <CustomDivider>BỘ LỌC</CustomDivider>
-      <Stack
-        spacing={{ xs: 1 }}
-        useFlexGap
-        flexWrap="wrap"
-        divider={<Divider flexItem />}
-      >
-        <CateFilter {...{ cateId: filters?.cate.id, onChangeCate }} />
-        <PublisherFilter {...{ pubs: filters?.pubIds, onChangePub, pubsRef }} />
-        <RangeFilter
-          {...{
-            value: filters?.value,
-            onChangeInputRange,
-            onChangeRange,
-            valueRef,
-          }}
-        />
-        <TypeFilter {...{ types: filters?.types, onChangeType, typesRef }} />
-        <RateFilter {...{ rating: filters?.rating, onChangeRate, rateRef }} />
-      </Stack>
-      <Button
-        variant="contained"
-        color="error"
-        size="large"
-        fullWidth
-        sx={{ marginTop: 1 }}
-        onClick={resetFilter}
-        startIcon={<FilterAltOff />}
-      >
-        Xoá bộ lọc
-      </Button>
-    </FilterWrapper>
-  );
-};
+const FilterList = memo(
+  ({
+    filters,
+    onResetFilters,
+    onChangeCate,
+    onChangePubs,
+    onChangeInputRange,
+    onChangeRange,
+    onChangeTypes,
+    onChangeRating,
+    pubsRef,
+    typesRef,
+    valueRef,
+    rateRef,
+  }) => {
+    return (
+      <FilterWrapper>
+        <StyledSimpleBar>
+          <Stack
+            spacing={{ xs: 1 }}
+            useFlexGap
+            flexWrap="wrap"
+            divider={<Divider flexItem />}
+          >
+            <CateFilter {...{ cateId: filters?.cate.id, onChangeCate }} />
+            <PublisherFilter
+              {...{ pubs: filters?.pubIds, onChangePubs, pubsRef }}
+            />
+            <RangeFilter
+              {...{
+                value: filters?.value,
+                onChangeInputRange,
+                onChangeRange,
+                valueRef,
+              }}
+            />
+            <TypeFilter
+              {...{ types: filters?.types, onChangeTypes, typesRef }}
+            />
+            <RateFilter
+              {...{ rating: filters?.rating, onChangeRating, rateRef }}
+            />
+          </Stack>
+          <ButtonContainer>
+            <Button
+              variant="contained"
+              color="error"
+              size="large"
+              fullWidth
+              onClick={onResetFilters}
+              startIcon={<FilterAltOff />}
+            >
+              Xoá bộ lọc
+            </Button>
+          </ButtonContainer>
+        </StyledSimpleBar>
+      </FilterWrapper>
+    );
+  }
+);
 
 export default FilterList;

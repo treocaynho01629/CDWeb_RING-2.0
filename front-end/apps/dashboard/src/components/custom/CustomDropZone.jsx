@@ -379,11 +379,11 @@ const CustomDropZone = ({
   }
 
   return (
-    <section className="container">
+    <section>
       <DropZoneContainer
         {...getRootProps({ isFocused, isDragAccept, isDragReject })}
       >
-        <input {...getInputProps()} />
+        <input {...getInputProps()} style={{ display: "none" }} />
         <DropZoneContent>
           <PermMedia fontSize="large" />
           <Title>Kéo thả hoặc chọn file ảnh</Title>

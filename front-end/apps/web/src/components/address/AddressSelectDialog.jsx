@@ -533,6 +533,8 @@ const AddressSelectDialog = ({
       fullWidth
       onClose={handleCloseDialog}
       fullScreen={fullScreen}
+      closeAfterTransition={false}
+      aria-modal
     >
       {openForm ? (
         <Suspense fallBack={null}>

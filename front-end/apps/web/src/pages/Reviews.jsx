@@ -25,6 +25,7 @@ const Orders = () => {
           scroll={"paper"}
           maxWidth={"md"}
           fullWidth
+          closeAfterTransition={false}
           slotProps={{
             paper: {
               elevation: 0,

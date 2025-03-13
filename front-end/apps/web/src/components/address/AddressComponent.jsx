@@ -532,6 +532,7 @@ const AddressComponent = ({ pending, setPending, mobileMode }) => {
         fullWidth
         onClose={handleClose}
         fullScreen={mobileMode}
+        closeAfterTransition={false}
       >
         {open != undefined && (
           <Suspense fallBack={null}>

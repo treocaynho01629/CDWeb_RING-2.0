@@ -19,7 +19,9 @@ import {
   ShoppingCartOutlined,
   NotificationsOutlined,
   Search,
+  SearchOff,
   KeyboardArrowLeft,
+  HomeOutlined,
 } from "@mui/icons-material";
 import {
   Stack,
@@ -33,7 +35,7 @@ import {
   useColorScheme,
   alpha,
 } from "@mui/material";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useMatch } from "react-router";
 import { LogoImage } from "@ring/ui/Components";
 import { debounce } from "lodash-es";
 import { useLogout, useAuth } from "@ring/auth";
@@ -137,30 +139,7 @@ const Social = styled.p`
   }
 `;
 
-const Left = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-
-  ${({ theme }) => theme.breakpoints.down("md")} {
-    justify-content: space-between;
-  }
-`;
-
-const Right = styled.div`
-  flex: 1;
-  align-items: center;
-  justify-content: flex-end;
-  display: flex;
-
-  ${({ theme }) => theme.breakpoints.down("md")} {
-    justify-content: space-evenly;
-    display: none;
-  }
-`;
-
-const Logo = styled.h2`
+const Logo = styled.span`
   position: relative;
   display: flex;
   align-items: center;
@@ -168,7 +147,7 @@ const Logo = styled.h2`
   white-space: nowrap;
   overflow: hidden;
 
-  &.active {
+  &.hidden {
     ${({ theme }) => theme.breakpoints.down("md")} {
       width: 0;
     }
@@ -186,19 +165,6 @@ const NavItem = styled.div`
   margin-left: 15px;
 `;
 
-const SearchContainer = styled.div`
-  display: flex;
-  width: 40ch;
-
-  ${({ theme }) => theme.breakpoints.down("lg")} {
-    width: 35ch;
-  }
-
-  ${({ theme }) => theme.breakpoints.down("md")} {
-    width: 100%;
-  }
-`;
-
 const StyledIconButton = styled(IconButton)`
   border-radius: 0;
 
@@ -209,7 +175,6 @@ const StyledIconButton = styled(IconButton)`
 
   &.nav {
     display: flex;
-    width: 90px;
     justify-content: flex-start;
 
     ${({ theme }) => theme.breakpoints.down("md_lg")} {
@@ -279,29 +244,92 @@ const IconText = styled.p`
 `;
 //#endregion
 
-const Navbar = () => {
-  //#region construct
-  const { cartProducts } = useCart();
-  const { mode, setMode } = useColorScheme();
-  const location = useLocation();
-  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md"));
-
-  //Search
-  const [searchField, setSearchField] = useState("");
-  const [focus, setFocus] = useState(false);
-  const [toggle, setToggle] = useState(searchField !== "");
+const SearchComponent = ({
+  tabletMode,
+  show,
+  toggle,
+  setToggle,
+  isSearch,
+  products,
+}) => {
+  const mobileMode = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
   const toggleSearch = () => {
-    setToggle((prev) => !prev);
+    setToggle(!show);
   };
 
-  //Drawer open state
-  const [openDrawer, setOpenDrawer] = useState(undefined);
+  return (
+    <Box
+      display="flex"
+      alignItems="center"
+      flex={1}
+      flexDirection={{ xs: "row-reverse", md: "row" }}
+    >
+      {tabletMode && isSearch ? (
+        <Link to={"/"} title="Trang chủ">
+          <StyledIconButton aria-label="home">
+            <HomeOutlined />
+          </StyledIconButton>
+        </Link>
+      ) : (
+        <Link to={"/store"} title="Duyệt cửa hàng">
+          <StyledIconButton aria-label="explore">
+            <Storefront />
+          </StyledIconButton>
+        </Link>
+      )}
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent={{ xs: "flex-end", md: "flex-start" }}
+        flex={1}
+      >
+        <SearchInput
+          {...{
+            mobileMode,
+            tabletMode,
+            show,
+            isFocus: toggle,
+          }}
+        />
+        {tabletMode && isSearch ? (
+          <Link to={"/cart"} title="Giỏ hàng">
+            <StyledIconButton aria-label="cart">
+              <Badge
+                color="primary"
+                badgeContent={products?.length}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                <ShoppingCartOutlined />
+              </Badge>
+            </StyledIconButton>
+          </Link>
+        ) : (
+          <StyledIconButton
+            aria-label="search toggle"
+            onClick={toggleSearch}
+            sx={{ mr: { xs: 0.3, md: 0 } }}
+          >
+            {show ? <SearchOff /> : <Search />}
+          </StyledIconButton>
+        )}
+      </Box>
+    </Box>
+  );
+};
 
-  //Other
-  const { username, image } = useAuth();
-  const signOut = useLogout();
-
+const PopoverComponents = ({
+  mode,
+  toggleMode,
+  cartProducts,
+  username,
+  image,
+  signOut,
+  location,
+}) => {
   //Anchor for popoever & open state
   const [anchorElCart, setAnchorElCart] = useState(undefined);
   const [anchorEl, setAnchorEl] = useState(undefined);
@@ -329,12 +357,145 @@ const Navbar = () => {
     [anchorEl]
   );
 
+  return (
+    <Grid
+      size={{ xs: 12, md: "auto" }}
+      sx={{
+        display: { xs: "none", md: "flex" },
+        alignItems: "center",
+        justifyContent: { xs: "space-evenly", md: "flex-end" },
+      }}
+    >
+      <NavItem>
+        <Stack
+          direction="row"
+          sx={{ color: "action.active" }}
+          alignItems="center"
+        >
+          <StyledIconButton className="nav" aria-label="notification">
+            <Badge
+              badgeContent={0}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              <NotificationsOutlined />
+            </Badge>
+            <IconText>Thông báo</IconText>
+          </StyledIconButton>
+          <Box
+            aria-owns={openCart ? "mouse-over-popover-cart" : undefined}
+            aria-haspopup="true"
+            onMouseEnter={hanldeCartPopover}
+            onMouseLeave={handleCartClose}
+          >
+            <Link to={"/cart"} title="Giỏ hàng">
+              <StyledIconButton className="nav" aria-label="cart">
+                <Badge
+                  color="primary"
+                  badgeContent={cartProducts?.length}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                >
+                  <ShoppingCartOutlined />
+                </Badge>
+                <IconText>Giỏ hàng</IconText>
+              </StyledIconButton>
+            </Link>
+            {anchorElCart !== undefined && (
+              <Suspense fallback={null}>
+                <MiniCart
+                  {...{
+                    openCart,
+                    anchorElCart,
+                    handleClose: handleCartClose,
+                    products: cartProducts,
+                  }}
+                />
+              </Suspense>
+            )}
+          </Box>
+          {username ? (
+            <Box
+              aria-owns={open ? "mouse-over-popover-profile" : undefined}
+              aria-haspopup="true"
+              onMouseEnter={handleProfilePopover}
+              onMouseLeave={handleProfileClose}
+            >
+              <Link to={"/profile/detail"} title="Tài khoản">
+                <StyledIconButton className="nav" aria-label="profile">
+                  <Avatar
+                    sx={{ width: 24, height: 24, fontSize: "16px" }}
+                    src={image ? image + "?size=tiny" : null}
+                  />
+                  <IconText className="username">{username}</IconText>
+                </StyledIconButton>
+              </Link>
+              {anchorEl !== undefined && (
+                <Suspense fallback={null}>
+                  <ProfilePopover
+                    {...{
+                      open,
+                      anchorEl,
+                      handleClose: handleProfileClose,
+                      signOut,
+                      mode,
+                      toggleMode,
+                      image,
+                    }}
+                  />
+                </Suspense>
+              )}
+            </Box>
+          ) : (
+            <Link
+              to={"/auth/login"}
+              state={{ from: location }}
+              title="Đăng nhập"
+            >
+              <StyledIconButton className="nav" aria-label="login">
+                <LockOutlined />
+                <IconText className="username">Đăng nhập</IconText>
+              </StyledIconButton>
+            </Link>
+          )}
+        </Stack>
+      </NavItem>
+    </Grid>
+  );
+};
+
+const Navbar = () => {
+  //#region construct
+  const { cartProducts } = useCart();
+  const location = useLocation();
+  const isHome = useMatch("/");
+  const isStore = useMatch("/store");
+  const isShop = useMatch("/shop");
+  const isSearch = isStore || isShop;
+  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md"));
+
+  //Search
+  const [toggle, setToggle] = useState(undefined);
+  const show = (isSearch && toggle == undefined) || toggle;
+
+  //Drawer open state
+  const [openDrawer, setOpenDrawer] = useState(undefined);
+
+  //Other
+  const { username, image } = useAuth();
+  const signOut = useLogout();
+
   //Toggle drawer open state
   const handleToggleDrawer = (value) => {
     setOpenDrawer(value);
   };
 
   //Toggle color mode
+  const { mode, setMode } = useColorScheme();
   const toggleMode = () => {
     if (!mode) {
       return;
@@ -379,22 +540,39 @@ const Navbar = () => {
     }
   };
 
+  const handleResetOpacity = () => {
+    if (navRef.current) {
+      navRef.current.style.setProperty("--scroll-progress", "0");
+    }
+  };
+
   const windowScrollListener = useCallback(handleWindowScroll, []);
 
   useEffect(() => {
     if (tabletMode) {
       window.addEventListener("scroll", windowScrollListener);
+      handleResetOpacity();
     } else {
       window.removeEventListener("scroll", windowScrollListener);
+      handleResetStyles();
     }
-    handleResetStyles();
     return () => {
       window.removeEventListener("scroll", windowScrollListener);
+      handleResetStyles();
     };
   }, [tabletMode]);
-  //#endregion
 
-  const isToggleSearch = focus || toggle;
+  useEffect(() => {
+    if (tabletMode) {
+      handleResetOpacity();
+      setToggle(undefined);
+    }
+  }, [location.pathname]);
+
+  //Check for go back button
+  const canGoBack = location.key !== "default";
+  const href = canGoBack ? -1 : "/";
+  //#endregion
 
   return (
     <>
@@ -435,200 +613,71 @@ const Navbar = () => {
           <Grid container size="grow">
             <Grid
               size={{ xs: 12, md: "grow" }}
-              sx={{ display: "flex", alignItems: "center" }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: { xs: "space-between", md: "flex-start" },
+              }}
             >
-              <Left>
-                {tabletMode && (
-                  <>
-                    <Box
-                      display={isToggleSearch ? "none" : "flex"}
-                      flex={1}
-                      alignItems="center"
-                    >
-                      <StyledIconButton
-                        onClick={() => handleToggleDrawer(true)}
-                      >
-                        <Menu sx={{ fontSize: 26 }} />
-                      </StyledIconButton>
-                    </Box>
-                    <Suspense fallback={null}>
-                      <NavDrawer
-                        {...{
-                          openDrawer,
-                          username,
-                          image,
-                          location,
-                          products: cartProducts,
-                          signOut,
-                          mode,
-                          toggleMode,
-                          handleOpen: () => handleToggleDrawer(true),
-                          handleClose: () => handleToggleDrawer(false),
-                        }}
-                      />
-                    </Suspense>
-                  </>
-                )}
-                <Link to={"/"}>
-                  <Logo className={isToggleSearch ? "active" : ""}>
-                    <LogoImage src="/full-logo.svg" alt="RING! logo" />
-                  </Logo>
-                </Link>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  flex={1}
-                  justifyContent={
-                    isToggleSearch
-                      ? { xs: "space-between", md: "flex-start" }
-                      : "flex-start"
-                  }
-                  flexDirection={{ xs: "row-reverse", md: "row" }}
-                >
-                  <Link to={"/store"} title="Duyệt cửa hàng">
-                    <StyledIconButton aria-label="explore">
-                      <Storefront />
+              {tabletMode && (
+                <Box display="flex" alignItems="center" flex={show ? 0 : 1}>
+                  {isHome ? (
+                    <StyledIconButton onClick={() => handleToggleDrawer(true)}>
+                      <Menu />
                     </StyledIconButton>
-                  </Link>
-                  {isToggleSearch && (
-                    <SearchContainer>
-                      <SearchInput
-                        {...{
-                          searchField,
-                          setSearchField,
-                        }}
-                      />
-                    </SearchContainer>
+                  ) : (
+                    <Link to={href} title="Quay lại">
+                      <StyledIconButton>
+                        <KeyboardArrowLeft />
+                      </StyledIconButton>
+                    </Link>
                   )}
-                  <StyledIconButton
-                    aria-label="search toggle"
-                    onClick={toggleSearch}
-                    sx={{ mr: { xs: 0.3, md: 0 } }}
-                  >
-                    {isToggleSearch ? <KeyboardArrowLeft /> : <Search />}
-                  </StyledIconButton>
+                  <Suspense fallback={null}>
+                    <NavDrawer
+                      {...{
+                        openDrawer,
+                        username,
+                        image,
+                        location,
+                        products: cartProducts,
+                        signOut,
+                        mode,
+                        toggleMode,
+                        handleOpen: () => handleToggleDrawer(true),
+                        handleClose: () => handleToggleDrawer(false),
+                      }}
+                    />
+                  </Suspense>
                 </Box>
-              </Left>
+              )}
+              <Link to={"/"} title="Trang chủ">
+                <Logo className={show ? "hidden" : ""}>
+                  <LogoImage src="/full-logo.svg" alt="RING! logo" />
+                </Logo>
+              </Link>
+              <SearchComponent
+                {...{
+                  tabletMode,
+                  show,
+                  toggle,
+                  setToggle,
+                  isSearch,
+                  products: cartProducts,
+                }}
+              />
             </Grid>
             {!tabletMode && (
-              <Grid
-                size={{ xs: 12, md: "auto" }}
-                sx={{ display: { xs: "none", md: "flex" } }}
-              >
-                <Right>
-                  <NavItem>
-                    <Stack
-                      spacing={1}
-                      direction="row"
-                      sx={{ color: "action.active" }}
-                      alignItems="center"
-                    >
-                      <StyledIconButton
-                        className="nav"
-                        aria-label="notification"
-                      >
-                        <Badge
-                          badgeContent={0}
-                          anchorOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                          }}
-                        >
-                          <NotificationsOutlined />
-                        </Badge>
-                        <IconText>Thông báo</IconText>
-                      </StyledIconButton>
-                      <Box
-                        aria-owns={
-                          openCart ? "mouse-over-popover-cart" : undefined
-                        }
-                        aria-haspopup="true"
-                        onMouseEnter={hanldeCartPopover}
-                        onMouseLeave={handleCartClose}
-                      >
-                        <Link to={"/cart"} title="Giỏ hàng">
-                          <StyledIconButton className="nav" aria-label="cart">
-                            <Badge
-                              color="primary"
-                              badgeContent={cartProducts?.length}
-                              anchorOrigin={{
-                                vertical: "top",
-                                horizontal: "right",
-                              }}
-                            >
-                              <ShoppingCartOutlined />
-                            </Badge>
-                            <IconText>Giỏ hàng</IconText>
-                          </StyledIconButton>
-                        </Link>
-                        <Suspense fallback={null}>
-                          {anchorElCart !== undefined && (
-                            <MiniCart
-                              {...{
-                                openCart,
-                                anchorElCart,
-                                handleClose: handleCartClose,
-                                products: cartProducts,
-                              }}
-                            />
-                          )}
-                        </Suspense>
-                      </Box>
-                      {username ? (
-                        <Box
-                          aria-owns={
-                            open ? "mouse-over-popover-profile" : undefined
-                          }
-                          aria-haspopup="true"
-                          onMouseEnter={handleProfilePopover}
-                          onMouseLeave={handleProfileClose}
-                        >
-                          <Link to={"/profile/detail"} title="Tài khoản">
-                            <StyledIconButton
-                              className="nav"
-                              aria-label="profile"
-                            >
-                              <Avatar
-                                sx={{ width: 24, height: 24, fontSize: "16px" }}
-                                src={image ? image + "?size=tiny" : null}
-                              />
-                              <IconText className="username">
-                                {username}
-                              </IconText>
-                            </StyledIconButton>
-                          </Link>
-                          <Suspense fallback={null}>
-                            {anchorEl !== undefined && (
-                              <ProfilePopover
-                                {...{
-                                  open,
-                                  anchorEl,
-                                  handleClose: handleProfileClose,
-                                  signOut,
-                                  mode,
-                                  toggleMode,
-                                  image,
-                                }}
-                              />
-                            )}
-                          </Suspense>
-                        </Box>
-                      ) : (
-                        <Link
-                          to={"/auth/login"}
-                          state={{ from: location }}
-                          title="Đăng nhập"
-                        >
-                          <StyledIconButton className="nav" aria-label="login">
-                            <LockOutlined />
-                            <IconText className="username">Đăng nhập</IconText>
-                          </StyledIconButton>
-                        </Link>
-                      )}
-                    </Stack>
-                  </NavItem>
-                </Right>
-              </Grid>
+              <PopoverComponents
+                {...{
+                  mode,
+                  toggleMode,
+                  cartProducts,
+                  username,
+                  image,
+                  signOut,
+                  location,
+                }}
+              />
             )}
           </Grid>
         </Wrapper>

@@ -656,6 +656,7 @@ const OrderDetailComponent = ({
         open={open}
         onClose={handleClose}
         fullScreen={mobileMode}
+        closeAfterTransition={false}
         aria-labelledby="cancel-refund-dialog"
       >
         {open && (

@@ -22,8 +22,9 @@ import {
   useGetShopQuery,
   useUnfollowShopMutation,
 } from "../../../features/shops/shopsApiSlice";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { numFormat } from "@ring/shared";
+import { useAuth } from "@ring/auth";
 
 //#region styled
 const ShopContainer = styled.div`
@@ -101,13 +102,19 @@ const ShopDetail = styled.span`
 
 const ShopDisplay = ({ id, name }) => {
   //Fetch reviews
+  const { username } = useAuth();
   const { data, isLoading, isSuccess } = useGetShopQuery(id, { skip: !id });
   const [followShop, { isLoading: following }] = useFollowShopMutation();
   const [unfollowShop, { isLoading: unfollowing }] = useUnfollowShopMutation();
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
   let loading = (!id && !data && !isSuccess) || isLoading;
 
   const handleClickFollow = () => {
-    if (isLoading || following || unfollowing) return;
+    if (!username) navigate("/auth/login", { state: { from: location } });
+    if (isLoading || following || unfollowing || !username) return;
 
     if (data?.followed) {
       unfollowShop(id)

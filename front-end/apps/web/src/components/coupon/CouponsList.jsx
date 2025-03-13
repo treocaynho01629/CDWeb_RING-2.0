@@ -70,7 +70,7 @@ const CouponsList = ({ scrollPosition, tabletMode }) => {
   const [tab, setTab] = useState(searchParams.get("tab") ?? "");
   const [filters, setFilters] = useState({
     ...couponItems[tab]?.filter,
-    code: searchParams.get("q") ?? "",
+    code: searchParams.get("k") ?? "",
   });
   const [pagination, setPagination] = useState({
     number: 0,
@@ -143,8 +143,8 @@ const CouponsList = ({ scrollPosition, tabletMode }) => {
   const updatePath = () => {
     tab === "" ? searchParams.delete("tab") : searchParams.set("tab", tab);
     filters?.code == ""
-      ? searchParams.delete("q")
-      : searchParams.set("q", filters.code);
+      ? searchParams.delete("k")
+      : searchParams.set("k", filters.code);
     setSearchParams(searchParams, { replace: true });
   };
 
@@ -272,7 +272,7 @@ const CouponsList = ({ scrollPosition, tabletMode }) => {
             autoComplete="code"
             id="code"
             size="small"
-            defaultValue={searchParams.get("q")}
+            defaultValue={searchParams.get("k")}
             inputRef={inputRef}
             fullWidth
             error={inputRef?.current?.value != filters.code}

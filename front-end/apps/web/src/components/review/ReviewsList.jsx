@@ -1,4 +1,11 @@
-import { Fragment, Suspense, useCallback, useState, lazy } from "react";
+import {
+  Fragment,
+  Suspense,
+  useCallback,
+  useState,
+  useEffect,
+  lazy,
+} from "react";
 import { KeyboardArrowLeft, Try } from "@mui/icons-material";
 import { useGetMyReviewsQuery } from "../../features/reviews/reviewsApiSlice";
 import { Message, Title } from "@ring/ui/Components";

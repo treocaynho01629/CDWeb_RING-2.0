@@ -405,10 +405,9 @@ const ProfileDetail = ({
                     <TextField
                       required
                       placeholder="Nhập Họ và Tên"
-                      type="text"
                       id="name"
                       onChange={(e) => setName(e.target.value)}
-                      value={name}
+                      value={name ?? ""}
                       error={err?.data?.errors?.name}
                       helperText={err?.data?.errors?.name}
                       size="small"

@@ -10,16 +10,16 @@ import Progress from "@ring/ui/Progress";
 //#region styled
 const Container = styled.div`
   position: relative;
-  min-height: 302px;
   max-height: 380px;
-  padding: ${({ theme }) => theme.spacing(0.25)} 0;
+  padding: ${({ theme }) => `${theme.spacing(0.25)} 0`};
 
   .react-multi-carousel-list {
     position: unset !important;
+    padding-bottom: 0.5px;
   }
 
   ${({ theme }) => theme.breakpoints.down("sm_md")} {
-    padding: 5px;
+    padding: 0;
   }
 `;
 
@@ -101,7 +101,10 @@ const responsive = {
 };
 
 const CustomArrow = ({ onClick, className, direction }) => (
-  <CustomArrowButton className={`${className} ${direction}`} onClick={onClick}>
+  <CustomArrowButton
+    className={`${className ?? ""} ${direction}`}
+    onClick={onClick}
+  >
     {direction == "left" ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
   </CustomArrowButton>
 );

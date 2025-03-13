@@ -394,6 +394,7 @@ const ReviewComponent = ({
             <Dialog
               fullScreen
               scroll="paper"
+              closeAfterTransition={false}
               open={isReview}
               onClose={() => handleToggleReview(false)}
             >

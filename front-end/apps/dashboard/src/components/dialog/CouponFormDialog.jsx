@@ -63,7 +63,7 @@ const CouponFormDialog = ({
   setPending,
 }) => {
   //#region construct
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const fullScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const [code, setCode] = useState("");
   const [attribute, setAttribute] = useState(0);
   const [maxDiscount, setMaxDiscount] = useState(0);
@@ -226,6 +226,7 @@ const CouponFormDialog = ({
       fullWidth
       onClose={handleCloseDialog}
       fullScreen={fullScreen}
+      closeAfterTransition={false}
       aria-modal
     >
       <DialogTitle sx={{ display: "flex", alignItems: "center" }}>

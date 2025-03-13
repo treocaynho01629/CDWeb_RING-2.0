@@ -154,7 +154,10 @@ const responsive = {
 };
 
 const CustomArrow = ({ onClick, className, direction }) => (
-  <CustomArrowButton className={`${className} ${direction}`} onClick={onClick}>
+  <CustomArrowButton
+    className={`${className ?? ""} ${direction}`}
+    onClick={onClick}
+  >
     {direction == "left" ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
   </CustomArrowButton>
 );

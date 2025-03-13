@@ -1,4 +1,5 @@
 import { trackWindowScroll } from "react-lazy-load-image-component";
+import { Box } from "@mui/material";
 import Progress from "@ring/ui/Progress";
 import Grid from "@mui/material/Grid2";
 import Product from "./Product";
@@ -36,14 +37,20 @@ const Products = ({ data, isError, isLoading, isSuccess, scrollPosition }) => {
   }
 
   return (
-    <div style={{ width: "100%", position: "relative", padding: "5px 0" }}>
+    <Box
+      sx={{
+        width: "100%",
+        position: "relative",
+        padding: { xs: 0, sm_md: 0.5 },
+      }}
+    >
       {(isLoading || isError) && (
         <Progress color={isError ? "error" : "primary"} />
       )}
       <Grid container spacing={0.2} size="grow">
         {productsContent}
       </Grid>
-    </div>
+    </Box>
   );
 };
 

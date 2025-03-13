@@ -377,6 +377,7 @@ const CouponDialog = ({
       fullWidth
       onClose={handleClose}
       fullScreen={fullScreen}
+      closeAfterTransition={false}
     >
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
         <TitleContainer>
