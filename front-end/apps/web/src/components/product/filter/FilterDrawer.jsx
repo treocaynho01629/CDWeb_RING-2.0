@@ -661,8 +661,8 @@ const RateFilter = memo(({ rating, onChangeRate }) => {
 
 const FilterDrawer = ({
   filters,
-  setFilters,
-  resetFilter,
+  onApplyFilters,
+  onResetFilters,
   open,
   handleClose,
   handleOpen,
@@ -697,14 +697,14 @@ const FilterDrawer = ({
   }, []);
 
   //Apply
-  const applyFilter = () => {
+  const handleApplyFilter = () => {
     handleClose();
-    setFilters(currFilters);
+    if (onApplyFilters) onApplyFilters(currFilters);
   };
 
   const handleResetFilter = () => {
     handleClose();
-    resetFilter();
+    if (onResetFilters) onResetFilters();
   };
 
   return (
@@ -744,7 +744,7 @@ const FilterDrawer = ({
             variant="contained"
             color="primary"
             size="large"
-            onClick={applyFilter}
+            onClick={handleApplyFilter}
             startIcon={<Check />}
           >
             Áp dụng

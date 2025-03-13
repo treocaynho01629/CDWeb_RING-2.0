@@ -171,11 +171,24 @@ const Container = styled.div`
   }
 `;
 
+const SliderContainer = styled.div`
+  padding: ${({ theme }) => theme.spacing(0.5)};
+  padding-top: 0;
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: 0;
+  }
+`;
+
 const SaleContainer = styled.div`
   position: relative;
   padding: ${({ theme }) => theme.spacing(2.5)} 0;
   margin: ${({ theme }) => theme.spacing(1)} 0;
   margin-bottom: ${({ theme }) => theme.spacing(4)};
+
+  ul {
+    margin: 0 -1.5px;
+  }
 
   &::before {
     content: "";
@@ -214,11 +227,15 @@ const cateToTabs = (cate) => {
   });
 };
 
-const Loadable = ({ children }) => (
-  <LazyLoad offset={100} placeholder={<Placeholder sx={{ height: 300 }} />}>
-    <Suspense fallback={null}>{children}</Suspense>
-  </LazyLoad>
-);
+const Loadable = ({ children }) => {
+  return (
+    <LazyLoad offset={100} height={300} once>
+      <Suspense fallback={<Placeholder sx={{ height: 300 }} />}>
+        {children}
+      </Suspense>
+    </LazyLoad>
+  );
+};
 
 const SaleList = () => {
   const { data, isLoading, isFetching, isSuccess, isError, refetch } =
@@ -333,10 +350,12 @@ const ProductsList = ({ tabs, value, title }) => {
           </CustomTabs>
         </ToggleGroupContainer>
       )}
-      <ProductsSlider
-        key={tabValue}
-        {...{ isLoading, isFetching, data, isSuccess, isError }}
-      />
+      <SliderContainer>
+        <ProductsSlider
+          key={tabValue}
+          {...{ isLoading, isFetching, data, isSuccess, isError }}
+        />
+      </SliderContainer>
     </Container>
   );
 };

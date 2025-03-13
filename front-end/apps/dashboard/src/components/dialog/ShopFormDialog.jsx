@@ -313,6 +313,7 @@ const ShopFormDialog = ({ open, handleClose, shop, pending, setPending }) => {
       fullWidth
       onClose={handleCloseDialog}
       fullScreen={fullScreen}
+      closeAfterTransition={false}
       aria-modal
     >
       <DialogTitle sx={{ display: "flex", alignItems: "center" }}>

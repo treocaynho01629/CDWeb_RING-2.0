@@ -15,15 +15,19 @@ import { Grid2 as Grid, Collapse } from "@mui/material";
 import { useState } from "react";
 
 //#region styled
-const Container = styled.div`
+const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.palette.divider};
   border-top: 2px solid ${({ theme }) => theme.palette.primary.main};
   margin-top: 15dvh;
   padding-top: 20px;
   width: 100%;
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    margin-top: ${({ theme }) => theme.spacing(2)};
+  }
 `;
 
-const Wrapper = styled.div`
+const Container = styled.div`
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
@@ -31,13 +35,13 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: center;
 
-  @media (min-width: 768px) {
+  ${({ theme }) => theme.breakpoints.up("sm_md")} {
     width: 750px;
   }
-  @media (min-width: 992px) {
+  ${({ theme }) => theme.breakpoints.up("md_lg")} {
     width: 970px;
   }
-  @media (min-width: 1200px) {
+  ${({ theme }) => theme.breakpoints.up("lg")} {
     width: 1170px;
   }
 `;
@@ -302,8 +306,8 @@ const Footer = () => {
   };
 
   return (
-    <Container>
-      <Wrapper>
+    <Wrapper>
+      <Container>
         <Grid container spacing={1} size="grow">
           <Grid size={{ xs: 12, lg: "auto" }}>
             <AddressContainer>
@@ -373,14 +377,14 @@ const Footer = () => {
             </Grid>
           </Grid>
         </Grid>
-      </Wrapper>
+      </Container>
       <BotFooter>
         <BotText>
           Giấy chứng nhận Đăng ý kính doanh do TP.HCM cấp ngày 01/01/2022.
         </BotText>
         <Name>DoraZ</Name>
       </BotFooter>
-    </Container>
+    </Wrapper>
   );
 };
 

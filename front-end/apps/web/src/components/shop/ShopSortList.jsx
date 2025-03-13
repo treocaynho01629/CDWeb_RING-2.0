@@ -1,5 +1,5 @@
 import { MenuItem, InputAdornment, IconButton } from "@mui/material";
-import { Straight } from "@mui/icons-material";
+import { Straight, TipsAndUpdatesOutlined } from "@mui/icons-material";
 import { filterShopsBy, sortShopsBy } from "../../ultils/filters";
 import {
   SortWrapper,
@@ -8,17 +8,20 @@ import {
   AltContainer,
   FilterTitle,
   StyledInput,
+  StyledSortButton,
 } from "../custom/SortComponents";
 import QuickPagination from "../custom/QuickPagination";
 
 const ShopSortList = ({
   mobileMode,
   pagination,
+  keyword,
   onOpenPagination,
   onChangeOrder,
   onChangeDir,
   onChangeFollowed,
   onPageChange,
+  onClearKeyword,
 }) => {
   const handleChangeOrder = (e) => {
     if (onChangeOrder) onChangeOrder(e.target.value);
@@ -32,6 +35,9 @@ const ShopSortList = ({
   };
   const handleChangeFollowed = (e) => {
     if (onChangeFollowed) onChangeFollowed(e.target.value);
+  };
+  const handleClearKeyword = () => {
+    if (onClearKeyword) onClearKeyword();
   };
 
   const endAdornment = (
@@ -95,6 +101,13 @@ const ShopSortList = ({
               </MenuItem>
             ))}
           </StyledInput>
+          <StyledSortButton
+            fullWidth={mobileMode}
+            onClick={handleClearKeyword}
+            endIcon={<TipsAndUpdatesOutlined color={keyword && "warning"} />}
+          >
+            Từ khoá
+          </StyledSortButton>
         </MainContainer>
         <AltContainer>
           <QuickPagination

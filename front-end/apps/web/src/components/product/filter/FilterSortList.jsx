@@ -20,7 +20,7 @@ const FilterSortList = ({
   onChangeDir,
   onChangeAmount,
   onPageChange,
-  setOpen,
+  onOpenFilters,
   isChanged,
 }) => {
   const handleChangeOrder = (e) => {
@@ -37,7 +37,7 @@ const FilterSortList = ({
     if (onChangeAmount) onChangeAmount(e.target.value);
   };
   const handleSetOpen = () => {
-    if (setOpen) setOpen(true);
+    if (onOpenFilters) onOpenFilters();
   };
 
   const endAdornment = (

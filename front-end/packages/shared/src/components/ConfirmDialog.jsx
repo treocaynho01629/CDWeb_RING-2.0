@@ -19,6 +19,7 @@ const ConfirmDialog = ({
     <Dialog
       open={open}
       onClose={handleCancel}
+      closeAfterTransition={false}
       aria-labelledby="confirmation-dialog"
     >
       <DialogTitle id="confirmation-dialog-title">{title}</DialogTitle>

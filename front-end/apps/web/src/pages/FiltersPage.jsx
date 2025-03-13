@@ -1,6 +1,6 @@
-import styled from "@emotion/styled";
 import {
   lazy,
+  memo,
   Suspense,
   useCallback,
   useEffect,
@@ -11,9 +11,10 @@ import { useMediaQuery, Grid2 as Grid, Skeleton } from "@mui/material";
 import { NavLink, useNavigate, useParams, useSearchParams } from "react-router";
 import { useGetCategoryQuery } from "../features/categories/categoriesApiSlice";
 import { useGetBooksQuery } from "../features/books/booksApiSlice";
-import { isEqual } from "lodash-es";
+import { debounce, isEqual } from "lodash-es";
 import { useTitle, useDeepEffect } from "@ring/shared";
 import { booksAmount, pageSizes, sortBooksBy } from "../ultils/filters";
+import { Wrapper } from "../components/custom/SortComponents";
 import AppPagination from "../components/custom/AppPagination";
 import CustomDivider from "../components/custom/CustomDivider";
 import FilteredProducts from "../components/product/filter/FilteredProducts";
@@ -33,29 +34,6 @@ const JumpPagination = lazy(
   () => import("../components/custom/JumpPagination")
 );
 
-//#region styled
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  position: relative;
-
-  @media (min-width: 600px) {
-    margin-right: auto;
-    margin-left: auto;
-    width: 600px;
-  }
-  @media (min-width: 768px) {
-    width: 750px;
-  }
-  @media (min-width: 992px) {
-    width: 970px;
-  }
-  @media (min-width: 1200px) {
-    width: 1170px;
-  }
-`;
-//#endregion
-
 const DEFAULT_FILTERS = {
   keyword: "",
   cate: { id: "", slug: "" },
@@ -68,7 +46,6 @@ const DEFAULT_FILTERS = {
 const DEFAULT_PAGINATION = {
   number: 0,
   size: pageSizes[1],
-  totalPages: 0,
   sortBy: sortBooksBy[0].value,
   sortDir: "desc",
   amount: booksAmount[0].value,
@@ -90,20 +67,27 @@ const createCrumbs = (cate) => {
   return;
 };
 
+const Pagination = memo(AppPagination);
+
 const FiltersPage = () => {
   //#region construct
-  const { cSlug, sSlug } = useParams();
+  const { cSlug } = useParams();
+
+  //Scroll ref
   const scrollRef = useRef(null);
   const pubsRef = useRef(null);
   const valueRef = useRef(null);
   const typesRef = useRef(null);
   const rateRef = useRef(null);
+
+  //Responsive stuff
   const mobileMode = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md_lg"));
-  const navigate = useNavigate();
-  const [openPagination, setOpenPagination] = useState(undefined); //Pagination
+
   const [open, setOpen] = useState(undefined); //Filter
+  const [openPagination, setOpenPagination] = useState(undefined); //Pagination
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   //Filter & pagination
   const [filters, setFilters] = useState({
@@ -112,11 +96,11 @@ const FiltersPage = () => {
       id: searchParams.get("cate") ?? DEFAULT_FILTERS.cate.id,
       slug: cSlug ?? DEFAULT_FILTERS.cate.slug,
     },
-    pubIds: searchParams.get("pubs") ?? DEFAULT_FILTERS.pubIds,
+    pubIds: searchParams.get("pubs")?.split(",") ?? DEFAULT_FILTERS.pubIds,
     value: searchParams.get("value")
       ? searchParams.get("value").split(",").map(Number)
       : DEFAULT_FILTERS.value,
-    types: searchParams.get("types") ?? DEFAULT_FILTERS.types,
+    types: searchParams.get("types")?.split(",") ?? DEFAULT_FILTERS.types,
     shopId: searchParams.get("shop") ?? DEFAULT_FILTERS.shopId,
     rating: searchParams.get("rating") ?? DEFAULT_FILTERS.rating,
   });
@@ -125,68 +109,62 @@ const FiltersPage = () => {
       ? searchParams.get("pNo") - 1
       : DEFAULT_PAGINATION.number,
     size: searchParams.get("pSize") ?? DEFAULT_PAGINATION.size,
-    totalPages: DEFAULT_PAGINATION.totalPages,
     sortBy: searchParams.get("sort") ?? DEFAULT_PAGINATION.sortBy,
     sortDir: searchParams.get("dir") ?? DEFAULT_PAGINATION.sortDir,
     amount: searchParams.get("amount") ?? DEFAULT_PAGINATION.amount,
   });
 
   //Fetch data
+  const { data, isLoading, isFetching, isUninitialized, isError, error } =
+    useGetBooksQuery({
+      //Books
+      page: pagination.number,
+      size: pagination.size,
+      sortBy: pagination.sortBy,
+      sortDir: pagination.sortDir,
+      amount: pagination.amount,
+      keyword: filters.keyword,
+      cateId: filters.cate.id,
+      rating: filters.rating,
+      types: filters.types,
+      shopId: filters.shopId,
+      pubIds: filters.pubIds,
+      value: filters.value,
+    });
   const { data: currCate, isLoading: loadCate } = useGetCategoryQuery(
     { slug: filters.cate.slug, include: "parent" },
-    { skip: !filters.cate.id || !filters.cate.slug }
+    { skip: !filters.cate.id || !filters.cate.slug || true }
   );
-  const {
-    data,
-    isLoading,
-    isFetching,
-    isUninitialized,
-    isSuccess,
-    isError,
-    error,
-  } = useGetBooksQuery({
-    //Books
-    page: pagination.number,
-    size: pagination.size,
-    sortBy: pagination.sortBy,
-    sortDir: pagination.sortDir,
-    amount: pagination.amount,
-    keyword: filters.keyword,
-    cateId: filters.cate.id,
-    rating: filters.rating,
-    types: filters.types,
-    shopId: filters.shopId,
-    pubIds: filters.pubIds,
-    value: filters.value,
-  });
 
-  //Set pagination after fetch
-  useEffect(() => {
-    if (data && !isLoading && isSuccess) {
-      setPagination({
-        ...pagination,
-        number: data.page.number,
-        size: data.page.size,
-        totalPages: data.page.totalPages,
-      });
-    }
-  }, [data]);
+  const updateFilters = () => {
+    setFilters((prev) => ({
+      ...prev,
+      keyword: searchParams.get("q") ?? DEFAULT_FILTERS.keyword,
+      cate: {
+        id: searchParams.get("cate") ? +searchParams.get("cate") : "",
+        slug: cSlug ?? DEFAULT_FILTERS.cate.slug,
+      },
+      pubIds: searchParams.get("pubs")?.split(",") ?? DEFAULT_FILTERS.pubIds,
+      value: searchParams.get("value")
+        ? searchParams.get("value").split(",").map(Number)
+        : DEFAULT_FILTERS.value,
+      types: searchParams.get("types")?.split(",") ?? DEFAULT_FILTERS.types,
+      shopId: searchParams.get("shop") ?? DEFAULT_FILTERS.shopId,
+      rating: searchParams.get("rating") ?? DEFAULT_FILTERS.rating,
+    }));
+    setPagination((prev) => ({
+      ...prev,
+      number: searchParams.get("pNo")
+        ? searchParams.get("pNo") - 1
+        : DEFAULT_PAGINATION.number,
+      size: searchParams.get("pSize") ?? DEFAULT_PAGINATION.size,
+      sortBy: searchParams.get("sort") ?? DEFAULT_PAGINATION.sortBy,
+      sortDir: searchParams.get("dir") ?? DEFAULT_PAGINATION.sortDir,
+      amount: searchParams.get("amount") ?? DEFAULT_PAGINATION.amount,
+    }));
+  };
 
-  //Go to first page on change + update path
-  useDeepEffect(() => {
-    handleChangePage(1);
-  }, [
-    filters,
-    pagination.size,
-    pagination.sortBy,
-    pagination.sortDir,
-    pagination.amount,
-  ]);
-  useEffect(() => {
-    updatePath();
-  }, [pagination]);
-
-  //Update keyword & cate
+  // Update filter
   useEffect(() => {
     updateFilters();
   }, [cSlug, searchParams]);
@@ -196,92 +174,188 @@ const FiltersPage = () => {
 
   //Handle change
   const scrollToTop = useCallback(() => {
-    scrollRef?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, []);
-  const handleChangePage = useCallback((page) => {
-    setPagination((prev) => ({ ...prev, number: page - 1 }));
-    scrollToTop();
-  }, []);
-  const handleChangeOrder = useCallback((newValue) => {
-    setPagination((prev) => ({ ...prev, sortBy: newValue }));
-  }, []);
-  const handleChangeDir = useCallback((newValue) => {
-    setPagination((prev) => ({ ...prev, sortDir: newValue }));
-  }, []);
-  const handleChangeSize = useCallback((newValue) => {
-    setPagination((prev) => ({ ...prev, size: newValue }));
-  }, []);
-  const handleChangeAmount = useCallback((newValue) => {
-    setPagination((prev) => ({ ...prev, amount: newValue }));
+    if (mobileMode) {
+      scrollRef?.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }, []);
 
-  //Search params
-  const updatePath = useCallback(() => {
-    //Filter
-    filters.cate.id == DEFAULT_FILTERS.cate.id
-      ? searchParams.delete("cate")
-      : searchParams.set("cate", filters.cate.id);
-    filters.shopId == DEFAULT_FILTERS.shopId
-      ? searchParams.delete("shop")
-      : searchParams.set("shop", filters.shopId);
-    filters.keyword == DEFAULT_FILTERS.keyword
-      ? searchParams.delete("q")
-      : searchParams.set("q", filters.keyword);
-    isEqual(filters.pubIds, DEFAULT_FILTERS.pubIds)
-      ? searchParams.delete("pubs")
-      : searchParams.set("pubs", filters.pubIds);
-    isEqual(filters.types, DEFAULT_FILTERS.types)
-      ? searchParams.delete("types")
-      : searchParams.set("types", filters.types);
-    isEqual(filters.value, DEFAULT_FILTERS.value)
-      ? searchParams.delete("value")
-      : searchParams.set("value", filters?.value);
-    filters.rating == DEFAULT_FILTERS.rating
-      ? searchParams.delete("rating")
-      : searchParams.set("rating", filters.rating);
-
-    //Pagination
-    pagination.number == DEFAULT_PAGINATION.number
-      ? searchParams.delete("pNo")
-      : searchParams.set("pNo", pagination.number + 1);
-    pagination.size == DEFAULT_PAGINATION.size
-      ? searchParams.delete("pSize")
-      : searchParams.set("pSize", pagination.size);
-    pagination.sortBy == DEFAULT_PAGINATION.sortBy
-      ? searchParams.delete("sort")
-      : searchParams.set("sort", pagination.sortBy);
-    pagination.sortDir == DEFAULT_PAGINATION.sortDir
-      ? searchParams.delete("dir")
-      : searchParams.set("dir", pagination.sortDir);
-    pagination.amount == DEFAULT_PAGINATION.amount
-      ? searchParams.delete("amount")
-      : searchParams.set("amount", pagination.amount);
-
-    //Set
-    const newPath = `/store${filters?.cate.slug ? `/${filters?.cate.slug}` : ""}`;
-    navigate(
-      { pathname: newPath, search: searchParams.toString() },
-      { replace: true }
-    );
-  }, [filters, pagination]);
-
-  const updateFilters = useCallback(() => {
+  //Filter change
+  const handleChangeKeyword = (newValue) => {
     setFilters((prev) => ({
       ...prev,
-      keyword: searchParams.get("q") ?? DEFAULT_FILTERS.keyword,
-      cate: {
-        id: searchParams.get("cate") ? +searchParams.get("cate") : "",
-        slug: cSlug ?? DEFAULT_FILTERS.cate.slug,
-      },
+      keyword: newValue,
     }));
-  }, [cSlug, searchParams]);
+    newValue == DEFAULT_FILTERS.keyword
+      ? searchParams.delete("q")
+      : searchParams.set("q", newValue);
+    setSearchParams(searchParams);
+    handleResetPage();
+  };
+  const handleChangeCate = (newValue) => {
+    newValue =
+      filters?.cate.id == newValue?.id ? { id: "", slug: "" } : newValue;
+    setFilters((prev) => ({
+      ...prev,
+      cate: newValue,
+    }));
+    newValue?.id == DEFAULT_FILTERS.cate.id
+      ? searchParams.delete("cate")
+      : searchParams.set("cate", newValue?.id);
+    const newPath = `/store${newValue?.slug ? `/${newValue.slug}` : ""}`;
+    navigate({ pathname: newPath, search: searchParams.toString() });
+    handleResetPage();
+  };
+  const handleChangePubs = debounce((newValue) => {
+    setFilters((prev) => ({ ...prev, pubIds: newValue }));
+    isEqual(newValue, DEFAULT_FILTERS.pubIds)
+      ? searchParams.delete("pubs")
+      : searchParams.set("pubs", newValue);
+    setSearchParams(searchParams);
+    handleResetPage();
+  }, 500);
+  const handleChangeInputRange = (newValue) => {
+    setFilters((prev) => ({ ...prev, value: newValue }));
+    isEqual(newValue, DEFAULT_FILTERS.value)
+      ? searchParams.delete("value")
+      : searchParams.set("value", newValue);
+    setSearchParams(searchParams);
+    handleResetPage();
+  };
+  const handleChangeRange = debounce((newValue) => {
+    setFilters((prev) => ({ ...prev, value: newValue }));
+    isEqual(newValue, DEFAULT_FILTERS.value)
+      ? searchParams.delete("value")
+      : searchParams.set("value", newValue);
+    setSearchParams(searchParams);
+    handleResetPage();
+  }, 1000);
+  const handleChangeTypes = debounce((newValue) => {
+    setFilters((prev) => ({ ...prev, types: newValue }));
+    isEqual(newValue, DEFAULT_FILTERS.types)
+      ? searchParams.delete("types")
+      : searchParams.set("types", newValue);
+    setSearchParams(searchParams);
+    handleResetPage();
+  }, 500);
+  const handleChangeRating = (newValue) => {
+    setFilters((prev) => ({
+      ...prev,
+      rating: prev.rating == newValue ? "" : newValue,
+    }));
+    newValue == DEFAULT_FILTERS.rating
+      ? searchParams.delete("rating")
+      : searchParams.set("rating", newValue);
+    setSearchParams(searchParams);
+    handleResetPage();
+  };
+  const handleApplyFilters = (newFilters) => {
+    setFilters(newFilters);
+    newFilters.cate.id == DEFAULT_FILTERS.cate.id
+      ? searchParams.delete("cate")
+      : searchParams.set("cate", newFilters.cate.id);
+    newFilters.shopId == DEFAULT_FILTERS.shopId
+      ? searchParams.delete("shop")
+      : searchParams.set("shop", newFilters.shopId);
+    newFilters.keyword == DEFAULT_FILTERS.keyword
+      ? searchParams.delete("q")
+      : searchParams.set("q", newFilters.keyword);
+    isEqual(newFilters.pubIds, DEFAULT_FILTERS.pubIds)
+      ? searchParams.delete("pubs")
+      : searchParams.set("pubs", newFilters.pubIds);
+    isEqual(newFilters.types, DEFAULT_FILTERS.types)
+      ? searchParams.delete("types")
+      : searchParams.set("types", newFilters.types);
+    isEqual(newFilters.value, DEFAULT_FILTERS.value)
+      ? searchParams.delete("value")
+      : searchParams.set("value", newFilters?.value);
+    newFilters.rating == DEFAULT_FILTERS.rating
+      ? searchParams.delete("rating")
+      : searchParams.set("rating", newFilters.rating);
+    setSearchParams(searchParams);
+    handleResetPage();
+  };
+
+  //Pagination change
+  const handleChangePage = (page) => {
+    setPagination((prev) => ({ ...prev, number: page - 1 }));
+    page - 1 == DEFAULT_PAGINATION.number
+      ? searchParams.delete("pNo")
+      : searchParams.set("pNo", page);
+    setSearchParams(searchParams);
+    scrollToTop();
+  };
+  const handleChangeOrder = (newValue) => {
+    setPagination((prev) => ({ ...prev, sortBy: newValue }));
+    newValue == DEFAULT_PAGINATION.sortBy
+      ? searchParams.delete("sort")
+      : searchParams.set("sort", newValue);
+    setSearchParams(searchParams, { replace: true });
+    handleResetPage();
+  };
+  const handleChangeDir = (newValue) => {
+    setPagination((prev) => ({ ...prev, sortDir: newValue }));
+    newValue == DEFAULT_PAGINATION.sortDir
+      ? searchParams.delete("dir")
+      : searchParams.set("dir", newValue);
+    setSearchParams(searchParams, { replace: true });
+    handleResetPage();
+  };
+  const handleChangeSize = (newValue) => {
+    setPagination((prev) => ({ ...prev, size: newValue }));
+    newValue == DEFAULT_PAGINATION.size
+      ? searchParams.delete("pSize")
+      : searchParams.set("pSize", newValue);
+    setSearchParams(searchParams, { replace: true });
+    handleResetPage();
+  };
+  const handleChangeAmount = (newValue) => {
+    setPagination((prev) => ({ ...prev, amount: newValue }));
+    newValue == DEFAULT_PAGINATION.amount
+      ? searchParams.delete("amount")
+      : searchParams.set("amount", newValue);
+    setSearchParams(searchParams, { replace: true });
+    handleResetPage();
+  };
+
+  //Pagination jump
+  const handleOpenPagination = () => {
+    setOpenPagination(true);
+  };
+  const handleClosePagination = () => {
+    setOpenPagination(false);
+  };
+
+  //Reset page
+  const handleResetPage = () => {
+    setPagination((prev) => ({
+      ...prev,
+      number: DEFAULT_PAGINATION.number,
+    }));
+    searchParams.delete("pNo");
+    setSearchParams(searchParams, { replace: true });
+    scrollToTop();
+  };
 
   //Reset
-  const resetFilter = useCallback(() => {
-    handleChangePage(1);
+  const handleResetFilters = () => {
     setFilters(DEFAULT_FILTERS);
-  }, []);
+    searchParams.delete("q");
+    searchParams.delete("cate");
+    searchParams.delete("pubs");
+    searchParams.delete("value");
+    searchParams.delete("types");
+    searchParams.delete("shop");
+    searchParams.delete("rating");
+    navigate({ pathname: "/store", search: searchParams.toString() });
+    handleResetPage();
+  };
 
+  //Stuff
   const handleOpen = () => {
     setOpen(true);
   };
@@ -289,16 +363,10 @@ const FiltersPage = () => {
     setOpen(false);
   };
 
-  const handleOpenPagination = () => {
-    setOpenPagination(true);
-  };
-  const handleClosePagination = () => {
-    setOpenPagination(false);
-  };
-  //#endregion
-
+  //Stuff
   let loading = isLoading || isFetching || isError || isUninitialized;
   let isChanged = !isEqual(filters, DEFAULT_FILTERS);
+  //#endregion
 
   return (
     <Wrapper>
@@ -321,7 +389,7 @@ const FiltersPage = () => {
       </CustomBreadcrumbs>
       <Grid
         container
-        spacing={4}
+        spacing={2}
         size="grow"
         position="relative"
         display="flex"
@@ -332,8 +400,8 @@ const FiltersPage = () => {
             <FilterDrawer
               {...{
                 filters,
-                setFilters,
-                resetFilter,
+                onApplyFilters: handleApplyFilters,
+                onResetFilters: handleResetFilters,
                 open,
                 handleOpen,
                 handleClose,
@@ -342,12 +410,18 @@ const FiltersPage = () => {
           </Suspense>
         ) : (
           <Grid size={{ xs: 12, md_lg: 2.8 }} position="relative">
+            <CustomDivider sx={{ mr: 2 }}>BỘ LỌC</CustomDivider>
             <Suspense fallback={null}>
               <FilterList
                 {...{
                   filters,
-                  setFilters,
-                  resetFilter,
+                  onResetFilters: handleResetFilters,
+                  onChangeCate: handleChangeCate,
+                  onChangePubs: handleChangePubs,
+                  onChangeInputRange: handleChangeInputRange,
+                  onChangeRange: handleChangeRange,
+                  onChangeTypes: handleChangeTypes,
+                  onChangeRating: handleChangeRating,
                   pubsRef,
                   typesRef,
                   valueRef,
@@ -372,7 +446,13 @@ const FiltersPage = () => {
                 {...{
                   filters,
                   setFilters,
-                  resetFilter,
+                  onResetFilters: handleResetFilters,
+                  onChangeCate: handleChangeCate,
+                  onChangePubs: handleChangePubs,
+                  onChangeInputRange: handleChangeInputRange,
+                  onChangeKeyword: handleChangeKeyword,
+                  onChangeTypes: handleChangeTypes,
+                  onChangeRating: handleChangeRating,
                   defaultFilters: DEFAULT_FILTERS,
                   isChanged,
                   pubsRef,
@@ -384,16 +464,23 @@ const FiltersPage = () => {
             </Suspense>
           )}
           <FilterSortList
-            {...{ pagination, mobileMode, setOpen, isChanged }}
-            onOpenPagination={handleOpenPagination}
-            onChangeOrder={handleChangeOrder}
-            onChangeDir={handleChangeDir}
-            onChangeAmount={handleChangeAmount}
-            onPageChange={handleChangePage}
+            {...{
+              pagination,
+              mobileMode,
+              onOpenFilters: handleOpen,
+              isChanged,
+              onOpenPagination: handleOpenPagination,
+              onChangeOrder: handleChangeOrder,
+              onChangeDir: handleChangeDir,
+              onChangeAmount: handleChangeAmount,
+              onPageChange: handleChangePage,
+            }}
           />
           <FilteredProducts {...{ data, error, loading }} />
-          <AppPagination
-            pagination={pagination}
+          <Pagination
+            page={pagination?.number}
+            size={pagination?.size}
+            count={data?.page?.totalPages ?? 0}
             onPageChange={handleChangePage}
             onSizeChange={handleChangeSize}
           />

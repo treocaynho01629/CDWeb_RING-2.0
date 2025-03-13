@@ -45,6 +45,7 @@ const JumpPagination = ({ pagination, onPageChange, open, handleClose }) => {
     <Dialog
       open={open}
       onClose={handleClose}
+      closeAfterTransition={false}
       aria-labelledby="pagination-dialog"
     >
       <DialogTitle id="pagination-dialog-title">Đi đến trang?</DialogTitle>

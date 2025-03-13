@@ -7,7 +7,13 @@ export const appSlice = createSlice({
   initialState,
   reducers: {
     addKeyword: (state, action) => {
-      state.keywords.push(action.payload);
+      if (state.keywords == "") return;
+      if (state.keywords.indexOf(action.payload) == -1) {
+        state.keywords.push(action.payload);
+      }
+      if (state.keywords.length >= 13) {
+        state.keywords.splice(0, 1);
+      }
     },
     removeKeyword: (state, action) => {
       state.keywords = state.keywords.filter(

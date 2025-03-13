@@ -133,7 +133,7 @@ const ButtonContainer = styled.div`
 `;
 //#endregion
 
-const Shop = ({ shop, onClickFollow, pending }) => {
+const Shop = ({ shop, onClickFollow }) => {
   const handleClickFollow = () => {
     if (onClickFollow) onClickFollow(shop);
   };

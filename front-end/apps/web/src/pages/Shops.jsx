@@ -7,9 +7,14 @@ import {
   useCallback,
   useRef,
 } from "react";
-import { NavLink, useSearchParams } from "react-router";
-import { Search, Close } from "@mui/icons-material";
-import { Box, Grid2 as Grid, TextField, useMediaQuery } from "@mui/material";
+import {
+  NavLink,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router";
+import { Close, TipsAndUpdatesOutlined } from "@mui/icons-material";
+import { Box, Grid2 as Grid, useMediaQuery } from "@mui/material";
 import {
   useFollowShopMutation,
   useGetDisplayShopsQuery,
@@ -22,6 +27,8 @@ import {
   pageSizes,
   sortShopsBy,
 } from "../ultils/filters";
+import { useAuth } from "@ring/auth";
+import { Wrapper } from "../components/custom/SortComponents";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 import AppPagination from "../components/custom/AppPagination";
 import CustomDivider from "../components/custom/CustomDivider";
@@ -38,7 +45,7 @@ const Container = styled.div`
   width: 100%;
   min-height: 90dvh;
   position: relative;
-  scroll-margin: ${({ theme }) => theme.mixins.toolbar.minHeight};
+  scroll-margin: ${({ theme }) => theme.mixins.toolbar.minHeight}px;
 `;
 
 const ShopsContainer = styled.div`
@@ -46,10 +53,6 @@ const ShopsContainer = styled.div`
   min-height: 90dvh;
   position: relative;
   padding: 0;
-`;
-
-const SearchContainer = styled.div`
-  width: 100%;
 `;
 
 const ClearButton = styled.div`
@@ -90,12 +93,13 @@ const DEFAULT_PAGINATION = {
 };
 
 const Shops = () => {
-  const inputRef = useRef(null);
   const scrollRef = useRef(null);
   const mobileMode = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md"));
+  const { username } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [openPagination, setOpenPagination] = useState(undefined); //Pagination
-  const [keyword, setKeyword] = useState("");
+  const [keyword, setKeyword] = useState(searchParams.get("q") ?? "");
   const [pagination, setPagination] = useState({
     number: searchParams.get("pNo")
       ? searchParams.get("pNo") - 1
@@ -108,6 +112,9 @@ const Shops = () => {
   });
   const [followShop, { isLoading: following }] = useFollowShopMutation();
   const [unfollowShop, { isLoading: unfollowing }] = useUnfollowShopMutation();
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const {
     data,
@@ -138,6 +145,9 @@ const Shops = () => {
   useEffect(() => {
     updatePath();
   }, [pagination]);
+  useEffect(() => {
+    setKeyword(searchParams.get("q") ?? "");
+  }, [searchParams]);
 
   //Set pagination after fetch
   useEffect(() => {
@@ -172,12 +182,19 @@ const Shops = () => {
     pagination.followed == DEFAULT_PAGINATION.followed
       ? searchParams.delete("followed")
       : searchParams.set("followed", pagination.followed);
-    setSearchParams(searchParams, { replace: true });
+    setSearchParams(searchParams);
   }, [keyword, pagination]);
 
   //Handle change
   const scrollToTop = useCallback(() => {
-    scrollRef?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (mobileMode) {
+      scrollRef?.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }, []);
   const handleChangePage = useCallback((page) => {
     setPagination((prev) => ({ ...prev, number: page - 1 }));
@@ -195,16 +212,13 @@ const Shops = () => {
   const handleChangeFollowed = useCallback((newValue) => {
     setPagination((prev) => ({ ...prev, followed: newValue }));
   }, []);
-  const handleChangeKeyword = useCallback((e) => {
-    e.preventDefault();
-    if (inputRef) setKeyword(inputRef.current.value);
-  }, []);
-  const handleRemoveKeyword = () => {
+  const handleClearKeyword = () => {
     setKeyword("");
   };
 
   const handleClickFollow = (shop) => {
-    if (isLoading || following || unfollowing) return;
+    if (!username) navigate("/auth/login", { state: { from: location } });
+    if (isLoading || following || unfollowing || !username) return;
 
     if (shop?.followed) {
       unfollowShop(shop?.id)
@@ -261,13 +275,15 @@ const Shops = () => {
     );
   }
 
+  let loading = isLoading || isFetching || isError || isUninitialized;
+
   return (
-    <>
+    <Wrapper>
       <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
         <NavLink to={"/shop"}>Danh sách cửa hàng</NavLink>
         {keyword && (
           <NavLink to={"#"} key={"keyword"}>
-            {`Cửa hàng liên quan đến: "${keyword}"`}
+            Kết quả tìm kiếm: "{keyword}"
           </NavLink>
         )}
       </CustomBreadcrumbs>
@@ -275,47 +291,29 @@ const Shops = () => {
         <CustomDivider sx={{ display: { xs: "none", md: "flex" } }}>
           DANH SÁCH CỬA HÀNG
         </CustomDivider>
-        <SearchContainer>
-          {keyword && (
-            <Keyword>
-              <span>
-                <Search />
-                &nbsp;Cửa hàng liên quan đến: '<b>{keyword}</b>'
-              </span>
-              <ClearButton onClick={handleRemoveKeyword}>
-                <Close />
-              </ClearButton>
-            </Keyword>
-          )}
-          <form ref={scrollRef} onSubmit={handleChangeKeyword}>
-            <TextField
-              placeholder="Tìm kiếm"
-              autoComplete="keyword"
-              id="keyword"
-              size="small"
-              defaultValue={searchParams.get("q")}
-              inputRef={inputRef}
-              fullWidth
-              error={inputRef?.current?.value != keyword}
-              slotProps={{
-                input: {
-                  startAdornment: <Search sx={{ marginRight: 1 }} />,
-                },
-              }}
-            />
-          </form>
-        </SearchContainer>
+        {!tabletMode && keyword && (
+          <Keyword>
+            <span>
+              <TipsAndUpdatesOutlined />
+              &nbsp;Cửa hàng liên quan đến: '<b>{keyword}</b>'
+            </span>
+            <ClearButton onClick={handleClearKeyword}>
+              <Close />
+            </ClearButton>
+          </Keyword>
+        )}
         <ShopSortList
-          {...{ pagination, mobileMode }}
+          {...{ pagination, mobileMode, keyword }}
           onOpenPagination={handleOpenPagination}
           onChangeOrder={handleChangeOrder}
           onChangeDir={handleChangeDir}
           onChangeFollowed={handleChangeFollowed}
           onPageChange={handleChangePage}
+          onClearKeyword={handleClearKeyword}
         />
         <ShopsContainer>
           <Grid container spacing={1}>
-            {isLoading && <Progress color={isError ? "error" : "primary"} />}
+            {loading && <Progress color={isError ? "error" : "primary"} />}
             {shopsContent}
           </Grid>
         </ShopsContainer>
@@ -337,7 +335,7 @@ const Shops = () => {
           )}
         </Suspense>
       </Container>
-    </>
+    </Wrapper>
   );
 };
 

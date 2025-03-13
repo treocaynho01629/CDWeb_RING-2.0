@@ -40,7 +40,7 @@ export const suggest = [
     icon: <Store />,
     color: "#8fb2c6",
     label: "Cửa hàng",
-    url: "/",
+    url: "/shop",
   },
   {
     icon: <MonetizationOn />,

@@ -143,8 +143,9 @@ const ProductDetail = () => {
           <Stack spacing={1}>
             <LazyLoad
               offset={50}
+              once
               placeholder={
-                <Placeholder
+                <Box
                   sx={{
                     width: "100%",
                     border: ".5px solid",
@@ -154,14 +155,26 @@ const ProductDetail = () => {
                 />
               }
             >
-              <Suspense fallback={null}>
+              <Suspense
+                fallback={
+                  <Placeholder
+                    sx={{
+                      width: "100%",
+                      border: ".5px solid",
+                      borderColor: "divider",
+                      height: { xs: 98, md: 133 },
+                    }}
+                  />
+                }
+              >
                 <ShopDisplay id={data?.shopId} name={data?.shopName} />
               </Suspense>
             </LazyLoad>
             <LazyLoad
               offset={50}
+              once
               placeholder={
-                <Placeholder
+                <Box
                   sx={{
                     width: "100%",
                     border: ".5px solid",
@@ -171,7 +184,18 @@ const ProductDetail = () => {
                 />
               }
             >
-              <Suspense fallback={null}>
+              <Suspense
+                fallback={
+                  <Placeholder
+                    sx={{
+                      width: "100%",
+                      border: ".5px solid",
+                      borderColor: "divider",
+                      height: { xs: 610, md: 980 },
+                    }}
+                  />
+                }
+              >
                 <ProductDetailContainer
                   {...{
                     loading: isLoading || isFetching,
@@ -194,8 +218,9 @@ const ProductDetail = () => {
           >
             <LazyLoad
               offset={50}
+              once
               placeholder={
-                <Placeholder
+                <Box
                   sx={{
                     width: "100%",
                     border: ".5px solid",
@@ -205,7 +230,18 @@ const ProductDetail = () => {
                 />
               }
             >
-              <Suspense fallback={null}>
+              <Suspense
+                fallback={
+                  <Placeholder
+                    sx={{
+                      width: "100%",
+                      border: ".5px solid",
+                      borderColor: "divider",
+                      height: { xs: 310, md: 410 },
+                    }}
+                  />
+                }
+              >
                 <ReviewComponent
                   {...{
                     book: data,
@@ -224,19 +260,33 @@ const ProductDetail = () => {
         <CustomDivider>Có thể bạn sẽ thích</CustomDivider>
         <LazyLoad
           offset={100}
+          once
           placeholder={
-            <Placeholder
+            <Box
               sx={{
                 height: "auto",
                 border: ".5px solid",
                 borderColor: "action.hover",
+                ["div"]: { opacity: 0 },
               }}
             >
               <ProductSimple />
-            </Placeholder>
+            </Box>
           }
         >
-          <Suspense fallback={null}>
+          <Suspense
+            fallback={
+              <Placeholder
+                sx={{
+                  height: "auto",
+                  border: ".5px solid",
+                  borderColor: "action.hover",
+                }}
+              >
+                <ProductSimple />
+              </Placeholder>
+            }
+          >
             <RandomList />
           </Suspense>
         </LazyLoad>

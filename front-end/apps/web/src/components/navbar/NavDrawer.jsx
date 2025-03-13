@@ -41,7 +41,7 @@ const DrawerContainer = styled(Box)`
   padding-right: ${({ theme }) => theme.spacing(1.5)};
   width: auto;
 
-  @media (min-width: 450px) {
+  ${({ theme }) => theme.breakpoints.up("xs_sm")} {
     width: 400px;
   }
 `;

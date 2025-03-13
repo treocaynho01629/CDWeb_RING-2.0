@@ -21,12 +21,12 @@ const ItemsContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 250px;
   margin: ${({ theme }) => theme.spacing(1)} 0;
 
   &.empty {
     justify-content: center;
     text-align: center;
+    min-height: 250px;
   }
 `;
 
@@ -93,16 +93,16 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
       onClick={handleClose}
       disableRestoreFocus
       disableScrollLock
-      transitionDuration={200}
+      closeAfterTransition
+      transitionDuration={150}
       transformOrigin={{ horizontal: "right", vertical: "top" }}
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       sx={{ pointerEvents: "none" }}
       slotProps={{
         paper: {
+          elevation: 2,
           sx: {
             overflow: "visible",
-            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-            bgcolor: "background.paper",
             mt: 1.5,
             borderRadius: 0,
             pointerEvents: "auto",
@@ -112,7 +112,7 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
       }}
     >
       <Paper
-        elevation={7}
+        elevation={2}
         sx={{
           display: "block",
           position: "absolute",

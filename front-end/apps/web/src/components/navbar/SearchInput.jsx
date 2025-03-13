@@ -1,31 +1,78 @@
 import styled from "@emotion/styled";
-import { Search, Close } from "@mui/icons-material";
+import {
+  Search,
+  Close,
+  Storefront,
+  History,
+  KeyboardArrowLeft,
+} from "@mui/icons-material";
 import {
   Button,
+  createFilterOptions,
   IconButton,
   inputBaseClasses,
   Paper,
   TextField,
   useAutocomplete,
 } from "@mui/material";
-import { useNavigate, useSearchParams } from "react-router";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  lazy,
+  Suspense,
+  useRef,
+} from "react";
+import { Link, useNavigate, useSearchParams } from "react-router";
+import { useGetBooksSuggestionQuery } from "../../features/books/booksApiSlice";
+import { debounce } from "lodash-es";
+import useApp from "../../hooks/useApp";
+
+const Dialog = lazy(() => import("@mui/material/Dialog"));
+const DialogContent = lazy(() => import("@mui/material/DialogContent"));
 
 //#region styled
-const StyledSearchForm = styled.form`
-  width: 100%;
+const AutocompleteContainer = styled.div`
   display: flex;
   align-items: center;
   position: relative;
+  width: 40ch;
+
+  &.hidden {
+    display: none;
+  }
+
+  ${({ theme }) => theme.breakpoints.down("lg")} {
+    width: 35ch;
+  }
+
+  ${({ theme }) => theme.breakpoints.down("md_lg")} {
+    width: 30ch;
+  }
 
   ${({ theme }) => theme.breakpoints.down("md")} {
+    width: 100%;
     flex-direction: row-reverse;
-    justify-content: space-between;
+    justify-content: center;
   }
 `;
 
-const AutocompleteContainer = styled.div`
+const SearchForm = styled.form`
   width: 100%;
   position: relative;
+`;
+
+const SearchInputContainer = styled.div`
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    display: flex;
+    align-items: center;
+    padding: ${({ theme }) => `${theme.spacing(1.5)} ${theme.spacing(1.5)}`};
+    border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
+  }
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: 10px 5px;
+  }
 `;
 
 const StyledSearchInput = styled(TextField)`
@@ -47,25 +94,20 @@ const StyledSearchInput = styled(TextField)`
   }
 `;
 
-const ListBoxContainer = styled(Paper)`
+const ListBoxPopover = styled(Paper)`
   width: 100%;
   z-index: 1;
   position: absolute;
   margin-top: ${({ theme }) => theme.spacing(1.5)};
-  filter: drop-shadow(0px 2px 8px rgba(0, 0, 0, 0.32));
+  padding: ${({ theme }) => theme.spacing(0.5)} 0;
+`;
 
-  ${({ theme }) => theme.breakpoints.down("sm")} {
-    position: fixed;
-    top: ${({ theme }) => theme.mixins.toolbar.minHeight + 16}px;
-    left: 0;
-    max-height: auto;
-    height: 100vh;
-    margin-top: 0;
-  }
+const ListBoxContainer = styled.div`
+  display: flex;
 `;
 
 const Listbox = styled.ul`
-  max-height: 250px;
+  max-height: 50dvh;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -73,14 +115,15 @@ const Listbox = styled.ul`
   background-color: transparent;
   overflow: auto;
 
-  ${({ theme }) => theme.breakpoints.down("sm")} {
-    max-height: auto;
-    height: 100vh;
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    max-height: calc(100% - 61px);
   }
 `;
 
 const ListItem = styled.li`
-  padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(1)}`};
+  padding: ${({ theme }) => `${theme.spacing(0.65)} ${theme.spacing(1)}`};
+  padding-right: 0;
+  height: 36px;
 
   &.Mui-focused {
     background-color: ${({ theme }) => theme.palette.action.hover};
@@ -90,15 +133,42 @@ const ListItem = styled.li`
   &:active {
     background-color: ${({ theme }) => theme.palette.action.selected};
   }
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    padding: ${({ theme }) => `${theme.spacing(2.75)} ${theme.spacing(1.5)}`};
+    padding-right: ${({ theme }) => theme.spacing(0.5)};
+    border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
+  }
+`;
+
+const ListLink = styled(Link)`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+`;
+
+const ItemTitle = styled.div`
+  display: flex;
+  align-items: center;
+
+  svg {
+    font-size: 24px;
+    margin-right: ${({ theme }) => theme.spacing(1)};
+  }
 `;
 
 const StyledIconButton = styled(IconButton)`
   border-radius: 0;
 
+  svg {
+    font-size: 20px;
+  }
+
   &:hover {
     background-color: transparent;
-    color: ${({ theme, hoverColor }) =>
-      theme.palette[hoverColor]?.main ?? theme.palette.primary.main};
+    color: ${({ theme }) => theme.palette.error.main};
   }
 `;
 
@@ -108,10 +178,11 @@ const AdornmentContainer = styled.div`
 `;
 
 const SearchButton = styled(Button)`
-  height: 28px;
+  height: 30px;
   width: 48px;
   min-width: auto;
   padding: ${({ theme }) => theme.spacing(0.5)};
+  border-left: 1px solid ${({ theme }) => theme.palette.divider};
 
   svg {
     font-size: 22px;
@@ -119,103 +190,386 @@ const SearchButton = styled(Button)`
 `;
 //#endregion
 
-const SearchInput = ({ searchField, setSearchField }) => {
+const filter = createFilterOptions();
+
+const AutocompleteComponent = ({
+  mobileMode,
+  tabletMode,
+  searchParams,
+  inputValue,
+  setInputValue,
+  handleOpenDialog,
+  handleCloseDialog,
+  show,
+  isFocus,
+  displayRef,
+}) => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [suggestValue, setSuggestValue] = useState(searchParams.get("q") ?? "");
+  const { keywords: historyOptions, addKeyword, removeKeyword } = useApp();
+  const { data, isLoading, isFetching, isSuccess, isError, error } =
+    useGetBooksSuggestionQuery(suggestValue, { skip: !suggestValue });
+
+  //Ignore if there is no more suggestion (< 9 keywords)
+  const debounceSetSuggest = useCallback(
+    debounce((newInputValue) => {
+      setSuggestValue((prev) =>
+        prev != "" &&
+        data?.length < 9 &&
+        newInputValue.toLowerCase().startsWith(prev.toLowerCase())
+          ? prev
+          : newInputValue
+      );
+    }, 200),
+    []
+  );
+
+  const handleChangeSuggest = useCallback((e, newInputValue) => {
+    debounceSetSuggest(newInputValue);
+    setInputValue(newInputValue);
+  }, []);
+
+  const handleSelectSuggest = (e, newValue) => {
+    handleSearch(e, newValue);
+  };
+
+  //Confirm search
+  const handleSearch = (e, newValue) => {
+    e.preventDefault();
+
+    const value = newValue?.value ?? inputValue;
+    addKeyword(value);
+    navigate(`/${newValue?.group == "SHOP" ? "shop" : "store"}?q=${value}`);
+    displayRef.current = value;
+    handleCloseDialog();
+  };
+
+  const handleRemoveKeyword = (e, keyword) => {
+    e.preventDefault();
+    e.stopPropagation();
+    removeKeyword(keyword);
+  };
+
+  //Focus input (autoFocus option only focus once)
+  const handleFocus = () => {
+    let inputRef = getInputProps().ref;
+    if (inputRef.current) inputRef.current.focus();
+  };
+
+  //Options
+  let options = [];
+
+  if (isLoading || isFetching) {
+    options = (tabletMode ? historyOptions : historyOptions.slice(0, 6)).map(
+      (option) => {
+        return { group: "HISTORY", value: option };
+      }
+    );
+    options.push({ value: "Đang tải..." });
+  } else if (isSuccess) {
+    options = historyOptions.map((option) => {
+      return { group: "HISTORY", value: option };
+    });
+
+    if (suggestValue) {
+      options = options.concat(
+        data.map((option) => {
+          return { group: "SUGGEST", value: option };
+        })
+      );
+    }
+  } else {
+    options = historyOptions.map((option) => {
+      return { group: "HISTORY", value: option };
+    });
+  }
+
+  useEffect(() => {
+    if (show && isFocus) {
+      handleFocus();
+      handleOpenDialog();
+    }
+  }, [show]);
+
+  //Autocomplete
   const {
     getRootProps,
     getInputProps,
     getListboxProps,
     getOptionProps,
-    groupedOptions,
-    inputValue,
     getClearProps,
+    groupedOptions,
   } = useAutocomplete({
     id: "autocomplete-input",
-    options: [
-      "The Godfather",
-      "Pulp Fiction",
-      "aaaa",
-      "bbbbbb",
-      "ccccc",
-      "dddddd",
-      "eeeeee",
-      "fffffff",
-      "ggggggg",
-      "iiiiiii",
-      "jjjjjj",
-    ],
+    options: options,
     freeSolo: true,
-    openOnFocus: true,
-  });
+    openOnFocus: !tabletMode,
+    inputValue: inputValue,
+    onInputChange: handleChangeSuggest,
+    onChange: handleSelectSuggest,
+    getOptionLabel: (option) => {
+      // Value selected with enter, right from the input
+      if (typeof option === "string") {
+        return option;
+      }
+      // Add "xxx" option created dynamically
+      if (option.inputValue) {
+        return option.inputValue;
+      }
+      // Regular option
+      return option.value;
+    },
+    filterOptions: (options, params) => {
+      let filtered = filter(options, params);
+      // Suggest search shop instead
+      if (inputValue) {
+        filtered = [{ group: "SHOP", value: inputValue }].concat(filtered);
+      }
 
-  //Confirm search
-  const handleNavigateStore = (e, value) => {
-    e.preventDefault();
-    let { pathname } = location;
-    let search;
-    if (!pathname.startsWith("/store")) {
-      pathname = "/store";
-      search = value != "" ? `?q=${value}` : "";
-    } else {
-      value != "" ? searchParams.set("q", value) : searchParams.delete("q");
-      search = searchParams.toString();
-    }
-    navigate({ pathname, search });
-  };
+      return filtered;
+    },
+    ...(tabletMode && { open: true }),
+  });
 
   let endAdornment = (
     <AdornmentContainer>
-      {inputValue && (
-        <StyledIconButton
-          {...getClearProps()}
-          aria-label="clear search value"
-          hoverColor="error"
-        >
-          <Close fontSize="small" />
+      {inputValue !== "" && (
+        <StyledIconButton {...getClearProps()} aria-label="clear search value">
+          <Close />
         </StyledIconButton>
       )}
-      <SearchButton variant="contained" size="small" aria-label="submit search">
+      <SearchButton type="submit" size="small" aria-label="submit search">
         <Search />
       </SearchButton>
     </AdornmentContainer>
   );
 
   return (
-    <StyledSearchForm onSubmit={(e) => handleNavigateStore(e, searchField)}>
-      <AutocompleteContainer {...getRootProps()}>
-        <StyledSearchInput
-          autoFocus
-          placeholder="Tìm kiếm..."
-          size="small"
-          slotProps={{
-            input: {
-              endAdornment: endAdornment,
-            },
-            htmlInput: {
-              ...getInputProps(),
-            },
-          }}
-        />
-        {groupedOptions.length > 0 ? (
-          <ListBoxContainer elevation={7}>
-            <Listbox {...getListboxProps()}>
-              {groupedOptions.map((option, index) => {
-                const { key, ...optionProps } = getOptionProps({
-                  option,
-                  index,
-                });
-                return (
-                  <ListItem key={key} {...optionProps}>
-                    {option}
-                  </ListItem>
-                );
-              })}
-            </Listbox>
-          </ListBoxContainer>
-        ) : null}
-      </AutocompleteContainer>
-    </StyledSearchForm>
+    <SearchForm {...getRootProps()} onSubmit={(e) => handleSearch(e)}>
+      {tabletMode ? (
+        <>
+          <SearchInputContainer>
+            {mobileMode && (
+              <StyledIconButton
+                onClick={handleCloseDialog}
+                aria-label="close search dialog"
+              >
+                <KeyboardArrowLeft />
+              </StyledIconButton>
+            )}
+            <StyledSearchInput
+              placeholder="Tìm kiếm..."
+              size="small"
+              autoFocus
+              slotProps={{
+                input: {
+                  endAdornment: endAdornment,
+                },
+                htmlInput: {
+                  ...getInputProps(),
+                },
+              }}
+            />
+          </SearchInputContainer>
+          {groupedOptions.length > 0 && (
+            <ListBoxContainer>
+              <Listbox {...getListboxProps()}>
+                {groupedOptions.map((option, index) => {
+                  const { key, ...optionProps } = getOptionProps({
+                    option,
+                    index,
+                  });
+                  return (
+                    <ListItem key={`option-${key}-${index}`} {...optionProps}>
+                      {option?.group == "SHOP" ? (
+                        <ListLink to={`/shop?q=${option.value}`}>
+                          <ItemTitle>
+                            <Storefront color="primary" />
+                            Tìm cửa hàng: "{option.value}"
+                          </ItemTitle>
+                        </ListLink>
+                      ) : option?.group == "HISTORY" ? (
+                        <ListLink to={`/store?q=${option.value}`}>
+                          <ItemTitle>
+                            <History />
+                            {option.value}
+                          </ItemTitle>
+                          <StyledIconButton
+                            onClick={(e) =>
+                              handleRemoveKeyword(e, option.value)
+                            }
+                            aria-label={`remove ${option.value} from history`}
+                          >
+                            <Close />
+                          </StyledIconButton>
+                        </ListLink>
+                      ) : option?.group == "SUGGEST" ? (
+                        <ListLink to={`/store?q=${option.value}`}>
+                          <ItemTitle>
+                            <Search />
+                            {option.value}
+                          </ItemTitle>
+                        </ListLink>
+                      ) : (
+                        option.value
+                      )}
+                    </ListItem>
+                  );
+                })}
+              </Listbox>
+            </ListBoxContainer>
+          )}
+        </>
+      ) : (
+        <>
+          <SearchInputContainer>
+            <StyledSearchInput
+              placeholder="Tìm kiếm..."
+              size="small"
+              slotProps={{
+                input: {
+                  endAdornment: endAdornment,
+                },
+                htmlInput: {
+                  ...getInputProps(),
+                },
+              }}
+            />
+          </SearchInputContainer>
+          {groupedOptions.length > 0 && (
+            <ListBoxPopover elevation={2}>
+              <Listbox {...getListboxProps()}>
+                {groupedOptions.map((option, index) => {
+                  const { key, ...optionProps } = getOptionProps({
+                    option,
+                    index,
+                  });
+                  return (
+                    <ListItem key={`option-${key}-${index}`} {...optionProps}>
+                      {option?.group == "SHOP" ? (
+                        <ListLink to={`/shop?q=${option.value}`}>
+                          <ItemTitle>
+                            <Storefront color="primary" />
+                            Tìm cửa hàng: "{option.value}"
+                          </ItemTitle>
+                        </ListLink>
+                      ) : option?.group == "HISTORY" ? (
+                        <ListLink to={`/store?q=${option.value}`}>
+                          <ItemTitle>
+                            <History />
+                            {option.value}
+                          </ItemTitle>
+                          <StyledIconButton
+                            onClick={(e) =>
+                              handleRemoveKeyword(e, option.value)
+                            }
+                            aria-label={`remove ${option.value} from history`}
+                          >
+                            <Close />
+                          </StyledIconButton>
+                        </ListLink>
+                      ) : option?.group == "SUGGEST" ? (
+                        <ListLink to={`/store?q=${option.value}`}>
+                          <ItemTitle>
+                            <Search />
+                            {option.value}
+                          </ItemTitle>
+                        </ListLink>
+                      ) : (
+                        option.value
+                      )}
+                    </ListItem>
+                  );
+                })}
+              </Listbox>
+            </ListBoxPopover>
+          )}
+        </>
+      )}
+    </SearchForm>
+  );
+};
+
+const SearchInput = ({ mobileMode, tabletMode, show, isFocus }) => {
+  const displayRef = useRef();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [inputValue, setInputValue] = useState(searchParams.get("q") ?? "");
+  const [openDialog, setOpenDialog] = useState(undefined);
+
+  useEffect(() => {
+    const query = searchParams.get("q");
+    setInputValue(query ?? "");
+    displayRef.current = query ?? "";
+  }, [searchParams]);
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  let autocomplete = (
+    <AutocompleteComponent
+      {...{
+        mobileMode,
+        tabletMode,
+        searchParams,
+        inputValue,
+        setInputValue,
+        handleOpenDialog,
+        handleCloseDialog,
+        show,
+        isFocus,
+        displayRef,
+      }}
+    />
+  );
+
+  return (
+    <>
+      {tabletMode ? (
+        <AutocompleteContainer className={show ? "" : "hidden"}>
+          <StyledSearchInput
+            placeholder="Tìm kiếm..."
+            size="small"
+            value={displayRef.current}
+            onClick={handleOpenDialog}
+            sx={{ mx: 0.5, maxWidth: 550 }}
+            slotProps={{
+              input: {
+                readOnly: true,
+              },
+            }}
+          />
+          <Suspense fallback={null}>
+            <Dialog
+              open={openDialog}
+              fullWidth
+              maxWidth={"sm"}
+              onClose={handleCloseDialog}
+              fullScreen={mobileMode}
+              aria-labelledby="search-dialog"
+              closeAfterTransition={false}
+              slotProps={{
+                paper: {
+                  elevation: 2,
+                },
+              }}
+            >
+              <DialogContent sx={{ minHeight: 500, p: 0 }}>
+                {autocomplete}
+              </DialogContent>
+            </Dialog>
+          </Suspense>
+        </AutocompleteContainer>
+      ) : (
+        <AutocompleteContainer className={show ? "" : "hidden"}>
+          {autocomplete}
+        </AutocompleteContainer>
+      )}
+    </>
   );
 };
 

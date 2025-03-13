@@ -173,21 +173,23 @@ const PriceRangeSlider = ({ value, onChange, disabledLabel }) => {
           }}
         />
       </Box>
-      <Box sx={{ width: "100%" }}>
-        <CustomSlider
-          getAriaLabel={() => "Bộ lọc giá"}
-          value={rangeValue}
-          min={0}
-          step={0.1}
-          max={13.3}
-          scale={calculateValue}
-          marks={marks}
-          valueLabelDisplay={disabledLabel ? "off" : "auto"}
-          getAriaValueText={valuetext}
-          valueLabelFormat={valuetext}
-          onChange={handleChangeRange}
-          onChangeCommitted={handleChange}
-        />
+      <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
+        <Box width="85%">
+          <CustomSlider
+            getAriaLabel={() => "Bộ lọc giá"}
+            value={rangeValue}
+            min={0}
+            step={0.1}
+            max={13.3}
+            scale={calculateValue}
+            marks={marks}
+            valueLabelDisplay={disabledLabel ? "off" : "auto"}
+            getAriaValueText={valuetext}
+            valueLabelFormat={valuetext}
+            onChange={handleChangeRange}
+            onChangeCommitted={handleChange}
+          />
+        </Box>
       </Box>
       <Button
         variant="outlined"

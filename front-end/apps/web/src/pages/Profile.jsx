@@ -88,6 +88,7 @@ const Profile = () => {
           scroll={"paper"}
           maxWidth={"md"}
           fullWidth
+          closeAfterTransition={false}
           slotProps={{
             paper: {
               elevation: 0,

@@ -46,7 +46,7 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
   const [contextOrder, setContextOrder] = useState(null);
   const [filters, setFilters] = useState({
     status: searchParams.get("status") ?? "",
-    keyword: searchParams.get("q") ?? "",
+    keyword: searchParams.get("k") ?? "",
   });
   const [pagination, setPagination] = useState({
     number: 0,
@@ -109,8 +109,8 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
       ? searchParams.delete("status")
       : searchParams.set("status", filters.status);
     filters?.keyword == ""
-      ? searchParams.delete("q")
-      : searchParams.set("q", filters.keyword);
+      ? searchParams.delete("k")
+      : searchParams.set("k", filters.keyword);
     setSearchParams(searchParams, { replace: true });
   };
 
@@ -280,7 +280,7 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
             autoComplete="order"
             id="order"
             size="small"
-            defaultValue={searchParams.get("q")}
+            defaultValue={searchParams.get("k")}
             inputRef={inputRef}
             fullWidth
             error={inputRef?.current?.value != filters.keyword}
@@ -311,6 +311,7 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
         open={open}
         onClose={handleClose}
         fullScreen={mobileMode}
+        closeAfterTransition={false}
         aria-labelledby="cancel-dialog"
       >
         {open && (

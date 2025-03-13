@@ -183,6 +183,15 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         } else return [{ type: "Book", id: "LIST" }];
       },
     }),
+    getBooksSuggestion: builder.query({
+      query: (keyword) => ({
+        url: `/api/books/suggest?keyword=${keyword}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result?.isError;
+        },
+      }),
+      providesTags: (result, error) => [{ type: "Book", id: "LIST" }],
+    }),
   }),
 });
 
@@ -191,6 +200,7 @@ export const {
   useGetBooksQuery,
   useGetBooksByIdsQuery,
   useGetRandomBooksQuery,
+  useGetBooksSuggestionQuery,
   usePrefetch: usePrefetchBooks,
 } = booksApiSlice;
 

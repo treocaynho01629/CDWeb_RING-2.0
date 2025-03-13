@@ -107,3 +107,27 @@ export const StyledSortButton = styled(Button)`
     display: flex;
   }
 `;
+
+export const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  ${({ theme }) => theme.breakpoints.up("sm")} {
+    margin-right: auto;
+    margin-left: auto;
+    width: 600px;
+  }
+
+  ${({ theme }) => theme.breakpoints.up("sm_md")} {
+    width: 750px;
+  }
+
+  ${({ theme }) => theme.breakpoints.up("md_lg")} {
+    width: 970px;
+  }
+
+  ${({ theme }) => theme.breakpoints.up("lg")} {
+    width: 1170px;
+  }
+`;

@@ -48,6 +48,15 @@ const SuggestText = styled.b`
     margin: 5px 0;
     color: ${({ theme }) => theme.palette.warning.main};
   }
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    display: flex;
+    width: 100%;
+    font-size: 14px;
+    font-weight: 400;
+    justify-content: center;
+    padding: ${({ theme }) => theme.spacing(1)};
+  }
 `;
 //#endregion
 
@@ -170,6 +179,7 @@ const ReviewForm = ({
       fullWidth
       onClose={handleClose}
       fullScreen={mobileMode}
+      closeAfterTransition={false}
     >
       <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
         <Edit />
@@ -233,23 +243,9 @@ const ReviewForm = ({
             </form>
           </div>
         ) : (
-          <div>
-            <div>
-              <SuggestText>
-                Bạn chưa đăng nhập, hãy Đăng nhập để đánh giá
-              </SuggestText>
-            </div>
-            <br />
-            <Link
-              to={"/auth/login"}
-              state={{ from: location }}
-              title="Đăng nhập"
-            >
-              <Button variant="contained" color="primary">
-                Đăng nhập ngay
-              </Button>
-            </Link>
-          </div>
+          <SuggestText>
+            Bạn chưa đăng nhập, hãy Đăng nhập để đánh giá
+          </SuggestText>
         )}
       </DialogContent>
       <DialogActions>

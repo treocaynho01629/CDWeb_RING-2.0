@@ -33,14 +33,16 @@ const ProfilePopover = ({
       onClick={handleClose}
       disableRestoreFocus
       disableScrollLock
-      transitionDuration={200}
+      closeAfterTransition
+      transitionDuration={150}
+      transformOrigin={{ horizontal: "right", vertical: "top" }}
+      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       sx={{ pointerEvents: "none" }}
       slotProps={{
         paper: {
+          elevation: 2,
           sx: {
             overflow: "visible",
-            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-            bgcolor: "background.paper",
             mt: 1.5,
             borderRadius: 0,
             pointerEvents: "auto",
@@ -48,11 +50,9 @@ const ProfilePopover = ({
           onMouseLeave: handleClose,
         },
       }}
-      transformOrigin={{ horizontal: "right", vertical: "top" }}
-      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
       <Paper
-        elevation={7}
+        elevation={2}
         sx={{
           display: "block",
           position: "absolute",
@@ -66,16 +66,16 @@ const ProfilePopover = ({
           zIndex: 0,
         }}
       />
-      <Link to={"/profile/detail"} style={{ color: "inherit" }}>
+      <Link to={"/profile/detail"}>
         <MenuItem>
           <Avatar
             sx={{ width: 30, height: 30, ml: -0.5, mr: 1 }}
             src={image ? image + "?size=tiny" : null}
-          />{" "}
+          />
           Thông tin tài khoản
         </MenuItem>
       </Link>
-      <Link to={"/profile/order"} style={{ color: "inherit" }}>
+      <Link to={"/profile/order"}>
         <MenuItem>
           <ListItemIcon>
             <DeliveryDiningOutlined fontSize="small" />

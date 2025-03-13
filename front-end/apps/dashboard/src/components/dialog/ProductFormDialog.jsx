@@ -423,6 +423,7 @@ const ProductFormDialog = ({
       fullWidth
       onClose={handleCloseDialog}
       fullScreen={fullScreen}
+      closeAfterTransition={false}
       aria-modal
     >
       <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
@@ -459,13 +460,6 @@ const ProductFormDialog = ({
                 fullWidth
                 multiline
                 minRows={6}
-                slotProps={{
-                  inputComponent: TextareaAutosize,
-                  inputProps: {
-                    minRows: 6,
-                    style: { resize: "auto" },
-                  },
-                }}
                 variant="outlined"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}

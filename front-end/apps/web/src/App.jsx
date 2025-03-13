@@ -7,6 +7,7 @@ import PageLayout from "./components/layout/PageLayout";
 import FallbackLogo from "@ring/ui/FallbackLogo";
 import Layout from "@ring/ui/Layout";
 import "react-multi-carousel/lib/styles.css";
+import "simplebar-react/dist/simplebar.min.css";
 
 function App() {
   useReachable(); //Test connection to server

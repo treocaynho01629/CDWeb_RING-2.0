@@ -65,7 +65,7 @@ export default function SummaryTableUsers() {
     userRows = ids?.length ? (
       ids?.map((id, index) => {
         const user = entities[id];
-        const roleItem = roleTypes[user?.roles];
+        const roleItem = roleTypes[user?.role];
 
         return (
           <TableRow hover tabIndex={-1} key={id}>
