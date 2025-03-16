@@ -72,11 +72,18 @@ public class ShopController {
         return new ResponseEntity<>(shopService.getShopsPreview(currUser), HttpStatus.OK);
     }
 
-    //Get shop by {id}
-    @GetMapping("/{id}")
+    //Get shop info by {id}
+    @GetMapping("info/{id}")
     public ResponseEntity<?> getShopInfo(@PathVariable("id") Long id,
                                          @CurrentAccount Account currUser) {
         return new ResponseEntity<>(shopService.getShopInfo(id, currUser), HttpStatus.OK);
+    }
+
+    //Get shop by {id}
+    @GetMapping("{id}")
+    public ResponseEntity<?> getShopDisplayDetail(@PathVariable("id") Long id,
+                                         @CurrentAccount Account currUser) {
+        return new ResponseEntity<>(shopService.getShopDisplayDetail(id, currUser), HttpStatus.OK);
     }
 
     //Get shop by {id}

@@ -27,6 +27,9 @@ const DetailContainer = styled.div`
 `;
 
 const ProductsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
   border: 0.5px solid ${({ theme }) => theme.palette.divider};
   background-color: ${({ theme }) => theme.palette.background.paper};
 `;
@@ -446,7 +449,7 @@ const ProductDetailContainer = ({ loading, book, tabletMode }) => {
           </DescriptionContainer>
         </DetailContainer>
       </Grid>
-      <Grid size={{ xs: 12, md: "auto" }}>
+      <Grid size={{ xs: 12, md: "auto" }} display={{ xs: "block", md: "flex" }}>
         <ProductsContainer>
           <Box padding={{ xs: "0 12px", md: "10px 20px 0" }}>
             <Title>

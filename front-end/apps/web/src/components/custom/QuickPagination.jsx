@@ -50,9 +50,9 @@ const Count = styled.span`
 `;
 //#endregion
 
-const QuickPagination = ({ pagination, onPageChange, onOpenPagination }) => {
-  const currPage = pagination?.number;
-  const totalPages = pagination?.totalPages;
+const QuickPagination = ({ page, count, onPageChange, onOpenPagination }) => {
+  const currPage = page;
+  const totalPages = count;
 
   const handlePageChange = (page) => {
     if (onPageChange) onPageChange(page);

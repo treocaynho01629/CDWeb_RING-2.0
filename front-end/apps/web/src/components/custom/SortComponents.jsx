@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Button, TextField } from "@mui/material";
+import { alpha, Button, TextField } from "@mui/material";
 
 export const SortWrapper = styled.div`
   position: sticky;
@@ -26,6 +26,7 @@ export const SortWrapper = styled.div`
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
+    z-index: ${({ theme }) => theme.zIndex.appBar};
     top: ${({ theme }) => theme.mixins.toolbar.minHeight + 4}px;
     border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
     margin: 0 0 20px;
@@ -101,6 +102,7 @@ export const StyledSortButton = styled(Button)`
   padding-right: 0;
   display: none;
   max-width: 100px;
+  background-color: ${({ theme }) => theme.palette.background.paper};
   color: ${({ theme }) => theme.palette.text.primary};
 
   ${({ theme }) => theme.breakpoints.down("md_lg")} {
@@ -129,5 +131,31 @@ export const Wrapper = styled.div`
 
   ${({ theme }) => theme.breakpoints.up("lg")} {
     width: 1170px;
+  }
+`;
+
+export const StoreSuggest = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 10px 0 20px;
+  padding: ${({ theme }) => theme.spacing(1)};
+  border: 0.5px solid ${({ theme }) => theme.palette.success.main};
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: ${({ theme }) => theme.palette.success.main};
+    background-color: ${({ theme }) => alpha(theme.palette.success.light, 0.1)};
+  }
+
+  span {
+    b {
+      color: ${({ theme }) => theme.palette.success.main};
+    }
+  }
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    margin: ${({ theme }) => `10px ${theme.spacing(1)} 20px`};
+    background-color: ${({ theme }) => alpha(theme.palette.success.light, 0.1)};
   }
 `;

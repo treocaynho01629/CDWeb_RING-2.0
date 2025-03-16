@@ -21,6 +21,16 @@ public interface PublisherRepository extends JpaRepository<Publisher, Integer>{
     Page<IPublisher> findPublishers(Pageable pageable);
 
     @Query("""
+          select distinct p as publisher, i.name as image
+          from Publisher p left join p.image i
+          join p.publisherBooks b
+          join b.cate c
+          where c.id = :cateId or c.parent.id = :cateId
+          group by p.id, i.name
+    """)
+    Page<IPublisher> findRelevantPublishers(Integer cateId, Pageable pageable);
+
+    @Query("""
           select p as publisher, i.name as image
           from Publisher p left join p.image i
           where p.id = :id

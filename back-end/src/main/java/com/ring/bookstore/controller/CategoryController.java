@@ -30,6 +30,14 @@ public class CategoryController {
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
+    //Get relevant categories
+    @GetMapping("/relevant/{id}")
+    public ResponseEntity<?> getRelevantCategories(@RequestParam(value = "pSize", defaultValue = "20") Integer pageSize,
+                                                   @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                                                   @PathVariable("id") Long shopId) {
+        return new ResponseEntity<>(cateService.getRelevantCategories(pageNo, pageSize, shopId), HttpStatus.OK);
+    }
+
     //Get categories
     @GetMapping
     public ResponseEntity<?> getCategories(@RequestParam(value = "pSize", defaultValue = "20") Integer pageSize,

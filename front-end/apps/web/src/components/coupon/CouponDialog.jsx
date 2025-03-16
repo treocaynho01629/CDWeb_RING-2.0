@@ -352,6 +352,8 @@ const CouponDialog = ({
     const summary = couponTypes[currCoupon?.type];
     const isDisabled =
       selectMode && (!currCoupon?.isUsable || currCoupon?.shopId != shopId);
+    const isUsed =
+      selectMode && (!currCoupon?.isUsed || currCoupon?.shopId != shopId);
     const isSelected = tempCoupon?.id == currCoupon?.id;
 
     topCoupon = (
@@ -362,6 +364,7 @@ const CouponDialog = ({
           summary,
           selectMode,
           isDisabled,
+          isUsed,
           isSelected,
           onClickApply: setTempCoupon,
         }}

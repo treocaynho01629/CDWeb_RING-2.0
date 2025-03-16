@@ -1,12 +1,5 @@
 import styled from "@emotion/styled";
-import {
-  Fragment,
-  useState,
-  useEffect,
-  memo,
-  useRef,
-  useCallback,
-} from "react";
+import { Fragment, useState, useEffect, memo, useRef } from "react";
 import {
   Button,
   Skeleton,
@@ -17,6 +10,7 @@ import {
   SwipeableDrawer,
   Collapse,
   Badge,
+  alpha,
 } from "@mui/material";
 import {
   Check,
@@ -26,8 +20,14 @@ import {
   ExpandMore,
 } from "@mui/icons-material";
 import { bookTypeItems } from "@ring/shared";
-import { useGetCategoriesQuery } from "../../../features/categories/categoriesApiSlice";
-import { useGetPublishersQuery } from "../../../features/publishers/publishersApiSlice";
+import {
+  useGetCategoriesQuery,
+  useGetRelevantCategoriesQuery,
+} from "../../../features/categories/categoriesApiSlice";
+import {
+  useGetPublishersQuery,
+  useGetRelevantPublishersQuery,
+} from "../../../features/publishers/publishersApiSlice";
 import { suggestPrices } from "../../../ultils/filters";
 import PriceRangeSlider from "./PriceRangeSlider";
 
@@ -83,7 +83,7 @@ const SliderContainer = styled.div`
 `;
 
 const StyledButton = styled.span`
-  width: 48%;
+  width: ${({ theme }) => `calc(50% - ${theme.spacing(0.5)})`};
   padding: 6px;
   background-color: ${({ theme }) => theme.palette.action.focus};
   border: 1px solid transparent;
@@ -99,29 +99,46 @@ const StyledButton = styled.span`
   }
 
   &.filled {
-    width: calc(96% + ${({ theme }) => theme.spacing(1)});
+    width: 100%;
   }
 
   &.expanded {
-    width: calc(96% + ${({ theme }) => theme.spacing(1)});
+    width: 100%;
     border-color: ${({ theme }) => theme.palette.primary.main};
     background-color: ${({ theme }) => theme.palette.action.hover};
   }
 
-  &.checked {
+  &.checked,
+  &.active {
     color: ${({ theme }) => theme.palette.primary.dark};
-    background-color: ${({ theme }) => theme.palette.action.selected};
+    background-color: ${({ theme }) => alpha(theme.palette.primary.light, 0.1)};
     border-color: ${({ theme }) => theme.palette.primary.main};
-    border-style: dashed;
     font-weight: 450;
   }
 
-  &.active {
-    color: ${({ theme }) => theme.palette.primary.dark};
-    background-color: ${({ theme }) => theme.palette.action.selected};
-    border-color: ${({ theme }) => theme.palette.primary.main};
-    font-weight: 450;
+  &.checked {
+    border-style: dashed;
   }
+`;
+
+const StyledStack = styled(Stack)`
+  margin-top: ${({ theme }) => theme.spacing(-0.5)};
+  padding: 2px;
+  border: 0.5px dashed ${({ theme }) => theme.palette.divider};
+
+  ${StyledButton} {
+    background-color: ${({ theme }) => theme.palette.action.hover};
+    width: ${({ theme }) => `calc(50% - ${theme.spacing(0.5)} - 2px)`};
+  }
+`;
+
+const Message = styled.span`
+  width: 100%;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.palette.warning.main};
 `;
 
 const Showmore = styled.div`
@@ -144,7 +161,7 @@ const Showmore = styled.div`
 const LIMIT_CATES = 4;
 const LIMIT_PUBS = 4;
 
-const CateFilter = memo(({ cateId, onChangeCate }) => {
+const CateFilter = memo(({ cateId, shopId, onChangeCate }) => {
   const [open, setOpen] = useState(false); //Open sub cate
   const [showmore, setShowmore] = useState(false);
   const childContainedRef = useRef(null);
@@ -155,12 +172,14 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
     totalElements: 0,
   });
 
-  const { data, isLoading, isFetching, isSuccess, isError } =
-    useGetCategoriesQuery({
-      include: "children",
-      page: pagination?.number,
-      loadMore: pagination?.isMore,
-    });
+  const { data, isLoading, isFetching, isSuccess, isError } = (
+    shopId ? useGetRelevantCategoriesQuery : useGetCategoriesQuery
+  )({
+    include: "children",
+    page: pagination?.number,
+    loadMore: pagination?.isMore,
+    id: shopId,
+  });
 
   useEffect(() => {
     if (data && !isLoading && isSuccess) {
@@ -248,8 +267,8 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
                 timeout="auto"
                 unmountOnExit
               >
-                <Stack
-                  spacing={{ xs: 1 }}
+                <StyledStack
+                  spacing={1}
                   direction="row"
                   useFlexGap
                   flexWrap="wrap"
@@ -263,7 +282,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
                       <ContentText>{child?.name}</ContentText>
                     </StyledButton>
                   ))}
-                </Stack>
+                </StyledStack>
               </Collapse>
             )}
           </Fragment>
@@ -297,11 +316,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
         </>
       );
     } else {
-      catesContent = [...Array(LIMIT_CATES)].map((item, index) => (
-        <Fragment key={`temp-cate-${index}`}>
-          <Skeleton variant="rectangular" height={38} width="48%" />
-        </Fragment>
-      ));
+      catesContent = <Message>Không có danh mục nào</Message>;
     }
   }
 
@@ -346,7 +361,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
   );
 });
 
-const PublisherFilter = memo(({ pubs, onChangePub }) => {
+const PublisherFilter = memo(({ pubs, cateId, onChangePub }) => {
   const [selectedPub, setSelectedPub] = useState(pubs || []);
   const [showmore, setShowmore] = useState(false);
   const [pagination, setPagination] = useState({
@@ -356,11 +371,13 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
     totalElements: 0,
   });
 
-  const { data, isLoading, isFetching, isSuccess, isError } =
-    useGetPublishersQuery({
-      page: pagination?.number,
-      loadMore: pagination?.isMore,
-    });
+  const { data, isLoading, isFetching, isSuccess, isError } = (
+    cateId ? useGetRelevantPublishersQuery : useGetPublishersQuery
+  )({
+    page: pagination?.number,
+    cateId,
+    loadMore: pagination?.isMore,
+  });
 
   useEffect(() => {
     setSelectedPub(pubs);
@@ -480,11 +497,7 @@ const PublisherFilter = memo(({ pubs, onChangePub }) => {
         </>
       );
     } else {
-      pubsContent = [...Array(LIMIT_PUBS)].map((item, index) => (
-        <Fragment key={`temp-pub-${index}`}>
-          <Skeleton variant="rectangular" height={38} width="48%" />
-        </Fragment>
-      ));
+      pubsContent = <Message>Không có NXB nào</Message>;
     }
   }
 
@@ -666,6 +679,7 @@ const FilterDrawer = ({
   open,
   handleClose,
   handleOpen,
+  defaultFilters,
 }) => {
   const [currFilters, setCurrFilters] = useState(filters);
 
@@ -674,27 +688,28 @@ const FilterDrawer = ({
     setCurrFilters(filters);
   }, [filters]);
 
-  const onChangeCate = useCallback((newValue) => {
+  const onChangeCate = (newValue) => {
     setCurrFilters((prev) => ({
       ...prev,
       cate: prev.cate.id == newValue?.id ? { id: "", slug: "" } : newValue,
+      pubs: defaultFilters?.pubIds,
     }));
-  }, []);
-  const onChangePub = useCallback((newValue) => {
+  };
+  const onChangePub = (newValue) => {
     setCurrFilters((prev) => ({ ...prev, pubIds: newValue }));
-  }, []);
-  const onChangeRange = useCallback((newValue) => {
+  };
+  const onChangeRange = (newValue) => {
     setCurrFilters((prev) => ({ ...prev, value: newValue }));
-  }, []);
-  const onChangeType = useCallback((newValue) => {
+  };
+  const onChangeType = (newValue) => {
     setCurrFilters((prev) => ({ ...prev, types: newValue }));
-  }, []);
-  const onChangeRate = useCallback((newValue) => {
+  };
+  const onChangeRate = (newValue) => {
     setCurrFilters((prev) => ({
       ...prev,
       rating: prev.rating == newValue ? "" : newValue,
     }));
-  }, []);
+  };
 
   //Apply
   const handleApplyFilter = () => {
@@ -724,8 +739,22 @@ const FilterDrawer = ({
           dividers
           sx={{ px: 2, py: 1, flex: "1 1 auto", overflowY: "auto" }}
         >
-          <CateFilter {...{ cateId: currFilters?.cate.id, onChangeCate }} />
-          <PublisherFilter {...{ pubs: currFilters?.pubIds, onChangePub }} />
+          <CateFilter
+            {...{
+              cateId: currFilters?.cate.id,
+              shopId: filters?.shopId,
+              onChangeCate,
+            }}
+          />
+          {!filters?.shopId && (
+            <PublisherFilter
+              {...{
+                pubs: currFilters?.pubIds,
+                cateId: currFilters?.cate.id,
+                onChangePub,
+              }}
+            />
+          )}
           <RangeFilter {...{ value: currFilters?.value, onChangeRange }} />
           <TypeFilter {...{ types: currFilters?.types, onChangeType }} />
           <RateFilter {...{ rating: currFilters?.rating, onChangeRate }} />

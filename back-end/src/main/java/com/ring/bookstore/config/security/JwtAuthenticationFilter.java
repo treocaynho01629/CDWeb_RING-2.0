@@ -35,6 +35,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final RequestMatcher excludeUrlPatterns = new OrRequestMatcher(
             new AntPathRequestMatcher("/api/auth/**"),
             new AntPathRequestMatcher("/api/books", "GET"),
+            new AntPathRequestMatcher("/api/shops/find", "GET"),
+            new AntPathRequestMatcher("/api/shops/info", "GET"),
+            new AntPathRequestMatcher("/api/shops/{id}", "GET"),
             new AntPathRequestMatcher("/api/publishers", "GET"),
             new AntPathRequestMatcher("/api/categories", "GET"),
             new AntPathRequestMatcher("/api/reviews/books", "GET"),

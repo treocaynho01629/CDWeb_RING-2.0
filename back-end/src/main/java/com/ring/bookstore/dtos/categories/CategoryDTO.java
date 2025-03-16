@@ -1,8 +1,11 @@
 package com.ring.bookstore.dtos.categories;
 
+import lombok.Builder;
+
 import java.util.List;
 
 //Category
+@Builder
 public record CategoryDTO(Integer id,
                           String slug,
                           String name,

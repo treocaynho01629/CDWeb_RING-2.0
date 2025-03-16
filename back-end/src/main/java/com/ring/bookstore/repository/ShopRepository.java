@@ -90,7 +90,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
-			s.name as name, s.description as description, i.name as image, s.createdDate as joinedDate,
+			s.name as name, i.name as image, s.createdDate as joinedDate,
 			count(r.id) as totalReviews, count(b.id) as totalProducts, size(s.followers) as totalFollowers,
 			case when f.id is null then false else true end as followed
 		from Shop s
@@ -103,6 +103,33 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	""")
     Optional<IShopInfo> findShopInfoById(Long id,
 										 Long userId);
+
+	@Query("""
+		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
+			s.name as name, s.description as description, i.name as image, a as address,
+			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+				then oi.quantity else 0 end) as totalSold,
+			coalesce(
+				sum (case when od.status = com.ring.bookstore.enums.OrderStatus.CANCELED
+					or od.status = com.ring.bookstore.enums.OrderStatus.REFUNDED then 1 else 0 end)
+				/ nullif(
+					coalesce(
+						sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+					then 1 else 0 end), 0), 0), 0) as canceledRate,
+			count(b.id) as totalProducts, avg(r.rating) as rating, count(r.id) as totalReviews, size(s.followers) as totalFollowers,
+		s.createdDate as joinedDate, case when f.id is null then false else true end as followed
+		from Shop s left join Image i on i.id = s.image.id
+		left join s.address a
+		left join OrderDetail od on od.shop.id = s.id
+		left join od.items oi
+		left join Book b on s.id = b.shop.id
+		left join Review r on b.id = r.book.id
+		left join s.followers f on f.id = :userId
+		where s.id = :id
+		group by s.id, s.owner.username, s.owner.id, i.id, a.id, f.id
+	""")
+	Optional<IShopDisplayDetail> findShopDisplayDetailById(Long id,
+													Long userId);
 
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,

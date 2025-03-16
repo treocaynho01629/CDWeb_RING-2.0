@@ -15,7 +15,22 @@ const BreadcrumbsContainer = styled.div`
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
-    display: none;
+    content-visibility: hidden;
+    background-color: ${({ theme }) => theme.palette.background.paper};
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: ${({ theme }) => theme.mixins.toolbar.minHeight + 4}px;
+    margin: 0;
+    z-index: ${({ theme }) => theme.zIndex.appBar - 1};
+
+    &.transparent {
+      display: none;
+    }
+
+    &.solid {
+      position: relative;
+    }
   }
 `;
 
@@ -26,11 +41,11 @@ const StyledMainCrumb = styled(Link)`
 `;
 
 export default function CustomBreadcrumbs(props) {
-  const { children } = props;
+  const { children, className, ...leftProps } = props;
 
   return (
-    <BreadcrumbsContainer>
-      <Breadcrumbs {...props}>
+    <BreadcrumbsContainer className={className ?? ""}>
+      <Breadcrumbs {...leftProps}>
         <StyledMainCrumb to={"/"}>Trang chủ</StyledMainCrumb>
         {children}
       </Breadcrumbs>

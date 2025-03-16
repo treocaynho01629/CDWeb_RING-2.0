@@ -52,7 +52,12 @@ const Cart = () => {
 
   return (
     <Wrapper>
-      <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
+      <CustomBreadcrumbs
+        separator="›"
+        maxItems={4}
+        aria-label="breadcrumb"
+        className="transparent"
+      >
         <NavLink to={"/cart"}>Giỏ hàng</NavLink>
       </CustomBreadcrumbs>
       {!cartProducts.length ? (

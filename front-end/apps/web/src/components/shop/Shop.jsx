@@ -152,7 +152,7 @@ const Shop = ({ shop, onClickFollow }) => {
                 mb: { xs: 0, sm: 1 },
                 mr: { xs: 1, sm: 0 },
               }}
-              src={shop?.image ?? null}
+              src={`${shop?.image}?size=small` ?? null}
             >
               <Store fontSize="large" />
             </Avatar>

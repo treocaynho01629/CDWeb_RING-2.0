@@ -8,18 +8,59 @@ import com.ring.bookstore.model.Category;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class CategoryMapper {
 
-    public CategoryDTO cateToDTO(Category category) {
+    public CategoryDTO projectionToDTO(ICategory category) {
+        return new CategoryDTO(category.getId(),
+                category.getSlug(),
+                category.getName(),
+                category.getParentId());
+    }
+
+    public CategoryDTO projectionToDTO(Category category) {
         return new CategoryDTO(category.getId(),
                 category.getSlug(),
                 category.getName(),
                 category.getParent() != null ? category.getParent().getId() : null);
+    }
+
+    public List<CategoryDTO> parendAndChildsToCateDTOS(List<ICategory> all, List<Integer> orderedIds) {
+        Map<Integer, CategoryDTO> catesMap = new LinkedHashMap<>();
+        Collections.reverse(all);
+
+        for (ICategory projection : all) {
+            if (projection.getParentId() == null) {
+                var newCate = CategoryDTO.builder().id(projection.getId())
+                        .name(projection.getName())
+                        .slug(projection.getSlug())
+                        .parentId(projection.getParentId())
+                        .children(new ArrayList<>())
+                        .build();
+
+                catesMap.put(newCate.id(), newCate);
+            } else {
+                var newChild = CategoryDTO.builder().id(projection.getId())
+                        .name(projection.getName())
+                        .slug(projection.getSlug())
+                        .parentId(projection.getParentId())
+                        .build();
+                catesMap.get(projection.getParentId()).children().add(newChild);
+            }
+
+        }
+
+        //Reordered to list
+        List<CategoryDTO> result = new ArrayList<>();
+        for (Integer id : orderedIds) {
+            if (catesMap.containsKey(id)) {
+                result.add(catesMap.get(id));
+            }
+        }
+        return result;
     }
 
     public CategoryDTO cateToDTO(Category category, String include) {
@@ -28,14 +69,14 @@ public class CategoryMapper {
         Category parentCate = category.getParent();
 
         //Include?
-        if (include == null) return this.cateToDTO(category);
-        if (include.equalsIgnoreCase("parent")){
+        if (include == null) return this.projectionToDTO(category);
+        if (include.equalsIgnoreCase("parent")) {
             parent = parentCate != null ? this.cateToDTO(parentCate, "parent") : null;
         } else if (include.equalsIgnoreCase("children")) {
             children = category.getSubCates()
                     .stream()
                     .sorted(Comparator.comparingInt(Category::getId))
-                    .map(this::cateToDTO).collect(Collectors.toList());
+                    .map(this::projectionToDTO).collect(Collectors.toList());
         }
 
         return new CategoryDTO(category.getId(),
@@ -61,13 +102,13 @@ public class CategoryMapper {
 
         //Include?
         if (include == null) return this.cateToDetailDTO(category);
-        if (include.equalsIgnoreCase("parent")){
+        if (include.equalsIgnoreCase("parent")) {
             parent = parentCate != null ? this.cateToDTO(parentCate, "parent") : null;
         } else if (include.equalsIgnoreCase("children")) {
             children = category.getSubCates()
                     .stream()
                     .sorted(Comparator.comparingInt(Category::getId))
-                    .map(this::cateToDTO).collect(Collectors.toList());
+                    .map(this::projectionToDTO).collect(Collectors.toList());
         }
 
         return new CategoryDetailDTO(category.getId(),
@@ -80,8 +121,6 @@ public class CategoryMapper {
     }
 
     public PreviewCategoryDTO projectionToPreviewDTO(ICategory projection) {
-        Category category = projection.getCategory();
-
         String fileDownloadUri = projection.getImage() != null ?
                 ServletUriComponentsBuilder
                         .fromCurrentContextPath()
@@ -90,10 +129,10 @@ public class CategoryMapper {
                         .toUriString()
                 : null;
 
-        return new PreviewCategoryDTO(category.getId(),
-                category.getSlug(),
-                category.getParent() != null ? category.getParent().getId() : null,
-                category.getName(),
+        return new PreviewCategoryDTO(projection.getId(),
+                projection.getSlug(),
+                projection.getParentId(),
+                projection.getName(),
                 fileDownloadUri);
     }
 }

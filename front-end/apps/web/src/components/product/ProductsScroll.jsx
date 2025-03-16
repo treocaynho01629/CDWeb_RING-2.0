@@ -2,7 +2,6 @@ import styled from "@emotion/styled";
 import Progress from "@ring/ui/Progress";
 import ProductPreview from "./ProductPreview";
 import { trackWindowScroll } from "react-lazy-load-image-component";
-import { Fragment } from "react";
 
 //#region styled
 const Container = styled.div`

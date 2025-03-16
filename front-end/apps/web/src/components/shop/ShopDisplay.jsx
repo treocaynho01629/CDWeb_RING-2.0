@@ -19,104 +19,33 @@ import {
 } from "@mui/icons-material";
 import {
   useFollowShopMutation,
-  useGetShopQuery,
   useUnfollowShopMutation,
-} from "../../../features/shops/shopsApiSlice";
+} from "../../features/shops/shopsApiSlice";
 import { Link, useLocation, useNavigate } from "react-router";
 import { numFormat } from "@ring/shared";
 import { useAuth } from "@ring/auth";
+import {
+  ShopContainer,
+  ShopInfo,
+  ShopName,
+  Verified,
+  ShopDetail,
+} from "./ShopComponents";
 
-//#region styled
-const ShopContainer = styled.div`
-  padding: 20px;
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  display: flex;
-  flex-wrap: wrap;
-
-  ${({ theme }) => theme.breakpoints.down("md")} {
-    padding: 10px 12px;
-  }
-`;
-
-const ShopInfo = styled.div`
-  display: flex;
-  align-items: center;
-  border-right: 0.5px solid ${({ theme }) => theme.palette.divider};
-  padding-right: 15px;
-
-  ${({ theme }) => theme.breakpoints.down("md")} {
-    border: none;
-    padding-right: 0;
-  }
-`;
-
-const ShopName = styled.h3`
-  margin: 0;
-  white-space: nowrap;
-
-  ${({ theme }) => theme.breakpoints.down("md")} {
-    font-size: 15px;
-  }
-`;
-
-const Verified = styled.p`
-  font-size: 13px;
-  margin: 0;
-  display: flex;
-  color: ${({ theme }) => theme.palette.text.secondary};
-`;
-
-const ShopDetail = styled.span`
-  flex-grow: 1;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  width: 40%;
-
-  svg {
-    font-size: 15px;
-    margin-right: 3px;
-  }
-
-  b {
-    margin-left: 10px;
-    color: ${({ theme }) => theme.palette.warning.main};
-  }
-
-  ${({ theme }) => theme.breakpoints.down("md")} {
-    font-size: 12px;
-    width: auto;
-    justify-content: center;
-
-    b {
-      margin-left: 5px;
-    }
-
-    &.hide-on-mobile {
-      display: none;
-    }
-  }
-`;
-//#endregion
-
-const ShopDisplay = ({ id, name }) => {
+const ShopDisplay = ({ shop, name }) => {
   //Fetch reviews
   const { username } = useAuth();
-  const { data, isLoading, isSuccess } = useGetShopQuery(id, { skip: !id });
   const [followShop, { isLoading: following }] = useFollowShopMutation();
   const [unfollowShop, { isLoading: unfollowing }] = useUnfollowShopMutation();
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  let loading = (!id && !data && !isSuccess) || isLoading;
-
   const handleClickFollow = () => {
     if (!username) navigate("/auth/login", { state: { from: location } });
-    if (isLoading || following || unfollowing || !username) return;
+    if (!shop || following || unfollowing || !username) return;
 
-    if (data?.followed) {
+    if (shop?.followed) {
       unfollowShop(id)
         .unwrap()
         .catch((err) => {
@@ -133,9 +62,9 @@ const ShopDisplay = ({ id, name }) => {
 
   return (
     <ShopContainer>
-      <Grid container size={12} spacing={1}>
+      <Grid container spacing={1} sx={{ width: "100%" }}>
         <Grid size={{ xs: 12, md: 4.5 }}>
-          {loading ? (
+          {!shop ? (
             <ShopInfo>
               <Skeleton
                 variant="circular"
@@ -173,15 +102,15 @@ const ShopDisplay = ({ id, name }) => {
             </ShopInfo>
           ) : (
             <ShopInfo>
-              <Link to={`/store?shopId=${id}`}>
+              <Link to={`/store?shopId=${shop?.id}`}>
                 <Avatar
-                  alt={`${name || data?.name} shop avatar`}
+                  alt={`${name || shop?.name} shop avatar`}
                   sx={{
                     width: { xs: 50, md: 75 },
                     height: { xs: 50, md: 75 },
                     marginRight: { xs: 0.5, md: 2 },
                   }}
-                  src={data?.image ?? null}
+                  src={`${shop?.image}?size=small` ?? null}
                 >
                   <Store fontSize="large" />
                 </Avatar>
@@ -192,9 +121,9 @@ const ShopDisplay = ({ id, name }) => {
                 alignItems="center"
                 flexGrow={1}
               >
-                <Link to={`/store?shopId=${id}`}>
+                <Link to={`/store?shopId=${shop?.id}`}>
                   <Box mb={{ xs: 0, md: 1 }}>
-                    <ShopName>{data?.name}</ShopName>
+                    <ShopName>{shop?.name}</ShopName>
                     <Verified>
                       <VerifiedIcon
                         sx={{ fontSize: "16px", marginRight: 1 }}
@@ -208,12 +137,12 @@ const ShopDisplay = ({ id, name }) => {
                   variant="outlined"
                   size="small"
                   sx={{ height: 35, width: { xs: "auto", md: "100%" } }}
-                  disabled={isLoading || following || unfollowing}
+                  disabled={!shop || following || unfollowing}
                   onClick={handleClickFollow}
-                  color={data?.followed ? "warning" : "primary"}
-                  startIcon={data?.followed ? <Check /> : <Add />}
+                  color={shop?.followed ? "warning" : "primary"}
+                  startIcon={shop?.followed ? <Check /> : <Add />}
                 >
-                  {data?.followed ? "Đang theo dõi" : "Theo dõi"}
+                  {shop?.followed ? "Đang theo dõi" : "Theo dõi"}
                 </Button>
               </Box>
             </ShopInfo>
@@ -232,7 +161,7 @@ const ShopDisplay = ({ id, name }) => {
             useFlexGap
             sx={{ flexWrap: "wrap", width: "100%" }}
           >
-            {loading ? (
+            {!shop ? (
               <>
                 <ShopDetail>
                   <Skeleton
@@ -272,23 +201,23 @@ const ShopDisplay = ({ id, name }) => {
             ) : (
               <>
                 <ShopDetail>
-                  <LocalActivity color="warning" />
-                  Đánh giá:<b>{numFormat.format(data?.totalReviews)}</b>
+                  <LocalActivity />
+                  Đánh giá:<b>{numFormat.format(shop?.totalReviews)}</b>
                 </ShopDetail>
                 <ShopDetail>
-                  <AutoStories color="warning" />
-                  Sản phẩm:<b>{numFormat.format(data?.totalProducts)}</b>
+                  <AutoStories />
+                  Sản phẩm:<b>{numFormat.format(shop?.totalProducts)}</b>
                 </ShopDetail>
                 <ShopDetail>
-                  <PersonAddAlt1 color="warning" />
+                  <PersonAddAlt1 />
                   Theo dõi:
-                  <b>{numFormat.format(data?.totalFollowers)}</b>
+                  <b>{numFormat.format(shop?.totalFollowers)}</b>
                 </ShopDetail>
                 <ShopDetail className="hide-on-mobile">
-                  <Today color="warning" />
+                  <Today />
                   Tham gia:
                   <b>
-                    {new Date(data?.joinedDate).toLocaleDateString("en-GB", {
+                    {new Date(shop?.joinedDate).toLocaleDateString("en-GB", {
                       year: "numeric",
                       month: "2-digit",
                       day: "2-digit",

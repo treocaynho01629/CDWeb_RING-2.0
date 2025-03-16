@@ -3,6 +3,7 @@ import {
   selectKeywords,
   addKeyword as addStatekeyword,
   removeKeyword as removeStateKeyword,
+  resetKeywords,
 } from "../features/app/appReducer";
 
 const useApp = () => {
@@ -13,11 +14,13 @@ const useApp = () => {
     dispatch(addStatekeyword(keyword));
   };
   const removeKeyword = (keyword) => dispatch(removeStateKeyword(keyword));
+  const clearKeywords = () => dispatch(resetKeywords());
 
   return {
     keywords,
     addKeyword,
     removeKeyword,
+    clearKeywords,
   };
 };
 

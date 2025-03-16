@@ -16,6 +16,10 @@ public interface PublisherService {
 									 String sortBy,
 									 String sortDir);
 
+	Page<PublisherDTO> getRelevantPublishers(Integer pageNo,
+									 Integer pageSize,
+									 Integer cateId);
+
 	PublisherDTO getPublisher(Integer id);
 
 	Publisher addPublisher(String name,

@@ -6,6 +6,7 @@ import {
   useGetRandomBooksQuery,
 } from "../features/books/booksApiSlice";
 import { useTitle } from "@ring/shared";
+import { useGetShopInfoQuery } from "../features/shops/shopsApiSlice";
 import Placeholder from "@ring/ui/Placeholder";
 import CustomDivider from "../components/custom/CustomDivider";
 import ProductContent from "../components/product/detail/ProductContent";
@@ -17,9 +18,7 @@ const PendingModal = lazy(() => import("@ring/ui"));
 const ProductsSlider = lazy(
   () => import("../components/product/ProductsSlider")
 );
-const ShopDisplay = lazy(
-  () => import("../components/product/detail/ShopDisplay")
-);
+const ShopDisplay = lazy(() => import("../components/shop/ShopDisplay"));
 const ProductDetailContainer = lazy(
   () => import("../components/product/detail/ProductDetailContainer")
 );
@@ -47,6 +46,42 @@ const RandomList = () => {
     useGetRandomBooksQuery({ amount: 10 });
   return (
     <ProductsSlider {...{ isLoading, isFetching, data, isSuccess, isError }} />
+  );
+};
+
+const ShopComponent = ({ id, name }) => {
+  const { data } = useGetShopInfoQuery(id, { skip: !id });
+
+  return (
+    <LazyLoad
+      offset={50}
+      once
+      placeholder={
+        <Box
+          sx={{
+            width: "100%",
+            border: ".5px solid",
+            borderColor: "divider",
+            height: { xs: 98, md: 133 },
+          }}
+        />
+      }
+    >
+      <Suspense
+        fallback={
+          <Placeholder
+            sx={{
+              width: "100%",
+              border: ".5px solid",
+              borderColor: "divider",
+              height: { xs: 98, md: 133 },
+            }}
+          />
+        }
+      >
+        <ShopDisplay shop={data} name={name} />
+      </Suspense>
+    </LazyLoad>
   );
 };
 
@@ -108,12 +143,22 @@ const ProductDetail = () => {
   return (
     <>
       {pending && (
-        <Suspense fallBack={<></>}>
+        <Suspense fallBack={null}>
           <PendingModal open={pending} message="Đang gửi yêu cầu..." />
         </Suspense>
       )}
-      <Box display="relative">
-        <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
+      <Box
+        display="relative"
+        sx={(theme) => ({
+          marginTop: { xs: `-${theme.mixins.toolbar.minHeight}px`, md: 0 },
+        })}
+      >
+        <CustomBreadcrumbs
+          separator="›"
+          maxItems={4}
+          aria-label="breadcrumb"
+          className="solid"
+        >
           {data ? (
             [
               <NavLink to={"/store"} key={"store"}>
@@ -141,35 +186,7 @@ const ProductDetail = () => {
           direction={{ xs: "column-reverse", md: "column" }}
         >
           <Stack spacing={1}>
-            <LazyLoad
-              offset={50}
-              once
-              placeholder={
-                <Box
-                  sx={{
-                    width: "100%",
-                    border: ".5px solid",
-                    borderColor: "divider",
-                    height: { xs: 98, md: 133 },
-                  }}
-                />
-              }
-            >
-              <Suspense
-                fallback={
-                  <Placeholder
-                    sx={{
-                      width: "100%",
-                      border: ".5px solid",
-                      borderColor: "divider",
-                      height: { xs: 98, md: 133 },
-                    }}
-                  />
-                }
-              >
-                <ShopDisplay id={data?.shopId} name={data?.shopName} />
-              </Suspense>
-            </LazyLoad>
+            <ShopComponent id={data?.shopId} name={data?.shopName} />
             <LazyLoad
               offset={50}
               once

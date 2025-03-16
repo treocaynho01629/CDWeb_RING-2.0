@@ -6,6 +6,7 @@ import {
   useEffect,
   useCallback,
   useRef,
+  memo,
 } from "react";
 import {
   NavLink,
@@ -86,11 +87,12 @@ const Keyword = styled.div`
 const DEFAULT_PAGINATION = {
   number: 0,
   size: pageSizes[0],
-  totalPages: 0,
   sortBy: sortShopsBy[0].value,
   sortDir: "desc",
   followed: filterShopsBy[0].value,
 };
+
+const Pagination = memo(AppPagination);
 
 const Shops = () => {
   const scrollRef = useRef(null);
@@ -105,7 +107,6 @@ const Shops = () => {
       ? searchParams.get("pNo") - 1
       : DEFAULT_PAGINATION.number,
     size: searchParams.get("pSize") ?? DEFAULT_PAGINATION.size,
-    totalPages: DEFAULT_PAGINATION.totalPages,
     sortBy: searchParams.get("sort") ?? DEFAULT_PAGINATION.sortBy,
     sortDir: searchParams.get("dir") ?? DEFAULT_PAGINATION.sortDir,
     followed: searchParams.get("followed") ?? DEFAULT_PAGINATION.followed,
@@ -133,57 +134,26 @@ const Shops = () => {
     keyword: keyword,
   });
 
-  useEffect(() => {
-    handleChangePage(1);
-  }, [
-    keyword,
-    pagination.size,
-    pagination.sortBy,
-    pagination.sortDir,
-    pagination.followed,
-  ]);
-  useEffect(() => {
-    updatePath();
-  }, [pagination]);
-  useEffect(() => {
+  const updateFilters = () => {
     setKeyword(searchParams.get("q") ?? "");
-  }, [searchParams]);
+    setPagination((prev) => ({
+      ...prev,
+      number: searchParams.get("pNo")
+        ? searchParams.get("pNo") - 1
+        : DEFAULT_PAGINATION.number,
+      size: searchParams.get("pSize") ?? DEFAULT_PAGINATION.size,
+      sortBy: searchParams.get("sort") ?? DEFAULT_PAGINATION.sortBy,
+      sortDir: searchParams.get("dir") ?? DEFAULT_PAGINATION.sortDir,
+      followed: searchParams.get("followed") ?? DEFAULT_PAGINATION.followed,
+    }));
+  };
 
-  //Set pagination after fetch
   useEffect(() => {
-    if (data && !isLoading && isSuccess) {
-      setPagination({
-        ...pagination,
-        number: data.page.number,
-        size: data.page.size,
-        totalPages: data.page.totalPages,
-      });
-    }
-  }, [data]);
+    updateFilters();
+  }, [searchParams]);
 
   //Set title
   useTitle("Danh sách cửa hàng");
-
-  //Search params
-  const updatePath = useCallback(() => {
-    keyword == "" ? searchParams.delete("q") : searchParams.set("q", keyword);
-    pagination.number == 0
-      ? searchParams.delete("pNo")
-      : searchParams.set("pNo", pagination.number + 1);
-    pagination.size == pageSizes[0]
-      ? searchParams.delete("pSize")
-      : searchParams.set("pSize", pagination.size);
-    pagination.sortBy == DEFAULT_PAGINATION.sortBy
-      ? searchParams.delete("sort")
-      : searchParams.set("sort", pagination.sortBy);
-    pagination.sortDir == DEFAULT_PAGINATION.sortDir
-      ? searchParams.delete("dir")
-      : searchParams.set("dir", pagination.sortDir);
-    pagination.followed == DEFAULT_PAGINATION.followed
-      ? searchParams.delete("followed")
-      : searchParams.set("followed", pagination.followed);
-    setSearchParams(searchParams);
-  }, [keyword, pagination]);
 
   //Handle change
   const scrollToTop = useCallback(() => {
@@ -196,24 +166,62 @@ const Shops = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, []);
-  const handleChangePage = useCallback((page) => {
+  const handleChangePage = (page) => {
     setPagination((prev) => ({ ...prev, number: page - 1 }));
+    page - 1 == DEFAULT_PAGINATION.number
+      ? searchParams.delete("pNo")
+      : searchParams.set("pNo", page);
+    setSearchParams(searchParams);
     scrollToTop();
-  }, []);
-  const handleChangeOrder = useCallback((newValue) => {
+  };
+  const handleChangeOrder = (newValue) => {
     setPagination((prev) => ({ ...prev, sortBy: newValue }));
-  }, []);
-  const handleChangeDir = useCallback((newValue) => {
+    newValue == DEFAULT_PAGINATION.sortBy
+      ? searchParams.delete("sort")
+      : searchParams.set("sort", newValue);
+    setSearchParams(searchParams, { replace: true });
+    handleResetPage();
+  };
+  const handleChangeDir = (newValue) => {
     setPagination((prev) => ({ ...prev, sortDir: newValue }));
-  }, []);
-  const handleChangeSize = useCallback((newValue) => {
+    newValue == DEFAULT_PAGINATION.sortDir
+      ? searchParams.delete("dir")
+      : searchParams.set("dir", newValue);
+    setSearchParams(searchParams, { replace: true });
+    handleResetPage();
+  };
+  const handleChangeSize = (newValue) => {
     setPagination((prev) => ({ ...prev, size: newValue }));
-  }, []);
-  const handleChangeFollowed = useCallback((newValue) => {
+    newValue == DEFAULT_PAGINATION.size
+      ? searchParams.delete("pSize")
+      : searchParams.set("pSize", newValue);
+    setSearchParams(searchParams, { replace: true });
+    handleResetPage();
+  };
+  const handleChangeFollowed = (newValue) => {
     setPagination((prev) => ({ ...prev, followed: newValue }));
-  }, []);
+    newValue == DEFAULT_PAGINATION.followed
+      ? searchParams.delete("followed")
+      : searchParams.set("followed", newValue);
+    setSearchParams(searchParams, { replace: true });
+    handleResetPage();
+  };
   const handleClearKeyword = () => {
     setKeyword("");
+    searchParams.delete("q");
+    setSearchParams(searchParams);
+    handleResetPage();
+  };
+
+  //Reset page
+  const handleResetPage = () => {
+    setPagination((prev) => ({
+      ...prev,
+      number: DEFAULT_PAGINATION.number,
+    }));
+    searchParams.delete("pNo");
+    setSearchParams(searchParams, { replace: true });
+    scrollToTop();
   };
 
   const handleClickFollow = (shop) => {
@@ -317,8 +325,10 @@ const Shops = () => {
             {shopsContent}
           </Grid>
         </ShopsContainer>
-        <AppPagination
-          pagination={pagination}
+        <Pagination
+          page={pagination?.number}
+          size={pagination?.size}
+          count={data?.page?.totalPages ?? 0}
           onPageChange={handleChangePage}
           onSizeChange={handleChangeSize}
         />

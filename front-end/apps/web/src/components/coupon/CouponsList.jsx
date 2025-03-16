@@ -23,7 +23,7 @@ import { Link, useSearchParams } from "react-router";
 import { CustomTab, CustomTabs } from "../custom/CustomTabs";
 import { debounce } from "lodash-es";
 import { Message } from "@ring/ui/Components";
-import { useDeepEffect, couponTypes, couponTypeItems } from "@ring/shared";
+import { couponTypes, couponTypeItems } from "@ring/shared";
 import { useGetCouponsQuery } from "../../features/coupons/couponsApiSlice";
 import { trackWindowScroll } from "react-lazy-load-image-component";
 import CouponItem from "./CouponItem";
@@ -67,7 +67,9 @@ const CouponsList = ({ scrollPosition, tabletMode }) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   //Filters
-  const [tab, setTab] = useState(searchParams.get("tab") ?? "");
+  const [tab, setTab] = useState(
+    searchParams.get("tab") ? +searchParams.get("tab") : ""
+  );
   const [filters, setFilters] = useState({
     ...couponItems[tab]?.filter,
     code: searchParams.get("k") ?? "",
@@ -95,17 +97,16 @@ const CouponsList = ({ scrollPosition, tabletMode }) => {
       loadMore: pagination?.isMore,
     });
 
-  useDeepEffect(() => {
-    updatePath();
-  }, [filters]);
-
   useEffect(() => {
     setFilters((prev) => ({
       ...couponItems[tab]?.filter,
       code: prev.code,
     }));
-    updatePath();
   }, [tab]);
+
+  useEffect(() => {
+    setTab(searchParams.get("tab") ? +searchParams.get("tab") : "");
+  }, [searchParams]);
 
   useEffect(() => {
     if (data && !isLoading && isSuccess) {
@@ -122,30 +123,29 @@ const CouponsList = ({ scrollPosition, tabletMode }) => {
   }, []);
 
   //Change tab
-  const handleChangeTab = useCallback((e, newValue) => {
+  const handleChangeTab = (e, newValue) => {
     setTab(newValue);
-    handleResetPagination();
-  }, []);
+    setFilters((prev) => ({ ...prev, keyword: "" }));
+    newValue === ""
+      ? searchParams.delete("tab")
+      : searchParams.set("tab", newValue);
+    searchParams.delete("k");
+    setSearchParams(searchParams);
+    handleResetPage();
+  };
 
-  const handleChangeCode = useCallback((e) => {
+  const handleChangeCode = (e) => {
     e.preventDefault();
-    if (inputRef)
-      setFilters((prev) => ({ ...prev, code: inputRef.current.value }));
-    handleResetPagination();
-  }, []);
+    let newValue = inputRef.current.value;
+    if (inputRef) setFilters((prev) => ({ ...prev, code: newValue }));
+    newValue == "" ? searchParams.delete("k") : searchParams.set("k", newValue);
+    setSearchParams(searchParams, { replace: true });
+    handleResetPage();
+  };
 
-  const handleResetPagination = useCallback(() => {
+  const handleResetPage = () => {
     setPagination((prev) => ({ ...prev, number: 0 }));
     scrollToTop();
-  }, []);
-
-  //Search params
-  const updatePath = () => {
-    tab === "" ? searchParams.delete("tab") : searchParams.set("tab", tab);
-    filters?.code == ""
-      ? searchParams.delete("k")
-      : searchParams.set("k", filters.code);
-    setSearchParams(searchParams, { replace: true });
   };
 
   //Show more

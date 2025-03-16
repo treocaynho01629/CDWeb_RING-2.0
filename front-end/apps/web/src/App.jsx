@@ -75,6 +75,13 @@ function App() {
                     },
                   },
                   {
+                    path: "shop/:id",
+                    lazy: async () => {
+                      let ShopDetail = await import("./pages/ShopDetail");
+                      return { Component: ShopDetail.default };
+                    },
+                  },
+                  {
                     path: "product/:slug",
                     lazy: async () => {
                       let ProductDetail = await import("./pages/ProductDetail");

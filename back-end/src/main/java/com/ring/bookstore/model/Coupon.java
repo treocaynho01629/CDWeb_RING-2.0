@@ -51,4 +51,7 @@ public class Coupon extends Auditable {
 
     @Transient
     private Boolean isUsable = false;
+
+    @Transient
+    private Boolean isUsed = false;
 }

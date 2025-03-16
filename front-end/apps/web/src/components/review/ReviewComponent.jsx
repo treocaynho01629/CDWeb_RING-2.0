@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { useEffect, useState, lazy, Suspense, Fragment } from "react";
+import { useState, lazy, Suspense, Fragment, memo } from "react";
 import {
   useGetReviewByBookIdQuery,
   useGetReviewsByBookIdQuery,
@@ -95,6 +95,8 @@ const StyledEmptyIcon = styled(EmptyIcon)`
 `;
 //#endregion
 
+const Pagination = memo(AppPagination);
+
 const ReviewComponent = ({
   book,
   scrollIntoTab,
@@ -113,7 +115,6 @@ const ReviewComponent = ({
   const [pagination, setPagination] = useState({
     number: 0,
     size: 8,
-    totalPages: 0,
     sortBy: "createdDate",
   });
 
@@ -148,18 +149,6 @@ const ReviewComponent = ({
     { skip: !haveReviews }
   );
   const loading = isLoading || isFetching || isError || isUninitialized;
-
-  //Set pagination after fetch
-  useEffect(() => {
-    if (!isLoading && isSuccess && data) {
-      setPagination({
-        ...pagination,
-        totalPages: data?.page?.totalPages,
-        number: data?.page?.number,
-        size: data?.page?.size,
-      });
-    }
-  }, [data]);
 
   //Change page
   const handlePageChange = (page) => {
@@ -295,8 +284,11 @@ const ReviewComponent = ({
       {reviewsContent}
       {book?.reviewsInfo?.total > pagination.size && (
         <Suspense fallback={null}>
-          <AppPagination
-            pagination={pagination}
+          <Pagination
+            page={pagination?.number}
+            size={pagination?.size}
+            count={data?.page?.totalPages ?? 0}
+            sizes={[8, 16, 24]}
             onPageChange={handlePageChange}
             onSizeChange={handleChangeSize}
           />
@@ -402,7 +394,7 @@ const ReviewComponent = ({
                 <KeyboardArrowLeft
                   onClick={() => handleToggleReview(false)}
                   style={{ marginRight: "4px" }}
-                />{" "}
+                />
                 Đánh giá
               </DialogTitle>
               <Suspense fallback={<Placeholder />}>

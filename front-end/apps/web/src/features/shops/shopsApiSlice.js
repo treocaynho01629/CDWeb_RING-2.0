@@ -22,6 +22,15 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, { id }) => [{ type: "Shop", id }],
     }),
+    getShopInfo: builder.query({
+      query: (id) => ({
+        url: `/api/shops/info/${id}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result?.isError;
+        },
+      }),
+      providesTags: (result, error, { id }) => [{ type: "Shop", id }],
+    }),
     getDisplayShops: builder.query({
       query: (args) => {
         const { page, size, sortBy, sortDir, keyword, followed } = args || {};
@@ -177,6 +186,7 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useGetShopQuery,
+  useGetShopInfoQuery,
   useGetDisplayShopsQuery,
   useFollowShopMutation,
   useUnfollowShopMutation,

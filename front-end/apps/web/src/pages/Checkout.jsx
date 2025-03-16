@@ -44,6 +44,7 @@ import {
   useDeepEffect,
 } from "@ring/shared";
 import { useReCaptcha } from "@ring/auth";
+import { isEqual } from "lodash-es";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 import AddressDisplay from "../components/address/AddressDisplay";
 import AddressSelectDialog from "../components/address/AddressSelectDialog";
@@ -51,7 +52,6 @@ import PreviewDetailRow from "../components/cart/PreviewDetailRow";
 import FinalCheckoutDialog from "../components/cart/FinalCheckoutDialog";
 import useCart from "../hooks/useCart";
 import useCheckout from "../hooks/useCheckout";
-import { isEqual } from "lodash-es";
 
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 const ReCaptcha = lazy(() => import("@ring/auth/ReCaptcha"));
@@ -509,7 +509,12 @@ const Checkout = () => {
             />
           </Suspense>
         )}
-        <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
+        <CustomBreadcrumbs
+          separator="›"
+          maxItems={4}
+          aria-label="breadcrumb"
+          className="transparent"
+        >
           <NavLink to={"/cart"}>Giỏ hàng</NavLink>
           <NavLink to={"/checkout"}>Thanh toán</NavLink>
         </CustomBreadcrumbs>

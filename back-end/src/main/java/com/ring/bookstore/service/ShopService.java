@@ -35,6 +35,9 @@ public interface ShopService {
     ShopInfoDTO getShopInfo(Long id,
                             Account user);
 
+    ShopDisplayDetailDTO getShopDisplayDetail(Long id,
+                            Account user);
+
     ShopDetailDTO getShopDetail(Long id,
                                 Account user);
 

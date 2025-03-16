@@ -5,8 +5,11 @@ import {
   Storefront,
   History,
   KeyboardArrowLeft,
+  Delete,
+  CategoryOutlined,
 } from "@mui/icons-material";
 import {
+  alpha,
   Button,
   createFilterOptions,
   IconButton,
@@ -23,7 +26,7 @@ import {
   Suspense,
   useRef,
 } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { useGetBooksSuggestionQuery } from "../../features/books/booksApiSlice";
 import { debounce } from "lodash-es";
 import useApp from "../../hooks/useApp";
@@ -60,6 +63,12 @@ const AutocompleteContainer = styled.div`
 const SearchForm = styled.form`
   width: 100%;
   position: relative;
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
 `;
 
 const SearchInputContainer = styled.div`
@@ -104,6 +113,8 @@ const ListBoxPopover = styled(Paper)`
 
 const ListBoxContainer = styled.div`
   display: flex;
+  flex: 1 1 auto;
+  overflow-y: auto;
 `;
 
 const Listbox = styled.ul`
@@ -116,14 +127,41 @@ const Listbox = styled.ul`
   overflow: auto;
 
   ${({ theme }) => theme.breakpoints.down("md")} {
-    max-height: calc(100% - 61px);
+    max-height: 100%;
   }
+`;
+
+const GroupItem = styled.li`
+  display: flex;
+  flex-direction: column;
+`;
+
+const GroupHeader = styled.div`
+  height: 40px;
+  padding: ${({ theme }) => `0 ${theme.spacing(1.5)}`};
+  padding-right: ${({ theme }) => theme.spacing(0.5)};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-transform: capitalize;
+  font-weight: 450;
+  background-color: ${({ theme }) => theme.palette.divider};
+  border-bottom: 0.5px solid ${({ theme }) => theme.palette.primary.main};
+`;
+
+const GroupListBox = styled.ul`
+  list-style: none;
+  padding: 0;
 `;
 
 const ListItem = styled.li`
   padding: ${({ theme }) => `${theme.spacing(0.65)} ${theme.spacing(1)}`};
   padding-right: 0;
   height: 36px;
+
+  &.alt {
+    background-color: ${({ theme }) => alpha(theme.palette.success.light, 0.1)};
+  }
 
   &.Mui-focused {
     background-color: ${({ theme }) => theme.palette.action.hover};
@@ -203,10 +241,17 @@ const AutocompleteComponent = ({
   show,
   isFocus,
   displayRef,
+  isShop,
+  id,
 }) => {
   const navigate = useNavigate();
   const [suggestValue, setSuggestValue] = useState(searchParams.get("q") ?? "");
-  const { keywords: historyOptions, addKeyword, removeKeyword } = useApp();
+  const {
+    keywords: historyOptions,
+    addKeyword,
+    removeKeyword,
+    clearKeywords,
+  } = useApp();
   const { data, isLoading, isFetching, isSuccess, isError, error } =
     useGetBooksSuggestionQuery(suggestValue, { skip: !suggestValue });
 
@@ -230,6 +275,7 @@ const AutocompleteComponent = ({
   }, []);
 
   const handleSelectSuggest = (e, newValue) => {
+    if (!newValue?.group) return;
     handleSearch(e, newValue);
   };
 
@@ -239,7 +285,19 @@ const AutocompleteComponent = ({
 
     const value = newValue?.value ?? inputValue;
     addKeyword(value);
-    navigate(`/${newValue?.group == "SHOP" ? "shop" : "store"}?q=${value}`);
+    navigate(
+      `/${
+        newValue?.group == "SHOP"
+          ? "shop"
+          : newValue?.group == "STORE"
+            ? "store"
+            : isShop
+              ? id
+                ? `shop/${id}`
+                : "shop"
+              : "store"
+      }?q=${value}`
+    );
     displayRef.current = value;
     handleCloseDialog();
   };
@@ -260,16 +318,18 @@ const AutocompleteComponent = ({
   let options = [];
 
   if (isLoading || isFetching) {
-    options = (tabletMode ? historyOptions : historyOptions.slice(0, 6)).map(
+    options = (tabletMode ? historyOptions : historyOptions.slice(0, 11)).map(
       (option) => {
         return { group: "HISTORY", value: option };
       }
     );
     options.push({ value: "Đang tải..." });
   } else if (isSuccess) {
-    options = historyOptions.map((option) => {
-      return { group: "HISTORY", value: option };
-    });
+    options = (tabletMode ? historyOptions : historyOptions.slice(0, 6)).map(
+      (option) => {
+        return { group: "HISTORY", value: option };
+      }
+    );
 
     if (suggestValue) {
       options = options.concat(
@@ -316,6 +376,10 @@ const AutocompleteComponent = ({
       if (option.inputValue) {
         return option.inputValue;
       }
+      //Groupt
+      if (option.groups?.length) {
+        return "group";
+      }
       // Regular option
       return option.value;
     },
@@ -323,12 +387,19 @@ const AutocompleteComponent = ({
       let filtered = filter(options, params);
       // Suggest search shop instead
       if (inputValue) {
-        filtered = [{ group: "SHOP", value: inputValue }].concat(filtered);
+        filtered = [
+          { group: isShop && !id ? "STORE" : "SHOP", value: inputValue },
+        ].concat(filtered);
       }
 
       return filtered;
     },
-    ...(tabletMode && { open: true }),
+    ...(tabletMode && {
+      open: true,
+      groupBy: (option) => {
+        return option?.group;
+      },
+    }),
   });
 
   let endAdornment = (
@@ -358,7 +429,7 @@ const AutocompleteComponent = ({
               </StyledIconButton>
             )}
             <StyledSearchInput
-              placeholder="Tìm kiếm..."
+              placeholder={`Tìm kiếm${isShop ? (id ? " trong cửa hàng" : " cửa hàng") : ""}...`}
               size="small"
               autoFocus
               slotProps={{
@@ -374,46 +445,83 @@ const AutocompleteComponent = ({
           {groupedOptions.length > 0 && (
             <ListBoxContainer>
               <Listbox {...getListboxProps()}>
-                {groupedOptions.map((option, index) => {
-                  const { key, ...optionProps } = getOptionProps({
-                    option,
-                    index,
-                  });
+                {groupedOptions.map((group) => {
                   return (
-                    <ListItem key={`option-${key}-${index}`} {...optionProps}>
-                      {option?.group == "SHOP" ? (
-                        <ListLink to={`/shop?q=${option.value}`}>
-                          <ItemTitle>
-                            <Storefront color="primary" />
-                            Tìm cửa hàng: "{option.value}"
-                          </ItemTitle>
-                        </ListLink>
-                      ) : option?.group == "HISTORY" ? (
-                        <ListLink to={`/store?q=${option.value}`}>
-                          <ItemTitle>
-                            <History />
-                            {option.value}
-                          </ItemTitle>
+                    <GroupItem key={`group-${group.key}-${group.index}`}>
+                      {group?.group == "HISTORY" ? (
+                        <GroupHeader>
+                          Lịch sử tìm kiếm
                           <StyledIconButton
-                            onClick={(e) =>
-                              handleRemoveKeyword(e, option.value)
-                            }
-                            aria-label={`remove ${option.value} from history`}
+                            onClick={clearKeywords}
+                            aria-label="remove all from history"
                           >
-                            <Close />
+                            <Delete />
                           </StyledIconButton>
-                        </ListLink>
-                      ) : option?.group == "SUGGEST" ? (
-                        <ListLink to={`/store?q=${option.value}`}>
-                          <ItemTitle>
-                            <Search />
-                            {option.value}
-                          </ItemTitle>
-                        </ListLink>
-                      ) : (
-                        option.value
-                      )}
-                    </ListItem>
+                        </GroupHeader>
+                      ) : group?.group == "SUGGEST" ? (
+                        <GroupHeader>Gợi ý</GroupHeader>
+                      ) : null}
+                      <GroupListBox>
+                        {group.options.map((option, index) => {
+                          const { key, ...optionProps } = getOptionProps({
+                            option,
+                            index,
+                          });
+                          return (
+                            <ListItem
+                              key={`option-${key}-${index}`}
+                              className={
+                                option?.group == "SHOP" ||
+                                option?.group == "STORE"
+                                  ? "alt"
+                                  : ""
+                              }
+                              {...optionProps}
+                            >
+                              {option?.group == "SHOP" ? (
+                                <ListLink to={`/shop?q=${option.value}`}>
+                                  <ItemTitle>
+                                    <Storefront color="success" />
+                                    Tìm cửa hàng: "{option.value}"
+                                  </ItemTitle>
+                                </ListLink>
+                              ) : option?.group == "STORE" ? (
+                                <ListLink to={`/store?q=${option.value}`}>
+                                  <ItemTitle>
+                                    <CategoryOutlined color="success" />
+                                    Tìm sản phẩm: "{option.value}"
+                                  </ItemTitle>
+                                </ListLink>
+                              ) : option?.group == "HISTORY" ? (
+                                <ListLink to={`/store?q=${option.value}`}>
+                                  <ItemTitle>
+                                    <History />
+                                    {option.value}
+                                  </ItemTitle>
+                                  <StyledIconButton
+                                    onClick={(e) =>
+                                      handleRemoveKeyword(e, option.value)
+                                    }
+                                    aria-label={`remove ${option.value} from history`}
+                                  >
+                                    <Close />
+                                  </StyledIconButton>
+                                </ListLink>
+                              ) : option?.group == "SUGGEST" ? (
+                                <ListLink to={`/store?q=${option.value}`}>
+                                  <ItemTitle>
+                                    <Search />
+                                    {option.value}
+                                  </ItemTitle>
+                                </ListLink>
+                              ) : (
+                                option.value
+                              )}
+                            </ListItem>
+                          );
+                        })}
+                      </GroupListBox>
+                    </GroupItem>
                   );
                 })}
               </Listbox>
@@ -424,7 +532,7 @@ const AutocompleteComponent = ({
         <>
           <SearchInputContainer>
             <StyledSearchInput
-              placeholder="Tìm kiếm..."
+              placeholder={`Tìm kiếm${isShop ? (id ? " trong cửa hàng" : " cửa hàng") : ""}...`}
               size="small"
               slotProps={{
                 input: {
@@ -445,12 +553,33 @@ const AutocompleteComponent = ({
                     index,
                   });
                   return (
-                    <ListItem key={`option-${key}-${index}`} {...optionProps}>
+                    <ListItem
+                      key={`option-${key}-${index}`}
+                      className={
+                        option?.group == "SHOP" || option?.group == "STORE"
+                          ? "alt"
+                          : ""
+                      }
+                      {...optionProps}
+                    >
                       {option?.group == "SHOP" ? (
-                        <ListLink to={`/shop?q=${option.value}`}>
+                        <ListLink
+                          className="alt"
+                          to={`/shop?q=${option.value}`}
+                        >
                           <ItemTitle>
                             <Storefront color="primary" />
                             Tìm cửa hàng: "{option.value}"
+                          </ItemTitle>
+                        </ListLink>
+                      ) : option?.group == "STORE" ? (
+                        <ListLink
+                          className="alt"
+                          to={`/store?q=${option.value}`}
+                        >
+                          <ItemTitle>
+                            <CategoryOutlined color="success" />
+                            Tìm sản phẩm: "{option.value}"
                           </ItemTitle>
                         </ListLink>
                       ) : option?.group == "HISTORY" ? (
@@ -490,8 +619,9 @@ const AutocompleteComponent = ({
   );
 };
 
-const SearchInput = ({ mobileMode, tabletMode, show, isFocus }) => {
+const SearchInput = ({ mobileMode, tabletMode, show, isFocus, isShop }) => {
   const displayRef = useRef();
+  const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [inputValue, setInputValue] = useState(searchParams.get("q") ?? "");
   const [openDialog, setOpenDialog] = useState(undefined);
@@ -522,6 +652,8 @@ const SearchInput = ({ mobileMode, tabletMode, show, isFocus }) => {
         handleCloseDialog,
         show,
         isFocus,
+        isShop,
+        id,
         displayRef,
       }}
     />
@@ -532,7 +664,7 @@ const SearchInput = ({ mobileMode, tabletMode, show, isFocus }) => {
       {tabletMode ? (
         <AutocompleteContainer className={show ? "" : "hidden"}>
           <StyledSearchInput
-            placeholder="Tìm kiếm..."
+            placeholder={`Tìm kiếm${isShop ? (id ? " trong cửa hàng" : " cửa hàng") : ""}...`}
             size="small"
             value={displayRef.current}
             onClick={handleOpenDialog}
@@ -558,7 +690,7 @@ const SearchInput = ({ mobileMode, tabletMode, show, isFocus }) => {
                 },
               }}
             >
-              <DialogContent sx={{ minHeight: 500, p: 0 }}>
+              <DialogContent sx={{ height: 500, p: 0 }}>
                 {autocomplete}
               </DialogContent>
             </Dialog>

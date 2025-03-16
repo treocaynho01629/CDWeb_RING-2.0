@@ -80,7 +80,6 @@ public class ShopMapper {
 				shop.getOwnerId(),
 				shop.getId(),
         		shop.getName(),
-        		shop.getDescription(),
         		fileDownloadUri,
         		shop.getJoinedDate(),
         		shop.getTotalReviews(),
@@ -88,6 +87,34 @@ public class ShopMapper {
         		shop.getTotalFollowers(),
 				shop.getFollowed());
     }
+
+	public ShopDisplayDetailDTO displayDetailToDTO(IShopDisplayDetail shop) {
+		String fileDownloadUri = shop.getImage() != null ?
+				ServletUriComponentsBuilder
+						.fromCurrentContextPath()
+						.path("/api/images/")
+						.path(shop.getImage())
+						.toUriString()
+				: null;
+
+		Address address = shop.getAddress();
+
+		return new ShopDisplayDetailDTO(shop.getUsername(),
+				shop.getOwnerId(),
+				shop.getId(),
+				shop.getName(),
+				shop.getDescription(),
+				fileDownloadUri,
+				address != null ? addressMapper.addressToDTO(address) : null,
+				shop.getTotalSold(),
+				shop.getCanceledRate(),
+				shop.getTotalProducts(),
+				shop.getRating(),
+				shop.getTotalReviews(),
+				shop.getTotalFollowers(),
+				shop.getJoinedDate(),
+				shop.getFollowed());
+	}
 
 	public ShopDetailDTO detailToDTO(IShopDetail shop) {
 		String fileDownloadUri = shop.getImage() != null ?

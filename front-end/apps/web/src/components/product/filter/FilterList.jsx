@@ -23,8 +23,14 @@ import {
   CategoryOutlined,
 } from "@mui/icons-material";
 import { bookTypeItems } from "@ring/shared";
-import { useGetCategoriesQuery } from "../../../features/categories/categoriesApiSlice";
-import { useGetPublishersQuery } from "../../../features/publishers/publishersApiSlice";
+import {
+  useGetCategoriesQuery,
+  useGetRelevantCategoriesQuery,
+} from "../../../features/categories/categoriesApiSlice";
+import {
+  useGetPublishersQuery,
+  useGetRelevantPublishersQuery,
+} from "../../../features/publishers/publishersApiSlice";
 import { suggestPrices } from "../../../ultils/filters";
 import PriceRangeSlider from "./PriceRangeSlider";
 import SimpleBar from "simplebar-react";
@@ -40,6 +46,16 @@ const StyledSimpleBar = styled(SimpleBar)`
   padding: ${({ theme }) => `0 ${theme.spacing(2)} 0 ${theme.spacing(0.5)}`};
   max-height: ${({ theme }) =>
     `calc(100dvh - ${theme.mixins.toolbar.minHeight}px)`};
+
+  .simplebar-track {
+    &.simplebar-vertical {
+      .simplebar-scrollbar {
+        &:before {
+          background-color: ${({ theme }) => theme.palette.divider};
+        }
+      }
+    }
+  }
 `;
 
 const TitleContainer = styled.div`
@@ -74,6 +90,11 @@ const LabelText = styled.span`
   svg {
     color: ${({ theme }) => theme.palette.warning.light};
     font-size: 18px;
+  }
+
+  &.warning {
+    padding: ${({ theme }) => theme.spacing(1)} 0;
+    color: ${({ theme }) => theme.palette.warning.main};
   }
 `;
 
@@ -121,17 +142,25 @@ const ButtonContainer = styled.div`
   bottom: 0;
   margin-top: ${({ theme }) => theme.spacing(1)};
   padding-bottom: ${({ theme }) => theme.spacing(2)};
-  background-color: ${({ theme }) => theme.palette.background.default};
+
+  &:before {
+    content: "";
+    position: absolute;
+    left: ${({ theme }) => theme.spacing(-0.5)};
+    width: ${({ theme }) => `calc(100% + ${theme.spacing(0.5)})`};
+    height: 100%;
+    background-color: ${({ theme }) => theme.palette.background.default};
+  }
 `;
 //#endregion
 
 const LIMIT_CATES = 10;
 const LIMIT_PUBS = 10;
 
-const CateFilter = memo(({ cateId, onChangeCate }) => {
+const CateFilter = memo(({ cateId, shopId, onChangeCate }) => {
+  const childContainedRef = useRef(null);
   const [open, setOpen] = useState(false); //Open sub cate
   const [showmore, setShowmore] = useState(false);
-  const childContainedRef = useRef(null);
   const [pagination, setPagination] = useState({
     isMore: true, //Merge new data
     number: 0,
@@ -139,12 +168,14 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
     totalElements: 0,
   });
 
-  const { data, isLoading, isFetching, isSuccess, isError } =
-    useGetCategoriesQuery({
-      include: "children",
-      page: pagination?.number,
-      loadMore: pagination?.isMore,
-    });
+  const { data, isLoading, isFetching, isSuccess, isError } = (
+    shopId ? useGetRelevantCategoriesQuery : useGetCategoriesQuery
+  )({
+    include: "children",
+    page: pagination?.number,
+    loadMore: pagination?.isMore,
+    id: shopId,
+  });
 
   useEffect(() => {
     if (data && !isLoading && isSuccess) {
@@ -268,15 +299,11 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
         </>
       );
     } else {
-      catesContent = [...Array(LIMIT_CATES)].map((item, index) => (
-        <Fragment key={`cate-${index}`}>
-          <StyledListItemButton>
-            <FilterText>
-              <Skeleton variant="text" width={120} animation={false} />
-            </FilterText>
-          </StyledListItemButton>
-        </Fragment>
-      ));
+      catesContent = (
+        <StyledListItemButton>
+          <LabelText className="warning">Không có danh mục nào</LabelText>
+        </StyledListItemButton>
+      );
     }
   }
 
@@ -326,7 +353,7 @@ const CateFilter = memo(({ cateId, onChangeCate }) => {
   );
 });
 
-const PublisherFilter = memo(({ pubs, onChangePubs, pubsRef }) => {
+const PublisherFilter = memo(({ pubs, cateId, onChangePubs, pubsRef }) => {
   const [selectedPub, setSelectedPub] = useState(pubs || []);
   const [showmore, setShowmore] = useState(false);
   const [pagination, setPagination] = useState({
@@ -336,11 +363,13 @@ const PublisherFilter = memo(({ pubs, onChangePubs, pubsRef }) => {
     totalElements: 0,
   });
 
-  const { data, isLoading, isFetching, isSuccess, isError } =
-    useGetPublishersQuery({
-      page: pagination?.number,
-      loadMore: pagination?.isMore,
-    });
+  const { data, isLoading, isFetching, isSuccess, isError } = (
+    cateId ? useGetRelevantPublishersQuery : useGetPublishersQuery
+  )({
+    page: pagination?.number,
+    cateId,
+    loadMore: pagination?.isMore,
+  });
 
   useEffect(() => {
     setSelectedPub(pubs);
@@ -425,6 +454,7 @@ const PublisherFilter = memo(({ pubs, onChangePubs, pubsRef }) => {
         const item = (
           <FormControlLabel
             key={`pub-${id}-${index}`}
+            disabled={isFetching}
             control={
               <Checkbox
                 value={id}
@@ -457,11 +487,7 @@ const PublisherFilter = memo(({ pubs, onChangePubs, pubsRef }) => {
         </>
       );
     } else {
-      pubsContent = [...Array(LIMIT_PUBS)].map((item, index) => (
-        <CheckPlaceholder key={`pub-temp-${index}`}>
-          <Skeleton variant="text" sx={{ fontSize: "14px" }} width={200} />
-        </CheckPlaceholder>
-      ));
+      pubsContent = <LabelText className="warning">Không có NXB nào</LabelText>;
     }
   }
 
@@ -550,6 +576,8 @@ const RangeFilter = memo(
                     checked={isItemSelected}
                     onChange={handleSelect}
                     disableRipple
+                    disableTouchRipple
+                    disableFocusRipple
                     name={option.label}
                     color="primary"
                     size="small"
@@ -659,6 +687,8 @@ const RateFilter = memo(({ rating, onChangeRating, rateRef }) => {
                   checked={isItemSelected}
                   onClick={handleChangeRate}
                   disableRipple
+                  disableTouchRipple
+                  disableFocusRipple
                   name={`${index + 1} Star${index + 1 !== 1 ? "s" : ""}`}
                   color="primary"
                   size="small"
@@ -708,10 +738,23 @@ const FilterList = memo(
             flexWrap="wrap"
             divider={<Divider flexItem />}
           >
-            <CateFilter {...{ cateId: filters?.cate.id, onChangeCate }} />
-            <PublisherFilter
-              {...{ pubs: filters?.pubIds, onChangePubs, pubsRef }}
+            <CateFilter
+              {...{
+                cateId: filters?.cate.id,
+                shopId: filters?.shopId,
+                onChangeCate,
+              }}
             />
+            {!filters?.shopId && (
+              <PublisherFilter
+                {...{
+                  pubs: filters?.pubIds,
+                  cateId: filters?.cate.id,
+                  onChangePubs,
+                  pubsRef,
+                }}
+              />
+            )}
             <RangeFilter
               {...{
                 value: filters?.value,

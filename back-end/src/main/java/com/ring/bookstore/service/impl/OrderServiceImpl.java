@@ -70,13 +70,13 @@ public class OrderServiceImpl implements OrderService {
         AddressRequest addressRequest = request.getAddress();
         var address = addressRequest != null
                 ? Address.builder()
-                        .name(addressRequest.getName())
-                        .companyName(addressRequest.getCompanyName())
-                        .phone(addressRequest.getPhone())
-                        .city(addressRequest.getCity())
-                        .address(addressRequest.getAddress())
-                        .type(addressRequest.getType())
-                        .build()
+                .name(addressRequest.getName())
+                .companyName(addressRequest.getCompanyName())
+                .phone(addressRequest.getPhone())
+                .city(addressRequest.getCity())
+                .address(addressRequest.getAddress())
+                .type(addressRequest.getType())
+                .build()
                 : null;
 
         OrderReceipt calculatedReceipt = processOrder(request.getCart(),
@@ -252,8 +252,8 @@ public class OrderServiceImpl implements OrderService {
         boolean isAdmin = isAuthAdmin();
 
         Page<Long> receiptIds = orderRepo.findAllIds(shopId, isAdmin ? null : user.getId(), status, keyword, pageable); //Fetch from database
-        List<IOrderDetail> detailsList = detailRepo.findAllWithReceiptIds(receiptIds.getContent());
-        List<ReceiptDTO> ordersList = orderMapper.detailsToReceiptDTO(detailsList);
+        List<IOrderDetail> detailsList = detailRepo.findAllByReceiptIds(receiptIds.getContent());
+        List<ReceiptDTO> ordersList = orderMapper.detailsToReceiptDTOS(detailsList);
         Page<ReceiptDTO> ordersDTOS = new PageImpl<ReceiptDTO>(
                 ordersList,
                 pageable,
@@ -426,13 +426,14 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //Apply main coupon
-        ICoupon coupon = orderCoupon == null ? null //Null => User not select any coupon
+        ICoupon cProjection = orderCoupon == null ? null //Null => User not select any coupon
                 : coupons.containsKey(orderCoupon) ? coupons.get(orderCoupon)
                 : (couponRepo.recommendCoupon(null, totalPrice - totalDealDiscount, totalQuantity)
                 .orElse(null));
 
-        if (coupon != null && coupon.getCoupon().getShop() == null
-                && !couponService.isExpired(coupon.getCoupon())) {
+        Coupon coupon = cProjection != null ? cProjection.getCoupon() : null;
+        if (coupon != null && coupon.getShop() == null
+                && !couponService.isExpired(coupon)) {
             //Initial value
             double discountValue = 0.0;
             double shippingDiscount = 0.0;
@@ -440,16 +441,25 @@ public class OrderServiceImpl implements OrderService {
             double shipping = totalShippingFee - totalShippingDiscount;
 
             //Apply coupon
-            CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(coupon.getCoupon(),
+            if (couponRepo.hasUserUsedCoupon(coupon.getId(), user.getId())) {
+                coupon.setIsUsed(true);
+                throw new HttpResponseException(
+                        HttpStatus.CONFLICT,
+                        "Coupon expired!",
+                        "Mã coupon " + orderCoupon + " đã qua sử dụng!"
+                );
+            }
+
+            CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(coupon,
                     new CartStateRequest(value, shipping, totalQuantity), user);
 
             if (discountFromCoupon != null) {
                 //Decrease usage on checkout
                 if (isCheckout) {
-                    couponRepo.decreaseUsage(coupon.getCoupon().getId());
+                    couponRepo.decreaseUsage(coupon.getId());
                 }
 
-                coupon.getCoupon().setIsUsable(true); //Mark usable for DTO result mapping
+                coupon.setIsUsable(true); //Mark usable for DTO result mapping
                 discountValue = discountFromCoupon.discountValue();
                 shippingDiscount = discountFromCoupon.discountShipping();
 
@@ -492,9 +502,9 @@ public class OrderServiceImpl implements OrderService {
         orderReceipt.setShippingDiscount(totalShippingDiscount);
 
         if (isCheckout) {
-            orderReceipt.setCoupon(coupon != null ? coupon.getCoupon() : null);
+            orderReceipt.setCoupon(coupon);
         } else {
-            orderReceipt.setCouponDTO(coupon != null ? couponMapper.couponToDTO(coupon) : null);
+            orderReceipt.setCouponDTO(cProjection != null ? couponMapper.couponToDTO(cProjection) : null);
         }
 
         return orderReceipt;
