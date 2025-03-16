@@ -18,6 +18,10 @@ public interface CategoryService {
                                     String include,
                                     Integer parentId);
 
+    Page<CategoryDTO> getRelevantCategories(Integer pageNo,
+                                            Integer pageSize,
+                                            Long shopId);
+
     List<PreviewCategoryDTO> getPreviewCategories();
 
     CategoryDetailDTO getCategory(Integer id,

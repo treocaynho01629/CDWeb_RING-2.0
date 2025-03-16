@@ -1,10 +1,14 @@
 package com.ring.bookstore.dtos.categories;
 
-import com.ring.bookstore.model.Category;
-
 public interface ICategory {
 
-    Category getCategory();
+    Integer getId();
+
+    String getName();
+
+    String getSlug();
+
+    Integer getParentId();
 
     String getImage();
 }

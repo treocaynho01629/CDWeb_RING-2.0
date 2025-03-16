@@ -281,6 +281,12 @@ const CouponContainer = styled.div`
     ${CouponAction} {
       pointer-events: none;
     }
+
+    &.used {
+      &::after {
+        content: "ĐÃ QUA SỬ DỤNG";
+      }
+    }
   }
 
   ${({ theme }) => theme.breakpoints.up("md_lg")} {
@@ -380,6 +386,7 @@ const CouponItem = ({
   coupon,
   summary,
   isDisabled,
+  isUsed,
   isSelected,
   isSaved,
   selectMode,
@@ -421,11 +428,13 @@ const CouponItem = ({
       {coupon ? (
         <CouponContainer
           className={
-            selectMode && isDisabled
-              ? "disabled"
-              : isSelected
-                ? "active"
-                : className
+            selectMode && isUsed
+              ? "disabled used"
+              : selectMode && isDisabled
+                ? "disabled"
+                : isSelected
+                  ? "active"
+                  : className
           }
         >
           <CouponEdge

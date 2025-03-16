@@ -64,5 +64,5 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         where o.id in (:ids)
         group by o.id, i.name, a.name, s.name, u.email, u.username, od.id, a.phone, a.address
     """)
-    List<IOrderDetail> findAllWithReceiptIds(List<Long> ids);
+    List<IOrderDetail> findAllByReceiptIds(List<Long> ids);
 }

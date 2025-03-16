@@ -33,13 +33,28 @@ public class PublisherServiceImpl implements PublisherService {
     private final ImageService imageService;
 
     @Override
-    public Page<PublisherDTO> getPublishers(Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+    public Page<PublisherDTO> getPublishers(Integer pageNo,
+                                            Integer pageSize,
+                                            String sortBy,
+                                            String sortDir) {
        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
 
         //Fetch from database
         Page<IPublisher> pubsList = pubRepo.findPublishers(pageable);
+        Page<PublisherDTO> pubDTOS = pubsList.map(pubMapper::apply);
+        return pubDTOS;
+    }
+
+    @Override
+    public Page<PublisherDTO> getRelevantPublishers(Integer pageNo,
+                                                    Integer pageSize,
+                                                    Integer cateId) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+
+        //Fetch from database
+        Page<IPublisher> pubsList = pubRepo.findRelevantPublishers(cateId, pageable);
         Page<PublisherDTO> pubDTOS = pubsList.map(pubMapper::apply);
         return pubDTOS;
     }

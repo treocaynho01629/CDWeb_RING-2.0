@@ -135,7 +135,7 @@ const FiltersDisplay = memo(
     };
     const handleRemoveRating = (e) => {
       e.stopPropagation();
-      if (onChangeRating) onChangeRating(defaultFilters.value);
+      if (onChangeRating) onChangeRating(defaultFilters.rating);
     };
     const handleRemoveKeyword = (e) => {
       e.stopPropagation();

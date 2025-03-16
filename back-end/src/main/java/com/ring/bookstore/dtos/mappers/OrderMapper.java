@@ -85,7 +85,7 @@ public class OrderMapper {
         return result;
     }
 
-    public List<ReceiptDTO> detailsToReceiptDTO(List<IOrderDetail> details) {
+    public List<ReceiptDTO> detailsToReceiptDTOS(List<IOrderDetail> details) {
         Map<Long, ReceiptDTO> receiptsMap = new LinkedHashMap<>();
 
         for (IOrderDetail projectedDetail : details) {

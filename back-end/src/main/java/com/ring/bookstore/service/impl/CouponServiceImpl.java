@@ -78,7 +78,11 @@ public class CouponServiceImpl implements CouponService {
                     .value(cValue)
                     .quantity(cQuantity)
                     .build();
-            Page<CouponDTO> couponDTOS = couponsList.map((coupon) -> couponMapper.couponToDTO(coupon, request));
+            Page<CouponDTO> couponDTOS = couponsList.map((projection) -> {
+                Coupon coupon = projection.getCoupon();
+                coupon.setIsUsable(this.isUsable(coupon, request));
+                return couponMapper.couponToDTO(projection);
+            });
             return couponDTOS;
         }
 
@@ -94,16 +98,17 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public CouponDTO getCouponByCode(String code, Double cValue, Integer cQuantity) {
-        ICoupon coupon = couponRepo.findCouponByCode(code).orElseThrow(() ->
+        ICoupon projection = couponRepo.findCouponByCode(code).orElseThrow(() ->
                 new ResourceNotFoundException("Coupon not found!"));
         if (cValue != null || cQuantity != null) {
             CartStateRequest request = CartStateRequest.builder()
                     .value(cValue)
                     .quantity(cQuantity)
                     .build();
-            return couponMapper.couponToDTO(coupon, request);
+            Coupon coupon = projection.getCoupon();
+            coupon.setIsUsable(this.isUsable(coupon, request));
         }
-        return couponMapper.couponToDTO(coupon);
+        return couponMapper.couponToDTO(projection);
     }
 
     public List<CouponDTO> recommendCoupons(List<Long> shopIds) {
@@ -304,6 +309,27 @@ public class CouponServiceImpl implements CouponService {
     public boolean isExpired(Coupon coupon) {
         CouponDetail couponDetail = coupon.getDetail();
         return (couponDetail.getUsage() <= 0 || couponDetail.getExpDate().isBefore(LocalDate.now()));
+    }
+
+    protected boolean isUsable(Coupon coupon, CartStateRequest request) {
+        CouponDetail couponDetail = coupon.getDetail();
+        CouponType type = couponDetail.getType();
+        double attribute = couponDetail.getAttribute();
+        boolean result = false;
+
+        //Current
+        double currValue = request.getValue() != null ? request.getValue() : -1;
+        int currQuantity = request.getQuantity() != null ? request.getQuantity() : -1;
+
+        //Check conditions & apply
+        if (type.equals(CouponType.MIN_AMOUNT) && currValue > -1) {
+            result = currQuantity >= attribute;
+        } else if (currValue > -1 &&
+                (type.equals(CouponType.MIN_VALUE) || type.equals(CouponType.SHIPPING))) {
+            result = currValue >= attribute;
+        }
+
+        return result;
     }
 
     //Check valid role function

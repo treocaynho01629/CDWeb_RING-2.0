@@ -54,24 +54,6 @@ public class CouponMapper {
                 fileDownloadUri);
     }
 
-    public CouponDTO couponToDTO(ICoupon projection, CartStateRequest request) {
-
-        CouponDTO coupon = couponToDTO(projection);
-        boolean isUsable = isUsable(projection, request);
-
-        return new CouponDTO(coupon.id(),
-                coupon.code(),
-                isUsable,
-                coupon.type(),
-                coupon.summary(),
-                coupon.condition(),
-                coupon.usage(),
-                coupon.expDate(),
-                coupon.shopId(),
-                coupon.shopName(),
-                coupon.shopImage());
-    }
-
     public CouponDetailDTO couponToDetailDTO(ICoupon projection) {
         Coupon coupon = projection.getCoupon();
         CouponDetail detail = coupon.getDetail();
@@ -86,27 +68,5 @@ public class CouponMapper {
                 detail.getUsage(),
                 coupon.getShop() != null ? coupon.getShop().getId() : null,
                 projection.getShopName());
-    }
-
-    protected boolean isUsable(ICoupon projection, CartStateRequest request) {
-        Coupon coupon = projection.getCoupon();
-        CouponDetail couponDetail = coupon.getDetail();
-        CouponType type = couponDetail.getType();
-        double attribute = couponDetail.getAttribute();
-        boolean result = false;
-
-        //Current
-        double currValue = request.getValue() != null ? request.getValue() : -1;
-        int currQuantity = request.getQuantity() != null ? request.getQuantity() : -1;
-
-        //Check conditions & apply
-        if (type.equals(CouponType.MIN_AMOUNT) && currValue > -1) {
-            result = currQuantity >= attribute;
-        } else if (currValue > -1 &&
-                (type.equals(CouponType.MIN_VALUE) || type.equals(CouponType.SHIPPING))) {
-            result = currValue >= attribute;
-        }
-
-        return result;
     }
 }

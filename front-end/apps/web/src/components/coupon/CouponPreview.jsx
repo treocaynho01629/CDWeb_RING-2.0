@@ -112,7 +112,7 @@ const CouponContent = styled.div`
   &::after {
     content: "";
     position: absolute;
-    background-color: ${({ theme }) => theme.palette.background.default};
+    background-color: ${({ theme }) => theme.palette.background.paper};
     border: 0.5px solid ${({ theme }) => theme.palette.divider};
     height: 10px;
     width: 10px;

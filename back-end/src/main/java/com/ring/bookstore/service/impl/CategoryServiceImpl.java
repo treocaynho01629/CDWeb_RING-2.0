@@ -1,6 +1,6 @@
 package com.ring.bookstore.service.impl;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.github.slugify.Slugify;
@@ -9,12 +9,11 @@ import com.ring.bookstore.dtos.categories.CategoryDetailDTO;
 import com.ring.bookstore.dtos.categories.PreviewCategoryDTO;
 import com.ring.bookstore.dtos.mappers.CategoryMapper;
 import com.ring.bookstore.dtos.categories.ICategory;
+import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.request.CategoryRequest;
+import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.exception.ResourceNotFoundException;
@@ -41,15 +40,43 @@ public class CategoryServiceImpl implements CategoryService {
         Page<CategoryDTO> cateDTOS = null;
 
         if (include != null && include.equalsIgnoreCase("children")) {
-            Page<Category> catesList = cateRepo.findCatesWithChildren(parentId, pageable);
-            cateDTOS = catesList.map(category -> cateMapper.cateToDTO(category, "children"));
-        } else if (include != null && include.equalsIgnoreCase("parent")) {
-            Page<Category> catesList = cateRepo.findCatesWithParent(parentId, pageable);
-            cateDTOS = catesList.map(category -> cateMapper.cateToDTO(category, "parent"));
+            Page<Integer> cateIds = cateRepo.findCatesIdsByParent(parentId, pageable);
+            List<ICategory> fullList = cateRepo.findParentAndSubCatesWithParentIds(cateIds.getContent());
+            List<CategoryDTO> catesList = cateMapper.parendAndChildsToCateDTOS(fullList, cateIds.getContent());
+            cateDTOS = new PageImpl<CategoryDTO>(
+                    catesList,
+                    pageable,
+                    cateIds.getTotalElements()
+            );
+            return cateDTOS;
         } else {
-            Page<Category> catesList = cateRepo.findCates(parentId, pageable);
-            cateDTOS = catesList.map(cateMapper::cateToDTO);
+            Page<ICategory> catesList = cateRepo.findCates(parentId, pageable);
+            cateDTOS = catesList.map(cateMapper::projectionToDTO);
         }
+        return cateDTOS;
+    }
+
+    public Page<CategoryDTO> getRelevantCategories(Integer pageNo, Integer pageSize, Long shopId) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+
+        Page<Integer[]> cateIds = cateRepo.findRelevantCategories(shopId, pageable);
+
+        //Joined id & parent id
+        LinkedHashSet<Integer> joinedIdsSet = new LinkedHashSet<>();
+        for (Integer[] arr : cateIds.getContent()) {
+            joinedIdsSet.add(arr[0]);
+            joinedIdsSet.add(arr[1]);
+        }
+        List<Integer> joinedIds = new ArrayList<>(joinedIdsSet.stream().toList());
+        List<ICategory> fullList = cateRepo.findCatesWithIds(joinedIds);
+
+        Collections.reverse(joinedIds);
+        List<CategoryDTO> catesList = cateMapper.parendAndChildsToCateDTOS(fullList, joinedIds);
+        Page<CategoryDTO> cateDTOS = new PageImpl<CategoryDTO>(
+                catesList,
+                pageable,
+                cateIds.getTotalElements()
+        );
         return cateDTOS;
     }
 
@@ -96,6 +123,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (request.getParentId() != null) {
             Category parent = cateRepo.findById(request.getParentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Parent category not found!"));
+            if (parent.getParent().getId() != null) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid parent category!");
             category.setParent(parent);
         }
 
@@ -119,8 +147,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         //Parent
         if (request.getParentId() != null && !request.getParentId().equals(category.getParent().getId())) {
+            if (!category.getSubCates().isEmpty()) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid child category!");
             Category parent = cateRepo.findById(request.getParentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Parent category not found!"));
+            if (parent.getParent().getId() != null) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid parent category!");
             category.setParent(parent);
         }
 

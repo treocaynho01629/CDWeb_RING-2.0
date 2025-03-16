@@ -15,6 +15,7 @@ import QuickPagination from "../../custom/QuickPagination";
 const FilterSortList = ({
   mobileMode,
   pagination,
+  totalPages,
   onOpenPagination,
   onChangeOrder,
   onChangeDir,
@@ -115,7 +116,12 @@ const FilterSortList = ({
         </MainContainer>
         <AltContainer>
           <QuickPagination
-            {...{ pagination, onPageChange, onOpenPagination }}
+            {...{
+              page: pagination?.number,
+              count: totalPages,
+              onPageChange,
+              onOpenPagination,
+            }}
           />
         </AltContainer>
       </SortContainer>

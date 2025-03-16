@@ -212,8 +212,12 @@ const StyledAppBar = styled(AppBar)`
   ${({ theme }) => theme.breakpoints.down("sm")} {
     ${Logo} {
       filter: ${({ theme }) =>
-        `drop-shadow(0px -1000px 0 rgb(from ${theme.palette.text.primary} r g b / calc(1 - var(--scroll-progress))))`};
+        `drop-shadow(0px -1000px 0 rgb(from ${theme.palette.grey[800]} r g b / calc(1 - var(--scroll-progress))))`};
       transform: translateY(calc((1 - round(var(--scroll-progress))) * 1000px));
+
+      ${({ theme }) =>
+        theme.palette.mode === "dark" &&
+        ` filter: drop-shadow(0px -1000px 0 rgb(from ${theme.palette.text.primary} r g b / calc(1 - var(--scroll-progress))))`}
     }
 
     ${StyledIconButton} {
@@ -250,6 +254,7 @@ const SearchComponent = ({
   toggle,
   setToggle,
   isSearch,
+  isShop,
   products,
 }) => {
   const mobileMode = useMediaQuery((theme) => theme.breakpoints.down("sm"));
@@ -290,6 +295,7 @@ const SearchComponent = ({
             tabletMode,
             show,
             isFocus: toggle,
+            isShop,
           }}
         />
         {tabletMode && isSearch ? (
@@ -662,6 +668,7 @@ const Navbar = () => {
                   toggle,
                   setToggle,
                   isSearch,
+                  isShop,
                   products: cartProducts,
                 }}
               />

@@ -100,6 +100,15 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
+    public ShopDisplayDetailDTO getShopDisplayDetail(Long id, Account user) {
+        Long userId = user != null ? user.getId() : null;
+        IShopDisplayDetail shop = shopRepo.findShopDisplayDetailById(id, userId).orElseThrow(() ->
+                new ResourceNotFoundException("Shop not found!"));
+        ShopDisplayDetailDTO shopDTO = shopMapper.displayDetailToDTO(shop); //Map to DTO
+        return shopDTO;
+    }
+
+    @Override
     public ShopDetailDTO getShopDetail(Long id, Account user) {
         IShopDetail shop = shopRepo.findShopDetailById(id,
                 isAuthAdmin() ? null : user.getId()).orElseThrow(() ->

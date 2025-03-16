@@ -33,6 +33,14 @@ public class PublisherController {
 		return new ResponseEntity<>(pubService.getPublishers(pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 
+	//Get relevant categories
+	@GetMapping("/relevant/{id}")
+	public ResponseEntity<?> getRelevantPublishers(@RequestParam(value = "pSize", defaultValue = "20") Integer pageSize,
+												   @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+												   @PathVariable("id") Integer cateId) {
+		return new ResponseEntity<>(pubService.getRelevantPublishers(pageNo, pageSize, cateId), HttpStatus.OK);
+	}
+
 	//Get publisher by {id}
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getPublisherById(@PathVariable("id") Integer id) {

@@ -7,7 +7,7 @@ export const appSlice = createSlice({
   initialState,
   reducers: {
     addKeyword: (state, action) => {
-      if (state.keywords == "") return;
+      if (action.payload == "") return;
       if (state.keywords.indexOf(action.payload) == -1) {
         state.keywords.push(action.payload);
       }
@@ -20,10 +20,13 @@ export const appSlice = createSlice({
         (keyword) => keyword !== action.payload
       );
     },
+    resetKeywords: (state) => {
+      state.keywords = [];
+    },
   },
 });
 
-export const { addKeyword, removeKeyword } = appSlice.actions;
+export const { addKeyword, removeKeyword, resetKeywords } = appSlice.actions;
 export const selectKeywords = (state) => state.app.keywords;
 
 export default appSlice.reducer;

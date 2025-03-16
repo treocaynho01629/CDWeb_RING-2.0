@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ring.bookstore.model.Category;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,35 +17,43 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     @Query("""
-          select c from Category c
-          where case when coalesce(:parentId) is null 
+          select c.id as id, c.name as name, c.slug as slug, c.parent.id as parentId
+          from Category c
+          where case when coalesce(:parentId) is null
           then (c.parent.id is null) else (c.parent.id = :parentId) end
     """)
-    Page<Category> findCates(Integer parentId, Pageable pageable);
+    Page<ICategory> findCates(Integer parentId, Pageable pageable);
 
     @Query(value = """
-          select c from Category c left join fetch c.subCates
-          where case when coalesce(:parentId) is null 
-          then (c.parent.id is null) else (c.parent.id = :parentId) end
-    """,
-    countQuery = """
-          select count(c) from Category c
-          where case when coalesce(:parentId) is null 
-          then (c.parent.id is null) else (c.parent.id = :parentId) end
+          select c.id as id, c.name as name, c.slug as slug, c.parent.id as parentId
+          from Category c
+          where c.id in :ids
+          order by c.parent.id desc
     """)
-    Page<Category> findCatesWithChildren(Integer parentId, Pageable pageable);
+    List<ICategory> findCatesWithIds(List<Integer> ids);
 
     @Query(value = """
-          select c from Category c left join fetch c.parent
-          where case when coalesce(:parentId) is null 
-          then (c.parent.id is null) else (c.parent.id = :parentId) end
-    """,
-    countQuery = """
-          select count(c) from Category c
-          where case when coalesce(:parentId) is null 
+          select c.id as id, c.name as name, c.slug as slug, c.parent.id as parentId
+          from Category c
+          where c.parent.id in :ids
+          or c.id in :ids
+          order by c.parent.id desc
+    """)
+    List<ICategory> findParentAndSubCatesWithParentIds(List<Integer> ids);
+
+    @Query(value = """
+          select distinct c.id from Category c
+          where case when coalesce(:parentId) is null
           then (c.parent.id is null) else (c.parent.id = :parentId) end
     """)
-    Page<Category> findCatesWithParent(Integer parentId, Pageable pageable);
+    Page<Integer> findCatesIdsByParent(Integer parentId, Pageable pageable);
+
+    @Query(value = """
+          select distinct array(c.id, c.parent.id) as id from Category c
+          join c.cateBooks b
+          where b.shop.id = :shopId
+    """)
+    Page<Integer[]> findRelevantCategories(Long shopId, Pageable pageable);
 
     @Query("""
           select c as category, t.image as image

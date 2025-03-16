@@ -10,6 +10,7 @@ import {
 import { useGetOrdersByUserQuery } from "../../features/orders/ordersApiSlice";
 import { KeyboardArrowLeft, Receipt, Search } from "@mui/icons-material";
 import {
+  Box,
   CircularProgress,
   Dialog,
   DialogContent,
@@ -23,13 +24,14 @@ import {
   MessageContainer,
   LoadContainer,
   PlaceholderContainer,
+  MainForm,
 } from "../custom/ProfileComponents";
 import { Link, useSearchParams } from "react-router";
 import { booksApiSlice } from "../../features/books/booksApiSlice";
 import { CustomTab, CustomTabs } from "../custom/CustomTabs";
 import { debounce } from "lodash-es";
 import { Message } from "@ring/ui/Components";
-import { useDeepEffect, orderItems } from "@ring/shared";
+import { orderItems } from "@ring/shared";
 import useCart from "../../hooks/useCart";
 import OrderItem from "./OrderItem";
 
@@ -67,9 +69,12 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
   const [getBought, { isLoading: fetching }] =
     booksApiSlice.useLazyGetBooksByIdsQuery();
 
-  useDeepEffect(() => {
-    updatePath();
-  }, [filters]);
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      status: searchParams.get("status") ?? "",
+    }));
+  }, [searchParams]);
 
   useEffect(() => {
     if (data && !isLoading && isSuccess) {
@@ -86,22 +91,29 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
   }, []);
 
   //Change tab
-  const handleChangeStatus = useCallback((e, newValue) => {
-    setFilters((prev) => ({ ...prev, status: newValue }));
-    handleResetPagination();
-  }, []);
+  const handleChangeStatus = (e, newValue) => {
+    setFilters((prev) => ({ ...prev, status: newValue, keyword: "" }));
+    newValue === ""
+      ? searchParams.delete("status")
+      : searchParams.set("status", newValue);
+    searchParams.delete("k");
+    setSearchParams(searchParams);
+    handleResetPage();
+  };
 
-  const handleChangeKeyword = useCallback((e) => {
+  const handleChangeKeyword = (e) => {
     e.preventDefault();
-    if (inputRef)
-      setFilters((prev) => ({ ...prev, keyword: inputRef.current.value }));
-    handleResetPagination();
-  }, []);
+    let newValue = inputRef.current.value;
+    if (inputRef) setFilters((prev) => ({ ...prev, keyword: newValue }));
+    newValue == "" ? searchParams.delete("k") : searchParams.set("k", newValue);
+    setSearchParams(searchParams, { replace: true });
+    handleResetPage();
+  };
 
-  const handleResetPagination = useCallback(() => {
+  const handleResetPage = () => {
     setPagination((prev) => ({ ...prev, number: 0 }));
     scrollToTop();
-  }, []);
+  };
 
   //Search params
   const updatePath = () => {
@@ -274,7 +286,7 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
         sx={{ py: 0, px: { xs: 0, sm: 2, md: 0 } }}
         onScroll={tabletMode ? scrollListener : undefined}
       >
-        <form ref={scrollRef} onSubmit={handleChangeKeyword}>
+        <MainForm ref={scrollRef} onSubmit={handleChangeKeyword}>
           <TextField
             placeholder="Tìm theo Mã, Tên Shop hoặc Tên sản phẩm"
             autoComplete="order"
@@ -291,7 +303,7 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
               },
             }}
           />
-        </form>
+        </MainForm>
         <MainContainer>
           {ordersContent}
           {pagination.number > 0 && isFetching && (

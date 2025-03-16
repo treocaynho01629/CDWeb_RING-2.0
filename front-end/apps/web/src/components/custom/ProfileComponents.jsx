@@ -36,6 +36,15 @@ export const StyledDialogTitle = styled(DialogTitle)`
   }
 `;
 
+export const MainForm = styled.form`
+  /* scroll-margin: ${({ theme }) => `calc(-40px - ${theme.spacing(4)}px)`};
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    scroll-margin: ${({ theme }) => `calc(-40px - ${theme.spacing(2)})`};
+  } */
+  scroll-margin-top: 100px;
+`;
+
 export const TabContentContainer = styled.div`
   position: relative;
   padding: 0 ${({ theme }) => theme.spacing(2)};
