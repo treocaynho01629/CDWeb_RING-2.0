@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Box, Stack, Button, DialogContent } from "@mui/material";
 import { Check, KeyboardArrowLeft, Password } from "@mui/icons-material";
 import { useChangePasswordMutation } from "../../features/users/usersApiSlice";
@@ -8,7 +8,14 @@ import { Instruction } from "@ring/ui/Components";
 import PasswordInput from "@ring/ui/PasswordInput";
 import PasswordEvaluate from "../custom/PasswordEvaluate";
 
-const ResetPassComponent = ({ pending, setPending }) => {
+const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
+
+const ResetPassComponent = ({
+  pending,
+  setPending,
+  verifyRefreshToken,
+  refreshing,
+}) => {
   const [err, setErr] = useState([]);
   const [errMsg, setErrMsg] = useState("");
   const [pass, setPass] = useState("");
@@ -81,6 +88,11 @@ const ResetPassComponent = ({ pending, setPending }) => {
       });
   };
 
+  //Check valid token
+  useEffect(() => {
+    verifyRefreshToken();
+  }, []);
+
   //Validation
   useEffect(() => {
     const match = newPass === newPassRe;
@@ -101,6 +113,14 @@ const ResetPassComponent = ({ pending, setPending }) => {
 
   return (
     <div>
+      {refreshing && (
+        <Suspense fallBack={null}>
+          <PendingModal
+            open={refreshing}
+            message="Đang xác thực đăng nhập ..."
+          />
+        </Suspense>
+      )}
       <StyledDialogTitle>
         <Link to={-1}>
           <KeyboardArrowLeft />

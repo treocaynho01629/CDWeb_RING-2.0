@@ -1,29 +1,33 @@
 package com.ring.bookstore.dtos.mappers;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.ring.bookstore.dtos.publishers.PublisherDTO;
-import com.ring.bookstore.dtos.publishers.IPublisher;
+import com.ring.bookstore.model.Image;
 import com.ring.bookstore.model.Publisher;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.function.Function;
 
+@RequiredArgsConstructor
 @Service
-public class PublisherMapper implements Function<IPublisher, PublisherDTO> {
-	
+public class PublisherMapper implements Function<Publisher, PublisherDTO> {
+
+    private final Cloudinary cloudinary;
+
     @Override
-    public PublisherDTO apply(IPublisher projection) {
-		Publisher publisher = projection.getPublisher();
-        String fileDownloadUri = projection.getImage() != null ?
-                ServletUriComponentsBuilder
-                        .fromCurrentContextPath()
-                        .path("/api/images/")
-                        .path(projection.getImage())
-                        .toUriString()
-                : null;
+    public PublisherDTO apply(Publisher publisher) {
+        Image image = publisher.getImage();
+        String url = cloudinary.url().transformation(new Transformation()
+                        .aspectRatio("1.0")
+                        .width(100)
+                        .quality("auto")
+                        .fetchFormat("auto"))
+                        .secure(true).generate(image.getPublicId());
 
         return new PublisherDTO(publisher.getId()
 				, publisher.getName()
-        		, fileDownloadUri);
+        		, url);
     }
 }

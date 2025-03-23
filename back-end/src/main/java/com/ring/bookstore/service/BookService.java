@@ -50,13 +50,13 @@ public interface BookService {
     BookResponseDTO addBook(BookRequest request,
                     MultipartFile thumbnail,
                     MultipartFile[] images,
-                    Account user) throws IOException, ImageResizerException;
+                    Account user);
 
     BookResponseDTO updateBook(Long id,
                        BookRequest request,
                        MultipartFile thumbnail,
                        MultipartFile[] images,
-                       Account user) throws IOException, ImageResizerException;
+                       Account user);
 
     BookResponseDTO deleteBook(Long id,
                        Account user);

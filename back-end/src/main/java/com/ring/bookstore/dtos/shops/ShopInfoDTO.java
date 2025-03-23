@@ -1,5 +1,7 @@
 package com.ring.bookstore.dtos.shops;
 
+import com.ring.bookstore.dtos.images.ImageDTO;
+
 import java.time.LocalDateTime;
 
 //Shop

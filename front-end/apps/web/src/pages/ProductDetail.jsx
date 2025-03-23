@@ -147,12 +147,7 @@ const ProductDetail = () => {
           <PendingModal open={pending} message="Đang gửi yêu cầu..." />
         </Suspense>
       )}
-      <Box
-        display="relative"
-        sx={(theme) => ({
-          marginTop: { xs: `-${theme.mixins.toolbar.minHeight}px`, md: 0 },
-        })}
-      >
+      <Box display="relative">
         <CustomBreadcrumbs
           separator="›"
           maxItems={4}

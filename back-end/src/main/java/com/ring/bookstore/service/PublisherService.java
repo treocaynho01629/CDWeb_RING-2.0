@@ -23,11 +23,11 @@ public interface PublisherService {
 	PublisherDTO getPublisher(Integer id);
 
 	Publisher addPublisher(String name,
-						   MultipartFile file) throws IOException, ImageResizerException;
+						   MultipartFile file);
 
 	Publisher updatePublisher(Integer id,
 							  String name,
-							  MultipartFile file) throws IOException, ImageResizerException;
+							  MultipartFile file);
 
 	void deletePublisher(Integer id);
 

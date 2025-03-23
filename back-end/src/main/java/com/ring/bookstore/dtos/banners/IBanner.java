@@ -1,5 +1,7 @@
 package com.ring.bookstore.dtos.banners;
 
+import com.ring.bookstore.dtos.images.IImage;
+
 public interface IBanner {
     Integer getId();
 
@@ -9,8 +11,7 @@ public interface IBanner {
 
     String getDescription();
 
-    String getImage();
-
     String getUrl();
 
+    IImage getImage();
 }

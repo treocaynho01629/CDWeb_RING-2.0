@@ -1,7 +1,7 @@
 package com.ring.bookstore.config;
 
 import com.ring.bookstore.enums.PrivilegeName;
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.Privilege;
 import com.ring.bookstore.model.Role;
@@ -49,10 +49,10 @@ public class SetupDataLoader implements
         List<Privilege> fullPrivileges = Arrays.asList(readPrivilege, createPrivilege, updatePrivilege, deletePrivilege);
 
         //Create initial roles
-        createRoleIfNotFound(RoleName.ROLE_USER, Collections.emptyList());
-        createRoleIfNotFound(RoleName.ROLE_SELLER, fullPrivileges);
-        final Role adminRole = createRoleIfNotFound(RoleName.ROLE_ADMIN, fullPrivileges);
-        final Role guestRole = createRoleIfNotFound(RoleName.ROLE_GUEST, Arrays.asList(readPrivilege));
+        createRoleIfNotFound(UserRole.ROLE_USER, Collections.emptyList());
+        createRoleIfNotFound(UserRole.ROLE_SELLER, fullPrivileges);
+        final Role adminRole = createRoleIfNotFound(UserRole.ROLE_ADMIN, fullPrivileges);
+        final Role guestRole = createRoleIfNotFound(UserRole.ROLE_GUEST, Arrays.asList(readPrivilege));
 
         //Create initial user
         createUserIfNotFound("test@test.com",
@@ -79,11 +79,11 @@ public class SetupDataLoader implements
     }
 
     @Transactional
-    public Role createRoleIfNotFound(RoleName roleName, Collection<Privilege> privileges) {
-        Role role = roleRepo.findByRoleName(roleName).orElse(null);
+    public Role createRoleIfNotFound(UserRole userRole, Collection<Privilege> privileges) {
+        Role role = roleRepo.findByRoleName(userRole).orElse(null);
         if (role == null) {
             role = new Role();
-            role.setRoleName(roleName);
+            role.setRoleName(userRole);
             role.setPrivileges(privileges);
             roleRepo.save(role);
         }

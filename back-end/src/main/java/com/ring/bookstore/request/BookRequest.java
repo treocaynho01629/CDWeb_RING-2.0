@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.ring.bookstore.enums.BookLanguage;
 import com.ring.bookstore.enums.BookType;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -65,9 +66,9 @@ public class BookRequest { //Request body for book
 	@Past(message = "Ngày xuất bản phải trước hôm nay!")
 	@DateTimeFormat(pattern = "dd-MM-yyyy")
 	private LocalDate date;
-	
-	@NotBlank(message = "Ngôn ngữ không được bỏ trống!")
-	private String language;
+
+	@NotNull(message = "Ngôn ngữ không được bỏ trống!")
+	private BookLanguage language;
 
 	@NotNull(message = "Cửa hàng không được bỏ trống!")
 	private Long shopId;

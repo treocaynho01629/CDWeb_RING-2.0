@@ -4,9 +4,8 @@ import com.ring.bookstore.dtos.dashboard.StatDTO;
 import com.ring.bookstore.dtos.mappers.DashboardMapper;
 import com.ring.bookstore.dtos.shops.*;
 import com.ring.bookstore.dtos.mappers.ShopMapper;
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 import com.ring.bookstore.exception.HttpResponseException;
-import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.AccountRepository;
@@ -16,6 +15,7 @@ import com.ring.bookstore.request.AddressRequest;
 import com.ring.bookstore.request.ShopRequest;
 import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.service.ShopService;
+import com.ring.bookstore.ultils.FileUploadUtil;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -143,11 +142,12 @@ public class ShopServiceImpl implements ShopService {
 
     //Add shop (SELLER)
     @Transactional
-    public Shop addShop(ShopRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException {
+    public Shop addShop(ShopRequest request, MultipartFile file, Account user) {
         Image image = null;
 
         //Image upload
-        if (file != null) image = imageService.upload(file);
+        if (file != null) image = imageService.upload(file, FileUploadUtil.SHOP_FOLDER);
+        ;
 
         //Create address
         AddressRequest addressRequest = request.getAddressRequest();
@@ -179,7 +179,7 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Transactional
-    public Shop updateShop(Long id, ShopRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException {
+    public Shop updateShop(Long id, ShopRequest request, MultipartFile file, Account user) {
         //Get original shop
         Shop shop = shopRepo.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Shop not found"));
@@ -192,7 +192,7 @@ public class ShopServiceImpl implements ShopService {
             Long imageId = shop.getImage().getId();
             if (imageId != null) imageService.deleteImage(imageId); //Delete old image
 
-            Image savedImage = imageService.upload(file); //Upload new image
+            Image savedImage = imageService.upload(file, FileUploadUtil.SHOP_FOLDER); //Upload new image
             shop.setImage(savedImage); //Set new image
         }
 
@@ -264,21 +264,21 @@ public class ShopServiceImpl implements ShopService {
     //Check valid role function
     protected boolean isAuthAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
     }
 
     //Check valid role function
     protected boolean isOwnerValid(Shop shop, Account user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        boolean isAdmin = (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+        boolean isAdmin = (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
         //Check if is admin or valid owner id
         return shop.getOwner().getId().equals(user.getId()) || isAdmin;
     }
 
-    protected Shop changeShopPic(MultipartFile file, String image, Shop shop) throws IOException, ImageResizerException {
+    protected Shop changeShopPic(MultipartFile file, String image, Shop shop) {
         if (file != null) { //Contain new image >> upload/replace
             if (shop.getImage() != null) imageService.deleteImage(shop.getImage().getId()); //Delete old image
-            Image savedImage = imageService.upload(file); //Upload new image
+            Image savedImage = imageService.upload(file, FileUploadUtil.SHOP_FOLDER); //Upload new image
             shop.setImage(savedImage); //Set new image
         } else if (image == null) { //Remove image
             if (shop.getImage() != null) imageService.deleteImage(shop.getImage().getId()); //Delete old image

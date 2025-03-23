@@ -1,5 +1,7 @@
 package com.ring.bookstore.dtos.books;
 
+import com.ring.bookstore.dtos.images.IImage;
+import com.ring.bookstore.enums.BookLanguage;
 import com.ring.bookstore.enums.BookType;
 
 import java.math.BigDecimal;
@@ -25,7 +27,7 @@ public interface IBookDetail {
 
     Short getAmount();
 
-    String getImage();
+    IImage getImage();
 
     Integer getPubId();
 
@@ -55,11 +57,11 @@ public interface IBookDetail {
 
     LocalDate getDate();
 
-    String getLanguage();
+    BookLanguage getLanguage();
 
     Double getWeight();
 
-    List<String> getPreviews();
+    List<IImage> getPreviews();
 
     Integer getTotalOrders();
 

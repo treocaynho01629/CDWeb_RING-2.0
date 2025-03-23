@@ -3,7 +3,7 @@ package com.ring.bookstore.service.impl;
 import com.ring.bookstore.dtos.banners.BannerDTO;
 import com.ring.bookstore.dtos.mappers.BannerMapper;
 import com.ring.bookstore.dtos.banners.IBanner;
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.Account;
@@ -104,7 +104,7 @@ public class BannerServiceImpl implements BannerService {
     //Check valid role function
     protected boolean isAuthAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
     }
 
     protected boolean isOwnerValid(Shop shop, Account user) {

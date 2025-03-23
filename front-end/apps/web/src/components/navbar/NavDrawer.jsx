@@ -138,7 +138,7 @@ const NavDrawer = ({
                     <ListItemIcon>
                       <Avatar
                         sx={{ width: 32, height: 32, ml: -0.5 }}
-                        src={image ? image + "?size=tiny" : null}
+                        src={image ?? null}
                       />
                     </ListItemIcon>
                     <ListItemText primary={username} />

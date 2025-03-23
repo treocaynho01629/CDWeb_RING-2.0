@@ -1,5 +1,6 @@
 package com.ring.bookstore.dtos.accounts;
 
+import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.model.Role;
 
 import java.util.List;
@@ -9,8 +10,6 @@ public interface IAccount {
 
     String getUsername();
 
-    String getImage();
-
     String getEmail();
 
     String getName();
@@ -18,4 +17,6 @@ public interface IAccount {
     String getPhone();
 
     List<Role> getRoles();
+
+    IImage getImage();
 }

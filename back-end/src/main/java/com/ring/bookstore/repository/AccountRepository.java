@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import com.ring.bookstore.dtos.accounts.IAccount;
 import com.ring.bookstore.dtos.dashboard.IStat;
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -48,7 +48,7 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 		and a.id not in :ids
 		group by a.id
 	""")
-	List<Long> findInverseIds(String keyword, RoleName role, List<Long> ids);
+	List<Long> findInverseIds(String keyword, UserRole role, List<Long> ids);
 
 	@Query("""
         select t.currentMonth as total, t.currentMonth as currentMonth, t.lastMonth as lastMonth
@@ -63,8 +63,8 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	IStat getAccountAnalytics();
 
 	@Query("""
-		select a.id as id, a.username as username, i.name as image,
-		a.email as email, p.name as name, p.phone as phone, a.roles as roles
+		select a.id as id, a.username as username, a.email as email,
+			p.name as name, p.phone as phone, a.roles as roles, i as image
 		from Account a
 		left join a.profile p
 		left join p.image i
@@ -72,7 +72,7 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 		where concat (a.email, a.username) ilike %:keyword%
 		and (coalesce(:role) is null or r.roleName = :role)
 	""")
-	Page<IAccount> findAccountsWithFilter(String keyword, RoleName role, Pageable pageable);
+	Page<IAccount> findAccountsWithFilter(String keyword, UserRole role, Pageable pageable);
 
 	@Modifying
 	@Query("""

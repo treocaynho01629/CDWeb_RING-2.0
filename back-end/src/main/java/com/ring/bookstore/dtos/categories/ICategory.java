@@ -10,5 +10,5 @@ public interface ICategory {
 
     Integer getParentId();
 
-    String getImage();
+    String getPublicId();
 }

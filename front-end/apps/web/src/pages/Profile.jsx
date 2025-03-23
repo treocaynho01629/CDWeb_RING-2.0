@@ -7,6 +7,8 @@ import {
 } from "../components/custom/ProfileComponents";
 import { useNavigate, useOutletContext, useParams } from "react-router";
 import { useTitle } from "@ring/shared";
+import { useRefreshMutation } from "@ring/redux";
+import { useLogout } from "@ring/auth";
 import Placeholder from "@ring/ui/Placeholder";
 
 const ProfileDetail = lazy(() => import("../components/profile/ProfileDetail"));
@@ -49,9 +51,27 @@ const Profile = () => {
     setPending,
   } = useOutletContext();
   const navigate = useNavigate();
+  const [refresh, { isLoading: refreshing }] = useRefreshMutation();
+  const signOut = useLogout();
 
   //Set title
   useTitle("Hồ sơ");
+
+  const verifyRefreshToken = async () => {
+    if (refreshing) return;
+
+    try {
+      await refresh().unwrap();
+    } catch (error) {
+      //Log user out if fail to refresh
+      if (error?.status === 500) {
+        setErrorMsg("Đã xảy ra lỗi xác thực, vui lòng đăng nhập lại!");
+      } else if (error?.status === 400 || error?.status === 403) {
+        setErrorMsg("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
+      }
+      signOut();
+    }
+  };
 
   let content;
 
@@ -66,6 +86,7 @@ const Profile = () => {
             loading,
             isSuccess,
             tabletMode,
+            verifyRefreshToken,
           }}
         />
       );
@@ -74,7 +95,11 @@ const Profile = () => {
       content = <AddressComponent {...{ pending, setPending, mobileMode }} />;
       break;
     case "password":
-      content = <ResetPassComponent {...{ pending, setPending }} />;
+      content = (
+        <ResetPassComponent
+          {...{ pending, setPending, verifyRefreshToken, refreshing }}
+        />
+      );
       break;
   }
 

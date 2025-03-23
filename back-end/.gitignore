@@ -1,5 +1,4 @@
 HELP.md
-application-dev.properties
 .env
 target/
 !.mvn/wrapper/maven-wrapper.jar

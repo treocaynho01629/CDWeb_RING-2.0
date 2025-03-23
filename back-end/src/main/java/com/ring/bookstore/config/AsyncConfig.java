@@ -17,12 +17,11 @@ public class AsyncConfig {
         SimpleApplicationEventMulticaster eventMulticaster = new SimpleApplicationEventMulticaster();
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
 
-        threadPoolTaskExecutor.setCorePoolSize(8);
-        threadPoolTaskExecutor.setMaxPoolSize(16);
+        threadPoolTaskExecutor.setCorePoolSize(5);
+        threadPoolTaskExecutor.setMaxPoolSize(10);
         threadPoolTaskExecutor.initialize();
         eventMulticaster.setTaskExecutor(threadPoolTaskExecutor);
 
         return eventMulticaster;
     }
-
 }

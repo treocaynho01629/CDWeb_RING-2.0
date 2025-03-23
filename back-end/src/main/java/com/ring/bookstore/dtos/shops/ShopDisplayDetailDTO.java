@@ -1,6 +1,7 @@
 package com.ring.bookstore.dtos.shops;
 
 import com.ring.bookstore.dtos.accounts.AddressDTO;
+import com.ring.bookstore.dtos.images.ImageDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

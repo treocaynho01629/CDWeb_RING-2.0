@@ -157,7 +157,7 @@ public class OrderMapper {
 
     public OrderItemDTO itemToDTO(OrderItem item) {
         Book book = item.getBook();
-        String fileDownloadUri = book.getImage().getFileDownloadUri();
+        String fileDownloadUri = "FIXLATER";
 
         return new OrderItemDTO(item.getId(),
                 item.getPrice(),

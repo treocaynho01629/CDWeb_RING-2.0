@@ -1,5 +1,6 @@
 package com.ring.bookstore.dtos.books;
 
+import com.ring.bookstore.enums.BookLanguage;
 import com.ring.bookstore.enums.BookType;
 
 import java.math.BigDecimal;
@@ -45,7 +46,7 @@ public interface IBook {
 
     LocalDate getDate();
 
-    String getLanguage();
+    BookLanguage getLanguage();
 
     Double getWeight();
 

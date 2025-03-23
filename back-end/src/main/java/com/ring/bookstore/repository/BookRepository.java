@@ -18,10 +18,10 @@ import com.ring.bookstore.model.Book;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
     @Query(value = """
-                select b.id as id, b.slug as slug, b.title as title, i.name as image,
+                select b.id as id, b.slug as slug, b.title as title,
                     (case when :withDesc = true then b.description else null end) as description,
                     b.price as price, b.discount as discount, b.amount as amount, s.id as shopId,
-                    s.name as shopName,
+                    s.name as shopName, i as image,
                     coalesce(rv.rating, 0) as rating,
                     coalesce(od.totalOrders, 0) as totalOrders
                 from Book b join b.shop s left join b.image i
@@ -39,7 +39,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                 and coalesce(rv.rating, 0) >= :rating
                 and b.price * (1 - b.discount) between :fromRange and :toRange
                 and b.amount >= :amount
-                group by b, i.name, rv.rating, od.totalOrders, s.id, s.name
+                group by b, i.id, rv.rating, od.totalOrders, s.id, s.name
             """,
             countQuery = """
                      select count(b)
@@ -72,10 +72,10 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                                            Pageable pageable);
 
     @Query("""
-                select b.id as id, b.slug as slug, b.title as title, i.name as image,
+                select b.id as id, b.slug as slug, b.title as title,
                     (case when :withDesc = true then b.description else null end) as description,
                     b.price as price, b.discount as discount, b.amount as amount, s.id as shopId,
-                    s.name as shopName,
+                    s.name as shopName, i as image,
                     coalesce(rv.rating, 0) as rating,
                     coalesce(od.totalOrders, 0) as totalOrders
                 from Book b join b.shop s left join b.image i
@@ -85,7 +85,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                 left join (select o.book.id as book_id, sum(o.quantity) as totalOrders
                     from OrderItem o
                     group by o.book.id) od on b.id = od.book_id
-                group by b, i.name, rv.rating, od.totalOrders, s.id, s.name
+                group by b, i.id, rv.rating, od.totalOrders, s.id, s.name
                 order by random()
                 limit :amount
             """)
@@ -93,9 +93,9 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                                        Boolean withDesc); //Get random books
 
     @Query("""
-                select b.id as id, b.slug as slug, b.title as title, i.name as image,
+                select b.id as id, b.slug as slug, b.title as title,
                     b.price as price, b.discount as discount, b.amount as amount, s.id as shopId,
-                    s.name as shopName,
+                    s.name as shopName, i as image,
                     coalesce(rv.rating, 0) as rating,
                     coalesce(od.totalOrders, 0) as totalOrders
                 from Book b join b.shop s left join b.image i

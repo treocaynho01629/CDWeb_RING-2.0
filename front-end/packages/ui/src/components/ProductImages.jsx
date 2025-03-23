@@ -10,6 +10,7 @@ const LightboxImages = lazy(() => import("./LightboxImages"));
 
 //#region styled
 const ImgContainer = styled.div`
+  position: relative;
   text-align: center;
   background-color: ${({ theme }) => theme.palette.background.paper};
 
@@ -232,7 +233,11 @@ const ButtonGroup = ({ images, goToSlide, currentSlide, responsive }) => {
                 onClick={() => goToSlide(index)}
               >
                 <StyledSmallLazyImage
-                  src={`${image?.src}?size=small`}
+                  src={image?.src}
+                  srcSet={image?.srcSet
+                    .map((item) => `${item.src} ${item.width}w`)
+                    .join(", ")}
+                  sizes="70px"
                   alt={image?.alt}
                   placeholder={
                     <StyledSmallSkeleton
@@ -294,6 +299,7 @@ const ProductImages = ({ images }) => {
               srcSet={image?.srcSet
                 .map((item) => `${item.src} ${item.width}w`)
                 .join(", ")}
+              sizes={image?.sizes}
               alt={image?.alt}
               visibleByDefault={index == 0}
               placeholder={

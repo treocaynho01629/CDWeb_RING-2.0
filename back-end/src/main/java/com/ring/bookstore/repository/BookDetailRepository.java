@@ -13,13 +13,15 @@ import java.util.Optional;
 @Repository
 public interface BookDetailRepository extends JpaRepository<BookDetail, Long>{
     @Query("""
-            select distinct b.id as id, b.slug as slug, b.price as price, b.discount as discount, b.title as title,
-                b.description as description, b.type as type, b.author as author, b.amount as amount, i.name as image,
-                p.id as pubId, p.name as pubName, c.id as cateId, c.name as cateName, c.slug as cateSlug,
-                pc.id as parentId, pc.name as parentName, pc.slug as parentSlug, pc.ancestor_id as ancestorId,
-                s.id as shopId, s.name as shopName,
-                d.size as size, d.pages as pages, d.bDate as date, d.bLanguage as language, d.bWeight as weight,
-                pv.previews as previews,
+            select distinct b.id as id, b.slug as slug,
+                b.price as price, b.discount as discount, b.title as title,
+                b.description as description, b.type as type, b.author as author,
+                b.amount as amount, p.id as pubId, p.name as pubName,
+                c.id as cateId, c.name as cateName, c.slug as cateSlug,
+                pc.id as parentId, pc.name as parentName, pc.slug as parentSlug,
+                pc.ancestor_id as ancestorId, s.id as shopId, s.name as shopName,
+                d.size as size, d.pages as pages, d.bDate as date,
+                d.bLanguage as language, d.bWeight as weight, i as image, pv as previews,
                 coalesce(od.totalOrders, 0) as totalOrders,
             	coalesce(rv.rating, 0) as rating, rv.totalRates as totalRates,
             	coalesce(rv.five, 0) as rate5,
@@ -29,11 +31,8 @@ public interface BookDetailRepository extends JpaRepository<BookDetail, Long>{
             	coalesce(rv.one, 0) as rate1
             from Book b
             left join b.detail d
-            left join (
-                select pi.detail.id as detail_id, array_agg(pi.name)
-                over (order by pi.detail.id) as previews
-                from Image pi) pv on pv.detail_id = d.id
             left join b.image i
+            left join d.previewImages pv
             join b.shop s
             join b.publisher p
             join b.cate c
@@ -58,10 +57,13 @@ public interface BookDetailRepository extends JpaRepository<BookDetail, Long>{
     Optional<IBookDetail> findBookDetail(Long id, String slug);
 
     @Query("""
-            select distinct b.id as id, b.slug as slug, b.price as price, b.discount as discount, b.title as title,
-                b.description as description, b.type as type, b.author as author, b.amount as amount, i.id as image,
-                p.id as pubId, p.name as pubName, c.id as cateId, c.name as cateName, s.id as shopId, s.name as shopName,
-                d.size as size, d.pages as pages, d.bDate as date, d.bLanguage as language, d.bWeight as weight,
+            select distinct b.id as id, b.slug as slug, b.price as price,
+                b.discount as discount, b.title as title, b.description as description,
+                b.type as type, b.author as author, b.amount as amount,
+                i.id as image, p.id as pubId, p.name as pubName,
+                c.id as cateId, c.name as cateName, s.id as shopId,
+                s.name as shopName, d.size as size, d.pages as pages,
+                d.bDate as date, d.bLanguage as language, d.bWeight as weight,
                 pv.previews as previews
             from Book b
             left join b.detail d

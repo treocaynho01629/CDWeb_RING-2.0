@@ -105,7 +105,6 @@ const StyledSkeleton = styled(Skeleton)`
 
 const ProductSimple = ({ book, scrollPosition }) => {
   const { addProduct } = useCart();
-
   const handleAddToCart = (book) => {
     addProduct(book, 1);
   };
@@ -116,7 +115,7 @@ const ProductSimple = ({ book, scrollPosition }) => {
         <Link to={`/product/${book?.slug}`} style={{ width: "100%" }}>
           <ImgContainer>
             <StyledLazyImage
-              src={`${book?.image}?size=small`}
+              src={book?.image?.srcSet[1]}
               alt={`${book?.title} Thumbnail`}
               width={"100%"}
               scrollPosition={scrollPosition}

@@ -1,5 +1,7 @@
 package com.ring.bookstore.model;
 
+import com.ring.bookstore.enums.BookLanguage;
+import com.ring.bookstore.enums.BookType;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -35,9 +37,9 @@ public class BookDetail {
     @Column
     private LocalDate bDate;
 
-    @Column(length = 100)
-    @Nationalized 
-    private String bLanguage;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private BookLanguage bLanguage;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId

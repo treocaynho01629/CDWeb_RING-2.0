@@ -1,18 +1,26 @@
 package com.ring.bookstore.dtos.mappers;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.ring.bookstore.dtos.categories.CategoryDTO;
 import com.ring.bookstore.dtos.categories.CategoryDetailDTO;
 import com.ring.bookstore.dtos.categories.PreviewCategoryDTO;
 import com.ring.bookstore.dtos.categories.ICategory;
+import com.ring.bookstore.dtos.images.IImage;
+import com.ring.bookstore.dtos.images.ImageDTO;
 import com.ring.bookstore.model.Category;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class CategoryMapper {
+
+    private final Cloudinary cloudinary;
 
     public CategoryDTO projectionToDTO(ICategory category) {
         return new CategoryDTO(category.getId(),
@@ -121,18 +129,17 @@ public class CategoryMapper {
     }
 
     public PreviewCategoryDTO projectionToPreviewDTO(ICategory projection) {
-        String fileDownloadUri = projection.getImage() != null ?
-                ServletUriComponentsBuilder
-                        .fromCurrentContextPath()
-                        .path("/api/images/")
-                        .path(projection.getImage())
-                        .toUriString()
-                : null;
+        String url = cloudinary.url().transformation(new Transformation()
+                        .aspectRatio("1.0")
+                        .width(70)
+                        .quality("auto")
+                        .fetchFormat("auto"))
+                .secure(true).generate(projection.getPublicId());
 
         return new PreviewCategoryDTO(projection.getId(),
                 projection.getSlug(),
                 projection.getParentId(),
                 projection.getName(),
-                fileDownloadUri);
+                url);
     }
 }

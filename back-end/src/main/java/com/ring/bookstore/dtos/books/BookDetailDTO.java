@@ -5,15 +5,17 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.ring.bookstore.dtos.categories.CategoryDTO;
+import com.ring.bookstore.dtos.images.ImageDTO;
 import com.ring.bookstore.dtos.publishers.PublisherDTO;
 import com.ring.bookstore.dtos.reviews.ReviewsInfoDTO;
+import com.ring.bookstore.enums.BookLanguage;
 import com.ring.bookstore.enums.BookType;
 
 //Book details
 public record BookDetailDTO(Long id,
                             String slug,
-                            String image,
-                            List<String> previews,
+                            ImageDTO image,
+                            List<ImageDTO> previews,
                             Double price,
                             BigDecimal discount,
                             String title,
@@ -28,7 +30,7 @@ public record BookDetailDTO(Long id,
                             String size,
                             Integer pages,
                             LocalDate date,
-                            String language,
+                            BookLanguage language,
                             Double weight,
                             Integer totalOrders,
                             ReviewsInfoDTO reviewsInfo) {

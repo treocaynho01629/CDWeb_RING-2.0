@@ -32,9 +32,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final RequestMatcher proceedUrlPatterns = new OrRequestMatcher(
+            new AntPathRequestMatcher("/api/books/analytics", "GET")
+    );
     private final RequestMatcher excludeUrlPatterns = new OrRequestMatcher(
             new AntPathRequestMatcher("/api/auth/**"),
-            new AntPathRequestMatcher("/api/books", "GET"),
+            new AntPathRequestMatcher("/api/books/**", "GET"),
             new AntPathRequestMatcher("/api/shops/find", "GET"),
             new AntPathRequestMatcher("/api/shops/info", "GET"),
             new AntPathRequestMatcher("/api/shops/{id}", "GET"),
@@ -43,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             new AntPathRequestMatcher("/api/reviews/books", "GET"),
             new AntPathRequestMatcher("/api/banners", "GET"),
             new AntPathRequestMatcher("/api/coupons", "GET"),
-            new AntPathRequestMatcher("/api/images/{name}", "GET")
+            new AntPathRequestMatcher("/api/v1/**", "GET")
     );
 
     @Override
@@ -95,7 +98,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return this.excludeUrlPatterns.matches(request);
+        return !this.proceedUrlPatterns.matches(request) && this.excludeUrlPatterns.matches(request);
     }
 
     private String parseJwt(HttpServletRequest request) {

@@ -1,5 +1,7 @@
 package com.ring.bookstore.dtos.books;
 
+import com.ring.bookstore.dtos.images.IImage;
+
 import java.math.BigDecimal;
 
 //Display book info
@@ -9,8 +11,6 @@ public interface IBookDisplay {
     String getSlug();
 
     String getTitle();
-
-    String getImage();
 
     String getDescription();
 
@@ -27,4 +27,6 @@ public interface IBookDisplay {
     Double getRating();
 
     Integer getTotalOrders();
+
+    IImage getImage();
 }

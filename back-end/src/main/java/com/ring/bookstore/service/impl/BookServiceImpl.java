@@ -1,6 +1,5 @@
 package com.ring.bookstore.service.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,10 +11,11 @@ import com.ring.bookstore.dtos.dashboard.StatDTO;
 import com.ring.bookstore.dtos.images.IImageInfo;
 import com.ring.bookstore.dtos.mappers.DashboardMapper;
 import com.ring.bookstore.enums.BookType;
-import com.ring.bookstore.exception.ImageResizerException;
+import com.ring.bookstore.enums.UserRole;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.*;
 import com.ring.bookstore.service.ImageService;
+import com.ring.bookstore.ultils.FileUploadUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ring.bookstore.dtos.mappers.BookMapper;
-import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.request.BookRequest;
@@ -140,7 +139,7 @@ public class BookServiceImpl implements BookService {
     public BookResponseDTO addBook(BookRequest request,
                                    MultipartFile thumbnail,
                                    MultipartFile[] images,
-                                   Account user) throws IOException, ImageResizerException {
+                                   Account user) {
         //Validation
         Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
@@ -148,7 +147,7 @@ public class BookServiceImpl implements BookService {
         if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid owner!");
 
         //Thumbnail
-        Image savedThumbnail = imageService.upload(thumbnail);
+        Image savedThumbnail = imageService.upload(thumbnail, FileUploadUtil.PRODUCT_FOLDER);
 
         //Slugify
         String slug = slg.slugify(request.getTitle());
@@ -175,7 +174,7 @@ public class BookServiceImpl implements BookService {
         if (images != null && images.length != 0) {
             Arrays.stream(images).forEach(image -> {
                 try {
-                    previewImages.add(imageService.upload(image));
+                    previewImages.add(imageService.upload(image, FileUploadUtil.PRODUCT_FOLDER));
                 } catch (Exception e) {
                     throw new HttpResponseException(HttpStatus.EXPECTATION_FAILED, "Upload image failed!");
                 }
@@ -205,7 +204,7 @@ public class BookServiceImpl implements BookService {
                                       BookRequest request,
                                       MultipartFile thumbnail,
                                       MultipartFile[] images,
-                                      Account user) throws IOException, ImageResizerException {
+                                      Account user) {
         //Check book exists & category, publisher validation
         Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
@@ -220,7 +219,7 @@ public class BookServiceImpl implements BookService {
         //Image upload/replace
         if (thumbnail != null) { //Contain new image >> upload/replace
             Image oldImage = book.getImage();
-            Image savedImage = imageService.upload(thumbnail); //Upload new image
+            Image savedImage = imageService.upload(thumbnail, FileUploadUtil.PRODUCT_FOLDER); //Upload new image
             book.setImage(savedImage); //Set new image
             currDetail.addImage(oldImage);
         } else if (request.getThumbnailId() != null
@@ -243,7 +242,7 @@ public class BookServiceImpl implements BookService {
         if (images != null && images.length != 0) {
             Arrays.stream(images).forEach(image -> {
                 try {
-                    currDetail.addImage(imageService.upload(image));
+                    currDetail.addImage(imageService.upload(image, FileUploadUtil.PRODUCT_FOLDER));
                 } catch (Exception e) {
                     throw new HttpResponseException(HttpStatus.EXPECTATION_FAILED, "Upload image failed!");
                 }
@@ -347,7 +346,7 @@ public class BookServiceImpl implements BookService {
     //Check valid role function
     protected boolean isAuthAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
     }
 
     protected boolean isOwnerValid(Shop shop, Account user) {

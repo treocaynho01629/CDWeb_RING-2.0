@@ -298,7 +298,7 @@ const ProfileTabsList = ({ profile, loading, tabletMode }) => {
                 </EditButton>
               }
             >
-              <StyledAvatar src={image ? image + "?size=tiny" : null} />
+              <StyledAvatar src={image ?? null} />
             </Badge>
             <InfoContainer>
               <UserContainer>

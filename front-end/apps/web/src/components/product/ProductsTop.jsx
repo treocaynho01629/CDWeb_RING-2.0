@@ -268,7 +268,7 @@ const TopItem = ({ book, scrollPosition }) => {
     <ItemContainer>
       {book ? (
         <StyledLazyImage
-          src={`${book?.image}?size=small`}
+          src={book?.image?.srcSet[1]}
           alt={`Top item: ${book?.title}`}
           scrollPosition={scrollPosition}
           placeholder={
@@ -408,49 +408,60 @@ const ProductsTop = ({
       </MessageContainer>
     );
 
-    {
-      product = selectedBook ? (
-        <Link to={`/product/${selectedBook?.slug}`}>
-          <Display>
-            <StyledDisplayLazyImage
-              src={`${selectedBook?.image}?size=medium`}
-              alt={selectedBook?.title}
-              scrollPosition={scrollPosition}
-              placeholder={
-                <StyledDisplaySkeleton
-                  variant="rectangular"
-                  animation={false}
-                />
-              }
-            />
-            <InfoWrapper>
-              <DisplayTitle>{selectedBook?.title}</DisplayTitle>
-              <ProductShop>{selectedBook?.shopName}</ProductShop>
-              <Price>
-                {currencyFormat.format(
-                  selectedBook?.price * (1 - selectedBook?.discount)
-                )}
-              </Price>
-              <DiscountContainer>
-                {selectedBook?.discount > 0 ? (
-                  <>
-                    <Discount>
-                      {currencyFormat.format(selectedBook?.price)}
-                    </Discount>
-                    <Percentage>-{selectedBook?.discount * 100}%</Percentage>
-                  </>
-                ) : (
-                  <span>&nbsp;</span>
-                )}
-              </DiscountContainer>
-              <Description>{selectedBook?.description}</Description>
-            </InfoWrapper>
-          </Display>
-        </Link>
-      ) : (
-        tempProduct
-      );
-    }
+    let srcSet = [
+      {
+        src: selectedBook?.image?.srcSet[2],
+        width: 375,
+      },
+      {
+        src: selectedBook?.image?.srcSet[3],
+        width: 450,
+      },
+      { src: selectedBook?.image?.url, width: 600 },
+    ];
+
+    product = selectedBook ? (
+      <Link to={`/product/${selectedBook?.slug}`}>
+        <Display>
+          <StyledDisplayLazyImage
+            src={selectedBook?.image?.url}
+            srcSet={srcSet
+              .map((item) => `${item.src} ${item.width}w`)
+              .join(", ")}
+            sizes="(min-width: 450px) 450px, 100vw"
+            alt={`${selectedBook?.title} showcase image`}
+            scrollPosition={scrollPosition}
+            placeholder={
+              <StyledDisplaySkeleton variant="rectangular" animation={false} />
+            }
+          />
+          <InfoWrapper>
+            <DisplayTitle>{selectedBook?.title}</DisplayTitle>
+            <ProductShop>{selectedBook?.shopName}</ProductShop>
+            <Price>
+              {currencyFormat.format(
+                selectedBook?.price * (1 - selectedBook?.discount)
+              )}
+            </Price>
+            <DiscountContainer>
+              {selectedBook?.discount > 0 ? (
+                <>
+                  <Discount>
+                    {currencyFormat.format(selectedBook?.price)}
+                  </Discount>
+                  <Percentage>-{selectedBook?.discount * 100}%</Percentage>
+                </>
+              ) : (
+                <span>&nbsp;</span>
+              )}
+            </DiscountContainer>
+            <Description>{selectedBook?.description}</Description>
+          </InfoWrapper>
+        </Display>
+      </Link>
+    ) : (
+      tempProduct
+    );
   } else {
     products = tempProducts;
     product = tempProduct;

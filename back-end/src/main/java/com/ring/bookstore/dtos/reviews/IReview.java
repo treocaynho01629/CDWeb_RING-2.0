@@ -1,6 +1,6 @@
 package com.ring.bookstore.dtos.reviews;
 
-import com.ring.bookstore.model.Book;
+import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.model.Review;
 
 public interface IReview {
@@ -10,7 +10,7 @@ public interface IReview {
 
     String getUsername();
 
-    String getImage();
+    IImage getImage();
 
     Long getBookId();
 
