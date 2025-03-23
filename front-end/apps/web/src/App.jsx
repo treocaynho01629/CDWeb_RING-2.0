@@ -1,7 +1,7 @@
 import "./App.css";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
-import { useReachable } from "@ring/shared";
+import { useReachable, useGetEnums } from "@ring/shared";
 import { RequireAuth, PersistLogin } from "@ring/auth";
 import PageLayout from "./components/layout/PageLayout";
 import FallbackLogo from "@ring/ui/FallbackLogo";
@@ -11,6 +11,7 @@ import "simplebar-react/dist/simplebar.min.css";
 
 function App() {
   useReachable(); //Test connection to server
+  useGetEnums();
 
   const router = createBrowserRouter(
     [

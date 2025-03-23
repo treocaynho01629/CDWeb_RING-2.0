@@ -1,4 +1,4 @@
-import { apiSlice } from "../apiSlice";
+import { apiSlice } from "../../app/apiSlice";
 import { setAuth, clearAuth } from "./authReducer";
 
 export const authApiSlice = apiSlice.injectEndpoints({

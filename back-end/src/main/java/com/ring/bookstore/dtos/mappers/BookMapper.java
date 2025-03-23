@@ -2,41 +2,37 @@ package com.ring.bookstore.dtos.mappers;
 
 import com.ring.bookstore.dtos.books.*;
 import com.ring.bookstore.dtos.categories.CategoryDTO;
+import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.dtos.images.IImageInfo;
+import com.ring.bookstore.dtos.images.ImageDTO;
 import com.ring.bookstore.dtos.images.ImageInfoDTO;
 import com.ring.bookstore.dtos.publishers.PublisherDTO;
 import com.ring.bookstore.dtos.reviews.ReviewsInfoDTO;
 import com.ring.bookstore.model.Book;
+import com.ring.bookstore.ultils.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class BookMapper {
     private final ImageMapper imageMapper;
+    private final FileUploadUtil fileUploadUtil;
 
     public BookDisplayDTO displayToDTO(IBookDisplay book) {
-        String fileDownloadUri = book.getImage() != null ?
-                ServletUriComponentsBuilder
-                        .fromCurrentContextPath()
-                        .path("/api/images/")
-                        .path(book.getImage())
-                        .toUriString()
-                : null;
-
         Double rating = book.getRating();
         Integer totalOrders = book.getTotalOrders();
+        IImage image = book.getImage();
 
+        //Generate url
+        Map<String, String> srcSet = fileUploadUtil.generateUrl(image.getPublicId());
         return new BookDisplayDTO(book.getId(),
                 book.getSlug(),
                 book.getTitle(),
-                fileDownloadUri,
+                new ImageDTO(image.getUrl(), srcSet),
                 book.getDescription(),
                 book.getPrice(),
                 book.getDiscount(),
@@ -59,24 +55,15 @@ public class BookMapper {
         rates.add(book.getRate4());
         rates.add(book.getRate5());
 
-        //Main thumbnail
-        String fileDownloadUri = book.getImage() != null ?
-                ServletUriComponentsBuilder
-                        .fromCurrentContextPath()
-                        .path("/api/images/")
-                        .path(book.getImage())
-                        .toUriString()
-                : null;
-
         //Other preview images
-        List<String> previews = book.getPreviews();
-        List<String> images = previews != null ? previews
+        List<IImage> previews = book.getPreviews();
+        List<ImageDTO> images = previews != null ? previews
                 .stream()
-                .map(image -> ServletUriComponentsBuilder
-                        .fromCurrentContextPath()
-                        .path("/api/images/")
-                        .path(image)
-                        .toUriString())
+                .map(image -> {
+                    //Generate url
+                    Map<String, String> srcSet = fileUploadUtil.generateUrl(image.getPublicId());
+                    return new ImageDTO(image.getUrl(), srcSet);
+                })
                 .collect(Collectors.toList())
                 : null;
 
@@ -100,9 +87,12 @@ public class BookMapper {
                 book.getPubName()
         );
 
+        //Generate url
+        IImage image = book.getImage();
+        Map<String, String> srcSet = fileUploadUtil.generateUrl(image.getPublicId());
         return new BookDetailDTO(book.getId(),
                 book.getSlug(),
-                fileDownloadUri,
+                new ImageDTO(image.getUrl(), srcSet),
                 images,
                 book.getPrice(),
                 book.getDiscount(),

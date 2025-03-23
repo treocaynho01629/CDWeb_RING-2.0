@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { clearAuth, setAuth } from "./features/authReducer";
+import { clearAuth, setAuth } from "../features/auth/authReducer";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_URL,

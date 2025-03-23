@@ -17,9 +17,10 @@ import java.util.Optional;
 public interface ShopRepository extends JpaRepository<Shop, Long> {
 
     @Query("""
-            	select s.owner.id as ownerId, s.id as id, s.name as name, i.name as image,
-            	count(r.id) as totalReviews, count(b.id) as totalProducts, size(s.followers) as totalFollowers,
-            	s.createdDate as joinedDate, case when f.id is null then false else true end as followed
+            	select s.owner.id as ownerId, s.id as id, s.name as name,
+            		count(r.id) as totalReviews, count(b.id) as totalProducts,
+					size(s.followers) as totalFollowers, s.createdDate as joinedDate,
+					case when f.id is null then false else true end as followed, i as image
             	from Shop s
             	left join s.image i
             	left join s.followers f on f.id = :userId
@@ -37,11 +38,12 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
-		s.name as name, i.name as image, size(s.followers) as totalFollowers, s.createdDate as joinedDate,
-		sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
-			then o.total - o.totalDiscount else 0 end) as sales,
-		sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
-			then oi.quantity else 0 end) as totalSold
+			s.name as name, size(s.followers) as totalFollowers, s.createdDate as joinedDate,
+			i as image,
+			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+				then o.total - o.totalDiscount else 0 end) as sales,
+			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+				then oi.quantity else 0 end) as totalSold
 		from Shop s
 		left join s.image i
 		left join OrderDetail od on od.shop.id = s.id
@@ -56,7 +58,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 						  Pageable pageable);
 
 	@Query("""
-		select s.id as id, s.name as name, i.name as image
+		select s.id as id, s.name as name, i as image
 		from Shop s
 		left join s.image i
 		where s.owner.id = :ownerId
@@ -90,11 +92,12 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
-			s.name as name, i.name as image, s.createdDate as joinedDate,
-			count(r.id) as totalReviews, count(b.id) as totalProducts, size(s.followers) as totalFollowers,
+			s.name as name, s.createdDate as joinedDate, i as image,
+			count(r.id) as totalReviews, count(b.id) as totalProducts,
+			size(s.followers) as totalFollowers,
 			case when f.id is null then false else true end as followed
 		from Shop s
-		left join Image i on i.id = s.image.id
+		left join s.image i
 		left join s.followers f on f.id = :userId
 		left join Book b on s.id = b.shop.id
 		left join Review r on b.id = r.book.id
@@ -106,7 +109,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
-			s.name as name, s.description as description, i.name as image, a as address,
+			s.name as name, s.description as description, a as address,
 			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
 				then oi.quantity else 0 end) as totalSold,
 			coalesce(
@@ -116,9 +119,10 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 					coalesce(
 						sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
 					then 1 else 0 end), 0), 0), 0) as canceledRate,
-			count(b.id) as totalProducts, avg(r.rating) as rating, count(r.id) as totalReviews, size(s.followers) as totalFollowers,
-		s.createdDate as joinedDate, case when f.id is null then false else true end as followed
-		from Shop s left join Image i on i.id = s.image.id
+			count(b.id) as totalProducts, avg(r.rating) as rating, count(r.id) as totalReviews,
+			size(s.followers) as totalFollowers, i as image,
+			s.createdDate as joinedDate, case when f.id is null then false else true end as followed
+		from Shop s left join s.image i
 		left join s.address a
 		left join OrderDetail od on od.shop.id = s.id
 		left join od.items oi
@@ -133,13 +137,14 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
-			s.name as name, s.description as description, i.name as image, a as address,
+			s.name as name, s.description as description, a as address,
 			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
 				then o.total - o.totalDiscount else 0 end) as sales,
 			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
 				then oi.quantity else 0 end) as totalSold,
-			count(b.id) as totalProducts, count(r.id) as totalReviews, size(s.followers) as totalFollowers, s.createdDate as joinedDate
-		from Shop s left join Image i on i.id = s.image.id
+			count(b.id) as totalProducts, count(r.id) as totalReviews, i as image,
+			size(s.followers) as totalFollowers, s.createdDate as joinedDate
+		from Shop s left join s.image i
 		left join s.address a
 		left join OrderDetail od on od.shop.id = s.id
 		left join od.order o

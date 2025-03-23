@@ -30,6 +30,7 @@ const BreadcrumbsContainer = styled.div`
 
     &.solid {
       position: relative;
+      margin-top: -${({ theme }) => theme.mixins.toolbar.minHeight}px;
     }
   }
 `;

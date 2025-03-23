@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.ring.bookstore.dtos.accounts.AccountDTO;
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 import com.ring.bookstore.exception.ImageResizerException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,7 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.ring.bookstore.config.CurrentAccount;
-import com.ring.bookstore.dtos.accounts.AccountDetailDTO;
 import com.ring.bookstore.dtos.accounts.ProfileDTO;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.AccountProfile;
@@ -44,7 +43,7 @@ public class AccountController {
                                             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
                                             @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
                                             @RequestParam(value = "keyword", defaultValue = "") String keyword,
-                                            @RequestParam(value = "role", required = false) RoleName role
+                                            @RequestParam(value = "role", required = false) UserRole role
     ) {
         Page<AccountDTO> accounts = accountService.getAllAccounts(pageNo, pageSize, sortBy, sortDir, keyword, role);
         return new ResponseEntity<>(accounts, HttpStatus.OK);
@@ -100,7 +99,7 @@ public class AccountController {
     @DeleteMapping("/delete-inverse")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<?> deleteAccountsInverse(@RequestParam(value = "keyword", defaultValue = "") String keyword,
-                                                   @RequestParam(value = "role", required = false) RoleName role,
+                                                   @RequestParam(value = "role", required = false) UserRole role,
                                                    @RequestParam("ids") List<Long> ids) {
         accountService.deleteAccountsInverse(keyword, role, ids);
         return new ResponseEntity<>("Accounts deleted successfully!", HttpStatus.OK);

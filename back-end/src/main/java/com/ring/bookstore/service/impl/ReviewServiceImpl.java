@@ -3,7 +3,7 @@ package com.ring.bookstore.service.impl;
 import java.util.List;
 
 import com.ring.bookstore.dtos.reviews.IReview;
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 import com.ring.bookstore.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -193,7 +193,7 @@ public class ReviewServiceImpl implements ReviewService {
     //Check valid role function
     protected boolean isAuthAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
     }
 
     protected boolean isUserValid(Review review, Account user) {

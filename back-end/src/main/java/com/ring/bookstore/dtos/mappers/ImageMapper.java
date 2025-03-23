@@ -12,17 +12,7 @@ import com.ring.bookstore.model.Image;
 public class ImageMapper {
 
     public ImageDTO imageToDTO(Image image) {
-
-		String fileDownloadUri = ServletUriComponentsBuilder
-					.fromCurrentContextPath()
-					.path("/api/images/")
-					.path(image.getName())
-					.toUriString();
-
-        return new ImageDTO(image.getName()
-        		,fileDownloadUri
-        		,image.getType()
-        		,image.getImage().length);
+        return new ImageDTO(image.getUrl(), null);
     }
 
 	public ImageInfoDTO infoToDTO(IImageInfo image) {

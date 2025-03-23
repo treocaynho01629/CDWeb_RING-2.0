@@ -6,7 +6,6 @@ import java.util.Optional;
 import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.dtos.images.IImageInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -18,7 +17,6 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     @Query("""
         select i.id as id, i.name as name, i.type as type
         from Image i
-        where i.parent is null
     """)
     List<IImageInfo> findAllInfo();
 
@@ -30,19 +28,12 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     List<IImageInfo> findInfo(List<Long> ids);
 
     @Query("""
-        select i.id as id, i.name as name, i.type as type
+        select i.publicId as publicId, i.url as url
         from AccountProfile p
         join p.image i
         where p.id = :id
     """)
-    Optional<IImageInfo> findInfoByProfileId(Long id);
-
-    @Query("""
-        select i.image as image, i.type as type from Image i where i.name = :name
-    """)
-    Optional<IImage> findDataByName(String name);
-
-    Optional<Image> findByName(String name);
+    Optional<IImage> findByProfile(Long id);
 
     @Query("""
         select i
@@ -62,6 +53,4 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
         and i.id in :imageIds
     """)
     List<Long> findBookImages(Long bookId, List<Long> imageIds);
-
-    boolean existsByName(String name);
 }

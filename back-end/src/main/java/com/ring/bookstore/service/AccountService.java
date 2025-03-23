@@ -6,7 +6,7 @@ import java.util.List;
 import com.ring.bookstore.dtos.dashboard.ChartDTO;
 import com.ring.bookstore.dtos.accounts.AccountDTO;
 import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 import com.ring.bookstore.exception.ImageResizerException;
 import org.springframework.data.domain.Page;
 
@@ -26,25 +26,24 @@ public interface AccountService {
                                     String sortBy,
                                     String sortDir,
                                     String keyword,
-                                    RoleName role);
+                                    UserRole role);
 
     AccountDetailDTO getAccountById(Long id);
 
     StatDTO getAnalytics();
 
     Account saveAccount(AccountRequest request,
-                        MultipartFile file) throws IOException, ImageResizerException;
-
+                        MultipartFile file);
     Account updateAccount(AccountRequest request,
                           MultipartFile file,
-                          Long id) throws IOException, ImageResizerException;
+                          Long id);
 
     void deleteAccount(Long id);
 
     void deleteAccounts(List<Long> ids);
 
     void deleteAccountsInverse(String keyword,
-                              RoleName role,
+                              UserRole role,
                               List<Long> ids);
 
     void deleteAllAccounts();

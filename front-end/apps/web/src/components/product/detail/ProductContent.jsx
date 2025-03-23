@@ -18,8 +18,10 @@ import { Link } from "react-router";
 import { currencyFormat, numFormat, bookTypes } from "@ring/shared";
 import { useGetMyAddressQuery } from "../../../features/addresses/addressesApiSlice";
 import { useAuth } from "@ring/auth";
+import { scale } from "@cloudinary/url-gen/actions/resize";
 import ProductImages from "@ring/ui/ProductImages";
 import ProductAction from "./ProductAction";
+import cloudinary from "../../../ultils/cloudinary";
 
 const CouponPreview = lazy(() => import("../../coupon/CouponPreview"));
 const AddressPreview = lazy(() => import("../../address/AddressPreview"));
@@ -320,21 +322,42 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
   };
 
   //Images
+
   let initialImages = book?.previews
     ? [].concat(book?.image, book?.previews)
     : [].concat(book?.image);
-  let images = initialImages.map((image, index) => ({
-    src: image,
-    alt: `${book?.title} preview image #${index + 1}`,
-    width: 600,
-    height: 600,
-    srcSet: [
-      { src: `${image}?size=tiny`, width: 45, height: 45 },
-      { src: `${image}?size=small`, width: 150, height: 150 },
-      { src: `${image}?size=medium`, width: 350, height: 350 },
-      { src: image, width: 600, height: 600 },
-    ],
-  }));
+  let images = initialImages.map((image, index) => {
+    const srcSet = image?.srcSet;
+
+    if (srcSet) {
+      return {
+        //The effect vary from different monitors with different pixel density (DPR), set it the 1.0 before testing ~ ~
+        src: image?.url,
+        alt: `${book?.title} preview image #${index + 1}`,
+        width: 600,
+        height: 600,
+        srcSet: [
+          {
+            src: srcSet[0],
+            width: 70,
+            height: 70,
+          },
+          {
+            src: srcSet[2],
+            width: 375,
+            height: 375,
+          },
+          {
+            src: srcSet[3],
+            width: 450,
+            height: 450,
+          },
+          { src: image?.url, width: 600, height: 600 },
+        ],
+        sizes: "(min-width: 450px) 450px, 100vw",
+      };
+    }
+  });
 
   return (
     <Grid

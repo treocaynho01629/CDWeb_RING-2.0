@@ -9,15 +9,21 @@
   "exports": {
     ".": "./src/index.js",
     "./ConfirmDialog": "./src/components/ConfirmDialog.jsx",
-    "./address": "./src/ultils/address.jsx",
-    "./book": "./src/ultils/book.jsx",
-    "./convert": "./src/ultils/convert.jsx",
-    "./coupon": "./src/ultils/coupon.jsx",
-    "./order": "./src/ultils/order.jsx",
-    "./payment": "./src/ultils/payment.jsx",
-    "./regex": "./src/ultils/regex.jsx",
-    "./shipping": "./src/ultils/shipping.jsx",
-    "./user": "./src/ultils/user.jsx",
+    "./enums/address": "./src/ultils/address.jsx",
+    "./enums/book": "./src/ultils/book.jsx",
+    "./enums/coupon": "./src/ultils/coupon.jsx",
+    "./enums/order": "./src/ultils/order.jsx",
+    "./enums/payment": "./src/ultils/payment.jsx",
+    "./enums/user": "./src/ultils/user.jsx",
+    "./utils/convert": "./src/ultils/convert.jsx",
+    "./utils/icon": "./src/ultils/icon.jsx",
+    "./utils/coupon": "./src/ultils/coupon.jsx",
+    "./utils/payment": "./src/ultils/payment.jsx",
+    "./utils/regex": "./src/ultils/regex.jsx",
+    "./utils/shipping": "./src/ultils/shipping.jsx",
+    "./utils/user": "./src/ultils/user.jsx",
+    "./utils/image": "./src/ultils/image.jsx",
+    "./utils/location": "./src/ultils/location.jsx",
     "./assets/empty": "./assets/empty.svg"
   },
   "scripts": {
@@ -26,6 +32,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@ring/redux": "*",
     "@ring/eslint-config": "*",
     "eslint": "^9.21.0"
   },

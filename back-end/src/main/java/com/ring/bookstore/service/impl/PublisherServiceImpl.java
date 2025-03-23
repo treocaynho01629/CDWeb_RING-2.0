@@ -1,15 +1,13 @@
 package com.ring.bookstore.service.impl;
 
-import java.io.IOException;
 import java.util.List;
 
 import com.ring.bookstore.dtos.publishers.PublisherDTO;
 import com.ring.bookstore.dtos.mappers.PublisherMapper;
-import com.ring.bookstore.dtos.publishers.IPublisher;
-import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.model.Image;
 import com.ring.bookstore.model.Publisher;
 import com.ring.bookstore.service.ImageService;
+import com.ring.bookstore.ultils.FileUploadUtil;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +40,7 @@ public class PublisherServiceImpl implements PublisherService {
                 Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<IPublisher> pubsList = pubRepo.findPublishers(pageable);
+        Page<Publisher> pubsList = pubRepo.findPublishers(pageable);
         Page<PublisherDTO> pubDTOS = pubsList.map(pubMapper::apply);
         return pubDTOS;
     }
@@ -54,14 +52,14 @@ public class PublisherServiceImpl implements PublisherService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
 
         //Fetch from database
-        Page<IPublisher> pubsList = pubRepo.findRelevantPublishers(cateId, pageable);
+        Page<Publisher> pubsList = pubRepo.findRelevantPublishers(cateId, pageable);
         Page<PublisherDTO> pubDTOS = pubsList.map(pubMapper::apply);
         return pubDTOS;
     }
 
     @Override
     public PublisherDTO getPublisher(Integer id) {
-        IPublisher publisher = pubRepo.findProjectionById(id).orElseThrow(() ->
+        Publisher publisher = pubRepo.findProjectionById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Publisher not found!"));
 
         PublisherDTO publisherDTO = pubMapper.apply(publisher); //Map to DTO
@@ -69,11 +67,11 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Transactional
-    public Publisher addPublisher(String name, MultipartFile file) throws IOException, ImageResizerException {
+    public Publisher addPublisher(String name, MultipartFile file) {
         Image image = null;
 
         //Image upload
-        if (file != null) image = imageService.upload(file);
+        if (file != null) image = imageService.upload(file, FileUploadUtil.ASSET_FOLDER);
 
         //Create new publisher
         var publisher = Publisher.builder()
@@ -85,7 +83,7 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Transactional
-    public Publisher updatePublisher(Integer id, String name, MultipartFile file) throws IOException, ImageResizerException {
+    public Publisher updatePublisher(Integer id, String name, MultipartFile file) {
         //Get original publisher
         Publisher publisher = pubRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
 
@@ -94,7 +92,7 @@ public class PublisherServiceImpl implements PublisherService {
             Long imageId = publisher.getImage().getId();
             if (imageId != null) imageService.deleteImage(imageId); //Delete old image
 
-            Image savedImage = imageService.upload(file); //Upload new image
+            Image savedImage = imageService.upload(file, FileUploadUtil.ASSET_FOLDER); //Upload new image
             publisher.setImage(savedImage); //Set new image
         }
 

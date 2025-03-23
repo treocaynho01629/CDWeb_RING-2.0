@@ -1,6 +1,6 @@
 package com.ring.bookstore.model;
 
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
@@ -22,7 +22,7 @@ public class Role {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private RoleName roleName;
+    private UserRole roleName;
 
     @ManyToMany(mappedBy = "roles")
     private Collection<Account> users;

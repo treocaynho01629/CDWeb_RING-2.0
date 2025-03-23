@@ -3,6 +3,7 @@ package com.ring.bookstore.dtos.books;
 import com.ring.bookstore.dtos.categories.CategoryDTO;
 import com.ring.bookstore.dtos.images.ImageInfoDTO;
 import com.ring.bookstore.dtos.publishers.PublisherDTO;
+import com.ring.bookstore.enums.BookLanguage;
 import com.ring.bookstore.enums.BookType;
 import lombok.Builder;
 
@@ -24,7 +25,7 @@ public record BookDTO(Long id,
                       String size,
                       Integer pages,
                       LocalDate date,
-                      String language,
+                      BookLanguage language,
                       Double weight,
                       Short amount,
                       PublisherDTO publisher,

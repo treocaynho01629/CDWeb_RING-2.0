@@ -3,7 +3,6 @@ package com.ring.bookstore.model;
 import jakarta.persistence.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;

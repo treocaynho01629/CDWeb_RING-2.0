@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import com.ring.bookstore.model.Category;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,11 +55,12 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     Page<Integer[]> findRelevantCategories(Long shopId, Pageable pageable);
 
     @Query("""
-          select c as category, t.image as image
+          select c.id as id, c.slug as slug, c.parent.id as parentId,
+              c.name as name, t.image.publicId as publicId
           from Category c
           left join (
-              select b.cate.id as cateId, i.name as image, row_number() over (partition by b.cate.id order by b.cate.id) as rn
-              from Book b join Image i on b.image.id = i.id
+              select b.cate.id as cateId, i as image, row_number() over (partition by b.cate.id order by b.cate.id) as rn
+              from Book b join b.image i
           ) t on c.id = t.cateId and t.rn = 1
           where t.image is not null
           order by c.parent.id desc nulls first

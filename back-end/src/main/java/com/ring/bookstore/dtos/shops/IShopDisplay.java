@@ -1,5 +1,7 @@
 package com.ring.bookstore.dtos.shops;
 
+import com.ring.bookstore.dtos.images.IImage;
+
 import java.time.LocalDateTime;
 
 public interface IShopDisplay {
@@ -8,8 +10,6 @@ public interface IShopDisplay {
     Long getId();
 
     String getName();
-
-    String getImage();
 
     Integer getTotalReviews();
 
@@ -20,4 +20,6 @@ public interface IShopDisplay {
     LocalDateTime getJoinedDate();
 
     Boolean getFollowed();
+
+    IImage getImage();
 }

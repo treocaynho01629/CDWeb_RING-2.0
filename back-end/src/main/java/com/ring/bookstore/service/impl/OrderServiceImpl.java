@@ -18,6 +18,7 @@ import com.ring.bookstore.dtos.dashboard.ChartDTO;
 import com.ring.bookstore.dtos.mappers.CalculateMapper;
 import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.enums.ShippingType;
+import com.ring.bookstore.enums.UserRole;
 import com.ring.bookstore.listener.checkout.OnCheckoutCompletedEvent;
 import com.ring.bookstore.model.*;
 import com.ring.bookstore.repository.*;
@@ -33,7 +34,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.dtos.mappers.OrderMapper;
-import com.ring.bookstore.enums.RoleName;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.service.OrderService;
@@ -669,14 +669,14 @@ public class OrderServiceImpl implements OrderService {
     //Check valid role function
     protected boolean isAuthAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
     }
 
     //Check valid role function
     protected boolean isOwnerValid(Shop shop,
                                    Account user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        boolean isAdmin = (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+        boolean isAdmin = (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
         //Check if is admin or valid owner id
         return shop.getOwner().getId().equals(user.getId()) || isAdmin;
     }
@@ -684,7 +684,7 @@ public class OrderServiceImpl implements OrderService {
     protected boolean isUserValid(OrderReceipt receipt,
                                   Account user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        boolean isAdmin = (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+        boolean isAdmin = (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
         //Check if is admin or valid owner id
         return receipt.getUser().getId().equals(user.getId()) || isAdmin;
     }

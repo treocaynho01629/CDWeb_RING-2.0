@@ -141,7 +141,7 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
                   width={50}
                   height={50}
                   style={{ objectFit: "contain" }}
-                  src={`${product?.image}?size=tiny`}
+                  src={product?.image?.srcSet[0]}
                   alt={`Cart item: ${product?.title}`}
                   placeholder={
                     <Skeleton

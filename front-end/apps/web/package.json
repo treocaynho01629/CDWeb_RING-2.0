@@ -11,6 +11,7 @@
     "update-dependencies": "npx npm-check-updates -u"
   },
   "dependencies": {
+    "@cloudinary/url-gen": "^1.21.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.7",

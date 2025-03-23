@@ -13,19 +13,21 @@ import java.util.Optional;
 @Repository
 public interface AccountProfileRepository extends JpaRepository<AccountProfile, Long>{
     @Query("""
-        select p.name as name, p.phone as phone, p.gender as gender, p.dob as dob,
-        a.email as email, p.image.name as image, a.createdDate as joinedDate,
-        size(a.following) as totalFollows, size(a.userReviews) as totalReviews
+        select p.name as name, p.phone as phone, p.gender as gender,
+			p.dob as dob, a.email as email, a.createdDate as joinedDate,
+			size(a.following) as totalFollows, size(a.userReviews) as totalReviews,
+			i as image
         from Account a left join a.profile p left join p.image i
         where a.id = :userId
     """)
     Optional<IProfile> findProfileByUser(Long userId);
 
     @Query("""
-		select a.id as id, a.username as username, i.name as image,
-		a.email as email, p.name as name, p.phone as phone,
-		size(a.roles) as roles, p.gender as gender, p.dob as dob,
-		a.createdDate as joinedDate, size(a.following) as totalFollows, size(a.userReviews) as totalReviews
+		select a.id as id, a.username as username, a.email as email,
+			p.name as name, p.phone as phone, size(a.roles) as roles,
+			p.gender as gender, p.dob as dob, a.createdDate as joinedDate,
+			size(a.following) as totalFollows, size(a.userReviews) as totalReviews,
+			i as image
 		from Account a
 		left join a.profile p
 		left join p.image i

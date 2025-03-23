@@ -1,8 +1,8 @@
 package com.ring.bookstore.dtos.images;
 
 public interface IImage {
-    byte[] getImage();
+    String getPublicId();
 
-    String getType();
+    String getUrl();
 
 }

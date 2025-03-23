@@ -1,6 +1,8 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.images.IImageInfo;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
+import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.exception.ResetPasswordException;
 import com.ring.bookstore.exception.TokenRefreshException;
 import com.ring.bookstore.listener.forgot.OnResetTokenCreatedEvent;
@@ -23,7 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.repository.AccountRepository;
@@ -34,7 +36,6 @@ import com.ring.bookstore.service.RoleService;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.*;
 
@@ -55,6 +56,7 @@ public class AuthenticationService {
 	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
     private final ApplicationEventPublisher eventPublisher;
+	private final Cloudinary cloudinary;
 
 	//Register
 	public Account register(RegisterRequest registerRequest, HttpServletRequest request) {
@@ -73,7 +75,7 @@ public class AuthenticationService {
 		} else {
 			//Set role for USER
 			Set<Role> roles = new HashSet<>();
-			roles.add(roleService.findByRoleName(RoleName.ROLE_USER)
+			roles.add(roleService.findByRoleName(UserRole.ROLE_USER)
 					.orElseThrow(() -> new ResourceNotFoundException("No roles has been set!")));
 
 			//Create and set new Account info
@@ -215,15 +217,19 @@ public class AuthenticationService {
 	public String generateToken(Account user) {
 		Map<String, Object> extraClaims = new HashMap<>();
 		extraClaims.put("id", user.getId());
-		IImageInfo image = imageRepo.findInfoByProfileId(user.getProfile().getId()).orElse(null);
+		IImage image = imageRepo.findByProfile(user.getProfile().getId()).orElse(null);
 
 		if (image != null) {
-			String fileDownloadUri = ServletUriComponentsBuilder
-					.fromCurrentContextPath()
-					.path("/api/images/")
-					.path(image.getName())
-					.toUriString();
-			extraClaims.put("image", fileDownloadUri);
+			String url = cloudinary.url().transformation(new Transformation()
+									.aspectRatio("1.0")
+									.width(35)
+									.crop("thumb")
+									.chain()
+									.radius("max")
+									.quality("auto")
+									.fetchFormat("auto"))
+							.secure(true).generate(image.getPublicId());
+			extraClaims.put("image", url);
 		}
 
 		return jwtService.generateToken(extraClaims, user);

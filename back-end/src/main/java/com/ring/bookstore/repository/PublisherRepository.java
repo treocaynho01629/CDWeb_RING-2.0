@@ -15,27 +15,27 @@ import java.util.Optional;
 @Repository
 public interface PublisherRepository extends JpaRepository<Publisher, Integer>{
     @Query("""
-          select p as publisher, i.name as image
-          from Publisher p left join p.image i
+          select p as publisher
+          from Publisher p left join fetch p.image i
     """)
-    Page<IPublisher> findPublishers(Pageable pageable);
+    Page<Publisher> findPublishers(Pageable pageable);
 
     @Query("""
-          select distinct p as publisher, i.name as image
-          from Publisher p left join p.image i
+          select distinct p as publisher
+          from Publisher p left join fetch p.image i
           join p.publisherBooks b
           join b.cate c
           where c.id = :cateId or c.parent.id = :cateId
           group by p.id, i.name
     """)
-    Page<IPublisher> findRelevantPublishers(Integer cateId, Pageable pageable);
+    Page<Publisher> findRelevantPublishers(Integer cateId, Pageable pageable);
 
     @Query("""
-          select p as publisher, i.name as image
-          from Publisher p left join p.image i
+          select p as publisher
+          from Publisher p left join fetch p.image i
           where p.id = :id
     """)
-    Optional<IPublisher> findProjectionById(Integer id);
+    Optional<Publisher> findProjectionById(Integer id);
 
     @Query("""
 	    select p.id from Publisher p where p.id not in :ids

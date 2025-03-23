@@ -1,6 +1,6 @@
 package com.ring.bookstore.dtos.accounts;
 
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 
 //Account
 public record AccountDTO(Long id,
@@ -9,6 +9,6 @@ public record AccountDTO(Long id,
                          String name,
                          String phone,
                          String image,
-                         RoleName role) {
+                         UserRole role) {
 
 }

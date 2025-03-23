@@ -5,9 +5,8 @@ import com.ring.bookstore.dtos.dashboard.ChartDTO;
 import com.ring.bookstore.dtos.dashboard.StatDTO;
 import com.ring.bookstore.dtos.mappers.AccountMapper;
 import com.ring.bookstore.dtos.mappers.DashboardMapper;
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 import com.ring.bookstore.exception.HttpResponseException;
-import com.ring.bookstore.exception.ImageResizerException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.listener.reset.OnResetPasswordCompletedEvent;
 import com.ring.bookstore.model.Account;
@@ -22,6 +21,7 @@ import com.ring.bookstore.request.ProfileRequest;
 import com.ring.bookstore.service.AccountService;
 import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.service.RoleService;
+import com.ring.bookstore.ultils.FileUploadUtil;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -58,7 +57,7 @@ public class AccountServiceImpl implements AccountService {
                                            String sortBy,
                                            String sortDir,
                                            String keyword,
-                                           RoleName role) {
+                                           UserRole role) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
@@ -81,7 +80,7 @@ public class AccountServiceImpl implements AccountService {
 
     //Create account (ADMIN)
     @Transactional
-    public Account saveAccount(AccountRequest request, MultipartFile file) throws IOException, ImageResizerException {
+    public Account saveAccount(AccountRequest request, MultipartFile file) {
 
         //Check if Account with these username and email has exists >> throw exception
         if (accountRepo.existsByUsernameOrEmail(request.getUsername(), request.getEmail())) {
@@ -94,16 +93,16 @@ public class AccountServiceImpl implements AccountService {
 
         //Set roles: 1 USER, 2 SELLER, 3 ADMIN
         Set<Role> roles = new HashSet<>();
-        roles.add(roleService.findByRoleName(RoleName.ROLE_USER).orElseThrow(
+        roles.add(roleService.findByRoleName(UserRole.ROLE_USER).orElseThrow(
                 () -> new ResourceNotFoundException("No roles has been set!")));
 
         if (request.getRoles() >= 2) {
-            roles.add(roleService.findByRoleName(RoleName.ROLE_SELLER).orElseThrow(
+            roles.add(roleService.findByRoleName(UserRole.ROLE_SELLER).orElseThrow(
                     () -> new ResourceNotFoundException("Role not found!")));
         }
 
         if (request.getRoles() >= 3) {
-            roles.add(roleService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(
+            roles.add(roleService.findByRoleName(UserRole.ROLE_ADMIN).orElseThrow(
                     () -> new ResourceNotFoundException("Role not found!")));
         }
 
@@ -135,7 +134,7 @@ public class AccountServiceImpl implements AccountService {
 
     //Update account (ADMIN)
     @Transactional
-    public Account updateAccount(AccountRequest request, MultipartFile file, Long id) throws IOException, ImageResizerException {
+    public Account updateAccount(AccountRequest request, MultipartFile file, Long id) {
         //Check Account exists?
         Account currUser = accountRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
@@ -154,15 +153,15 @@ public class AccountServiceImpl implements AccountService {
         //Set roles: 1 USER, 2 SELLER, 3 ADMIN
         if (currUser.getRolesSize() != request.getRoles()) {
             Set<Role> roles = new HashSet<>();
-            roles.add(roleService.findByRoleName(RoleName.ROLE_USER).orElseThrow(
+            roles.add(roleService.findByRoleName(UserRole.ROLE_USER).orElseThrow(
                     () -> new ResourceNotFoundException("No roles has been set!")));
 
             if (request.getRoles() >= 2) {
-                roles.add(roleService.findByRoleName(RoleName.ROLE_SELLER).orElseThrow(
+                roles.add(roleService.findByRoleName(UserRole.ROLE_SELLER).orElseThrow(
                         () -> new ResourceNotFoundException("Role not found!")));
             }
             if (request.getRoles() >= 3) {
-                roles.add(roleService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(
+                roles.add(roleService.findByRoleName(UserRole.ROLE_ADMIN).orElseThrow(
                         () -> new ResourceNotFoundException("Role not found!")));
             }
             currUser.setRoles(roles);
@@ -204,7 +203,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void deleteAccountsInverse(String keyword, RoleName role, List<Long> ids) {
+    public void deleteAccountsInverse(String keyword, UserRole role, List<Long> ids) {
         List<Long> deleteIds = accountRepo.findInverseIds(
                 keyword,
                 role,
@@ -227,7 +226,7 @@ public class AccountServiceImpl implements AccountService {
 
     //Update account's profile
     @Transactional
-    public AccountProfile updateProfile(ProfileRequest request, MultipartFile file, Account user) throws IOException, ImageResizerException {
+    public AccountProfile updateProfile(ProfileRequest request, MultipartFile file, Account user) {
         AccountProfile profile = profileRepo.findById(user.getProfile().getId()).orElseThrow(()
                 -> new ResourceNotFoundException("Profile not found!"));
 
@@ -288,10 +287,10 @@ public class AccountServiceImpl implements AccountService {
         return null;
     }
 
-    protected AccountProfile changeProfilePic(MultipartFile file, String image, AccountProfile profile) throws IOException, ImageResizerException {
+    protected AccountProfile changeProfilePic(MultipartFile file, String image, AccountProfile profile) {
         if (file != null) { //Contain new image >> upload/replace
             if (profile.getImage() != null) imageService.deleteImage(profile.getImage().getId()); //Delete old image
-            Image savedImage = imageService.upload(file); //Upload new image
+            Image savedImage = imageService.upload(file, FileUploadUtil.USER_FOLDER);//Upload new image
             profile.setImage(savedImage); //Set new image
         } else if (image == null) { //Remove image
             if (profile.getImage() != null) imageService.deleteImage(profile.getImage().getId()); //Delete old image

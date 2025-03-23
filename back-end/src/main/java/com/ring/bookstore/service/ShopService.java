@@ -51,12 +51,12 @@ public interface ShopService {
 
     Shop addShop(ShopRequest request,
                  MultipartFile file,
-                 Account user) throws IOException, ImageResizerException;
+                 Account user);
 
     Shop updateShop(Long id,
                     ShopRequest request,
                     MultipartFile file,
-                    Account user) throws IOException, ImageResizerException;
+                    Account user);
 
     Shop deleteShop(Long id,
                     Account user);

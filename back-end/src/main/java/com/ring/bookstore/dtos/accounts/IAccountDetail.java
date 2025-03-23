@@ -1,5 +1,6 @@
 package com.ring.bookstore.dtos.accounts;
 
+import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.enums.Gender;
 
 import java.time.LocalDate;
@@ -9,8 +10,6 @@ public interface IAccountDetail {
     Long getId();
 
     String getUsername();
-
-    String getImage();
 
     String getEmail();
 
@@ -29,4 +28,6 @@ public interface IAccountDetail {
     Integer getTotalFollows();
 
     Integer getTotalReviews();
+
+    IImage getImage();
 }

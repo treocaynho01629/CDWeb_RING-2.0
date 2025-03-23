@@ -24,7 +24,6 @@ import {
   MessageContainer,
   LoadContainer,
   PlaceholderContainer,
-  MainForm,
 } from "../custom/ProfileComponents";
 import { Link, useSearchParams } from "react-router";
 import { booksApiSlice } from "../../features/books/booksApiSlice";
@@ -286,7 +285,7 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
         sx={{ py: 0, px: { xs: 0, sm: 2, md: 0 } }}
         onScroll={tabletMode ? scrollListener : undefined}
       >
-        <MainForm ref={scrollRef} onSubmit={handleChangeKeyword}>
+        <form ref={scrollRef} onSubmit={handleChangeKeyword}>
           <TextField
             placeholder="Tìm theo Mã, Tên Shop hoặc Tên sản phẩm"
             autoComplete="order"
@@ -303,7 +302,7 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
               },
             }}
           />
-        </MainForm>
+        </form>
         <MainContainer>
           {ordersContent}
           {pagination.number > 0 && isFetching && (

@@ -7,7 +7,7 @@ import {
 import { Divider, Skeleton, Rating } from "@mui/material";
 import { Link } from "react-router";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { currencyFormat, numFormat } from "@ring/shared";
+import { currencyFormat, imageSizes, numFormat } from "@ring/shared";
 import useCart from "../../hooks/useCart";
 
 //#region styled
@@ -265,7 +265,7 @@ const Product = ({ book, scrollPosition }) => {
               )}
               <ImageContainer>
                 <StyledLazyImage
-                  src={`${book?.image}?size=small`}
+                  src={book?.image?.srcSet[imageSizes.SMALL.value]}
                   alt={`${book?.title} Thumbnail`}
                   scrollPosition={scrollPosition}
                   placeholder={

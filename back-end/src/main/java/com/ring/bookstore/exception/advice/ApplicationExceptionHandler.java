@@ -98,6 +98,16 @@ public class ApplicationExceptionHandler{
                 e.getMessage()
         );
     }
+
+    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+    @ExceptionHandler(ImageUploadException.class)
+    public ExceptionResponse handleImageUploadException(ImageUploadException e) {
+        return new ExceptionResponse(
+                HttpStatus.EXPECTATION_FAILED.value(),
+                e.getError(),
+                e.getMessage()
+        );
+    }
     
     @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
     @ExceptionHandler(MaxUploadSizeExceededException.class)

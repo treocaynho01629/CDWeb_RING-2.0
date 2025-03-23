@@ -8,7 +8,7 @@ import com.ring.bookstore.dtos.dashboard.StatDTO;
 import com.ring.bookstore.dtos.mappers.CouponMapper;
 import com.ring.bookstore.dtos.mappers.DashboardMapper;
 import com.ring.bookstore.enums.CouponType;
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.*;
@@ -335,7 +335,7 @@ public class CouponServiceImpl implements CouponService {
     //Check valid role function
     protected boolean isAuthAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_ADMIN.toString())));
+        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
     }
 
     protected boolean isOwnerValid(Shop shop, Account user) {

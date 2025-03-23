@@ -1,5 +1,6 @@
 package com.ring.bookstore.dtos.shops;
 
+import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.model.Address;
 
 import java.math.BigDecimal;
@@ -15,8 +16,6 @@ public interface IShopDisplayDetail {
     String getName();
 
     String getDescription();
-
-    String getImage();
 
     Address getAddress();
 
@@ -35,4 +34,6 @@ public interface IShopDisplayDetail {
     LocalDateTime getJoinedDate();
 
     Boolean getFollowed();
+
+    IImage getImage();
 }

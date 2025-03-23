@@ -1,5 +1,6 @@
 package com.ring.bookstore.dtos.shops;
 
+import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.model.Address;
 
 import java.time.LocalDateTime;
@@ -15,8 +16,6 @@ public interface IShopDetail {
 
     String getDescription();
 
-    String getImage();
-
     Address getAddress();
 
     Double getSales();
@@ -31,4 +30,5 @@ public interface IShopDetail {
 
     LocalDateTime getJoinedDate();
 
+    IImage getImage();
 }

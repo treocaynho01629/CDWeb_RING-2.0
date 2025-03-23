@@ -16,7 +16,7 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review, Long>{
 
 	@Query("""
-		select r as review, u.id as userId, u.username as username, i.name as image,
+		select r as review, u.id as userId, u.username as username, i as image,
 		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
 		from Review r
 		join r.book b
@@ -51,7 +51,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>{
 							  List<Long> ids);
 
 	@Query("""
-		select r as review, u.id as userId, u.username as username, i.name as image,
+		select r as review, u.id as userId, u.username as username, i as image,
 		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
 		from Review r join r.book b
 		join r.user u
@@ -64,7 +64,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>{
 	Page<IReview> findReviewsByBookId(Long id, Integer rating, Pageable pageable); //Get reviews from book's {id}
 
 	@Query("""
-		select r as review, u.id as userId, u.username as username, i.name as image,
+		select r as review, u.id as userId, u.username as username, i as image,
 		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
 		from Review r join r.book b
 		join r.user u
@@ -76,7 +76,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>{
 	Page<IReview> findUserReviews(Long id, Integer rating, Pageable pageable); //Get reviews by user's {id}
 
 	@Query("""
-		select r as review, u.id as userId, u.username as username, i.name as image,
+		select r as review, u.id as userId, u.username as username, i as image,
 		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
 		from Review r join r.book b
 		join r.user u

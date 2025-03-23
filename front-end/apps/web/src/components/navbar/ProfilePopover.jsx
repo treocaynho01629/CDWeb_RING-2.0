@@ -70,7 +70,7 @@ const ProfilePopover = ({
         <MenuItem>
           <Avatar
             sx={{ width: 30, height: 30, ml: -0.5, mr: 1 }}
-            src={image ? image + "?size=tiny" : null}
+            src={image ?? null}
           />
           Thông tin tài khoản
         </MenuItem>

@@ -1,25 +1,32 @@
 package com.ring.bookstore.dtos.mappers;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.ring.bookstore.dtos.accounts.*;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.AccountProfile;
-import com.ring.bookstore.model.Address;
-import com.ring.bookstore.model.Image;
+import com.ring.bookstore.dtos.images.IImage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDate;
 
+@RequiredArgsConstructor
 @Service
 public class AccountMapper {
 
+    private final Cloudinary cloudinary;
+
     public AccountDTO projectionToDTO(IAccount projection) {
-        String fileDownloadUri = projection.getImage() != null ?
-                ServletUriComponentsBuilder
-                        .fromCurrentContextPath()
-                        .path("/api/images/")
-                        .path(projection.getImage())
-                        .toUriString()
+        IImage image = projection.getImage();
+        String url = image != null ?
+                cloudinary.url().transformation(new Transformation()
+                                .aspectRatio("1.0")
+                                .width(55)
+                                .crop("thumb")
+                                .chain()
+                                .radius("max")
+                                .quality(50)
+                                .fetchFormat("auto"))
+                        .secure(true).generate(image.getPublicId())
                 : null;
 
         return new AccountDTO(projection.getId(),
@@ -27,23 +34,28 @@ public class AccountMapper {
                 projection.getEmail(),
                 projection.getName(),
                 projection.getPhone(),
-                fileDownloadUri,
+                url,
                 projection.getRoles().get(projection.getRoles().size() - 1).getRoleName());
     }
 
     public AccountDetailDTO projectionToDetailDTO(IAccountDetail projection) {
         LocalDate dob = (dob = projection.getDob()) != null ? dob : LocalDate.of(1970, 1, 1);
-        String fileDownloadUri = projection.getImage() != null ?
-                ServletUriComponentsBuilder
-                        .fromCurrentContextPath()
-                        .path("/api/images/")
-                        .path(projection.getImage())
-                        .toUriString()
+        IImage image = projection.getImage();
+        String url = image != null ?
+                cloudinary.url().transformation(new Transformation()
+                                .aspectRatio("1.0")
+                                .width(120)
+                                .crop("thumb")
+                                .chain()
+                                .radius("max")
+                                .quality("auto")
+                                .fetchFormat("auto"))
+                        .secure(true).generate(image.getPublicId())
                 : null;
 
         return new AccountDetailDTO(projection.getId(),
                 projection.getUsername(),
-                fileDownloadUri,
+                url,
                 projection.getEmail(),
                 projection.getRoles(),
                 projection.getName(),
@@ -57,15 +69,20 @@ public class AccountMapper {
 
     public ProfileDTO projectionToProfileDTO(IProfile projection) {
         LocalDate dob = (dob = projection.getDob()) != null ? dob : LocalDate.of(1970, 1, 1);
-        String fileDownloadUri = projection.getImage() != null ?
-                ServletUriComponentsBuilder
-                        .fromCurrentContextPath()
-                        .path("/api/images/")
-                        .path(projection.getImage())
-                        .toUriString()
+        IImage image = projection.getImage();
+        String url = image != null ?
+                cloudinary.url().transformation(new Transformation()
+                                .aspectRatio("1.0")
+                                .width(120)
+                                .crop("thumb")
+                                .chain()
+                                .radius("max")
+                                .quality("auto")
+                                .fetchFormat("auto"))
+                        .secure(true).generate(image.getPublicId())
                 : null;
 
-        return new ProfileDTO(fileDownloadUri,
+        return new ProfileDTO(url,
                 projection.getName(),
                 projection.getEmail(),
                 projection.getPhone(),
