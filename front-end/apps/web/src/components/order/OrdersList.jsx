@@ -30,12 +30,13 @@ import { booksApiSlice } from "../../features/books/booksApiSlice";
 import { CustomTab, CustomTabs } from "../custom/CustomTabs";
 import { debounce } from "lodash-es";
 import { Message } from "@ring/ui/Components";
-import { orderItems } from "@ring/shared";
+import { getOrderStatus } from "@ring/shared";
 import useCart from "../../hooks/useCart";
 import OrderItem from "./OrderItem";
 
 const CancelRefundForm = lazy(() => import("./CancelRefundForm"));
 
+const OrderStatus = getOrderStatus();
 const defaultSize = 5;
 
 const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
@@ -272,7 +273,7 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
           scrollButtons="auto"
         >
           <CustomTab label="Tất cả" value="" />
-          {orderItems.map((tab, index) => (
+          {Object.values(OrderStatus).map((tab, index) => (
             <CustomTab
               key={`tab-${index}`}
               label={tab.label}

@@ -22,7 +22,7 @@ import {
   StarBorder,
   CategoryOutlined,
 } from "@mui/icons-material";
-import { bookTypeItems } from "@ring/shared";
+import { getBookType } from "@ring/shared";
 import {
   useGetCategoriesQuery,
   useGetRelevantCategoriesQuery,
@@ -156,6 +156,7 @@ const ButtonContainer = styled.div`
 
 const LIMIT_CATES = 10;
 const LIMIT_PUBS = 10;
+const BookType = getBookType();
 
 const CateFilter = memo(({ cateId, shopId, onChangeCate }) => {
   const childContainedRef = useRef(null);
@@ -636,7 +637,7 @@ const TypeFilter = memo(({ types, onChangeTypes, typesRef }) => {
         <FilterText>Hình thức bìa</FilterText>
       </TitleContainer>
       <FormGroup sx={{ padding: 0, width: "100%" }}>
-        {bookTypeItems.map((option, index) => {
+        {Object.values(BookType).map((option, index) => {
           const isItemSelected = isSelected(option.value);
 
           return (

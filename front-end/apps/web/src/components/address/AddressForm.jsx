@@ -22,8 +22,10 @@ import {
   TextareaAutosize,
 } from "@mui/material";
 import { Instruction } from "@ring/ui/Components";
-import { PHONE_REGEX, addressItems, location } from "@ring/shared";
+import { PHONE_REGEX, getAddressType, location } from "@ring/shared";
 import { PatternFormat } from "react-number-format";
+
+const AddressType = getAddressType();
 
 const splitAddress = (addressInfo) => {
   let city = "";
@@ -318,9 +320,9 @@ const AddressForm = ({
                 <MenuItem value={null}>
                   <em>--Không--</em>
                 </MenuItem>
-                {addressItems.map((item, index) => (
-                  <MenuItem key={index} value={item.value}>
-                    {item.label}
+                {Object.values(AddressType).map((option, index) => (
+                  <MenuItem key={index} value={option.value}>
+                    {option.label}
                   </MenuItem>
                 ))}
               </TextField>

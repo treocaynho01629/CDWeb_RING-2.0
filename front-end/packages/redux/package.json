@@ -6,7 +6,8 @@
     "src"
   ],
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./store": "./src/app/store.js"
   },
   "scripts": {
     "lint": "eslint \"**/*.{ts,tsx,js,jsx}\"",

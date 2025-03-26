@@ -8,7 +8,13 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
-import { addressTypes, shippingItems, currencyFormat } from "@ring/shared";
+import {
+  currencyFormat,
+  getAddressType,
+  getShippingType,
+  iconList,
+} from "@ring/shared";
+import { Suspense } from "react";
 
 //#region styled
 const Title = styled.h4`
@@ -131,6 +137,10 @@ const AddressTag = styled.span`
 `;
 //#endregion
 
+const AddressType = getAddressType();
+const ShippingType = getShippingType();
+const tempShippingPrice = 10000;
+
 const AddressDisplay = ({
   addressInfo,
   handleOpen,
@@ -140,7 +150,7 @@ const AddressDisplay = ({
   handleChange,
 }) => {
   const fullAddress = [addressInfo?.city, addressInfo?.address].join(", ");
-  const address = addressInfo?.type ? addressTypes[addressInfo.type] : null;
+  const address = addressInfo?.type ? AddressType[addressInfo.type] : null;
 
   return (
     <>
@@ -197,27 +207,34 @@ const AddressDisplay = ({
       </AddressDisplayContainer>
       <Title>Hình thức giao hàng</Title>
       <RadioGroup value={value} onChange={handleChange}>
-        {shippingItems.map((item, index) => (
-          <StyledForm
-            key={index}
-            value={item.value}
-            control={<Radio />}
-            label={
-              <FormContent>
-                <ItemContent>
-                  <ItemTitle>
-                    {item.icon}
-                    {item.label}
-                  </ItemTitle>
-                  <PriceTag color={item.color}>
-                    {currencyFormat.format(item.price)}
-                  </PriceTag>
-                </ItemContent>
-                <Estimate>{item.description}</Estimate>
-              </FormContent>
-            }
-          />
-        ))}
+        {Object.values(ShippingType).map((item, index) => {
+          const Icon = iconList[item.icon];
+          return (
+            <StyledForm
+              key={index}
+              value={item.value}
+              control={<Radio />}
+              label={
+                <FormContent>
+                  <ItemContent>
+                    <ItemTitle>
+                      <Suspense fallback={null}>
+                        <Icon />
+                      </Suspense>
+                      {item.label}
+                    </ItemTitle>
+                    <PriceTag color={item.color}>
+                      {currencyFormat.format(
+                        tempShippingPrice * item.multiplier
+                      )}
+                    </PriceTag>
+                  </ItemContent>
+                  <Estimate>{item.description}</Estimate>
+                </FormContent>
+              }
+            />
+          );
+        })}
       </RadioGroup>
     </>
   );

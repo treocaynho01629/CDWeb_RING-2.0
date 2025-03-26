@@ -50,7 +50,6 @@ public class FileUploadUtil {
         Map<String, String> srcSet = new HashMap<>();
         for (ImageSize size : ImageSize.values()) {
             srcSet.put(size.name(), cloudinary.url().transformation(new Transformation()
-                            .aspectRatio("1.0")
                             .width(size.getWidth())
                             .quality("auto")
                             .fetchFormat("auto"))

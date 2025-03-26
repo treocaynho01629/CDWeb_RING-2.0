@@ -16,8 +16,8 @@ import {
 import {
   currencyFormat,
   idFormatter,
-  orderTypes,
-  paymentTypes,
+  getOrderStatus,
+  getPaymentType,
 } from "@ring/shared";
 import { Link } from "react-router";
 import {
@@ -183,9 +183,12 @@ const Amount = styled.span`
 `;
 //#endregion
 
+const OrderStatus = getOrderStatus();
+const PaymentType = getPaymentType();
+
 const OrderReceipt = ({ order, tabletMode }) => {
   const [open, setOpen] = useState(false);
-  const paymentSummary = paymentTypes[order?.paymentType];
+  const paymentSummary = PaymentType[order?.paymentType];
 
   const togglePrice = () => {
     setOpen((prev) => !prev);
@@ -231,15 +234,15 @@ const OrderReceipt = ({ order, tabletMode }) => {
             <BodyContainer
               key={`item-${item?.id}-${itemIndex}`}
               className={
-                order?.status == orderTypes.CANCELED.value ||
-                order?.status == orderTypes.REFUNDED.value
+                order?.status == OrderStatus.CANCELED.value ||
+                order?.status == OrderStatus.REFUNDED.value
                   ? "disabled"
                   : ""
               }
             >
               <Link to={`/product/${item?.bookSlug}`}>
                 <StyledLazyImage
-                  src={`${item?.image}?size=small`}
+                  src={item?.image}
                   alt={`${item?.bookTitle} Order item`}
                   placeholder={
                     <StyledSkeleton variant="rectangular" animation={false} />
@@ -251,7 +254,7 @@ const OrderReceipt = ({ order, tabletMode }) => {
                   <ItemTitle>{item?.bookTitle}</ItemTitle>
                 </Link>
                 <StuffContainer>
-                  {order?.status == orderTypes.COMPLETED.value ? (
+                  {order?.status == OrderStatus.COMPLETED.value ? (
                     <div>
                       <Amount>
                         Số lượng: <b>{item?.quantity}</b>

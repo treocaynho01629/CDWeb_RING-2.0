@@ -12,7 +12,7 @@ import {
   SpaceTableRow,
   StyledTableCell,
 } from "../custom/TableComponents";
-import { currencyFormat } from "@ring/shared";
+import { currencyFormat, getImageSize } from "@ring/shared";
 
 //#region styled
 const ItemContainer = styled.div`
@@ -163,6 +163,8 @@ const StyledSkeleton = styled(Skeleton)`
 `;
 //#endregion
 
+const ImageSize = getImageSize();
+
 function ItemRow({ product, index }) {
   const isDisabled = !product || product.amount < 1;
 
@@ -175,7 +177,7 @@ function ItemRow({ product, index }) {
       <StyledTableCell className="preview" component="th" scope="row">
         <ItemContainer>
           <StyledLazyImage
-            src={`${product.image}?size=small`}
+            src={product?.image.srcSet[ImageSize.TINY.value]}
             alt={`${product.title} Cart item`}
             placeholder={
               <StyledSkeleton variant="rectangular" animation={false} />

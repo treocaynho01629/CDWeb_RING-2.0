@@ -38,10 +38,10 @@ import {
 } from "../features/orders/ordersApiSlice";
 import {
   PHONE_REGEX,
-  shippingType,
-  paymentType,
   useTitle,
   useDeepEffect,
+  getPaymentType,
+  getShippingType,
 } from "@ring/shared";
 import { useReCaptcha } from "@ring/auth";
 import { isEqual } from "lodash-es";
@@ -139,13 +139,18 @@ const StyledStepContent = styled(StepContent)(({ theme }) => ({
 }));
 //#endregion
 
+const PaymentType = getPaymentType();
+const ShippingType = getShippingType();
+
 const Checkout = () => {
   //#region construct
   const scrollRef = useRef(null);
   const prevPayload = useRef();
   const [activeStep, setActiveStep] = useState(0);
-  const [delivery, setDelivery] = useState(shippingType[0]);
-  const [payment, setPayment] = useState(paymentType[0]);
+  const [delivery, setDelivery] = useState(
+    Object.values(ShippingType)[0].value
+  );
+  const [payment, setPayment] = useState(Object.values(PaymentType)[0].value);
 
   const [pending, setPending] = useState(false);
   const maxSteps = 3;

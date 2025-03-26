@@ -19,7 +19,7 @@ import {
   ExpandLess,
   ExpandMore,
 } from "@mui/icons-material";
-import { bookTypeItems } from "@ring/shared";
+import { getBookType } from "@ring/shared";
 import {
   useGetCategoriesQuery,
   useGetRelevantCategoriesQuery,
@@ -160,6 +160,7 @@ const Showmore = styled.div`
 
 const LIMIT_CATES = 4;
 const LIMIT_PUBS = 4;
+const BookType = getBookType();
 
 const CateFilter = memo(({ cateId, shopId, onChangeCate }) => {
   const [open, setOpen] = useState(false); //Open sub cate
@@ -625,7 +626,7 @@ const TypeFilter = memo(({ types, onChangeType }) => {
         <FilterText>Hình thức bìa</FilterText>
       </TitleContainer>
       <Stack spacing={{ xs: 1 }} direction="row" useFlexGap flexWrap="wrap">
-        {bookTypeItems.map((option, index) => {
+        {Object.values(BookType).map((option, index) => {
           const isItemSelected = isSelected(option.value);
 
           return (

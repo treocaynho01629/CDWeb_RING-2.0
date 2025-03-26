@@ -1,10 +1,11 @@
 import styled from "@emotion/styled";
 import { Button, Skeleton, Paper, alpha } from "@mui/material";
-import { dateFormatter } from "@ring/shared";
+import { dateFormatter, iconList } from "@ring/shared";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import useCoupon from "../../hooks/useCoupon";
 import { Storefront } from "@mui/icons-material";
 import { Link } from "react-router";
+import { Suspense } from "react";
+import useCoupon from "../../hooks/useCoupon";
 
 //#region styled
 const Wrapper = styled.div`
@@ -407,21 +408,22 @@ const CouponItem = ({
     isSaved ? removeCoupon(coupon?.code) : addCoupon(coupon?.code);
   };
 
-  let shopIcon = (
+  const Icon = iconList[summary?.icon];
+  let shopIcon = coupon ? (
     <CouponIcon color={summary?.color}>
       {coupon?.shopImage ? (
         <ShopImage
-          src={`${coupon.shopImage}?size=small`}
+          src={coupon.shopImage}
           alt={`Shop: ${coupon?.shopName}`}
           scrollPosition={scrollPosition}
           placeholder={<Storefront />}
         />
       ) : (
-        summary?.icon
+        <Icon />
       )}
       {coupon?.shopName && <ShopName>{coupon?.shopName}</ShopName>}
     </CouponIcon>
-  );
+  ) : null;
 
   return (
     <Wrapper className={className}>
@@ -446,11 +448,13 @@ const CouponItem = ({
             className="right"
           />
           <CouponContent>
-            {coupon?.shopId ? (
-              <Link to={`/shop/${coupon?.shopId}`}>{shopIcon}</Link>
-            ) : (
-              shopIcon
-            )}
+            <Suspense fallback={null}>
+              {coupon?.shopId ? (
+                <Link to={`/shop/${coupon?.shopId}`}>{shopIcon}</Link>
+              ) : (
+                shopIcon
+              )}
+            </Suspense>
             <CouponMain>
               <div>
                 <h2>{coupon?.summary}</h2>

@@ -3,7 +3,7 @@ import { lazy, Suspense, useState } from "react";
 import { KeyboardArrowRight, LabelOff } from "@mui/icons-material";
 import { useGetCouponsQuery } from "../../features/coupons/couponsApiSlice";
 import { Skeleton } from "@mui/material";
-import { couponTypes } from "@ring/shared";
+import { getCouponType, iconList } from "@ring/shared";
 import { MobileExtendButton } from "@ring/ui/Components";
 import { trackWindowScroll } from "react-lazy-load-image-component";
 import useCoupon from "../../hooks/useCoupon";
@@ -195,6 +195,7 @@ const CouponMessage = styled.span`
 //#endregion
 
 const defaultSize = 4;
+const CouponType = getCouponType();
 
 const CouponPreview = ({ shopId, scrollPosition }) => {
   const { coupons: savedCoupons } = useCoupon();
@@ -247,7 +248,8 @@ const CouponPreview = ({ shopId, scrollPosition }) => {
     coupons = ids?.length ? (
       ids?.map((id, index) => {
         const coupon = entities[id];
-        const summary = couponTypes[coupon.type];
+        const summary = CouponType[coupon.type];
+        const Icon = iconList[summary.icon];
 
         return (
           <Coupon
@@ -256,7 +258,11 @@ const CouponPreview = ({ shopId, scrollPosition }) => {
             aria-haspopup="true"
             onMouseEnter={(e) => handlePopover(e, coupon, summary)}
           >
-            <CouponIcon color={summary.color}>{summary.icon}</CouponIcon>
+            <CouponIcon color={summary.color}>
+              <Suspense fallback={null}>
+                <Icon />
+              </Suspense>
+            </CouponIcon>
             <CouponContent>
               <CouponTitle>{coupon?.summary}</CouponTitle>
             </CouponContent>

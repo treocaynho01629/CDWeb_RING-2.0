@@ -12,6 +12,10 @@ import com.ring.bookstore.service.ImageService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
@@ -35,24 +39,20 @@ public class ImageController {
         return new ResponseEntity<>(result.getUrl(), HttpStatus.OK);
     }
 
-//    //Upload multiples images
-//    @PostMapping("/upload-multiples")
-//    @PreAuthorize("hasRole('ADMIN') and hasAuthority('CREATE_PRIVILEGE')")
-//    public ResponseEntity<?> uploadImages(@RequestParam("images") MultipartFile[] files) {
-//        List<String> messages = new ArrayList<>();
-//
-//        Arrays.asList(files).forEach(file -> {
-//            try {
-//                imageService.upload(file);
-//                messages.add(file.getOriginalFilename() + " [Successful]");
-//            } catch (Exception e) {
-//                messages.add(file.getOriginalFilename() + " <Failed> - " + e.getMessage());
-//            }
-//        });
-//
-//        return new ResponseEntity<>(messages, HttpStatus.OK);
-//    }
-//
+    //Upload multiples images
+    @PostMapping("/upload-multiples")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('CREATE_PRIVILEGE')")
+    public ResponseEntity<?> uploadImages(@RequestParam("images") MultipartFile[] files,
+                                          @RequestParam(value = "folder", required = false) String folder) {
+        List<String> messages = new ArrayList<>();
+
+        imageService.uploadMultiple(Arrays.asList(files), folder).forEach(image -> {
+            messages.add(image.getName() + " uploaded!");
+        });
+
+        return new ResponseEntity<>(messages, HttpStatus.OK);
+    }
+
 //    //Upload image
 //    @PutMapping("/replace")
 //    @PreAuthorize("hasRole('ADMIN') and hasAuthority('UPDATE_PRIVILEGE')")

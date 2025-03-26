@@ -1,32 +1,38 @@
 package com.ring.bookstore.dtos.mappers;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.ring.bookstore.dtos.coupons.CouponDTO;
 import com.ring.bookstore.dtos.coupons.CouponDetailDTO;
 import com.ring.bookstore.dtos.coupons.ICoupon;
 import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.model.Coupon;
 import com.ring.bookstore.model.CouponDetail;
-import com.ring.bookstore.request.CartStateRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.text.NumberFormat;
 import java.util.Locale;
-import java.util.function.Function;
 
+@RequiredArgsConstructor
 @Service
 public class CouponMapper {
+
+    private final Cloudinary cloudinary;
 
     public CouponDTO couponToDTO(ICoupon projection) {
         Coupon coupon = projection.getCoupon();
         CouponDetail detail = coupon.getDetail();
-
-        String fileDownloadUri = projection.getShopImage() != null ?
-                ServletUriComponentsBuilder
-                        .fromCurrentContextPath()
-                        .path("/api/images/")
-                        .path(projection.getShopImage())
-                        .toUriString()
+        String url = projection.getShopImage() != null ?
+                cloudinary.url().transformation(new Transformation()
+                                .aspectRatio("1.0")
+                                .width(55)
+                                .crop("thumb")
+                                .chain()
+                                .radius("max")
+                                .quality(50)
+                                .fetchFormat("auto"))
+                        .secure(true).generate(projection.getShopImage().getPublicId())
                 : null;
 
         //Detail stuff
@@ -51,7 +57,7 @@ public class CouponMapper {
                 detail.getExpDate(),
                 coupon.getShop() != null ? coupon.getShop().getId() : null,
                 projection.getShopName(),
-                fileDownloadUri);
+                url);
     }
 
     public CouponDetailDTO couponToDetailDTO(ICoupon projection) {

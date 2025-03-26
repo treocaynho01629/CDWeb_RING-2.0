@@ -3,7 +3,7 @@ import { NavLink } from "react-router";
 import { ChevronLeft } from "@mui/icons-material";
 import { ReactComponent as EmptyIcon } from "@ring/shared/assets/empty";
 import { Button } from "@mui/material";
-import { useTitle, useConfirm, BookLanguage } from "@ring/shared";
+import { useTitle, useConfirm } from "@ring/shared";
 import Placeholder from "@ring/ui/Placeholder";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 import styled from "@emotion/styled";
@@ -36,8 +36,6 @@ const StyledEmptyIcon = styled(EmptyIcon)`
   }
 `;
 //#endregion
-
-console.log(BookLanguage);
 
 const Cart = () => {
   const { cartProducts } = useCart();

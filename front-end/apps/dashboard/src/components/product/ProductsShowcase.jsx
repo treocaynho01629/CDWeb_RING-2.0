@@ -8,6 +8,7 @@ import { Star, StarBorder } from "@mui/icons-material";
 import { Link } from "react-router";
 import { Message } from "@ring/ui/Components";
 import { currencyFormat, numFormat } from "@ring/shared/convert";
+import { getImageSize } from "@ring/shared";
 import { Title } from "../custom/Components";
 
 //#region styled
@@ -148,12 +149,14 @@ const ProductShop = styled.span`
 `;
 //#endregion
 
+const ImageSize = getImageSize();
+
 const ProductItem = ({ book, scrollPosition }) => {
   return (
     <ItemContainer>
       {book ? (
         <StyledLazyImage
-          src={book?.image?.srcSet[1]}
+          src={book?.image?.srcSet[ImageSize.SMALL.value]}
           alt={`Top item: ${book?.title}`}
           scrollPosition={scrollPosition}
           placeholder={

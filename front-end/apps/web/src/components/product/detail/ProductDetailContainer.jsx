@@ -9,7 +9,7 @@ import {
   KeyboardArrowRight,
   KeyboardArrowUp,
 } from "@mui/icons-material";
-import { idFormatter, bookTypes } from "@ring/shared";
+import { idFormatter, getBookType, getBookLanguage } from "@ring/shared";
 import ProductsScroll from "../ProductsScroll";
 
 const SwipeableDrawer = lazy(() => import("@mui/material/SwipeableDrawer"));
@@ -95,6 +95,9 @@ const DescTitle = styled.h4`
 `;
 
 //#endregion
+
+const BookLanguage = getBookLanguage();
+const BookType = getBookType();
 
 const ProductDetailContainer = ({ loading, book, tabletMode }) => {
   const descRef = useRef(null);
@@ -186,7 +189,9 @@ const ProductDetailContainer = ({ loading, book, tabletMode }) => {
               <InfoText className="secondary">Ngôn ngữ: </InfoText>
             </InfoTitle>
             <InfoStack>
-              <InfoText>{book?.language ?? "Đang cập nhật"}</InfoText>
+              <InfoText>
+                {BookLanguage[book?.language]?.label ?? "Đang cập nhật"}
+              </InfoText>
             </InfoStack>
           </tr>
           <tr>
@@ -225,7 +230,7 @@ const ProductDetailContainer = ({ loading, book, tabletMode }) => {
             </InfoTitle>
             <InfoStack>
               <Link to={`/store?types=${book?.type}`}>
-                <InfoText>{bookTypes[book?.type]}</InfoText>
+                <InfoText>{BookType[book?.type]?.label}</InfoText>
               </Link>
             </InfoStack>
           </tr>

@@ -3,7 +3,7 @@ import { RemoveShoppingCart as RemoveShoppingCartIcon } from "@mui/icons-materia
 import { Button, Skeleton, Popover, Paper } from "@mui/material";
 import { Link } from "react-router";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { currencyFormat } from "@ring/shared";
+import { currencyFormat, getImageSize } from "@ring/shared";
 
 //#region styled
 const MiniCartContainer = styled.div`
@@ -83,6 +83,8 @@ const ActionContainer = styled.div`
 `;
 //#endregion
 
+const ImageSize = getImageSize();
+
 const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
   return (
     <Popover
@@ -141,7 +143,7 @@ const MiniCart = ({ openCart, anchorElCart, handleClose, products }) => {
                   width={50}
                   height={50}
                   style={{ objectFit: "contain" }}
-                  src={product?.image?.srcSet[0]}
+                  src={product?.image?.srcSet[ImageSize.TINY.value]}
                   alt={`Cart item: ${product?.title}`}
                   placeholder={
                     <Skeleton

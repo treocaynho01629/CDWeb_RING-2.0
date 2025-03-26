@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { KeyboardArrowRight, MoreHoriz } from "@mui/icons-material";
 import { Box, Button, IconButton, Radio } from "@mui/material";
-import { PHONE_REGEX } from "@ring/shared/regex";
+import { PHONE_REGEX } from "@ring/shared/ultils/regex";
 
 //#region styled
 const Wrapper = styled.div`

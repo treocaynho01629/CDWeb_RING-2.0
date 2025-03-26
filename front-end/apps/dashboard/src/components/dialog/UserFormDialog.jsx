@@ -21,7 +21,7 @@ import {
   useUpdateUserMutation,
 } from "../../features/users/usersApiSlice";
 import { genderTypeItems, roleTypeItems } from "@ring/shared/user";
-import { EMAIL_REGEX, PHONE_REGEX } from "@ring/shared/regex";
+import { EMAIL_REGEX, PHONE_REGEX } from "@ring/shared/ultils/regex";
 import dayjs from "dayjs";
 import ImageSelect from "../custom/ImageSelect";
 

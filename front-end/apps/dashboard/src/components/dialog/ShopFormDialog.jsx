@@ -20,7 +20,7 @@ import {
   Apartment,
   Home,
 } from "@mui/icons-material";
-import { location, addressItems, PHONE_REGEX } from "@ring/shared";
+import { location, PHONE_REGEX, getAddressType } from "@ring/shared";
 import { Title } from "../custom/Components";
 import { PatternFormat } from "react-number-format";
 import { Instruction } from "@ring/ui";
@@ -29,6 +29,8 @@ import {
   useCreateShopMutation,
   useUpdateShopMutation,
 } from "../../features/shops/shopsApiSlice";
+
+const AddressType = getAddressType();
 
 const splitAddress = (addressInfo) => {
   let city = "";
@@ -462,9 +464,9 @@ const ShopFormDialog = ({ open, handleClose, shop, pending, setPending }) => {
                 <MenuItem value={null}>
                   <em>--Không--</em>
                 </MenuItem>
-                {addressItems.map((item, index) => (
-                  <MenuItem key={index} value={item.value}>
-                    {item.label}
+                {Object.values(AddressType).map((option, index) => (
+                  <MenuItem key={index} value={option.value}>
+                    {option.label}
                   </MenuItem>
                 ))}
               </TextField>

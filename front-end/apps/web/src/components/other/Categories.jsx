@@ -202,7 +202,7 @@ const Categories = () => {
               >
                 <ItemContainer>
                   <StyledLazyImage
-                    src={`${cate?.image}?size=tiny`}
+                    src={cate?.image}
                     alt={`Category item: ${cate?.name}`}
                     placeholder={
                       <StyledSkeleton variant="rectangular" animation={false} />

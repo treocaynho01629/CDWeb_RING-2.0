@@ -22,9 +22,10 @@ import {
 import {
   currencyFormat,
   dateFormatter,
+  getOrderStatus,
+  getShippingType,
+  iconList,
   idFormatter,
-  orderTypes,
-  shippingTypes,
   timeFormatter,
   useConfirm,
 } from "@ring/shared";
@@ -226,36 +227,40 @@ const MainButtonContainer = styled.div`
 `;
 //#endregion
 
+const OrderStatus = getOrderStatus();
+const ShippingType = getShippingType();
+const tempShippingFee = 10000;
+
 function getDetailSummary(detail) {
   const date = new Date(detail?.date);
 
   switch (detail?.status) {
-    case orderTypes.PENDING.value:
+    case OrderStatus.PENDING.value:
       return {
         step: 1,
         summary: "Đang chờ nhận hàng từ shop.",
       };
-    case orderTypes.SHIPPING.value:
+    case OrderStatus.SHIPPING.value:
       return {
         step: 2,
         summary: "Đang giao hàng cho đơn vị vận chuyển.",
       };
-    case orderTypes.PENDING_REFUND.value:
+    case OrderStatus.PENDING_REFUND.value:
       return {
         step: 3,
         summary: "Đang chờ hoàn trả hàng.",
       };
-    case orderTypes.COMPLETED.value:
+    case OrderStatus.COMPLETED.value:
       return {
         step: 4,
         summary: "Cảm ơn bạn đã mua hàng!",
       };
-    case orderTypes.CANCELED.value:
+    case OrderStatus.CANCELED.value:
       return {
         step: 1,
         summary: `Đã huỷ đơn vào ${timeFormatter(date)} ${dateFormatter(date)}.`,
       };
-    case orderTypes.REFUNDED.value:
+    case OrderStatus.REFUNDED.value:
       return {
         step: 4,
         summary: `Đã hoàn trả ${currencyFormat.format(detail?.totalPrice - detail?.totalDiscount)} vào tài khoản vào ${timeFormatter(date)} ${dateFormatter(date)}.`,
@@ -274,7 +279,7 @@ const OrderDetailComponent = ({
   const [openCancel, setOpenCancel] = useState(undefined);
   const [openRefund, setOpenRefund] = useState(undefined);
   const open = Boolean(openCancel || openRefund);
-  const detailStatus = orderTypes[order?.status];
+  const detailStatus = OrderStatus[order?.status];
   const [getBought, { isLoading: fetching }] =
     booksApiSlice.useLazyGetBooksByIdsQuery();
   const [confirmOrder, { isLoading: confirming }] = useConfirmOrderMutation();
@@ -358,7 +363,8 @@ const OrderDetailComponent = ({
   const detailSummary = getDetailSummary(order);
   const orderedDate = new Date(order?.orderedDate);
   const date = new Date(order?.date);
-  const shippingSummary = shippingTypes[order?.shippingType];
+  const shippingSummary = ShippingType[order?.shippingType];
+  const Icon = iconList[shippingSummary?.icon];
 
   return (
     <>
@@ -452,8 +458,8 @@ const OrderDetailComponent = ({
                 >
                   Đang tải
                 </MainButton>
-              ) : order?.status == orderTypes.PENDING.value ||
-                order?.status == orderTypes.SHIPPING.value ? (
+              ) : order?.status == OrderStatus.PENDING.value ||
+                order?.status == OrderStatus.SHIPPING.value ? (
                 <>
                   <MainButton
                     variant="contained"
@@ -486,7 +492,7 @@ const OrderDetailComponent = ({
                   >
                     Mua lại
                   </MainButton>
-                  {order?.status == orderTypes.COMPLETED.value && (
+                  {order?.status == OrderStatus.COMPLETED.value && (
                     <MainButton
                       variant="outlined"
                       color="warning"
@@ -547,19 +553,19 @@ const OrderDetailComponent = ({
                     {!order ? (
                       <Skeleton variant="text" width={200} />
                     ) : (
-                      <>
+                      <Suspense fallback={null}>
                         <ShippingTag color={shippingSummary?.color}>
-                          {shippingSummary?.icon} {shippingSummary?.label}:
+                          <Icon /> {shippingSummary?.label}:
                         </ShippingTag>
                         &nbsp;{shippingSummary?.description}
-                      </>
+                      </Suspense>
                     )}
                   </InfoText>
                   <InfoText className="price">
                     {!order ? (
                       <Skeleton variant="text" width={190} />
                     ) : (
-                      `Phí vận chuyển ${currencyFormat.format(shippingSummary?.price)}`
+                      `Phí vận chuyển ${currencyFormat.format(tempShippingFee * shippingSummary?.multiplier)}`
                     )}
                   </InfoText>
                 </Box>
@@ -588,8 +594,8 @@ const OrderDetailComponent = ({
                 <KeyboardArrowRight fontSize="small" />
               </MobileExtendButton>
             </MobileButton>
-          ) : order?.status == orderTypes.PENDING.value ||
-            order?.status == orderTypes.SHIPPING.value ? (
+          ) : order?.status == OrderStatus.PENDING.value ||
+            order?.status == OrderStatus.SHIPPING.value ? (
             <MobileButton onClick={handleCancelOrder}>
               <span>
                 <Close fontSize="small" color="error" />
@@ -600,7 +606,7 @@ const OrderDetailComponent = ({
               </MobileExtendButton>
             </MobileButton>
           ) : (
-            order?.status == orderTypes.COMPLETED.value && (
+            order?.status == OrderStatus.COMPLETED.value && (
               <MobileButton onClick={handleRefundOrder}>
                 <span>
                   <KeyboardReturn fontSize="small" color="warning" />
@@ -625,8 +631,8 @@ const OrderDetailComponent = ({
               >
                 Đang tải
               </MainButton>
-            ) : order?.status == orderTypes.PENDING.value ||
-              order?.status == orderTypes.SHIPPING.value ? (
+            ) : order?.status == OrderStatus.PENDING.value ||
+              order?.status == OrderStatus.SHIPPING.value ? (
               <MainButton
                 variant="contained"
                 color="success"

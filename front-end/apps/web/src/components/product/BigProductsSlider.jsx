@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useGetRandomBooksQuery } from "../../features/books/booksApiSlice";
+import { getImageSize } from "@ring/shared";
 import Carousel from "react-multi-carousel";
 import useCart from "../../hooks/useCart";
 
@@ -136,6 +137,8 @@ const StyledLazyImage = styled(LazyLoadImage)`
 `;
 //#endregion
 
+const ImageSize = getImageSize();
+
 const responsive = {
   default: {
     breakpoint: {
@@ -181,10 +184,15 @@ function Item({ book, index }) {
             <Link to={`/product/${book.slug}`}>
               <ImgContainer>
                 <StyledLazyImage
-                  src={book.image}
-                  srcSet={`${book.image}?size=medium 350w, ${book.image} 600w`}
+                  src={book.image.url}
+                  srcSet={Object.values(ImageSize)
+                    .map(
+                      (size) =>
+                        `${book.image.srcSet[size.value]} ${size.width}w`
+                    )
+                    .join(", ")}
                   alt={`${book.title} Big product item`}
-                  sizes="400px"
+                  sizes={"(min-width: 450px) 450px, 100vw"}
                   height={400}
                   width={"100%"}
                   visibleByDefault={index == 0}

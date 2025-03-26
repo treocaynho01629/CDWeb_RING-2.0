@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.dtos.reviews.ReviewDTO;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RequiredArgsConstructor
 @Service

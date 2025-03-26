@@ -1,18 +1,13 @@
 import styled from "@emotion/styled";
-import { keyframes } from "@emotion/react";
-import { Fragment, useState } from "react";
-import { Grid2 as Grid, Skeleton } from "@mui/material";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { Grid2 as Grid, Skeleton, useMediaQuery } from "@mui/material";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useGetBannersQuery } from "../../features/banners/bannersApiSlice";
+import { getImageSize } from "@ring/shared";
 import Carousel from "react-multi-carousel";
 
 //#region styled
-const fadeIn = keyframes`
-  from {opacity: 0}
-  to {opacity: 1}
-`;
-
 const CustomDotButton = styled("span")(({ theme }) => ({
   width: 8,
   height: 8,
@@ -93,10 +88,10 @@ const BackdropContainer = styled.div`
 const BackdropImage = styled(LazyLoadImage)`
   position: absolute;
   top: 0;
-  left: -5%;
-  filter: blur(15px);
-  width: 110%;
-  height: 100%;
+  left: -15%;
+  filter: saturate(1.4) blur(20px);
+  width: 130%;
+  height: 130%;
   object-fit: fill;
   background-color: ${({ theme }) => theme.palette.action.disabledBackground};
 `;
@@ -146,11 +141,28 @@ const StyledSkeleton = styled(Skeleton)`
   }
 `;
 
-const ExtraContainer = styled.div`
-  position: relative;
+const ExtraWrapper = styled.div`
+  height: 100%;
   width: 100%;
-  height: calc(50% - ${({ theme }) => theme.spacing(0.5)});
-  animation: ${fadeIn} 0.5s ease;
+  overflow: hidden;
+  position: relative;
+`;
+
+const ExtraSlider = styled.div`
+  --scroll-offset: -1;
+
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: ${({ theme }) =>
+    `calc((var(--scroll-offset) + 1) * -50% - (${theme.spacing(1)} * (var(--scroll-offset) + 1)))`};
+  transition: top 0.3s ease-out;
+`;
+
+const ExtraContainer = styled.div`
+  display: flex;
+  position: relative;
+  padding-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 //#endregion
 
@@ -170,6 +182,7 @@ const responsive = {
     items: 1,
   },
 };
+const ImageSize = getImageSize();
 
 const CustomArrow = ({ onClick, className, direction }) => (
   <CustomArrowButton
@@ -194,7 +207,7 @@ function Item({ banner, index }) {
           <BackdropContainer>
             <BackdropImage
               aria-hidden
-              src={`${banner?.image}?size=tiny`}
+              src={banner?.image?.srcSet[ImageSize.TINY.value]}
               visibleByDefault={index == 0}
               placeholder={
                 <BackdropPlaceholder variant="rectangular" animation={false} />
@@ -202,8 +215,13 @@ function Item({ banner, index }) {
             />
           </BackdropContainer>
           <StyledLazyImage
-            src={banner?.image}
-            srcSet={`${banner?.image}?size=medium 350w, ${banner?.image} 600w`}
+            src={banner?.image.url}
+            srcSet={Object.values(ImageSize)
+              .map(
+                (size) => `${banner?.image.srcSet[size.value]} ${size.width}w`
+              )
+              .concat(`${banner?.image.url} 600w`)
+              .join(", ")}
             alt={banner?.name}
             visibleByDefault={index == 0}
             placeholder={
@@ -223,20 +241,12 @@ function Item({ banner, index }) {
   );
 }
 
-function ExtraItem({ banner, index, length, slideIndex }) {
-  const showIndex = slideIndex + 1 > length - 1 ? 0 : slideIndex + 1;
-  const showIndex2 = slideIndex + 2 > length - 1 ? 1 : slideIndex + 2;
-
+function ExtraItem({ banner }) {
   if (banner) {
     return (
-      <ExtraContainer
-        key={`extra-${slideIndex}-${banner?.id}-${index}`}
-        style={{
-          display: index == showIndex || index == showIndex2 ? "flex" : "none",
-        }}
-      >
+      <ExtraContainer>
         <StyledLazyImage
-          src={`${banner?.image}?size=medium`}
+          src={banner?.image?.srcSet[ImageSize.MEDIUM.value]}
           alt={banner?.name}
           visibleByDefault={true}
           placeholder={
@@ -254,7 +264,24 @@ function ExtraItem({ banner, index, length, slideIndex }) {
   }
 }
 
+const ExtraBanners = ({ extraBanners, slideIndex, totalBanners }) => {
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    let newIndex =
+      totalBanners <= 1 ? -1 : slideIndex >= totalBanners - 1 ? -1 : slideIndex;
+    scrollRef.current.style.setProperty("--scroll-offset", newIndex);
+  }, [slideIndex]);
+
+  return (
+    <ExtraWrapper>
+      <ExtraSlider ref={scrollRef}>{extraBanners}</ExtraSlider>
+    </ExtraWrapper>
+  );
+};
+
 const BannersSlider = () => {
+  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md"));
   const [slideIndex, setSlideIndex] = useState(0);
   const { data, isLoading, isSuccess, isError } = useGetBannersQuery({
     byShop: false,
@@ -265,12 +292,7 @@ const BannersSlider = () => {
 
   if (isLoading || isError) {
     bannersContent = <Item />;
-    extraBanners = (
-      <>
-        <ExtraItem />
-        <ExtraItem />
-      </>
-    );
+    extraBanners = [<ExtraItem key={"temp-1"} />, <ExtraItem key={"temp-2"} />];
   } else if (isSuccess) {
     const { ids, entities } = data;
 
@@ -288,20 +310,24 @@ const BannersSlider = () => {
         );
         extraBanners.push(
           <Fragment key={`extra-${banner?.id}-${index}`}>
-            <ExtraItem
-              {...{ banner, index, length: ids?.length, slideIndex }}
-            />
+            <ExtraItem banner={banner} />
           </Fragment>
         );
       });
+
+      //Dummy
+      const dummy = entities[ids[0]];
+      extraBanners.push(
+        <Fragment key={`dummy-${dummy?.id}`}>
+          <ExtraItem banner={dummy} />
+        </Fragment>
+      );
     } else {
       bannersContent = <Item />;
-      extraBanners = (
-        <>
-          <ExtraItem />
-          <ExtraItem />
-        </>
-      );
+      extraBanners = [
+        <ExtraItem key={"temp-1"} />,
+        <ExtraItem key={"temp-2"} />,
+      ];
     }
   }
 
@@ -340,14 +366,21 @@ const BannersSlider = () => {
           {bannersContent}
         </Carousel>
       </Grid>
-      <Grid
-        size={{ xs: 12, md: 4 }}
-        display={{ xs: "none", md: "flex" }}
-        flexDirection="column"
-        justifyContent="space-between"
-      >
-        {extraBanners}
-      </Grid>
+      {!tabletMode && (
+        <Grid
+          size={4}
+          display={{ xs: "none", md: "block" }}
+          sx={{ position: "relative" }}
+        >
+          <ExtraBanners
+            {...{
+              extraBanners,
+              slideIndex,
+              totalBanners: data?.ids.length ?? 0,
+            }}
+          />
+        </Grid>
+      )}
     </Grid>
   );
 };

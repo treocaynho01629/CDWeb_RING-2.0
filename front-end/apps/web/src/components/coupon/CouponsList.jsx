@@ -23,12 +23,13 @@ import { Link, useSearchParams } from "react-router";
 import { CustomTab, CustomTabs } from "../custom/CustomTabs";
 import { debounce } from "lodash-es";
 import { Message } from "@ring/ui/Components";
-import { couponTypes, couponTypeItems } from "@ring/shared";
+import { getCouponType } from "@ring/shared";
 import { useGetCouponsQuery } from "../../features/coupons/couponsApiSlice";
 import { trackWindowScroll } from "react-lazy-load-image-component";
 import CouponItem from "./CouponItem";
 import useCoupon from "../../hooks/useCoupon";
 
+const CouponType = getCouponType();
 const defaultSize = 10;
 const couponItems = [
   {
@@ -51,7 +52,7 @@ const couponItems = [
   },
 ];
 
-couponTypeItems.forEach((item) => {
+Object.values(CouponType).forEach((item) => {
   couponItems.push({
     label: item.label,
     filter: {
@@ -207,7 +208,7 @@ const CouponsList = ({ scrollPosition, tabletMode }) => {
     couponsContent = ids?.length ? (
       ids?.map((id, index) => {
         const coupon = entities[id];
-        const summary = couponTypes[coupon?.type];
+        const summary = CouponType[coupon?.type];
         const isSaved = savedCoupons?.indexOf(coupon?.code) != -1;
 
         return (
