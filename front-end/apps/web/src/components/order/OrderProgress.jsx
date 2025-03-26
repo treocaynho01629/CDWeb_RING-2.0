@@ -25,7 +25,7 @@ import {
   SaveAltOutlined,
   StarBorder,
 } from "@mui/icons-material";
-import { dateFormatter, orderTypes, timeFormatter } from "@ring/shared";
+import { dateFormatter, getOrderStatus, timeFormatter } from "@ring/shared";
 import { useState } from "react";
 import { ToggleArrow } from "../custom/OrderComponents";
 import PropTypes from "prop-types";
@@ -198,6 +198,8 @@ const SummaryIcon = styled.span`
 `;
 //#endregion
 
+const OrderStatus = getOrderStatus();
+
 function StyledStepIcon(props) {
   const { active, completed, className, color, icon } = props;
 
@@ -260,10 +262,10 @@ const OrderProgress = ({
         activeStep={detailSummary?.step}
         orientation={tabletMode ? "vertical" : "horizontal"}
       >
-        {(order?.status == orderTypes.CANCELED.value
+        {(order?.status == OrderStatus.CANCELED.value
           ? cancelSteps
-          : order?.status == orderTypes.PENDING_REFUND.value ||
-              order?.status === orderTypes.REFUNDED.value
+          : order?.status == OrderStatus.PENDING_REFUND.value ||
+              order?.status === OrderStatus.REFUNDED.value
             ? refundSteps
             : steps
         ).map((step, index) => (
@@ -294,10 +296,10 @@ const OrderProgress = ({
               </div>
               {detailSummary?.step >= index && (
                 <LabelCheck color={detailStatus?.color}>
-                  {order?.status == orderTypes.CANCELED.value ? (
+                  {order?.status == OrderStatus.CANCELED.value ? (
                     <Close />
-                  ) : order?.status == orderTypes.PENDING_REFUND.value ||
-                    order?.status === orderTypes.REFUNDED.value ? (
+                  ) : order?.status == OrderStatus.PENDING_REFUND.value ||
+                    order?.status === OrderStatus.REFUNDED.value ? (
                     <KeyboardReturn />
                   ) : (
                     <Check />
@@ -330,9 +332,9 @@ const OrderProgress = ({
               <p>{detailSummary?.summary}</p>
             </div>
             <SummaryIcon>
-              {order?.status == orderTypes.CANCELED.value
+              {order?.status == OrderStatus.CANCELED.value
                 ? cancelSteps[detailSummary?.step]?.icon
-                : order?.status == orderTypes.REFUNDED.value
+                : order?.status == OrderStatus.REFUNDED.value
                   ? refundSteps[detailSummary?.step]?.icon
                   : steps[detailSummary?.step]?.icon}
             </SummaryIcon>

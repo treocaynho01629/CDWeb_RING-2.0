@@ -147,7 +147,6 @@ public class ShopServiceImpl implements ShopService {
 
         //Image upload
         if (file != null) image = imageService.upload(file, FileUploadUtil.SHOP_FOLDER);
-        ;
 
         //Create address
         AddressRequest addressRequest = request.getAddressRequest();

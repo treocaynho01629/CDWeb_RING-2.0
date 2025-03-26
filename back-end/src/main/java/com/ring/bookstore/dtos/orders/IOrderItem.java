@@ -1,5 +1,6 @@
 package com.ring.bookstore.dtos.orders;
 
+import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.model.OrderItem;
 
@@ -12,7 +13,7 @@ public interface IOrderItem {
 
     String getSlug();
 
-    String getImage();
+    IImage getImage();
 
     Long getDetailId();
 

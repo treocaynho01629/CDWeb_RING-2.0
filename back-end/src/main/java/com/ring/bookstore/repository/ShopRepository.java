@@ -29,7 +29,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
             	where concat (s.name, s.owner.username) ilike %:keyword%
             	and (coalesce(:followed) is null or case when :followed = true
                        		then f.id is not null else f.id is null end)
-            	group by s.id, s.owner.id, i.name, f.id
+            	group by s.id, s.owner.id, i.id, f.id
             """)
     Page<IShopDisplay> findShopsDisplay(String keyword,
 										Boolean followed,
@@ -51,7 +51,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 		left join od.items oi
 		where concat (s.name, s.owner.username) ilike %:keyword%
 		and (coalesce(:userId) is null or s.owner.id = :userId)
-		group by s.id, s.owner.id, s.owner.username, i.name
+		group by s.id, s.owner.id, s.owner.username, i.id
 	""")
 	Page<IShop> findShops(String keyword,
 						  Long userId,

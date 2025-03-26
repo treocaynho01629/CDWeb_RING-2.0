@@ -110,7 +110,7 @@ const ShopDisplay = ({ shop, name }) => {
                     height: { xs: 50, md: 75 },
                     marginRight: { xs: 0.5, md: 2 },
                   }}
-                  src={shop?.image ? `${shop.image}?size=small` : null}
+                  src={shop?.image ?? null}
                 >
                   <Store fontSize="large" />
                 </Avatar>

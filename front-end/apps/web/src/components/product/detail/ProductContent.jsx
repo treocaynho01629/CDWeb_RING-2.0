@@ -15,13 +15,16 @@ import {
   Stack,
 } from "@mui/material";
 import { Link } from "react-router";
-import { currencyFormat, numFormat, bookTypes } from "@ring/shared";
+import {
+  currencyFormat,
+  numFormat,
+  getBookType,
+  getImageSize,
+} from "@ring/shared";
 import { useGetMyAddressQuery } from "../../../features/addresses/addressesApiSlice";
 import { useAuth } from "@ring/auth";
-import { scale } from "@cloudinary/url-gen/actions/resize";
 import ProductImages from "@ring/ui/ProductImages";
 import ProductAction from "./ProductAction";
-import cloudinary from "../../../ultils/cloudinary";
 
 const CouponPreview = lazy(() => import("../../coupon/CouponPreview"));
 const AddressPreview = lazy(() => import("../../address/AddressPreview"));
@@ -295,6 +298,9 @@ const policiesPlaceholder = (
 );
 //#endregion
 
+const BookType = getBookType();
+const ImageSize = getImageSize();
+
 const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
   const { username } = useAuth();
   const [addressInfo, setAddressInfo] = useState({
@@ -322,7 +328,6 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
   };
 
   //Images
-
   let initialImages = book?.previews
     ? [].concat(book?.image, book?.previews)
     : [].concat(book?.image);
@@ -336,24 +341,13 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
         alt: `${book?.title} preview image #${index + 1}`,
         width: 600,
         height: 600,
-        srcSet: [
-          {
-            src: srcSet[0],
-            width: 70,
-            height: 70,
-          },
-          {
-            src: srcSet[2],
-            width: 375,
-            height: 375,
-          },
-          {
-            src: srcSet[3],
-            width: 450,
-            height: 450,
-          },
-          { src: image?.url, width: 600, height: 600 },
-        ],
+        srcSet: Object.values(ImageSize)
+          .map((size, index) => ({
+            src: srcSet[size.value],
+            width: size.width,
+            height: size.width,
+          }))
+          .concat({ src: image?.url, width: 600, height: 600 }),
         sizes: "(min-width: 450px) 450px, 100vw",
       };
     }
@@ -443,7 +437,7 @@ const ProductContent = ({ book, handleToggleReview, pending, setPending }) => {
                     <>
                       Hình thức bìa: &nbsp;
                       <Link to={`/store?types=${book?.type}`}>
-                        {bookTypes[book?.type]}
+                        {BookType[book?.type]?.label}
                       </Link>
                     </>
                   ) : (

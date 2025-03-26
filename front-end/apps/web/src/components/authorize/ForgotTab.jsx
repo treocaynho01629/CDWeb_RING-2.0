@@ -1,13 +1,13 @@
 import { Stack, TextField } from "@mui/material";
 import { useEffect, useState, Suspense, lazy } from "react";
 import { useForgotMutation } from "../../features/auth/authApiSlice";
-import { EMAIL_REGEX } from "@ring/shared/regex";
+import { EMAIL_REGEX } from "@ring/shared/ultils/regex";
 import { Instruction } from "@ring/ui/Components";
 import { AuthTitle, ConfirmButton } from "@ring/ui/AuthComponents";
 import { MarkEmailReadOutlined } from "@mui/icons-material";
 import { keyframes } from "@emotion/react";
-import styled from "@emotion/styled";
 import { Link } from "react-router";
+import styled from "@emotion/styled";
 
 const ReCaptcha = lazy(() => import("@ring/auth/ReCaptcha"));
 

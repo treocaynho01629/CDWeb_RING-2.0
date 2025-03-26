@@ -30,7 +30,7 @@ import {
 import { NavLink } from "react-router";
 import { MobileExtendButton } from "@ring/ui/Components";
 import { useAuth } from "@ring/auth";
-import { numFormat, orderTypes, roleTypes } from "@ring/shared";
+import { numFormat, getOrderStatus, getUserRole } from "@ring/shared";
 
 //#region styled
 const ListContainer = styled.div`
@@ -251,33 +251,36 @@ const NavItem = styled(NavLink)`
 `;
 //#endregion
 
+const OrderStatus = getOrderStatus();
+const UserRole = getUserRole();
+
 const items = [
   {
     label: "Đang xử lý",
     icon: <PendingOutlined />,
-    url: `/profile/order?status=${orderTypes.PENDING.value}`,
+    url: `/profile/order?status=${OrderStatus.PENDING.value}`,
   },
   {
     label: "Đang vận chuyển",
     icon: <LocalShippingOutlined />,
-    url: `/profile/order?status=${orderTypes.SHIPPING.value}`,
+    url: `/profile/order?status=${OrderStatus.SHIPPING.value}`,
   },
   {
     label: "Đã giao",
     icon: <DomainVerification />,
-    url: `/profile/order?status=${orderTypes.COMPLETED.value}`,
+    url: `/profile/order?status=${OrderStatus.COMPLETED.value}`,
   },
   {
     label: "Đổi trả",
     icon: <Replay />,
-    url: `/profile/order?status=${orderTypes.REFUNDED.value}`,
+    url: `/profile/order?status=${OrderStatus.REFUNDED.value}`,
   },
 ];
 
 const ProfileTabsList = ({ profile, loading, tabletMode }) => {
   const { username, image, roles } = useAuth();
   const [open, setOpen] = useState(true);
-  const currRole = roleTypes[roles?.find((role) => role.startsWith("ROLE_"))];
+  const currRole = UserRole[roles?.find((role) => role.startsWith("ROLE_"))];
 
   const toggleOpen = (e) => {
     e.preventDefault();

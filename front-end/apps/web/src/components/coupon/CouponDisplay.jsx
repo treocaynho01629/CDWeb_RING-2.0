@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
-import { couponTypes } from "@ring/shared";
+import { getCouponType, iconList } from "@ring/shared";
+import { Suspense } from "react";
 
 //#region styled
 const CouponContainer = styled.div`
@@ -140,12 +141,19 @@ const CouponDesc = styled.b`
 `;
 //#endregion
 
+const CouponType = getCouponType();
+
 const CouponDisplay = ({ coupon }) => {
-  const summary = couponTypes[coupon?.type];
+  const summary = CouponType[coupon?.type];
+  const Icon = iconList[summary?.icon];
 
   return (
     <CouponContainer>
-      <CouponIcon color={summary?.color}>{summary?.icon}</CouponIcon>
+      <CouponIcon color={summary?.color}>
+        <Suspense fallback={null}>
+          <Icon />
+        </Suspense>
+      </CouponIcon>
       <CouponDesc>{coupon?.summary}</CouponDesc>
     </CouponContainer>
   );

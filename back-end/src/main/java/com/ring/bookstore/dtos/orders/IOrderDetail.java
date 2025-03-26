@@ -1,5 +1,6 @@
 package com.ring.bookstore.dtos.orders;
 
+import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.model.OrderDetail;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ public interface IOrderDetail {
 
     String getName();
 
-    String getImage();
+    IImage getImage();
 
     String getAddress();
 

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, Suspense, lazy } from "react";
 import { Grow, Paper, Stack, TextField } from "@mui/material";
 import { useRegisterMutation } from "../../features/auth/authApiSlice";
-import { USER_REGEX, EMAIL_REGEX } from "@ring/shared/regex";
+import { USER_REGEX, EMAIL_REGEX } from "@ring/shared/ultils/regex";
 import {
   AuthHighlight,
   AuthText,
@@ -149,7 +149,7 @@ const RegisterTab = ({
   };
 
   const validRegister = [validName, validPass, validMatch, validEmail].every(
-    Boolean,
+    Boolean
   );
 
   return (

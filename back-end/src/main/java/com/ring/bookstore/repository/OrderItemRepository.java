@@ -13,7 +13,7 @@ import java.util.List;
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     @Query("""
         select oi as item,
-        b.id as bookId, b.title as title, b.slug as slug, i.name as image,
+        b.id as bookId, b.title as title, b.slug as slug, i as image,
         od.id as detailId, od.totalPrice as totalPrice, od.shippingFee as shippingFee,
         od.shippingDiscount as shippingDiscount, od.discount as discount, od.status as status,
         s.id as shopId, s.name as shopName
@@ -31,7 +31,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
         select o.id as orderId, a.name as name, a.companyName as companyName,
         a.city as city, a.address as address, o.orderMessage as message, a.phone as phone,
         o.createdDate as orderedDate, o.lastModifiedDate as date, oi as item, o.paymentType as paymentType,
-        b.id as bookId, b.title as title, b.slug as slug, i.name as image, o.shippingType as shippingType,
+        b.id as bookId, b.title as title, b.slug as slug, i as image, o.shippingType as shippingType,
         od.id as detailId, od.totalPrice as totalPrice, od.shippingFee as shippingFee,
         od.shippingDiscount as shippingDiscount, od.discount as discount, od.status as status,
         s.id as shopId, s.name as shopName

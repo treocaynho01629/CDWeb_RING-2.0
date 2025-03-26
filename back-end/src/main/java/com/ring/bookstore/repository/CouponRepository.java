@@ -27,7 +27,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     boolean hasUserUsedCoupon(Long id, Long userId);
 
     @Query("""
-            	select c as coupon, s.name as shopName, i.name as image
+            	select c as coupon, s.name as shopName, i as image
                 from Coupon c
                 join fetch c.detail cd
                 left join c.shop s
@@ -39,7 +39,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
             	and (coalesce(:shopId) is null or c.shop.id = :shopId)
             	and (coalesce(:byShop) is null or case when :byShop = true
             		then c.shop.id is not null else c.shop.id is null end)
-            	group by c.id, cd.id, s.name, i.name
+            	group by c.id, cd.id, s.name, i.id
             """)
     Page<ICoupon> findCoupon(List<CouponType> types,
                              List<String> codes,
@@ -79,7 +79,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
                               List<Long> ids);
 
     @Query("""
-            	select c as coupon, s.name as shopName, i.name as image
+            	select c as coupon, s.name as shopName, i as image
                 from Coupon c
                 join fetch c.detail cd
                 left join c.shop s
@@ -97,7 +97,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     List<ICoupon> recommendCoupons(List<Long> shopIds);
 
     @Query("""
-               select c as coupon, s.name as shopName, i.name as image
+               select c as coupon, s.name as shopName, i as image
                from Coupon c
                join fetch c.detail cd
                left join c.shop s
@@ -107,7 +107,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     List<ICoupon> findCouponInCodes(List<String> codes);
 
     @Query("""
-            	select c as coupon, s.name as shopName, i.name as image
+            	select c as coupon, s.name as shopName, i as image
                 from Coupon c
                 join fetch c.detail cd
                 left join c.shop s
@@ -118,14 +118,14 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
             			com.ring.bookstore.enums.CouponType.SHIPPING) and cd.attribute < :value)
             		or (coalesce(:quantity) is null
             			or (cd.type = com.ring.bookstore.enums.CouponType.MIN_AMOUNT and cd.attribute < :quantity)))
-            	group by c.shop.id, c.id, cd.id, cd.attribute, cd.discount, cd.maxDiscount, s.name, i.name
+            	group by c.shop.id, c.id, cd.id, cd.attribute, cd.discount, cd.maxDiscount, s.name, i.id
             	order by cd.attribute asc, cd.discount desc, cd.maxDiscount desc
             	limit 1
             """)
     Optional<ICoupon> recommendCoupon(Long shopId, Double value, Integer quantity);
 
     @Query("""
-            	select c as coupon, s.name as shopName, i.name as image
+            	select c as coupon, s.name as shopName, i as image
                 from Coupon c
                 join fetch c.detail cd
                 left join c.shop s
@@ -135,7 +135,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     Optional<ICoupon> findCouponByCode(String code);
 
     @Query("""
-            	select c as coupon, s.name as shopName, i.name as image
+            	select c as coupon, s.name as shopName, i as image
                 from Coupon c
                 join fetch c.detail cd
                 left join c.shop s

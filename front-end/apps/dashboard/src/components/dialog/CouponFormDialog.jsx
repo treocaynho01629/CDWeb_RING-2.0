@@ -11,7 +11,7 @@ import {
   Button,
 } from "@mui/material";
 import { Check, Close as CloseIcon, Loyalty } from "@mui/icons-material";
-import { couponTypeItems, couponTypes } from "@ring/shared";
+import { getCouponType } from "@ring/shared";
 import { Title } from "../custom/Components";
 import { useGetPreviewShopsQuery } from "../../features/shops/shopsApiSlice";
 import { currencyFormat } from "@ring/shared";
@@ -23,6 +23,8 @@ import {
   useCreateCouponMutation,
   useUpdateCouponMutation,
 } from "../../features/coupons/couponsApiSlice";
+
+const CouponType = getCouponType();
 
 const NumericFormatCustom = forwardRef(
   function NumericFormatCustom(props, ref) {
@@ -72,7 +74,7 @@ const CouponFormDialog = ({
   const [expireDate, setExpireDate] = useState(dayjs());
   const [currShop, setCurrShop] = useState(shop ?? "");
   const [openShop, setOpenShop] = useState(false);
-  const [type, setType] = useState(couponTypeItems[0].value);
+  const [type, setType] = useState(Object.values(CouponType)[0].value);
   const [err, setErr] = useState([]);
   const [errMsg, setErrMsg] = useState("");
 
@@ -108,7 +110,7 @@ const CouponFormDialog = ({
     setDiscount(0);
     setUsage(0);
     setExpireDate(dayjs());
-    setType(couponTypeItems[0].value);
+    setType(Object.values(CouponType)[0].value);
     setCurrShop(currShop);
     setErr([]);
     setErrMsg("");
@@ -265,7 +267,7 @@ const CouponFormDialog = ({
                 value={type}
                 onChange={(e) => setType(e.target.value)}
               >
-                {couponTypeItems.map((option) => (
+                {Object.values(BookType).map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>
@@ -276,7 +278,7 @@ const CouponFormDialog = ({
               <Title>Chi tiết mã giảm giá</Title>
             </Grid>
             <Grid size={{ xs: 12, md: 4 }}>
-              {type == couponTypes.MIN_AMOUNT.value ? (
+              {type == CouponType.MIN_AMOUNT.value ? (
                 <NumericFormat
                   required
                   id="attribute"

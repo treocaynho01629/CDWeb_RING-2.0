@@ -26,7 +26,7 @@ import { Link } from "react-router";
 import { StyledDialogTitle } from "../custom/ProfileComponents";
 import { PatternFormat } from "react-number-format";
 import { useAuth } from "@ring/auth";
-import { PHONE_REGEX, useConfirm, genderTypeItems } from "@ring/shared";
+import { PHONE_REGEX, useConfirm, getGenderType } from "@ring/shared";
 import dayjs from "dayjs";
 
 const DatePicker = lazy(() => import("@ring/ui/DatePicker"));
@@ -127,6 +127,7 @@ const BadgeButton = styled.span`
 `;
 //#endregion
 
+const GenderType = getGenderType();
 const allowedExtensions = ["jpeg", "jpg", "png", "gif", "svg"],
   sizeLimit = 2_097_152; //2MB
 
@@ -558,7 +559,7 @@ const ProfileDetail = ({
                         size="small"
                         fullWidth
                       >
-                        {genderTypeItems?.map((gender, index) => (
+                        {Object.values(GenderType).map((gender, index) => (
                           <MenuItem
                             key={`menu-${gender?.value}-${index}`}
                             value={gender?.value}
@@ -593,7 +594,7 @@ const ProfileDetail = ({
                       value={gender}
                       onChange={(e) => setGender(e.target.value)}
                     >
-                      {genderTypeItems?.map((gender, index) => (
+                      {Object.values(GenderType).map((gender, index) => (
                         <FormControlLabel
                           key={`radio-${gender?.value}-${index}`}
                           value={gender?.value}

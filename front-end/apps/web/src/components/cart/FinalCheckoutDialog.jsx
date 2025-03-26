@@ -24,7 +24,7 @@ import {
   LocalActivityOutlined,
 } from "@mui/icons-material";
 import { lazy, Suspense, useRef, useState } from "react";
-import { currencyFormat, addressTypes } from "@ring/shared";
+import { currencyFormat, getAddressType } from "@ring/shared";
 import CouponDisplay from "../coupon/CouponDisplay";
 import PriceDisplay from "./PriceDisplay";
 import NumberFlow from "@number-flow/react";
@@ -103,6 +103,8 @@ const AddressDivider = styled.div`
 `;
 //#endregion
 
+const AddressType = getAddressType();
+
 const FinalCheckoutDialog = ({
   coupon,
   discount,
@@ -127,7 +129,7 @@ const FinalCheckoutDialog = ({
   const toggleDrawer = (newOpen) => {
     setOpen(newOpen);
   };
-  const address = addressInfo?.type ? addressTypes[addressInfo.type] : null;
+  const address = addressInfo?.type ? AddressType[addressInfo.type] : null;
 
   //Prevent overlap
   useOffset(overlapRef);
@@ -169,7 +171,7 @@ const FinalCheckoutDialog = ({
         {mobileMode ? (
           <div ref={overlapRef}>
             <CheckoutStack>
-              <CouponButton onClick={handleOpenDialog}>
+              <CouponButton onClick={() => handleOpenDialog()}>
                 <span>
                   <LocalActivityOutlined color="error" />
                   &nbsp;
@@ -236,7 +238,7 @@ const FinalCheckoutDialog = ({
         ) : tabletMode ? (
           <CheckoutBox className="sticky" ref={overlapRef}>
             <CheckoutStack>
-              <CouponButton onClick={handleOpenDialog}>
+              <CouponButton onClick={() => handleOpenDialog()}>
                 <span>
                   <LocalActivityOutlined color="error" />
                   &nbsp;
@@ -346,7 +348,7 @@ const FinalCheckoutDialog = ({
                 <CheckoutRow>
                   {coupon && <CouponDisplay coupon={coupon} />}
                 </CheckoutRow>
-                <CouponButton onClick={handleOpenDialog}>
+                <CouponButton onClick={() => handleOpenDialog()}>
                   <span>
                     <LocalActivityOutlined color="error" />
                     &nbsp;

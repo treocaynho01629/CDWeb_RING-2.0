@@ -1,11 +1,5 @@
 import styled from "@emotion/styled";
-import {
-  BookOnline,
-  CreditCard,
-  LocalAtm,
-  Payments,
-  QrCode2,
-} from "@mui/icons-material";
+import { CreditCard, QrCode2 } from "@mui/icons-material";
 import {
   Checkbox,
   FormControlLabel,

@@ -5,7 +5,7 @@ import {
   KeyboardArrowRight,
   Storefront,
 } from "@mui/icons-material";
-import { orderTypes, currencyFormat } from "@ring/shared";
+import { currencyFormat, getOrderStatus } from "@ring/shared";
 import { Link } from "react-router";
 import {
   ItemTitle,
@@ -108,8 +108,10 @@ const MainButton = styled(Button)`
 `;
 //#endregion
 
+const OrderStatus = getOrderStatus();
+
 const OrderItem = ({ order, handleAddToCart, handleCancelOrder }) => {
-  const detailStatus = orderTypes[order?.status];
+  const detailStatus = OrderStatus[order?.status];
 
   return (
     <OrderItemContainer>
@@ -133,14 +135,14 @@ const OrderItem = ({ order, handleAddToCart, handleCancelOrder }) => {
         >
           <BodyContainer
             className={
-              order?.status == orderTypes.CANCELED.value ||
-              order?.status == orderTypes.REFUNDED.value
+              order?.status == OrderStatus.CANCELED.value ||
+              order?.status == OrderStatus.REFUNDED.value
                 ? "disabled"
                 : ""
             }
           >
             <StyledLazyImage
-              src={`${item?.image}?size=small`}
+              src={item?.image}
               alt={`${item?.bookTitle} Order item`}
               placeholder={
                 <StyledSkeleton variant="rectangular" animation={false} />
@@ -197,8 +199,8 @@ const OrderItem = ({ order, handleAddToCart, handleCancelOrder }) => {
             </Price>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-            {order?.status == orderTypes.PENDING.value ||
-            order?.status == orderTypes.SHIPPING.value ? (
+            {order?.status == OrderStatus.PENDING.value ||
+            order?.status == OrderStatus.SHIPPING.value ? (
               <MainButton
                 variant="outlined"
                 color="error"

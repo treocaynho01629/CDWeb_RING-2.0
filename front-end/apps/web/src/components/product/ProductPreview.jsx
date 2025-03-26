@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { Link } from "react-router";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Skeleton } from "@mui/material";
-import { currencyFormat } from "@ring/shared";
+import { currencyFormat, getImageSize } from "@ring/shared";
 
 //#region styled
 const Container = styled.div`
@@ -116,13 +116,15 @@ const StyledSkeleton = styled(Skeleton)`
 `;
 //#endregion
 
+const ImageSize = getImageSize();
+
 const ProductPreview = ({ book, scrollPosition }) => {
   return (
     <Container>
       {book ? (
         <Link to={`/product/${book?.slug}`} style={{ width: "100%" }}>
           <StyledLazyImage
-            src={book?.image?.srcSet[1]}
+            src={book?.image?.srcSet[ImageSize.SMALL.value]}
             alt={`${book?.title} Thumbnail`}
             width={"100%"}
             scrollPosition={scrollPosition}

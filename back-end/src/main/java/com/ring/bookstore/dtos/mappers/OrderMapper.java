@@ -3,13 +3,18 @@ package com.ring.bookstore.dtos.mappers;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.ring.bookstore.dtos.orders.*;
 import com.ring.bookstore.model.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+@RequiredArgsConstructor
 @Service
 public class OrderMapper {
+
+    private final Cloudinary cloudinary;
 
     public ReceiptDTO orderToDTO(OrderReceipt order) {
         List<OrderDetail> orderDetails = order.getDetails();
@@ -42,12 +47,13 @@ public class OrderMapper {
         for (IOrderItem projectedItem : items) {
             OrderItem item = projectedItem.getItem(); //Get Item
 
-            String fileDownloadUri = projectedItem.getImage() != null ?
-                    ServletUriComponentsBuilder
-                            .fromCurrentContextPath()
-                            .path("/api/images/")
-                            .path(projectedItem.getImage())
-                            .toUriString()
+            String url = projectedItem.getImage() != null ?
+                    cloudinary.url().transformation(new Transformation()
+                                    .aspectRatio("1.0")
+                                    .width(90)
+                                    .quality("auto")
+                                    .fetchFormat("auto"))
+                            .secure(true).generate(projectedItem.getImage().getPublicId())
                     : null;
 
             var newItem = OrderItemDTO.builder().id(item.getId())
@@ -57,7 +63,7 @@ public class OrderMapper {
                     .bookId(projectedItem.getBookId())
                     .bookTitle(projectedItem.getTitle())
                     .bookSlug(projectedItem.getSlug())
-                    .image(fileDownloadUri)
+                    .image(url)
                     .build();
 
             if (!ordersMap.containsKey(projectedItem.getDetailId())) { //Insert if not exist
@@ -91,12 +97,13 @@ public class OrderMapper {
         for (IOrderDetail projectedDetail : details) {
             OrderDetail detail = projectedDetail.getDetail(); //Get detail
 
-            String fileDownloadUri = projectedDetail.getImage() != null ?
-                    ServletUriComponentsBuilder
-                            .fromCurrentContextPath()
-                            .path("/api/images/")
-                            .path(projectedDetail.getImage())
-                            .toUriString()
+            String url = projectedDetail.getImage() != null ?
+                    cloudinary.url().transformation(new Transformation()
+                                    .aspectRatio("1.0")
+                                    .width(90)
+                                    .quality("auto")
+                                    .fetchFormat("auto"))
+                            .secure(true).generate(projectedDetail.getImage().getPublicId())
                     : null;
 
             var newDetail = OrderDTO.builder().id(detail.getId())
@@ -117,7 +124,7 @@ public class OrderMapper {
                 var newReceipt = ReceiptDTO.builder().id(projectedDetail.getOrderId())
                         .email(projectedDetail.getEmail())
                         .name(projectedDetail.getName())
-                        .image(fileDownloadUri)
+                        .image(url)
                         .phone(projectedDetail.getPhone())
                         .address(projectedDetail.getAddress())
                         .message(projectedDetail.getMessage())
@@ -157,7 +164,12 @@ public class OrderMapper {
 
     public OrderItemDTO itemToDTO(OrderItem item) {
         Book book = item.getBook();
-        String fileDownloadUri = "FIXLATER";
+        String url = cloudinary.url().transformation(new Transformation()
+                                .aspectRatio("1.0")
+                                .width(90)
+                                .quality("auto")
+                                .fetchFormat("auto"))
+                        .secure(true).generate(book.getImage().getPublicId());
 
         return new OrderItemDTO(item.getId(),
                 item.getPrice(),
@@ -165,7 +177,7 @@ public class OrderMapper {
                 item.getQuantity(),
                 book.getId(),
                 book.getSlug(),
-                fileDownloadUri,
+                url,
                 book.getTitle());
     }
 
@@ -194,12 +206,13 @@ public class OrderMapper {
         for (IOrderDetailItem projectedItem : items) {
             OrderItem item = projectedItem.getItem(); //Get Item
 
-            String fileDownloadUri = projectedItem.getImage() != null ?
-                    ServletUriComponentsBuilder
-                            .fromCurrentContextPath()
-                            .path("/api/images/")
-                            .path(projectedItem.getImage())
-                            .toUriString()
+            String url = projectedItem.getImage() != null ?
+                    cloudinary.url().transformation(new Transformation()
+                                    .aspectRatio("1.0")
+                                    .width(90)
+                                    .quality("auto")
+                                    .fetchFormat("auto"))
+                            .secure(true).generate(projectedItem.getImage().getPublicId())
                     : null;
 
             var newItem = OrderItemDTO.builder().id(item.getId())
@@ -209,7 +222,7 @@ public class OrderMapper {
                     .bookId(projectedItem.getBookId())
                     .bookTitle(projectedItem.getTitle())
                     .bookSlug(projectedItem.getSlug())
-                    .image(fileDownloadUri)
+                    .image(url)
                     .build();
 
             result.items().add(newItem);

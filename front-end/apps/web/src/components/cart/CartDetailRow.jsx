@@ -16,7 +16,7 @@ import {
   SpaceTableRow,
   StyledTableCell,
 } from "../custom/TableComponents";
-import { currencyFormat } from "@ring/shared";
+import { currencyFormat, getImageSize } from "@ring/shared";
 import { StyledCheckbox } from "../custom/CartComponents";
 import AmountInput from "../custom/AmountInput";
 
@@ -190,6 +190,7 @@ const StyledIconButton = styled(IconButton)`
 `;
 //#endregion
 
+const ImageSize = getImageSize();
 const MIN_VALUE = 1;
 const MAX_VALUE = 199;
 
@@ -233,7 +234,7 @@ function ItemRow({
         <ItemContainer>
           <Link to={`/product/${product.slug}`}>
             <StyledLazyImage
-              src={product?.image?.srcSet[1]}
+              src={product?.image?.srcSet[ImageSize.SMALL.value]}
               alt={`${product.title} Cart item`}
               placeholder={
                 <StyledSkeleton variant="rectangular" animation={false} />

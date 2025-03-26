@@ -133,6 +133,7 @@ const ReviewItem = ({ review, username, isPreview, handleClick }) => {
                   height: { xs: 30, md: 40 },
                   marginRight: 1,
                 }}
+                src={review?.userImage ?? null}
               />
               <div>
                 <RatingInfo>{review?.username}</RatingInfo>

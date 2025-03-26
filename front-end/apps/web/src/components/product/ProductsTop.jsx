@@ -4,7 +4,7 @@ import {
   LazyLoadImage,
   trackWindowScroll,
 } from "react-lazy-load-image-component";
-import { currencyFormat, numFormat } from "@ring/shared";
+import { currencyFormat, getImageSize, numFormat } from "@ring/shared";
 import { useEffect, useState } from "react";
 import { Star, StarBorder, StarRounded } from "@mui/icons-material";
 import { Link } from "react-router";
@@ -263,12 +263,14 @@ const ProductShop = styled.span`
 `;
 //#endregion
 
+const ImageSize = getImageSize();
+
 const TopItem = ({ book, scrollPosition }) => {
   return (
     <ItemContainer>
       {book ? (
         <StyledLazyImage
-          src={book?.image?.srcSet[1]}
+          src={book?.image?.srcSet[ImageSize.SMALL.value]}
           alt={`Top item: ${book?.title}`}
           scrollPosition={scrollPosition}
           placeholder={
@@ -408,25 +410,16 @@ const ProductsTop = ({
       </MessageContainer>
     );
 
-    let srcSet = [
-      {
-        src: selectedBook?.image?.srcSet[2],
-        width: 375,
-      },
-      {
-        src: selectedBook?.image?.srcSet[3],
-        width: 450,
-      },
-      { src: selectedBook?.image?.url, width: 600 },
-    ];
-
     product = selectedBook ? (
       <Link to={`/product/${selectedBook?.slug}`}>
         <Display>
           <StyledDisplayLazyImage
             src={selectedBook?.image?.url}
-            srcSet={srcSet
-              .map((item) => `${item.src} ${item.width}w`)
+            srcSet={Object.values(ImageSize)
+              .map(
+                (size) =>
+                  `${selectedBook?.image.srcSet[size.value]} ${size.width}w`
+              )
               .join(", ")}
             sizes="(min-width: 450px) 450px, 100vw"
             alt={`${selectedBook?.title} showcase image`}

@@ -50,7 +50,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
     @Query("""
         select distinct od as detail,
         o.id as orderId, s.name as shopName, u.email as email, u.username as username,
-        a.phone as phone, a.name as name, i.name as image, a.address as address, o.orderMessage as message,
+        a.phone as phone, a.name as name, i as image, a.address as address, o.orderMessage as message,
         o.createdDate as date, o.total as total, o.totalDiscount as totalDiscount,
         sum(oi.quantity) as totalItems
         from OrderDetail od

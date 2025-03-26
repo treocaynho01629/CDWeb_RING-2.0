@@ -53,4 +53,5 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
         and i.id in :imageIds
     """)
     List<Long> findBookImages(Long bookId, List<Long> imageIds);
+
 }

@@ -5,6 +5,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ring.bookstore.model.Image;
 
+import java.util.List;
+
 @Service
 public interface ImageService {
 
@@ -31,6 +33,8 @@ public interface ImageService {
 //    void deleteImages(List<Long> ids);
 
     Image upload(MultipartFile file, String folderName);
+
+    List<Image> uploadMultiple(List<MultipartFile> files, String folderName);
 
     String deleteImage(String publicId);
 

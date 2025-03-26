@@ -24,7 +24,7 @@ import {
   useGetCouponQuery,
   useGetCouponsQuery,
 } from "../../features/coupons/couponsApiSlice";
-import { couponTypes } from "@ring/shared";
+import { getCouponType } from "@ring/shared";
 import { Instruction } from "@ring/ui/Components";
 import { trackWindowScroll } from "react-lazy-load-image-component";
 import CouponItem from "./CouponItem";
@@ -78,6 +78,7 @@ const Showmore = styled.div`
 `;
 //#endregion
 
+const CouponType = getCouponType();
 const defaultSize = 4;
 const DEFAULT_PAGINATON = {
   number: 0,
@@ -117,7 +118,7 @@ const CouponDialog = ({
   } = useGetCouponsQuery(
     {
       shopId,
-      types: [couponTypes.SHIPPING.value],
+      types: [CouponType.SHIPPING.value],
       byShop: shopId != null,
       cValue: checkState?.value,
       cQuantity: checkState?.quantity,
@@ -133,7 +134,7 @@ const CouponDialog = ({
         shopId,
         types: saved
           ? []
-          : [couponTypes.MIN_VALUE.value, couponTypes.MIN_AMOUNT.value],
+          : [CouponType.MIN_VALUE.value, CouponType.MIN_AMOUNT.value],
         codes: saved
           ? savedCoupons?.length > 0
             ? savedCoupons
@@ -277,7 +278,7 @@ const CouponDialog = ({
         <DetailTitle>Mã vận chuyển</DetailTitle>
         {ids?.map((id, index) => {
           const coupon = entities[id];
-          const summary = couponTypes[coupon?.type];
+          const summary = CouponType[coupon?.type];
           const isDisabled = selectMode && !coupon.isUsable;
           const isSelected = tempCoupon?.id == id;
           const isSaved = savedCoupons?.indexOf(coupon?.code) != -1;
@@ -324,7 +325,7 @@ const CouponDialog = ({
         <DetailTitle>{saved ? "Mã đã lưu" : "Mã giảm giá"}</DetailTitle>
         {ids?.map((id, index) => {
           const coupon = entities[id];
-          const summary = couponTypes[coupon?.type];
+          const summary = CouponType[coupon?.type];
           const isDisabled = selectMode && !coupon.isUsable;
           const isSelected = tempCoupon?.id == id;
           const isSaved = savedCoupons?.indexOf(coupon?.code) != -1;
@@ -349,7 +350,7 @@ const CouponDialog = ({
   }
 
   if (currCoupon) {
-    const summary = couponTypes[currCoupon?.type];
+    const summary = CouponType[currCoupon?.type];
     const isDisabled =
       selectMode && (!currCoupon?.isUsable || currCoupon?.shopId != shopId);
     const isUsed =

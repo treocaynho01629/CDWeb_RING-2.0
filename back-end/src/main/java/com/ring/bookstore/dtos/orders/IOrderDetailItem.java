@@ -1,5 +1,6 @@
 package com.ring.bookstore.dtos.orders;
 
+import com.ring.bookstore.dtos.images.IImage;
 import com.ring.bookstore.enums.OrderStatus;
 import com.ring.bookstore.enums.PaymentType;
 import com.ring.bookstore.enums.ShippingType;
@@ -34,7 +35,7 @@ public interface IOrderDetailItem {
 
     String getSlug();
 
-    String getImage();
+    IImage getImage();
 
     Long getDetailId();
 

@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
-import { getPaymentContent, paymentItems } from "@ring/shared";
+import { getPaymentContent, getPaymentType } from "@ring/shared";
 
 //#region styled
 const StyledForm = styled(FormControlLabel)`
@@ -50,12 +50,14 @@ const PaymentContainer = styled.div`
 `;
 //#endregion
 
+const PaymentType = getPaymentType();
+
 const PaymentSelect = ({ value, handleChange }) => {
   return (
     <>
       <RadioContainer>
         <RadioGroup spacing={1} row value={value} onChange={handleChange}>
-          {paymentItems.map((item, index) => (
+          {Object.values(PaymentType).map((item, index) => (
             <StyledForm
               key={index}
               sx={{ width: "100%" }}
