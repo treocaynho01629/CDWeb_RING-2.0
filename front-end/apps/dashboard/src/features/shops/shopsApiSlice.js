@@ -122,7 +122,7 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
     }),
     deleteShops: builder.mutation({
       query: (ids) => ({
-        url: `/api/shops/delete-multiples?ids=${ids}`,
+        url: `/api/shops/delete-multiple?ids=${ids}`,
         method: "DELETE",
       }),
       invalidatesTags: (result, error) => [{ type: "Shop", id: "LIST" }],

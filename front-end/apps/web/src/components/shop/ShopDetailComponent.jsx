@@ -104,7 +104,7 @@ const ShopDetailComponent = ({ shop, name }) => {
             </ShopInfo>
           ) : (
             <ShopInfo>
-              <Link to={`/store?shopId=${shop?.id}`}>
+              <Link to={`/shop/${shop?.id}`}>
                 <Avatar
                   alt={`${name || shop?.name} shop avatar`}
                   sx={{
@@ -123,7 +123,7 @@ const ShopDetailComponent = ({ shop, name }) => {
                 alignItems="center"
                 flexGrow={1}
               >
-                <Link to={`/store?shopId=${shop?.id}`}>
+                <Link to={`/shop/${shop?.id}`}>
                   <Box mb={{ xs: 0, md: 1 }}>
                     <ShopName>{shop?.name}</ShopName>
                     <Verified>
@@ -205,7 +205,7 @@ const ShopDetailComponent = ({ shop, name }) => {
                 <ShopDetail>
                   <LocalActivity />
                   Đánh giá:
-                  <b>{`${shop?.rating} (${numFormat.format(shop?.totalReviews)} đánh giá)`}</b>
+                  <b>{`${(shop?.rating ?? 0).toFixed(1)} (${numFormat.format(shop?.totalReviews)} đánh giá)`}</b>
                 </ShopDetail>
                 <ShopDetail>
                   <AutoStories />

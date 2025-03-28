@@ -21,7 +21,7 @@ const ShopSelect = ({ open, anchorEl, handleClose, shop, setShop, data }) => {
             sx={{ px: 1, fontSize: 14 }}
           >
             <Avatar
-              src={shop?.image ? shop.image + "?size=tiny" : null}
+              src={shop?.image ?? null}
               sx={{ width: 22, height: 22, mr: 1 }}
             >
               <Store fontSize="small" />

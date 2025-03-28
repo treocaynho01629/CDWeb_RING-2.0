@@ -24,7 +24,7 @@ import {
 import { CustomTab, CustomTabs } from "../components/custom/CustomTabs";
 import { useGetPublishersQuery } from "../features/publishers/publishersApiSlice";
 import { useTitle } from "@ring/shared";
-import { orderTabs } from "../ultils/suggest";
+import { orderTabs } from "../utils/suggest";
 import Placeholder from "@ring/ui/Placeholder";
 import Suggest from "../components/other/Suggest";
 import CustomDivider from "../components/custom/CustomDivider";

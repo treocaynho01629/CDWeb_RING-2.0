@@ -167,7 +167,7 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
     }),
     deleteCoupons: builder.mutation({
       query: (ids) => ({
-        url: `/api/coupons/delete-multiples?ids=${ids}`,
+        url: `/api/coupons/delete-multiple?ids=${ids}`,
         method: "DELETE",
       }),
       invalidatesTags: (result, error) => [{ type: "Coupon", id: "LIST" }],
@@ -188,7 +188,7 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
         if (ids?.length) params.append("ids", ids);
 
         return {
-          url: `/api/coupons/delete-multiples?${params.toString()}`,
+          url: `/api/coupons/delete-multiple?${params.toString()}`,
           method: "DELETE",
         };
       },

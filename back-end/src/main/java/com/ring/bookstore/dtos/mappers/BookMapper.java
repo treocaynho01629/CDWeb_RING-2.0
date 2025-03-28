@@ -3,12 +3,11 @@ package com.ring.bookstore.dtos.mappers;
 import com.ring.bookstore.dtos.books.*;
 import com.ring.bookstore.dtos.categories.CategoryDTO;
 import com.ring.bookstore.dtos.images.IImage;
-import com.ring.bookstore.dtos.images.IImageInfo;
 import com.ring.bookstore.dtos.images.ImageDTO;
-import com.ring.bookstore.dtos.images.ImageInfoDTO;
 import com.ring.bookstore.dtos.publishers.PublisherDTO;
 import com.ring.bookstore.dtos.reviews.ReviewsInfoDTO;
 import com.ring.bookstore.model.Book;
+import com.ring.bookstore.model.Image;
 import com.ring.bookstore.ultils.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class BookMapper {
-    private final ImageMapper imageMapper;
     private final FileUploadUtil fileUploadUtil;
 
     public BookDisplayDTO displayToDTO(IBookDisplay book) {
@@ -123,15 +121,14 @@ public class BookMapper {
                 book.getTitle());
     }
 
-    public BookDTO projectionToDTO(IBook book, List<IImageInfo> imagesList) {
+    public BookDTO projectionToDTO(IBook book, List<Image> imagesList) {
         //Images
-        Optional<ImageInfoDTO> thumbnail = imagesList.stream()
+        Optional<Image> thumbnail = imagesList.stream()
                                                 .filter(item -> item.getId().equals(book.getImage()))
-                                                .findFirst()
-                                                .map(imageMapper::infoToDTO);
-        List<ImageInfoDTO> previews = imagesList.stream()
+                                                .findFirst();
+        List<Image> previews = imagesList.stream()
                                                 .filter(item -> !item.getId().equals(book.getImage()))
-                                                .map(imageMapper::infoToDTO).toList();
+                                                .toList();
 
         //Category
         CategoryDTO cate = new CategoryDTO(

@@ -16,11 +16,20 @@ import {
   HeaderContainer,
   InfoTable,
 } from "../components/custom/Components";
-import { useTitle, bookTypes, currencyFormat } from "@ring/shared";
+import {
+  useTitle,
+  getBookType,
+  getBookLanguage,
+  currencyFormat,
+  getImageSize,
+} from "@ring/shared";
 import ProductImages from "@ring/ui/ProductImages";
 import SummaryTableOrders from "../components/table/SummaryTableOrders";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 
+const BookType = getBookType();
+const BookLanguage = getBookLanguage();
+const ImageSize = getImageSize();
 const maxStocks = 199;
 
 const DetailProduct = () => {
@@ -41,18 +50,26 @@ const DetailProduct = () => {
   let initialImages = data?.previews
     ? [].concat(data?.image, data?.previews)
     : [].concat(data?.image);
-  let images = initialImages.map((image, index) => ({
-    src: image?.url,
-    alt: `${data?.title} preview image #${index + 1}`,
-    width: 600,
-    height: 600,
-    srcSet: [
-      { src: `${image?.url}?size=tiny`, width: 45, height: 45 },
-      { src: `${image?.url}?size=small`, width: 150, height: 150 },
-      { src: `${image?.url}?size=medium`, width: 350, height: 350 },
-      { src: image?.url, width: 600, height: 600 },
-    ],
-  }));
+  let images = initialImages.map((image, index) => {
+    const srcSet = image?.srcSet;
+
+    if (srcSet) {
+      return {
+        src: image?.url,
+        alt: `${book?.title} preview image #${index + 1}`,
+        width: 600,
+        height: 600,
+        srcSet: Object.values(ImageSize)
+          .map((size, index) => ({
+            src: srcSet[size.value],
+            width: size.width,
+            height: size.width,
+          }))
+          .concat({ src: image?.url, width: 600, height: 600 }),
+        sizes: "(min-width: 450px) 450px, 100vw",
+      };
+    }
+  });
 
   const stockProgress = Math.min((data?.amount / maxStocks) * 100, 100);
   const stockColor =
@@ -173,7 +190,7 @@ const DetailProduct = () => {
                   </td>
                   <td>
                     <Typography variant="subtitle1" color="text.secondary">
-                      {bookTypes[data?.type]}
+                      {BookType[data?.type]?.label}
                     </Typography>
                   </td>
                 </tr>

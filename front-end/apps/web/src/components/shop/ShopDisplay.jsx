@@ -102,7 +102,7 @@ const ShopDisplay = ({ shop, name }) => {
             </ShopInfo>
           ) : (
             <ShopInfo>
-              <Link to={`/store?shopId=${shop?.id}`}>
+              <Link to={`/shop/${shop?.id}`}>
                 <Avatar
                   alt={`${name || shop?.name} shop avatar`}
                   sx={{
@@ -121,7 +121,7 @@ const ShopDisplay = ({ shop, name }) => {
                 alignItems="center"
                 flexGrow={1}
               >
-                <Link to={`/store?shopId=${shop?.id}`}>
+                <Link to={`/shop/${shop?.id}`}>
                   <Box mb={{ xs: 0, md: 1 }}>
                     <ShopName>{shop?.name}</ShopName>
                     <Verified>

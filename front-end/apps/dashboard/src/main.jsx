@@ -4,8 +4,9 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import { store, persistor } from "./app/store";
+import { persistor } from "./app/store";
 import { ThemeContextProvider, SnackbarProvider } from "@ring/ui";
+import { store } from "@ring/redux";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -18,5 +19,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         </ThemeContextProvider>
       </PersistGate>
     </Provider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

@@ -13,7 +13,7 @@ import { useGetCategoryQuery } from "../features/categories/categoriesApiSlice";
 import { useGetBooksQuery } from "../features/books/booksApiSlice";
 import { debounce, isEqual } from "lodash-es";
 import { useTitle } from "@ring/shared";
-import { booksAmount, pageSizes, sortBooksBy } from "../ultils/filters";
+import { booksAmount, pageSizes, sortBooksBy } from "../utils/filters";
 import { StoreSuggest, Wrapper } from "../components/custom/SortComponents";
 import { StoreOutlined } from "@mui/icons-material";
 import AppPagination from "../components/custom/AppPagination";

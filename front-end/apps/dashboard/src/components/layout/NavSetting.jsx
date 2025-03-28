@@ -61,7 +61,7 @@ const NavSetting = ({ open, setOpen, image, username }) => {
           <Avatar
             alt={username}
             sx={{ width: 85, height: 85 }}
-            src={image ? image + "?size=small" : null}
+            src={image ?? null}
           />
           <Typography variant="h6" sx={{ mt: 2 }}>
             {username}

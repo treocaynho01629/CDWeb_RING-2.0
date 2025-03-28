@@ -27,7 +27,7 @@ import {
   filterShopsValue,
   pageSizes,
   sortShopsBy,
-} from "../ultils/filters";
+} from "../utils/filters";
 import { useAuth } from "@ring/auth";
 import { Wrapper } from "../components/custom/SortComponents";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";

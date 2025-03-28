@@ -49,7 +49,7 @@ export const publishersApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
@@ -127,7 +127,7 @@ export const publishersApiSlice = apiSlice.injectEndpoints({
     }),
     deletePublishers: builder.mutation({
       query: (ids) => ({
-        url: `/api/publishers/delete-multiples?ids=${ids}`,
+        url: `/api/publishers/delete-multiple?ids=${ids}`,
         method: "DELETE",
       }),
       invalidatesTags: (result, error) => [{ type: "Publisher", id: "LIST" }],
@@ -157,7 +157,7 @@ export const selectPublishersResult =
 
 const selectPublishersData = createSelector(
   selectPublishersResult,
-  (pubsResult) => pubsResult.data,
+  (pubsResult) => pubsResult.data
 );
 
 export const {
@@ -166,5 +166,5 @@ export const {
   selectIds: selectPublisherIds,
   selectEntities: selectPublisherEntities,
 } = pubsAdapter.getSelectors(
-  (state) => selectPublishersData(state) ?? initialState,
+  (state) => selectPublishersData(state) ?? initialState
 );

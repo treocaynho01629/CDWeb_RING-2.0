@@ -232,8 +232,20 @@ public class OrderMapper {
     }
 
     public ReceiptSummaryDTO summaryToDTO(IReceiptSummary projection) {
+        String url = projection.getImage() != null ?
+                cloudinary.url().transformation(new Transformation()
+                                .aspectRatio("1.0")
+                                .width(55)
+                                .crop("thumb")
+                                .chain()
+                                .radius("max")
+                                .quality(50)
+                                .fetchFormat("auto"))
+                        .secure(true).generate(projection.getImage().getPublicId())
+                : null;
+
         return new ReceiptSummaryDTO(projection.getId(),
-                projection.getImage(),
+                url,
                 projection.getName(),
                 projection.getDate(),
                 projection.getTotalPrice(),

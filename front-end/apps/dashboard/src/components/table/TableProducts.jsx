@@ -49,8 +49,8 @@ import {
   currencyFormat,
   idFormatter,
   useDeepEffect,
-  bookTypeItems,
-  bookTypes,
+  getBookType,
+  getImageSize,
 } from "@ring/shared";
 import { publishersApiSlice } from "../../features/publishers/publishersApiSlice";
 import { categoriesApiSlice } from "../../features/categories/categoriesApiSlice";
@@ -58,6 +58,8 @@ import { Progress } from "@ring/ui";
 import CustomTableHead from "./CustomTableHead";
 import CustomTablePagination from "./CustomTablePagination";
 
+const ImageSize = getImageSize();
+const BookType = getBookType();
 const maxStocks = 199;
 
 const headCells = [
@@ -375,7 +377,9 @@ function ProductFilters({ filters, setFilters }) {
             onChange: (e) => handleChangeTypes(e),
             onClose: handleApplyTypes,
             renderValue: (selected) => {
-              const filteredLabel = selected?.map((value) => bookTypes[value]);
+              const filteredLabel = selected?.map(
+                (value) => BookType[value].label
+              );
               return filteredLabel.join(", ");
             },
             MenuProps: {
@@ -390,7 +394,7 @@ function ProductFilters({ filters, setFilters }) {
           },
         }}
       >
-        {bookTypeItems.map((type, index) => (
+        {Object.values(BookType).map((type, index) => (
           <MenuItem key={`type-${type.value}-${index}`} value={type.value}>
             <Checkbox
               sx={{ py: 0.5, pr: 1, pl: 0 }}
@@ -797,7 +801,7 @@ export default function TableProducts({
                 style={{ display: "flex", alignItems: "center" }}
               >
                 <LazyLoadImage
-                  src={`${book.image}?size=tiny`}
+                  src={book?.image?.srcSet[ImageSize.TINY.value]}
                   height={45}
                   width={45}
                   style={{ marginRight: "10px" }}

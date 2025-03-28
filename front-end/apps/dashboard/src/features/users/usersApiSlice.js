@@ -120,7 +120,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     }),
     deleteUsers: builder.mutation({
       query: (ids) => ({
-        url: `/api/accounts/delete-multiples?ids=${ids}`,
+        url: `/api/accounts/delete-multiple?ids=${ids}`,
         method: "DELETE",
         credentials: "include",
       }),

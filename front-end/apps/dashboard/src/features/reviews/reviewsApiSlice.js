@@ -66,7 +66,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
     }),
     deleteReviews: builder.mutation({
       query: (ids) => ({
-        url: `/api/reviews/delete-multiples?ids=${ids}`,
+        url: `/api/reviews/delete-multiple?ids=${ids}`,
         method: "DELETE",
       }),
       invalidatesTags: (result, error) => [{ type: "Review", id: "LIST" }],

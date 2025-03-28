@@ -3,12 +3,13 @@ import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import { RequireAuth, PersistLogin } from "@ring/auth";
 import { Layout, FallbackLogo } from "@ring/ui";
-import { useReachable } from "@ring/shared";
+import { useGetEnums, useReachable } from "@ring/shared";
 import PageLayout from "./components/layout/PageLayout";
 import "react-multi-carousel/lib/styles.css";
 
 function App() {
   useReachable(); //Test connection to server
+  useGetEnums();
 
   const router = createBrowserRouter(
     [

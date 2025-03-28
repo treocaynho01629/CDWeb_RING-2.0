@@ -7,7 +7,7 @@ import {
 import { Star, StarBorder } from "@mui/icons-material";
 import { Link } from "react-router";
 import { Message } from "@ring/ui/Components";
-import { currencyFormat, numFormat } from "@ring/shared/convert";
+import { currencyFormat, numFormat } from "@ring/shared/utils/convert";
 import { getImageSize } from "@ring/shared";
 import { Title } from "../custom/Components";
 

@@ -1,7 +1,6 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.images.ImageInfoDTO;
-import com.ring.bookstore.dtos.images.IImageInfo;
+import com.cloudinary.api.ApiResponse;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ImageUploadException;
 import com.ring.bookstore.response.CloudinaryResponse;
@@ -14,12 +13,14 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ring.bookstore.dtos.mappers.ImageMapper;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.Image;
 import com.ring.bookstore.repository.ImageRepository;
 import com.ring.bookstore.service.ImageService;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,68 +32,42 @@ import java.util.stream.Collectors;
 public class ImageServiceImpl implements ImageService {
 
     private final ImageRepository imageRepo;
-    private final ImageMapper imageMapper;
     private final CloudinaryService cloudinaryService;
 
-//    //Map to DTO instead
-//    @Transactional
-//    public ImageDTO uploadAndMap(MultipartFile file) throws ImageResizerException, IOException {
-//        Image savedImage = upload(file);
-//        ImageDTO dto = imageMapper.imageToDTO(savedImage); //Map to DTO
-//        return dto;
-//    }
-//
-//    @Transactional
-//    public ImageDTO replaceAndMap(MultipartFile file) throws ImageResizerException, IOException {
-//        Image savedImage = replace(file);
-//        ImageDTO dto = imageMapper.imageToDTO(savedImage); //Map to DTO
-//        return dto;
-//    }
-
-//    //Upload to Database
-//    @Transactional
-//    public Image upload(MultipartFile file) throws ImageResizerException, IOException {
-//        //File name & data
-//        String fileName = System.currentTimeMillis() + "_" + StringUtils.cleanPath(file.getOriginalFilename()); //With timestamp
-//        BufferedImage originalImage = ImageIO.read(file.getInputStream());
-//
-//        //Compress image
-//        BufferedImage compressImage = Scalr.resize(originalImage,
-//                Scalr.Method.BALANCED,
-//                Scalr.Mode.AUTOMATIC, //Keep dimension
-//                originalImage.getWidth()); //Keep original size
-//
-//        Image savedImage = this.save(compressImage, fileName, file.getContentType());
-//        return savedImage;
-//    }
-//
-//    //Replace on Database
-//    @Transactional
-//    public Image replace(MultipartFile file) throws ImageResizerException, IOException {
-//        //File name & data
-//        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-//        BufferedImage originalImage = ImageIO.read(file.getInputStream());
-//
-//        //Compress image
-//        BufferedImage compressImage = Scalr.resize(originalImage,
-//                Scalr.Method.BALANCED,
-//                Scalr.Mode.AUTOMATIC, //Keep dimension
-//                originalImage.getWidth()); //Keep original size
-//
-//        Image savedImage = this.save(compressImage, fileName, file.getContentType());
-//        return savedImage;
-//    }
-
     //Get all images
-    public List<ImageInfoDTO> getAllImages() {
-        List<IImageInfo> imagesList = imageRepo.findAllInfo();
-        List<ImageInfoDTO> imageDTOS = imagesList.stream().map(imageMapper::infoToDTO).collect(Collectors.toList()); //Map to DTO
-        return imageDTOS;
+    public List<Image> getAllImages() {
+        return imageRepo.findAll();
     }
 
+    @Override
+    public Image replace(MultipartFile file, Long id) {
+        FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
+
+        try {
+            if (file.isEmpty()) {
+                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "File not found!");
+            }
+            Image image = imageRepo.findById(id).orElseThrow(() ->
+                    new ResourceNotFoundException("Image not found!"));
+
+            BufferedImage imageBuffer = ImageIO.read(file.getInputStream());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(imageBuffer, file.getContentType().split("/")[1], baos);
+            byte[] bytes = baos.toByteArray();
+
+            CloudinaryResponse uploaded = cloudinaryService.replace(bytes, image.getPublicId());
+            if (uploaded.getUrl() == null) {
+                throw new ImageUploadException("Image failed to replace!");
+            }
+            return image;
+        } catch (Exception e) {
+            throw new ImageUploadException("Image failed to replace!", e);
+        }
+    }
 
     @Override
     public Image upload(MultipartFile file, String folderName) {
+        FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
         String fileName = FileUploadUtil.getFileName(file);
 
         try {
@@ -100,8 +75,12 @@ public class ImageServiceImpl implements ImageService {
                 throw new HttpResponseException(HttpStatus.BAD_REQUEST, "File not found!");
             }
 
-            CloudinaryResponse uploaded = cloudinaryService.upload(file, FilenameUtils.getBaseName(fileName), folderName);
+            BufferedImage imageBuffer = ImageIO.read(file.getInputStream());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(imageBuffer, file.getContentType().split("/")[1], baos);
+            byte[] bytes = baos.toByteArray();
 
+            CloudinaryResponse uploaded = cloudinaryService.upload(bytes, FilenameUtils.getBaseName(fileName), folderName);
             Image image = Image.builder()
                     .name(fileName)
                     .publicId(uploaded.getPublicId())
@@ -141,17 +120,22 @@ public class ImageServiceImpl implements ImageService {
     }
 
     public String deleteImage(String publicId) {
-        try {
-            cloudinaryService.destroy(publicId);
-            return "Delete image " + publicId + " succesfully!";
-        } catch (Exception e) {
-            throw new ImageUploadException("Delete image failed!", e);
-        }
+        cloudinaryService.destroy(publicId);
+        return "Delete image " + publicId + " succesfully!";
     }
 
     public String deleteImage(Long id) {
         Image image = imageRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
         return deleteImage(image.getPublicId());
+    }
+
+    public ApiResponse deleteImages(List<String> publicIds) {
+        return cloudinaryService.destroyMultiple(publicIds);
+    }
+
+    public ApiResponse deleteImagesByIds(List<Long> ids) {
+        List<String> publicIds = imageRepo.findPublicIds(ids);
+        return cloudinaryService.destroyMultiple(publicIds);
     }
 }

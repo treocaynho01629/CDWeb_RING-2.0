@@ -15,8 +15,9 @@ import { Link } from "react-router";
 import { ItemTitle, LinkButton, Title } from "../custom/Components";
 import { useGetUsersQuery } from "../../features/users/usersApiSlice";
 import { Progress } from "@ring/ui";
-import { roleTypes } from "@ring/shared";
+import { getUserRole } from "@ring/shared";
 
+const UserRole = getUserRole();
 const headCells = [
   {
     id: "user",
@@ -65,7 +66,7 @@ export default function SummaryTableUsers() {
     userRows = ids?.length ? (
       ids?.map((id, index) => {
         const user = entities[id];
-        const roleItem = roleTypes[user?.role];
+        const roleItem = UserRole[user?.role];
 
         return (
           <TableRow hover tabIndex={-1} key={id}>
@@ -74,10 +75,7 @@ export default function SummaryTableUsers() {
                 to={`/users/${id}`}
                 style={{ display: "flex", alignItems: "center" }}
               >
-                <Avatar
-                  sx={{ marginRight: 1 }}
-                  src={user?.image ? user.image + "?size=tiny" : null}
-                >
+                <Avatar sx={{ marginRight: 1 }} src={user?.image ?? null}>
                   {user?.username?.charAt(0) ?? ""}
                 </Avatar>
                 <Box>

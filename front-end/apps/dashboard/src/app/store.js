@@ -1,16 +1,13 @@
-import { configureStore } from "@reduxjs/toolkit";
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from "redux-persist";
-import { apiSlice, authReducer } from "@ring/redux";
+import { combineReducers } from "@reduxjs/toolkit";
+import { persistStore, persistReducer } from "redux-persist";
+import { store, apiSlice, authReducer, enumReducer } from "@ring/redux";
 import storage from "redux-persist/lib/storage";
+
+const enumPersistConfig = {
+  key: "enum",
+  version: 1,
+  storage,
+};
 
 const authPersistConfig = {
   key: "auth",
@@ -18,18 +15,18 @@ const authPersistConfig = {
   storage,
 };
 
-export const store = configureStore({
-  reducer: {
-    [apiSlice.reducerPath]: apiSlice.reducer,
-    auth: persistReducer(authPersistConfig, authReducer), //AUTH
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }).concat(apiSlice.middleware),
-  devTools: import.meta.env.VITE_NODE_ENV === "dev",
-});
+// Static reducer
+const staticReducer = {
+  [apiSlice.reducerPath]: apiSlice.reducer,
+};
+
+// Web reducers
+const webReducers = {
+  enum: persistReducer(enumPersistConfig, enumReducer), //ENUM
+  auth: persistReducer(authPersistConfig, authReducer), //AUTH
+};
+
+// Replace/inject reducers
+store.replaceReducer(combineReducers({ ...staticReducer, ...webReducers }));
 
 export let persistor = persistStore(store);

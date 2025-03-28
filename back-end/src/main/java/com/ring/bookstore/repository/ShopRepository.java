@@ -93,14 +93,14 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
 			s.name as name, s.createdDate as joinedDate, i as image,
-			count(r.id) as totalReviews, count(b.id) as totalProducts,
+			count(distinct r.id) as totalReviews, count(distinct b.id) as totalProducts,
 			size(s.followers) as totalFollowers,
 			case when f.id is null then false else true end as followed
 		from Shop s
 		left join s.image i
 		left join s.followers f on f.id = :userId
-		left join Book b on s.id = b.shop.id
-		left join Review r on b.id = r.book.id
+		left join s.books b
+		left join b.bookReviews r
 		where s.id = :id
 		group by s.id, s.owner.username, s.owner.id, i.id, f.id
 	""")
@@ -119,15 +119,15 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 					coalesce(
 						sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
 					then 1 else 0 end), 0), 0), 0) as canceledRate,
-			count(b.id) as totalProducts, avg(r.rating) as rating, count(r.id) as totalReviews,
+			count(distinct b.id) as totalProducts, avg(r.rating) as rating, count(distinct r.id) as totalReviews,
 			size(s.followers) as totalFollowers, i as image,
 			s.createdDate as joinedDate, case when f.id is null then false else true end as followed
 		from Shop s left join s.image i
 		left join s.address a
 		left join OrderDetail od on od.shop.id = s.id
 		left join od.items oi
-		left join Book b on s.id = b.shop.id
-		left join Review r on b.id = r.book.id
+		left join s.books b
+		left join b.bookReviews r
 		left join s.followers f on f.id = :userId
 		where s.id = :id
 		group by s.id, s.owner.username, s.owner.id, i.id, a.id, f.id

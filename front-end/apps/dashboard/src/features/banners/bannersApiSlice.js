@@ -74,7 +74,7 @@ export const bannersApiSlice = apiSlice.injectEndpoints({
     }),
     deleteBanners: builder.mutation({
       query: (ids) => ({
-        url: `/api/banners/delete-multiples?ids=${ids}`,
+        url: `/api/banners/delete-multiple?ids=${ids}`,
         method: "DELETE",
         responseHandler: "text",
       }),

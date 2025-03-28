@@ -20,10 +20,13 @@ import {
   useCreateUserMutation,
   useUpdateUserMutation,
 } from "../../features/users/usersApiSlice";
-import { genderTypeItems, roleTypeItems } from "@ring/shared/user";
-import { EMAIL_REGEX, PHONE_REGEX } from "@ring/shared/ultils/regex";
+import { getGenderType, getUserRole } from "@ring/shared";
+import { EMAIL_REGEX, PHONE_REGEX } from "@ring/shared/utils/regex";
 import dayjs from "dayjs";
 import ImageSelect from "../custom/ImageSelect";
+
+const GenderType = getGenderType();
+const UserRole = getUserRole();
 
 const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
   //#region construct
@@ -82,8 +85,8 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
     setEmail("");
     setName("");
     setPhone("");
-    setRoles(roleTypeItems[0].value);
-    setGender(genderTypeItems[0].value);
+    setRoles(Object.values(UserRole)[0].value);
+    setGender(Object.values(GenderType)[0].value);
     setDob(dayjs("2001-01-01"));
     setErr([]);
     setErrMsg("");

@@ -62,7 +62,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         left join u.profile p
         left join p.image i
         where o.id in (:ids)
-        group by o.id, i.name, a.name, s.name, u.email, u.username, od.id, a.phone, a.address
+        group by o.id, i.id, a.name, s.name, u.email, u.username, od.id, a.phone, a.address
     """)
     List<IOrderDetail> findAllByReceiptIds(List<Long> ids);
 }

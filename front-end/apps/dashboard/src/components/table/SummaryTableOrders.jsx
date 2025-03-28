@@ -83,10 +83,7 @@ export default function SummaryTableOrders({ title, shopId, bookId }) {
                 to={`/product/${id}`}
                 style={{ display: "flex", alignItems: "center" }}
               >
-                <Avatar
-                  sx={{ marginRight: 1 }}
-                  src={order?.image ? order.image + "?size=tiny" : null}
-                >
+                <Avatar sx={{ marginRight: 1 }} src={order?.image ?? null}>
                   {order?.name?.charAt(0) ?? ""}
                 </Avatar>
                 <Box>
