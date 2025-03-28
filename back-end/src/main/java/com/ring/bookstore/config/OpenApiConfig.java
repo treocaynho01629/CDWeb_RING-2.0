@@ -1,21 +1,25 @@
 package com.ring.bookstore.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
 @Configuration
+@Profile({"!prod && dev"})
 public class OpenApiConfig {
 
-        @Value("${ring.openapi.dev-url}")
-        private String devUrl;
+        final String securitySchemeName = "bearerAuth";
 
         @Value("${ring.openapi.prod-url}")
         private String prodUrl;
@@ -30,7 +34,7 @@ public class OpenApiConfig {
         @Bean
         OpenAPI customOpenAPI() {
                 Server devServer = new Server()
-                        .url(devUrl)
+                        .url("/")
                         .description("Server URL in Development environment");
 
                 Server prodServer = new Server()
@@ -44,10 +48,19 @@ public class OpenApiConfig {
 
                 Info info = new Info()
                         .title("OpenAPI specification - RING-Bookstore")
-                        .version("1.0")
+                        .version("2.0")
                         .contact(contact)
                         .description("OpenAPI documentation.");
 
-                return new OpenAPI().info(info).servers(List.of(devServer, prodServer));
+                return new OpenAPI()
+                        .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
+                        .components(new Components()
+                                .addSecuritySchemes(securitySchemeName, new SecurityScheme()
+                                        .name(securitySchemeName)
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")))
+                        .info(info)
+                        .servers(List.of(devServer, prodServer));
         }
 }

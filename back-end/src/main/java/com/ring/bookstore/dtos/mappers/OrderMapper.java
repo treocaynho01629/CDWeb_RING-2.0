@@ -1,44 +1,255 @@
 package com.ring.bookstore.dtos.mappers;
 
-import java.util.List;
-import java.util.function.Function;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
+import com.ring.bookstore.dtos.orders.*;
+import com.ring.bookstore.model.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.OrderDTO;
-import com.ring.bookstore.dtos.OrderDetailDTO;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.OrderDetail;
-import com.ring.bookstore.model.OrderReceipt;
-
+@RequiredArgsConstructor
 @Service
-public class OrderMapper implements Function<OrderReceipt, OrderDTO> {
-	
-	@Autowired
-	private OrderDetailMapper detailMapper;
-	
-    @Override
-    public OrderDTO apply(OrderReceipt order) {
-    	
-    	List<OrderDetail> orderDetails = order.getOrderOrderDetails();
-    	List<OrderDetailDTO> detailsDTO = orderDetails.stream().map(detailMapper::apply).collect(Collectors.toList());
-    	
-    	Account user = order.getUser();
-    	String userName = "Người dùng RING!";
-    	if (user != null) userName = user.getUsername();
-        
-    	return new OrderDTO(order.getId(),
-				order.getFullName(),
-        		order.getEmail(), 
-        		order.getPhone(),
-        		order.getOAddress(),
-        		order.getOMessage(),
-        		order.getODate(),
-        		order.getTotal(),
-        		userName,
-        		detailsDTO
-		);
+public class OrderMapper {
+
+    private final Cloudinary cloudinary;
+
+    public ReceiptDTO orderToDTO(OrderReceipt order) {
+        List<OrderDetail> orderDetails = order.getDetails();
+        List<OrderDTO> detailDTOS = orderDetails.stream().map(this::detailToOrderDTO).collect(Collectors.toList());
+        Account user = order.getUser();
+        Address address = order.getAddress();
+
+        //If user deleted
+        String username = "Người dùng RING!";
+        if (user != null) username = user.getUsername();
+
+        return new ReceiptDTO(order.getId(),
+                order.getEmail(),
+                address.getCompanyName() != null ? address.getCompanyName() : address.getName(),
+                null,
+                address.getPhone(),
+                address.getCity() + ", " + address.getAddress(),
+                order.getOrderMessage(),
+                order.getLastModifiedDate(),
+                order.getTotal(),
+                order.getTotalDiscount(),
+                username,
+                detailDTOS
+        );
+    }
+
+    public List<OrderDTO> itemsToDetailDTO(List<IOrderItem> items) {
+        Map<Long, OrderDTO> ordersMap = new LinkedHashMap<>();
+
+        for (IOrderItem projectedItem : items) {
+            OrderItem item = projectedItem.getItem(); //Get Item
+
+            String url = projectedItem.getImage() != null ?
+                    cloudinary.url().transformation(new Transformation()
+                                    .aspectRatio("1.0")
+                                    .width(90)
+                                    .quality("auto")
+                                    .fetchFormat("auto"))
+                            .secure(true).generate(projectedItem.getImage().getPublicId())
+                    : null;
+
+            var newItem = OrderItemDTO.builder().id(item.getId())
+                    .quantity(item.getQuantity())
+                    .price(item.getPrice())
+                    .discount(item.getDiscount())
+                    .bookId(projectedItem.getBookId())
+                    .bookTitle(projectedItem.getTitle())
+                    .bookSlug(projectedItem.getSlug())
+                    .image(url)
+                    .build();
+
+            if (!ordersMap.containsKey(projectedItem.getDetailId())) { //Insert if not exist
+                List<OrderItemDTO> itemsList = new ArrayList<>(); //New list
+                itemsList.add(newItem);
+
+                var newOrder = OrderDTO.builder().id(projectedItem.getDetailId())
+                        .totalPrice(projectedItem.getTotalPrice())
+                        .shippingFee(projectedItem.getShippingFee())
+                        .totalDiscount(projectedItem.getDiscount())
+                        .shippingDiscount(projectedItem.getShippingDiscount())
+                        .status(projectedItem.getStatus())
+                        .shopId(projectedItem.getShopId())
+                        .shopName(projectedItem.getShopName())
+                        .items(itemsList)
+                        .build();
+                ordersMap.put(projectedItem.getDetailId(), newOrder);
+            } else { //Add to existing list
+                ordersMap.get(projectedItem.getDetailId()).items().add(newItem);
+            }
+        }
+
+        //Convert & return
+        List<OrderDTO> result = new ArrayList<OrderDTO>(ordersMap.values());
+        return result;
+    }
+
+    public List<ReceiptDTO> detailsToReceiptDTOS(List<IOrderDetail> details) {
+        Map<Long, ReceiptDTO> receiptsMap = new LinkedHashMap<>();
+
+        for (IOrderDetail projectedDetail : details) {
+            OrderDetail detail = projectedDetail.getDetail(); //Get detail
+
+            String url = projectedDetail.getImage() != null ?
+                    cloudinary.url().transformation(new Transformation()
+                                    .aspectRatio("1.0")
+                                    .width(90)
+                                    .quality("auto")
+                                    .fetchFormat("auto"))
+                            .secure(true).generate(projectedDetail.getImage().getPublicId())
+                    : null;
+
+            var newDetail = OrderDTO.builder().id(detail.getId())
+                    .shopId(detail.getShop().getId())
+                    .shopName(projectedDetail.getShopName())
+                    .totalPrice(detail.getTotalPrice())
+                    .totalDiscount(detail.getDiscount())
+                    .shippingFee(detail.getShippingFee())
+                    .shippingDiscount(detail.getShippingDiscount())
+                    .totalItems(projectedDetail.getTotalItems())
+                    .status(detail.getStatus())
+                    .build();
+
+            if (!receiptsMap.containsKey(projectedDetail.getOrderId())) { //Insert if not exist
+                List<OrderDTO> detailsList = new ArrayList<>(); //New list
+                detailsList.add(newDetail);
+
+                var newReceipt = ReceiptDTO.builder().id(projectedDetail.getOrderId())
+                        .email(projectedDetail.getEmail())
+                        .name(projectedDetail.getName())
+                        .image(url)
+                        .phone(projectedDetail.getPhone())
+                        .address(projectedDetail.getAddress())
+                        .message(projectedDetail.getMessage())
+                        .date(projectedDetail.getDate())
+                        .total(projectedDetail.getTotal())
+                        .totalDiscount(projectedDetail.getTotalDiscount())
+                        .username(projectedDetail.getUsername())
+                        .details(detailsList)
+                        .build();
+                receiptsMap.put(projectedDetail.getOrderId(), newReceipt);
+            } else { //Add to existing list
+                receiptsMap.get(projectedDetail.getOrderId()).details().add(newDetail);
+            }
+        }
+
+        //Convert & return
+        List<ReceiptDTO> result = new ArrayList<ReceiptDTO>(receiptsMap.values());
+        return result;
+    }
+
+    public OrderDTO detailToOrderDTO(OrderDetail detail) {
+        List<OrderItem> orderItems = detail.getItems();
+        List<OrderItemDTO> itemDTOS = orderItems.stream().map(this::itemToDTO).collect(Collectors.toList());
+        Shop shop = detail.getShop();
+
+        return new OrderDTO(detail.getId(),
+                shop.getId(),
+                shop.getName(),
+                detail.getTotalPrice(),
+                detail.getDiscount(),
+                detail.getShippingFee(),
+                detail.getShippingDiscount(),
+                null,
+                detail.getStatus(),
+                itemDTOS);
+    }
+
+    public OrderItemDTO itemToDTO(OrderItem item) {
+        Book book = item.getBook();
+        String url = cloudinary.url().transformation(new Transformation()
+                                .aspectRatio("1.0")
+                                .width(90)
+                                .quality("auto")
+                                .fetchFormat("auto"))
+                        .secure(true).generate(book.getImage().getPublicId());
+
+        return new OrderItemDTO(item.getId(),
+                item.getPrice(),
+                item.getDiscount(),
+                item.getQuantity(),
+                book.getId(),
+                book.getSlug(),
+                url,
+                book.getTitle());
+    }
+
+    public OrderDetailDTO detailItemsToDTO(List<IOrderDetailItem> items) {
+        IOrderDetailItem firstItem = items.get(0);
+        ArrayList<OrderItemDTO> itemDTOS = new ArrayList<>();
+        OrderDetailDTO result = new OrderDetailDTO(firstItem.getOrderId(),
+                firstItem.getCompanyName() != null ? firstItem.getCompanyName() : firstItem.getName(),
+                firstItem.getPhone(),
+                firstItem.getCity() + ", " + firstItem.getAddress(),
+                firstItem.getMessage(),
+                firstItem.getOrderedDate(),
+                firstItem.getDate(),
+                firstItem.getDetailId(),
+                firstItem.getShopId(),
+                firstItem.getShopName(),
+                firstItem.getTotalPrice(),
+                firstItem.getDiscount(),
+                firstItem.getShippingFee(),
+                firstItem.getShippingDiscount(),
+                firstItem.getShippingType(),
+                firstItem.getPaymentType(),
+                firstItem.getStatus(),
+                itemDTOS);
+
+        for (IOrderDetailItem projectedItem : items) {
+            OrderItem item = projectedItem.getItem(); //Get Item
+
+            String url = projectedItem.getImage() != null ?
+                    cloudinary.url().transformation(new Transformation()
+                                    .aspectRatio("1.0")
+                                    .width(90)
+                                    .quality("auto")
+                                    .fetchFormat("auto"))
+                            .secure(true).generate(projectedItem.getImage().getPublicId())
+                    : null;
+
+            var newItem = OrderItemDTO.builder().id(item.getId())
+                    .quantity(item.getQuantity())
+                    .price(item.getPrice())
+                    .discount(item.getDiscount())
+                    .bookId(projectedItem.getBookId())
+                    .bookTitle(projectedItem.getTitle())
+                    .bookSlug(projectedItem.getSlug())
+                    .image(url)
+                    .build();
+
+            result.items().add(newItem);
+        }
+
+        return result;
+    }
+
+    public ReceiptSummaryDTO summaryToDTO(IReceiptSummary projection) {
+        String url = projection.getImage() != null ?
+                cloudinary.url().transformation(new Transformation()
+                                .aspectRatio("1.0")
+                                .width(55)
+                                .crop("thumb")
+                                .chain()
+                                .radius("max")
+                                .quality(50)
+                                .fetchFormat("auto"))
+                        .secure(true).generate(projection.getImage().getPublicId())
+                : null;
+
+        return new ReceiptSummaryDTO(projection.getId(),
+                url,
+                projection.getName(),
+                projection.getDate(),
+                projection.getTotalPrice(),
+                projection.getTotalItems()
+        );
     }
 }

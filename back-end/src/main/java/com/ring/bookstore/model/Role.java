@@ -1,33 +1,53 @@
 package com.ring.bookstore.model;
 
-import com.ring.bookstore.enums.RoleName;
+import com.ring.bookstore.enums.UserRole;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collection;
 
 @Entity
-@Table(name = "\"role\"")
 @Getter
 @Setter
 @EqualsAndHashCode
+@Table(name = "\"role\"")
 public class Role {
 
     @Id
-    @Column(nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private RoleName roleName;
+    private UserRole roleName;
+
+    @ManyToMany(mappedBy = "roles")
+    private Collection<Account> users;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "roles_privileges", joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
+    private Collection<Privilege> privileges;
+
+    public void addUser(Account user) {
+        this.users.add(user);
+        user.getRoles().add(this);
+    }
+
+    public void removeUser(Account user) {
+        this.users.add(user);
+        user.getRoles().remove(this);
+    }
+
+    public void addPrivilege(Privilege privilege) {
+        this.privileges.add(privilege);
+        privilege.getRoles().add(this);
+    }
+
+    public void removePrivilege(Privilege privilege) {
+        this.privileges.add(privilege);
+        privilege.getRoles().remove(this);
+    }
 }

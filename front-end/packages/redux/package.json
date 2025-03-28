@@ -1,0 +1,24 @@
+{
+  "name": "@ring/redux",
+  "version": "0.0.0",
+  "sideEffects": false,
+  "files": [
+    "src"
+  ],
+  "exports": {
+    ".": "./src/index.js",
+    "./store": "./src/app/store.js"
+  },
+  "scripts": {
+    "lint": "eslint \"**/*.{ts,tsx,js,jsx}\"",
+    "update-dependencies": "npx npm-check-updates -u"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@ring/eslint-config": "*",
+    "eslint": "^9.21.0"
+  },
+  "peerDependencies": {
+    "@reduxjs/toolkit": "^2.4.0"
+  }
+}

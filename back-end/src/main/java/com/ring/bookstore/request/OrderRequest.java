@@ -2,9 +2,10 @@ package com.ring.bookstore.request;
 
 import java.util.List;
 
-import com.ring.bookstore.model.CartItem;
-
-import jakarta.validation.constraints.NotBlank;
+import com.ring.bookstore.enums.PaymentType;
+import com.ring.bookstore.enums.ShippingType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -17,18 +18,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderRequest { //Request body when order
-	
+
 	@NotNull(message = "Giỏ hàng không được trống!")
-	private List<CartItem> cart;
-	
-	@NotBlank(message = "Tên không được bỏ trống!")
-	@Size(min = 5, max = 150, message = "Tên phải dài từ 5-150 kí tự")
-	private String name;
-	
-	@NotBlank(message = "Số điện thoại không được bỏ trống!")
-	private String phone;
-	
-	@NotBlank(message = "Địa chỉ không được bỏ trống!")
-	private String address;
+	@NotEmpty(message = "Giỏ hàng không được trống!")
+	private List<CartDetailRequest> cart;
+
+	private String coupon;
+
+	@Size(max = 300, message = "Ghi chú không quá quá 300 kí tự!")
 	private String message;
+
+	@NotNull(message = "Hình thức giao hàng không được bỏ trống!")
+	private ShippingType shippingType;
+
+	@NotNull(message = "Hình thức thanh toán không được bỏ trống!")
+	private PaymentType paymentMethod;
+
+	@Valid
+	@NotNull(groups = AddressRequest.class)
+	private AddressRequest address;
 }

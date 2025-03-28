@@ -24,13 +24,13 @@ import lombok.Setter;
 
 
 @Entity
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
-public class Review {
+@EqualsAndHashCode(callSuper = true)
+public class Review extends Auditable {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -44,7 +44,7 @@ public class Review {
             strategy = GenerationType.SEQUENCE,
             generator = "primary_sequence"
     )
-    private Integer id;
+    private Long id;
     
     @Column(length = 1000)
     @Nationalized 
@@ -52,9 +52,6 @@ public class Review {
 
     @Column
     private Integer rating;
-
-    @Column
-    private LocalDateTime rDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
@@ -66,4 +63,7 @@ public class Review {
     @JsonIgnore
     private Account user;
 
+    @JsonIgnore
+    @Column(columnDefinition = "boolean default false")
+    private boolean isHidden = false;
 }

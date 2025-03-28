@@ -1,18 +1,18 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.enums.ImageSize;
-import com.ring.bookstore.exception.ImageResizerException;
-import jakarta.transaction.Transactional;
-import org.imgscalr.Scalr;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import com.cloudinary.api.ApiResponse;
+import com.ring.bookstore.exception.HttpResponseException;
+import com.ring.bookstore.exception.ImageUploadException;
+import com.ring.bookstore.response.CloudinaryResponse;
+import com.ring.bookstore.service.CloudinaryService;
+import com.ring.bookstore.ultils.FileUploadUtil;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ring.bookstore.dtos.ImageDTO;
-import com.ring.bookstore.dtos.mappers.ImageMapper;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.Image;
 import com.ring.bookstore.repository.ImageRepository;
@@ -20,197 +20,122 @@ import com.ring.bookstore.service.ImageService;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class ImageServiceImpl implements ImageService {
 
-    @Value("${image.size.small}")
-    private Integer smallSize;
-
-    @Value("${image.size.medium}")
-    private Integer medSize;
-
-    @Autowired
-    private ImageRepository imageRepo;
-
-    @Autowired
-    private ImageMapper imageMapper;
-
-    //Map to DTO instead
-    public ImageDTO uploadAndMap(MultipartFile file) throws ImageResizerException, IOException {
-        Image savedImage = upload(file);
-        ImageDTO dto = imageMapper.apply(savedImage); //Map to DTO
-        return dto;
-    }
-
-    public ImageDTO replaceAndMap(MultipartFile file) throws ImageResizerException, IOException {
-        Image savedImage = replace(file);
-        ImageDTO dto = imageMapper.apply(savedImage); //Map to DTO
-        return dto;
-    }
-
-    //Upload to Database
-    public Image upload(MultipartFile file) throws ImageResizerException, IOException {
-        //File name & data
-        String fileName = System.currentTimeMillis() + "_" + StringUtils.cleanPath(file.getOriginalFilename()); //With timestamp
-        BufferedImage originalImage = ImageIO.read(file.getInputStream());
-
-        //Compress image
-        BufferedImage compressImage = Scalr.resize(originalImage,
-                Scalr.Method.BALANCED,
-                Scalr.Mode.AUTOMATIC, //Keep dimension
-                originalImage.getWidth()); //Keep original size
-
-        Image savedImage = save(compressImage, fileName, file.getContentType());
-        return savedImage;
-    }
-
-    //Replace on Database
-    public Image replace(MultipartFile file) throws ImageResizerException, IOException {
-        //File name & data
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        BufferedImage originalImage = ImageIO.read(file.getInputStream());
-
-        //Compress image
-        BufferedImage compressImage = Scalr.resize(originalImage,
-                Scalr.Method.BALANCED,
-                Scalr.Mode.AUTOMATIC, //Keep dimension
-                originalImage.getWidth()); //Keep original size
-
-        Image savedImage = save(compressImage, fileName, file.getContentType());
-        return savedImage;
-    }
+    private final ImageRepository imageRepo;
+    private final CloudinaryService cloudinaryService;
 
     //Get all images
-    public List<ImageDTO> getAllImages() {
-        List<Image> imagesList = imageRepo.findAll();
-        List<ImageDTO> imageDtos = imagesList.stream().map(imageMapper::apply).collect(Collectors.toList()); //Map to DTO
-        return imageDtos;
+    public List<Image> getAllImages() {
+        return imageRepo.findAll();
     }
 
-    //Delete image by {id}
-    @Transactional
-    public ImageDTO deleteImage(Integer id) {
-        Image image = imageRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Image does not exists!"));
-        imageRepo.deleteById(id);
+    @Override
+    public Image replace(MultipartFile file, Long id) {
+        FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
 
-        ImageDTO dto = imageMapper.apply(image); //Map to DTO
-        return dto;
-    }
-
-    //Check if image with {name} already exists
-    public boolean existsImage(String name) {
-        return imageRepo.existsByName(name);
-    }
-
-    //Get image by {name}
-    public Image get(String name) {
-        Image image = imageRepo.findByName(name)
-                .orElseThrow(() -> new ResourceNotFoundException("Image does not exists!"));
-        return image;
-    }
-
-    //Save image to database
-    @Transactional
-    public Image save(BufferedImage bufferedImage, String fileName, String contentType) throws ImageResizerException {
         try {
-            Image image = imageRepo.findByName(fileName).orElse( //Create image row if not already exists
-                    Image.builder()
-                            .name(fileName)
-                            .type(contentType)
-                            .image(null)
-                            .build());
+            if (file.isEmpty()) {
+                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "File not found!");
+            }
+            Image image = imageRepo.findById(id).orElseThrow(() ->
+                    new ResourceNotFoundException("Image not found!"));
 
+            BufferedImage imageBuffer = ImageIO.read(file.getInputStream());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(bufferedImage, contentType.split("/")[1], baos);
+            ImageIO.write(imageBuffer, file.getContentType().split("/")[1], baos);
             byte[] bytes = baos.toByteArray();
 
-            image.setImage(bytes); //Set image data
-            imageRepo.save(image); //Save to database
+            CloudinaryResponse uploaded = cloudinaryService.replace(bytes, image.getPublicId());
+            if (uploaded.getUrl() == null) {
+                throw new ImageUploadException("Image failed to replace!");
+            }
             return image;
-        } catch (IOException e) {
-            throw new ImageResizerException(HttpStatus.INTERNAL_SERVER_ERROR, "Resized image could not be saved.");
-        }
-    }
-    //Get image with {reference (name)} and {type (size)}
-    public Image resolve(String type, String reference) throws ImageResizerException {
-        if (!type.equalsIgnoreCase(ImageSize.ORIGINAL.toString())) {
-            try {
-                // Get image from database if it is already resized.
-                return get(getResizedFileName(reference, type));
-            } catch (ResourceNotFoundException exception) {
-                // Resize image, store it and return it.
-                return resizeAndSave(reference, type);
-            }
-        } else {
-            try {
-                // Return original.
-                return get(reference);
-            } catch (ResourceNotFoundException exception) {
-                throw new ImageResizerException(HttpStatus.NOT_FOUND, "The original image could not be found.");
-            }
-        }
-    }
-
-    @Transactional
-    public Image resizeAndSave(String reference, String type) throws ImageResizerException {
-        try {
-            Image image = get(reference); //Get original image
-            BufferedImage resizedBi = getResizedImage(image.getImage(), type); //Resize it
-
-            Image resizedImage = save(resizedBi, getResizedFileName(reference, type), image.getType()); //Store in database
-
-            //Set parent image for cascade
-            resizedImage.setParent(image);
-            imageRepo.save(resizedImage);
-
-            return resizedImage;
-        } catch (ResourceNotFoundException exception) {
-            throw new ImageResizerException(HttpStatus.NOT_FOUND, "The original image could not be found.");
-        }
-    }
-
-    private BufferedImage resize(BufferedImage bufferedImage, String type) throws ImageResizerException {
-        Integer size = -1; //Get resize size base on type
-        if (type.equalsIgnoreCase(ImageSize.SMALL.toString())) {
-            size = smallSize;
-        } else if (type.equalsIgnoreCase(ImageSize.MEDIUM.toString())) {
-            size = medSize;
-        } else {
-            throw new ImageResizerException(HttpStatus.INTERNAL_SERVER_ERROR, "Configuration is not available: " + type);
-        }
-
-        try {
-            return Scalr.resize(bufferedImage,
-                    Scalr.Method.BALANCED,
-                    Scalr.Mode.AUTOMATIC,
-                    size); // Size base on type
         } catch (Exception e) {
-            throw new ImageResizerException(HttpStatus.INTERNAL_SERVER_ERROR, "Image could not be resized to type: " + e.getMessage());
+            throw new ImageUploadException("Image failed to replace!", e);
         }
     }
 
-    private BufferedImage getResizedImage(byte[] data, String type) throws ImageResizerException {
+    @Override
+    public Image upload(MultipartFile file, String folderName) {
+        FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
+        String fileName = FileUploadUtil.getFileName(file);
+
         try {
-            // Convert byte[] back to a BufferedImage
-            InputStream is = new ByteArrayInputStream(data);
-            BufferedImage bufferedImage = ImageIO.read(is);
+            if (file.isEmpty()) {
+                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "File not found!");
+            }
 
-            BufferedImage resizedImage = resize(bufferedImage, type);
-            return resizedImage;
-        } catch (IOException e) {
-            throw new ImageResizerException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not read the original image.");
+            BufferedImage imageBuffer = ImageIO.read(file.getInputStream());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(imageBuffer, file.getContentType().split("/")[1], baos);
+            byte[] bytes = baos.toByteArray();
+
+            CloudinaryResponse uploaded = cloudinaryService.upload(bytes, FilenameUtils.getBaseName(fileName), folderName);
+            Image image = Image.builder()
+                    .name(fileName)
+                    .publicId(uploaded.getPublicId())
+                    .url(uploaded.getUrl())
+                    .type(file.getContentType())
+                    .build();
+            if (image.getUrl() == null) {
+                throw new ImageUploadException("Image failed to upload!");
+            }
+            Image savedImage = imageRepo.save(image);
+            return savedImage;
+        } catch (Exception e) {
+            throw new ImageUploadException("Image failed to upload!", e);
         }
     }
 
-    private String getResizedFileName(String reference, String type) {
-        return type + "_" + reference;
+    @Async
+    protected CompletableFuture<Image> uploadAsync(MultipartFile file, String folderName) {
+        return CompletableFuture.completedFuture(upload(file, folderName));
+    }
+
+    public List<Image> uploadMultiple(List<MultipartFile> files, String folderName) {
+        List<CompletableFuture<Image>> futures = new ArrayList<>();
+        for (MultipartFile file : files) {
+            CompletableFuture<Image> future = uploadAsync(file, folderName);
+            futures.add(future);
+        }
+
+        // Wait for all futures to complete and gather the results
+        CompletableFuture<Void> allUploads = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+
+        return allUploads.thenApply(v -> futures.stream()
+                        .map(CompletableFuture::join) // Join each future to get the result
+                        .filter(Objects::nonNull) // Filter out any failed uploads
+                        .collect(Collectors.toList()))
+                .join();
+    }
+
+    public String deleteImage(String publicId) {
+        cloudinaryService.destroy(publicId);
+        return "Delete image " + publicId + " succesfully!";
+    }
+
+    public String deleteImage(Long id) {
+        Image image = imageRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
+        return deleteImage(image.getPublicId());
+    }
+
+    public ApiResponse deleteImages(List<String> publicIds) {
+        return cloudinaryService.destroyMultiple(publicIds);
+    }
+
+    public ApiResponse deleteImagesByIds(List<Long> ids) {
+        List<String> publicIds = imageRepo.findPublicIds(ids);
+        return cloudinaryService.destroyMultiple(publicIds);
     }
 }

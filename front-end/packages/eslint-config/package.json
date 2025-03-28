@@ -1,0 +1,18 @@
+{
+  "name": "@ring/eslint-config",
+  "version": "0.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "update-dependencies": "npx npm-check-updates -u"
+  },
+  "dependencies": {
+    "eslint-config-prettier": "^10.0.2",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

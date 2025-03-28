@@ -1,0 +1,44 @@
+{
+  "name": "@ring/shared",
+  "version": "0.0.0",
+  "sideEffects": false,
+  "files": [
+    "src",
+    "assets"
+  ],
+  "exports": {
+    ".": "./src/index.js",
+    "./ConfirmDialog": "./src/components/ConfirmDialog.jsx",
+    "./enums/address": "./src/enums/address.js",
+    "./enums/book": "./src/enums/book.js",
+    "./enums/coupon": "./src/enums/coupon.js",
+    "./enums/image": "./src/enums/image.js",
+    "./enums/order": "./src/enums/order.js",
+    "./enums/payment": "./src/enums/payment.js",
+    "./enums/shipping": "./src/enums/shipping.js",
+    "./enums/user": "./src/enums/user.js",
+    "./utils/convert": "./src/utils/convert.js",
+    "./utils/icon": "./src/utils/icon.jsx",
+    "./utils/location": "./src/utils/location.js",
+    "./utils/payment": "./src/utils/payment.jsx",
+    "./utils/regex": "./src/utils/regex.js",
+    "./assets/empty": "./assets/empty.svg"
+  },
+  "scripts": {
+    "lint": "eslint \"**/*.{ts,tsx,js,jsx}\"",
+    "update-dependencies": "npx npm-check-updates -u"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@ring/redux": "*",
+    "@ring/eslint-config": "*",
+    "eslint": "^9.21.0"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "lodash-es": "^4.17.21",
+    "@mui/icons-material": "^6.0.1",
+    "@mui/material": "^6.0.1",
+    "notistack": "^3.0.1"
+  }
+}

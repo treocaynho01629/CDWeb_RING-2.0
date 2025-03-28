@@ -2,31 +2,27 @@ package com.ring.bookstore.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-public class Account implements UserDetails {
+@SQLDelete(sql = "UPDATE Product SET active = false WHERE id=?")
+@SQLRestriction("active=true")
+@EqualsAndHashCode(callSuper = true)
+public class Account extends Auditable implements UserDetails {
 
     /**
 	 * 
@@ -45,41 +41,46 @@ public class Account implements UserDetails {
             strategy = GenerationType.SEQUENCE,
             generator = "primary_sequence"
     )
-    private Integer id;
+    private Long id;
 
     @Column(unique = true, nullable = false, length = 30)
-    private String userName;
+    private String username;
 
     @Column(nullable = false, length = 500)
     @JsonIgnore
     private String pass;
 
-    @Column(nullable = false, length = 1000)
+    @Column(unique = true, nullable = false, length = 100)
     private String email;
-    
-    @Column(unique = true)
-    @JsonIgnore
-    private String resetPassToken;
-    
-    @Column(nullable = true)
-    @JsonIgnore
-	private LocalDateTime tokenCreationDate;
-    
-    @OneToOne(cascade = CascadeType.ALL, 
-    		orphanRemoval = true, 
-    		mappedBy = "user")
-    private AccountProfile profile;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(	name = "user_roles",
+    @OneToOne(cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY,
+    		mappedBy = "user",
+    		orphanRemoval = true,
+			optional = false)
+	@PrimaryKeyJoinColumn
+	@JsonIgnore
+    @EqualsAndHashCode.Exclude
+	private AccountProfile profile;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(	name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonIgnore
-    private Set<Role> roles;
-    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Book> sellBooks;
+    private Collection<Role> roles;
+
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<RefreshToken> refreshTokens = new ArrayList<>();
+
+	@Column(unique = true)
+	@JsonIgnore
+	private String resetToken;
+
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<Shop> shops;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -89,10 +90,35 @@ public class Account implements UserDetails {
     @JsonIgnore
     private List<OrderReceipt> userOrderReceipts;
 
+	@ManyToMany(mappedBy = "followers")
+	@JsonIgnore
+	@EqualsAndHashCode.Exclude
+	private Set<Shop> following = new HashSet<>();
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRoleName().name())).collect(Collectors.toList());
+		return getGrantedAuthorities(getPrivileges());
+	}
+
+	private List<String> getPrivileges() {
+		List<String> privileges = new ArrayList<>();
+		List<Privilege> collection = new ArrayList<>();
+		for (Role role : this.roles) {
+			privileges.add(role.getRoleName().name());
+			collection.addAll(role.getPrivileges());
+		}
+		for (Privilege item : collection) {
+			privileges.add(item.getPrivilegeName().name());
+		}
+		return privileges;
+	}
+
+	private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
+		List<GrantedAuthority> authorities = new ArrayList<>();
+		for (String privilege : privileges) {
+			authorities.add(new SimpleGrantedAuthority(privilege));
+		}
+		return authorities;
 	}
 
 	@Override
@@ -103,7 +129,7 @@ public class Account implements UserDetails {
 
 	@Override
 	public String getUsername() {
-		return this.userName;
+		return this.username;
 	}
 	
 	@Override
@@ -127,9 +153,22 @@ public class Account implements UserDetails {
 	@Override
 	@JsonIgnore
 	public boolean isEnabled() {
-		return true;
+		return this.isActive();
 	}
-	
+
+	public int getRolesSize() { return this.roles.size();}
+
+	public void setProfile(AccountProfile profile) {
+		if (profile == null) {
+			if (this.profile != null) {
+				this.profile.setUser(null);
+			}
+		} else {
+			profile.setUser(this);
+		}
+		this.profile = profile;
+	}
+
 	public void removeAllOrders() {
 		userOrderReceipts.forEach(order -> order.setUser(null));
         this.userOrderReceipts.clear();
@@ -139,13 +178,36 @@ public class Account implements UserDetails {
         userReviews.forEach(review -> review.setUser(null));
         this.userReviews.clear();
     }
-	
-	public void removeAllBooks() {
-		sellBooks.forEach(book -> book.setUser(null));
-        this.sellBooks.clear();
-    }
-	
+
+	public void addRole(Role role) {
+		this.roles.add(role);
+		role.getUsers().add(this);
+	}
+
+	public void removeRole(Role role) {
+		this.roles.add(role);
+		role.getUsers().remove(this);
+	}
+
 	public void removeAllRoles() {
         this.roles.clear();
     }
+
+	public void followShop(Shop shop) {
+		this.following.add(shop);
+	}
+
+	public void unfollowShop(Shop shop) {
+		this.following.remove(shop);
+	}
+
+	public void addRefreshToken(RefreshToken token) {
+		this.refreshTokens.add(token);
+		token.setUser(this);
+	}
+
+	public void removeRefreshToken(RefreshToken token) {
+		this.refreshTokens.remove(token);
+		token.setUser(null);
+	}
 }

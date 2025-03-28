@@ -1,57 +1,84 @@
 package com.ring.bookstore.repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+import com.ring.bookstore.dtos.accounts.IAccount;
+import com.ring.bookstore.dtos.dashboard.IStat;
+import com.ring.bookstore.enums.UserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.ring.bookstore.model.Account;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, Integer>{
+public interface AccountRepository extends JpaRepository<Account, Long>{
 	
-	boolean existsByUserName(String userName); //Check exists Account by {userName}
-	
-	Optional<Account> findByUserName(String userName); //Get Account by {userName}
-	
-	List<Account> findByEmail(String email); //Get Account by {email}
-	
-	Optional<Account> findByResetPassToken(String resetPassToken); //Get Account by {resetPassToken}
-	
+	boolean existsByUsernameOrEmail(String username, String email);
+
 	@Query("""
-	select a from Account a 
-	where concat (a.email, a.userName) ilike %:keyword%
-	and size(a.roles) <= :maxRoles
-	and size(a.roles) > :minRoles
+		select a from Account a
+		join fetch a.roles r
+		where a.username = :username
 	""")
-	Page<Account> findAccountsWithFilter(String keyword, Integer maxRoles, Integer minRoles, Pageable pageable);
-	
-	@Query(value ="""
-	select t.user_name as name, coalesce(t.rv, 0) as reviews, coalesce(t2.od, 0) as orders, coalesce(t2.sp, 0) as spends
-	from
-	(select a.user_name, r.user_id, count(r.id) as rv
-	from review r join account a on a.id = r.user_id
-	group by a.user_name, r.user_id order by rv desc) t
-	left join
-	(select o2.user_id, sum(o.amount) as od, sum(o.amount * o.price) as sp\s
-	from order_receipt o2 join order_detail o on o2.id = o.order_id
-	group by o2.user_id order by od DESC) t2\s
-	on t.user_id = t2.user_id
-	order BY orders desc limit 7
-	""", nativeQuery = true)
-	List<Map<String,Object>> getTopUser(); //Top 7 users base on receipts and reviews
-	
+	Optional<Account> findByUsername(String username);
+
+	Optional<Account> findByEmail(String email);
+
 	@Query("""
-	select a.userName as name, coalesce(sum(o.amount), 0) as books, coalesce(sum(o.amount * o.price), 0) as sales
-	from Account a join Book b on a.id = b.user.id 
-	left join OrderDetail o on b.id = o.book.id
-	group by a.userName
-	order by sales desc
+		select a from Account a
+		join a.refreshTokens t
+		join fetch a.roles r
+		where t.refreshToken = :token
+		and a.username = :username
 	""")
-	List<Map<String,Object>> getTopSeller(); //Top sellers base on sale (username, total amount sold, total sales)
+	Optional<Account> findByRefreshTokenAndUsername(String token, String username);
+
+	Optional<Account> findByResetToken(String token);
+
+	@Query("""
+		select a.id from Account a
+		join a.roles r
+		where concat (a.email, a.username) ilike %:keyword%
+		and (coalesce(:role) is null or r.roleName = :role)
+		and a.id not in :ids
+		group by a.id
+	""")
+	List<Long> findInverseIds(String keyword, UserRole role, List<Long> ids);
+
+	@Query("""
+        select t.currentMonth as total, t.currentMonth as currentMonth, t.lastMonth as lastMonth
+        from (select count(a.id) as total,
+			count(case when a.createdDate >= date_trunc('month', current date) then 1 end) as currentMonth,
+			count(case when a.createdDate >= date_trunc('month', current date) - 1 month
+				and a.createdDate < date_trunc('month', current date) then 1 end) lastMonth
+			from Account a
+			where a.createdDate >= date_trunc('month', current date) - 1 month
+        ) t
+   	""")
+	IStat getAccountAnalytics();
+
+	@Query("""
+		select a.id as id, a.username as username, a.email as email,
+			p.name as name, p.phone as phone, a.roles as roles, i as image
+		from Account a
+		left join a.profile p
+		left join p.image i
+		join a.roles r
+		where concat (a.email, a.username) ilike %:keyword%
+		and (coalesce(:role) is null or r.roleName = :role)
+	""")
+	Page<IAccount> findAccountsWithFilter(String keyword, UserRole role, Pageable pageable);
+
+	@Modifying
+	@Query("""
+        update Account a
+        set a.resetToken = null
+        where a.resetToken = :token
+    """)
+	void clearResetToken(String token);
 }

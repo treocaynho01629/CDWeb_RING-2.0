@@ -2,16 +2,16 @@ package com.ring.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.ring.bookstore.dtos.coupons.CouponDTO;
 import com.ring.bookstore.enums.OrderStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,13 +30,19 @@ public class OrderDetail {
             strategy = GenerationType.SEQUENCE,
             generator = "primary_sequence"
     )
-    private Integer id;
+    private Long id;
 
     @Column
-    private Integer amount;
+    private Double totalPrice; //Product's price
 
     @Column
-    private Double price;
+    private Double shippingFee;
+
+    @Column
+    private Double shippingDiscount;
+
+    @Column
+    private Double discount; //Coupon discount + deal
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
@@ -48,8 +54,42 @@ public class OrderDetail {
     private OrderReceipt order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "shop_id")
     @JsonIgnore
-    private Book book;
-   
+    private Shop shop;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id")
+    @JsonIgnore
+    private Coupon coupon;
+
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "detail",
+            fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<OrderItem> items;
+
+    //For mapping DTO result
+    @Transient
+    private Double couponDiscount;
+
+    @Transient
+    private Double dealDiscount; //Product's discount * price
+
+    @Transient
+    private Integer totalQuantity;
+
+    @Transient
+    private CouponDTO couponDTO;
+
+    public void addOrderItem(OrderItem item) {
+        items.add(item);
+        item.setDetail(this);
+    }
+
+    public void removeOrderItem(OrderItem item) {
+        items.remove(item);
+        item.setDetail(null);
+    }
 }

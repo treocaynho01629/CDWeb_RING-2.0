@@ -1,42 +1,29 @@
 package com.ring.bookstore.model;
 
+import com.ring.bookstore.enums.BookLanguage;
+import com.ring.bookstore.enums.BookType;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import lombok.*;
 import org.hibernate.annotations.Nationalized;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-
 @Entity
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 public class BookDetail {
 
     @Id
     @Column(nullable = false, updatable = false)
-    @SequenceGenerator(
-            name = "primary_sequence",
-            sequenceName = "primary_sequence",
-            allocationSize = 1,
-            initialValue = 10000
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "primary_sequence"
-    )
     @JsonIgnore
-    private Integer id;
+    private Long id;
 
     @Column
     private Double bWeight;
@@ -50,13 +37,31 @@ public class BookDetail {
     @Column
     private LocalDate bDate;
 
-    @Column(length = 100)
-    @Nationalized 
-    private String bLanguage;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private BookLanguage bLanguage;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
+    @MapsId
+    @JoinColumn(name = "id")
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Book book;
 
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "detail",
+            fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Image> previewImages;
+
+    public void addImage(Image image) {
+        previewImages.add(image);
+        image.setDetail(this);
+    }
+
+    public void removeImage(Image image) {
+        previewImages.remove(image);
+        image.setDetail(null);
+    }
 }

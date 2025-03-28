@@ -1,137 +1,93 @@
 package com.ring.bookstore.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.ring.bookstore.exception.ImageResizerException;
-import org.springframework.http.HttpHeaders;
+import com.cloudinary.api.ApiResponse;
+import com.ring.bookstore.exception.HttpResponseException;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ring.bookstore.dtos.ImageDTO;
 import com.ring.bookstore.model.Image;
 import com.ring.bookstore.service.ImageService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
-@CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
 public class ImageController {
-	
-	private final ImageService imageService;
-	
-	//Gett all images
-	@GetMapping
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> getAllImages() {
-		return new ResponseEntity<>(imageService.getAllImages(), HttpStatus.OK);
-	}
 
-	//Upload image
-	@PostMapping("/upload")
-	@PreAuthorize("hasAnyRole('ADMIN')")
-	public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) {
-		if (file.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File does not exist!");
-		}
+    private final ImageService imageService;
 
-		try {
-			ImageDTO image = imageService.uploadAndMap(file);
-			return new ResponseEntity<>(image, HttpStatus.OK);
-		} catch (Exception e) {
-			String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-		}
-	}
+    //Get all images
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllImages() {
+        return new ResponseEntity<>(imageService.getAllImages(), HttpStatus.OK);
+    }
 
-	//Upload multiples images
-	@PostMapping("/upload_multiples")
-	@PreAuthorize("hasAnyRole('ADMIN')")
-	public ResponseEntity<?> uploadImages( @RequestParam("images") MultipartFile[] files) {
-		List<String> messages = new ArrayList<>();
+    //Upload image
+    @PostMapping("/upload")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('CREATE_PRIVILEGE')")
+    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file,
+                                         @RequestParam(value = "folder", required = false) String folder) {
+        Image result = imageService.upload(file, folder);
+        return new ResponseEntity<>(result.getUrl(), HttpStatus.OK);
+    }
 
-		Arrays.asList(files).forEach(file -> {
-			try {
-				imageService.upload(file);
-				messages.add(file.getOriginalFilename() + " [Successful]");
-			} catch (Exception e) {
-				messages.add(file.getOriginalFilename() + " <Failed> - " + e.getMessage());
-			}
-		});
+    //Upload multiples images
+    @PostMapping("/upload-multiple")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('CREATE_PRIVILEGE')")
+    public ResponseEntity<?> uploadImages(@RequestParam("images") MultipartFile[] files,
+                                          @RequestParam(value = "folder", required = false) String folder) {
+        List<String> messages = new ArrayList<>();
 
-		return new ResponseEntity<>(messages, HttpStatus.OK);
-	}
+        imageService.uploadMultiple(Arrays.asList(files), folder).forEach(image -> {
+            messages.add(image.getName() + " uploaded!");
+        });
 
-	//Upload image
-	@PostMapping("/replace")
-	@PreAuthorize("hasAnyRole('ADMIN')")
-	public ResponseEntity<?> replaceImage(@RequestParam("image") MultipartFile file) {
-		if (file.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File does not exist!");
-		}
+        return new ResponseEntity<>(messages, HttpStatus.OK);
+    }
 
-		try {
-			ImageDTO image = imageService.replaceAndMap(file);
-			return new ResponseEntity<>(image, HttpStatus.OK);
-		} catch (Exception e) {
-			String message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-		}
-	}
+    //Replace image
+    @PutMapping("/replace")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('UPDATE_PRIVILEGE')")
+    public ResponseEntity<?> replaceImage(@RequestParam("image") MultipartFile file,
+                                          @RequestParam("id") Long id) {
+        Image result = imageService.replace(file, id);
+        return new ResponseEntity<>(result.getUrl(), HttpStatus.OK);
+    }
 
-	//Upload multiples images
-	@PostMapping("/replace_multiples")
-	@PreAuthorize("hasAnyRole('ADMIN')")
-	public ResponseEntity<?> replaceImages( @RequestParam("images") MultipartFile[] files) {
-		List<String> messages = new ArrayList<>();
+    //Delete image by {id}
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
+    public ResponseEntity<?> uploadImage(@RequestParam("id") @NotBlank(message = "Phải bao gồm public id!") String publicId) {
+        String result = imageService.deleteImage(publicId);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
-		Arrays.asList(files).forEach(file -> {
-			try {
-				imageService.replace(file);
-				messages.add(file.getOriginalFilename() + " [Successful]");
-			} catch (Exception e) {
-				messages.add(file.getOriginalFilename() + " <Failed> - " + e.getMessage());
-			}
-		});
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
+    public ResponseEntity<?> uploadImage(@PathVariable Long id) {
+        String result = imageService.deleteImage(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
-		return new ResponseEntity<>(messages, HttpStatus.OK);
-	}
-	
-	//Get image by {name}
-	@GetMapping("/{name}")
-	public ResponseEntity<?> getImage(@PathVariable String name,
-									   @RequestParam(value = "size", defaultValue = "original") String predefinedTypeName) {
-		final HttpHeaders headers = new HttpHeaders();
-		try {
-			Image image = imageService.resolve(predefinedTypeName, name);
-			return ResponseEntity.status(HttpStatus.OK)
-					.contentType(MediaType.valueOf(image.getType()))
-					.body(image.getImage()); //Return image
-		} catch (ImageResizerException e) {
-			headers.setContentType(MediaType.TEXT_HTML);
-			return new ResponseEntity<>(e.getMessage(), headers, e.getStatus());
-		}
-	}
-	
-	//Delete image by {id}
-	@DeleteMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> deleteImage(@PathVariable Integer id) {
-		ImageDTO image = imageService.deleteImage(id);
-		return new ResponseEntity<>(image, HttpStatus.OK);
-	}
+    //Delete images
+    @DeleteMapping("/delete-multiple")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
+    public ResponseEntity<?> deleteImages(@RequestParam(value = "publicIds", required = false) List<String> publicIds,
+                                          @RequestParam(value = "ids", required = false) List<Long> ids) {
+        if (publicIds.isEmpty() && ids.isEmpty())
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Phải bao gồm ids hoặc publicIds");
+        ApiResponse response = !publicIds.isEmpty() ? imageService.deleteImages(publicIds)
+                : imageService.deleteImagesByIds(ids);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

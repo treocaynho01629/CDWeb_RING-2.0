@@ -1,43 +1,29 @@
 package com.ring.bookstore.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
-
+import java.math.BigDecimal;
 import java.util.List;
 
-import jakarta.validation.constraints.Max;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.Nationalized;
+import com.ring.bookstore.enums.BookType;
+import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
+import lombok.*;
+import org.hibernate.annotations.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
 @Entity
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@EqualsAndHashCode
+@SQLDelete(sql = "UPDATE Book SET active = false WHERE id=?")
+@SQLRestriction("active=true")
+@EqualsAndHashCode(callSuper = true)
 @Table(indexes = @Index(columnList = "title"))
-public class Book {
+public class Book extends Auditable {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -51,86 +37,95 @@ public class Book {
             strategy = GenerationType.SEQUENCE,
             generator = "primary_sequence"
     )
-    private Integer id;
-    
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id", nullable = true)
-    private Image images;
-    
+    private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY,
+            orphanRemoval = true,
+            cascade = CascadeType.ALL,
+            optional = false)
+    @JoinColumn(name = "image_id")
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private Image image;
+
     @Column
     private Double price;
 
-    @Column
-    @Max(value = 199, message = "Kho hàng đã đầy (giới hạn 199)")
-    private Integer amount;
+    @Column(precision = 5, scale = 4)
+    private BigDecimal discount;
 
-    @Column(length = 200)
-    @Nationalized 
+    @Column
+    private Short amount;
+
+    @Column(length = 200, unique = true)
+    @Nationalized
     private String title;
 
     @Column(length = 4000)
-    @Nationalized 
+    @Nationalized
     private String description;
 
-    @Column(length = 200)
-    @Nationalized 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private BookType type;
 
     @Column(length = 200)
-    @Nationalized 
+    @Nationalized
     private String author;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sell_id")
-    @JsonIgnore 
-    private Account user;
+    @Column(unique = true)
+    private String slug;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id")
+    @JsonIgnore
+    private Shop shop;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "publisher_id")
+    @JsonIgnore
     private Publisher publisher;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cate_id")
+    @JsonIgnore
     private Category cate;
 
-    @OneToOne(cascade = CascadeType.ALL, 
-    		orphanRemoval = true, 
-    		mappedBy = "book")
-    private BookDetail bookDetail;
+    @OneToOne(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "book",
+            orphanRemoval = true,
+            optional = false)
+    @PrimaryKeyJoinColumn
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private BookDetail detail;
 
-    @OneToMany(cascade = CascadeType.ALL, 
-    		orphanRemoval = true, 
-    		mappedBy = "book", 
-    		fetch = FetchType.LAZY)
-    @LazyCollection(LazyCollectionOption.EXTRA)
-    @JsonIgnore 
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "book",
+            fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Review> bookReviews;
 
-    @OneToMany(cascade = CascadeType.ALL, 
-    		orphanRemoval = true, 
-    		mappedBy = "book", 
-    		fetch = FetchType.LAZY)
-    @LazyCollection(LazyCollectionOption.EXTRA)
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            mappedBy = "book",
+            fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<OrderDetail> orderDetails;
-    
+    private List<OrderItem> orderItems;
+
     public void addReview(Review review) {
-    	bookReviews.add(review);
-    	review.setBook(this);
+        bookReviews.add(review);
+        review.setBook(this);
     }
- 
+
     public void removeReview(Review review) {
-    	bookReviews.remove(review);
+        bookReviews.remove(review);
         review.setBook(null);
     }
-    
-    public void addOrderDetail(OrderDetail detail) {
-    	orderDetails.add(detail);
-    	detail.setBook(this);
-    }
- 
-    public void removeOrderDetail(OrderDetail detail) {
-    	orderDetails.remove(detail);
-    	detail.setBook(null);
+
+    @PreRemove
+    private void preRemove() {
+        this.setImage(null);
     }
 }

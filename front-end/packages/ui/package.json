@@ -1,0 +1,56 @@
+{
+  "name": "@ring/ui",
+  "version": "0.0.0",
+  "sideEffects": false,
+  "files": [
+    "src"
+  ],
+  "exports": {
+    ".": "./src/index.js",
+    "./Components": "./src/components/Components.jsx",
+    "./AuthComponents": "./src/components/AuthComponents.jsx",
+    "./DatePicker": "./src/components/DatePicker.jsx",
+    "./LightboxImages": "./src/components/LightboxImages.jsx",
+    "./ProductImages": "./src/components/ProductImages.jsx",
+    "./PasswordInput": "./src/components/PasswordInput.jsx",
+    "./Placeholder": "./src/components/Placeholder.jsx",
+    "./Progress": "./src/components/Progress.jsx",
+    "./Snackbar": "./src/components/Snackbar.jsx",
+    "./FallbackLogo": "./src/layout/FallbackLogo.jsx",
+    "./Layout": "./src/layout/Layout.jsx",
+    "./LoadingProgress": "./src/layout/LoadingProgress.jsx",
+    "./PendingModal": "./src/layout/PendingModal.jsx",
+    "./ScrollToTop": "./src/layout/ScrollToTop.jsx",
+    "./SimpleNavbar": "./src/layout/SimpleNavbar.jsx",
+    "./Missing": "./src/pages/Missing.jsx",
+    "./Unauthorized": "./src/pages/Unauthorized.jsx",
+    "./SnackbarProvider": "./src/provider/SnackbarProvider.jsx",
+    "./ThemeContextProvider": "./src/provider/ThemeContextProvider.jsx"
+  },
+  "scripts": {
+    "lint": "eslint \"**/*.{ts,tsx,js,jsx}\"",
+    "update-dependencies": "npx npm-check-updates -u"
+  },
+  "dependencies": {
+    "@mui/styles": "^6.4.7",
+    "@mui/x-date-pickers": "^7.27.1",
+    "@ring/shared": "*",
+    "yet-another-react-lightbox": "^3.21.7"
+  },
+  "devDependencies": {
+    "@ring/eslint-config": "*",
+    "eslint": "^9.21.0"
+  },
+  "peerDependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^6.0.1",
+    "@mui/material": "^6.0.1",
+    "dayjs": "^1.11.11",
+    "notistack": "^3.0.1",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "react-multi-carousel": "^2.8.5",
+    "react-router": "^7.0.1"
+  }
+}

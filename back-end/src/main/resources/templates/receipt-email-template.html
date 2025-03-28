@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+    <title th:text="${subject}"> Email Sign up Template</title>
+    <!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+        #outlook a {
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table,
+        td {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+        }
+
+        p {
+            display: block;
+            margin: 13px 0;
+        }
+
+    </style>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:AllowPNG/>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <!--[if lte mso 11]>
+    <style type="text/css">
+        .mj-outlook-group-fix { width:100% !important; }
+    </style>
+    <![endif]-->
+    <!--[if !mso]><!-->
+    <link href="https://fonts.googleapis.com/css2?family=Abel&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=VT323&display=swap" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        @import url(https://fonts.googleapis.com/css2?family=Abel&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=VT323&display=swap);
+
+    </style>
+    <!--<![endif]-->
+    <style type="text/css">
+        @media only screen and (min-width:480px) {
+            .mj-column-per-100 {
+                width: 100% !important;
+                max-width: 100%;
+            }
+
+            .mj-column-per-50 {
+                width: 50% !important;
+                max-width: 50%;
+            }
+
+            .mj-column-per-30 {
+                width: 30% !important;
+                max-width: 30%;
+            }
+
+            .mj-column-per-70 {
+                width: 70% !important;
+                max-width: 70%;
+            }
+        }
+
+    </style>
+    <style media="screen and (min-width:480px)">
+        .moz-text-html .mj-column-per-100 {
+            width: 100% !important;
+            max-width: 100%;
+        }
+
+        .moz-text-html .mj-column-per-50 {
+            width: 50% !important;
+            max-width: 50%;
+        }
+
+        .moz-text-html .mj-column-per-30 {
+            width: 30% !important;
+            max-width: 30%;
+        }
+
+        .moz-text-html .mj-column-per-70 {
+            width: 70% !important;
+            max-width: 70%;
+        }
+
+    </style>
+    <style type="text/css">
+        @media only screen and (max-width:479px) {
+            table.mj-full-width-mobile {
+                width: 100% !important;
+            }
+
+            td.mj-full-width-mobile {
+                width: auto !important;
+            }
+        }
+
+    </style>
+</head>
+
+<body style="word-spacing:normal;background-color:#f9f9fb;">
+<div style="background-color:#f9f9fb;" lang="und" dir="auto">
+    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#f9f9fb" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:#f9f9fb;background-color:#f9f9fb;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#f9f9fb;background-color:#f9f9fb;width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;font-size:0px;padding:8px;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:584px;" ><![endif]-->
+                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                            <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                                        <tbody>
+                                        <tr>
+                                            <td style="width:120px;">
+                                                <a th:href="${clientUrl}">
+                                                    <img alt th:src="|cid:${logo}|" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="120" height="auto">
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;">
+            <tbody>
+            <tr>
+                <td style="border:0.5px solid lightgray;direction:ltr;font-size:0px;padding:32px 0;text-align:center;">
+                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" width="600px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+                    <div style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;">
+                            <tbody>
+                            <tr>
+                                <td style="direction:ltr;font-size:0px;padding:0;text-align:center;">
+                                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+                                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                    <div style="font-family:Roboto, sans-serif;font-size:24px;font-weight:450;line-height:24px;text-align:left;color:#000000;">Cảm ơn bạn đã mua hàng</div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                    <div style="font-family:Roboto, sans-serif;font-size:18px;font-weight:450;line-height:24px;text-align:left;color:#000000;">Tài khoản <span th:text="${username}"></span> của bạn đã thực hiện giao dịch tại RING!</div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                    <div style="font-family:Roboto, sans-serif;font-size:14px;font-weight:400;line-height:24px;text-align:left;color:#000000;">RING! gửi đến quý khách hóa đơn điện tử cho đơn hàng #<span th:text="${receipt.id}"></span>, Quý khách có thể theo dõi đơn hàng tại <a style="color: #63aee3" th:src="|${clientUrl}/profile/order|">đây</a>, mã tra cứu #<span th:text="${receipt.id}"></span>.<br>
+                                                        Sản phẩm sẽ được giao đến bạn sớm nhất có thể.<br><br>
+                                                        Chúc bạn có một trải nghiệm thật vui vẻ.<br>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left" class="title" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                    <div style="text-transform: uppercase; border-bottom: 0.5px solid lightgray; font-family: Roboto, sans-serif; line-height: 24px; text-align: left; font-size: 16px; font-weight: 450; color: #63e399;">Thông tin đơn hàng #<span th:text="${receipt.id}"></span></div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table></td></tr><tr><td class="" width="600px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+                    <div style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;">
+                            <tbody>
+                            <tr>
+                                <td style="direction:ltr;font-size:0px;padding:0 25px;text-align:center;">
+                                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:275px;" ><![endif]-->
+                                    <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left" class="info" style="font-size:0px;padding:4px;word-break:break-word;">
+                                                    <div style="font-family:Roboto, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:left;color:#000000;">
+                                                        <div class="inner" style="padding: 0; padding-top: 8px; font-size: 16px; font-weight: bold;"> Thông tin thanh toán
+                                                            <p style="margin-bottom: 0; font-weight: 400; font-size: 14px;">
+                                                                Tên: <span th:text="${receipt.name}"></span><br>
+                                                                Email: <a style="color: #63aee3" th:href="|mailto:${receipt.email}|" th:text="${receipt.email}"></a><br>
+                                                                Ngày: <span th:text="${#temporals.format(receipt.date, 'dd/MM/yyyy - hh:mm:ss')}"></span><br>
+                                                                Hình thức thanh toán: <span th:text="${paymentType}"></span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--[if mso | IE]></td><td class="info-column-outlook" style="vertical-align:top;width:275px;" ><![endif]-->
+                                    <div class="mj-column-per-50 mj-outlook-group-fix info-column" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left" class="info" style="font-size:0px;padding:4px;word-break:break-word;">
+                                                    <div style="font-family:Roboto, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:left;color:#000000;">
+                                                        <div class="inner" style="padding: 0; padding-top: 8px; font-size: 16px; font-weight: bold;"> Địa chỉ giao hàng
+                                                            <p style="margin-bottom: 0; font-weight: 400; font-size: 14px;">
+                                                                <span th:text="${receipt.address}"></span><br/>
+                                                                <span th:text="${receipt.phone}"></span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table></td></tr><tr><td class="" width="600px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+                    <div style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;">
+                            <tbody>
+                            <tr>
+                                <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0;text-align:center;">
+                                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+                                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left" class="title" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                    <div style="text-transform: uppercase; border-bottom: 0.5px solid lightgray; font-family: Roboto, sans-serif; line-height: 24px; text-align: left; font-size: 16px; font-weight: 450; color: #63e399;">Chi tiết đơn hàng</div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left" class="receipt-table" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                    <table cellpadding="0" cellspacing="0" width="100%" border="0" style="background: #fff; color: #000000; font-family: Roboto, sans-serif; font-size: 13px; line-height: 22px; table-layout: auto; width: 100%; border: 0.5px solid lightgray;">
+                                                        <tr>
+                                                            <th align="left" style="padding: 12px 16px; border-bottom: 0.5px solid lightgray; font-size: 14px; font-weight: 450; line-height: 14px; background-color: rgba(99, 227, 153, 0.25);" bgcolor="rgba(99, 227, 153, 0.25)">Sản phẩm</th>
+                                                            <th align="right" style="padding: 12px 16px; border-bottom: 0.5px solid lightgray; font-size: 14px; font-weight: 450; line-height: 14px; background-color: rgba(99, 227, 153, 0.25);" bgcolor="rgba(99, 227, 153, 0.25)">Tổng</th>
+                                                        </tr>
+                                                        <tbody th:each="detail : ${receipt.details}">
+                                                            <tr th:each="item : ${detail.items}">
+                                                                <td align="left" style="padding: 16px;">
+                                                                    <b th:text="${item.bookTitle}"></b><br>
+                                                                    <span class="price" style="color: #63e399; font-size: 16px; font-weight: 450; white-space: nowrap;">
+                                                                         <span th:text="${#strings.replace(
+                                                                        #numbers.formatDecimal(item.price * (1 - item.discount), 0, 'COMMA', 2, 'POINT')
+                                                                        , '.00'
+                                                                        , '')}">
+                                                                        </span>&nbsp;₫
+                                                                    </span>
+                                                                    <span class="discount" style="text-decoration: line-through; font-size: 12px; margin-left: 8px; color: gray;">
+                                                                         <span th:text="${#strings.replace(
+                                                                        #numbers.formatDecimal(item.price, 0, 'COMMA', 2, 'POINT')
+                                                                        , '.00'
+                                                                        , '')}">
+                                                                        </span>&nbsp;₫
+                                                                    </span>
+                                                                    <b style="margin-left: 8px">SL: <span th:text="${item.quantity}"></span></b>
+                                                                </td>
+                                                                <td align="right" style="padding: 16px;">
+                                                                    <span class="price total" style="font-size: 16px; font-weight: 450; white-space: nowrap; color: #ffa726;">
+                                                                    <span th:text="${#strings.replace(
+                                                                    #numbers.formatDecimal(item.price * (1 - item.discount) * item.quantity, 0, 'COMMA', 2, 'POINT')
+                                                                    , '.00'
+                                                                    , '')}">
+                                                                    </span>&nbsp;₫
+                                                                </span>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table></td></tr><tr><td class="" width="600px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+                    <div style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;">
+                            <tbody>
+                            <tr>
+                                <td style="direction:ltr;font-size:0px;padding:0 25px;text-align:center;">
+                                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:165px;" ><![endif]-->
+                                    <div class="mj-column-per-30 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--[if mso | IE]></td><td class="" style="vertical-align:top;width:385px;" ><![endif]-->
+                                    <div class="mj-column-per-70 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+                                            <tbody>
+                                            <tr>
+                                                <td style="border:0.5px solid lightgray;vertical-align:top;padding:16px;">
+                                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style width="100%">
+                                                        <tbody>
+                                                        <tr>
+                                                            <td align="left" style="font-size:0px;padding:0;word-break:break-word;">
+                                                                <div style="font-family:Roboto, sans-serif;font-size:16px;font-weight:bold;line-height:24px;text-align:left;color:#000000;">ĐƠN GIÁ</div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td align="left" class="final-table" style="font-size:0px;padding:8px 0;word-break:break-word;">
+                                                                <table cellpadding="0" cellspacing="0" width="100%" border="0" style="color:#000000;font-family:Roboto, sans-serif;font-size:13px;line-height:22px;table-layout:auto;width:100%;border:none;">
+                                                                    <tr>
+                                                                        <td align="left" style="padding: 4px 0; font-size: 14px;">Tổng tiền hàng:</td>
+                                                                        <td align="right" style="padding: 4px 0; font-size: 14px;">
+                                                                            <span th:text="${#strings.replace(
+                                                                            #numbers.formatDecimal(productsTotal, 0, 'COMMA', 2, 'POINT')
+                                                                            , '.00'
+                                                                            , '')}">
+                                                                            </span>&nbsp;₫
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td align="left" style="padding: 4px 0; font-size: 14px;">Phí vận chuyển:</td>
+                                                                        <td align="right" style="padding: 4px 0; font-size: 14px;">
+                                                                           <span th:text="${#strings.replace(
+                                                                            #numbers.formatDecimal(shippingFee, 0, 'COMMA', 2, 'POINT')
+                                                                            , '.00'
+                                                                            , '')}">
+                                                                            </span>&nbsp;₫
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td align="left" style="padding: 4px 0; font-size: 14px;">Giảm giá:</td>
+                                                                        <td align="right" style="padding: 4px 0; font-size: 14px;">
+                                                                            <span th:text="${#strings.replace(
+                                                                            #numbers.formatDecimal(receipt.totalDiscount, 0, 'COMMA', 2, 'POINT')
+                                                                            , '.00'
+                                                                            , '')}">
+                                                                            </span>&nbsp;₫
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr style="border-top: 1px dashed lightgray;">
+                                                                        <td align="left" style="padding-top: 8px; font-size: 14px;">Tổng:</td>
+                                                                        <td align="right" style="padding: 4px 0; font-size: 14px;">
+                                                                            <span class="total" style="font-size: 16px; font-weight: 450; color: #ef5350;">
+                                                                                <span th:text="${#strings.replace(
+                                                                                #numbers.formatDecimal(receipt.total - receipt.totalDiscount, 0, 'COMMA', 2, 'POINT')
+                                                                                , '.00'
+                                                                                , '')}">
+                                                                                </span>&nbsp;₫
+                                                                            </span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table></td></tr><tr><td class="" width="600px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+                    <div style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;">
+                            <tbody>
+                            <tr>
+                                <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0;text-align:center;">
+                                    <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+                                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                                            <tbody>
+                                            <tr>
+                                                <td style="font-size:0px;word-break:break-word;">
+                                                    <div style="height:16px;line-height:16px;">&#8202;</div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                    <p style="border-top:solid 1px lightgray;font-size:1px;margin:0px auto;width:100%;">
+                                                    </p>
+                                                    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 1px lightgray;font-size:1px;margin:0px auto;width:550px;" role="presentation" width="550px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+                                              </td></tr></table><![endif]-->
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                                    <div style="font-family:Roboto, sans-serif;font-size:14px;font-weight:400;line-height:24px;text-align:left;color:gray;">Cảm ơn, <br><br>
+                                                        Đội ngũ RING!<br>
+                                                        <a style="color: #63aee3" href="mailto:support@ringdoraz.io.vn">support@ringdoraz.io.vn</a></div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--[if mso | IE]></td></tr></table><![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]></td></tr></table></td></tr></table><![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
+</div>
+</body>
+</html>

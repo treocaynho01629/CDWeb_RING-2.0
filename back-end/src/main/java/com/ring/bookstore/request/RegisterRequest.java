@@ -1,7 +1,7 @@
 package com.ring.bookstore.request;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,15 +14,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RegisterRequest { //Request body for sign-up
 
-	@NotNull(message = "Tên đăng nhập không được để trống!")
+	@NotBlank(message = "Tên đăng nhập không được để trống!")
 	@Size(min = 4, max = 24, message = "Tên đăng nhập dài 4-24 kí tự")
-	private String userName;
+	private String username;
 	
-	@NotNull(message = "Mật khẩu không được để trống!")
+	@NotBlank(message = "Mật khẩu không được để trống!")
 	@Size(min = 8, max = 24, message = "Mật khẩu dài 8-24 kí tự")
 	private String pass;
 	
-	@NotNull(message = "Email không được để trống!")
+	@NotBlank(message = "Email không được để trống!")
 	@Email(message = "Sai định dạng email!")
 	private String email;
 }

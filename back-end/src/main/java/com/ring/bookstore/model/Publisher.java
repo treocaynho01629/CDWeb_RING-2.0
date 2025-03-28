@@ -1,26 +1,20 @@
 package com.ring.bookstore.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
 import java.util.Set;
 
+import lombok.*;
 import org.hibernate.annotations.Nationalized;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import lombok.Getter;
-import lombok.Setter;
 
 
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Publisher {
 
     @Id
@@ -39,10 +33,18 @@ public class Publisher {
 
     @Column(length = 200)
     @Nationalized 
-    private String pubName;
+    private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "publisher")
+    @OneToOne(fetch = FetchType.LAZY,
+            orphanRemoval = true,
+            cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_id")
+    @JsonIgnore
+    private Image image;
+
+    @OneToMany(cascade = CascadeType.ALL,
+            mappedBy = "publisher",
+            fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Book> publisherBooks;
-
 }

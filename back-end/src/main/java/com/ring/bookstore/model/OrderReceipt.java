@@ -1,38 +1,28 @@
 package com.ring.bookstore.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
-import java.time.LocalDateTime;
+import com.ring.bookstore.dtos.coupons.CouponDTO;
+import com.ring.bookstore.enums.PaymentType;
+import com.ring.bookstore.enums.ShippingType;
+import jakarta.persistence.*;
+
 import java.util.List;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.Nationalized;
+import jakarta.persistence.CascadeType;
+import lombok.*;
+import org.hibernate.annotations.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
 @Entity
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@EqualsAndHashCode
-public class OrderReceipt {
+@SQLDelete(sql = "UPDATE Coupon SET active = false WHERE id=?")
+@SQLRestriction("active=true")
+@EqualsAndHashCode(callSuper = true)
+public class OrderReceipt extends Auditable {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -46,52 +36,79 @@ public class OrderReceipt {
             strategy = GenerationType.SEQUENCE,
             generator = "primary_sequence"
     )
-    private Integer id;
+    private Long id;
 
     @Column(length = 200)
-    @Nationalized 
-    private String fullName;
-
-    @Column(length = 1000)
     private String email;
 
-    @Column(length = 15)
-    private String phone;
+    @OneToOne(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    @JsonIgnore
+    private Address address;
 
-    @Column(length = 1000)
+    @Column(length = 300)
     @Nationalized 
-    private String oAddress;
-
-    @Column(length = 1000)
-    @Nationalized 
-    private String oMessage;
+    private String orderMessage;
 
     @Column
-    private LocalDateTime oDate;
+    private Double total; //Products price - deal + shipping fee
 
     @Column
-    private Double total;
+    private Double totalDiscount; //Coupon discount + deal + shipping discount
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private Account user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id")
+    @JsonIgnore
+    private Coupon coupon;
+
     @OneToMany(cascade = CascadeType.ALL, 
     		orphanRemoval = true,  
     		mappedBy = "order", 
     		fetch = FetchType.LAZY)
-    @LazyCollection(LazyCollectionOption.EXTRA)
     @JsonIgnore
-    private List<OrderDetail> orderOrderDetails;
+    private List<OrderDetail> details;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private ShippingType shippingType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private PaymentType paymentType;
+
+    //For mapping DTO result
+    @Transient
+    private Double productsPrice;
+
+    @Transient
+    private Double shippingFee;
+
+    @Transient
+    private Double shippingDiscount;
+
+    @Transient
+    private Double dealDiscount; //Product's discount * price
+
+    @Transient
+    private Double couponDiscount;
+
+    @Transient
+    private CouponDTO couponDTO;
 
     public void addOrderDetail(OrderDetail detail) {
-    	orderOrderDetails.add(detail);
+        details.add(detail);
     	detail.setOrder(this);
     }
  
     public void removeOrderDetail(OrderDetail detail) {
-    	orderOrderDetails.remove(detail);
+        details.remove(detail);
     	detail.setOrder(null);
     }
 }

@@ -1,0 +1,14 @@
+package com.ring.bookstore.dtos.accounts;
+
+import com.ring.bookstore.enums.UserRole;
+
+//Account
+public record AccountDTO(Long id,
+                         String username,
+                         String email,
+                         String name,
+                         String phone,
+                         String image,
+                         UserRole role) {
+
+}

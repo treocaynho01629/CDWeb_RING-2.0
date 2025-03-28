@@ -1,21 +1,11 @@
 package com.ring.bookstore.controller;
 
-import java.io.IOException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.core.exc.StreamWriteException;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.request.AuthenticationRequest;
 import com.ring.bookstore.request.RegisterRequest;
@@ -23,52 +13,72 @@ import com.ring.bookstore.request.ResetPassRequest;
 import com.ring.bookstore.response.AuthenticationResponse;
 import com.ring.bookstore.service.impl.AuthenticationService;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-	@Autowired
 	private final AuthenticationService authService;
 
 	//Register
 	@PostMapping("/register")
-	public ResponseEntity<AuthenticationResponse> register(@RequestBody @Valid RegisterRequest request) {
-		return ResponseEntity.ok(authService.register(request));
+	public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest,
+									  HttpServletRequest request) {
+		authService.register(registerRequest, request);
+		return ResponseEntity.ok("Đăng ký thành công!");
 	}
 
 	//Authenticate sign in
 	@PostMapping("/authenticate")
-	public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request) {
-		return ResponseEntity.ok(authService.authenticate(request));
+	public ResponseEntity<AuthenticationResponse> authenticate(
+			@RequestParam(value = "persist", defaultValue = "true") Boolean persist,
+			@RequestBody @Valid AuthenticationRequest authRequest,
+			HttpServletRequest request) {
+		//Generate new JWT & refresh token
+		Account auth = authService.authenticate(authRequest, request);
+		String jwtToken = authService.generateToken(auth);
+
+		//Set refresh token
+		ResponseCookie refreshCookie;
+		if (persist) {
+			refreshCookie = authService.generateRefreshCookie(auth);
+		} else {
+			refreshCookie = authService.clearRefreshCookie();
+		}
+
+		return ResponseEntity.ok()
+				.header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+				.body(new AuthenticationResponse(jwtToken));
 	}
 
 	//Refresh JWT token
 	@GetMapping("/refresh-token")
-	public void refreshToken(HttpServletRequest request, HttpServletResponse response)
-			throws StreamWriteException, DatabindException, IOException {
-		authService.refreshToken(request, response);
+	public ResponseEntity<AuthenticationResponse> refreshToken(HttpServletRequest request) {
+		//Generate new token
+		Account auth = authService.refreshToken(request);
+		String jwtToken = authService.generateToken(auth);
+
+		return ResponseEntity.ok().body(new AuthenticationResponse(jwtToken));
 	}
 	
 	//Send forgot password email
 	@PostMapping("/forgot-password")
-	public ResponseEntity<?> forgotPassword(@RequestParam(value="email") String email){
-		authService.forgotPassword(email);
-		return new ResponseEntity< >("Đã gửi email khôi phục mật khẩu", HttpStatus.OK);
+	public ResponseEntity<?> forgotPassword(@RequestParam(value="email") String email,
+											HttpServletRequest request){
+		authService.forgotPassword(email, request);
+
+		return ResponseEntity.ok("Đã gửi email khôi phục mật khẩu!");
 	}
 	
 	//Reset password
-	@PutMapping("/reset-password")
-	public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPassRequest request){
-		Account account = authService.resetPassword(request);
-		String result = "Đổi mật khẩu thất bại";
-		if (account != null) result = "Thay đổi mật khẩu thành công!";
-		return new ResponseEntity< >(result, HttpStatus.OK);
+	@PutMapping("/reset-password/{token}")
+	public ResponseEntity<?> resetPassword(@PathVariable("token") String token,
+										   @Valid @RequestBody ResetPassRequest resetRequest,
+											HttpServletRequest request){
+		authService.resetPassword(token, resetRequest, request);
+		return ResponseEntity.ok("Thay đổi mật khẩu thành công!");
 	}
 }
