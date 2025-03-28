@@ -1,513 +1,792 @@
+import styled from "@emotion/styled";
+import { useState, useEffect, Fragment, memo, useRef } from "react";
 import {
-  lazy,
-  memo,
-  Suspense,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { useMediaQuery, Grid2 as Grid, Skeleton } from "@mui/material";
-import { NavLink, useNavigate, useParams, useSearchParams } from "react-router";
-import { useGetCategoryQuery } from "../features/categories/categoriesApiSlice";
-import { useGetBooksQuery } from "../features/books/booksApiSlice";
-import { debounce, isEqual } from "lodash-es";
-import { useTitle } from "@ring/shared";
-import { booksAmount, pageSizes, sortBooksBy } from "../utils/filters";
-import { StoreSuggest, Wrapper } from "../components/custom/SortComponents";
-import { StoreOutlined } from "@mui/icons-material";
-import AppPagination from "../components/custom/AppPagination";
-import CustomDivider from "../components/custom/CustomDivider";
-import FilteredProducts from "../components/product/filter/FilteredProducts";
-import FilterSortList from "../components/product/filter/FilterSortList";
-import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
+  Button,
+  Divider,
+  Checkbox,
+  FormGroup,
+  FormControlLabel,
+  List,
+  ListItemButton,
+  Collapse,
+  Skeleton,
+  Stack,
+  Badge,
+  Radio,
+} from "@mui/material";
+import {
+  ExpandLess,
+  ExpandMore,
+  FilterAltOff,
+  Star,
+  StarBorder,
+  CategoryOutlined,
+} from "@mui/icons-material";
+import { getBookType } from "@ring/shared";
+import {
+  useGetCategoriesQuery,
+  useGetRelevantCategoriesQuery,
+} from "../../../features/categories/categoriesApiSlice";
+import {
+  useGetPublishersQuery,
+  useGetRelevantPublishersQuery,
+} from "../../../features/publishers/publishersApiSlice";
+import { suggestPrices } from "../../../utils/filters";
+import PriceRangeSlider from "./PriceRangeSlider";
+import SimpleBar from "simplebar-react";
 
-const FilterList = lazy(
-  () => import("../components/product/filter/FilterList")
-);
-const FilterDrawer = lazy(
-  () => import("../components/product/filter/FilterDrawer")
-);
-const FiltersDisplay = lazy(
-  () => import("../components/product/filter/FiltersDisplay")
-);
-const JumpPagination = lazy(
-  () => import("../components/custom/JumpPagination")
-);
+//#region styled
+const FilterWrapper = styled.div`
+  position: sticky;
+  top: ${({ theme }) => theme.mixins.toolbar.minHeight}px;
+  overflow: hidden;
+`;
 
-const DEFAULT_FILTERS = {
-  keyword: "",
-  cate: { id: "", slug: "" },
-  pubIds: [],
-  types: [],
-  value: [0, 10000000],
-  rating: 0,
-};
-const DEFAULT_PAGINATION = {
-  number: 0,
-  size: pageSizes[1],
-  sortBy: sortBooksBy[0].value,
-  sortDir: "desc",
-  amount: booksAmount[0].value,
-};
+const StyledSimpleBar = styled(SimpleBar)`
+  padding: ${({ theme }) => `0 ${theme.spacing(2)} 0 ${theme.spacing(0.5)}`};
+  max-height: ${({ theme }) =>
+    `calc(100dvh - ${theme.mixins.toolbar.minHeight}px)`};
 
-const createCrumbs = (cate) => {
-  if (cate) {
-    return [
-      createCrumbs(cate?.parent),
-      <NavLink
-        to={`/store/${cate?.slug}?cate=${cate?.id}`}
-        end
-        key={`crumb-${cate?.id}`}
-      >
-        {cate?.name}
-      </NavLink>,
-    ];
-  }
-  return;
-};
-
-const Pagination = memo(AppPagination);
-
-const FiltersPage = () => {
-  //#region construct
-  const { cSlug } = useParams();
-
-  //Scroll ref
-  const scrollRef = useRef(null);
-  const pubsRef = useRef(null);
-  const valueRef = useRef(null);
-  const typesRef = useRef(null);
-  const rateRef = useRef(null);
-
-  //Responsive stuff
-  const mobileMode = useMediaQuery((theme) => theme.breakpoints.down("sm"));
-  const tabletMode = useMediaQuery((theme) => theme.breakpoints.down("md_lg"));
-
-  const [open, setOpen] = useState(undefined); //Filter
-  const [openPagination, setOpenPagination] = useState(undefined); //Pagination
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-
-  //Filter & pagination
-  const [filters, setFilters] = useState({
-    keyword: searchParams.get("q") ?? DEFAULT_FILTERS.keyword,
-    cate: {
-      id: searchParams.get("cate") ?? DEFAULT_FILTERS.cate.id,
-      slug: cSlug ?? DEFAULT_FILTERS.cate.slug,
-    },
-    pubIds: searchParams.get("pubs")?.split(",") ?? DEFAULT_FILTERS.pubIds,
-    value: searchParams.get("value")
-      ? searchParams.get("value").split(",").map(Number)
-      : DEFAULT_FILTERS.value,
-    types: searchParams.get("types")?.split(",") ?? DEFAULT_FILTERS.types,
-    rating: searchParams.get("rating") ?? DEFAULT_FILTERS.rating,
-  });
-  const [pagination, setPagination] = useState({
-    number: searchParams.get("pNo")
-      ? searchParams.get("pNo") - 1
-      : DEFAULT_PAGINATION.number,
-    size: searchParams.get("pSize") ?? DEFAULT_PAGINATION.size,
-    sortBy: searchParams.get("sort") ?? DEFAULT_PAGINATION.sortBy,
-    sortDir: searchParams.get("dir") ?? DEFAULT_PAGINATION.sortDir,
-    amount: searchParams.get("amount") ?? DEFAULT_PAGINATION.amount,
-  });
-
-  //Fetch data
-  const { data, isLoading, isFetching, isUninitialized, isError, error } =
-    useGetBooksQuery({
-      //Books
-      page: pagination.number,
-      size: pagination.size,
-      sortBy: pagination.sortBy,
-      sortDir: pagination.sortDir,
-      amount: pagination.amount,
-      keyword: filters.keyword,
-      cateId: filters.cate.id,
-      rating: filters.rating,
-      types: filters.types,
-      pubIds: filters.pubIds,
-      value: filters.value,
-    });
-  const { data: currCate, isLoading: loadCate } = useGetCategoryQuery(
-    { slug: filters.cate.slug, include: "parent" },
-    { skip: !filters.cate.id || !filters.cate.slug || true }
-  );
-
-  const updateFilters = () => {
-    setFilters((prev) => ({
-      ...prev,
-      keyword: searchParams.get("q") ?? DEFAULT_FILTERS.keyword,
-      cate: {
-        id: searchParams.get("cate") ? +searchParams.get("cate") : "",
-        slug: cSlug ?? DEFAULT_FILTERS.cate.slug,
-      },
-      pubIds: searchParams.get("pubs")?.split(",") ?? DEFAULT_FILTERS.pubIds,
-      value: searchParams.get("value")
-        ? searchParams.get("value").split(",").map(Number)
-        : DEFAULT_FILTERS.value,
-      types: searchParams.get("types")?.split(",") ?? DEFAULT_FILTERS.types,
-      rating: searchParams.get("rating") ?? DEFAULT_FILTERS.rating,
-    }));
-    setPagination((prev) => ({
-      ...prev,
-      number: searchParams.get("pNo")
-        ? searchParams.get("pNo") - 1
-        : DEFAULT_PAGINATION.number,
-      size: searchParams.get("pSize") ?? DEFAULT_PAGINATION.size,
-      sortBy: searchParams.get("sort") ?? DEFAULT_PAGINATION.sortBy,
-      sortDir: searchParams.get("dir") ?? DEFAULT_PAGINATION.sortDir,
-      amount: searchParams.get("amount") ?? DEFAULT_PAGINATION.amount,
-    }));
-  };
-
-  // Update filter
-  useEffect(() => {
-    updateFilters();
-  }, [cSlug, searchParams]);
-
-  //Set title
-  useTitle("Cửa hàng");
-
-  //Handle change
-  const scrollToTop = useCallback(() => {
-    if (mobileMode) {
-      scrollRef?.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+  .simplebar-track {
+    &.simplebar-vertical {
+      .simplebar-scrollbar {
+        &:before {
+          background-color: ${({ theme }) => theme.palette.divider};
+        }
+      }
     }
-  }, []);
+  }
+`;
 
-  //Filter change
-  const handleChangeKeyword = (newValue) => {
-    setFilters((prev) => ({
-      ...prev,
-      keyword: newValue,
-    }));
-    newValue == DEFAULT_FILTERS.keyword
-      ? searchParams.delete("q")
-      : searchParams.set("q", newValue);
-    setSearchParams(searchParams);
-    handleResetPage();
-  };
-  const handleChangeCate = (newValue) => {
-    newValue =
-      filters?.cate.id == newValue?.id ? { id: "", slug: "" } : newValue;
-    setFilters((prev) => ({
-      ...prev,
-      cate: newValue,
-      pubs: DEFAULT_FILTERS.pubIds,
-    }));
-    newValue?.id == DEFAULT_FILTERS.cate.id
-      ? searchParams.delete("cate")
-      : searchParams.set("cate", newValue?.id);
-    searchParams.delete("pubs");
-    const newPath = `/store${newValue?.slug ? `/${newValue.slug}` : ""}`;
-    navigate({ pathname: newPath, search: searchParams.toString() });
-    handleResetPage();
-  };
-  const handleChangePubs = debounce((newValue) => {
-    setFilters((prev) => ({ ...prev, pubIds: newValue }));
-    isEqual(newValue, DEFAULT_FILTERS.pubIds)
-      ? searchParams.delete("pubs")
-      : searchParams.set("pubs", newValue);
-    setSearchParams(searchParams);
-    handleResetPage();
-  }, 500);
-  const handleChangeInputRange = (newValue) => {
-    setFilters((prev) => ({ ...prev, value: newValue }));
-    isEqual(newValue, DEFAULT_FILTERS.value)
-      ? searchParams.delete("value")
-      : searchParams.set("value", newValue);
-    setSearchParams(searchParams);
-    handleResetPage();
-  };
-  const handleChangeRange = debounce((newValue) => {
-    setFilters((prev) => ({ ...prev, value: newValue }));
-    isEqual(newValue, DEFAULT_FILTERS.value)
-      ? searchParams.delete("value")
-      : searchParams.set("value", newValue);
-    setSearchParams(searchParams);
-    handleResetPage();
-  }, 1000);
-  const handleChangeTypes = debounce((newValue) => {
-    setFilters((prev) => ({ ...prev, types: newValue }));
-    isEqual(newValue, DEFAULT_FILTERS.types)
-      ? searchParams.delete("types")
-      : searchParams.set("types", newValue);
-    setSearchParams(searchParams);
-    handleResetPage();
-  }, 500);
-  const handleChangeRating = (newValue) => {
-    setFilters((prev) => ({
-      ...prev,
-      rating: prev.rating == newValue ? "" : newValue,
-    }));
-    newValue == DEFAULT_FILTERS.rating
-      ? searchParams.delete("rating")
-      : searchParams.set("rating", newValue);
-    setSearchParams(searchParams);
-    handleResetPage();
-  };
-  const handleApplyFilters = (newFilters) => {
-    setFilters(newFilters);
-    newFilters.cate.id == DEFAULT_FILTERS.cate.id
-      ? searchParams.delete("cate")
-      : searchParams.set("cate", newFilters.cate.id);
-    newFilters.keyword == DEFAULT_FILTERS.keyword
-      ? searchParams.delete("q")
-      : searchParams.set("q", newFilters.keyword);
-    isEqual(newFilters.pubIds, DEFAULT_FILTERS.pubIds)
-      ? searchParams.delete("pubs")
-      : searchParams.set("pubs", newFilters.pubIds);
-    isEqual(newFilters.types, DEFAULT_FILTERS.types)
-      ? searchParams.delete("types")
-      : searchParams.set("types", newFilters.types);
-    isEqual(newFilters.value, DEFAULT_FILTERS.value)
-      ? searchParams.delete("value")
-      : searchParams.set("value", newFilters?.value);
-    newFilters.rating == DEFAULT_FILTERS.rating
-      ? searchParams.delete("rating")
-      : searchParams.set("rating", newFilters.rating);
-    setSearchParams(searchParams);
-    handleResetPage();
-  };
+const TitleContainer = styled.div`
+  width: 100%;
+`;
 
-  //Pagination change
-  const handleChangePage = (page) => {
-    setPagination((prev) => ({ ...prev, number: page - 1 }));
-    page - 1 == DEFAULT_PAGINATION.number
-      ? searchParams.delete("pNo")
-      : searchParams.set("pNo", page);
-    setSearchParams(searchParams);
-    scrollToTop();
-  };
-  const handleChangeOrder = (newValue) => {
-    setPagination((prev) => ({ ...prev, sortBy: newValue }));
-    newValue == DEFAULT_PAGINATION.sortBy
-      ? searchParams.delete("sort")
-      : searchParams.set("sort", newValue);
-    setSearchParams(searchParams, { replace: true });
-    handleResetPage();
-  };
-  const handleChangeDir = (newValue) => {
-    setPagination((prev) => ({ ...prev, sortDir: newValue }));
-    newValue == DEFAULT_PAGINATION.sortDir
-      ? searchParams.delete("dir")
-      : searchParams.set("dir", newValue);
-    setSearchParams(searchParams, { replace: true });
-    handleResetPage();
-  };
-  const handleChangeSize = (newValue) => {
-    setPagination((prev) => ({ ...prev, size: newValue }));
-    newValue == DEFAULT_PAGINATION.size
-      ? searchParams.delete("pSize")
-      : searchParams.set("pSize", newValue);
-    setSearchParams(searchParams, { replace: true });
-    handleResetPage();
-  };
-  const handleChangeAmount = (newValue) => {
-    setPagination((prev) => ({ ...prev, amount: newValue }));
-    newValue == DEFAULT_PAGINATION.amount
-      ? searchParams.delete("amount")
-      : searchParams.set("amount", newValue);
-    setSearchParams(searchParams, { replace: true });
-    handleResetPage();
-  };
+const Filter = styled.div`
+  padding: ${({ theme }) => theme.spacing(2)} 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  scroll-margin: ${({ theme }) => theme.mixins.toolbar.minHeight};
+`;
 
-  //Pagination jump
-  const handleOpenPagination = () => {
-    setOpenPagination(true);
-  };
-  const handleClosePagination = () => {
-    setOpenPagination(false);
+const FilterText = styled.h3`
+  font-size: 14px;
+  text-transform: uppercase;
+  margin: 5px 0px;
+  color: inherit;
+  display: flex;
+  align-items: center;
+`;
+
+const LabelText = styled.span`
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+
+  svg {
+    color: ${({ theme }) => theme.palette.warning.light};
+    font-size: 18px;
+  }
+
+  &.warning {
+    padding: ${({ theme }) => theme.spacing(1)} 0;
+    color: ${({ theme }) => theme.palette.warning.main};
+  }
+`;
+
+const StyledListItemButton = styled(ListItemButton)`
+  padding: 0;
+  justify-content: space-between;
+
+  &.secondary {
+    padding-left: 16px;
+    font-size: 13px;
+    color: ${({ theme }) => theme.palette.text.secondary};
+
+    &.Mui-selected {
+      color: ${({ theme }) => theme.palette.primary.main};
+    }
+  }
+
+  &.Mui-selected {
+    color: ${({ theme }) => theme.palette.primary.main};
+  }
+`;
+
+const CheckPlaceholder = styled.div`
+  padding: ${({ theme }) => theme.spacing(1)} 0;
+`;
+
+const Showmore = styled.div`
+  font-size: 14px;
+  font-weight: 500;
+  padding-top: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.palette.info.main};
+  cursor: pointer;
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    margin-top: 0;
+  }
+`;
+
+const ButtonContainer = styled.div`
+  position: sticky;
+  bottom: 0;
+  margin-top: ${({ theme }) => theme.spacing(1)};
+  padding-bottom: ${({ theme }) => theme.spacing(2)};
+
+  &:before {
+    content: "";
+    position: absolute;
+    left: ${({ theme }) => theme.spacing(-0.5)};
+    width: ${({ theme }) => `calc(100% + ${theme.spacing(0.5)})`};
+    height: 100%;
+    background-color: ${({ theme }) => theme.palette.background.default};
+  }
+`;
+//#endregion
+
+const LIMIT_CATES = 10;
+const LIMIT_PUBS = 10;
+const BookType = getBookType();
+
+const CateFilter = memo(({ cateId, shopId, onChangeCate }) => {
+  const childContainedRef = useRef(null);
+  const [open, setOpen] = useState(false); //Open sub cate
+  const [showmore, setShowmore] = useState(false);
+  const [pagination, setPagination] = useState({
+    isMore: true, //Merge new data
+    number: 0,
+    totalPages: 0,
+    totalElements: 0,
+  });
+
+  const { data, isLoading, isFetching, isSuccess, isError } = (
+    shopId ? useGetRelevantCategoriesQuery : useGetCategoriesQuery
+  )({
+    include: "children",
+    page: pagination?.number,
+    loadMore: pagination?.isMore,
+    id: shopId,
+  });
+
+  useEffect(() => {
+    if (data && !isLoading && isSuccess) {
+      setPagination({
+        ...pagination,
+        number: data.page.number,
+        totalPages: data.page.totalPages,
+        totalElements: data.page.totalElements,
+      });
+    }
+  }, [data]);
+
+  //Change cate
+  const handleCateChange = (cate) => {
+    onChangeCate({ id: cate?.id, slug: cate?.slug });
   };
 
-  //Reset page
-  const handleResetPage = () => {
-    setPagination((prev) => ({
-      ...prev,
-      number: DEFAULT_PAGINATION.number,
-    }));
-    searchParams.delete("pNo");
-    setSearchParams(searchParams, { replace: true });
-    scrollToTop();
+  //Open sub cate
+  const handleClick = (e, id) => {
+    setOpen((prev) => ({ ...prev, [id]: !prev[id] }));
+    e.stopPropagation();
   };
 
-  //Reset
-  const handleResetFilters = () => {
-    setFilters(DEFAULT_FILTERS);
-    searchParams.delete("q");
-    searchParams.delete("cate");
-    searchParams.delete("pubs");
-    searchParams.delete("value");
-    searchParams.delete("types");
-    searchParams.delete("rating");
-    navigate({ pathname: "/store", search: searchParams.toString() });
-    handleResetPage();
+  const handleShowMore = () => {
+    let currPage = (pagination?.number || 0) + 1;
+    if (pagination?.totalPages <= currPage) {
+      setShowmore((prev) => !prev);
+    } else {
+      setPagination({ ...pagination, number: currPage });
+      setShowmore(true);
+    }
   };
 
-  //Stuff
-  const handleOpen = () => {
-    setOpen(true);
+  let isMore = pagination?.totalPages > (pagination?.number || 0) + 1;
+  let isCollapsable = pagination?.totalElements > LIMIT_CATES;
+  let containedSelected = () => {
+    let checkId = childContainedRef.current || cateId;
+    let cateIndex = data?.ids?.indexOf(+checkId);
+    return checkId && (cateIndex < 0 || cateIndex >= LIMIT_CATES);
   };
-  const handleClose = () => {
-    setOpen(false);
-  };
+  let catesContent;
 
-  //Stuff
-  let loading = isLoading || isFetching || isError || isUninitialized;
-  let isChanged = !isEqual(filters, DEFAULT_FILTERS);
-  //#endregion
+  if (isLoading || isError) {
+    catesContent = [...Array(LIMIT_CATES)].map((item, index) => (
+      <Fragment key={`temp-cate-${index}`}>
+        <StyledListItemButton>
+          <FilterText>
+            <Skeleton variant="text" width={120} />
+          </FilterText>
+        </StyledListItemButton>
+      </Fragment>
+    ));
+  } else if (isSuccess) {
+    const { ids, entities } = data;
+
+    if (ids?.length) {
+      let limitContent = [];
+      let collapseContent = [];
+
+      ids?.forEach((id, index) => {
+        const cate = entities[id];
+        const containedSelected =
+          cate?.children && cate.children.some((child) => child.id == cateId);
+        if (containedSelected) childContainedRef.current = id;
+        const item = (
+          <Fragment key={`cate-${id}-${index}`}>
+            <StyledListItemButton
+              selected={cateId == id}
+              onClick={() => handleCateChange(cate)}
+            >
+              <FilterText>{cate?.name}</FilterText>
+              {cate.children?.length ? (
+                open[id] ? (
+                  <ExpandLess onClick={(e) => handleClick(e, id)} />
+                ) : (
+                  <Badge
+                    color="primary"
+                    variant="dot"
+                    invisible={!containedSelected}
+                  >
+                    <ExpandMore onClick={(e) => handleClick(e, id)} />
+                  </Badge>
+                )
+              ) : null}
+            </StyledListItemButton>
+            {cate?.children && (
+              <Collapse in={open[id]} timeout="auto" unmountOnExit>
+                {cate.children?.map((child, subIndex) => (
+                  <List
+                    key={`${child?.id}-${subIndex}`}
+                    component="div"
+                    disablePadding
+                  >
+                    <StyledListItemButton
+                      className="secondary"
+                      selected={cateId == child?.id}
+                      onClick={() => handleCateChange(child)}
+                    >
+                      <FilterText>{child?.name}</FilterText>
+                    </StyledListItemButton>
+                  </List>
+                ))}
+              </Collapse>
+            )}
+          </Fragment>
+        );
+
+        if (index < LIMIT_CATES) {
+          limitContent.push(item);
+        } else {
+          collapseContent.push(item);
+        }
+      });
+
+      catesContent = (
+        <>
+          {limitContent}
+          <Collapse in={showmore} timeout="auto" unmountOnExit>
+            {collapseContent}
+          </Collapse>
+        </>
+      );
+    } else {
+      catesContent = (
+        <StyledListItemButton>
+          <LabelText className="warning">Không có danh mục nào</LabelText>
+        </StyledListItemButton>
+      );
+    }
+  }
 
   return (
-    <Wrapper>
-      <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
-        {!loadCate ? (
-          [
-            <NavLink to={"/store"} end key={"store"}>
-              Danh mục sản phẩm
-            </NavLink>,
-            cSlug && createCrumbs(currCate),
-            filters?.keyword && (
-              <NavLink to={"#"} key={"keyword"}>
-                {`Kết quả tìm kiếm: "${filters?.keyword}"`}
-              </NavLink>
-            ),
-          ]
-        ) : (
-          <Skeleton variant="text" sx={{ fontSize: "16px" }} width={200} />
-        )}
-      </CustomBreadcrumbs>
-      <Grid
-        container
-        spacing={2}
-        size="grow"
-        position="relative"
-        display="flex"
-        justifyContent="center"
+    <Filter>
+      <TitleContainer>
+        <FilterText>
+          <CategoryOutlined />
+          &nbsp;Danh mục
+        </FilterText>
+      </TitleContainer>
+      <List
+        sx={{ width: "100%", py: 0 }}
+        component="nav"
+        aria-labelledby="nested-list-categories"
       >
-        {tabletMode ? (
-          <Suspense fallback={null}>
-            <FilterDrawer
+        {catesContent}
+        {isFetching && !isLoading && (
+          <StyledListItemButton>
+            <FilterText>
+              <Skeleton variant="text" width={120} />
+            </FilterText>
+          </StyledListItemButton>
+        )}
+      </List>
+      {!isFetching && isCollapsable && (
+        <Showmore onClick={handleShowMore}>
+          {!showmore || isMore ? (
+            <>
+              Xem thêm
+              <Badge
+                color="primary"
+                variant="dot"
+                invisible={!containedSelected()}
+              >
+                <ExpandMore />
+              </Badge>
+            </>
+          ) : (
+            <>
+              Ẩn bớt <ExpandLess />
+            </>
+          )}
+        </Showmore>
+      )}
+    </Filter>
+  );
+});
+
+const PublisherFilter = memo(({ pubs, cateId, onChangePubs, pubsRef }) => {
+  const [selectedPub, setSelectedPub] = useState(pubs || []);
+  const [showmore, setShowmore] = useState(false);
+  const [pagination, setPagination] = useState({
+    isMore: true, //Merge new data
+    number: 0,
+    totalPages: 0,
+    totalElements: 0,
+  });
+
+  const { data, isLoading, isFetching, isSuccess, isError } = (
+    cateId ? useGetRelevantPublishersQuery : useGetPublishersQuery
+  )({
+    page: pagination?.number,
+    cateId,
+    loadMore: pagination?.isMore,
+  });
+
+  useEffect(() => {
+    setSelectedPub(pubs);
+  }, [pubs]);
+
+  useEffect(() => {
+    if (data && !isLoading && isSuccess) {
+      setPagination({
+        ...pagination,
+        number: data.page.number,
+        totalPages: data.page.totalPages,
+        totalElements: data.page.totalElements,
+      });
+    }
+  }, [data]);
+
+  //Change pub
+  const handleChangePub = (e) => {
+    const selectedIndex = selectedPub.indexOf(e.target.value);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selectedPub, e.target.value);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selectedPub.slice(1));
+    } else if (selectedIndex === selectedPub.length - 1) {
+      newSelected = newSelected.concat(selectedPub.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selectedPub.slice(0, selectedIndex),
+        selectedPub.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelectedPub(newSelected);
+    handleUpdatePubs(newSelected);
+  };
+
+  const handleUpdatePubs = (newSelected) => {
+    if (onChangePubs) onChangePubs(newSelected);
+  };
+
+  const handleShowMore = () => {
+    let currPage = (pagination?.number || 0) + 1;
+    if (pagination?.totalPages <= currPage) {
+      setShowmore((prev) => !prev);
+    } else {
+      setPagination({ ...pagination, number: currPage });
+      setShowmore(true);
+    }
+  };
+
+  const isSelected = (id) => selectedPub.indexOf(id) !== -1;
+  let isMore = pagination?.totalPages > (pagination?.number || 0) + 1;
+  let isCollapsable = pagination?.totalElements > LIMIT_PUBS;
+  let containedSelected = false;
+  let isContained = (id) => {
+    let pubIndex = data?.ids?.indexOf(id);
+    return selectedPub?.length && (pubIndex < 0 || pubIndex >= LIMIT_PUBS);
+  };
+  let pubsContent;
+
+  if (isLoading || isError) {
+    pubsContent = [...Array(LIMIT_PUBS)].map((item, index) => (
+      <CheckPlaceholder key={`pub-temp-${index}`}>
+        <Skeleton variant="text" sx={{ fontSize: "14px" }} width={200} />
+      </CheckPlaceholder>
+    ));
+  } else if (isSuccess) {
+    const { ids, entities } = data;
+
+    if (ids?.length) {
+      let limitContent = [];
+      let collapseContent = [];
+
+      ids?.forEach((id, index) => {
+        const pub = entities[id];
+        const isItemSelected = isSelected(`${id}`);
+        if (isItemSelected && !containedSelected)
+          containedSelected = isContained(id);
+
+        const item = (
+          <FormControlLabel
+            key={`pub-${id}-${index}`}
+            disabled={isFetching}
+            control={
+              <Checkbox
+                value={id}
+                checked={isItemSelected}
+                onChange={handleChangePub}
+                disableRipple
+                name={pub?.name}
+                color="primary"
+                size="small"
+              />
+            }
+            sx={{ fontSize: "14px", width: "100%", marginRight: 0 }}
+            label={<LabelText>{pub?.name}</LabelText>}
+          />
+        );
+
+        if (index < LIMIT_PUBS) {
+          limitContent.push(item);
+        } else {
+          collapseContent.push(item);
+        }
+      });
+
+      pubsContent = (
+        <>
+          {limitContent}
+          <Collapse in={showmore} timeout="auto" unmountOnExit>
+            {collapseContent}
+          </Collapse>
+        </>
+      );
+    } else {
+      pubsContent = <LabelText className="warning">Không có NXB nào</LabelText>;
+    }
+  }
+
+  return (
+    <Filter ref={pubsRef}>
+      <TitleContainer>
+        <FilterText>Nhà xuất bản</FilterText>
+      </TitleContainer>
+      <FormGroup sx={{ padding: 0, width: "100%" }}>
+        {pubsContent}
+        {isFetching && !isLoading && (
+          <CheckPlaceholder>
+            <Skeleton variant="text" sx={{ fontSize: "14px" }} width={200} />
+          </CheckPlaceholder>
+        )}
+      </FormGroup>
+      {!isFetching && isCollapsable && (
+        <Showmore onClick={handleShowMore}>
+          {!showmore || isMore ? (
+            <>
+              Xem thêm
+              <Badge
+                color="primary"
+                variant="dot"
+                invisible={!containedSelected}
+              >
+                <ExpandMore />
+              </Badge>
+            </>
+          ) : (
+            <>
+              Ẩn bớt <ExpandLess />
+            </>
+          )}
+        </Showmore>
+      )}
+    </Filter>
+  );
+});
+
+const RangeFilter = memo(
+  ({ value, onChangeInputRange, onChangeRange, valueRef }) => {
+    const [valueInput, setValueInput] = useState(value || [0, 10000000]);
+
+    useEffect(() => {
+      setValueInput(value);
+    }, [value]);
+
+    //Change
+    const handleSelect = (e) => {
+      let newValue = e.target.value.split(",").map(Number);
+      setValueInput(newValue);
+      handleUpdateInputRange(newValue);
+    };
+
+    const handleChangeRange = (value) => {
+      setValueInput(value);
+      handleUpdateRange(value);
+    };
+
+    const handleUpdateInputRange = (newValue) => {
+      if (onChangeInputRange) onChangeInputRange(newValue);
+    };
+    const handleUpdateRange = (newValue) => {
+      if (onChangeRange) onChangeRange(newValue);
+    };
+
+    const isSelected = (currValue) =>
+      valueInput[0] == currValue[0] && valueInput[1] == currValue[1];
+
+    return (
+      <Filter ref={valueRef}>
+        <TitleContainer>
+          <FilterText>Khoảng giá</FilterText>
+        </TitleContainer>
+        <FormGroup sx={{ padding: 0, width: "100%", mb: 1 }}>
+          {suggestPrices.map((option, index) => {
+            const isItemSelected = isSelected(option.value);
+
+            return (
+              <FormControlLabel
+                key={`range-${index}`}
+                control={
+                  <Radio
+                    value={option.value}
+                    checked={isItemSelected}
+                    onChange={handleSelect}
+                    disableRipple
+                    disableTouchRipple
+                    disableFocusRipple
+                    name={option.label}
+                    color="primary"
+                    size="small"
+                  />
+                }
+                sx={{ fontSize: "14px", width: "100%", marginRight: 0 }}
+                label={<LabelText>{option.label}</LabelText>}
+              />
+            );
+          })}
+        </FormGroup>
+        <PriceRangeSlider
+          {...{ value: valueInput, onChange: handleChangeRange }}
+        />
+      </Filter>
+    );
+  }
+);
+
+const TypeFilter = memo(({ types, onChangeTypes, typesRef }) => {
+  const [selectedType, setSelectedType] = useState(types || []);
+
+  useEffect(() => {
+    setSelectedType(types);
+  }, [types]);
+
+  const handleChangeType = (e) => {
+    const selectedIndex = selectedType.indexOf(e.target.value);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selectedType, e.target.value);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selectedType.slice(1));
+    } else if (selectedIndex === selectedType.length - 1) {
+      newSelected = newSelected.concat(selectedType.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selectedType.slice(0, selectedIndex),
+        selectedType.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelectedType(newSelected);
+    handleUpdateType(newSelected);
+  };
+
+  const handleUpdateType = (newSelected) => {
+    if (onChangeTypes) onChangeTypes(newSelected);
+  };
+  const isSelected = (type) => selectedType.indexOf(type) !== -1;
+
+  return (
+    <Filter ref={typesRef}>
+      <TitleContainer>
+        <FilterText>Hình thức bìa</FilterText>
+      </TitleContainer>
+      <FormGroup sx={{ padding: 0, width: "100%" }}>
+        {Object.values(BookType).map((option, index) => {
+          const isItemSelected = isSelected(option.value);
+
+          return (
+            <FormControlLabel
+              key={`type-${index}`}
+              control={
+                <Checkbox
+                  value={option.value}
+                  checked={isItemSelected}
+                  onChange={handleChangeType}
+                  disableRipple
+                  name={option.label}
+                  color="primary"
+                  size="small"
+                />
+              }
+              sx={{ fontSize: "14px", width: "100%", marginRight: 0 }}
+              label={<LabelText>{option.label}</LabelText>}
+            />
+          );
+        })}
+      </FormGroup>
+    </Filter>
+  );
+});
+
+const RateFilter = memo(({ rating, onChangeRating, rateRef }) => {
+  const handleChangeRate = (e) => {
+    let newValue = e.target.value;
+    if (onChangeRating) onChangeRating(newValue);
+  };
+
+  return (
+    <Filter ref={rateRef}>
+      <TitleContainer>
+        <FilterText>Đánh giá</FilterText>
+      </TitleContainer>
+      <FormGroup sx={{ padding: 0, width: "100%", mb: 1 }}>
+        {[...Array(5)].map((item, index) => {
+          const isItemSelected = index + 1 == rating;
+
+          return (
+            <FormControlLabel
+              key={`rating-${index + 1}`}
+              control={
+                <Radio
+                  value={index + 1}
+                  checked={isItemSelected}
+                  onClick={handleChangeRate}
+                  disableRipple
+                  disableTouchRipple
+                  disableFocusRipple
+                  name={`${index + 1} Star${index + 1 !== 1 ? "s" : ""}`}
+                  color="primary"
+                  size="small"
+                />
+              }
+              sx={{ fontSize: "14px", width: "100%", marginRight: 0 }}
+              label={
+                <LabelText>
+                  {[...Array(index + 1)].map((item, i) => (
+                    <Star key={`s-${index}-${i}`} />
+                  ))}
+                  {[...Array(5 - (index + 1))].map((item, j) => (
+                    <StarBorder key={`sb-${index}-${j}`} />
+                  ))}
+                  {index < 4 && <>&nbsp;trở lên</>}
+                </LabelText>
+              }
+            />
+          );
+        })}
+      </FormGroup>
+    </Filter>
+  );
+});
+
+const FilterList = memo(
+  ({
+    filters,
+    onResetFilters,
+    onChangeCate,
+    onChangePubs,
+    onChangeInputRange,
+    onChangeRange,
+    onChangeTypes,
+    onChangeRating,
+    pubsRef,
+    typesRef,
+    valueRef,
+    rateRef,
+  }) => {
+    return (
+      <FilterWrapper>
+        <StyledSimpleBar>
+          <Stack
+            spacing={{ xs: 1 }}
+            useFlexGap
+            flexWrap="wrap"
+            divider={<Divider flexItem />}
+          >
+            <CateFilter
               {...{
-                filters,
-                onApplyFilters: handleApplyFilters,
-                onResetFilters: handleResetFilters,
-                open,
-                handleOpen,
-                handleClose,
-                defaultFilters: DEFAULT_FILTERS,
+                cateId: filters?.cate.id,
+                shopId: filters?.shopId,
+                onChangeCate,
               }}
             />
-          </Suspense>
-        ) : (
-          <Grid size={{ xs: 12, md_lg: 2.8 }} position="relative">
-            <CustomDivider sx={{ mr: 2 }}>BỘ LỌC</CustomDivider>
-            <Suspense fallback={null}>
-              <FilterList
+            {!filters?.shopId && (
+              <PublisherFilter
                 {...{
-                  filters,
-                  onResetFilters: handleResetFilters,
-                  onChangeCate: handleChangeCate,
-                  onChangePubs: handleChangePubs,
-                  onChangeInputRange: handleChangeInputRange,
-                  onChangeRange: handleChangeRange,
-                  onChangeTypes: handleChangeTypes,
-                  onChangeRating: handleChangeRating,
+                  pubs: filters?.pubIds,
+                  cateId: filters?.cate.id,
+                  onChangePubs,
                   pubsRef,
-                  typesRef,
-                  valueRef,
-                  rateRef,
-                }}
-              />
-            </Suspense>
-          </Grid>
-        )}
-        <Grid
-          ref={scrollRef}
-          size={{ xs: 12, md_lg: 9.2 }}
-          sx={(theme) => ({ scrollMargin: theme.mixins.toolbar.minHeight })}
-          position="relative"
-        >
-          <CustomDivider sx={{ display: { xs: "none", md: "flex" } }}>
-            DANH MỤC SẢN PHẨM
-          </CustomDivider>
-          {filters.keyword && (
-            <NavLink to={`/shop?q=${filters.keyword}`}>
-              <StoreSuggest>
-                <StoreOutlined />
-                &nbsp;
-                <span>
-                  Tìm kiếm của hàng với từ khoá: '<b>{filters.keyword}</b>'
-                </span>
-              </StoreSuggest>
-            </NavLink>
-          )}
-          {!tabletMode && (
-            <Suspense fallback={null}>
-              <FiltersDisplay
-                {...{
-                  filters,
-                  setFilters,
-                  onResetFilters: handleResetFilters,
-                  onChangeCate: handleChangeCate,
-                  onChangePubs: handleChangePubs,
-                  onChangeInputRange: handleChangeInputRange,
-                  onChangeKeyword: handleChangeKeyword,
-                  onChangeTypes: handleChangeTypes,
-                  onChangeRating: handleChangeRating,
-                  defaultFilters: DEFAULT_FILTERS,
-                  isChanged,
-                  pubsRef,
-                  typesRef,
-                  valueRef,
-                  rateRef,
-                }}
-              />
-            </Suspense>
-          )}
-          <FilterSortList
-            {...{
-              pagination,
-              totalPages: data?.page?.totalPages ?? 0,
-              mobileMode,
-              onOpenFilters: handleOpen,
-              isChanged,
-              onOpenPagination: handleOpenPagination,
-              onChangeOrder: handleChangeOrder,
-              onChangeDir: handleChangeDir,
-              onChangeAmount: handleChangeAmount,
-              onPageChange: handleChangePage,
-            }}
-          />
-          <FilteredProducts {...{ data, error, loading }} />
-          <Pagination
-            page={pagination?.number}
-            size={pagination?.size}
-            count={data?.page?.totalPages ?? 0}
-            onPageChange={handleChangePage}
-            onSizeChange={handleChangeSize}
-          />
-          <Suspense fallback={null}>
-            {openPagination != undefined && (
-              <JumpPagination
-                {...{
-                  pagination,
-                  onPageChange: handleChangePage,
-                  open: openPagination,
-                  handleClose: handleClosePagination,
                 }}
               />
             )}
-          </Suspense>
-        </Grid>
-      </Grid>
-    </Wrapper>
-  );
-};
+            <RangeFilter
+              {...{
+                value: filters?.value,
+                onChangeInputRange,
+                onChangeRange,
+                valueRef,
+              }}
+            />
+            <TypeFilter
+              {...{ types: filters?.types, onChangeTypes, typesRef }}
+            />
+            <RateFilter
+              {...{ rating: filters?.rating, onChangeRating, rateRef }}
+            />
+          </Stack>
+          <ButtonContainer>
+            <Button
+              variant="contained"
+              color="error"
+              size="large"
+              fullWidth
+              onClick={onResetFilters}
+              startIcon={<FilterAltOff />}
+            >
+              Xoá bộ lọc
+            </Button>
+          </ButtonContainer>
+        </StyledSimpleBar>
+      </FilterWrapper>
+    );
+  }
+);
 
-export default FiltersPage;
+export default FilterList;
