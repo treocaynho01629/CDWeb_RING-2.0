@@ -3,7 +3,7 @@ import { Button, TextField, Box } from "@mui/material";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { NumberFormatBase } from "react-number-format";
 import { currencyFormat } from "@ring/shared";
-import { marks } from "../../../ultils/filters";
+import { marks } from "../../../utils/filters";
 import CustomSlider from "../../custom/CustomSlider";
 
 const NumericFormatCustom = forwardRef(

@@ -32,8 +32,7 @@ import { ItemTitle, FooterContainer, FooterLabel } from "../custom/Components";
 import {
   idFormatter,
   useDeepEffect,
-  couponTypes,
-  couponTypeItems,
+  getCouponType,
   dateFormatter,
 } from "@ring/shared";
 import { Progress } from "@ring/ui";
@@ -47,6 +46,7 @@ import {
   useDeleteCouponsMutation,
 } from "../../features/coupons/couponsApiSlice";
 
+const CouponType = getCouponType();
 const headCells = [
   {
     id: "id",
@@ -180,7 +180,7 @@ function CouponFilters({ filters, setFilters }) {
             onClose: handleApplyTypes,
             renderValue: (selected) => {
               const filteredLabel = selected?.map(
-                (value) => couponTypes[value].label
+                (value) => CouponType[value].label
               );
               return filteredLabel.join(", ");
             },
@@ -197,7 +197,7 @@ function CouponFilters({ filters, setFilters }) {
         }}
         sx={{ maxWidth: { xs: "auto", md: 200 } }}
       >
-        {couponTypeItems.map((type, index) => (
+        {Object.values(CouponType).map((type, index) => (
           <MenuItem key={`type-${type.value}-${index}`} value={type.value}>
             <Checkbox
               sx={{ py: 0.5, pr: 1, pl: 0 }}
@@ -570,7 +570,7 @@ export default function TableCoupons({
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
         const date = new Date(coupon?.expDate);
-        const couponItem = couponTypes[coupon?.type];
+        const couponItem = CouponType[coupon?.type];
 
         return (
           <TableRow hover aria-checked={isItemSelected} tabIndex={-1} key={id}>

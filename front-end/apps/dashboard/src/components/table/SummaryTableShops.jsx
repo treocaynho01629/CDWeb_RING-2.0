@@ -94,10 +94,7 @@ export default function SummaryTableShops() {
                 to={`dashboard/shop/${id}`}
                 style={{ display: "flex", alignItems: "center" }}
               >
-                <Avatar
-                  sx={{ marginRight: 1 }}
-                  src={shop?.image ? shop.image + "?size=tiny" : null}
-                >
+                <Avatar sx={{ marginRight: 1 }} src={shop?.image ?? null}>
                   {shop?.name?.charAt(0) ?? ""}
                 </Avatar>
                 <Box>

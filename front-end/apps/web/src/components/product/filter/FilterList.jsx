@@ -31,7 +31,7 @@ import {
   useGetPublishersQuery,
   useGetRelevantPublishersQuery,
 } from "../../../features/publishers/publishersApiSlice";
-import { suggestPrices } from "../../../ultils/filters";
+import { suggestPrices } from "../../../utils/filters";
 import PriceRangeSlider from "./PriceRangeSlider";
 import SimpleBar from "simplebar-react";
 

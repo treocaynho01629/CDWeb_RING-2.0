@@ -18,7 +18,7 @@ import {
   Close as CloseIcon,
   AutoStories as AutoStoriesIcon,
 } from "@mui/icons-material";
-import { bookLanguageItems, bookTypeItems } from "@ring/shared";
+import { getBookLanguage, getBookType } from "@ring/shared";
 import { Title } from "../custom/Components";
 import { publishersApiSlice } from "../../features/publishers/publishersApiSlice";
 import { categoriesApiSlice } from "../../features/categories/categoriesApiSlice";
@@ -37,6 +37,9 @@ import { Instruction, DatePicker } from "@ring/ui";
 import CustomDropZone from "../custom/CustomDropZone";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
+
+const BookLanguage = getBookLanguage();
+const BookType = getBookType();
 
 const NumericFormatCustom = forwardRef(
   function NumericFormatCustom(props, ref) {
@@ -97,8 +100,10 @@ const ProductFormDialog = ({
   });
   const [pub, setPub] = useState("");
   const [cate, setCate] = useState("");
-  const [language, setLanguage] = useState(bookLanguageItems[0].value);
-  const [type, setType] = useState(bookTypeItems[0].value);
+  const [language, setLanguage] = useState(
+    Object.values(BookLanguage)[0].value
+  );
+  const [type, setType] = useState(Object.values(BookType)[0].value);
   const [err, setErr] = useState([]);
   const [errMsg, setErrMsg] = useState("");
   const [pubsPagination, setPubsPagination] = useState({
@@ -737,7 +742,7 @@ const ProductFormDialog = ({
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
               >
-                {bookLanguageItems.map((option) => (
+                {Object.values(BookLanguage).map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>
@@ -754,7 +759,7 @@ const ProductFormDialog = ({
                 value={type}
                 onChange={(e) => setType(e.target.value)}
               >
-                {bookTypeItems.map((option) => (
+                {Object.values(BookType).map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>

@@ -28,7 +28,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
     boolean hasUserBoughtBook(Long id, Long userId); //Check if user have bought this book before
 
     @Query(value = """
-        select distinct o.id as id, i.name as image, a.name as name,
+        select distinct o.id as id, i as image, a.name as name,
         o.createdDate as date, o.total - o.totalDiscount as totalPrice,
         sum(oi.quantity) as totalItems
         from OrderReceipt o
@@ -41,7 +41,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         where (coalesce(:shopId) is null or od.shop.id = :shopId)
         and (coalesce(:userId) is null or od.shop.owner.id = :userId)
         and (coalesce(:bookId) is null or oi.book.id = :bookId)
-        group by o.id, i.name, a.name, o.createdDate
+        group by o.id, i.id, a.name, o.createdDate
     """,
     countQuery = """
         select count(o.id)

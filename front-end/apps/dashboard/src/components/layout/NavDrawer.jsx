@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { NavLink } from "react-router";
 import { useAuth } from "@ring/auth";
-import { navigationList } from "../../ultils/navigate";
+import { navigationList } from "../../utils/navigate";
 import MuiDrawer from "@mui/material/Drawer";
 
 //#region styled

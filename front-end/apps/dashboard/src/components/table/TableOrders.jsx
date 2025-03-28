@@ -34,8 +34,7 @@ import {
   currencyFormat,
   dateFormatter,
   idFormatter,
-  orderItems,
-  orderTypes,
+  getOrderStatus,
   timeFormatter,
 } from "@ring/shared";
 import { Progress } from "@ring/ui";
@@ -43,6 +42,7 @@ import { FooterContainer, FooterLabel, ItemTitle } from "../custom/Components";
 import CustomTableHead from "../table/CustomTableHead";
 import CustomTablePagination from "../table/CustomTablePagination";
 
+const OrderStatus = getOrderStatus();
 const headCells = [
   {
     id: "id",
@@ -153,7 +153,7 @@ function OrderFilters({ filters, setFilters }) {
         sx={{ maxWidth: { xs: "auto", md: 200 } }}
       >
         <MenuItem value="">Tất cả</MenuItem>
-        {orderItems.map((tab, index) => (
+        {Object.values(OrderStatus).map((tab, index) => (
           <MenuItem key={`tab-${index}`} value={tab.value}>
             {tab.label}
           </MenuItem>
@@ -236,10 +236,7 @@ function OrderRow({
         </TableCell>
         <TableCell align="left">
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Avatar
-              sx={{ marginRight: 1 }}
-              src={order?.image ? order.image + "?size=tiny" : null}
-            >
+            <Avatar sx={{ marginRight: 1 }} src={order?.image ?? null}>
               {order?.username?.charAt(0) ?? ""}
             </Avatar>
             <Box>
@@ -304,7 +301,7 @@ function OrderRow({
               </TableHead>
               <TableBody>
                 {order?.details.map((detail, index) => {
-                  const itemStatus = orderTypes[detail.status];
+                  const itemStatus = OrderStatus[detail.status];
                   const isDetailSelected = isSelected(detail.id);
                   const detailLabelId = `detail-checkbox-${index}`;
 

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import com.ring.bookstore.dtos.images.IImage;
-import com.ring.bookstore.dtos.images.IImageInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -15,17 +14,16 @@ import com.ring.bookstore.model.Image;
 public interface ImageRepository extends JpaRepository<Image, Long> {
 
     @Query("""
-        select i.id as id, i.name as name, i.type as type
-        from Image i
+        select i.publicId from Image i
+        where i.id in :imageIds
     """)
-    List<IImageInfo> findAllInfo();
+    List<String> findPublicIds(List<Long> imageIds);
 
     @Query("""
-        select i.id as id, i.name as name, i.type as type
-        from Image i
-        where i.id in :ids
+        select i from Image i
+        where i.id in :imageIds
     """)
-    List<IImageInfo> findInfo(List<Long> ids);
+    List<Image> findImages(List<Long> imageIds);
 
     @Query("""
         select i.publicId as publicId, i.url as url

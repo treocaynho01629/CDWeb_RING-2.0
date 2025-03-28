@@ -1,6 +1,6 @@
 import { MenuItem, InputAdornment, IconButton, Badge } from "@mui/material";
 import { Sort, Straight } from "@mui/icons-material";
-import { booksAmount, sortBooksBy } from "../../../ultils/filters";
+import { booksAmount, sortBooksBy } from "../../../utils/filters";
 import {
   SortWrapper,
   SortContainer,

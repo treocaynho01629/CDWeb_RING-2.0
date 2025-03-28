@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import com.github.slugify.Slugify;
 import com.ring.bookstore.dtos.books.*;
 import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.dtos.images.IImageInfo;
 import com.ring.bookstore.dtos.mappers.DashboardMapper;
 import com.ring.bookstore.enums.BookType;
 import com.ring.bookstore.enums.UserRole;
@@ -109,7 +108,7 @@ public class BookServiceImpl implements BookService {
         List<Long> imageIds = book.getPreviews() != null ? book.getPreviews() : new ArrayList<>();
         imageIds.add(book.getImage());
 
-        List<IImageInfo> images = imageRepo.findInfo(imageIds);
+        List<Image> images = imageRepo.findImages(imageIds);
         BookDTO bookDTO = bookMapper.projectionToDTO(book, images); //Map to DTO
         return bookDTO;
     }
@@ -172,13 +171,7 @@ public class BookServiceImpl implements BookService {
         //Images upload
         ArrayList<Image> previewImages = new ArrayList<>();
         if (images != null && images.length != 0) {
-            Arrays.stream(images).forEach(image -> {
-                try {
-                    previewImages.add(imageService.upload(image, FileUploadUtil.PRODUCT_FOLDER));
-                } catch (Exception e) {
-                    throw new HttpResponseException(HttpStatus.EXPECTATION_FAILED, "Upload image failed!");
-                }
-            });
+            previewImages.addAll(imageService.uploadMultiple(Arrays.asList(images), FileUploadUtil.PRODUCT_FOLDER));
         }
 
         //Create book details
@@ -240,13 +233,7 @@ public class BookServiceImpl implements BookService {
 
         //Images
         if (images != null && images.length != 0) {
-            Arrays.stream(images).forEach(image -> {
-                try {
-                    currDetail.addImage(imageService.upload(image, FileUploadUtil.PRODUCT_FOLDER));
-                } catch (Exception e) {
-                    throw new HttpResponseException(HttpStatus.EXPECTATION_FAILED, "Upload image failed!");
-                }
-            });
+            imageService.uploadMultiple(Arrays.asList(images), FileUploadUtil.PRODUCT_FOLDER).forEach(currDetail::addImage);
         }
         detailRepo.save(currDetail); //Save new details to database
 

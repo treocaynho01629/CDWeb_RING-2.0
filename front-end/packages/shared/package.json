@@ -17,11 +17,11 @@
     "./enums/payment": "./src/enums/payment.js",
     "./enums/shipping": "./src/enums/shipping.js",
     "./enums/user": "./src/enums/user.js",
-    "./ultils/convert": "./src/ultils/convert.js",
-    "./ultils/icon": "./src/ultils/icon.jsx",
-    "./ultils/location": "./src/ultils/location.js",
-    "./ultils/payment": "./src/ultils/payment.jsx",
-    "./ultils/regex": "./src/ultils/regex.js",
+    "./utils/convert": "./src/utils/convert.js",
+    "./utils/icon": "./src/utils/icon.jsx",
+    "./utils/location": "./src/utils/location.js",
+    "./utils/payment": "./src/utils/payment.jsx",
+    "./utils/regex": "./src/utils/regex.js",
     "./assets/empty": "./assets/empty.svg"
   },
   "scripts": {

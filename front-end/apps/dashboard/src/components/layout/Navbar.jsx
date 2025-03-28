@@ -19,14 +19,14 @@ import {
 } from "@mui/icons-material";
 import { useGetPreviewShopsQuery } from "../../features/shops/shopsApiSlice";
 import { useAuth } from "@ring/auth";
-import { roleTypes } from "@ring/shared";
+import { getUserRole } from "@ring/shared";
 import MuiAppBar from "@mui/material/AppBar";
 import NavSetting from "./NavSetting";
 import styled from "@emotion/styled";
 
 const ShopSelect = lazy(() => import("./ShopSelect"));
 
-//#region preStyled
+//#region styled
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -52,12 +52,14 @@ const StyledAvatar = styled(Avatar)`
 `;
 //#endregion
 
+const UserRole = getUserRole();
+
 export default function Navbar({ open, setOpen }) {
   const { image, username, roles, shop, setShop } = useAuth();
   const [openSetting, setOpenSetting] = useState(false);
   const [anchorEl, setAnchorEl] = useState(undefined);
   const openShop = Boolean(anchorEl);
-  const currRole = roleTypes[roles?.find((role) => role.startsWith("ROLE_"))];
+  const currRole = UserRole[roles?.find((role) => role.startsWith("ROLE_"))];
 
   //Shop select
   const { data, isLoading, isSuccess, isError } = useGetPreviewShopsQuery(
@@ -91,7 +93,7 @@ export default function Navbar({ open, setOpen }) {
 
     shopBadgeContent = (
       <>
-        <StyledAvatar src={shopInfo?.image ? shopInfo.image : null}>
+        <StyledAvatar src={shopInfo?.image ?? null}>
           <Store fontSize="small" />
         </StyledAvatar>
         <Typography variant="body2" color="text.primary" mx={1}>
@@ -176,10 +178,7 @@ export default function Navbar({ open, setOpen }) {
             aria-controls={openSetting ? "account-menu" : undefined}
             aria-expanded={openSetting ? "true" : undefined}
           >
-            <Avatar
-              sx={{ width: 32, height: 32 }}
-              src={image ? image + "?size=tiny" : null}
-            />
+            <Avatar sx={{ width: 32, height: 32 }} src={image ?? null} />
           </IconButton>
         </Stack>
         <NavSetting

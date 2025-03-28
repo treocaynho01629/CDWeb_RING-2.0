@@ -5,10 +5,8 @@ import {
   MenuItem,
   TextField,
   paginationItemClasses,
-  paginationClasses,
 } from "@mui/material";
-import { pageSizes } from "../../ultils/filters";
-import { memo } from "react";
+import { pageSizes } from "../../utils/filters";
 
 //#region styled
 const Container = styled.div`

@@ -28,6 +28,9 @@ public class FileUploadUtil {
     public static final String USER_FOLDER = "/ring/users";
     public static final String ASSET_FOLDER = "/ring/assets";
     public static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)";
+    public static final Integer PRODUCT_SIZE = 600;
+    public static final Integer ASSET_SIZE = 250;
+    public static final Integer BANNER_SIZE = 1297;
 
     public static boolean isAllowedExtension(final String fileName, final String pattern) {
         final Matcher matcher = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE).matcher(fileName);

@@ -127,7 +127,7 @@ public class BookController {
     public ResponseEntity<?> addBook(@Valid @RequestPart("request") BookRequest request,
                                      @RequestPart("thumbnail") MultipartFile thumbnail,
                                      @RequestPart(name = "images", required = false) MultipartFile[] images,
-                                     @CurrentAccount Account currUser) throws ImageResizerException, IOException {
+                                     @CurrentAccount Account currUser) {
         return new ResponseEntity<>(bookService.addBook(request,
                 thumbnail, images, currUser), HttpStatus.CREATED);
     }
@@ -139,7 +139,7 @@ public class BookController {
                                         @Valid @RequestPart("request") BookRequest request,
                                         @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail,
                                         @RequestPart(name = "images", required = false) MultipartFile[] images,
-                                        @CurrentAccount Account currUser) throws ImageResizerException, IOException {
+                                        @CurrentAccount Account currUser) {
         return new ResponseEntity<>(bookService.updateBook(id,
                 request, thumbnail, images, currUser), HttpStatus.CREATED);
     }

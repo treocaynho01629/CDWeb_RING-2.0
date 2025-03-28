@@ -1,6 +1,6 @@
 import { MenuItem, InputAdornment, IconButton } from "@mui/material";
 import { Straight, TipsAndUpdatesOutlined } from "@mui/icons-material";
-import { filterShopsBy, sortShopsBy } from "../../ultils/filters";
+import { filterShopsBy, sortShopsBy } from "../../utils/filters";
 import {
   SortWrapper,
   SortContainer,

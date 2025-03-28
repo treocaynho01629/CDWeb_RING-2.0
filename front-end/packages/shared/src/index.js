@@ -19,11 +19,11 @@ export * from "./enums/shipping";
 export * from "./enums/user";
 
 // Utils
-export * from "./ultils/convert";
-export * from "./ultils/icon";
-export * from "./ultils/location";
-export * from "./ultils/payment";
-export * from "./ultils/regex";
+export * from "./utils/convert";
+export * from "./utils/icon";
+export * from "./utils/location";
+export * from "./utils/payment";
+export * from "./utils/regex";
 
 // Theme
 export * from "./theme";

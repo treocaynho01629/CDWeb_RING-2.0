@@ -521,12 +521,7 @@ export default function TableReviews({
                 to={`/user/${review.userId}`}
                 style={{ display: "flex", alignItems: "center" }}
               >
-                <Avatar
-                  sx={{ marginRight: 1 }}
-                  src={
-                    review?.userImage ? review.userImage + "?size=tiny" : null
-                  }
-                >
+                <Avatar sx={{ marginRight: 1 }} src={review?.userImage ?? null}>
                   {review?.username?.charAt(0) ?? ""}
                 </Avatar>
                 <Box>

@@ -17,8 +17,11 @@ import {
   HeaderContainer,
   InfoTable,
 } from "../components/custom/Components";
-import { numFormat, genderTypes, roleTypes, useTitle } from "@ring/shared";
+import { numFormat, getGenderType, getUserRole, useTitle } from "@ring/shared";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
+
+const GenderType = getGenderType();
+const UserRole = getUserRole();
 
 const DetailAccount = () => {
   const { id } = useParams();
@@ -34,7 +37,7 @@ const DetailAccount = () => {
   //Set title
   useTitle(data?.username ?? "Thành viên");
 
-  const roleItem = roleTypes[data?.roles];
+  const roleItem = UserRole[data?.roles];
 
   return (
     <>
@@ -133,7 +136,7 @@ const DetailAccount = () => {
                   </td>
                   <td>
                     <Typography variant="subtitle1" color="text.secondary">
-                      {genderTypes[data?.gender ?? ""]}
+                      {GenderType[data?.gender ?? ""]?.label}
                     </Typography>
                   </td>
                 </tr>

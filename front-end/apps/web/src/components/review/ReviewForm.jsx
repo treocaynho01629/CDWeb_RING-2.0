@@ -16,7 +16,7 @@ import {
   useUpdateReviewMutation,
 } from "../../features/reviews/reviewsApiSlice";
 import { useEffect, useState } from "react";
-import { rateLabels } from "../../ultils/filters";
+import { rateLabels } from "../../utils/filters";
 
 //#region styled
 const RatingSelect = styled.div`

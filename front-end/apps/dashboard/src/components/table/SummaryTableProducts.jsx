@@ -14,9 +14,10 @@ import { Link } from "react-router";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useGetBooksQuery } from "../../features/books/booksApiSlice";
 import { ItemTitle, LinkButton, Title } from "../custom/Components";
-import { currencyFormat } from "@ring/shared";
+import { currencyFormat, getImageSize } from "@ring/shared";
 import { Progress } from "@ring/ui";
 
+const ImageSize = getImageSize();
 const headCells = [
   {
     id: "title",
@@ -78,7 +79,7 @@ export default function SummaryTableProducts({ shop }) {
                 style={{ display: "flex", alignItems: "center" }}
               >
                 <LazyLoadImage
-                  src={`${book.image}?size=tiny`}
+                  src={book?.image?.srcSet[ImageSize.TINY.value]}
                   height={45}
                   width={45}
                   style={{ marginRight: "10px" }}

@@ -1,7 +1,7 @@
 import { Stack, TextField } from "@mui/material";
 import { useEffect, useState, Suspense, lazy } from "react";
 import { useForgotMutation } from "../../features/auth/authApiSlice";
-import { EMAIL_REGEX } from "@ring/shared/ultils/regex";
+import { EMAIL_REGEX } from "@ring/shared/utils/regex";
 import { Instruction } from "@ring/ui/Components";
 import { AuthTitle, ConfirmButton } from "@ring/ui/AuthComponents";
 import { MarkEmailReadOutlined } from "@mui/icons-material";

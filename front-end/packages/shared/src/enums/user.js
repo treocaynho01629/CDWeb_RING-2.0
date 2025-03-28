@@ -14,10 +14,26 @@ export const getUserRole = () => {
   return (
     enums?.["UserRole"]?.enums ??
     Object.freeze({
-      ROLE_USER: { label: "Thành viên", color: "default" },
-      ROLE_SELLER: { label: "Nhân viên", color: "info" },
-      ROLE_ADMIN: { label: "Admin", color: "primary" },
-      ROLE_GUEST: { label: "Khách", color: "warning" },
+      ROLE_USER: {
+        color: "default",
+        label: "Thành viên",
+        value: "ROLE_USER",
+      },
+      ROLE_SELLER: {
+        color: "info",
+        label: "Người bán",
+        value: "ROLE_SELLER",
+      },
+      ROLE_ADMIN: {
+        color: "primary",
+        label: "Quản trị viên",
+        value: "ROLE_ADMIN",
+      },
+      ROLE_GUEST: {
+        color: "warning",
+        label: "Khách",
+        value: "ROLE_GUEST",
+      },
     })
   );
 };

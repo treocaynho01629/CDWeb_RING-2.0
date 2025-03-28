@@ -306,7 +306,7 @@ const CustomDropZone = ({
         >
           <Thumb className="thumbnail">
             <ThumbInner>
-              <ThumbImage src={`${thumbnail.url}?size=small`} />
+              <ThumbImage src={thumbnail.url} />
             </ThumbInner>
           </Thumb>
         </Tooltip>
@@ -369,7 +369,7 @@ const CustomDropZone = ({
                 <PermMedia />
               </StyledIconButton>
               <ThumbInner>
-                <ThumbImage src={`${image.url}?size=small`} />
+                <ThumbImage src={image.url} />
               </ThumbInner>
             </Thumb>
           </Tooltip>

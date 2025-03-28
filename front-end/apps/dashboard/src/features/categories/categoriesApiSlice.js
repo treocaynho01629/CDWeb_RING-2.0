@@ -52,7 +52,7 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
@@ -129,7 +129,7 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
     }),
     deleteCategories: builder.mutation({
       query: (ids) => ({
-        url: `/api/categories/delete-multiples?ids=${ids}`,
+        url: `/api/categories/delete-multiple?ids=${ids}`,
         method: "DELETE",
       }),
       invalidatesTags: (result, error) => [{ type: "Category", id: "LIST" }],
@@ -160,7 +160,7 @@ export const selectCategoriesResult =
 
 const selectCategoriesData = createSelector(
   selectCategoriesResult,
-  (catesResult) => catesResult.data,
+  (catesResult) => catesResult.data
 );
 
 export const {
@@ -169,5 +169,5 @@ export const {
   selectIds: selectCategoryIds,
   selectEntities: selectCategoryEntities,
 } = catesAdapter.getSelectors(
-  (state) => selectCategoriesData(state) ?? initialState,
+  (state) => selectCategoriesData(state) ?? initialState
 );

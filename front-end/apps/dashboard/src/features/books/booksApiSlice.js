@@ -170,7 +170,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
     }),
     deleteBooks: builder.mutation({
       query: (ids) => ({
-        url: `/api/books/delete-multiples?ids=${ids}`,
+        url: `/api/books/delete-multiple?ids=${ids}`,
         method: "DELETE",
         responseHandler: "text",
       }),

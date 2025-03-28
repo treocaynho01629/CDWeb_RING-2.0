@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, Suspense, lazy } from "react";
 import { Grow, Paper, Stack, TextField } from "@mui/material";
 import { useRegisterMutation } from "../../features/auth/authApiSlice";
-import { USER_REGEX, EMAIL_REGEX } from "@ring/shared/ultils/regex";
+import { USER_REGEX, EMAIL_REGEX } from "@ring/shared/utils/regex";
 import {
   AuthHighlight,
   AuthText,

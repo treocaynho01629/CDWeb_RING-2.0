@@ -30,7 +30,6 @@ import {
   Delete,
   Visibility,
   FilterAltOff,
-  Add,
 } from "@mui/icons-material";
 import { Link } from "react-router";
 import {
@@ -42,15 +41,11 @@ import {
 } from "../../features/users/usersApiSlice";
 import { FooterLabel, ItemTitle, FooterContainer } from "../custom/Components";
 import { Progress } from "@ring/ui";
-import {
-  useDeepEffect,
-  roleTypeItems,
-  roleTypes,
-  idFormatter,
-} from "@ring/shared";
+import { useDeepEffect, getUserRole, idFormatter } from "@ring/shared";
 import CustomTablePagination from "../table/CustomTablePagination";
 import CustomTableHead from "../table/CustomTableHead";
 
+const UserRole = getUserRole();
 const headCells = [
   {
     id: "id",
@@ -129,7 +124,7 @@ function UserFilters({ filters, setFilters }) {
         <MenuItem value="">
           <em>--Tất cả--</em>
         </MenuItem>
-        {roleTypeItems.map((role, index) => (
+        {Object.values(UserRole).map((role, index) => (
           <MenuItem key={`type-${role.value}-${index}`} value={role.value}>
             {role.label}
           </MenuItem>
@@ -477,7 +472,7 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
         const user = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
-        const roleItem = roleTypes[user.role];
+        const roleItem = UserRole[user.role];
 
         return (
           <TableRow hover aria-checked={isItemSelected} tabIndex={-1} key={id}>
@@ -505,10 +500,7 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
                 to={`/user/${id}`}
                 style={{ display: "flex", alignItems: "center" }}
               >
-                <Avatar
-                  sx={{ marginRight: 1 }}
-                  src={user?.image ? user.image + "?size=tiny" : null}
-                >
+                <Avatar sx={{ marginRight: 1 }} src={user?.image ?? null}>
                   {user?.username?.charAt(0) ?? ""}
                 </Avatar>
                 <Box>
