@@ -1,53 +1,195 @@
-# CDWeb_RING-2.0
-An E-Commerce Web App using Spring Boot, ViteJS.
+<p align="center">
+<img width="60" alt="RING Logo" src="https://raw.githubusercontent.com/treocaynho01629/CDWeb_RING-2.0/main/front-end/apps/web/public/logo.svg"/>
+</p>
+<div align="center">
+  <h1 align="center">RING</h1>
+</div>
 
-#### Feature:
-- CRUD Books, Users, Reviews.
-- JWT Authentication: Sign in, Sign up, Recover pass
-- Search, Filters books, Sell books
-- Cart function, Orders, Reviews books
+<div align="center">
+  
+[![treocaynho01629 - CDWeb_RING-2.0](https://img.shields.io/static/v1?label=treocaynho01629&message=CDWeb_RING-2.0&color=blue&logo=github)](https://github.com/treocaynho01629/CDWeb_RING-2.0 "Go to GitHub repo")
+[![License](https://img.shields.io/badge/License-GNU_GPLv3-blue)](#license)
 
-## Local setup
-#### Database
-- You can get the MSSQL database files from the old `master` branch and migrate from there
+</div>
 
-#### Setup environment variable
-- Front-End .env
+<div align="center">
+
+![screenshot](https://github.com/user-attachments/assets/7095dcec-1f3d-4bdc-b37a-42d44c1ccb6e)
+
+</div>
+
+## Introduction
+
+RING is an E-Commerce Web App built using Spring Boot, ViteJS, Turborepo, and PostgreSQL.
+
+#### Live Demo:
+<a href="https://ringdoraz.io.vn/" target="_blank">
+  <img src="https://github.com/user-attachments/assets/c56ea83a-4d6b-4b14-8c7e-dddea6bde1e5" width="100" />
+</a>
+&nbsp;
+<a href="https://admin.ringdoraz.io.vn/" target="_blank">
+  <img src="https://github.com/user-attachments/assets/c37f89ba-c4b8-4c1e-99d3-5a66ccf89ca0" width="100" />
+</a>
+
+#### Guest account:
+
+- Username: `Guest`
+- Password: `Guest123`
+
+## Installation Guide
+
+### Setup Environment Variables:
+
+#### Back-end
+
+Create a `.env` file in the back-end directory or edit environment variables configuration of your IDE.
+
 ```.env
-VITE_PORT_SOCKET_SPRING=<Your spring application url path>
+# =======================
+# Spring
+# =======================
+CLIENT_URL= Web URL (http://localhost:5173/)
+DASHBOARD_URL= Dashboard URL (http://localhost:3000/)
+PROD_URL=<Optional>
+
+# Database
+DB_HOST= PostgreSQL host
+DB_PORT= PostgreSQL port
+DB_USERNAME= PostgreSQL user name
+DB_PASSWORD= PostgreSQL password
+DB_NAME= PostgreSQL database name
+
+# Email SMTP service
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_PASSWORD=
+EMAIL_USERNAME=
+
+# Dev mode email SMTP service <Optional>
+TEST_EMAIL_HOST=
+TEST_EMAIL_PORT=
+TEST_EMAIL_USERNAME=
+TEST_EMAIL_PASSWORD=
+
+# Jwt secret key (Base 64)
+JWT_SECRET_KEY=
+JWT_SECRET_REFRESH_KEY=
+
+# Google reCAPTCHA
+RECAPTCHA_SECRET_KEY=
+RECAPTCHA_V3_SECRET_KEY=
+
+# Cloudinary
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+CLOUDINARY_CLOUD_NAME=
+
+# Profile
+SPRING_PROFILES_ACTIVE= dev || prod
 ```
-- Back-End .env
+
+#### Front-end
+
+Create a `.env` file in each of the front-end `/apps` directory.
+
 ```.env
-SPRING_PROFILES_ACTIVE=<Active profiles>
-CLIENT_URL=<Your client path>
-DB_HOST=<Your SQL database path>
-DB_PORT=<Your SQL database port>
-DB_NAME=<Your SQL database name>
-DB_USERNAME=<Your SQL username>
-DB_PASSWORD=<Your SQL password>
-EMAIL_USERNAME=<Your email address>
-EMAIL_PASSWORD=<Your email app password>
-JWT_SECRET_KEY=<Your secret key>
-JWT_SECRET_REFRESH_KEY=<Your refresh secret key>
+VITE_API_URL= Api path (http://localhost:8080)
+VITE_NODE_ENV= dev || prod
+VITE_RECAPTCHA_SITE_KEY=
+VITE_RECAPTCHA_V3_SITE_KEY=
 ```
-[About email app password](https://support.google.com/mail/answer/185833?hl=en)
 
-#### Commands
-- Use `npm install` to install and then `npm run dev` to start the front-end | `npm run build` and `npm run preview` to build prod
-- Use `mvn clean install` to install and then `mvn spring-boot:run` to start the back-end
+- [Mailtrap SMTP](https://mailtrap.io/blog/spring-send-email/t) or other SMTP services.
+- [Cloudinary SDK](https://cloudinary.com/documentation/java_quickstart)
+- [reCAPTCHA](https://developers.google.com/recaptcha)
 
-#### Screenshot
-![TRANGCHU](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/800848dd-97e1-4585-8141-7bf4ee3a3f1b)
-![DANGNHAP](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/1c8cd8c5-3eba-4651-9f54-be834782d14e)
-![CUAHANG](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/608411ea-8d83-4876-86aa-2517a499dbc7)
-![SANPHAM](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/7fcbda25-a641-4443-b5e5-094df7205150)
-![DANHGIA](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/879acf5a-3664-4ebd-80ae-1e58ddb756e6)
-![GIOHANG](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/b2174ebc-9cfc-4c7a-a2da-3658b0d7b2f9)
-![THANHTOAN](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/e3872419-5799-4ed5-ba6d-0f637b017af2)
-![HOSO](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/1d391e42-05f2-4225-80f9-a12444e5cb80)
-![HOSO2](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/5833f481-8cef-4849-b6a8-ceb22a5f40af)
-![HOSO3](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/b2eb00ca-90dc-4003-9163-d0416e43344b)
-![DASHBOARD](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/056b47e7-7ac0-4aee-952c-204df802c0ee)
-![QUANLYSACH3](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/d50db8dc-713e-493d-bf54-dbc21f6f7cfc)
-![QUANLYNGUOIDUNG3](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/58d06db9-15d3-4a03-b981-5ec8cda099ae)
-![KHOIPHUCMATKHAU](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/26a663d5-963d-4a7e-8008-04695f507749)
+### Installation:
+
+#### Back-end
+
+- Navigate to back-end directory and run the following commands:
+  
+```
+mvn clean install
+mvn spring-boot:run
+```
+
+This will install dependencies and start the Spring Boot server.
+
+#### Front-end
+
+- Navigate to the front-end directory and run the following commands:
+
+```
+npm install
+npm run dev
+```
+
+This will install dependencies and start the front-end apps.
+
+### Installation using Docker:
+
+Alternatively, you can use the `docker-compose` file in the root directory to start the back-end and PostgreSQL without manually configuring the environment variables.
+
+- Create a `.env` file in the root directory.
+
+```.env
+# =======================
+# Posgres
+# =======================
+POSTGRES_USERNAME=
+POSTGRES_PASSWORD=
+POSTGRES_DB=
+
+# =======================
+# Spring
+# =======================
+CLIENT_URL= Web URL (http://localhost:5173/)
+DASHBOARD_URL= Dashboard URL (http://localhost:3000/)
+PROD_URL=<Optional>
+
+# Database
+DB_HOST= PostgreSQL host
+DB_PORT= PostgreSQL port
+DB_USERNAME= PostgreSQL user name
+DB_PASSWORD= PostgreSQL password
+DB_NAME= PostgreSQL database name
+
+# Email SMTP service
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_PASSWORD=
+EMAIL_USERNAME=
+
+# Dev mode email SMTP service <Optional>
+TEST_EMAIL_HOST=
+TEST_EMAIL_PORT=
+TEST_EMAIL_USERNAME=
+TEST_EMAIL_PASSWORD=
+
+# Jwt secret key (Base 64)
+JWT_SECRET_KEY=
+JWT_SECRET_REFRESH_KEY=
+
+# Google reCAPTCHA
+RECAPTCHA_SECRET_KEY=
+RECAPTCHA_V3_SECRET_KEY=
+
+# Cloudinary
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+CLOUDINARY_CLOUD_NAME=
+
+# Profile
+SPRING_PROFILES_ACTIVE= dev || prod
+```
+
+- Run the following command to build and run the Docker container:
+
+```
+docker-compose --env-file .env up --build
+```
+
+## License
+
+Released under [GNU GPLv3](/LICENSE) by [@treocaynho01629](https://github.com/treocaynho01629).
