@@ -1,7 +1,5 @@
 package com.ring.bookstore.config;
 
-import com.ring.bookstore.dtos.accounts.IAuth;
-import com.ring.bookstore.model.Account;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

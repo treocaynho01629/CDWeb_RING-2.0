@@ -115,7 +115,7 @@ public class AccountController {
 
     //Get account's profile (AccountProfile)
     @GetMapping("/profile")
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ProfileDTO> getProfile(@CurrentAccount Account currUser) {
         ProfileDTO profile = accountService.getProfile(currUser);
         return new ResponseEntity<>(profile, HttpStatus.OK);

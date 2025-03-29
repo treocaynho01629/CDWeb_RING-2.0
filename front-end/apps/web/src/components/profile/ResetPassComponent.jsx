@@ -33,7 +33,7 @@ const ResetPassComponent = ({
     e.preventDefault();
     if (pending || changing) return;
 
-    if (!validPass) {
+    if (!validNewPass) {
       setErrMsg("Sai định dạng thông tin!");
       return;
     }
