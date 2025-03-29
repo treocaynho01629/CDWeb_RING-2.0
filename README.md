@@ -1,22 +1,30 @@
 # CDWeb_RING-2.0
+
 An E-Commerce Web App using Spring Boot, ViteJS.
 
 #### Feature:
+
 - CRUD Books, Users, Reviews.
 - JWT Authentication: Sign in, Sign up, Recover pass
 - Search, Filters books, Sell books
 - Cart function, Orders, Reviews books
 
 ## Local setup
+
 #### Database
+
 - You can get the MSSQL database files from the old `master` branch and migrate from there
 
 #### Setup environment variable
+
 - Front-End .env
+
 ```.env
 VITE_PORT_SOCKET_SPRING=<Your spring application url path>
 ```
+
 - Back-End .env
+
 ```.env
 SPRING_PROFILES_ACTIVE=<Active profiles>
 CLIENT_URL=<Your client path>
@@ -30,13 +38,16 @@ EMAIL_PASSWORD=<Your email app password>
 JWT_SECRET_KEY=<Your secret key>
 JWT_SECRET_REFRESH_KEY=<Your refresh secret key>
 ```
+
 [About email app password](https://support.google.com/mail/answer/185833?hl=en)
 
 #### Commands
+
 - Use `npm install` to install and then `npm run dev` to start the front-end | `npm run build` and `npm run preview` to build prod
 - Use `mvn clean install` to install and then `mvn spring-boot:run` to start the back-end
 
 #### Screenshot
+
 ![TRANGCHU](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/800848dd-97e1-4585-8141-7bf4ee3a3f1b)
 ![DANGNHAP](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/1c8cd8c5-3eba-4651-9f54-be834782d14e)
 ![CUAHANG](https://github.com/treocaynho01629/CDWeb_RING-2.0/assets/91520278/608411ea-8d83-4876-86aa-2517a499dbc7)

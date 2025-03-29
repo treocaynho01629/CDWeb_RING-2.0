@@ -1,9 +1,7 @@
 package com.ring.bookstore.config.security;
 
 import java.io.IOException;
-import java.util.List;
 
-import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,7 +12,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -40,7 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             new AntPathRequestMatcher("/api/books/**", "GET"),
             new AntPathRequestMatcher("/api/shops/find", "GET"),
             new AntPathRequestMatcher("/api/shops/info", "GET"),
-            new AntPathRequestMatcher("/api/shops/{id}", "GET"),
             new AntPathRequestMatcher("/api/publishers", "GET"),
             new AntPathRequestMatcher("/api/categories", "GET"),
             new AntPathRequestMatcher("/api/reviews/books", "GET"),
@@ -97,8 +93,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return !this.proceedUrlPatterns.matches(request) && this.excludeUrlPatterns.matches(request);
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        boolean proceed = this.proceedUrlPatterns.matches(request);
+        boolean exclude = this.excludeUrlPatterns.matches(request);
+        return exclude && !proceed;
     }
 
     private String parseJwt(HttpServletRequest request) {

@@ -25,6 +25,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       query: (changeBody) => ({
         url: "/api/accounts/change-password",
         method: "PUT",
+        responseHandler: "text",
         body: {
           ...changeBody,
         },

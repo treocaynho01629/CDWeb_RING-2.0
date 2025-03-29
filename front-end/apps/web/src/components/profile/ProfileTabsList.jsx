@@ -280,6 +280,7 @@ const items = [
 const ProfileTabsList = ({ profile, loading, tabletMode }) => {
   const { username, image, roles } = useAuth();
   const [open, setOpen] = useState(true);
+
   const currRole = UserRole[roles?.find((role) => role.startsWith("ROLE_"))];
 
   const toggleOpen = (e) => {
