@@ -56,6 +56,8 @@ public class ImageServiceImpl implements ImageService {
             byte[] bytes = baos.toByteArray();
 
             CloudinaryResponse uploaded = cloudinaryService.replace(bytes, image.getPublicId());
+            image.setPublicId(uploaded.getPublicId());
+            image.setUrl(uploaded.getUrl());
             if (uploaded.getUrl() == null) {
                 throw new ImageUploadException("Image failed to replace!");
             }

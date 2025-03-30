@@ -154,9 +154,10 @@ const ExtraSlider = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
-  top: ${({ theme }) =>
-    `calc((var(--scroll-offset) + 1) * -50% - (${theme.spacing(1)} * (var(--scroll-offset) + 1)))`};
-  transition: top 0.3s ease-out;
+  top: 0;
+  transform: ${({ theme }) =>
+    `translate3D(0, calc((var(--scroll-offset) + 1) * -50% - (${theme.spacing(1)} * (var(--scroll-offset) + 1))), 0)`};
+  transition: transform 0.3s ease-out;
 `;
 
 const ExtraContainer = styled.div`

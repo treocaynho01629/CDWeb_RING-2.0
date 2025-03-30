@@ -23,8 +23,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
         try {
             HashMap<Object, Object> options = new HashMap<>();
             options.put("public_id", publicId);
-
-
+            options.put("invalidated", true);
 
             cloudinary.uploader().upload(data, options);
             return CloudinaryResponse.builder()
