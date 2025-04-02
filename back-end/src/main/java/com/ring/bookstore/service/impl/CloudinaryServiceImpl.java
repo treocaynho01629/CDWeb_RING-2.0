@@ -23,8 +23,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
         try {
             HashMap<Object, Object> options = new HashMap<>();
             options.put("public_id", publicId);
-            options.put("invalidated", true);
-
+            options.put("invalidate", true);
             cloudinary.uploader().upload(data, options);
             return CloudinaryResponse.builder()
                     .publicId(publicId)
@@ -54,7 +53,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     public void destroy(String publicId) {
         try {
             HashMap<Object, Object> options = new HashMap<>();
-            options.put("invalidated", true);
+            options.put("invalidate", true);
             cloudinary.uploader().destroy(publicId, options);
         } catch (Exception e) {
             throw new ImageUploadException("Delete image failed!", e);
@@ -64,7 +63,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     public ApiResponse destroyMultiple(List<String> publicIds) {
         try {
             HashMap<Object, Object> options = new HashMap<>();
-            options.put("invalidated", true);
+            options.put("invalidate", true);
             return cloudinary.api().deleteResources(publicIds, options);
         } catch (Exception e) {
             throw new ImageUploadException("Delete images failed!", e);

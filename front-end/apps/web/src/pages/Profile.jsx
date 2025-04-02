@@ -7,8 +7,7 @@ import {
 } from "../components/custom/ProfileComponents";
 import { useNavigate, useOutletContext, useParams } from "react-router";
 import { useTitle } from "@ring/shared";
-import { useRefreshMutation } from "@ring/redux";
-import { useLogout } from "@ring/auth";
+import { useRefreshMutation, useSignOutMutation } from "@ring/redux";
 import Placeholder from "@ring/ui/Placeholder";
 
 const ProfileDetail = lazy(() => import("../components/profile/ProfileDetail"));
@@ -52,7 +51,7 @@ const Profile = () => {
   } = useOutletContext();
   const navigate = useNavigate();
   const [refresh, { isLoading: refreshing }] = useRefreshMutation();
-  const signOut = useLogout();
+  const [logout] = useSignOutMutation();
 
   //Set title
   useTitle("Hồ sơ");
@@ -63,13 +62,14 @@ const Profile = () => {
     try {
       await refresh().unwrap();
     } catch (error) {
+      let errorMsg;
       //Log user out if fail to refresh
       if (error?.status === 500) {
-        setErrorMsg("Đã xảy ra lỗi xác thực, vui lòng đăng nhập lại!");
+        errorMsg = "Đã xảy ra lỗi xác thực, vui lòng đăng nhập lại!";
       } else if (error?.status === 400 || error?.status === 403) {
-        setErrorMsg("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
+        errorMsg = "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!";
       }
-      signOut();
+      await logout().unwrap();
     }
   };
 

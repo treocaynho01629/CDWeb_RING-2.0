@@ -44,12 +44,12 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     Optional<Image> findBookImage(Long bookId, Long imageId);
 
     @Query("""
-        select i.id from Image i
+        select i.publicId from Image i
         left join i.detail d
         left join Book b on b.image.id = i.id
         where (b.id = :bookId or d.book.id = :bookId)
         and i.id in :imageIds
     """)
-    List<Long> findBookImages(Long bookId, List<Long> imageIds);
+    List<String> findBookImagePublicIds(Long bookId, List<Long> imageIds);
 
 }

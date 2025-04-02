@@ -4,6 +4,7 @@ import { Grid2 as Grid, Skeleton, useMediaQuery } from "@mui/material";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useGetBannersQuery } from "../../features/banners/bannersApiSlice";
+import { Link } from "react-router";
 import { getImageSize } from "@ring/shared";
 import Carousel from "react-multi-carousel";
 
@@ -165,6 +166,13 @@ const ExtraContainer = styled.div`
   position: relative;
   padding-bottom: ${({ theme }) => theme.spacing(1)};
 `;
+
+const StyledLink = styled(Link)`
+  width: 100%;
+  /* height: 100%; */
+  display: flex;
+  justify-content: center;
+`;
 //#endregion
 
 const responsive = {
@@ -215,20 +223,22 @@ function Item({ banner, index }) {
               }
             />
           </BackdropContainer>
-          <StyledLazyImage
-            src={banner?.image.url}
-            srcSet={Object.values(ImageSize)
-              .map(
-                (size) => `${banner?.image.srcSet[size.value]} ${size.width}w`
-              )
-              .concat(`${banner?.image.url} 600w`)
-              .join(", ")}
-            alt={banner?.name}
-            visibleByDefault={index == 0}
-            placeholder={
-              <StyledSkeleton variant="rectangular" animation={false} />
-            }
-          />
+          <StyledLink>
+            <StyledLazyImage
+              src={banner?.image.url}
+              srcSet={Object.values(ImageSize)
+                .map(
+                  (size) => `${banner?.image.srcSet[size.value]} ${size.width}w`
+                )
+                .concat(`${banner?.image.url} 600w`)
+                .join(", ")}
+              alt={banner?.name}
+              visibleByDefault={index == 0}
+              placeholder={
+                <StyledSkeleton variant="rectangular" animation={false} />
+              }
+            />
+          </StyledLink>
         </>
       ) : (
         <>
@@ -246,14 +256,16 @@ function ExtraItem({ banner }) {
   if (banner) {
     return (
       <ExtraContainer>
-        <StyledLazyImage
-          src={banner?.image?.srcSet[ImageSize.MEDIUM.value]}
-          alt={banner?.name}
-          visibleByDefault={true}
-          placeholder={
-            <StyledSkeleton variant="rectangular" animation={false} />
-          }
-        />
+        <StyledLink to={banner?.url}>
+          <StyledLazyImage
+            src={banner?.image?.srcSet[ImageSize.MEDIUM.value]}
+            alt={banner?.name}
+            visibleByDefault={true}
+            placeholder={
+              <StyledSkeleton variant="rectangular" animation={false} />
+            }
+          />
+        </StyledLink>
       </ExtraContainer>
     );
   } else {

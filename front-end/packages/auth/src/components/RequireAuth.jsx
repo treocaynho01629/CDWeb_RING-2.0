@@ -10,7 +10,11 @@ const RequireAuth = ({ allowedRoles }) => {
   ) : token ? (
     <Navigate to="/unauthorized" state={{ from: location }} replace /> //To error page
   ) : (
-    <Navigate to="/auth/login" state={{ from: location }} replace />
+    <Navigate
+      to="/auth/login"
+      state={{ from: location, errorMsg: "Vui lòng đăng nhập để tiếp tục." }}
+      replace
+    />
   ); //To login if not logged in
 };
 

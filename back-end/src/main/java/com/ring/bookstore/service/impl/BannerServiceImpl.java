@@ -40,7 +40,7 @@ public class BannerServiceImpl implements BannerService {
                 Sort.by(sortBy).descending());
 
         //Fetch from database
-        Page<IBanner> bannersList = bannerRepo.findBanner(keyword, shopId, byShop, pageable);
+        Page<IBanner> bannersList = bannerRepo.findBanners(keyword, shopId, byShop, pageable);
         Page<BannerDTO> bannerDTOS = bannersList.map(bannerMapper::apply);
         return bannerDTOS;
     }
@@ -52,12 +52,12 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Transactional
-    public Banner updateBanner(Long id, BannerRequest request, Account user) {
+    public Banner updateBanner(Integer id, BannerRequest request, Account user) {
         return null;
     }
 
     @Override
-    public Banner deleteBanner(Long id, Account user) {
+    public Banner deleteBanner(Integer id, Account user) {
         Banner banner = bannerRepo.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Banner not found"));
         //Check if correct seller or admin
@@ -68,14 +68,14 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
-    public void deleteBanners(List<Long> ids, Account user) {
-        List<Long> deleteIds = isAuthAdmin() ? ids : bannerRepo.findBannerIdsByInIdsAndOwner(ids, user.getId());
+    public void deleteBanners(List<Integer> ids, Account user) {
+        List<Integer> deleteIds = isAuthAdmin() ? ids : bannerRepo.findBannerIdsByInIdsAndOwner(ids, user.getId());
         bannerRepo.deleteAllById(deleteIds);
     }
 
     @Override
-    public void deleteBannersInverse(String keyword, Long shopId, Boolean byShop, List<Long> ids, Account user) {
-        List<Long> deleteIds = bannerRepo.findInverseIds(
+    public void deleteBannersInverse(String keyword, Long shopId, Boolean byShop, List<Integer> ids, Account user) {
+        List<Integer> deleteIds = bannerRepo.findInverseIds(
                 keyword,
                 shopId,
                 byShop,

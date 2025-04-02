@@ -22,7 +22,7 @@ const useReachable = () => {
   };
 
   useEffect(() => {
-    return () => connect();
+    connect();
   }, []);
 };
 

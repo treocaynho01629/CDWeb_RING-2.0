@@ -6,9 +6,9 @@ export const getImageSize = () => {
   return (
     enums?.["ImageSize"]?.enums ??
     Object.freeze({
-      TINY: { value: "TINY", size: 65 },
-      SMALL: { value: "SMALL", size: 180 },
-      MEDIUM: { value: "MEDIUM", size: 405 },
+      TINY: { value: "TINY", width: 65 },
+      SMALL: { value: "SMALL", width: 180 },
+      MEDIUM: { value: "MEDIUM", width: 405 },
     })
   );
 };

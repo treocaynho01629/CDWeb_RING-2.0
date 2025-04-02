@@ -43,7 +43,7 @@ public class BannerController {
     //Update banner by id
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('UPDATE_PRIVILEGE')")
-    public ResponseEntity<?> updateBanner(@PathVariable("id") Long id,
+    public ResponseEntity<?> updateBanner(@PathVariable("id") Integer id,
                                           @Valid @RequestPart("request") BannerRequest request,
                                           @CurrentAccount Account currUser) {
         return new ResponseEntity<>(bannerService.updateBanner(id, request, currUser), HttpStatus.CREATED);
@@ -52,14 +52,14 @@ public class BannerController {
     //Delete banner
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
-    public ResponseEntity<?> deleteBanner(@PathVariable("id") Long id, @CurrentAccount Account currUser) {
+    public ResponseEntity<?> deleteBanner(@PathVariable("id") Integer id, @CurrentAccount Account currUser) {
         return new ResponseEntity<>(bannerService.deleteBanner(id, currUser), HttpStatus.OK);
     }
 
     //Delete multiples banners in a lists of {ids}
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasAnyRole('ADMIN','SELLER') and hasAuthority('DELETE_PRIVILEGE')")
-    public ResponseEntity<?> deleteBanners(@RequestParam("ids") List<Long> ids,
+    public ResponseEntity<?> deleteBanners(@RequestParam("ids") List<Integer> ids,
                                            @CurrentAccount Account currUser
     ) {
         bannerService.deleteBanners(ids, currUser);
@@ -72,7 +72,7 @@ public class BannerController {
     public ResponseEntity<?> deleteCouponsInverse(@RequestParam(value = "shopId", required = false) Long shopId,
                                                   @RequestParam(value = "byShop", required=false) Boolean byShop,
                                                   @RequestParam(value = "keyword", defaultValue = "") String keyword,
-                                                  @RequestParam("ids") List<Long> ids,
+                                                  @RequestParam("ids") List<Integer> ids,
                                                   @CurrentAccount Account currUser) {
         bannerService.deleteBannersInverse(keyword, shopId, byShop, ids, currUser);
         return new ResponseEntity<>("Banners deleted successfully!", HttpStatus.OK);

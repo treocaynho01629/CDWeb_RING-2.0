@@ -17,7 +17,7 @@ const useGetEnums = () => {
   };
 
   useEffect(() => {
-    return () => syncEnums();
+    syncEnums();
   }, []);
 };
 

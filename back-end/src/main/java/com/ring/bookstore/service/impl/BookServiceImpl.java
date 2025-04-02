@@ -255,7 +255,7 @@ public class BookServiceImpl implements BookService {
         Book updatedBook = bookRepo.save(book);
 
         //Delete images
-        if (isRemove) imageRepo.deleteAllById(imageRepo.findBookImages(id, removeImageIds));
+        if (isRemove) imageService.deleteImages(imageRepo.findBookImagePublicIds(id, removeImageIds));
 
         return bookMapper.bookToResponseDTO(updatedBook);
     }

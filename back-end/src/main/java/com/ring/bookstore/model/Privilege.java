@@ -3,16 +3,17 @@ package com.ring.bookstore.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ring.bookstore.enums.PrivilegeName;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Collection;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 public class Privilege {
 
     @Id

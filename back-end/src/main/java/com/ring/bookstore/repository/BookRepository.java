@@ -14,9 +14,11 @@ import org.springframework.stereotype.Repository;
 
 import com.ring.bookstore.dtos.books.IBookDisplay;
 import com.ring.bookstore.model.Book;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
+
     @Query(value = """
                 select b.id as id, b.slug as slug, b.title as title,
                     (case when :withDesc = true then b.description else null end) as description,
@@ -24,7 +26,10 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                     s.name as shopName, i as image,
                     coalesce(rv.rating, 0) as rating,
                     coalesce(od.totalOrders, 0) as totalOrders
-                from Book b join b.shop s left join b.image i
+                from Book b
+                join b.shop s
+                left join b.image i
+                left join b.cate c
                 left join (select r.book.id as book_id, avg(r.rating) as rating
                     from Review r
                     group by r.book.id) rv on b.id = rv.book_id
@@ -33,7 +38,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                     group by o.book.id) od on b.id = od.book_id
                 where concat (b.title, b.author, s.name) ilike %:keyword%
                 and (coalesce(:shopId) is null or b.shop.id = :shopId)
-                and (coalesce(:cateId) is null or b.cate.id = :cateId or b.cate.parent.id = :cateId)
+                and (coalesce(:cateId) is null or c.id = :cateId or c.parent.id = :cateId)
                 and (coalesce(:pubIds) is null or b.publisher.id in :pubIds)
                 and (coalesce(:types) is null or b.type in :types)
                 and coalesce(rv.rating, 0) >= :rating
@@ -43,12 +48,14 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             """,
             countQuery = """
                      select count(b)
-                        from Book b join b.shop s
+                        from Book b
+                        join b.shop s
+                        left join b.cate c
                         left join (select r.book.id as book_id, avg(r.rating) as rating
                             from Review r
                             group by r.book.id) rv on b.id = rv.book_id
                         where concat (b.title, b.author, s.name) ilike %:keyword%
-                        and (coalesce(:cateId) is null or b.cate.id = :cateId or b.cate.parent.id = :cateId)
+                        and (coalesce(:cateId) is null or c.id = :cateId or c.id = :cateId)
                         and (coalesce(:pubIds) is null or b.publisher.id in :pubIds)
                         and (coalesce(:types) is null or b.type in :types)
                         and (coalesce(:shopId) is null or b.shop.id = :shopId)
@@ -124,12 +131,14 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("""
                 select b.id
-                from Book b join b.shop s
+                from Book b
+                join b.shop s
+                left join b.cate c
                 left join (select r.book.id as book_id, avg(r.rating) as rating
                     from Review r
                     group by r.book.id) rv on b.id = rv.book_id
                 where concat (b.title, b.author, s.name) ilike %:keyword%
-                and (coalesce(:cateId) is null or b.cate.id = :cateId or b.cate.parent.id = :cateId)
+                and (coalesce(:cateId) is null or c.id = :cateId or c.parent.id = :cateId)
                 and (coalesce(:pubIds) is null or b.publisher.id in :pubIds)
                 and (coalesce(:types) is null or b.type in :types)
                 and (coalesce(:shopId) is null or b.shop.id = :shopId)
@@ -154,9 +163,9 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("""
                 select count(b.id) as total,
-                count(case when b.lastModifiedDate >= date_trunc('month', current date) then 1 end) as currentMonth,
-                count(case when b.lastModifiedDate >= date_trunc('month', current date) - 1 month
-                    and b.lastModifiedDate < date_trunc('month', current date) then 1 end) lastMonth
+                count(case when b.createdDate >= date_trunc('month', current date) then 1 end) as currentMonth,
+                count(case when b.createdDate >= date_trunc('month', current date) - 1 month
+                    and b.createdDate < date_trunc('month', current date) then 1 end) lastMonth
                 from Book b
                 where (coalesce(:shopId) is null or b.shop.id = :shopId)
             """)
@@ -174,15 +183,16 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             """, nativeQuery = true)
     List<String> findSuggestion(String keyword);
 
+    @Modifying
+    @Transactional
+    @Query("""
+                update Book b set b.amount = b.amount - :amount where b.id = :id
+            """)
+    void decreaseStock(Long id, short amount);
+
     void deleteAllByShopId(Long shopId);
 
     void deleteAllByShop_Owner(Account owner);
 
     void deleteAllByShopIdAndShop_Owner(Long shopId, Account owner);
-
-    @Modifying
-    @Query("""
-                update Book b set b.amount = b.amount - :amount where b.id = :id
-            """)
-    void decreaseStock(Long id, short amount);
 }

@@ -20,14 +20,14 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	
 	boolean existsByUsernameOrEmail(String username, String email);
 
+	Optional<Account> findByEmail(String email);
+
 	@Query("""
 		select a from Account a
 		join fetch a.roles r
 		where a.username = :username
 	""")
 	Optional<Account> findByUsername(String username);
-
-	Optional<Account> findByEmail(String email);
 
 	@Query("""
 		select a from Account a

@@ -23,20 +23,20 @@ public interface BannerService {
     Banner addBanner(BannerRequest request,
                      Account user);
 
-    Banner updateBanner(Long id,
+    Banner updateBanner(Integer id,
                         BannerRequest request,
                         Account user);
 
-    Banner deleteBanner(Long id,
+    Banner deleteBanner(Integer id,
                         Account user);
 
-    void deleteBanners(List<Long> ids,
+    void deleteBanners(List<Integer> ids,
                        Account user);
 
     void deleteBannersInverse(String keyword,
                               Long shopId,
                               Boolean byShop,
-                              List<Long> ids,
+                              List<Integer> ids,
                               Account user);
 
     void deleteAllBanners(Long shopId,
