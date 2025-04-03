@@ -49,7 +49,7 @@ public class ReviewServiceImpl implements ReviewService {
                 "Hãy mua sản phẩm để có thể đánh giá!"
         );
         //Check if user had reviewed it yet
-        if (reviewRepo.findUserReviewOfBook(id, user.getId()).isPresent()) throw new HttpResponseException(
+        if (reviewRepo.findUserBookReview(id, user.getId()).isPresent()) throw new HttpResponseException(
                 HttpStatus.CONFLICT,
                 "User have already reviewed this product!",
                 "Bạn đã đánh giá sản phẩm rồi!"
@@ -119,7 +119,7 @@ public class ReviewServiceImpl implements ReviewService {
                     "User have not bought the product!",
                     "Hãy mua sản phẩm để có thể đánh giá!"
             );
-        IReview projection = reviewRepo.findUserReviewOfBook(id, user.getId()).orElseThrow(()
+        IReview projection = reviewRepo.findUserBookReview(id, user.getId()).orElseThrow(()
                 -> new ResourceNotFoundException(
                 "Review not found",
                 "Người dùng chưa đánh giá sản phẩm này!"

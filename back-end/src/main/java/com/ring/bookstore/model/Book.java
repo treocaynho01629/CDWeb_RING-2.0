@@ -123,9 +123,4 @@ public class Book extends Auditable {
         bookReviews.remove(review);
         review.setBook(null);
     }
-
-    @PreRemove
-    private void preRemove() {
-        this.setImage(null);
-    }
 }

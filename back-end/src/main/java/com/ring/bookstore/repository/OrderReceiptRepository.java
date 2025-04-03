@@ -36,7 +36,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         join o.details od
         join o.address a
         join od.items oi
-        join o.user u
+        left join o.user u
         left join u.profile p
         left join p.image i
         where (coalesce(:shopId) is null or od.shop.id = :shopId)
@@ -63,7 +63,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         from OrderReceipt o
         join o.details od
         join od.items oi
-        join Book b on oi.book.id = b.id
+        left join Book b on oi.book.id = b.id
         where (coalesce(:shopId) is null or od.shop.id = :shopId)
         and (coalesce(:userId) is null or od.shop.owner.id = :userId)
         and (coalesce(:status) is null or od.status = :status)

@@ -25,7 +25,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 		left join p.image i
 		where (coalesce(:userId) is null or u.id = :userId)
 		and (coalesce(:bookId) is null or r.book.id = :bookId)
-		and (coalesce(:rating) is null or  r.rating = :rating)
+		and (coalesce(:rating) is null or r.rating = :rating)
 		and concat (r.rContent, u.username) ilike %:keyword%
 	""")
 	Page<IReview> findReviews(Long bookId,
@@ -84,5 +84,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 		left join p.image i
 		where r.user.id = :userId and b.id = :bookId
 	""")
-	Optional<IReview> findUserReviewOfBook(Long bookId, Long userId); //Get user's review of this book
+	Optional<IReview> findUserBookReview(Long bookId, Long userId); //Get user's review of this book
 }

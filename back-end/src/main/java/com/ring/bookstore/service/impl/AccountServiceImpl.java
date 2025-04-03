@@ -116,7 +116,7 @@ public class AccountServiceImpl implements AccountService {
 
         Account savedAccount = accountRepo.save(acc); //Save to Database
 
-        //Create their profile
+        //Create profile
         var profile = AccountProfile.builder()
                 .name(request.getName())
                 .phone(request.getPhone())

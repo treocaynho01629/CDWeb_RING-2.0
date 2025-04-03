@@ -34,16 +34,13 @@ public class ReviewMapper {
                 : null;
         Book book = review.getBook();
 
-        String username = (username = user.getUsername()) != null ? username  : "Người dùng RING!";
-        Long userId = user.getId();
-
         return new ReviewDTO(review.getId(),
                 review.getRContent(),
                 review.getRating(),
                 review.getCreatedDate(),
                 review.getLastModifiedDate(),
-                userId,
-                username,
+                user.getId(),
+                user.getUsername(),
                 url,
                 book.getId(),
                 book.getTitle(),

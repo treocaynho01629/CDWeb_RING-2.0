@@ -19,8 +19,8 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
         s.id as shopId, s.name as shopName
         from OrderItem oi
         join oi.detail od
-        join od.shop s
-        join oi.book b
+        left join od.shop s
+        left join oi.book b
         left join b.image i
         where od.id in (:ids)
         order by oi.detail.id desc
@@ -39,8 +39,8 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
         join oi.detail od
         join od.order o
         join o.address a
-        join od.shop s
-        join oi.book b
+        left join od.shop s
+        left join oi.book b
         left join b.image i
         where od.id = :id
         and (coalesce(:userId) is null or o.user.id = :userId)

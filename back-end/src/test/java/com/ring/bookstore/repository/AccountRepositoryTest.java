@@ -20,6 +20,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +40,9 @@ class AccountRepositoryTest {
     private AccountRepository accountRepo;
 
     @Autowired
+    private AccountProfileRepository profileRepo;
+
+    @Autowired
     private RoleRepository roleRepo;
 
     @Autowired
@@ -51,13 +55,14 @@ class AccountRepositoryTest {
     private EntityManager entityManager;
 
     private Account account;
+    private RefreshToken token;
 
     @BeforeEach
     void setUp() {
         Privilege privilege = Privilege.builder().privilegeName(PrivilegeName.READ_PRIVILEGE).build();
         Privilege savedPrivilege = privilegeRepo.save(privilege);
-        Role newRole = Role.builder().roleName(UserRole.ROLE_GUEST).privileges(List.of(savedPrivilege)).build();
-        Role savedRole = roleRepo.save(newRole);
+        Role role = Role.builder().roleName(UserRole.ROLE_GUEST).privileges(List.of(savedPrivilege)).build();
+        Role savedRole = roleRepo.save(role);
 
         account = Account.builder()
                 .username("initial")
@@ -86,11 +91,21 @@ class AccountRepositoryTest {
         List<Account> accounts = List.of(account, account2, account3);
         accountRepo.saveAll(accounts);
 
-        RefreshToken token = RefreshToken.builder()
+        token = RefreshToken.builder()
                 .refreshToken("test")
                 .user(account)
                 .build();
         tokenRepo.save(token);
+
+        AccountProfile profile = AccountProfile.builder()
+                .dob(LocalDate.now())
+                .user(account)
+                .build();
+
+        profileRepo.save(profile);
+
+        entityManager.flush();
+        entityManager.clear();
     }
 
     @Test
@@ -101,10 +116,10 @@ class AccountRepositoryTest {
                 .email("email")
                 .build();
 
-        Account savedProfile = accountRepo.save(account);
+        Account savedAccount = accountRepo.save(account);
 
-        assertNotNull(savedProfile);
-        assertNotNull(savedProfile.getId());
+        assertNotNull(savedAccount);
+        assertNotNull(savedAccount.getId());
     }
 
     @Test
@@ -127,8 +142,10 @@ class AccountRepositoryTest {
         accountRepo.deleteById(account.getId());
 
         Account foundAccount = accountRepo.findById(account.getId()).orElse(null);
+        RefreshToken foundToken = tokenRepo.findById(token.getId()).orElse(null);
 
         assertNull(foundAccount);
+        assertNull(foundToken);
     }
 
     @Test
@@ -183,8 +200,8 @@ class AccountRepositoryTest {
     @Test
     public void whenClearResetToken_ThenResetTokenIsNull() {
         accountRepo.clearResetToken("reset123");
-        entityManager.flush(); // Force changes to be written
-        entityManager.clear(); // Clear persistence context to fetch fresh data
+        entityManager.flush();
+        entityManager.clear();
 
         Account foundAccount = accountRepo.findByEmail("initialEmail@initial.com").orElse(null);
         assertNotNull(foundAccount);

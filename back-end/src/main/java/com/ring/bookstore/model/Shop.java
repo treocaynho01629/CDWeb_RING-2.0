@@ -57,7 +57,8 @@ public class Shop extends Auditable {
     @EqualsAndHashCode.Exclude
     private Image image;
 
-    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true,
             mappedBy = "shop",
             fetch = FetchType.LAZY)
     @JsonIgnore
@@ -70,7 +71,7 @@ public class Shop extends Auditable {
     @JsonIgnore
     private List<Coupon> coupons;
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(	name = "shops_followers",
             joinColumns = @JoinColumn(name = "shop_id"),
             inverseJoinColumns = @JoinColumn(name = "follower_id"))
@@ -78,7 +79,9 @@ public class Shop extends Auditable {
     @EqualsAndHashCode.Exclude
     private Set<Account> followers = new HashSet<>();
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     @JsonIgnore
     private Address address;

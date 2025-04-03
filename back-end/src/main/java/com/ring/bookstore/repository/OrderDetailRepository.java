@@ -27,8 +27,8 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         select od.id
         from OrderDetail od
         join OrderItem oi on od.id = oi.detail.id
-        join Shop s on od.shop.id = s.id
-        join Book b on oi.book.id = b.id
+        left join Shop s on od.shop.id = s.id
+        left join Book b on oi.book.id = b.id
         where od.order.user.id = :id
         and (coalesce(:status) is null or od.status = :status)
         and concat (b.title, s.name, od.order.id) ilike %:keyword%
@@ -56,9 +56,9 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         from OrderDetail od
         join od.order o
         join od.items oi
-        join od.shop s
         join o.address a
-        join o.user u
+        left join od.shop s
+        left join o.user u
         left join u.profile p
         left join p.image i
         where o.id in (:ids)

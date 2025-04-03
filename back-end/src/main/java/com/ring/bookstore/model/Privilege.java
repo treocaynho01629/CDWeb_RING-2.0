@@ -24,7 +24,8 @@ public class Privilege {
     @Column(nullable = false, length = 30)
     private PrivilegeName privilegeName;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "privileges")
+    @ManyToMany(fetch = FetchType.LAZY,
+            mappedBy = "privileges")
     @JsonIgnore
     private Collection<Role> roles;
 

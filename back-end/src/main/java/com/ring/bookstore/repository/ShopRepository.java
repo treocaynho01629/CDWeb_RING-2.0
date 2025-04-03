@@ -158,8 +158,6 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	Optional<IShopDetail> findShopDetailById(Long id,
 											 Long userId);
 
-	void deleteAllByOwner(Account owner);
-
 	@Query("""
         select count(s.id) as total,
         count(case when s.createdDate >= date_trunc('month', current date) then 1 end) as currentMonth,
@@ -168,4 +166,6 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
         from Shop s
     """)
 	IStat getShopAnalytics();
+
+	void deleteAllByOwner(Account owner);
 }

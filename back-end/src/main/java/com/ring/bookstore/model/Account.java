@@ -64,13 +64,16 @@ public class Account extends Auditable implements UserDetails {
 	private AccountProfile profile;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(	name = "users_roles",
+    @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonIgnore
     private Collection<Role> roles;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL,
+			orphanRemoval = true,
+			mappedBy = "user",
+			fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<RefreshToken> refreshTokens = new ArrayList<>();
 
@@ -78,19 +81,28 @@ public class Account extends Auditable implements UserDetails {
 	@JsonIgnore
 	private String resetToken;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL,
+			orphanRemoval = true,
+			mappedBy = "owner",
+			fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Shop> shops;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,
+			orphanRemoval = true,
+			mappedBy = "user",
+			fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Review> userReviews;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+			mappedBy = "user",
+			fetch = FetchType.LAZY)
     @JsonIgnore
     private List<OrderReceipt> userOrderReceipts;
 
-	@ManyToMany(mappedBy = "followers")
+	@ManyToMany(fetch = FetchType.LAZY,
+			mappedBy = "followers")
 	@JsonIgnore
 	@EqualsAndHashCode.Exclude
 	private Set<Shop> following = new HashSet<>();
