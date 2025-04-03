@@ -50,6 +50,8 @@ class AccountRepositoryTest {
     @PersistenceContext
     private EntityManager entityManager;
 
+    private Account account;
+
     @BeforeEach
     void setUp() {
         Privilege privilege = Privilege.builder().privilegeName(PrivilegeName.READ_PRIVILEGE).build();
@@ -57,7 +59,7 @@ class AccountRepositoryTest {
         Role newRole = Role.builder().roleName(UserRole.ROLE_GUEST).privileges(List.of(savedPrivilege)).build();
         Role savedRole = roleRepo.save(newRole);
 
-        Account account = Account.builder()
+        account = Account.builder()
                 .username("initial")
                 .pass("asd")
                 .email("initialEmail@initial.com")
@@ -107,15 +109,7 @@ class AccountRepositoryTest {
 
     @Test
     public void whenUpdateAccount_ThenReturnAccount() {
-        Account account = Account.builder()
-                .username("username")
-                .pass("asd")
-                .email("email")
-                .build();
-
-        Account savedProfile = accountRepo.save(account);
-
-        Account foundAccount = accountRepo.findById(savedProfile.getId()).orElse(null);
+        Account foundAccount = accountRepo.findById(account.getId()).orElse(null);
 
         assertNotNull(foundAccount);
         foundAccount.setUsername("nameuser");
@@ -130,17 +124,9 @@ class AccountRepositoryTest {
 
     @Test
     public void whenDeleteAccount_ThenFindNull() {
-        Account account = Account.builder()
-                .username("username")
-                .pass("asd")
-                .email("email")
-                .build();
+        accountRepo.deleteById(account.getId());
 
-        Account savedAccount = accountRepo.save(account);
-
-        accountRepo.deleteById(savedAccount.getId());
-
-        Account foundAccount = accountRepo.findById(savedAccount.getId()).orElse(null);
+        Account foundAccount = accountRepo.findById(account.getId()).orElse(null);
 
         assertNull(foundAccount);
     }

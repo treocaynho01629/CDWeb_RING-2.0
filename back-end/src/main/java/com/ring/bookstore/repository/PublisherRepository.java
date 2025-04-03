@@ -1,6 +1,5 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.publishers.IPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PublisherRepository extends JpaRepository<Publisher, Integer>{
+public interface PublisherRepository extends JpaRepository<Publisher, Integer> {
+
     @Query("""
           select p as publisher
           from Publisher p left join fetch p.image i
@@ -26,7 +26,7 @@ public interface PublisherRepository extends JpaRepository<Publisher, Integer>{
           join p.publisherBooks b
           join b.cate c
           where c.id = :cateId or c.parent.id = :cateId
-          group by p.id, i.name
+          group by p.id, i.id
     """)
     Page<Publisher> findRelevantPublishers(Integer cateId, Pageable pageable);
 
@@ -35,7 +35,7 @@ public interface PublisherRepository extends JpaRepository<Publisher, Integer>{
           from Publisher p left join fetch p.image i
           where p.id = :id
     """)
-    Optional<Publisher> findProjectionById(Integer id);
+    Optional<Publisher> findWithImageById(Integer id);
 
     @Query("""
 	    select p.id from Publisher p where p.id not in :ids

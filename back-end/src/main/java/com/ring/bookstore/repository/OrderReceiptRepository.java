@@ -25,7 +25,8 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         where o.user.id = :userId and oi.book.id = :id
         and od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
     """)
-    boolean hasUserBoughtBook(Long id, Long userId); //Check if user have bought this book before
+    boolean hasUserBoughtBook(Long id,
+                              Long userId); //Check if user have bought this book before
 
     @Query(value = """
         select distinct o.id as id, i as image, a.name as name,
@@ -52,7 +53,10 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         and (coalesce(:userId) is null or od.shop.owner.id = :userId)
         and (coalesce(:bookId) is null or oi.book.id = :bookId)
     """)
-    Page<IReceiptSummary> findAllSummaries(Long shopId, Long userId, Long bookId, Pageable pageable);
+    Page<IReceiptSummary> findAllSummaries(Long shopId,
+                                           Long userId,
+                                           Long bookId,
+                                           Pageable pageable);
 
     @Query("""
         select o.id
@@ -66,7 +70,11 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         and concat (b.title, o.id) ilike %:keyword%
         group by o.id
     """)
-    Page<Long> findAllIds(Long shopId, Long userId, OrderStatus status, String keyword, Pageable pageable);
+    Page<Long> findAllIds(Long shopId,
+                          Long userId,
+                          OrderStatus status,
+                          String keyword,
+                          Pageable pageable);
 
     //Exclude shipping fee?
     @Query("""
@@ -83,7 +91,8 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
             and (coalesce(:userId) is null or od.shop.owner.id = :userId)
         ) t
     """)
-    IStat getSalesAnalytics(Long shopId, Long userId);
+    IStat getSalesAnalytics(Long shopId,
+                            Long userId);
 
     @Query("""
         select month(o.createdDate) as name,
@@ -97,5 +106,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         and (coalesce(:year) is null or year(o.createdDate) = :year)
         group by month(o.createdDate)
     """)
-    List<Map<String, Object>> getMonthlySales(Long shopId, Long userId, Integer year); //Get monthly sale
+    List<Map<String, Object>> getMonthlySales(Long shopId,
+                                              Long userId,
+                                              Integer year); //Get monthly sale
 }

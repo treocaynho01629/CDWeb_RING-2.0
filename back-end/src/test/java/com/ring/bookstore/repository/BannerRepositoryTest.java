@@ -39,6 +39,8 @@ class BannerRepositoryTest {
     @Autowired
     private AccountRepository accountRepo;
 
+    private Banner banner;
+
     @BeforeEach
     void setUp() {
         Account account = Account.builder()
@@ -57,7 +59,7 @@ class BannerRepositoryTest {
         Image image2 = Image.builder().name("image2").build();
         Image image3 = Image.builder().name("image3").build();
 
-        Banner banner = Banner.builder()
+        banner = Banner.builder()
                 .name("banner1")
                 .description("test")
                 .image(image)
@@ -92,16 +94,8 @@ class BannerRepositoryTest {
     }
 
     @Test
-    public void whenUpdateAccount_ThenReturnAccount() {
-        Image image = Image.builder().build();
-        Banner banner = Banner.builder()
-                .name("banner4")
-                .image(image)
-                .build();
-
-        Banner savedBanner = bannerRepo.save(banner);
-
-        Banner foundBanner = bannerRepo.findById(savedBanner.getId()).orElse(null);
+    public void whenUpdateBanner_ThenReturnBanner() {
+        Banner foundBanner = bannerRepo.findById(banner.getId()).orElse(null);
 
         assertNotNull(foundBanner);
         foundBanner.setDescription("tset");
@@ -115,18 +109,10 @@ class BannerRepositoryTest {
     }
 
     @Test
-    public void whenDeleteAccount_ThenFindNull() {
-        Image image = Image.builder().build();
-        Banner banner = Banner.builder()
-                .name("banner4")
-                .image(image)
-                .build();
+    public void whenDeleteBanner_ThenFindNull() {
+        bannerRepo.deleteById(banner.getId());
 
-        Banner savedBanner = bannerRepo.save(banner);
-
-        bannerRepo.deleteById(savedBanner.getId());
-
-        Banner foundBanner = bannerRepo.findById(savedBanner.getId()).orElse(null);
+        Banner foundBanner = bannerRepo.findById(banner.getId()).orElse(null);
 
         assertNull(foundBanner);
     }

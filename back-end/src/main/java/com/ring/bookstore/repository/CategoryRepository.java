@@ -45,7 +45,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
           where case when coalesce(:parentId) is null
           then (c.parent.id is null) else (c.parent.id = :parentId) end
     """)
-    Page<Integer> findCatesIdsByParent(Integer parentId, Pageable pageable);
+    Page<Integer> findCateIdsByParent(Integer parentId, Pageable pageable);
 
     @Query(value = """
           select distinct array(c.id, c.parent.id) as id from Category c
@@ -70,36 +70,30 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     @Query("""
           select c from Category c
-          where case when coalesce(:id) is not null 
+          where case when coalesce(:id) is not null
           then (c.id = :id) else (c.slug = :slug) end
     """)
     Optional<Category> findCate(Integer id, String slug);
 
     @Query("""
           select c from Category c left join fetch c.subCates
-          where case when coalesce(:id) is not null 
+          where case when coalesce(:id) is not null
           then (c.id = :id) else (c.slug = :slug) end
     """)
     Optional<Category> findCateWithChildren(Integer id, String slug);
 
     @Query("""
           select c from Category c left join fetch c.parent
-          where case when coalesce(:id) is not null 
+          where case when coalesce(:id) is not null
           then (c.id = :id) else (c.slug = :slug) end
     """)
     Optional<Category> findCateWithParent(Integer id, String slug);
 
     @Query("""
         select c.id from Category c
-        where (coalesce(:parentId) is null or c.parent.id = :parentId)
-              and c.id not in :ids
+        where case when coalesce(:parentId) is null
+        then (c.parent.id is null) else (c.parent.id = :parentId) end
+        and c.id not in :ids
 	""")
     List<Integer> findInverseIds(Integer parentId, List<Integer> ids);
-
-    @Query("""
-        delete from Category c
-        where size(c.subCates) = 0 and c.id in :ids
-	""")
-    void deleteByIdIsIn(List<Integer> ids);
-
 }

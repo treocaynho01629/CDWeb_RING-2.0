@@ -2,6 +2,7 @@ package com.ring.bookstore.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -41,8 +42,9 @@ public class Category {
     @JsonIgnore
     private Set<Book> cateBooks;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
+    @JsonIgnore
     private Category parent;
 
     @OneToMany(cascade = CascadeType.ALL,
@@ -64,6 +66,7 @@ public class Category {
 
     @PreRemove
     private void updateOrRemoveBooks() {
+        if (this.cateBooks == null || this.cateBooks.isEmpty()) return;
         for (Book b : this.cateBooks) {
             if (this.parent != null) {
                 b.setCate(this.parent);

@@ -42,7 +42,7 @@ public class Publisher {
     @JsonIgnore
     private Image image;
 
-    @OneToMany(cascade = CascadeType.ALL,
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             mappedBy = "publisher",
             fetch = FetchType.LAZY)
     @JsonIgnore

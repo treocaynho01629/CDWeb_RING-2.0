@@ -29,7 +29,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                 from Book b
                 join b.shop s
                 left join b.image i
-                left join b.cate c
                 left join (select r.book.id as book_id, avg(r.rating) as rating
                     from Review r
                     group by r.book.id) rv on b.id = rv.book_id
@@ -38,7 +37,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                     group by o.book.id) od on b.id = od.book_id
                 where concat (b.title, b.author, s.name) ilike %:keyword%
                 and (coalesce(:shopId) is null or b.shop.id = :shopId)
-                and (coalesce(:cateId) is null or c.id = :cateId or c.parent.id = :cateId)
+                and (coalesce(:cateId) is null or b.cate.id = :cateId or b.cate.parent.id = :cateId)
                 and (coalesce(:pubIds) is null or b.publisher.id in :pubIds)
                 and (coalesce(:types) is null or b.type in :types)
                 and coalesce(rv.rating, 0) >= :rating
@@ -50,12 +49,11 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                      select count(b)
                         from Book b
                         join b.shop s
-                        left join b.cate c
                         left join (select r.book.id as book_id, avg(r.rating) as rating
                             from Review r
                             group by r.book.id) rv on b.id = rv.book_id
                         where concat (b.title, b.author, s.name) ilike %:keyword%
-                        and (coalesce(:cateId) is null or c.id = :cateId or c.id = :cateId)
+                        and (coalesce(:cateId) is null or b.cate.id = :cateId or b.cate.parent.id = :cateId)
                         and (coalesce(:pubIds) is null or b.publisher.id in :pubIds)
                         and (coalesce(:types) is null or b.type in :types)
                         and (coalesce(:shopId) is null or b.shop.id = :shopId)
@@ -133,12 +131,11 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                 select b.id
                 from Book b
                 join b.shop s
-                left join b.cate c
                 left join (select r.book.id as book_id, avg(r.rating) as rating
                     from Review r
                     group by r.book.id) rv on b.id = rv.book_id
                 where concat (b.title, b.author, s.name) ilike %:keyword%
-                and (coalesce(:cateId) is null or c.id = :cateId or c.parent.id = :cateId)
+                and (coalesce(:cateId) is null or b.cate.id = :cateId or b.cate.parent.id = :cateId)
                 and (coalesce(:pubIds) is null or b.publisher.id in :pubIds)
                 and (coalesce(:types) is null or b.type in :types)
                 and (coalesce(:shopId) is null or b.shop.id = :shopId)

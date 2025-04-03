@@ -41,6 +41,9 @@ class BookRepositoryTest {
     private ShopRepository shopRepo;
 
     @Autowired
+    private CategoryRepository cateRepo;
+
+    @Autowired
     private AccountRepository accountRepo;
 
     @PersistenceContext
@@ -63,6 +66,9 @@ class BookRepositoryTest {
         shop.setCreatedDate(LocalDateTime.now());
         Shop savedShop = shopRepo.save(shop);
 
+        Category cate = Category.builder().name("test").build();
+        Category savedCate = cateRepo.save(cate);
+
         Image image = Image.builder().name("image").build();
         Image image2 = Image.builder().name("image2").build();
         Image image3 = Image.builder().name("image3").build();
@@ -75,6 +81,7 @@ class BookRepositoryTest {
                 .discount(BigDecimal.valueOf(0))
                 .amount((short) 88)
                 .shop(savedShop)
+                .cate(savedCate)
                 .build();
         Book book2 = Book.builder()
                 .image(image2)
@@ -84,6 +91,7 @@ class BookRepositoryTest {
                 .discount(BigDecimal.valueOf(0))
                 .amount((short) 1)
                 .shop(savedShop)
+                .cate(savedCate)
                 .build();
         Book book3 = Book.builder()
                 .image(image3)
@@ -93,12 +101,55 @@ class BookRepositoryTest {
                 .discount(BigDecimal.valueOf(0))
                 .amount((short) 0)
                 .shop(savedShop)
+                .cate(savedCate)
                 .build();
         book.setCreatedDate(LocalDateTime.now().minusMonths(1));
         book2.setCreatedDate(LocalDateTime.now().minusMonths(1));
         book3.setCreatedDate(LocalDateTime.now());
         List<Book> books = List.of(book, book2, book3);
         bookRepo.saveAll(books);
+    }
+
+    @Test
+    public void givenNewBook_whenSaveBook_ThenReturnBook() {
+        Image image = Image.builder().build();
+        Book book = Book.builder()
+                .image(image)
+                .title("book4")
+                .author("author4")
+                .price(60000.0)
+                .discount(BigDecimal.valueOf(0.3))
+                .amount((short) 111)
+                .build();
+
+        Book savedBook = bookRepo.save(book);
+
+        assertNotNull(savedBook);
+        assertNotNull(savedBook.getId());
+    }
+
+    @Test
+    public void whenUpdateBook_ThenReturnBook() {
+        Book foundBook = bookRepo.findById(book.getId()).orElse(null);
+
+        assertNotNull(foundBook);
+        foundBook.setTitle("tset");
+        foundBook.setDescription("description");
+
+        Book updatedBook = bookRepo.save(foundBook);
+
+        assertNotNull(updatedBook);
+        assertNotNull(updatedBook.getDescription());
+        assertEquals("tset", updatedBook.getTitle());
+    }
+
+    @Test
+    public void whenDeleteBook_ThenFindNull() {
+        bookRepo.deleteById(book.getId());
+
+        Book foundBook = bookRepo.findById(book.getId()).orElse(null);
+
+        assertNull(foundBook);
     }
 
     @Test

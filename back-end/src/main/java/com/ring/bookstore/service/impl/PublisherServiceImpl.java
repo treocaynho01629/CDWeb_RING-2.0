@@ -59,7 +59,7 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     public PublisherDTO getPublisher(Integer id) {
-        Publisher publisher = pubRepo.findProjectionById(id).orElseThrow(() ->
+        Publisher publisher = pubRepo.findWithImageById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Publisher not found!"));
 
         PublisherDTO publisherDTO = pubMapper.apply(publisher); //Map to DTO

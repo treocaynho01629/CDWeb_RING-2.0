@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long>{
+public interface ReviewRepository extends JpaRepository<Review, Long> {
 
 	@Query("""
 		select r as review, u.id as userId, u.username as username, i as image,

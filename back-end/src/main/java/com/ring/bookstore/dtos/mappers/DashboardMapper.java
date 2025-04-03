@@ -13,7 +13,7 @@ import java.util.Map;
 public class DashboardMapper {
 
     public StatDTO statToDTO(IStat projection, String id, String label) {
-        Double value = Double.valueOf(projection.getTotal());
+        Double value = projection.getTotal();
         BigDecimal diff = BigDecimal.valueOf(projection.getCurrentMonth() == projection.getLastMonth() ? 0
                 : projection.getCurrentMonth() / (projection.getLastMonth() == 0 ? 1 : projection.getLastMonth()) - 1);
         return new StatDTO(id, label, value, diff);

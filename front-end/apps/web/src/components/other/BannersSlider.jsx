@@ -169,7 +169,6 @@ const ExtraContainer = styled.div`
 
 const StyledLink = styled(Link)`
   width: 100%;
-  /* height: 100%; */
   display: flex;
   justify-content: center;
 `;

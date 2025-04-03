@@ -2,7 +2,6 @@ package com.ring.bookstore.repository;
 
 import com.ring.bookstore.dtos.coupons.ICoupon;
 import com.ring.bookstore.dtos.dashboard.IStat;
-import com.ring.bookstore.enums.BookType;
 import com.ring.bookstore.enums.CouponType;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.Coupon;
@@ -41,13 +40,13 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
             		then c.shop.id is not null else c.shop.id is null end)
             	group by c.id, cd.id, s.name, i.id
             """)
-    Page<ICoupon> findCoupon(List<CouponType> types,
-                             List<String> codes,
-                             String code,
-                             Long shopId,
-                             Boolean byShop,
-                             Boolean showExpired,
-                             Pageable pageable);
+    Page<ICoupon> findCoupons(List<CouponType> types,
+                              List<String> codes,
+                              String code,
+                              Long shopId,
+                              Boolean byShop,
+                              Boolean showExpired,
+                              Pageable pageable);
 
     @Query("""
                 select c.id from Coupon c
@@ -146,23 +145,23 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     @Query("""
                 select count(c.id) as total,
-                count(case when c.lastModifiedDate >= date_trunc('month', current date) then 1 end) as currentMonth,
-                count(case when c.lastModifiedDate >= date_trunc('month', current date) - 1 month
-                    and c.lastModifiedDate < date_trunc('month', current date) then 1 end) lastMonth
+                count(case when c.createdDate >= date_trunc('month', current date) then 1 end) as currentMonth,
+                count(case when c.createdDate >= date_trunc('month', current date) - 1 month
+                    and c.createdDate < date_trunc('month', current date) then 1 end) lastMonth
                 from Coupon c
                 where (coalesce(:shopId) is null or c.shop.id = :shopId)
             """)
     IStat getCouponAnalytics(Long shopId);
-
-    void deleteAllByShopId(Long shopId);
-
-    void deleteAllByShop_Owner(Account owner);
-
-    void deleteAllByShopIdAndShop_Owner(Long shopId, Account owner);
 
     @Modifying
     @Query("""
                 update CouponDetail c set c.usage = c.usage - cast(1 as short) where c.coupon.id = :id
             """)
     void decreaseUsage(Long id);
+
+    void deleteAllByShopId(Long shopId);
+
+    void deleteAllByShop_Owner(Account owner);
+
+    void deleteAllByShopIdAndShop_Owner(Long shopId, Account owner);
 }

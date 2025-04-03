@@ -40,7 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
         Page<CategoryDTO> cateDTOS = null;
 
         if (include != null && include.equalsIgnoreCase("children")) {
-            Page<Integer> cateIds = cateRepo.findCatesIdsByParent(parentId, pageable);
+            Page<Integer> cateIds = cateRepo.findCateIdsByParent(parentId, pageable);
             List<ICategory> fullList = cateRepo.findParentAndSubCatesWithParentIds(cateIds.getContent());
             List<CategoryDTO> catesList = cateMapper.parendAndChildsToCateDTOS(fullList, cateIds.getContent());
             cateDTOS = new PageImpl<CategoryDTO>(
@@ -168,7 +168,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategories(Integer parentId, List<Integer> ids, Boolean isInverse) {
         List<Integer> listDelete = ids;
         if (isInverse) listDelete = cateRepo.findInverseIds(parentId, ids);
-        cateRepo.deleteByIdIsIn(listDelete);
+        cateRepo.deleteAllByIdInBatch(listDelete);
     }
 
     @Override
