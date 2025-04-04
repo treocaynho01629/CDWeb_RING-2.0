@@ -4,6 +4,8 @@ import com.ring.bookstore.dtos.accounts.IAccountDetail;
 import com.ring.bookstore.dtos.accounts.IProfile;
 import com.ring.bookstore.model.Account;
 import com.ring.bookstore.model.AccountProfile;
+import com.ring.bookstore.model.Address;
+import com.ring.bookstore.model.Image;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -17,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Testcontainers
 @DataJpaTest
@@ -29,6 +32,12 @@ class AccountProfileRepositoryTest {
 
     @Autowired
     private AccountProfileRepository profileRepo;
+
+    @Autowired
+    private AddressRepository addressRepo;
+
+    @Autowired
+    private ImageRepository imageRepo;
 
     @Test
     public void givenNewProfile_whenSaveProfile_ThenReturnProfile() {
@@ -81,9 +90,20 @@ class AccountProfileRepositoryTest {
                 .pass("asd")
                 .email("email")
                 .build();
+        account.setCreatedDate(LocalDateTime.now());
+        Image image = Image.builder().build();
+        Address address = Address.builder()
+                .address("123/abc/j12")
+                .build();
+        Address address2 = Address.builder()
+                .address("321/abc/j12")
+                .build();
         AccountProfile profile = AccountProfile.builder()
                 .dob(LocalDate.now())
                 .user(account)
+                .image(image)
+                .address(address)
+                .addresses(List.of(address2))
                 .build();
 
         profileRepo.save(profile);
@@ -91,8 +111,12 @@ class AccountProfileRepositoryTest {
         profileRepo.deleteById(profile.getId());
 
         AccountProfile foundProfile = profileRepo.findById(profile.getId()).orElse(null);
+        Image foundImage = imageRepo.findById(image.getId()).orElse(null);
+        List<Address> foundAddresses = addressRepo.findAllById(List.of(address.getId(), address2.getId()));
 
         assertNull(foundProfile);
+        assertNull(foundImage);
+        assertTrue(foundAddresses.isEmpty());
     }
 
     @Test
