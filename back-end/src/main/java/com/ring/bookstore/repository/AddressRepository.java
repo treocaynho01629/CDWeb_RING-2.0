@@ -1,7 +1,7 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.accounts.IAddress;
-import com.ring.bookstore.model.Address;
+import com.ring.bookstore.model.dto.response.accounts.IAddress;
+import com.ring.bookstore.model.entity.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

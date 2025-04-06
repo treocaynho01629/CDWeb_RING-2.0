@@ -1,14 +1,14 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.orders.IOrderDetail;
-import com.ring.bookstore.enums.OrderStatus;
+import com.ring.bookstore.model.dto.response.orders.IOrderDetail;
+import com.ring.bookstore.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.ring.bookstore.model.OrderDetail;
+import com.ring.bookstore.model.entity.OrderDetail;
 
 import java.util.List;
 import java.util.Optional;

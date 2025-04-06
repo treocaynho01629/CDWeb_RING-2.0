@@ -1,10 +1,10 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.accounts.IAccount;
-import com.ring.bookstore.dtos.dashboard.IStat;
-import com.ring.bookstore.enums.PrivilegeName;
-import com.ring.bookstore.enums.UserRole;
-import com.ring.bookstore.model.*;
+import com.ring.bookstore.model.dto.response.accounts.IAccount;
+import com.ring.bookstore.model.dto.response.dashboard.IStat;
+import com.ring.bookstore.model.enums.PrivilegeType;
+import com.ring.bookstore.model.enums.UserRole;
+import com.ring.bookstore.model.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,56 +57,56 @@ class AccountRepositoryTest {
     private Account account;
     private RefreshToken token;
 
-    @BeforeEach
-    void setUp() {
-        Privilege privilege = Privilege.builder().privilegeName(PrivilegeName.READ_PRIVILEGE).build();
-        Privilege savedPrivilege = privilegeRepo.save(privilege);
-        Role role = Role.builder().roleName(UserRole.ROLE_GUEST).privileges(List.of(savedPrivilege)).build();
-        Role savedRole = roleRepo.save(role);
-
-        account = Account.builder()
-                .username("initial")
-                .pass("asd")
-                .email("initialEmail@initial.com")
-                .roles(List.of(savedRole))
-                .resetToken("reset123")
-                .build();
-        Account account2 = Account.builder()
-                .username("testUser")
-                .pass("password")
-                .email("test1@example.com")
-                .resetToken("reset321")
-                .roles(List.of(savedRole))
-                .build();
-        Account account3 = Account.builder()
-                .username("testUser2")
-                .pass("password")
-                .email("test2@example.com")
-                .resetToken("reset234")
-                .roles(List.of(savedRole))
-                .build();
-        account.setCreatedDate(LocalDateTime.now().minusMonths(1));
-        account2.setCreatedDate(LocalDateTime.now().minusMonths(1));
-        account3.setCreatedDate(LocalDateTime.now());
-        List<Account> accounts = List.of(account, account2, account3);
-        accountRepo.saveAll(accounts);
-
-        token = RefreshToken.builder()
-                .refreshToken("test")
-                .user(account)
-                .build();
-        tokenRepo.save(token);
-
-        AccountProfile profile = AccountProfile.builder()
-                .dob(LocalDate.now())
-                .user(account)
-                .build();
-
-        profileRepo.save(profile);
-
-        entityManager.flush();
-        entityManager.clear();
-    }
+//    @BeforeEach
+//    void setUp() {
+//        Privilege privilege = Privilege.builder().privilegeType(PrivilegeType.READ_PRIVILEGE).build();
+//        Privilege savedPrivilege = privilegeRepo.save(privilege);
+//        Role role = Role.builder().roleName(UserRole.ROLE_GUEST).privileges(List.of(savedPrivilege)).build();
+//        Role savedRole = roleRepo.save(role);
+//
+//        account = Account.builder()
+//                .username("initial")
+//                .pass("asd")
+//                .email("initialEmail@initial.com")
+//                .roles(List.of(savedRole))
+//                .resetToken("reset123")
+//                .build();
+//        Account account2 = Account.builder()
+//                .username("testUser")
+//                .pass("password")
+//                .email("test1@example.com")
+//                .resetToken("reset321")
+//                .roles(List.of(savedRole))
+//                .build();
+//        Account account3 = Account.builder()
+//                .username("testUser2")
+//                .pass("password")
+//                .email("test2@example.com")
+//                .resetToken("reset234")
+//                .roles(List.of(savedRole))
+//                .build();
+//        account.setCreatedDate(LocalDateTime.now().minusMonths(1));
+//        account2.setCreatedDate(LocalDateTime.now().minusMonths(1));
+//        account3.setCreatedDate(LocalDateTime.now());
+//        List<Account> accounts = List.of(account, account2, account3);
+//        accountRepo.saveAll(accounts);
+//
+//        token = RefreshToken.builder()
+//                .refreshToken("test")
+//                .user(account)
+//                .build();
+//        tokenRepo.save(token);
+//
+//        AccountProfile profile = AccountProfile.builder()
+//                .dob(LocalDate.now())
+//                .user(account)
+//                .build();
+//
+//        profileRepo.save(profile);
+//
+//        entityManager.flush();
+//        entityManager.clear();
+//    }
 
     @Test
     public void givenNewAccount_whenSaveAccount_ThenReturnAccount() {

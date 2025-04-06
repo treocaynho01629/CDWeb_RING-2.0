@@ -1,15 +1,14 @@
 package com.ring.bookstore.service;
 
-import com.ring.bookstore.dtos.coupons.CouponDTO;
-import com.ring.bookstore.dtos.coupons.CouponDetailDTO;
-import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
-import com.ring.bookstore.dtos.coupons.ICoupon;
-import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.enums.CouponType;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Coupon;
-import com.ring.bookstore.request.CartStateRequest;
-import com.ring.bookstore.request.CouponRequest;
+import com.ring.bookstore.model.dto.response.coupons.CouponDTO;
+import com.ring.bookstore.model.dto.response.coupons.CouponDetailDTO;
+import com.ring.bookstore.model.dto.response.coupons.CouponDiscountDTO;
+import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
+import com.ring.bookstore.model.enums.CouponType;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.Coupon;
+import com.ring.bookstore.model.dto.request.CartStateRequest;
+import com.ring.bookstore.model.dto.request.CouponRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 

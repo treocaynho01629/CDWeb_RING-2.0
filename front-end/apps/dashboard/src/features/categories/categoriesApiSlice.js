@@ -134,6 +134,26 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error) => [{ type: "Category", id: "LIST" }],
     }),
+    deleteCategoriesInverse: builder.mutation({
+      query: (args) => {
+        const { parentId, ids } = args || {};
+
+        //Params
+        const params = new URLSearchParams();
+        if (parentId) params.append("parentId", parentId);
+        if (ids?.length) params.append("ids", ids);
+
+        return {
+          url: `/api/categories/delete-inverse?${params.toString()}`,
+          method: "DELETE",
+          validateStatus: (response, result) => {
+            return response.status === 200 && !result?.isError;
+          },
+          responseHandler: "text",
+        };
+      },
+      invalidatesTags: (result, error) => [{ type: "Category", id: "LIST" }],
+    }),
     deleteAllCategories: builder.mutation({
       query: () => ({
         url: "/api/categories/delete-all",

@@ -1,16 +1,16 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.accounts.AddressDTO;
-import com.ring.bookstore.dtos.mappers.AddressMapper;
-import com.ring.bookstore.dtos.accounts.IAddress;
+import com.ring.bookstore.model.dto.response.accounts.AddressDTO;
+import com.ring.bookstore.model.mappers.AddressMapper;
+import com.ring.bookstore.model.dto.response.accounts.IAddress;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.AccountProfile;
-import com.ring.bookstore.model.Address;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.AccountProfile;
+import com.ring.bookstore.model.entity.Address;
 import com.ring.bookstore.repository.AccountProfileRepository;
 import com.ring.bookstore.repository.AddressRepository;
-import com.ring.bookstore.request.AddressRequest;
+import com.ring.bookstore.model.dto.request.AddressRequest;
 import com.ring.bookstore.service.AddressService;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;

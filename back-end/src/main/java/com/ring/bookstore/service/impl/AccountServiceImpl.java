@@ -1,23 +1,23 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.accounts.*;
-import com.ring.bookstore.dtos.dashboard.ChartDTO;
-import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.dtos.mappers.AccountMapper;
-import com.ring.bookstore.dtos.mappers.DashboardMapper;
-import com.ring.bookstore.enums.UserRole;
+import com.ring.bookstore.model.dto.response.accounts.*;
+import com.ring.bookstore.model.dto.response.dashboard.ChartDTO;
+import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
+import com.ring.bookstore.model.mappers.AccountMapper;
+import com.ring.bookstore.model.mappers.DashboardMapper;
+import com.ring.bookstore.model.enums.UserRole;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.listener.reset.OnResetPasswordCompletedEvent;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.AccountProfile;
-import com.ring.bookstore.model.Image;
-import com.ring.bookstore.model.Role;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.AccountProfile;
+import com.ring.bookstore.model.entity.Image;
+import com.ring.bookstore.model.entity.Role;
 import com.ring.bookstore.repository.AccountProfileRepository;
 import com.ring.bookstore.repository.AccountRepository;
-import com.ring.bookstore.request.AccountRequest;
-import com.ring.bookstore.request.ChangePassRequest;
-import com.ring.bookstore.request.ProfileRequest;
+import com.ring.bookstore.model.dto.request.AccountRequest;
+import com.ring.bookstore.model.dto.request.ChangePassRequest;
+import com.ring.bookstore.model.dto.request.ProfileRequest;
 import com.ring.bookstore.service.AccountService;
 import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.service.RoleService;
@@ -91,27 +91,16 @@ public class AccountServiceImpl implements AccountService {
             );
         }
 
-        //Set roles: 1 USER, 2 SELLER, 3 ADMIN
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleService.findByRoleName(UserRole.ROLE_USER).orElseThrow(
-                () -> new ResourceNotFoundException("No roles has been set!")));
-
-        if (request.getRoles() >= 2) {
-            roles.add(roleService.findByRoleName(UserRole.ROLE_SELLER).orElseThrow(
-                    () -> new ResourceNotFoundException("Role not found!")));
-        }
-
-        if (request.getRoles() >= 3) {
-            roles.add(roleService.findByRoleName(UserRole.ROLE_ADMIN).orElseThrow(
-                    () -> new ResourceNotFoundException("Role not found!")));
-        }
+        //Set role
+        Role role = roleService.findByRoleName(request.getRole()).orElseThrow(
+                () -> new ResourceNotFoundException("Role not found!"));
 
         //Create account
         var acc = Account.builder()
                 .username(request.getUsername())
                 .pass(passwordEncoder.encode(request.getPass()))
                 .email(request.getEmail())
-                .roles(roles)
+                .roles(List.of(role))
                 .build();
 
         Account savedAccount = accountRepo.save(acc); //Save to Database
@@ -150,22 +139,10 @@ public class AccountServiceImpl implements AccountService {
             );
         }
 
-        //Set roles: 1 USER, 2 SELLER, 3 ADMIN
-        if (currUser.getRolesSize() != request.getRoles()) {
-            Set<Role> roles = new HashSet<>();
-            roles.add(roleService.findByRoleName(UserRole.ROLE_USER).orElseThrow(
-                    () -> new ResourceNotFoundException("No roles has been set!")));
-
-            if (request.getRoles() >= 2) {
-                roles.add(roleService.findByRoleName(UserRole.ROLE_SELLER).orElseThrow(
-                        () -> new ResourceNotFoundException("Role not found!")));
-            }
-            if (request.getRoles() >= 3) {
-                roles.add(roleService.findByRoleName(UserRole.ROLE_ADMIN).orElseThrow(
-                        () -> new ResourceNotFoundException("Role not found!")));
-            }
-            currUser.setRoles(roles);
-        }
+        // Set role
+        Role role = roleService.findByRoleName(request.getRole()).orElseThrow(
+                () -> new ResourceNotFoundException("Role not found!"));
+        currUser.setRoles(List.of(role));
 
         //Set new info
         currUser.setUsername(request.getUsername());
@@ -239,8 +216,7 @@ public class AccountServiceImpl implements AccountService {
         profile.setDob(request.getDob());
         profile.setGender(request.getGender());
 
-        AccountProfile updatedProfile = profileRepo.save(profile); //Save to Database
-        return updatedProfile;
+        return profileRepo.save(profile); //Save to Database
     }
 
     //Change password
@@ -271,20 +247,6 @@ public class AccountServiceImpl implements AccountService {
                 user.getEmail()));
 
         return savedAccount; //Return updated account
-    }
-
-    //Get top users FIX
-    public List<ChartDTO> getTopAccount() {
-//        List<Map<String,Object>> result = accountRepo.getTopUser();
-//        return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
-        return null;
-    }
-
-    //Get top sellers
-    public List<ChartDTO> getTopSeller() {
-//        List<Map<String,Object>> result = accountRepo.getTopSeller();
-//        return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
-        return null;
     }
 
     protected AccountProfile changeProfilePic(MultipartFile file, String image, AccountProfile profile) {

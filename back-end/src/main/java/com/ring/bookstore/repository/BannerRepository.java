@@ -1,8 +1,8 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.banners.IBanner;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Banner;
+import com.ring.bookstore.model.dto.response.banners.IBanner;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.Banner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

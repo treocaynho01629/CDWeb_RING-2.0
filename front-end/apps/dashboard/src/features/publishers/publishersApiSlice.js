@@ -132,6 +132,13 @@ export const publishersApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error) => [{ type: "Publisher", id: "LIST" }],
     }),
+    deletePublishersInverse: builder.mutation({
+      query: (ids) => ({
+        url: `/api/publishers/delete-inverse?ids=${ids}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error) => [{ type: "Publisher", id: "LIST" }],
+    }),
     deleteAllPublishers: builder.mutation({
       query: () => ({
         url: "/api/publishers/delete-all",

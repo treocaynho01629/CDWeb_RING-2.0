@@ -1,13 +1,13 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.categories.ICategory;
+import com.ring.bookstore.model.dto.response.categories.ICategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.ring.bookstore.model.Category;
+import com.ring.bookstore.model.entity.Category;
 
 import java.util.List;
 import java.util.Optional;

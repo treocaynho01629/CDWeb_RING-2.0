@@ -1,9 +1,9 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.dashboard.IStat;
-import com.ring.bookstore.dtos.orders.IReceiptSummary;
-import com.ring.bookstore.enums.OrderStatus;
-import com.ring.bookstore.model.*;
+import com.ring.bookstore.model.dto.response.dashboard.IStat;
+import com.ring.bookstore.model.dto.response.orders.IReceiptSummary;
+import com.ring.bookstore.model.enums.OrderStatus;
+import com.ring.bookstore.model.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;

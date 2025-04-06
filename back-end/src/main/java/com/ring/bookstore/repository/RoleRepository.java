@@ -1,9 +1,9 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.enums.UserRole;
+import com.ring.bookstore.model.enums.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.ring.bookstore.model.Role;
+import com.ring.bookstore.model.entity.Role;
 
 import java.util.Optional;
 

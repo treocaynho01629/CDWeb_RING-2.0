@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Cloudinary configuration class to set up integration with Cloudinary service.
+ */
 @Configuration
 public class CloudinaryConfig {
 

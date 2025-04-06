@@ -2,9 +2,11 @@ package com.ring.bookstore.service.impl;
 
 import java.util.List;
 
-import com.ring.bookstore.dtos.reviews.IReview;
-import com.ring.bookstore.enums.UserRole;
-import com.ring.bookstore.model.*;
+import com.ring.bookstore.model.dto.response.reviews.IReview;
+import com.ring.bookstore.model.enums.UserRole;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.Book;
+import com.ring.bookstore.model.entity.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,14 +16,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.reviews.ReviewDTO;
-import com.ring.bookstore.dtos.mappers.ReviewMapper;
+import com.ring.bookstore.model.dto.response.reviews.ReviewDTO;
+import com.ring.bookstore.model.mappers.ReviewMapper;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.repository.BookRepository;
 import com.ring.bookstore.repository.OrderReceiptRepository;
 import com.ring.bookstore.repository.ReviewRepository;
-import com.ring.bookstore.request.ReviewRequest;
+import com.ring.bookstore.model.dto.request.ReviewRequest;
 import com.ring.bookstore.service.ReviewService;
 
 import org.springframework.transaction.annotation.Transactional;

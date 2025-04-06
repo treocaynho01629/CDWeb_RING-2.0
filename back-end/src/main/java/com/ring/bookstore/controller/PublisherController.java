@@ -1,9 +1,7 @@
 package com.ring.bookstore.controller;
 
-import java.io.IOException;
 import java.util.List;
 
-import com.ring.bookstore.exception.ImageResizerException;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
@@ -17,6 +15,10 @@ import com.ring.bookstore.service.PublisherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Controller named {@link PublisherController} for handling publisher-related operations.
+ * Exposes endpoints under "/api/publishers".
+ */
 @RestController
 @RequestMapping("/api/publishers")
 @RequiredArgsConstructor
@@ -24,7 +26,15 @@ public class PublisherController {
 	
 	private final PublisherService pubService;
 
-	//Get publishers
+	/**
+	 * Retrieves all publishers with pagination and sorting.
+	 *
+	 * @param pageSize  size of each page
+	 * @param pageNo    page number
+	 * @param sortBy    sorting field
+	 * @param sortDir   sorting direction
+	 * @return a {@link ResponseEntity} containing paginated publishers
+	 */
 	@GetMapping
 	public ResponseEntity<?> getPublishers(@RequestParam(value = "pSize", defaultValue = "20") Integer pageSize,
 										   @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
@@ -33,7 +43,14 @@ public class PublisherController {
 		return new ResponseEntity<>(pubService.getPublishers(pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
 	}
 
-	//Get relevant categories
+	/**
+	 * Retrieves publishers relevant to a specific category.
+	 *
+	 * @param pageSize  size of each page
+	 * @param pageNo    page number
+	 * @param cateId    ID of the category
+	 * @return a {@link ResponseEntity} containing relevant publishers
+	 */
 	@GetMapping("/relevant/{id}")
 	public ResponseEntity<?> getRelevantPublishers(@RequestParam(value = "pSize", defaultValue = "20") Integer pageSize,
 												   @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
@@ -41,52 +58,95 @@ public class PublisherController {
 		return new ResponseEntity<>(pubService.getRelevantPublishers(pageNo, pageSize, cateId), HttpStatus.OK);
 	}
 
-	//Get publisher by {id}
+	/**
+	 * Retrieves a publisher by its ID.
+	 *
+	 * @param id the publisher ID
+	 * @return a {@link ResponseEntity} containing the publisher
+	 */
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getPublisherById(@PathVariable("id") Integer id) {
 		return new ResponseEntity<>(pubService.getPublisher(id), HttpStatus.OK);
 	}
 
-	//Add publisher
+	/**
+	 * Creates a new publisher.
+	 *
+	 * @param name the name of the publisher
+	 * @param file optional image file for the publisher
+	 * @return a {@link ResponseEntity} containing the created publisher
+	 */
 	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-	@PreAuthorize("hasRole('ADMIN') and hasAuthority('CREATE_PRIVILEGE')")
+	@PreAuthorize("hasRole('ADMIN') and hasAuthority('create:publisher')")
 	public ResponseEntity<?> createPublisher(@RequestParam @NotBlank(message = "Tên nhà xuất bản không được bỏ trống!")
 		 @Size(min = 1, max = 50, message = "Tên nhà xuất bản dài từ 1-50 kí tự!") String name,
-		 @RequestPart(name = "image", required = false) MultipartFile file) throws ImageResizerException, IOException {
+		 @RequestPart(name = "image", required = false) MultipartFile file) {
 		return new ResponseEntity<>(pubService.addPublisher(name, file), HttpStatus.CREATED);
 	}
 
-	//Update publisher by id
+	/**
+	 * Updates a publisher by its ID.
+	 *
+	 * @param id the ID of the publisher to update
+	 * @param name the updated name
+	 * @param file optional updated image file
+	 * @return a {@link ResponseEntity} containing the updated publisher
+	 */
 	@PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-	@PreAuthorize("hasRole('ADMIN') and hasAuthority('UPDATE_PRIVILEGE')")
+	@PreAuthorize("hasRole('ADMIN') and hasAuthority('update:publisher')")
 	public ResponseEntity<?> updatePublisher(@PathVariable("id") Integer id,
 		 @RequestParam @NotBlank(message = "Tên nhà xuất bản không được bỏ trống!")
 		 @Size(min = 1, max = 50, message = "Tên nhà xuất bản dài từ 1-50 kí tự!") String name,
-		 @RequestPart(name = "image", required = false) MultipartFile file) throws ImageResizerException, IOException {
+		 @RequestPart(name = "image", required = false) MultipartFile file) {
 		return new ResponseEntity<>(pubService.updatePublisher(id, name, file), HttpStatus.CREATED);
 	}
 
-	//Delete publisher
+	/**
+	 * Deletes a publisher by its ID.
+	 *
+	 * @param id the ID of the publisher to delete
+	 * @return a {@link ResponseEntity} with a success message
+	 */
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
+	@PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:publisher')")
 	public ResponseEntity<?> deletePublisher(@PathVariable("id") Integer id) {
 		pubService.deletePublisher(id);
 		return new ResponseEntity<>("Publisher deleted!", HttpStatus.OK);
 	}
 
-	//Delete multiples publishers in a lists of {ids}
+	/**
+	 * Deletes multiple publishers by a list of IDs.
+	 *
+	 * @param ids list of publisher IDs to delete
+	 * @return a {@link ResponseEntity} containing a success message
+	 */
 	@DeleteMapping("/delete-multiples")
-	@PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
-	public ResponseEntity<?> deletePublishers(@RequestParam("ids") List<Integer> ids,
-											  @RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse
-	) {
-		pubService.deletePublishers(ids, isInverse);
+	@PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:publisher')")
+	public ResponseEntity<?> deletePublishers(@RequestParam("ids") List<Integer> ids) {
+		pubService.deletePublishers(ids);
 		return new ResponseEntity<>("Publishers deleted successfully!", HttpStatus.OK);
 	}
 
-	//Delete all publishers
+	/**
+	 * Deletes publishers that are NOT in the given list of IDs.
+	 *
+	 * @param ids list of IDs to exclude from deletion
+	 * @return a {@link ResponseEntity} containing a success message
+	 */
+	@DeleteMapping("/delete-inverse")
+	@PreAuthorize("hasRole('SELLER') and hasAuthority('delete:book')")
+	public ResponseEntity<?> deletePublishersInverse(@RequestParam("ids") List<Integer> ids) {
+		pubService.deletePublishersInverse(ids);
+		return new ResponseEntity<>("Publishers deleted successfully!", HttpStatus.OK);
+	}
+
+	/**
+	 * Deletes all publishers in the system.
+	 *
+	 * @return a {@link ResponseEntity} with a success message
+	 */
 	@DeleteMapping("/delete-all")
-	@PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
+	@PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:publisher')")
 	public ResponseEntity<?> deleteAllPublishers() {
 		pubService.deleteAllPublishers();
 		return new ResponseEntity<>("All publishers deleted successfully!", HttpStatus.OK);

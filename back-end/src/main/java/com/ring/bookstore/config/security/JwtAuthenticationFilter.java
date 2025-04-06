@@ -2,6 +2,7 @@ package com.ring.bookstore.config.security;
 
 import java.io.IOException;
 
+import com.ring.bookstore.service.TokenService;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,8 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.ring.bookstore.service.impl.JwtService;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final TokenService tokenService;
     private final UserDetailsService userDetailsService;
     private final RequestMatcher proceedUrlPatterns = new OrRequestMatcher(
             new AntPathRequestMatcher("/api/books/analytics", "GET")
@@ -35,8 +34,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final RequestMatcher excludeUrlPatterns = new OrRequestMatcher(
             new AntPathRequestMatcher("/api/auth/**"),
             new AntPathRequestMatcher("/api/books/**", "GET"),
-            new AntPathRequestMatcher("/api/shops/find", "GET"),
-            new AntPathRequestMatcher("/api/shops/info", "GET"),
             new AntPathRequestMatcher("/api/publishers", "GET"),
             new AntPathRequestMatcher("/api/categories", "GET"),
             new AntPathRequestMatcher("/api/reviews/books", "GET"),
@@ -45,6 +42,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             new AntPathRequestMatcher("/api/v1/**", "GET")
     );
 
+    /**
+     * Processes the HTTP request and performs bearer token authentication if a valid bearer token is present.
+     *
+     * @param request  the HTTP request.
+     * @param response the HTTP response.
+     * @param filterChain         the filter chain.
+     * @throws ServletException if an exception occurs that interferes with the filter chain's operation.
+     * @throws IOException      if an I/O error occurs during processing.
+     */
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -61,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         //Parse & return error
         try {
-            jwtService.validateToken(jwt);
+            tokenService.validateToken(jwt);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); //Not exists >> throw error
             response.getWriter().write(e.getMessage());
@@ -70,12 +76,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         //Set authentication
-        final String username = jwtService.extractUsername(jwt);
+        final String username = tokenService.extractUsername(jwt);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            if (jwtService.isTokenValid(jwt, userDetails)) { //Check valid JWT
+            if (tokenService.isTokenValid(jwt, userDetails)) { //Check valid JWT
                 //Create auth token
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,

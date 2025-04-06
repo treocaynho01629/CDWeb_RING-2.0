@@ -1,7 +1,10 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.reviews.IReview;
-import com.ring.bookstore.model.*;
+import com.ring.bookstore.model.dto.response.reviews.IReview;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.Book;
+import com.ring.bookstore.model.entity.Image;
+import com.ring.bookstore.model.entity.Review;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,16 +3,16 @@ package com.ring.bookstore.repository;
 import java.util.List;
 import java.util.Map;
 
-import com.ring.bookstore.dtos.dashboard.IStat;
-import com.ring.bookstore.dtos.orders.IReceiptSummary;
-import com.ring.bookstore.enums.OrderStatus;
+import com.ring.bookstore.model.dto.response.dashboard.IStat;
+import com.ring.bookstore.model.dto.response.orders.IReceiptSummary;
+import com.ring.bookstore.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.ring.bookstore.model.OrderReceipt;
+import com.ring.bookstore.model.entity.OrderReceipt;
 
 @Repository
 public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long> {
@@ -23,7 +23,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         join o.details od
         join od.items oi
         where o.user.id = :userId and oi.book.id = :id
-        and od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+        and od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
     """)
     boolean hasUserBoughtBook(Long id,
                               Long userId); //Check if user have bought this book before
@@ -85,7 +85,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
                 and o.createdDate < date_trunc('month', current date)
                     then (od.totalPrice - od.discount) end), 0) lastMonth
             from OrderDetail od join od.order o
-            where od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+            where od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
             and o.createdDate >= date_trunc('month', current date) - 1 month
             and (coalesce(:shopId) is null or od.shop.id = :shopId)
             and (coalesce(:userId) is null or od.shop.owner.id = :userId)
@@ -100,7 +100,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
             coalesce(sum(distinct o.total) , 0) as sales
         from OrderReceipt o
         join o.details od
-        where od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+        where od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
         and (coalesce(:shopId) is null or od.shop.id = :shopId)
         and (coalesce(:userId) is null or od.shop.owner.id = :userId)
         and (coalesce(:year) is null or year(o.createdDate) = :year)

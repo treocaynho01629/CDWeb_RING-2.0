@@ -1,16 +1,16 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.banners.BannerDTO;
-import com.ring.bookstore.dtos.mappers.BannerMapper;
-import com.ring.bookstore.dtos.banners.IBanner;
-import com.ring.bookstore.enums.UserRole;
+import com.ring.bookstore.model.dto.response.banners.BannerDTO;
+import com.ring.bookstore.model.mappers.BannerMapper;
+import com.ring.bookstore.model.dto.response.banners.IBanner;
+import com.ring.bookstore.model.enums.UserRole;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Banner;
-import com.ring.bookstore.model.Shop;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.Banner;
+import com.ring.bookstore.model.entity.Shop;
 import com.ring.bookstore.repository.BannerRepository;
-import com.ring.bookstore.request.BannerRequest;
+import com.ring.bookstore.model.dto.request.BannerRequest;
 import com.ring.bookstore.service.BannerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;

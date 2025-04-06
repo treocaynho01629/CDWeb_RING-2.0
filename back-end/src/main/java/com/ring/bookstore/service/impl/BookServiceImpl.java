@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.slugify.Slugify;
-import com.ring.bookstore.dtos.books.*;
-import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.dtos.mappers.DashboardMapper;
-import com.ring.bookstore.enums.BookType;
-import com.ring.bookstore.enums.UserRole;
-import com.ring.bookstore.model.*;
+import com.ring.bookstore.model.dto.response.books.*;
+import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
+import com.ring.bookstore.model.mappers.DashboardMapper;
+import com.ring.bookstore.model.enums.BookType;
+import com.ring.bookstore.model.enums.UserRole;
+import com.ring.bookstore.model.entity.*;
 import com.ring.bookstore.repository.*;
 import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.ultils.FileUploadUtil;
@@ -25,10 +25,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ring.bookstore.dtos.mappers.BookMapper;
+import com.ring.bookstore.model.mappers.BookMapper;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.request.BookRequest;
+import com.ring.bookstore.model.dto.request.BookRequest;
 import com.ring.bookstore.service.BookService;
 
 import org.springframework.transaction.annotation.Transactional;

@@ -7,8 +7,10 @@ import java.time.LocalDateTime;
 
 @Service
 public class ScheduleService {
+
     @Scheduled(cron = "0 0/12 * * * *") //Every 12 minutes
     public void execute() {
         System.out.println("Health checks at: " + LocalDateTime.now());
     }
+
 }

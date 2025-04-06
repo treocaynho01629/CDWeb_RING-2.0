@@ -2,8 +2,8 @@ package com.ring.bookstore.service;
 
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.enums.UserRole;
-import com.ring.bookstore.model.Role;
+import com.ring.bookstore.model.enums.UserRole;
+import com.ring.bookstore.model.entity.Role;
 
 import java.util.Optional;
 

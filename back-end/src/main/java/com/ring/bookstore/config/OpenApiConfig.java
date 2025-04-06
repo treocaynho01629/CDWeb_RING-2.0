@@ -15,6 +15,9 @@ import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
+/**
+ * Configuration class named {@link OpenApiConfig} for OpenAPI documentation.
+ */
 @Configuration
 @Profile({"!prod && dev"})
 public class OpenApiConfig {
@@ -23,6 +26,7 @@ public class OpenApiConfig {
 
         @Value("${ring.openapi.prod-url}")
         private String prodUrl;
+
         @Bean
         GroupedOpenApi publicApi() {
                 return GroupedOpenApi.builder()

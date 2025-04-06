@@ -2,10 +2,10 @@ package com.ring.bookstore.service.impl;
 
 import java.util.List;
 
-import com.ring.bookstore.dtos.publishers.PublisherDTO;
-import com.ring.bookstore.dtos.mappers.PublisherMapper;
-import com.ring.bookstore.model.Image;
-import com.ring.bookstore.model.Publisher;
+import com.ring.bookstore.model.dto.response.publishers.PublisherDTO;
+import com.ring.bookstore.model.mappers.PublisherMapper;
+import com.ring.bookstore.model.entity.Image;
+import com.ring.bookstore.model.entity.Publisher;
 import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.ultils.FileUploadUtil;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,10 +109,14 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Transactional
-    public void deletePublishers(List<Integer> ids, Boolean isInverse) {
-        List<Integer> listDelete = ids;
-        if (isInverse) listDelete = pubRepo.findInverseIds(ids);
-        pubRepo.deleteAllByIdInBatch(listDelete);
+    public void deletePublishers(List<Integer> ids) {
+        pubRepo.deleteAllByIdInBatch(ids);
+    }
+
+    @Transactional
+    public void deletePublishersInverse(List<Integer> ids) {
+        List<Integer> listDelete = pubRepo.findInverseIds(ids);
+        pubRepo.deleteAllByIdInBatch(ids);
     }
 
     @Transactional

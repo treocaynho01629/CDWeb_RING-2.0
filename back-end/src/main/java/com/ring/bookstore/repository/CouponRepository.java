@@ -1,10 +1,10 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.coupons.ICoupon;
-import com.ring.bookstore.dtos.dashboard.IStat;
-import com.ring.bookstore.enums.CouponType;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Coupon;
+import com.ring.bookstore.model.dto.response.coupons.ICoupon;
+import com.ring.bookstore.model.dto.response.dashboard.IStat;
+import com.ring.bookstore.model.enums.CouponType;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.Coupon;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -113,10 +113,10 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
                 left join s.image i
             	where (cd.expDate > current date and cd.usage > 0)
             	and (case when coalesce(:shopId) is null then c.shop.id is null else c.shop.id = :shopId end)
-            	and (coalesce(:value) is null or (cd.type in (com.ring.bookstore.enums.CouponType.MIN_VALUE,
-            			com.ring.bookstore.enums.CouponType.SHIPPING) and cd.attribute < :value)
+            	and (coalesce(:value) is null or (cd.type in (com.ring.bookstore.model.enums.CouponType.MIN_VALUE,
+            			com.ring.bookstore.model.enums.CouponType.SHIPPING) and cd.attribute < :value)
             		or (coalesce(:quantity) is null
-            			or (cd.type = com.ring.bookstore.enums.CouponType.MIN_AMOUNT and cd.attribute < :quantity)))
+            			or (cd.type = com.ring.bookstore.model.enums.CouponType.MIN_AMOUNT and cd.attribute < :quantity)))
             	group by c.shop.id, c.id, cd.id, cd.attribute, cd.discount, cd.maxDiscount, s.name, i.id
             	order by cd.attribute asc, cd.discount desc, cd.maxDiscount desc
             	limit 1

@@ -9,6 +9,7 @@ public interface EmailService {
     void sendSimpleMail(String to,
                         String subject,
                         String text);
+    
     void sendTemplateMail(String to,
                           String subject,
                           String template,

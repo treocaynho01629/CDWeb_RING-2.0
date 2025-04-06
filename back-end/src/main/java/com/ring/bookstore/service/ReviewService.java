@@ -2,13 +2,13 @@ package com.ring.bookstore.service;
 
 import java.util.List;
 
-import com.ring.bookstore.model.Review;
+import com.ring.bookstore.model.entity.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.reviews.ReviewDTO;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.request.ReviewRequest;
+import com.ring.bookstore.model.dto.response.reviews.ReviewDTO;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.dto.request.ReviewRequest;
 
 @Service
 public interface ReviewService {

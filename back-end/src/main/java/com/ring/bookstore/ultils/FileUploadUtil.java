@@ -2,10 +2,9 @@ package com.ring.bookstore.ultils;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
-import com.ring.bookstore.enums.ImageSize;
+import com.ring.bookstore.model.enums.ImageSize;
 import com.ring.bookstore.exception.HttpResponseException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

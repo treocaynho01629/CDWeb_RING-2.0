@@ -1,8 +1,8 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.books.IBook;
-import com.ring.bookstore.dtos.books.IBookDetail;
-import com.ring.bookstore.model.*;
+import com.ring.bookstore.model.dto.response.books.IBook;
+import com.ring.bookstore.model.dto.response.books.IBookDetail;
+import com.ring.bookstore.model.entity.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

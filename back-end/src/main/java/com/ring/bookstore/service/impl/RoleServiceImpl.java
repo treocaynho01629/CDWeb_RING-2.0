@@ -3,8 +3,8 @@ package com.ring.bookstore.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.enums.UserRole;
-import com.ring.bookstore.model.Role;
+import com.ring.bookstore.model.enums.UserRole;
+import com.ring.bookstore.model.entity.Role;
 import com.ring.bookstore.repository.RoleRepository;
 import com.ring.bookstore.service.RoleService;
 

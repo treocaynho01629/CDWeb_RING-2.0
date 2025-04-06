@@ -3,7 +3,7 @@ package com.ring.bookstore.service.impl;
 import com.ring.bookstore.config.captcha.CaptchaSettings;
 import com.ring.bookstore.exception.ReCaptchaInvalidException;
 import com.ring.bookstore.exception.ReCaptchaSuspiciousException;
-import com.ring.bookstore.response.RecaptchaResponse;
+import com.ring.bookstore.model.dto.response.RecaptchaResponse;
 import com.ring.bookstore.service.CaptchaService;
 
 import jakarta.servlet.http.HttpServletRequest;

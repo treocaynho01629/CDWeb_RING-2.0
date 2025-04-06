@@ -1,7 +1,7 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.categories.ICategory;
-import com.ring.bookstore.model.*;
+import com.ring.bookstore.model.dto.response.categories.ICategory;
+import com.ring.bookstore.model.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;

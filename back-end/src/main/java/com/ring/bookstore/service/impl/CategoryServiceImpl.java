@@ -4,20 +4,20 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.github.slugify.Slugify;
-import com.ring.bookstore.dtos.categories.CategoryDTO;
-import com.ring.bookstore.dtos.categories.CategoryDetailDTO;
-import com.ring.bookstore.dtos.categories.PreviewCategoryDTO;
-import com.ring.bookstore.dtos.mappers.CategoryMapper;
-import com.ring.bookstore.dtos.categories.ICategory;
+import com.ring.bookstore.model.dto.response.categories.CategoryDTO;
+import com.ring.bookstore.model.dto.response.categories.CategoryDetailDTO;
+import com.ring.bookstore.model.dto.response.categories.PreviewCategoryDTO;
+import com.ring.bookstore.model.mappers.CategoryMapper;
+import com.ring.bookstore.model.dto.response.categories.ICategory;
 import com.ring.bookstore.exception.HttpResponseException;
-import com.ring.bookstore.request.CategoryRequest;
+import com.ring.bookstore.model.dto.request.CategoryRequest;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.model.Category;
+import com.ring.bookstore.model.entity.Category;
 import com.ring.bookstore.repository.CategoryRepository;
 import com.ring.bookstore.service.CategoryService;
 
@@ -165,13 +165,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Transactional
-    public void deleteCategories(Integer parentId, List<Integer> ids, Boolean isInverse) {
-        List<Integer> listDelete = ids;
-        if (isInverse) listDelete = cateRepo.findInverseIds(parentId, ids);
-        cateRepo.deleteAllByIdInBatch(listDelete);
+    public void deleteCategories(List<Integer> ids) {
+        cateRepo.deleteAllByIdInBatch(ids);
     }
 
-    @Override
+    @Transactional
+    public void deleteCategoriesInverse(Integer parentId, List<Integer> ids) {
+        List<Integer> listDelete = cateRepo.findInverseIds(parentId, ids);
+        cateRepo.deleteAllByIdInBatch(ids);
+    }
+
+    @Transactional
     public void deleteAllCategories() {
         cateRepo.deleteAll();
     }

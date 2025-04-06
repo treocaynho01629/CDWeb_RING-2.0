@@ -4,7 +4,7 @@ import com.cloudinary.api.ApiResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ring.bookstore.model.Image;
+import com.ring.bookstore.model.entity.Image;
 
 import java.util.List;
 

@@ -3,7 +3,7 @@ package com.ring.bookstore.service.impl;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.api.ApiResponse;
 import com.ring.bookstore.exception.ImageUploadException;
-import com.ring.bookstore.response.CloudinaryResponse;
+import com.ring.bookstore.model.dto.response.CloudinaryResponse;
 import com.ring.bookstore.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

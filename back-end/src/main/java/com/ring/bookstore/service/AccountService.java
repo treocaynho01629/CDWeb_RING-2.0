@@ -1,22 +1,20 @@
 package com.ring.bookstore.service;
 
-import java.io.IOException;
 import java.util.List;
 
-import com.ring.bookstore.dtos.dashboard.ChartDTO;
-import com.ring.bookstore.dtos.accounts.AccountDTO;
-import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.enums.UserRole;
-import com.ring.bookstore.exception.ImageResizerException;
+import com.ring.bookstore.model.dto.response.dashboard.ChartDTO;
+import com.ring.bookstore.model.dto.response.accounts.AccountDTO;
+import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
+import com.ring.bookstore.model.enums.UserRole;
 import org.springframework.data.domain.Page;
 
-import com.ring.bookstore.dtos.accounts.AccountDetailDTO;
-import com.ring.bookstore.dtos.accounts.ProfileDTO;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.AccountProfile;
-import com.ring.bookstore.request.AccountRequest;
-import com.ring.bookstore.request.ChangePassRequest;
-import com.ring.bookstore.request.ProfileRequest;
+import com.ring.bookstore.model.dto.response.accounts.AccountDetailDTO;
+import com.ring.bookstore.model.dto.response.accounts.ProfileDTO;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.AccountProfile;
+import com.ring.bookstore.model.dto.request.AccountRequest;
+import com.ring.bookstore.model.dto.request.ChangePassRequest;
+import com.ring.bookstore.model.dto.request.ProfileRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AccountService {
@@ -52,12 +50,9 @@ public interface AccountService {
 
     AccountProfile updateProfile(ProfileRequest request,
                                  MultipartFile file,
-                                 Account user) throws IOException, ImageResizerException;
+                                 Account user);
 
     Account changePassword(ChangePassRequest request,
                            Account user);
 
-    List<ChartDTO> getTopAccount();
-
-    List<ChartDTO> getTopSeller();
 }

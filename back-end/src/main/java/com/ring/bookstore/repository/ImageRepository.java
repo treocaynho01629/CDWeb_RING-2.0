@@ -3,12 +3,12 @@ package com.ring.bookstore.repository;
 import java.util.List;
 import java.util.Optional;
 
-import com.ring.bookstore.dtos.images.IImage;
+import com.ring.bookstore.model.dto.response.images.IImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.ring.bookstore.model.Image;
+import com.ring.bookstore.model.entity.Image;
 
 @Repository
 public interface ImageRepository extends JpaRepository<Image, Long> {

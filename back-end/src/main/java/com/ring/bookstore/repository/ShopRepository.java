@@ -1,9 +1,9 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.dashboard.IStat;
-import com.ring.bookstore.dtos.shops.*;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Shop;
+import com.ring.bookstore.model.dto.response.dashboard.IStat;
+import com.ring.bookstore.model.dto.response.shops.*;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.Shop;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,9 +40,9 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
 			s.name as name, size(s.followers) as totalFollowers, s.createdDate as joinedDate,
 			i as image,
-			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+			sum(case when od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
 				then o.total - o.totalDiscount else 0 end) as sales,
-			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+			sum(case when od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
 				then oi.quantity else 0 end) as totalSold
 		from Shop s
 		left join s.image i
@@ -110,14 +110,14 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
 			s.name as name, s.description as description, a as address,
-			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+			sum(case when od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
 				then oi.quantity else 0 end) as totalSold,
 			coalesce(
-				sum (case when od.status = com.ring.bookstore.enums.OrderStatus.CANCELED
-					or od.status = com.ring.bookstore.enums.OrderStatus.REFUNDED then 1 else 0 end)
+				sum (case when od.status = com.ring.bookstore.model.enums.OrderStatus.CANCELED
+					or od.status = com.ring.bookstore.model.enums.OrderStatus.REFUNDED then 1 else 0 end)
 				/ nullif(
 					coalesce(
-						sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+						sum(case when od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
 					then 1 else 0 end), 0), 0), 0) as canceledRate,
 			count(distinct b.id) as totalProducts, avg(r.rating) as rating, count(distinct r.id) as totalReviews,
 			size(s.followers) as totalFollowers, i as image,
@@ -138,9 +138,9 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	@Query("""
 		select s.owner.username as username, s.owner.id as ownerId, s.id as id,
 			s.name as name, s.description as description, a as address,
-			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+			sum(case when od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
 				then o.total - o.totalDiscount else 0 end) as sales,
-			sum(case when od.status = com.ring.bookstore.enums.OrderStatus.COMPLETED
+			sum(case when od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
 				then oi.quantity else 0 end) as totalSold,
 			count(b.id) as totalProducts, count(r.id) as totalReviews, i as image,
 			size(s.followers) as totalFollowers, s.createdDate as joinedDate

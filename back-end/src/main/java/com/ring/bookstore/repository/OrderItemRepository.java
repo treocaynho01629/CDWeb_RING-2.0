@@ -1,8 +1,8 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.orders.IOrderDetailItem;
-import com.ring.bookstore.dtos.orders.IOrderItem;
-import com.ring.bookstore.model.OrderItem;
+import com.ring.bookstore.model.dto.response.orders.IOrderDetailItem;
+import com.ring.bookstore.model.dto.response.orders.IOrderItem;
+import com.ring.bookstore.model.entity.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

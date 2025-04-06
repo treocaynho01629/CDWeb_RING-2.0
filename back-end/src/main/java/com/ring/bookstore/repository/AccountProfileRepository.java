@@ -1,12 +1,12 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.accounts.IAccountDetail;
-import com.ring.bookstore.dtos.accounts.IProfile;
+import com.ring.bookstore.model.dto.response.accounts.IAccountDetail;
+import com.ring.bookstore.model.dto.response.accounts.IProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.ring.bookstore.model.AccountProfile;
+import com.ring.bookstore.model.entity.AccountProfile;
 
 import java.util.Optional;
 

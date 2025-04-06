@@ -5,6 +5,9 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * Configuration class named {@link CaptchaSettings} for reCAPTCHA parameters used in validating reCAPTCHA.
+ */
 @Getter
 @Setter
 @Component
@@ -16,4 +19,5 @@ public class CaptchaSettings {
     private String url;
     private float threshold;
     private float suspicious;
+
 }

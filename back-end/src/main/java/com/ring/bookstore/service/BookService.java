@@ -1,20 +1,18 @@
 package com.ring.bookstore.service;
 
-import java.io.IOException;
 import java.util.List;
 
-import com.ring.bookstore.dtos.books.BookDTO;
-import com.ring.bookstore.dtos.books.BookResponseDTO;
-import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.enums.BookType;
-import com.ring.bookstore.exception.ImageResizerException;
+import com.ring.bookstore.model.dto.response.books.BookDTO;
+import com.ring.bookstore.model.dto.response.books.BookResponseDTO;
+import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
+import com.ring.bookstore.model.enums.BookType;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ring.bookstore.dtos.books.BookDisplayDTO;
-import com.ring.bookstore.dtos.books.BookDetailDTO;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.request.BookRequest;
+import com.ring.bookstore.model.dto.response.books.BookDisplayDTO;
+import com.ring.bookstore.model.dto.response.books.BookDetailDTO;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.dto.request.BookRequest;
 
 public interface BookService {
 

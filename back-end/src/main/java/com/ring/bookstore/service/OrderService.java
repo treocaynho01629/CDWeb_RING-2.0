@@ -2,16 +2,16 @@ package com.ring.bookstore.service;
 
 import java.util.List;
 
-import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.dtos.orders.*;
-import com.ring.bookstore.dtos.dashboard.ChartDTO;
-import com.ring.bookstore.enums.OrderStatus;
-import com.ring.bookstore.request.CalculateRequest;
+import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
+import com.ring.bookstore.model.dto.response.dashboard.ChartDTO;
+import com.ring.bookstore.model.dto.response.orders.*;
+import com.ring.bookstore.model.enums.OrderStatus;
+import com.ring.bookstore.model.dto.request.CalculateRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.request.OrderRequest;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.dto.request.OrderRequest;
 
 public interface OrderService {
 

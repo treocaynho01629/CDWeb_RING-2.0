@@ -150,7 +150,7 @@ const ExtraWrapper = styled.div`
 `;
 
 const ExtraSlider = styled.div`
-  --scroll-offset: -1;
+  --scroll-offset: 0;
 
   position: absolute;
   width: 100%;
@@ -281,7 +281,7 @@ const ExtraBanners = ({ extraBanners, slideIndex, totalBanners }) => {
 
   useEffect(() => {
     let newIndex =
-      totalBanners <= 1 ? -1 : slideIndex >= totalBanners - 1 ? -1 : slideIndex;
+      totalBanners <= 1 ? 0 : slideIndex >= totalBanners - 1 ? -1 : slideIndex;
     scrollRef.current.style.setProperty("--scroll-offset", newIndex);
   }, [slideIndex]);
 
@@ -304,7 +304,11 @@ const BannersSlider = () => {
 
   if (isLoading || isError) {
     bannersContent = <Item />;
-    extraBanners = [<ExtraItem key={"temp-1"} />, <ExtraItem key={"temp-2"} />];
+    extraBanners = [
+      <ExtraItem key={"temp-1"} />,
+      <ExtraItem key={"temp-2"} />,
+      <ExtraItem key={"temp-3"} />,
+    ];
   } else if (isSuccess) {
     const { ids, entities } = data;
 
@@ -339,6 +343,7 @@ const BannersSlider = () => {
       extraBanners = [
         <ExtraItem key={"temp-1"} />,
         <ExtraItem key={"temp-2"} />,
+        <ExtraItem key={"temp-3"} />,
       ];
     }
   }

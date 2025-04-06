@@ -2,20 +2,25 @@ package com.ring.bookstore.controller;
 
 import java.util.List;
 
-import com.ring.bookstore.dtos.categories.CategoryDTO;
-import com.ring.bookstore.dtos.categories.PreviewCategoryDTO;
-import com.ring.bookstore.request.CategoryRequest;
+import com.ring.bookstore.config.CurrentAccount;
+import com.ring.bookstore.model.dto.response.categories.PreviewCategoryDTO;
+import com.ring.bookstore.model.dto.request.CategoryRequest;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.enums.BookType;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.ring.bookstore.model.Category;
 import com.ring.bookstore.service.CategoryService;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Controller named {@link CategoryController} for handling category-related operations.
+ * Exposes endpoints under "/api/categories".
+ */
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
@@ -23,14 +28,25 @@ public class CategoryController {
 
     private final CategoryService cateService;
 
-    //Get preview categories
+    /**
+     * Retrieves preview categories for quick selection.
+     *
+     * @return a {@link ResponseEntity} containing a list of preview categories
+     */
     @GetMapping("/preview")
     public ResponseEntity<?> getPreviewCategories() {
         List<PreviewCategoryDTO> categories = cateService.getPreviewCategories();
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
-    //Get relevant categories
+    /**
+     * Retrieves categories relevant to a specific shop.
+     *
+     * @param pageSize  size of each page
+     * @param pageNo    page number
+     * @param shopId    ID of the shop
+     * @return a {@link ResponseEntity} containing relevant categories
+     */
     @GetMapping("/relevant/{id}")
     public ResponseEntity<?> getRelevantCategories(@RequestParam(value = "pSize", defaultValue = "20") Integer pageSize,
                                                    @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
@@ -38,7 +54,17 @@ public class CategoryController {
         return new ResponseEntity<>(cateService.getRelevantCategories(pageNo, pageSize, shopId), HttpStatus.OK);
     }
 
-    //Get categories
+    /**
+     * Retrieves all categories with pagination, sorting, and optional filters.
+     *
+     * @param pageSize  size of each page
+     * @param pageNo    page number
+     * @param sortBy    sorting field
+     * @param sortDir   sorting direction
+     * @param include   optional field to include "parent" or "children"
+     * @param parentId  optional parent category ID to filter by
+     * @return a {@link ResponseEntity} containing paginated categories
+     */
     @GetMapping
     public ResponseEntity<?> getCategories(@RequestParam(value = "pSize", defaultValue = "20") Integer pageSize,
                                            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
@@ -49,57 +75,108 @@ public class CategoryController {
         return new ResponseEntity<>(cateService.getCategories(pageNo, pageSize, sortBy, sortDir, include, parentId), HttpStatus.OK);
     }
 
-    //Get category by {id}
+    /**
+     * Retrieves a category by its ID.
+     *
+     * @param id the category ID
+     * @param include optional field to include "parent" or "children"
+     * @return a {@link ResponseEntity} containing the category
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getCategoryById(@PathVariable("id") Integer id,
                                              @RequestParam(value = "include", required = false) String include) {
         return new ResponseEntity<>(cateService.getCategory(id, null, include), HttpStatus.OK);
     }
 
-    //Get category by {slug}
+    /**
+     * Retrieves a category by its slug.
+     *
+     * @param slug the slug of the category
+     * @param include optional field to include "parent" or "children"
+     * @return a {@link ResponseEntity} containing the category
+     */
     @GetMapping("/slug/{slug}")
     public ResponseEntity<?> getCategoryBySlug(@PathVariable("slug") String slug,
                                              @RequestParam(value = "include", required = false) String include) {
         return new ResponseEntity<>(cateService.getCategory(null, slug, include), HttpStatus.OK);
     }
 
-    //Add category
+    /**
+     * Creates a new category.
+     *
+     * @param request the {@link CategoryRequest} containing category data
+     * @return a {@link ResponseEntity} containing the created category
+     */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('create:category')")
     public ResponseEntity<?> createCategory(@Valid @RequestPart("request") CategoryRequest request) {
         return new ResponseEntity<>(cateService.addCategory(request), HttpStatus.CREATED);
     }
 
-    //Update category by id
+    /**
+     * Updates a category by its ID.
+     *
+     * @param id the ID of the category to update
+     * @param request the updated category data
+     * @return a {@link ResponseEntity} containing the updated category
+     */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('UPDATE_PRIVILEGE')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('update:category')")
     public ResponseEntity<?> updateCategory(@PathVariable("id") Integer id,
                                             @Valid @RequestPart("request") CategoryRequest request) {
         return new ResponseEntity<>(cateService.updateCategory(id, request), HttpStatus.CREATED);
     }
 
-    //Delete category
+    /**
+     * Deletes a category by its ID.
+     *
+     * @param id the ID of the category to delete
+     * @return a {@link ResponseEntity} with a success message
+     */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:category')")
     public ResponseEntity<?> deleteCategory(@PathVariable("id") Integer id) {
         cateService.deleteCategory(id);
         return new ResponseEntity<>("Category deleted!", HttpStatus.OK);
     }
 
-    //Delete multiples categories in a lists of {ids}
+    /**
+     * Deletes multiple categories by a list of IDs.
+     *
+     * @param ids list of category IDs to delete
+     * @return a {@link ResponseEntity} containing a success message
+     */
     @DeleteMapping("/delete-multiples")
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:category')")
     public ResponseEntity<?> deleteCategories(@RequestParam(value = "parentId", required = false) Integer parentId,
-                                              @RequestParam("ids") List<Integer> ids,
-                                              @RequestParam(value = "isInverse", defaultValue = "false") Boolean isInverse
+                                              @RequestParam("ids") List<Integer> ids
     ) {
-        cateService.deleteCategories(parentId, ids, isInverse);
+        cateService.deleteCategories(ids);
         return new ResponseEntity<>("Categories deleted successfully!", HttpStatus.OK);
     }
 
-    //Delete all categories
+    /**
+     * Deletes categories that are NOT in the given list of IDs.
+     *
+     * @param ids list of IDs to exclude from deletion
+     * @param parentId optional parent category ID to filter by
+     * @return a {@link ResponseEntity} containing a success message
+     */
+    @DeleteMapping("/delete-inverse")
+    @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:book')")
+    public ResponseEntity<?> deleteCategoriesInverse(@RequestParam(value = "parentId", required = false) Integer parentId,
+                                                     @RequestParam("ids") List<Integer> ids) {
+        cateService.deleteCategoriesInverse(parentId, ids);
+        return new ResponseEntity<>("Categories deleted successfully!", HttpStatus.OK);
+    }
+
+    /**
+     * Deletes all categories in the system.
+     *
+     * @return a {@link ResponseEntity} with a success message
+     */
     @DeleteMapping("/delete-all")
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:category')")
     public ResponseEntity<?> deleteAllCategories() {
         cateService.deleteAllCategories();
         return new ResponseEntity<>("All categories deleted successfully!", HttpStatus.OK);

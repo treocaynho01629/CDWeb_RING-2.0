@@ -1,6 +1,9 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.*;
+import com.ring.bookstore.model.entity.Book;
+import com.ring.bookstore.model.entity.Category;
+import com.ring.bookstore.model.entity.Image;
+import com.ring.bookstore.model.entity.Publisher;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;

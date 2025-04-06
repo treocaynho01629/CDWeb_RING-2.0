@@ -1,7 +1,7 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.enums.EnumsDTO;
-import com.ring.bookstore.enums.*;
+import com.ring.bookstore.model.dto.response.enums.EnumsDTO;
+import com.ring.bookstore.model.enums.*;
 import com.ring.bookstore.service.ConfigService;
 import org.springframework.stereotype.Service;
 

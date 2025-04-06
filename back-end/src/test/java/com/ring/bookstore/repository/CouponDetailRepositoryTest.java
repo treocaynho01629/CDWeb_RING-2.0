@@ -1,7 +1,8 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.enums.CouponType;
-import com.ring.bookstore.model.*;
+import com.ring.bookstore.model.enums.CouponType;
+import com.ring.bookstore.model.entity.Coupon;
+import com.ring.bookstore.model.entity.CouponDetail;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

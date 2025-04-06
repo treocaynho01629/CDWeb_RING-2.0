@@ -256,7 +256,6 @@ const ProfileDetail = ({
       .then((data) => {
         setErrMsg("");
         setErr([]);
-        refresh;
         enqueueSnackbar("Cập nhật hồ sơ thành công!", { variant: "success" });
         setPending(false);
         verifyRefreshToken(); //Refresh

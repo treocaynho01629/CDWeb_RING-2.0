@@ -8,21 +8,21 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
-import com.ring.bookstore.dtos.coupons.ICoupon;
-import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.dtos.mappers.CouponMapper;
-import com.ring.bookstore.dtos.mappers.DashboardMapper;
-import com.ring.bookstore.dtos.orders.*;
-import com.ring.bookstore.dtos.dashboard.ChartDTO;
-import com.ring.bookstore.dtos.mappers.CalculateMapper;
-import com.ring.bookstore.enums.OrderStatus;
-import com.ring.bookstore.enums.ShippingType;
-import com.ring.bookstore.enums.UserRole;
+import com.ring.bookstore.model.dto.request.*;
+import com.ring.bookstore.model.dto.response.coupons.CouponDiscountDTO;
+import com.ring.bookstore.model.dto.response.coupons.ICoupon;
+import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
+import com.ring.bookstore.model.mappers.CouponMapper;
+import com.ring.bookstore.model.mappers.DashboardMapper;
+import com.ring.bookstore.model.dto.response.dashboard.ChartDTO;
+import com.ring.bookstore.model.mappers.CalculateMapper;
+import com.ring.bookstore.model.dto.response.orders.*;
+import com.ring.bookstore.model.enums.OrderStatus;
+import com.ring.bookstore.model.enums.ShippingType;
+import com.ring.bookstore.model.enums.UserRole;
 import com.ring.bookstore.listener.checkout.OnCheckoutCompletedEvent;
-import com.ring.bookstore.model.*;
+import com.ring.bookstore.model.entity.*;
 import com.ring.bookstore.repository.*;
-import com.ring.bookstore.request.*;
 import com.ring.bookstore.service.CaptchaService;
 import com.ring.bookstore.service.CouponService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.ring.bookstore.dtos.mappers.OrderMapper;
+import com.ring.bookstore.model.mappers.OrderMapper;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.service.OrderService;
@@ -443,11 +443,14 @@ public class OrderServiceImpl implements OrderService {
             //Apply coupon
             if (couponRepo.hasUserUsedCoupon(coupon.getId(), user.getId())) {
                 coupon.setIsUsed(true);
-                throw new HttpResponseException(
-                        HttpStatus.CONFLICT,
-                        "Coupon expired!",
-                        "Mã coupon " + orderCoupon + " đã qua sử dụng!"
-                );
+
+                if (isCheckout) {
+                    throw new HttpResponseException(
+                            HttpStatus.CONFLICT,
+                            "Coupon expired!",
+                            "Mã coupon " + orderCoupon + " đã qua sử dụng!"
+                    );
+                }
             }
 
             CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(coupon,
@@ -605,6 +608,19 @@ public class OrderServiceImpl implements OrderService {
                 && !couponService.isExpired(shopCoupon.getCoupon())) {
             CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(shopCoupon.getCoupon(),
                     new CartStateRequest(detailTotal - discountDeal, shippingFee, detailQuantity), user);
+
+            //Apply coupon
+            if (couponRepo.hasUserUsedCoupon(shopCoupon.getCoupon().getId(), user.getId())) {
+                shopCoupon.getCoupon().setIsUsed(true);
+
+                if (isCheckout) {
+                    throw new HttpResponseException(
+                            HttpStatus.CONFLICT,
+                            "Coupon expired!",
+                            "Mã coupon " + detail.getCoupon() + " đã qua sử dụng!"
+                    );
+                }
+            }
 
             //Appliable coupon
             if (discountFromCoupon != null) {

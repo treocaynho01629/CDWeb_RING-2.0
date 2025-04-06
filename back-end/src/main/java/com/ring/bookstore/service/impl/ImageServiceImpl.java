@@ -3,7 +3,7 @@ package com.ring.bookstore.service.impl;
 import com.cloudinary.api.ApiResponse;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ImageUploadException;
-import com.ring.bookstore.response.CloudinaryResponse;
+import com.ring.bookstore.model.dto.response.CloudinaryResponse;
 import com.ring.bookstore.service.CloudinaryService;
 import com.ring.bookstore.ultils.FileUploadUtil;
 import org.apache.commons.io.FilenameUtils;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.model.Image;
+import com.ring.bookstore.model.entity.Image;
 import com.ring.bookstore.repository.ImageRepository;
 import com.ring.bookstore.service.ImageService;
 

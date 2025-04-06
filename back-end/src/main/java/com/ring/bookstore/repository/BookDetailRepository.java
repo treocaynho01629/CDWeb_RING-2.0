@@ -1,12 +1,12 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.books.IBook;
-import com.ring.bookstore.dtos.books.IBookDetail;
+import com.ring.bookstore.model.dto.response.books.IBook;
+import com.ring.bookstore.model.dto.response.books.IBookDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.ring.bookstore.model.BookDetail;
+import com.ring.bookstore.model.entity.BookDetail;
 
 import java.util.Optional;
 

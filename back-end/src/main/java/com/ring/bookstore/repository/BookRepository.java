@@ -2,9 +2,9 @@ package com.ring.bookstore.repository;
 
 import java.util.List;
 
-import com.ring.bookstore.dtos.dashboard.IStat;
-import com.ring.bookstore.enums.BookType;
-import com.ring.bookstore.model.Account;
+import com.ring.bookstore.model.dto.response.dashboard.IStat;
+import com.ring.bookstore.model.enums.BookType;
+import com.ring.bookstore.model.entity.Account;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,8 +12,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.ring.bookstore.dtos.books.IBookDisplay;
-import com.ring.bookstore.model.Book;
+import com.ring.bookstore.model.dto.response.books.IBookDisplay;
+import com.ring.bookstore.model.entity.Book;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository

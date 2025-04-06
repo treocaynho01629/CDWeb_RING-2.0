@@ -1,9 +1,9 @@
 package com.ring.bookstore.service;
 
-import com.ring.bookstore.dtos.accounts.AddressDTO;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Address;
-import com.ring.bookstore.request.AddressRequest;
+import com.ring.bookstore.model.dto.response.accounts.AddressDTO;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.Address;
+import com.ring.bookstore.model.dto.request.AddressRequest;
 
 import java.util.List;
 

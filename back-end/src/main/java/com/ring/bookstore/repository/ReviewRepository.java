@@ -1,13 +1,13 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.reviews.IReview;
+import com.ring.bookstore.model.dto.response.reviews.IReview;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.ring.bookstore.model.Review;
+import com.ring.bookstore.model.entity.Review;
 
 import java.util.List;
 import java.util.Optional;
