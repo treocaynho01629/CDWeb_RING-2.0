@@ -9,6 +9,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+/**
+ * Auditable entity class named {@link Auditable} with common fields for audit tracking and lifecycle management.
+ * Provides automatic population of audit fields using JPA lifecycle annotations.
+ */
 @Data
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)

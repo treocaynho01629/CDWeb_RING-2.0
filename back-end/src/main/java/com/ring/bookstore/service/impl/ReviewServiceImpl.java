@@ -2,7 +2,7 @@ package com.ring.bookstore.service.impl;
 
 import java.util.List;
 
-import com.ring.bookstore.model.dto.response.reviews.IReview;
+import com.ring.bookstore.model.dto.projection.reviews.IReview;
 import com.ring.bookstore.model.enums.UserRole;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.entity.Book;

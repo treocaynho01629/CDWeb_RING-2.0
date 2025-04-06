@@ -1,6 +1,6 @@
-package com.ring.bookstore.model.dto.response.shops;
+package com.ring.bookstore.model.dto.projection.shops;
 
-import com.ring.bookstore.model.dto.response.images.IImage;
+import com.ring.bookstore.model.dto.projection.images.IImage;
 import com.ring.bookstore.model.entity.Address;
 
 import java.math.BigDecimal;

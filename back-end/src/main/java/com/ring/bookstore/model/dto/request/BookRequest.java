@@ -14,11 +14,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a book request as {@link BookRequest}.
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookRequest { //Request body for book
+public class BookRequest {
 	
 	@NotNull(message = "Giá không được bỏ trống!")
 	@Min(value = 1000, message = "Giá từ 1.000 ₫")

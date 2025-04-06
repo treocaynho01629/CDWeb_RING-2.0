@@ -1,10 +1,15 @@
-package com.ring.bookstore.model.dto.response.shops;
+package com.ring.bookstore.model.dto.projection.shops;
 
-import com.ring.bookstore.model.dto.response.images.IImage;
+import com.ring.bookstore.model.dto.projection.images.IImage;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents a shop projection as {@link IShop}, containing owner's username,
+ * owner information, sales, total sold items, followers, join date, and image.
+ */
 public interface IShop {
+
     String getUsername();
 
     Long getOwnerId();

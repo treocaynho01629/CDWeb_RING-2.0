@@ -9,11 +9,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 
+/**
+ * Represents a review request as {@link ReviewRequest}.
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewRequest { //Request body for review
+public class ReviewRequest {
 	
 	@NotBlank(message = "Nội dung đánh giá không bỏ trống!")
 	@Size(min = 50, message = "Nội dung tối thiểu 50 kí tự!")

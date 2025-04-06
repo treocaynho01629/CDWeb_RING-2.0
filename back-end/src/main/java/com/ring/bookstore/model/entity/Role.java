@@ -8,6 +8,9 @@ import org.hibernate.annotations.Nationalized;
 
 import java.util.Collection;
 
+/**
+ * Represents an entity as {@link Role} for roles.
+ */
 @Entity
 @Getter
 @Setter

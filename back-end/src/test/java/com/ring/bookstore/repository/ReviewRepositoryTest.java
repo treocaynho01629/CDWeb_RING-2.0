@@ -1,6 +1,6 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.dto.response.reviews.IReview;
+import com.ring.bookstore.model.dto.projection.reviews.IReview;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.entity.Book;
 import com.ring.bookstore.model.entity.Image;

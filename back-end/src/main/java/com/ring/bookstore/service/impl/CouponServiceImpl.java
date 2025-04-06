@@ -3,7 +3,7 @@ package com.ring.bookstore.service.impl;
 import com.ring.bookstore.model.dto.response.coupons.CouponDTO;
 import com.ring.bookstore.model.dto.response.coupons.CouponDetailDTO;
 import com.ring.bookstore.model.dto.response.coupons.CouponDiscountDTO;
-import com.ring.bookstore.model.dto.response.coupons.ICoupon;
+import com.ring.bookstore.model.dto.projection.coupons.ICoupon;
 import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
 import com.ring.bookstore.model.mappers.CouponMapper;
 import com.ring.bookstore.model.mappers.DashboardMapper;

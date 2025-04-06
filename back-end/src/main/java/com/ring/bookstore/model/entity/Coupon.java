@@ -6,6 +6,9 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+/**
+ * Represents an entity as {@link Coupon} for coupons.
+ */
 @Entity
 @Getter
 @Setter

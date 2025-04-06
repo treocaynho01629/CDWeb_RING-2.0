@@ -1,7 +1,8 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.dto.response.orders.IOrderDetailItem;
-import com.ring.bookstore.model.dto.response.orders.IOrderItem;
+import com.ring.bookstore.model.dto.projection.orders.IOrderDetailItem;
+import com.ring.bookstore.model.dto.projection.orders.IOrderItem;
+import com.ring.bookstore.model.entity.OrderDetail;
 import com.ring.bookstore.model.entity.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,8 +10,20 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Repository interface named {@link OrderItemRepository} for managing {@link OrderItem} entities.
+ */
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
+
+    /**
+     * Retrieves a list of order items and their associated details based on the provided
+     * detail IDs. The result includes information about the order item, book, order detail,
+     * and shop, if available.
+     *
+     * @param ids the list of detail IDs to filter the query
+     * @return a list of {@link IOrderItem} projections containing order item and related details
+     */
     @Query("""
         select oi as item,
         b.id as bookId, b.title as title, b.slug as slug, i as image,
@@ -27,6 +40,13 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     """)
     List<IOrderItem> findAllWithDetailIds(List<Long> ids);
 
+    /**
+     * Retrieves a list of order detail items based on the provided detail ID and user ID.
+     *
+     * @param id the ID of the order detail to retrieve items for
+     * @param userId the ID of the user associated with the order; if null, no user filter is applied
+     * @return a list of IOrderDetailItem projections containing detailed order item information
+     */
     @Query("""
         select o.id as orderId, a.name as name, a.companyName as companyName,
         a.city as city, a.address as address, o.orderMessage as message, a.phone as phone,

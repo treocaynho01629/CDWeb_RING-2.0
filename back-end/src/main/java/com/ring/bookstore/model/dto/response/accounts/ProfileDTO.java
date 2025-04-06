@@ -5,7 +5,9 @@ import com.ring.bookstore.model.enums.Gender;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-//Account's profile
+/**
+ * Represents a profile response as {@link ProfileDTO}.
+ */
 public record ProfileDTO(String image,
                          String name,
                          String email,

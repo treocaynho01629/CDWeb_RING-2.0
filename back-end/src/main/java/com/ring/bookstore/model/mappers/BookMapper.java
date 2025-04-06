@@ -1,8 +1,11 @@
 package com.ring.bookstore.model.mappers;
 
+import com.ring.bookstore.model.dto.projection.books.IBook;
+import com.ring.bookstore.model.dto.projection.books.IBookDetail;
+import com.ring.bookstore.model.dto.projection.books.IBookDisplay;
 import com.ring.bookstore.model.dto.response.books.*;
 import com.ring.bookstore.model.dto.response.categories.CategoryDTO;
-import com.ring.bookstore.model.dto.response.images.IImage;
+import com.ring.bookstore.model.dto.projection.images.IImage;
 import com.ring.bookstore.model.dto.response.images.ImageDTO;
 import com.ring.bookstore.model.dto.response.publishers.PublisherDTO;
 import com.ring.bookstore.model.dto.response.reviews.ReviewsInfoDTO;

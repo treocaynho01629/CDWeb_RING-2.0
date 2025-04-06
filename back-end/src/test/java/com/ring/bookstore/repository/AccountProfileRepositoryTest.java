@@ -1,7 +1,7 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.dto.response.accounts.IAccountDetail;
-import com.ring.bookstore.model.dto.response.accounts.IProfile;
+import com.ring.bookstore.model.dto.projection.accounts.IAccountDetail;
+import com.ring.bookstore.model.dto.projection.accounts.IProfile;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.entity.AccountProfile;
 import com.ring.bookstore.model.entity.Address;

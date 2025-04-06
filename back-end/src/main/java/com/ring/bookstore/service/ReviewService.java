@@ -4,13 +4,11 @@ import java.util.List;
 
 import com.ring.bookstore.model.entity.Review;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.model.dto.response.reviews.ReviewDTO;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.dto.request.ReviewRequest;
 
-@Service
 public interface ReviewService {
 
     Page<ReviewDTO> getReviews(Long bookId,

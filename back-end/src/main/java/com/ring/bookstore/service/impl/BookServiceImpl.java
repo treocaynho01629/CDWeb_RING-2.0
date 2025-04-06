@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.slugify.Slugify;
+import com.ring.bookstore.model.dto.projection.books.IBook;
+import com.ring.bookstore.model.dto.projection.books.IBookDetail;
+import com.ring.bookstore.model.dto.projection.books.IBookDisplay;
 import com.ring.bookstore.model.dto.response.books.*;
 import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
 import com.ring.bookstore.model.mappers.DashboardMapper;

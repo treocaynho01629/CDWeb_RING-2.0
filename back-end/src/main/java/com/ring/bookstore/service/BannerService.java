@@ -1,15 +1,13 @@
 package com.ring.bookstore.service;
 
+import com.ring.bookstore.model.dto.request.BannerRequest;
 import com.ring.bookstore.model.dto.response.banners.BannerDTO;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.entity.Banner;
-import com.ring.bookstore.model.dto.request.BannerRequest;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface BannerService {
 
     Page<BannerDTO> getBanners(Integer pageNo,

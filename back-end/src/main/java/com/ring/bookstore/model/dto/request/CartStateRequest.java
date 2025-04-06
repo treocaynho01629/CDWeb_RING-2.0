@@ -6,6 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents the current cart's state {@link CartStateRequest} with cart total value, products quantity
+ * and estimated shipping fee.
+ */
 @Data
 @Builder
 @AllArgsConstructor

@@ -5,7 +5,9 @@ import com.ring.bookstore.model.dto.response.accounts.AddressDTO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-//Shop
+/**
+ * Represents a shop detail slim response as {@link ShopDisplayDetailDTO}.
+ */
 public record ShopDisplayDetailDTO(String username,
                                    Long ownerId,
                                    Long id,

@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Nationalized;
 
+/**
+ * Represents an entity as {@link Address} for addresses.
+ */
 @Entity
 @Getter
 @Setter

@@ -11,6 +11,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Represents a full book response as {@link BookDTO}.
+ */
 @Builder
 public record BookDTO(Long id,
                       String slug,

@@ -1,7 +1,7 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.dto.response.books.IBook;
-import com.ring.bookstore.model.dto.response.books.IBookDetail;
+import com.ring.bookstore.model.dto.projection.books.IBook;
+import com.ring.bookstore.model.dto.projection.books.IBookDetail;
 import com.ring.bookstore.model.entity.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

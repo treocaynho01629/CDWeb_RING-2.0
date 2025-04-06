@@ -4,8 +4,10 @@ import com.ring.bookstore.model.dto.response.orders.ReceiptDTO;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+/**
+ * {@link OnCheckoutCompletedEvent} is an event that is triggered when a user successfully completes a checkout.
+ */
 @Getter
-@SuppressWarnings("serial")
 public class OnCheckoutCompletedEvent extends ApplicationEvent {
 
     private final String username;

@@ -14,6 +14,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Represents an entity as {@link Account} for users.
+ */
 @Entity
 @Getter
 @Setter

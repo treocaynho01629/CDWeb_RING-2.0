@@ -10,6 +10,9 @@ import org.hibernate.annotations.Nationalized;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Represents an entity as {@link AccountProfile} for user's profile.
+ */
 @Entity
 @Getter
 @Setter

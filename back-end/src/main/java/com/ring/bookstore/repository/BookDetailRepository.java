@@ -1,7 +1,8 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.dto.response.books.IBook;
-import com.ring.bookstore.model.dto.response.books.IBookDetail;
+import com.ring.bookstore.model.dto.projection.books.IBook;
+import com.ring.bookstore.model.dto.projection.books.IBookDetail;
+import com.ring.bookstore.model.entity.AccountProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,8 +11,20 @@ import com.ring.bookstore.model.entity.BookDetail;
 
 import java.util.Optional;
 
+/**
+ * Repository interface named {@link BookDetailRepository} for managing {@link BookDetail} entities.
+ */
 @Repository
 public interface BookDetailRepository extends JpaRepository<BookDetail, Long>{
+
+    /**
+     * Retrieves detailed information about a book based on its ID or slug.
+     *
+     * @param id the ID of the book to retrieve details for; optional if slug is provided.
+     * @param slug the slug identifier of the book to retrieve details for; optional if ID is provided.
+     * @return an {@code Optional} containing the details of the book as an {@code IBookDetail}
+     *         projection, or an empty {@code Optional} if no book matches the specified criteria.
+     */
     @Query("""
             select distinct b.id as id, b.slug as slug,
                 b.price as price, b.discount as discount, b.title as title,
@@ -56,6 +69,13 @@ public interface BookDetailRepository extends JpaRepository<BookDetail, Long>{
             """)
     Optional<IBookDetail> findBookDetail(Long id, String slug);
 
+    /**
+     * Retrieves a book's detailed information based on its unique identifier.
+     *
+     * @param id the unique identifier of the book to be retrieved
+     * @return an {@link Optional} containing the book information represented by {@code IBook},
+     *         or an empty {@link Optional} if no book matches the provided identifier
+     */
     @Query("""
             select distinct b.id as id, b.slug as slug, b.price as price,
                 b.discount as discount, b.title as title, b.description as description,

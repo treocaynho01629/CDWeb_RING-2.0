@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a banner request as {@link BannerRequest}.
+ */
 @Data
 @Builder
 @AllArgsConstructor

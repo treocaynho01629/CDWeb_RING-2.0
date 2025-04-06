@@ -1,7 +1,9 @@
 package com.ring.bookstore.service.impl;
 
+import com.ring.bookstore.model.dto.projection.accounts.IAccount;
+import com.ring.bookstore.model.dto.projection.accounts.IAccountDetail;
+import com.ring.bookstore.model.dto.projection.accounts.IProfile;
 import com.ring.bookstore.model.dto.response.accounts.*;
-import com.ring.bookstore.model.dto.response.dashboard.ChartDTO;
 import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
 import com.ring.bookstore.model.mappers.AccountMapper;
 import com.ring.bookstore.model.mappers.DashboardMapper;
@@ -51,7 +53,6 @@ public class AccountServiceImpl implements AccountService {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
 
-    //Get all accounts
     public Page<AccountDTO> getAllAccounts(Integer pageNo,
                                            Integer pageSize,
                                            String sortBy,
@@ -65,7 +66,6 @@ public class AccountServiceImpl implements AccountService {
         return accountsList.map(accountMapper::projectionToDTO);
     }
 
-    //Get account by {id}
     public AccountDetailDTO getAccountById(Long id) {
         IAccountDetail account = profileRepo.findDetailById(id).orElseThrow(()
                 -> new ResourceNotFoundException("User not found!"));
@@ -78,7 +78,6 @@ public class AccountServiceImpl implements AccountService {
                 "Thành viên mới");
     }
 
-    //Create account (ADMIN)
     @Transactional
     public Account saveAccount(AccountRequest request, MultipartFile file) {
 
@@ -121,7 +120,6 @@ public class AccountServiceImpl implements AccountService {
         return savedAccount; //Return created account
     }
 
-    //Update account (ADMIN)
     @Transactional
     public Account updateAccount(AccountRequest request, MultipartFile file, Long id) {
         //Check Account exists?
@@ -167,13 +165,11 @@ public class AccountServiceImpl implements AccountService {
         return updatedAccount; //Return updated account
     }
 
-    //Delete account
     @Transactional
     public void deleteAccount(Long id) {
         accountRepo.deleteById(id);
     }
 
-    //Delete multiples accounts
     @Transactional
     public void deleteAccounts(List<Long> ids) {
         accountRepo.deleteAllById(ids);
@@ -188,20 +184,17 @@ public class AccountServiceImpl implements AccountService {
         accountRepo.deleteAllById(deleteIds);
     }
 
-    //Delete all accounts (ADMIN)
     @Transactional
     public void deleteAllAccounts() {
         accountRepo.deleteAll();
     }
 
-    //Get account's profile
     public ProfileDTO getProfile(Account user) {
         IProfile currProfile = profileRepo.findProfileByUser(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found!"));
         return accountMapper.projectionToProfileDTO(currProfile);
     }
 
-    //Update account's profile
     @Transactional
     public AccountProfile updateProfile(ProfileRequest request, MultipartFile file, Account user) {
         AccountProfile profile = profileRepo.findById(user.getProfile().getId()).orElseThrow(()
@@ -219,7 +212,6 @@ public class AccountServiceImpl implements AccountService {
         return profileRepo.save(profile); //Save to Database
     }
 
-    //Change password
     @Override
     public Account changePassword(ChangePassRequest request, Account user) {
         //Check current password
@@ -249,6 +241,15 @@ public class AccountServiceImpl implements AccountService {
         return savedAccount; //Return updated account
     }
 
+    /**
+     * Updates the profile picture of a user account. This method allows uploading
+     * a new profile picture, replacing an existing one, or removing the profile picture.
+     *
+     * @param file the new image file to be uploaded as the profile picture, can be null for removing the image
+     * @param image the identifier of the image, used for determining if an image should be removed, can be null
+     * @param profile the account profile to be updated
+     * @return the updated account profile with the modified profile picture
+     */
     protected AccountProfile changeProfilePic(MultipartFile file, String image, AccountProfile profile) {
         if (file != null) { //Contain new image >> upload/replace
             if (profile.getImage() != null) imageService.deleteImage(profile.getImage().getId()); //Delete old image

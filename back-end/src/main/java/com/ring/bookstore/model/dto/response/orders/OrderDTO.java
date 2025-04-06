@@ -5,7 +5,9 @@ import lombok.Builder;
 
 import java.util.List;
 
-//Order detail
+/**
+ * Represents a checkout response as {@link OrderDTO}.
+ */
 @Builder
 public record OrderDTO(Long id,
                        Long shopId,

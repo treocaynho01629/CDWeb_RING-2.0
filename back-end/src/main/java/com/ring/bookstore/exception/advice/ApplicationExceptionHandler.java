@@ -2,10 +2,12 @@ package com.ring.bookstore.exception.advice;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.ring.bookstore.exception.*;
+import com.ring.bookstore.model.dto.response.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +21,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * {@link ApplicationExceptionHandler} is a global exception handler for the application.
+ * It handles different types of exceptions and returns appropriate {@link ExceptionResponse} for each.
+ */
 @RestControllerAdvice
 public class ApplicationExceptionHandler{
 
@@ -130,6 +136,16 @@ public class ApplicationExceptionHandler{
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ExceptionResponse handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        return new ExceptionResponse(
+                HttpStatus.FORBIDDEN.value() ,
+                "Authorization failed!",
+                e.getLocalizedMessage()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(BadCredentialsException.class)
     public ExceptionResponse handleBadCredentialsException(BadCredentialsException e) {
         return new ExceptionResponse(
@@ -184,8 +200,7 @@ public class ApplicationExceptionHandler{
     public ExceptionResponse handleValidationException(HttpMessageNotReadableException e) {
         String errorMessage = "";
 
-        if (e.getCause() instanceof InvalidFormatException) {
-            InvalidFormatException ifx = (InvalidFormatException) e.getCause();
+        if (e.getCause() instanceof InvalidFormatException ifx) {
             if (ifx.getTargetType() != null && ifx.getTargetType().isEnum()) {
                 errorMessage = String.format("Invalid enum value: '%s' for the field: '%s'. The value must be one of: %s.",
                         ifx.getValue(), ifx.getPath().get(ifx.getPath().size()-1).getFieldName(), Arrays.toString(ifx.getTargetType().getEnumConstants()));

@@ -1,10 +1,13 @@
-package com.ring.bookstore.exception;
+package com.ring.bookstore.model.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Map;
 
+/**
+ * Represents a response as {@link ExceptionResponse} containing error messages and error status.
+ */
 @Data
 @AllArgsConstructor
 public class ExceptionResponse {

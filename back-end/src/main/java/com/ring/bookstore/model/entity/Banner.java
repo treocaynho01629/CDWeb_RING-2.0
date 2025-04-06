@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Nationalized;
 
+/**
+ * Represents an entity as {@link Banner} for banners.
+ */
 @Entity
 @Getter
 @Setter

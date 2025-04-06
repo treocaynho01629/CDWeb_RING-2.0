@@ -4,6 +4,10 @@ import lombok.Getter;
 
 import java.util.List;
 
+/**
+ * Enum representing different user roles in the system as {@link UserRole}.
+ * Each enum constant contains label, color, and a list of privileges associated with the role by default.
+ */
 @Getter
 public enum UserRole {
 

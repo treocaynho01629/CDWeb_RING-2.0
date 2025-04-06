@@ -4,6 +4,9 @@ import com.ring.bookstore.model.dto.response.images.ImageDTO;
 
 import java.math.BigDecimal;
 
+/**
+ * Represents a book slim response as {@link BookDisplayDTO}.
+ */
 public record BookDisplayDTO(Long id,
                              String slug,
                              String title,

@@ -6,6 +6,9 @@ import org.hibernate.annotations.Nationalized;
 
 import java.util.Collection;
 
+/**
+ * Represents an entity as {@link PrivilegeGroup} for privilege groups.
+ */
 @Entity
 @Getter
 @Setter

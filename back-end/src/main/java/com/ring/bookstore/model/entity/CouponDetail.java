@@ -8,6 +8,9 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Represents an entity as {@link CouponDetail} for coupon details.
+ */
 @Entity
 @Getter
 @Setter

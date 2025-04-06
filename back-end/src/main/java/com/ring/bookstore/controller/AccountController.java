@@ -41,9 +41,9 @@ public class AccountController {
      * Retrieves all accounts with pagination and filtering options.
      *
      * @param pageSize size of each page
-     * @param pageNo the page number to retrieve (default is 0)
-     * @param sortBy the field to sort by (default is "id")
-     * @param sortDir the direction of sorting (default is "desc")
+     * @param pageNo   page number
+     * @param sortBy   sorting field
+     * @param sortDir  sorting direction
      * @param keyword a search keyword to filter accounts (default is an empty string)
      * @param role the role to filter accounts (optional)
      * @return a {@link ResponseEntity} containing a list of accounts wrapped in a {@link Page} object
@@ -158,7 +158,7 @@ public class AccountController {
     }
 
     /**
-     * Deletes all accounts from the system.
+     * Deletes all accounts from the repository.
      *
      * @return a {@link ResponseEntity} containing a success message
      */

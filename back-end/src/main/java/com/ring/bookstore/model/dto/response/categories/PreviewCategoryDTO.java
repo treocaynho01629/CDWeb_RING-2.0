@@ -1,6 +1,8 @@
 package com.ring.bookstore.model.dto.response.categories;
 
-//Category
+/**
+ * Represents a preview category response as {@link PreviewCategoryDTO}.
+ */
 public record PreviewCategoryDTO(Integer id,
                                  String slug,
                                  Integer parentId,

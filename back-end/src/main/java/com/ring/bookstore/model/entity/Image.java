@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.*;
 
+/**
+ * Represents an entity as {@link Image} for images.
+ */
 @Entity
 @Getter
 @Setter

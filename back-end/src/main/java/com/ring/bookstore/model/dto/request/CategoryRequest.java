@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a category request as {@link CategoryRequest}.
+ */
 @Data
 @Builder
 @AllArgsConstructor

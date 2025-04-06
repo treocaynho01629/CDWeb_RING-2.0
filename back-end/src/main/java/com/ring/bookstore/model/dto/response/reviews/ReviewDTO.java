@@ -2,6 +2,9 @@ package com.ring.bookstore.model.dto.response.reviews;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents a review response as {@link ReviewDTO}.
+ */
 public record ReviewDTO(Long id,
                         String content,
                         Integer rating,

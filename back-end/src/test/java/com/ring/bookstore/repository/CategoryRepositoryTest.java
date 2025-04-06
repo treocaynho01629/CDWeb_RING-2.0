@@ -1,6 +1,6 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.dto.response.categories.ICategory;
+import com.ring.bookstore.model.dto.projection.categories.ICategory;
 import com.ring.bookstore.model.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

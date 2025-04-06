@@ -13,6 +13,9 @@ import org.hibernate.annotations.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Represents an entity as {@link OrderReceipt} for order receipts.
+ */
 @Entity
 @Getter
 @Setter

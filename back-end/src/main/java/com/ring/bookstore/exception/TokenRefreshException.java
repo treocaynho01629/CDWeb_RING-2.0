@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.io.Serial;
 
 /**
- * Exception class named {@link TokenRefreshException} thrown when the token is invalid.
+ * Exception class named {@link TokenRefreshException} thrown when the refresh token is invalid.
  */
 @Getter
 @ResponseStatus(code = HttpStatus.FORBIDDEN)

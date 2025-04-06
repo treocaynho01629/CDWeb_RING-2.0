@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 /**
  * Service interface named {@link TokenService} for handling various types of authentication tokens,
- *  * including access tokens, refresh tokens, and custom tokens.
+ * including access tokens, refresh tokens, and custom tokens.
  */
 public interface TokenService {
 

@@ -2,7 +2,7 @@ package com.ring.bookstore.service.impl;
 
 import com.ring.bookstore.model.dto.response.banners.BannerDTO;
 import com.ring.bookstore.model.mappers.BannerMapper;
-import com.ring.bookstore.model.dto.response.banners.IBanner;
+import com.ring.bookstore.model.dto.projection.banners.IBanner;
 import com.ring.bookstore.model.enums.UserRole;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;

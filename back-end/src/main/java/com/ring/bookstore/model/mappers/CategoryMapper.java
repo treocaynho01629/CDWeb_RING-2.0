@@ -5,7 +5,7 @@ import com.cloudinary.Transformation;
 import com.ring.bookstore.model.dto.response.categories.CategoryDTO;
 import com.ring.bookstore.model.dto.response.categories.CategoryDetailDTO;
 import com.ring.bookstore.model.dto.response.categories.PreviewCategoryDTO;
-import com.ring.bookstore.model.dto.response.categories.ICategory;
+import com.ring.bookstore.model.dto.projection.categories.ICategory;
 import com.ring.bookstore.model.entity.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

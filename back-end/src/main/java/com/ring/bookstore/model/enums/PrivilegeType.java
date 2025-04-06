@@ -2,13 +2,16 @@ package com.ring.bookstore.model.enums;
 
 import lombok.Getter;
 
+/**
+ * Enum representing the privilege type as {@link PrivilegeType}.
+ */
 @Getter
 public enum PrivilegeType {
 
     READ_BOOK("read:book", "Xem sản phẩm"),
-    CREATE_BOOK("read:book", "Tạo sản phẩm"),
-    UPDATE_BOOK("read:book", "Sửa sản phẩm"),
-    DELETE_BOOK("read:book", "Xoá sản phẩm"),
+    CREATE_BOOK("create:book", "Tạo sản phẩm"),
+    UPDATE_BOOK("update:book", "Sửa sản phẩm"),
+    DELETE_BOOK("delete:book", "Xoá sản phẩm"),
 
     READ_USER("read:user", "Xem người dùng"),
     CREATE_USER("create:user", "Tạo người dùng"),

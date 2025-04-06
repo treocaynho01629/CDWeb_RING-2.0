@@ -8,9 +8,13 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.ring.bookstore.model.dto.projection.orders.IOrderDetail;
+import com.ring.bookstore.model.dto.projection.orders.IOrderDetailItem;
+import com.ring.bookstore.model.dto.projection.orders.IOrderItem;
+import com.ring.bookstore.model.dto.projection.orders.IReceiptSummary;
 import com.ring.bookstore.model.dto.request.*;
 import com.ring.bookstore.model.dto.response.coupons.CouponDiscountDTO;
-import com.ring.bookstore.model.dto.response.coupons.ICoupon;
+import com.ring.bookstore.model.dto.projection.coupons.ICoupon;
 import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
 import com.ring.bookstore.model.mappers.CouponMapper;
 import com.ring.bookstore.model.mappers.DashboardMapper;

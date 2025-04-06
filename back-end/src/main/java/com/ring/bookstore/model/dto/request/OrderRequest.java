@@ -13,11 +13,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a checkout request as {@link OrderRequest} to proceed a checkout.
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderRequest { //Request body when order
+public class OrderRequest {
 
 	@NotNull(message = "Giỏ hàng không được trống!")
 	@NotEmpty(message = "Giỏ hàng không được trống!")

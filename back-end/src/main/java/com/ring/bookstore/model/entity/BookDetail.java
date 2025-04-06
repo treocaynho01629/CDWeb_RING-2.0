@@ -10,6 +10,9 @@ import lombok.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Represents an entity as {@link BookDetail} for book details.
+ */
 @Entity
 @Getter
 @Setter

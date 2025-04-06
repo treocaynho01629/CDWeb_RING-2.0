@@ -1,4 +1,4 @@
-package com.ring.bookstore.model.dto.response.books;
+package com.ring.bookstore.model.dto.projection.books;
 
 import com.ring.bookstore.model.enums.BookLanguage;
 import com.ring.bookstore.model.enums.BookType;
@@ -7,7 +7,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Represents a book projection as {@link IBook}, containing the book's ID,
+ * slug, price, discount, title, description, type, author, amount, image, publisher details, category details, shop details, and more.
+ */
 public interface IBook {
+
     Long getId();
 
     String getSlug();

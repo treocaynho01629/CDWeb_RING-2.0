@@ -4,7 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
 import com.ring.bookstore.model.dto.response.coupons.CouponDTO;
 import com.ring.bookstore.model.dto.response.coupons.CouponDetailDTO;
-import com.ring.bookstore.model.dto.response.coupons.ICoupon;
+import com.ring.bookstore.model.dto.projection.coupons.ICoupon;
 import com.ring.bookstore.model.enums.CouponType;
 import com.ring.bookstore.model.entity.Coupon;
 import com.ring.bookstore.model.entity.CouponDetail;

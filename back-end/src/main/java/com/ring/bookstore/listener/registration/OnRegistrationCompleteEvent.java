@@ -3,8 +3,10 @@ package com.ring.bookstore.listener.registration;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+/**
+ * {@link OnRegistrationCompleteEvent} is an event that is triggered when a user successfully register.
+ */
 @Getter
-@SuppressWarnings("serial")
 public class OnRegistrationCompleteEvent extends ApplicationEvent {
 
     private final String username;

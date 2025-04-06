@@ -8,7 +8,9 @@ import java.util.Set;
 import lombok.*;
 import org.hibernate.annotations.Nationalized;
 
-
+/**
+ * Represents an entity as {@link Publisher} for publishers.
+ */
 @Entity
 @Getter
 @Setter

@@ -2,6 +2,10 @@ package com.ring.bookstore.model.enums;
 
 import lombok.Getter;
 
+/**
+ * Enum representing the language of a book as {@link BookLanguage}.
+ * Each enum constant contains a label (language name in the local language).
+ */
 @Getter
 public enum BookLanguage {
     VN("VN", "Tiếng Việt"),

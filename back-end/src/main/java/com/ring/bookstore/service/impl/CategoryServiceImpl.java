@@ -8,7 +8,7 @@ import com.ring.bookstore.model.dto.response.categories.CategoryDTO;
 import com.ring.bookstore.model.dto.response.categories.CategoryDetailDTO;
 import com.ring.bookstore.model.dto.response.categories.PreviewCategoryDTO;
 import com.ring.bookstore.model.mappers.CategoryMapper;
-import com.ring.bookstore.model.dto.response.categories.ICategory;
+import com.ring.bookstore.model.dto.projection.categories.ICategory;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.model.dto.request.CategoryRequest;
 import org.springframework.data.domain.*;

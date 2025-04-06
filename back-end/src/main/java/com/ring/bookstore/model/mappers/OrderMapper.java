@@ -5,6 +5,10 @@ import java.util.stream.Collectors;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
+import com.ring.bookstore.model.dto.projection.orders.IOrderDetail;
+import com.ring.bookstore.model.dto.projection.orders.IOrderDetailItem;
+import com.ring.bookstore.model.dto.projection.orders.IOrderItem;
+import com.ring.bookstore.model.dto.projection.orders.IReceiptSummary;
 import com.ring.bookstore.model.dto.response.orders.*;
 import com.ring.bookstore.model.entity.*;
 import lombok.RequiredArgsConstructor;

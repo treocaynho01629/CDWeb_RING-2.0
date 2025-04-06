@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents an entity as {@link RefreshToken} for refresh tokens.
+ */
 @Entity
 @Data
 @AllArgsConstructor

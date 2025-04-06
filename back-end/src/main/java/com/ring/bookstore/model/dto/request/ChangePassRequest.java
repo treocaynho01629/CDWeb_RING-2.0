@@ -7,11 +7,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a request as {@link ChangePassRequest} to change user's password.
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChangePassRequest { //Request body for changing password
+public class ChangePassRequest {
 
 	@NotNull(message = "Mật khẩu hiện tại không được để trống!")
 	private String pass;

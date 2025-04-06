@@ -1,10 +1,13 @@
 package com.ring.bookstore.model.dto.response.shops;
 
 import com.ring.bookstore.model.dto.response.accounts.AddressDTO;
+import com.ring.bookstore.model.dto.response.reviews.ReviewsInfoDTO;
 
 import java.time.LocalDateTime;
 
-//Shop
+/**
+ * Represents a shop detail response as {@link ShopDetailDTO}.
+ */
 public record ShopDetailDTO(String username,
                             Long ownerId,
                             Long id,

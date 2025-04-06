@@ -6,6 +6,9 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
+/**
+ * Represents an entity as {@link OrderItem} for order items.
+ */
 @Entity
 @Getter
 @Setter

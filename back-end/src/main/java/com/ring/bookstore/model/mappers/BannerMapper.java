@@ -1,8 +1,8 @@
 package com.ring.bookstore.model.mappers;
 
 import com.ring.bookstore.model.dto.response.banners.BannerDTO;
-import com.ring.bookstore.model.dto.response.banners.IBanner;
-import com.ring.bookstore.model.dto.response.images.IImage;
+import com.ring.bookstore.model.dto.projection.banners.IBanner;
+import com.ring.bookstore.model.dto.projection.images.IImage;
 import com.ring.bookstore.model.dto.response.images.ImageDTO;
 import com.ring.bookstore.ultils.FileUploadUtil;
 import lombok.RequiredArgsConstructor;

@@ -3,8 +3,10 @@ package com.ring.bookstore.listener.reset;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+/**
+ * {@link OnResetPasswordCompletedEvent} is an event that is triggered when a user successfully reset password.
+ */
 @Getter
-@SuppressWarnings("serial")
 public class OnResetPasswordCompletedEvent extends ApplicationEvent {
 
     private final String username;

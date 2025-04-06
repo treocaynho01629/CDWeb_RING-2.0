@@ -4,7 +4,9 @@ import lombok.Builder;
 
 import java.math.BigDecimal;
 
-//Order item
+/**
+ * Represents an order item response as {@link OrderItemDTO}.
+ */
 @Builder
 public record OrderItemDTO(Long id,
                            Double price,

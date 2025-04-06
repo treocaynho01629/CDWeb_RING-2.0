@@ -21,7 +21,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
+/**
+ * Represents an entity as {@link Review} for reviews.
+ */
 @Entity
 @Getter
 @Setter

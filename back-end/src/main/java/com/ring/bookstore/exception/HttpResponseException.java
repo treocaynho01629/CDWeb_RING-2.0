@@ -5,6 +5,9 @@ import org.springframework.http.HttpStatus;
 
 import java.io.Serial;
 
+/**
+ * Exception class named {@link HttpResponseException} for generic exception.
+ */
 @Getter
 public class HttpResponseException extends RuntimeException {
 

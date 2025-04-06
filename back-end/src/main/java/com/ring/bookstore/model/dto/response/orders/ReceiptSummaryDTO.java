@@ -4,7 +4,9 @@ import lombok.Builder;
 
 import java.time.LocalDateTime;
 
-//Order detail
+/**
+ * Represents a receipt summary response as {@link ReceiptSummaryDTO}.
+ */
 @Builder
 public record ReceiptSummaryDTO(Long id,
                                 String image,

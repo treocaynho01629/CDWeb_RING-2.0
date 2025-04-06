@@ -9,7 +9,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class AuthenticationRequest { //Request body for auth
+public class AuthenticationRequest {
 
 	@NotBlank(message = "Tên đăng nhập không được để trống!")
 	private String username;

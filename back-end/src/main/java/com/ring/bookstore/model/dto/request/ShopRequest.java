@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a shop request as {@link ShopRequest}.
+ */
 @Data
 @Builder
 @AllArgsConstructor

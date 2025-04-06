@@ -2,7 +2,7 @@ package com.ring.bookstore.service.impl;
 
 import com.ring.bookstore.model.dto.response.accounts.AddressDTO;
 import com.ring.bookstore.model.mappers.AddressMapper;
-import com.ring.bookstore.model.dto.response.accounts.IAddress;
+import com.ring.bookstore.model.dto.projection.accounts.IAddress;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.entity.Account;

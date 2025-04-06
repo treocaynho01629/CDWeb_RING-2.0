@@ -7,11 +7,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents an address request as {@link AddressRequest}.
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddressRequest { //Request body for address
+public class AddressRequest {
+
 	@NotBlank(message = "Tên người nhận không được để trống!")
 	@Size(max = 250, message = "Tên người nhận không quá 250 kí tự!")
 	private String name;

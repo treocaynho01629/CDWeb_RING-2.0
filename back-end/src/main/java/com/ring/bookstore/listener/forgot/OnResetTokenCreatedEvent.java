@@ -3,8 +3,10 @@ package com.ring.bookstore.listener.forgot;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+/**
+ * {@link OnResetTokenCreatedEvent} is an event that is triggered when a user request a reset token.
+ */
 @Getter
-@SuppressWarnings("serial")
 public class OnResetTokenCreatedEvent extends ApplicationEvent {
 
     private final String username;

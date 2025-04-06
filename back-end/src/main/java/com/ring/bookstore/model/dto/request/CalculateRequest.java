@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Represents a calculation request as {@link CalculateRequest} to calculate cart value.
+ */
 @Data
 @Builder
 @AllArgsConstructor

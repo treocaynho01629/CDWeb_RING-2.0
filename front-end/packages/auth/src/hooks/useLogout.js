@@ -7,10 +7,9 @@ const useLogout = () => {
 
   const signOut = async (message) => {
     try {
-      navigate("/");
       await logout().unwrap();
 
-      //Queue snack
+      navigate("/");
       const { enqueueSnackbar } = await import("notistack");
       enqueueSnackbar(message || "Đã đăng xuất!", { variant: "error" });
     } catch (err) {

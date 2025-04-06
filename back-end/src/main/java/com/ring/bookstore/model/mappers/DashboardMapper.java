@@ -1,7 +1,7 @@
 package com.ring.bookstore.model.mappers;
 
 import com.ring.bookstore.model.dto.response.dashboard.ChartDTO;
-import com.ring.bookstore.model.dto.response.dashboard.IStat;
+import com.ring.bookstore.model.dto.projection.dashboard.IStat;
 import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
 import org.springframework.stereotype.Service;
 

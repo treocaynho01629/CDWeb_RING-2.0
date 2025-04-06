@@ -9,6 +9,9 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Represents an entity as {@link OrderDetail} for order details.
+ */
 @Entity
 @Getter
 @Setter

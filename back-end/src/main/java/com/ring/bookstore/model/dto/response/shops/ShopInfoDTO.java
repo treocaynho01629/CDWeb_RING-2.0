@@ -2,7 +2,9 @@ package com.ring.bookstore.model.dto.response.shops;
 
 import java.time.LocalDateTime;
 
-//Shop
+/**
+ * Represents a shop info response as {@link ShopInfoDTO}.
+ */
 public record ShopInfoDTO(String username,
                           Long ownerId,
                           Long id,

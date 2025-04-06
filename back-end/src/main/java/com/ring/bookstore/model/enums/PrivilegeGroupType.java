@@ -4,6 +4,9 @@ import lombok.Getter;
 
 import java.util.List;
 
+/**
+ * Enum representing the privilege group as {@link PrivilegeGroupType}.
+ */
 @Getter
 public enum PrivilegeGroupType {
 

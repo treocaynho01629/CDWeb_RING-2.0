@@ -4,6 +4,11 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 
+/**
+ * Enum representing different types of shipping methods as {@link ShippingType}.
+ * Each enum constant contains label, description, color, multiplier, and icon associated
+ * with a specific shipping type.
+ */
 @Getter
 public enum ShippingType {
     ECONOMY("ECONOMY", "Tiêu chuẩn", "2-4 ngày giao hàng", "", BigDecimal.ONE, "LocalShippingOutlined"),
@@ -30,5 +35,4 @@ public enum ShippingType {
         this.multiplier = multiplier;
         this.icon = icon;
     }
-
 }

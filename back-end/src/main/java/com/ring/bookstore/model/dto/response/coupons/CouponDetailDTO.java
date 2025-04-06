@@ -5,6 +5,9 @@ import com.ring.bookstore.model.enums.CouponType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Represents a coupon detail response as {@link CouponDetailDTO}.
+ */
 public record CouponDetailDTO(Long id,
                               String code,
                               CouponType type,

@@ -1,6 +1,6 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.dto.response.banners.IBanner;
+import com.ring.bookstore.model.dto.projection.banners.IBanner;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.entity.Banner;
 import com.ring.bookstore.model.entity.Image;

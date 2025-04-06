@@ -2,6 +2,10 @@ package com.ring.bookstore.model.enums;
 
 import lombok.Getter;
 
+/**
+ * Enum representing different image sizes as {@link ImageSize}.
+ * Each enum constant contains width (in pixels) for the image.
+ */
 @Getter
 public enum ImageSize {
     TINY("TINY", 65),

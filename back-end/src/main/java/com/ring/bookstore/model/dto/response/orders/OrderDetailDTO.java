@@ -7,7 +7,9 @@ import com.ring.bookstore.model.enums.ShippingType;
 import java.time.LocalDateTime;
 import java.util.List;
 
-//Order detail
+/**
+ * Represents an order detail response as {@link OrderDetailDTO}.
+ */
 public record OrderDetailDTO(Long orderId,
                              String name,
                              String phone,

@@ -1,10 +1,15 @@
-package com.ring.bookstore.model.dto.response.orders;
+package com.ring.bookstore.model.dto.projection.orders;
 
-import com.ring.bookstore.model.dto.response.images.IImage;
+import com.ring.bookstore.model.dto.projection.images.IImage;
 import com.ring.bookstore.model.enums.OrderStatus;
 import com.ring.bookstore.model.entity.OrderItem;
 
+/**
+ * Represents an order item projection as {@link IOrderItem}, containing details about a specific item
+ * in an order, including book details, pricing, discounts, shipping, status, and shop information.
+ */
 public interface IOrderItem {
+
     OrderItem getItem();
 
     Long getBookId();

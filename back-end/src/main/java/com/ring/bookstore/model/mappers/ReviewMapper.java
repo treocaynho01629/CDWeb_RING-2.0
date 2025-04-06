@@ -2,8 +2,8 @@ package com.ring.bookstore.model.mappers;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
-import com.ring.bookstore.model.dto.response.images.IImage;
-import com.ring.bookstore.model.dto.response.reviews.IReview;
+import com.ring.bookstore.model.dto.projection.images.IImage;
+import com.ring.bookstore.model.dto.projection.reviews.IReview;
 import com.ring.bookstore.model.entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

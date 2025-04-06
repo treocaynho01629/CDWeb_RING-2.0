@@ -7,10 +7,14 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Represents an order detail request as {@link CartDetailRequest}.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CartDetailRequest {
+
     @NotNull(message = "Cửa hàng không được bỏ trống!")
     private Long shopId;
 

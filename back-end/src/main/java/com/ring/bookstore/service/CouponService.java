@@ -1,20 +1,18 @@
 package com.ring.bookstore.service;
 
+import com.ring.bookstore.model.dto.request.CartStateRequest;
+import com.ring.bookstore.model.dto.request.CouponRequest;
 import com.ring.bookstore.model.dto.response.coupons.CouponDTO;
 import com.ring.bookstore.model.dto.response.coupons.CouponDetailDTO;
 import com.ring.bookstore.model.dto.response.coupons.CouponDiscountDTO;
 import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
-import com.ring.bookstore.model.enums.CouponType;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.entity.Coupon;
-import com.ring.bookstore.model.dto.request.CartStateRequest;
-import com.ring.bookstore.model.dto.request.CouponRequest;
+import com.ring.bookstore.model.enums.CouponType;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface CouponService {
 
     Page<CouponDTO> getCoupons(Integer pageNo,

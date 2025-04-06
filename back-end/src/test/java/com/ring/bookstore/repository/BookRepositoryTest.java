@@ -1,7 +1,7 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.dto.response.books.IBookDisplay;
-import com.ring.bookstore.model.dto.response.dashboard.IStat;
+import com.ring.bookstore.model.dto.projection.books.IBookDisplay;
+import com.ring.bookstore.model.dto.projection.dashboard.IStat;
 import com.ring.bookstore.model.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

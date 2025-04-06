@@ -1,7 +1,7 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.dto.response.accounts.IAccountDetail;
-import com.ring.bookstore.model.dto.response.accounts.IProfile;
+import com.ring.bookstore.model.dto.projection.accounts.IAccountDetail;
+import com.ring.bookstore.model.dto.projection.accounts.IProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,9 +10,24 @@ import com.ring.bookstore.model.entity.AccountProfile;
 
 import java.util.Optional;
 
+/**
+ * Repository interface named {@link AccountProfileRepository} for managing {@link AccountProfile} entities.
+ */
 @Repository
 public interface AccountProfileRepository extends JpaRepository<AccountProfile, Long>{
-    @Query("""
+
+	/**
+	 * Retrieves profile details for a specific user identified by their user ID.
+	 * The method fetches details such as the user's name, phone number, gender, date of birth,
+	 * email, account creation date, total number of follows, total number of reviews,
+	 * and associated profile image.
+	 *
+	 * @param userId the unique identifier of the user whose profile is to be retrieved.
+	 * @return an {@code Optional} containing {@code IProfile}, which provides a projection
+	 *         of the user's profile details, or an empty {@code Optional} if no profile
+	 *         exists for the given user ID.
+	 */
+	@Query("""
         select p.name as name, p.phone as phone, p.gender as gender,
 			p.dob as dob, a.email as email, a.createdDate as joinedDate,
 			size(a.following) as totalFollows, size(a.userReviews) as totalReviews,
@@ -22,7 +37,16 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
     """)
     Optional<IProfile> findProfileByUser(Long userId);
 
-    @Query("""
+    /**
+	 * Retrieves detailed account information for a specific account ID.
+	 * The method returns an optional projection of account details, including
+	 * user information, profile attributes, and related metadata.
+	 *
+	 * @param id the unique identifier of the account for which details are to be retrieved
+	 * @return an Optional containing {@link IAccountDetail} if the account exists,
+	 *         or an empty Optional if no account is found with the specified ID
+	 */
+	@Query("""
 		select a.id as id, a.username as username, a.email as email,
 			p.name as name, p.phone as phone, size(a.roles) as roles,
 			p.gender as gender, p.dob as dob, a.createdDate as joinedDate,

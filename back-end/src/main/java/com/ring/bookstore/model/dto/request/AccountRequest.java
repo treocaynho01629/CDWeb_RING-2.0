@@ -12,11 +12,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents an account request as {@link AccountRequest}.
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountRequest { //Request body for account
+public class AccountRequest {
 
 	@NotBlank(message = "Tên đăng nhập không được để trống!")
 	@Size(min = 4, max = 24, message = "Tên đăng nhập dài 4-24 kí tự")

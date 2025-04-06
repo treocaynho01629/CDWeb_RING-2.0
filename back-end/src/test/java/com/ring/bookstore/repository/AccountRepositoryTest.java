@@ -1,13 +1,10 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.dto.response.accounts.IAccount;
-import com.ring.bookstore.model.dto.response.dashboard.IStat;
-import com.ring.bookstore.model.enums.PrivilegeType;
-import com.ring.bookstore.model.enums.UserRole;
+import com.ring.bookstore.model.dto.projection.accounts.IAccount;
+import com.ring.bookstore.model.dto.projection.dashboard.IStat;
 import com.ring.bookstore.model.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -20,8 +17,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 

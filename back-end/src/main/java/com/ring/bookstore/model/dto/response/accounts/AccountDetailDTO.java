@@ -5,7 +5,9 @@ import com.ring.bookstore.model.enums.Gender;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-//Account details
+/**
+ * Represents an account detail response as {@link AccountDetailDTO}.
+ */
 public record AccountDetailDTO(Long id,
                                String username,
                                String image,

@@ -1,5 +1,6 @@
 package com.ring.bookstore.service.impl;
 
+import com.ring.bookstore.model.dto.projection.shops.*;
 import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
 import com.ring.bookstore.model.mappers.DashboardMapper;
 import com.ring.bookstore.model.mappers.ShopMapper;

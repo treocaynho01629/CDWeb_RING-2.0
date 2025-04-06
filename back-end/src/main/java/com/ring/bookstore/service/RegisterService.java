@@ -1,16 +1,9 @@
 package com.ring.bookstore.service;
 
-import com.ring.bookstore.exception.HttpResponseException;
-import com.ring.bookstore.exception.ResetPasswordException;
-import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.listener.forgot.OnResetTokenCreatedEvent;
-import com.ring.bookstore.listener.reset.OnResetPasswordCompletedEvent;
 import com.ring.bookstore.model.dto.request.RegisterRequest;
 import com.ring.bookstore.model.dto.request.ResetPassRequest;
 import com.ring.bookstore.model.entity.Account;
-import com.ring.bookstore.service.impl.CaptchaServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
 
 /**
  * Service interface named {@link RegisterService} for handling user registration operations.

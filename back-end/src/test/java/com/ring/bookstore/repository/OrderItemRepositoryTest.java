@@ -1,7 +1,7 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.dto.response.orders.IOrderDetailItem;
-import com.ring.bookstore.model.dto.response.orders.IOrderItem;
+import com.ring.bookstore.model.dto.projection.orders.IOrderDetailItem;
+import com.ring.bookstore.model.dto.projection.orders.IOrderItem;
 import com.ring.bookstore.model.enums.OrderStatus;
 import com.ring.bookstore.model.entity.*;
 import jakarta.persistence.EntityManager;

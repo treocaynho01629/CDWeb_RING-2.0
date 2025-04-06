@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a Cloudinary response as {@link CloudinaryResponse} containing url and image's publicId.
+ */
 @Data
 @Builder
 @AllArgsConstructor

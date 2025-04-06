@@ -13,11 +13,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a profile request as {@link ProfileRequest} to change user's profile.
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProfileRequest { //Request body for profile
+public class ProfileRequest {
 
 	@Size(max = 150, message = "Tên không quá 150 kí tự")
 	private String name;

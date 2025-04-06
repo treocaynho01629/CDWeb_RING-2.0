@@ -1,11 +1,16 @@
-package com.ring.bookstore.model.dto.response.orders;
+package com.ring.bookstore.model.dto.projection.orders;
 
-import com.ring.bookstore.model.dto.response.images.IImage;
+import com.ring.bookstore.model.dto.projection.images.IImage;
 import com.ring.bookstore.model.entity.OrderDetail;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents an order detail projection as {@link IOrderDetail}, containing the details of an order
+ * including information about the order, shop, customer, items, discounts, and the order date.
+ */
 public interface IOrderDetail {
+
     OrderDetail getDetail();
 
     Long getOrderId();
