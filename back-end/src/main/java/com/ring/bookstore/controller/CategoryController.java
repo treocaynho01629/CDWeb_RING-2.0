@@ -31,7 +31,7 @@ public class CategoryController {
     /**
      * Retrieves preview categories for quick selection.
      *
-     * @return a {@link ResponseEntity} containing a list of preview categories
+     * @return a {@link ResponseEntity} containing a list of preview categories.
      */
     @GetMapping("/preview")
     public ResponseEntity<?> getPreviewCategories() {
@@ -42,10 +42,10 @@ public class CategoryController {
     /**
      * Retrieves categories relevant to a specific shop.
      *
-     * @param pageSize  size of each page
-     * @param pageNo    page number
-     * @param shopId    ID of the shop
-     * @return a {@link ResponseEntity} containing relevant categories
+     * @param pageSize  size of each page.
+     * @param pageNo    page number.
+     * @param shopId    ID of the shop.
+     * @return a {@link ResponseEntity} containing relevant categories.
      */
     @GetMapping("/relevant/{id}")
     public ResponseEntity<?> getRelevantCategories(@RequestParam(value = "pSize", defaultValue = "20") Integer pageSize,
@@ -57,13 +57,13 @@ public class CategoryController {
     /**
      * Retrieves all categories with pagination, sorting, and optional filters.
      *
-     * @param pageSize  size of each page
-     * @param pageNo    page number
-     * @param sortBy    sorting field
-     * @param sortDir   sorting direction
-     * @param include   optional field to include "parent" or "children"
-     * @param parentId  optional parent category ID to filter by
-     * @return a {@link ResponseEntity} containing paginated categories
+     * @param pageSize  size of each page.
+     * @param pageNo    page number.
+     * @param sortBy    sorting field.
+     * @param sortDir   sorting direction.
+     * @param include   optional field to include "parent" or "children".
+     * @param parentId  optional parent category ID to filter by.
+     * @return a {@link ResponseEntity} containing paginated categories.
      */
     @GetMapping
     public ResponseEntity<?> getCategories(@RequestParam(value = "pSize", defaultValue = "20") Integer pageSize,
@@ -78,9 +78,9 @@ public class CategoryController {
     /**
      * Retrieves a category by its ID.
      *
-     * @param id the category ID
-     * @param include optional field to include "parent" or "children"
-     * @return a {@link ResponseEntity} containing the category
+     * @param id the category ID.
+     * @param include optional field to include "parent" or "children".
+     * @return a {@link ResponseEntity} containing the category.
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> getCategoryById(@PathVariable("id") Integer id,
@@ -91,9 +91,9 @@ public class CategoryController {
     /**
      * Retrieves a category by its slug.
      *
-     * @param slug the slug of the category
-     * @param include optional field to include "parent" or "children"
-     * @return a {@link ResponseEntity} containing the category
+     * @param slug the slug of the category.
+     * @param include optional field to include "parent" or "children".
+     * @return a {@link ResponseEntity} containing the category.
      */
     @GetMapping("/slug/{slug}")
     public ResponseEntity<?> getCategoryBySlug(@PathVariable("slug") String slug,
@@ -104,8 +104,8 @@ public class CategoryController {
     /**
      * Creates a new category.
      *
-     * @param request the {@link CategoryRequest} containing category data
-     * @return a {@link ResponseEntity} containing the created category
+     * @param request the {@link CategoryRequest} containing category data.
+     * @return a {@link ResponseEntity} containing the created category.
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('create:category')")
@@ -116,9 +116,9 @@ public class CategoryController {
     /**
      * Updates a category by its ID.
      *
-     * @param id the ID of the category to update
-     * @param request the updated category data
-     * @return a {@link ResponseEntity} containing the updated category
+     * @param id the ID of the category to update.
+     * @param request the updated category data.
+     * @return a {@link ResponseEntity} containing the updated category.
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('update:category')")
@@ -130,8 +130,8 @@ public class CategoryController {
     /**
      * Deletes a category by its ID.
      *
-     * @param id the ID of the category to delete
-     * @return a {@link ResponseEntity} with a success message
+     * @param id the ID of the category to delete.
+     * @return a {@link ResponseEntity} with a success message.
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:category')")
@@ -143,8 +143,8 @@ public class CategoryController {
     /**
      * Deletes multiple categories by a list of IDs.
      *
-     * @param ids list of category IDs to delete
-     * @return a {@link ResponseEntity} containing a success message
+     * @param ids list of category IDs to delete.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:category')")
@@ -158,9 +158,9 @@ public class CategoryController {
     /**
      * Deletes categories that are NOT in the given list of IDs.
      *
-     * @param ids list of IDs to exclude from deletion
-     * @param parentId optional parent category ID to filter by
-     * @return a {@link ResponseEntity} containing a success message
+     * @param ids list of IDs to exclude from deletion.
+     * @param parentId optional parent category ID to filter by.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/delete-inverse")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:book')")
@@ -173,7 +173,7 @@ public class CategoryController {
     /**
      * Deletes all categories in the system.
      *
-     * @return a {@link ResponseEntity} with a success message
+     * @return a {@link ResponseEntity} with a success message.
      */
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:category')")

@@ -1,7 +1,9 @@
 package com.ring.bookstore.model.dto.request;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import com.ring.bookstore.config.validator.NullOrNotBlank;
 import com.ring.bookstore.model.enums.Gender;
 import com.ring.bookstore.model.enums.UserRole;
 import jakarta.validation.constraints.*;
@@ -24,7 +26,8 @@ public class AccountRequest {
 	@NotBlank(message = "Tên đăng nhập không được để trống!")
 	@Size(min = 4, max = 24, message = "Tên đăng nhập dài 4-24 kí tự")
 	private String username;
-	
+
+	@NullOrNotBlank(message = "Mật khẩu không được để trống!")
 	@Size(min = 8, max = 24, message = "Mật khẩu dài 8-24 kí tự")
 	private String pass;
 	
@@ -33,7 +36,8 @@ public class AccountRequest {
 	private String email;
 	
 	@NotNull(message = "Chức vụ không được để trống!")
-	private UserRole role;
+	@NotEmpty(message = "Chức vụ không được để trống!")
+	private List<UserRole> roles;
 
 	@Size(max = 250, message = "Tên không quá 250 kí tự")
 	private String name;
@@ -48,6 +52,4 @@ public class AccountRequest {
 	private Gender gender;
 
 	private String image;
-	
-	private boolean keepOldPass;
 }

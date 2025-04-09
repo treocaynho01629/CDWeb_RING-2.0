@@ -1,36 +1,24 @@
 package com.ring.bookstore.repository;
 
+import com.ring.bookstore.base.AbstractRepositoryTest;
 import com.ring.bookstore.model.dto.projection.orders.IOrderDetail;
-import com.ring.bookstore.model.enums.OrderStatus;
 import com.ring.bookstore.model.entity.*;
+import com.ring.bookstore.model.enums.OrderStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class OrderDetailRepositoryTest {
-
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+class OrderDetailRepositoryTest extends AbstractRepositoryTest {
 
     @Autowired
     private ShopRepository shopRepo;
@@ -53,10 +41,14 @@ class OrderDetailRepositoryTest {
     @Autowired
     private OrderItemRepository itemRepo;
 
+    @Autowired
+    private CouponRepository couponRepo;
+
     @PersistenceContext
     private EntityManager entityManager;
 
     private Book book;
+    private Shop shop;
     private Account account;
     private OrderReceipt receipt;
     private OrderDetail detail;
@@ -72,7 +64,7 @@ class OrderDetailRepositoryTest {
         account.setCreatedDate(LocalDateTime.now());
         Account savedAccount = accountRepo.save(account);
 
-        Shop shop = Shop.builder().name("shop").owner(savedAccount).build();
+        shop = Shop.builder().name("shop").owner(savedAccount).build();
         shop.setCreatedDate(LocalDateTime.now());
         Shop savedShop = shopRepo.save(shop);
 
@@ -153,27 +145,35 @@ class OrderDetailRepositoryTest {
 
     @Test
     public void givenNewOrderDetail_whenSaveOrderDetail_ThenReturnOrderDetail() {
+
+        // Given
         OrderDetail detail4 = OrderDetail.builder()
                 .order(receipt)
                 .status(OrderStatus.PENDING)
                 .build();
         detailRepo.save(detail4);
 
+        // When
         OrderDetail savedDetail = detailRepo.save(detail4);
 
+        // Then
         assertNotNull(savedDetail);
         assertNotNull(savedDetail.getId());
     }
 
     @Test
     public void whenUpdateOrderDetail_ThenReturnUpdatedOrderDetail() {
+
+        // Given
         OrderDetail foundDetail = detailRepo.findById(detail.getId()).orElse(null);
         assertNotNull(foundDetail);
+
+        // When
         foundDetail.setStatus(OrderStatus.CANCELED);
         foundDetail.setDiscount(10000.0);
-
         OrderDetail updatedDetail = detailRepo.save(foundDetail);
 
+        // Then
         assertNotNull(updatedDetail);
         assertNotNull(updatedDetail.getDiscount());
         assertEquals(OrderStatus.CANCELED, updatedDetail.getStatus());
@@ -181,25 +181,51 @@ class OrderDetailRepositoryTest {
 
     @Test
     public void whenDeleteOrderDetail_ThenFindNull() {
+
+        // Given
+        OrderDetail beforeChange = detailRepo.findById(detail.getId()).orElse(null);
+        assertNotNull(beforeChange);
+        Coupon coupon = Coupon.builder()
+                .code("TEST1")
+                .shop(shop)
+                .build();
+        coupon.setCreatedDate(LocalDateTime.now());
+        couponRepo.save(coupon);
+        beforeChange.setCoupon(coupon);
+        detailRepo.save(beforeChange);
+
+        // When
         detailRepo.deleteById(detail.getId());
 
+        // Then
         OrderDetail foundDetail = detailRepo.findById(detail.getId()).orElse(null);
         OrderItem foundItem = itemRepo.findById(item.getId()).orElse(null);
+        OrderReceipt foundReceipt = receiptRepo.findById(receipt.getId()).orElse(null);
+        Shop foundShop = shopRepo.findById(shop.getId()).orElse(null);
+        Coupon foundCoupon = couponRepo.findById(coupon.getId()).orElse(null);
 
         assertNull(foundDetail);
         assertNull(foundItem);
+        assertNotNull(foundReceipt);
+        assertNotNull(foundShop);
+        assertNotNull(foundCoupon);
     }
 
     @Test
     public void whenFindDetailById_ThenReturnOrderDetail() {
+
+        // When
         OrderDetail foundDetail = detailRepo.findDetailById(detail.getId()).orElse(null);
 
+        // Then
         assertNotNull(foundDetail);
         assertEquals(detail.getId(), foundDetail.getId());
     }
 
     @Test
     public void whenFindAllIdsByUserId_ThenReturnIds() {
+
+        // When
         Pageable pageable = PageRequest.of(0, 10);
         Page<Long> foundIds = detailRepo.findAllIdsByUserId(
                 account.getId(),
@@ -207,24 +233,30 @@ class OrderDetailRepositoryTest {
                 "",
                 pageable);
 
+        // Then
         assertNotNull(foundIds);
         assertEquals(2, foundIds.getTotalElements());
     }
 
     @Test
     public void whenFindAllIdsByBookId_ThenReturnIds() {
-        Pageable pageable = PageRequest.of(0, 10);
 
+        // When
+        Pageable pageable = PageRequest.of(0, 10);
         Page<Long> foundIds = detailRepo.findAllIdsByBookId(book.getId(), pageable);
 
+        // Then
         assertNotNull(foundIds);
         assertEquals(2, foundIds.getTotalElements());
     }
 
     @Test
     public void whenFindAllByReceiptIds_ThenReturnOrderDetails() {
+
+        // When
         List<IOrderDetail> orderDetails = detailRepo.findAllByReceiptIds(List.of(receipt.getId()));
 
+        // Then
         assertNotNull(orderDetails);
         assertEquals(2, orderDetails.size());
     }

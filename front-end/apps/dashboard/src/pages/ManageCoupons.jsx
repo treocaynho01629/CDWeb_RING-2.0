@@ -19,11 +19,17 @@ const CouponFormDialog = lazy(
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 
 const ManageCoupons = () => {
-  const { shop } = useAuth();
+  const { id, roles, shop } = useAuth();
+  const isAdmin = roles?.find((role) =>
+    ["ROLE_ADMIN", "ROLE_GUEST"].includes(role)
+  );
   const [contextCoupon, setContextCoupon] = useState(null);
   const [open, setOpen] = useState(undefined);
   const [pending, setPending] = useState(false);
-  const { data: couponAnalytics } = useGetCouponAnalyticsQuery(shop ?? null);
+  const { data: couponAnalytics } = useGetCouponAnalyticsQuery(
+    { shopId: shop ?? null, userId: isAdmin ? null : id },
+    { skip: !id }
+  );
   const [getCoupon, { isLoading }] = couponsApiSlice.useLazyGetCouponQuery();
 
   //Set title
@@ -76,7 +82,9 @@ const ManageCoupons = () => {
           color="error"
         />
       </Box>
-      <TableCoupons {...{ shop, handleOpenEdit, pending, setPending }} />
+      <TableCoupons
+        {...{ shop, userId: id, isAdmin, handleOpenEdit, pending, setPending }}
+      />
       <Suspense fallback={null}>
         {open !== undefined && (
           <CouponFormDialog

@@ -1,4 +1,4 @@
-import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
+import { createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "@ring/redux";
 import { isEqual } from "lodash-es";
 
@@ -52,7 +52,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       providesTags: (result, error, arg) => {
@@ -90,7 +90,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
             ...initialState,
             page,
           },
-          content,
+          content
         );
       },
       serializeQueryArgs: ({ endpointName, queryArgs, endpointDefinition }) => {
@@ -119,11 +119,12 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
           return endpointName;
         }
       },
-      merge: (currentCache, newItems) => {
+      merge: (currentCache, newItems, { arg: currentArg }) => {
         currentCache.page = newItems.page;
+        if (!currentArg?.loadMore) reviewsAdapter.removeAll(currentCache);
         reviewsAdapter.upsertMany(
           currentCache,
-          reviewsSelector.selectAll(newItems),
+          reviewsSelector.selectAll(newItems)
         );
       },
       forceRefetch: ({ currentArg, previousArg }) => {
@@ -174,20 +175,3 @@ export const {
   useUpdateReviewMutation,
   usePrefetch: usePrefetchReviews,
 } = reviewsApiSlice;
-
-export const selectReviewsResult =
-  reviewsApiSlice.endpoints.getMyReviews.select();
-
-const selectReviewsData = createSelector(
-  selectReviewsResult,
-  (reviewsResult) => reviewsResult.data, // normalized state object with ids & entities
-);
-
-export const {
-  selectAll: selectAllReviews,
-  selectById: selectReviewById,
-  selectIds: selectReviewIds,
-  selectEntities: selectReviewEntities,
-} = reviewsAdapter.getSelectors(
-  (state) => selectReviewsData(state) ?? initialState,
-);

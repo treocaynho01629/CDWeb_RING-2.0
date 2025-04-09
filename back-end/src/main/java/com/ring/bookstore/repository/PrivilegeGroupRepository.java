@@ -2,8 +2,10 @@ package com.ring.bookstore.repository;
 
 import com.ring.bookstore.model.entity.PrivilegeGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,4 +21,15 @@ public interface PrivilegeGroupRepository extends JpaRepository<PrivilegeGroup, 
      * @return an {@code Optional} containing the {@code PrivilegeGroup} if found, or an empty {@code Optional} if not found
      */
     Optional<PrivilegeGroup> findByGroupName(String name);
+
+    /**
+     * Retrieves all {@link PrivilegeGroup} entities along with their associated privileges.
+     *
+     * @return a list of {@link PrivilegeGroup} entities with their group privileges eagerly fetched
+     */
+    @Query("""
+        select pg from PrivilegeGroup pg
+        join fetch pg.groupPrivileges p
+    """)
+    List<PrivilegeGroup> findAllWithPrivileges();
 }

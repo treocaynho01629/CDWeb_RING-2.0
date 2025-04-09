@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE Product SET active = false WHERE id=?")
+@SQLDelete(sql = "UPDATE Account SET active = false WHERE id=?")
 @SQLRestriction("active=true")
 @EqualsAndHashCode(callSuper = true)
 public class Account extends Auditable implements UserDetails {

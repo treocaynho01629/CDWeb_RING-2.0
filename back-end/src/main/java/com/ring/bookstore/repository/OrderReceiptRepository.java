@@ -61,9 +61,11 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         left join o.user u
         left join u.profile p
         left join p.image i
-        where (coalesce(:shopId) is null or od.shop.id = :shopId)
-        and (coalesce(:userId) is null or od.shop.owner.id = :userId)
-        and (coalesce(:bookId) is null or oi.book.id = :bookId)
+        left join od.shop s
+        left join oi.book b
+        where (coalesce(:shopId) is null or s.id = :shopId)
+        and (coalesce(:userId) is null or s.owner.id = :userId)
+        and (coalesce(:bookId) is null or b.id = :bookId)
         group by o.id, i.id, a.name, o.createdDate
     """,
     countQuery = """
@@ -71,9 +73,11 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         from OrderReceipt o
         join o.details od
         join od.items oi
-        where (coalesce(:shopId) is null or od.shop.id = :shopId)
-        and (coalesce(:userId) is null or od.shop.owner.id = :userId)
-        and (coalesce(:bookId) is null or oi.book.id = :bookId)
+        left join od.shop s
+        left join oi.book b
+        where (coalesce(:shopId) is null or s.id = :shopId)
+        and (coalesce(:userId) is null or s.owner.id = :userId)
+        and (coalesce(:bookId) is null or b.id = :bookId)
     """)
     Page<IReceiptSummary> findAllSummaries(Long shopId,
                                            Long userId,
@@ -95,9 +99,10 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         from OrderReceipt o
         join o.details od
         join od.items oi
+        left join od.shop s
         left join Book b on oi.book.id = b.id
-        where (coalesce(:shopId) is null or od.shop.id = :shopId)
-        and (coalesce(:userId) is null or od.shop.owner.id = :userId)
+        where (coalesce(:shopId) is null or s.id = :shopId)
+        and (coalesce(:userId) is null or s.owner.id = :userId)
         and (coalesce(:status) is null or od.status = :status)
         and concat (b.title, o.id) ilike %:keyword%
         group by o.id
@@ -124,11 +129,13 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
             coalesce(sum(case when o.createdDate >= date_trunc('month', current date) - 1 month
                 and o.createdDate < date_trunc('month', current date)
                     then (od.totalPrice - od.discount) end), 0) lastMonth
-            from OrderDetail od join od.order o
+            from OrderDetail od
+                join od.order o
+                left join od.shop s
             where od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
             and o.createdDate >= date_trunc('month', current date) - 1 month
-            and (coalesce(:shopId) is null or od.shop.id = :shopId)
-            and (coalesce(:userId) is null or od.shop.owner.id = :userId)
+            and (coalesce(:shopId) is null or s.id = :shopId)
+            and (coalesce(:userId) is null or s.owner.id = :userId)
         ) t
     """)
     IStat getSalesAnalytics(Long shopId,
@@ -149,9 +156,10 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
             coalesce(sum(distinct o.total) , 0) as sales
         from OrderReceipt o
         join o.details od
+        left join od.shop s
         where od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
-        and (coalesce(:shopId) is null or od.shop.id = :shopId)
-        and (coalesce(:userId) is null or od.shop.owner.id = :userId)
+        and (coalesce(:shopId) is null or s.id = :shopId)
+        and (coalesce(:userId) is null or s.owner.id = :userId)
         and (coalesce(:year) is null or year(o.createdDate) = :year)
         group by month(o.createdDate)
     """)

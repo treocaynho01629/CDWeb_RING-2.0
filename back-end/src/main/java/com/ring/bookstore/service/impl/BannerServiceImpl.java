@@ -33,9 +33,14 @@ public class BannerServiceImpl implements BannerService {
     private final BannerMapper bannerMapper;
 
     @Override
-    public Page<BannerDTO> getBanners(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                                   String keyword, Long shopId, Boolean byShop) {
-       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+    public Page<BannerDTO> getBanners(Integer pageNo,
+                                      Integer pageSize,
+                                      String sortBy,
+                                      String sortDir,
+                                      String keyword,
+                                      Long shopId,
+                                      Boolean byShop) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
 
@@ -47,34 +52,44 @@ public class BannerServiceImpl implements BannerService {
 
     //Add banner (SELLER)
     @Transactional
-    public Banner addBanner(BannerRequest request, Account user) {
+    public Banner addBanner(BannerRequest request,
+                            Account user) {
         return null;
     }
 
     @Transactional
-    public Banner updateBanner(Integer id, BannerRequest request, Account user) {
+    public Banner updateBanner(Integer id,
+                               BannerRequest request,
+                               Account user) {
         return null;
     }
 
     @Override
-    public Banner deleteBanner(Integer id, Account user) {
+    public Banner deleteBanner(Integer id,
+                               Account user) {
         Banner banner = bannerRepo.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Banner not found"));
         //Check if correct seller or admin
-        if (!isOwnerValid(banner.getShop(), user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+        if (!isOwnerValid(banner.getShop(), user))
+            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
         bannerRepo.deleteById(id); //Delete from database
         return banner;
     }
 
     @Override
-    public void deleteBanners(List<Integer> ids, Account user) {
+    public void deleteBanners(List<Integer> ids,
+                              Account user) {
         List<Integer> deleteIds = isAuthAdmin() ? ids : bannerRepo.findBannerIdsByInIdsAndOwner(ids, user.getId());
         bannerRepo.deleteAllById(deleteIds);
     }
 
     @Override
-    public void deleteBannersInverse(String keyword, Long shopId, Boolean byShop, List<Integer> ids, Account user) {
+    public void deleteBannersInverse(String keyword,
+                                     Long shopId,
+                                     Boolean byShop,
+                                     List<Integer> ids,
+                                     Account user) {
         List<Integer> deleteIds = bannerRepo.findInverseIds(
                 keyword,
                 shopId,
@@ -85,7 +100,8 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
-    public void deleteAllBanners(Long shopId, Account user) {
+    public void deleteAllBanners(Long shopId,
+                                 Account user) {
         if (isAuthAdmin()) {
             if (shopId != null) {
                 bannerRepo.deleteAllByShopId(shopId);
@@ -107,7 +123,8 @@ public class BannerServiceImpl implements BannerService {
         return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
     }
 
-    protected boolean isOwnerValid(Shop shop, Account user) {
+    protected boolean isOwnerValid(Shop shop,
+                                   Account user) {
         //Check if is admin or valid owner id
         boolean isAdmin = isAuthAdmin();
 

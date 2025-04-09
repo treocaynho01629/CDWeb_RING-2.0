@@ -39,7 +39,8 @@ public interface ShopService {
     ShopDetailDTO getShopDetail(Long id,
                                 Account user);
 
-    StatDTO getAnalytics();
+    StatDTO getAnalytics(Long userId,
+                         Account user);
 
     void follow(Long id,
                 Account user);

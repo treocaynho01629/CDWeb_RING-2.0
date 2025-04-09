@@ -1,4 +1,4 @@
-import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
+import { createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "@ring/redux";
 
 const usersAdapter = createEntityAdapter({});
@@ -115,6 +115,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         url: `/api/accounts/${id}`,
         method: "DELETE",
         credentials: "include",
+        responseHandler: "text",
       }),
       invalidatesTags: (result, error, id) => [{ type: "User", id }],
     }),
@@ -123,6 +124,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         url: `/api/accounts/delete-multiple?ids=${ids}`,
         method: "DELETE",
         credentials: "include",
+        responseHandler: "text",
       }),
       invalidatesTags: (result, error) => [{ type: "User", id: "LIST" }],
     }),
@@ -172,19 +174,3 @@ export const {
   useDeleteAllUsersMutation,
   usePrefetch: usePrefetchUsers,
 } = usersApiSlice;
-
-export const selectUsersResult = usersApiSlice.endpoints.getUsers.select();
-
-const selectUsersData = createSelector(
-  selectUsersResult,
-  (usersResult) => usersResult.data
-);
-
-export const {
-  selectAll: selectAllUsers,
-  selectById: selectUserById,
-  selectIds: selectUserIds,
-  selectEntities: selectUserEntities,
-} = usersAdapter.getSelectors(
-  (state) => selectUsersData(state) ?? initialState
-);

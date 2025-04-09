@@ -1,5 +1,6 @@
 package com.ring.bookstore.repository;
 
+import com.ring.bookstore.base.AbstractRepositoryTest;
 import com.ring.bookstore.model.dto.projection.books.IBookDisplay;
 import com.ring.bookstore.model.dto.projection.dashboard.IStat;
 import com.ring.bookstore.model.entity.*;
@@ -8,15 +9,9 @@ import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,17 +20,13 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class BookRepositoryTest {
-
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+class BookRepositoryTest extends AbstractRepositoryTest {
 
     @Autowired
     private BookRepository bookRepo;
+
+    @Autowired
+    private BookDetailRepository detailRepo;
 
     @Autowired
     private ShopRepository shopRepo;
@@ -46,11 +37,26 @@ class BookRepositoryTest {
     @Autowired
     private AccountRepository accountRepo;
 
+    @Autowired
+    private ImageRepository imageRepo;
+
+    @Autowired
+    private PublisherRepository pubRepo;
+
+    @Autowired
+    private ReviewRepository reviewRepo;
+
+    @Autowired
+    private OrderItemRepository itemRepo;
+
     @PersistenceContext
     private EntityManager entityManager;
 
     private Book book;
     private Account account;
+    private Shop shop;
+    private Image image;
+    private Category cate;
 
     @BeforeEach
     void setUp() {
@@ -62,14 +68,14 @@ class BookRepositoryTest {
         account.setCreatedDate(LocalDateTime.now());
         Account savedAccount = accountRepo.save(account);
 
-        Shop shop = Shop.builder().name("shop").owner(savedAccount).build();
+        shop = Shop.builder().name("shop").owner(savedAccount).build();
         shop.setCreatedDate(LocalDateTime.now());
         Shop savedShop = shopRepo.save(shop);
 
-        Category cate = Category.builder().name("test").build();
+        cate = Category.builder().name("test").build();
         Category savedCate = cateRepo.save(cate);
 
-        Image image = Image.builder().name("image").build();
+        image = Image.builder().name("image").build();
         Image image2 = Image.builder().name("image2").build();
         Image image3 = Image.builder().name("image3").build();
 
@@ -112,6 +118,8 @@ class BookRepositoryTest {
 
     @Test
     public void givenNewBook_whenSaveBook_ThenReturnBook() {
+
+        // Given
         Image image = Image.builder().build();
         Book book = Book.builder()
                 .image(image)
@@ -122,22 +130,28 @@ class BookRepositoryTest {
                 .amount((short) 111)
                 .build();
 
+        // When
         Book savedBook = bookRepo.save(book);
 
+        // Then
         assertNotNull(savedBook);
         assertNotNull(savedBook.getId());
     }
 
     @Test
     public void whenUpdateBook_ThenReturnBook() {
-        Book foundBook = bookRepo.findById(book.getId()).orElse(null);
 
+        // Given
+        Book foundBook = bookRepo.findById(book.getId()).orElse(null);
         assertNotNull(foundBook);
+
+        // When
         foundBook.setTitle("tset");
         foundBook.setDescription("description");
 
         Book updatedBook = bookRepo.save(foundBook);
 
+        // Then
         assertNotNull(updatedBook);
         assertNotNull(updatedBook.getDescription());
         assertEquals("tset", updatedBook.getTitle());
@@ -145,15 +159,68 @@ class BookRepositoryTest {
 
     @Test
     public void whenDeleteBook_ThenFindNull() {
+
+        // Given
+        Book beforeChange = bookRepo.findById(book.getId()).orElse(null);
+        assertNotNull(beforeChange);
+
+        BookDetail detail = BookDetail.builder()
+                .book(beforeChange)
+                .pages(123)
+                .build();
+        detailRepo.save(detail);
+
+        Review review = Review.builder()
+                .book(book)
+                .user(account)
+                .rating(5)
+                .rContent("test")
+                .build();
+        review.setCreatedDate(LocalDateTime.now());
+        reviewRepo.save(review);
+
+        OrderItem item = OrderItem.builder()
+                .book(book)
+                .quantity((short) 99)
+                .build();
+        itemRepo.save(item);
+
+        Publisher pub = Publisher.builder().name("test2").build();
+        pubRepo.save(pub);
+
+        beforeChange.setPublisher(pub);
+        bookRepo.save(beforeChange);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // When
         bookRepo.deleteById(book.getId());
 
+        // Then
         Book foundBook = bookRepo.findById(book.getId()).orElse(null);
+        BookDetail foundDetail = detailRepo.findById(detail.getId()).orElse(null);
+        Image foundImage = imageRepo.findById(image.getId()).orElse(null);
+        Review foundReview = reviewRepo.findById(review.getId()).orElse(null);
+        Shop foundShop = shopRepo.findById(shop.getId()).orElse(null);
+        Category foundCate = cateRepo.findById(cate.getId()).orElse(null);
+        Publisher foundPub = pubRepo.findById(pub.getId()).orElse(null);
+        List<OrderItem> foundItems = itemRepo.findAll();
 
         assertNull(foundBook);
+        assertNull(foundDetail);
+        assertNull(foundImage);
+        assertNull(foundReview);
+        assertNotNull(foundShop);
+        assertNotNull(foundCate);
+        assertNotNull(foundPub);
+        assertEquals(1, foundItems.size());
     }
 
     @Test
     public void whenFindBooksWithFilter_ThenReturnBooks() {
+
+        // When
         Pageable pageable = PageRequest.of(0, 10);
         Page<IBookDisplay> foundBooks = bookRepo.findBooksWithFilter(
                 "book",
@@ -169,43 +236,57 @@ class BookRepositoryTest {
                 0,
                 pageable);
 
+        // Then
         assertNotNull(foundBooks);
         assertEquals(2, foundBooks.getContent().size());
     }
 
     @Test
     public void whenFindRandomBooks_ThenReturnBooks() {
+
+        // When
         List<IBookDisplay> books = bookRepo.findRandomBooks(1, false);
 
+        // Then
         assertNotNull(books);
         assertEquals(1, books.size());
     }
 
     @Test
     public void whenFindBookIdsByInIdsAndOwner_ThenReturnIds() {
+
+        // Given
         List<Book> foundBooks = bookRepo.findAll();
         List<Long> foundIds = foundBooks.stream().map(Book::getId).collect(Collectors.toList());
 
+        // When
         List<Long> bookIds = bookRepo.findBookIdsByInIdsAndOwner(foundIds, account.getId());
 
+        // Then
         assertNotNull(bookIds);
         assertEquals(foundIds.size(), bookIds.size());
     }
 
     @Test
     public void whenFindBooksDisplayInIds_ThenReturnBooks() {
+
+        // Given
         List<Book> foundBooks = bookRepo.findAll();
         List<Long> foundIds = foundBooks.stream().map(Book::getId).collect(Collectors.toList());
         foundIds.remove(0);
 
+        // When
         List<IBookDisplay> books = bookRepo.findBooksDisplayInIds(foundIds);
 
+        // Then
         assertNotNull(books);
         assertEquals(2, books.size());
     }
 
     @Test
     public void whenFindInverseIds_ThenReturnIds() {
+
+        // Given
         Pageable pageable = PageRequest.of(0, 10);
         Page<IBookDisplay> foundBooks = bookRepo.findBooksWithFilter(
                 "",
@@ -223,6 +304,7 @@ class BookRepositoryTest {
         List<Long> foundIds = foundBooks.getContent().stream().map(IBookDisplay::getId).collect(Collectors.toList());
         foundIds.remove(0);
 
+        // When
         List<Long> inverseIds = bookRepo.findInverseIds(
                 "",
                 null,
@@ -236,14 +318,18 @@ class BookRepositoryTest {
                 0,
                 foundIds);
 
+        // Then
         assertNotNull(inverseIds);
         assertEquals(foundBooks.getTotalElements() - foundIds.size(), inverseIds.size());
     }
 
     @Test
     public void whenGetBookAnalytics_ThenReturnStats() {
-        IStat foundData = bookRepo.getBookAnalytics(null);
 
+        // When
+        IStat foundData = bookRepo.getBookAnalytics(null, account.getId());
+
+        // Then
         assertNotNull(foundData);
         assertEquals(3, foundData.getTotal());
         assertEquals(2, foundData.getLastMonth());
@@ -252,18 +338,24 @@ class BookRepositoryTest {
 
     @Test
     public void whenFindSuggestion_ThenReturnKeywords() {
+
+        // When
         List<String> suggestions = bookRepo.findSuggestion("ko");
 
+        // Then
         assertNotNull(suggestions);
         assertFalse(suggestions.isEmpty());
     }
 
     @Test
     public void whenDecreaseStock_ThenReduceAmount() {
+
+        // When
         bookRepo.decreaseStock(book.getId(), (short) 5);
         entityManager.flush(); // Force changes to be written
         entityManager.clear(); // Clear persistence context to fetch fresh data
 
+        // Then
         Book foundBook = bookRepo.findById(book.getId()).orElse(null);
 
         assertNotNull(foundBook);

@@ -1,5 +1,6 @@
 package com.ring.bookstore.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ring.bookstore.model.enums.UserRole;
 
 import jakarta.persistence.*;
@@ -23,6 +24,7 @@ public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Byte id;
 
     @Column(length = 200)
@@ -35,6 +37,7 @@ public class Role {
 
     @ManyToMany(fetch = FetchType.LAZY,
             mappedBy = "roles")
+    @JsonIgnore
     private Collection<Account> users;
 
     @ManyToMany(fetch = FetchType.EAGER)

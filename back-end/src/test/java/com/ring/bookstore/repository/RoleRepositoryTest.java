@@ -1,31 +1,16 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.model.enums.PrivilegeType;
-import com.ring.bookstore.model.enums.UserRole;
-import com.ring.bookstore.model.entity.Privilege;
+import com.ring.bookstore.base.AbstractRepositoryTest;
 import com.ring.bookstore.model.entity.Role;
+import com.ring.bookstore.model.enums.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import static org.junit.jupiter.api.Assertions.*;
+class RoleRepositoryTest extends AbstractRepositoryTest {
 
-@Testcontainers
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class RoleRepositoryTest {
-
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
-    
     @Autowired
     private RoleRepository roleRepo;
 

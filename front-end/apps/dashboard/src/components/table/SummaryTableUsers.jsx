@@ -66,7 +66,7 @@ export default function SummaryTableUsers() {
     userRows = ids?.length ? (
       ids?.map((id, index) => {
         const user = entities[id];
-        const roleItem = UserRole[user?.role];
+        const roleItem = UserRole[user?.roles?.[0]];
 
         return (
           <TableRow hover tabIndex={-1} key={id}>
@@ -89,9 +89,9 @@ export default function SummaryTableUsers() {
             </TableCell>
             <TableCell align="right">
               <Chip
-                color={roleItem?.color}
-                label={roleItem?.label}
                 variant="outlined"
+                label={`${roleItem?.label}${user?.roles?.length > 1 ? " +" + (user.roles.length - 1) : ""}`}
+                color={roleItem?.color}
                 sx={{ fontWeight: "bold" }}
               />
             </TableCell>

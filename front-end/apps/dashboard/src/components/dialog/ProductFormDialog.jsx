@@ -100,10 +100,8 @@ const ProductFormDialog = ({
   });
   const [pub, setPub] = useState("");
   const [cate, setCate] = useState("");
-  const [language, setLanguage] = useState(
-    Object.values(BookLanguage)[0].value
-  );
-  const [type, setType] = useState(Object.values(BookType)[0].value);
+  const [language, setLanguage] = useState(Object.keys(BookLanguage)[0]);
+  const [type, setType] = useState(Object.keys(BookType)[0]);
   const [err, setErr] = useState([]);
   const [errMsg, setErrMsg] = useState("");
   const [pubsPagination, setPubsPagination] = useState({

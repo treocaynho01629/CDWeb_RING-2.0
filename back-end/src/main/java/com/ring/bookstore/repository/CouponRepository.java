@@ -46,6 +46,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
      * @param codes a list of coupon codes to filter the results by
      * @param code a specific coupon code to filter the results by
      * @param shopId the ID of the shop to filter the associated coupons
+     * @param userId the ID of the shop owner to filter the associated coupons
      * @param byShop a boolean flag to determine whether to include coupons linked with a shop
      * @param showExpired a boolean flag to include expired*/
     @Query("""
@@ -59,6 +60,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
             	and (coalesce(:code) is null or c.code = :code)
             	and (coalesce(:types) is null or cd.type in :types)
             	and (coalesce(:shopId) is null or c.shop.id = :shopId)
+            	and (coalesce(:userId) is null or c.shop.owner.id = :userId)
             	and (coalesce(:byShop) is null or case when :byShop = true
             		then c.shop.id is not null else c.shop.id is null end)
             	group by c.id, cd.id, s.name, i.id
@@ -67,6 +69,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
                               List<String> codes,
                               String code,
                               Long shopId,
+                              Long userId,
                               Boolean byShop,
                               Boolean showExpired,
                               Pageable pageable);
@@ -111,9 +114,9 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
                               List<String> codes,
                               String code,
                               Long shopId,
+                              Long userId,
                               Boolean byShop,
                               Boolean showExpired,
-                              Long userId,
                               List<Long> ids);
 
     /**
@@ -232,6 +235,9 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
      *
      * @param shopId the ID of the shop for which the coupon analytics should be retrieved. If null, analytics
      *               for all shops will be retrieved.
+     * @param userId the identifier of the shop owner which analytics is to be retrieved;
+     *               if null, analytics is calculated for all owners
+     *
      * @return an object implementing the {@code IStat} interface containing analytics data such as total coupons,
      *         coupons created in the current month, and coupons created in the last month.
      */
@@ -241,9 +247,12 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
                 count(case when c.createdDate >= date_trunc('month', current date) - 1 month
                     and c.createdDate < date_trunc('month', current date) then 1 end) lastMonth
                 from Coupon c
-                where (coalesce(:shopId) is null or c.shop.id = :shopId)
+                left join c.shop s
+                where (coalesce(:shopId) is null or s.id = :shopId)
+                and (coalesce(:userId) is null or s.owner.id = :userId)
             """)
-    IStat getCouponAnalytics(Long shopId);
+    IStat getCouponAnalytics(Long shopId,
+                             Long userId);
 
     /**
      * Decreases the usage count of a coupon by 1 based on the coupon's ID.

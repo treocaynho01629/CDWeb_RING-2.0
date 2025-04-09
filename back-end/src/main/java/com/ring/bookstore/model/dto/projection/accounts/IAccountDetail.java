@@ -1,10 +1,13 @@
 package com.ring.bookstore.model.dto.projection.accounts;
 
 import com.ring.bookstore.model.dto.projection.images.IImage;
+import com.ring.bookstore.model.entity.Role;
 import com.ring.bookstore.model.enums.Gender;
+import com.ring.bookstore.model.enums.UserRole;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Represents a detailed account projection as {@link IAccountDetail}, containing the user's
@@ -23,7 +26,7 @@ public interface IAccountDetail {
 
     String getPhone();
 
-    Short getRoles();
+    List<UserRole> getRoles();
 
     Gender getGender();
 

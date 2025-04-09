@@ -59,7 +59,8 @@ public interface BookService {
     BookResponseDTO deleteBook(Long id,
                        Account user);
 
-    StatDTO getAnalytics(Long shopId);
+    StatDTO getAnalytics(Long shopId,
+                         Long userId);
 
     void deleteBooks(List<Long> ids,
                      Account user);

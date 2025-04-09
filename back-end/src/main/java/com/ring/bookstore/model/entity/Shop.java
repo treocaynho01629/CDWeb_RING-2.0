@@ -74,6 +74,12 @@ public class Shop extends Auditable {
     @JsonIgnore
     private List<Coupon> coupons;
 
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            mappedBy = "shop",
+            fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<OrderDetail> shopOrderDetails;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(	name = "shops_followers",
             joinColumns = @JoinColumn(name = "shop_id"),

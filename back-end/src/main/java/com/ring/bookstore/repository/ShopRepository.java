@@ -246,6 +246,9 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	 * the number of shops created in the current month, and the number
 	 * of shops created in the previous month.
 	 *
+	 * @param userId the identifier of the shop owner which analytics is to be retrieved;
+	 *               if null, analytics is calculated for all owners
+	 *
 	 * @return an {@link IStat} instance containing the analytics data,
 	 * including the total count of shops, the count for the current month,
 	 * and the count for the previous month.
@@ -256,8 +259,9 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
         count(case when s.createdDate >= date_trunc('month', current date) - 1 month
             and s.createdDate < date_trunc('month', current date) then 1 end) lastMonth
         from Shop s
+		where (coalesce(:userId) is null or s.owner.id = :userId)
     """)
-	IStat getShopAnalytics();
+	IStat getShopAnalytics(Long userId);
 
 	/**
 	 * Deletes all entities associated with the specified owner.

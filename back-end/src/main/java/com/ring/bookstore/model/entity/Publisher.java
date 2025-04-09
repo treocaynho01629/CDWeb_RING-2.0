@@ -49,4 +49,12 @@ public class Publisher {
             fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Book> publisherBooks;
+
+    @PreRemove
+    private void detachBooksFromPublisher() {
+        if (this.publisherBooks == null || this.publisherBooks.isEmpty()) return;
+        for (Book b : this.publisherBooks) {
+            b.setPublisher(null);
+        }
+    }
 }

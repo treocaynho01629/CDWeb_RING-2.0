@@ -57,6 +57,7 @@ public class CouponServiceImpl implements CouponService {
                                       List<String> codes,
                                       String code,
                                       Long shopId,
+                                      Long userId,
                                       Boolean byShop,
                                       Boolean showExpired,
                                       Double cValue,
@@ -71,6 +72,7 @@ public class CouponServiceImpl implements CouponService {
                 codes,
                 code,
                 shopId,
+                userId,
                 byShop,
                 showExpired,
                 pageable);
@@ -127,8 +129,12 @@ public class CouponServiceImpl implements CouponService {
         return couponMapper.couponToDTO(coupon);
     }
 
-    public StatDTO getAnalytics(Long shopId) {
-        return dashMapper.statToDTO(couponRepo.getCouponAnalytics(shopId),
+    public StatDTO getAnalytics(Long shopId,
+                                Long userId,
+                                Account user) {
+        boolean isAdmin = isAuthAdmin();
+        return dashMapper.statToDTO(couponRepo.getCouponAnalytics(shopId,
+                        isAdmin ? userId : user.getId()),
                 "coupons",
                 "Mã giảm giá");
     }
@@ -235,6 +241,7 @@ public class CouponServiceImpl implements CouponService {
                                      List<String> codes,
                                      String code,
                                      Long shopId,
+                                     Long userId,
                                      Boolean byShop,
                                      Boolean showExpired,
                                      List<Long> ids,
@@ -244,9 +251,9 @@ public class CouponServiceImpl implements CouponService {
                 codes,
                 code,
                 shopId,
+                isAuthAdmin() ? userId : user.getId(),
                 byShop,
                 showExpired,
-                isAuthAdmin() ? null : user.getId(),
                 ids);
         couponRepo.deleteAllById(deleteIds);
     }

@@ -28,23 +28,25 @@ public class CouponController {
     /**
      * Retrieves a list of coupons with optional filters and pagination.
      *
-     * @param types         types of coupons to filter
-     * @param shopId        shop ID to filter coupons by
-     * @param byShop        if true, filters coupons created by shops, if false, filters coupons created by system, null will return both
-     * @param showExpired   if true, includes expired coupons
-     * @param codes         list of coupon codes to filter
-     * @param code          a single code to match
-     * @param checkValue    optional minimum value to validate
-     * @param checkQuantity optional minimum quantity to validate
-     * @param pageSize      size of each page
-     * @param pageNo        page number
-     * @param sortBy        sorting field
-     * @param sortDir       sorting direction
-     * @return paginated and filtered list of coupons
+     * @param types         types of coupons to filter.
+     * @param shopId        shop ID to filter coupons by.
+     * @param userId        shop owner ID to filter coupons by.
+     * @param byShop        if true, filters coupons created by shops, if false, filters coupons created by system, null will return both.
+     * @param showExpired   if true, includes expired coupons.
+     * @param codes         list of coupon codes to filter.
+     * @param code          a single code to match.
+     * @param checkValue    optional minimum value to validate.
+     * @param checkQuantity optional minimum quantity to validate.
+     * @param pageSize      size of each page.
+     * @param pageNo        page number.
+     * @param sortBy        sorting field.
+     * @param sortDir       sorting direction.
+     * @return paginated and filtered list of coupons.
      */
     @GetMapping
     public ResponseEntity<?> getCoupons(@RequestParam(value = "types", required = false) List<CouponType> types,
                                         @RequestParam(value = "shopId", required = false) Long shopId,
+                                        @RequestParam(value = "userId", required = false) Long userId,
                                         @RequestParam(value = "byShop", required = false) Boolean byShop,
                                         @RequestParam(value = "showExpired", required = false) Boolean showExpired,
                                         @RequestParam(value = "codes", required = false) List<String> codes,
@@ -64,6 +66,7 @@ public class CouponController {
                 codes,
                 code,
                 shopId,
+                userId,
                 byShop,
                 showExpired,
                 checkValue,
@@ -73,8 +76,8 @@ public class CouponController {
     /**
      * Retrieves a coupon by its ID.
      *
-     * @param id the coupon ID
-     * @return the coupon data
+     * @param id the coupon ID.
+     * @return the coupon data.
      */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:coupon')")
@@ -85,10 +88,10 @@ public class CouponController {
     /**
      * Retrieves a coupon by its code with optional value/quantity validation.
      *
-     * @param code the coupon code
-     * @param checkValue optional value to validate against
-     * @param checkQuantity optional quantity to validate against
-     * @return the matching coupon
+     * @param code the coupon code.
+     * @param checkValue optional value to validate against.
+     * @param checkQuantity optional quantity to validate against.
+     * @return the matching coupon.
      */
     @GetMapping("/code/{code}")
     public ResponseEntity<?> getCoupon(@PathVariable("code") String code,
@@ -100,8 +103,8 @@ public class CouponController {
     /**
      * Recommends coupons based on provided shop IDs.
      *
-     * @param shopIds list of shop IDs
-     * @return recommended coupons for the shops
+     * @param shopIds list of shop IDs.
+     * @return recommended coupons for the shops.
      */
     @GetMapping("/recommend")
     public ResponseEntity<?> recommendCoupons(@RequestParam("shopIds") List<Long> shopIds) {
@@ -111,21 +114,25 @@ public class CouponController {
     /**
      * Provides analytics for coupons of a specific shop.
      *
-     * @param shopId optional shop ID
-     * @return analytics data
+     * @param shopId    optional shop ID.
+     * @param userId    the shop owner ID.
+     * @param currUser  the current authenticated user.
+     * @return analytics data.
      */
     @GetMapping("/analytics")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:coupon')")
-    public ResponseEntity<?> getCouponAnalytics(@RequestParam(value = "shopId", required = false) Long shopId) {
-        return new ResponseEntity<>(couponService.getAnalytics(shopId), HttpStatus.OK);
+    public ResponseEntity<?> getCouponAnalytics(@RequestParam(value = "shopId", required = false) Long shopId,
+                                                @RequestParam(value = "userId", required = false) Long userId,
+                                                @CurrentAccount Account currUser) {
+        return new ResponseEntity<>(couponService.getAnalytics(shopId, userId, currUser), HttpStatus.OK);
     }
 
     /**
      * Creates a new coupon.
      *
-     * @param request coupon data
-     * @param currUser the current authenticated seller
-     * @return the created coupon
+     * @param request coupon data.
+     * @param currUser the current authenticated seller.
+     * @return the created coupon.
      */
     @PostMapping
     @PreAuthorize("hasRole('SELLER') and hasAuthority('create:coupon')")
@@ -137,10 +144,10 @@ public class CouponController {
     /**
      * Updates an existing coupon by its ID.
      *
-     * @param id the coupon ID
-     * @param request updated coupon data
-     * @param currUser the current authenticated seller
-     * @return the updated coupon
+     * @param id the coupon ID.
+     * @param request updated coupon data.
+     * @param currUser the current authenticated seller.
+     * @return the updated coupon.
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('update:coupon')")
@@ -153,9 +160,9 @@ public class CouponController {
     /**
      * Deletes a coupon by its ID.
      *
-     * @param id the coupon ID
-     * @param currUser the current authenticated seller
-     * @return success message
+     * @param id the coupon ID.
+     * @param currUser the current authenticated seller.
+     * @return success message.
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:coupon')")
@@ -166,9 +173,9 @@ public class CouponController {
     /**
      * Deletes multiple coupons by a list of IDs.
      *
-     * @param ids list of coupon IDs to delete
-     * @param currUser the current authenticated seller
-     * @return success message
+     * @param ids list of coupon IDs to delete.
+     * @param currUser the current authenticated seller.
+     * @return success message.
      */
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:coupon')")
@@ -182,20 +189,22 @@ public class CouponController {
     /**
      * Deletes all coupons except those specified by a list of IDs.
      *
-     * @param types optional filter for coupon types
-     * @param shopId optional shop ID
-     * @param byShop if true, filters coupons created by shops, if false, filters coupons created by system, null will return both
-     * @param showExpired whether to include expired coupons
-     * @param code optional coupon code
-     * @param codes optional list of coupon codes
-     * @param ids list of IDs to exclude from deletion
-     * @param currUser the current authenticated seller
-     * @return success message
+     * @param types         optional filter for coupon types.
+     * @param shopId        optional shop ID.
+     * @param userId        shop owner ID to filter coupons by.
+     * @param byShop        if true, filters coupons created by shops, if false, filters coupons created by system, null will return both.
+     * @param showExpired   whether to include expired coupons.
+     * @param code          optional coupon code.
+     * @param codes         optional list of coupon codes.
+     * @param ids           list of IDs to exclude from deletion.
+     * @param currUser      the current authenticated seller.
+     * @return success message.
      */
     @DeleteMapping("/delete-inverse")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:coupon')")
     public ResponseEntity<?> deleteCouponsInverse(@RequestParam(value = "types", required = false) List<CouponType> types,
                                                   @RequestParam(value = "shopId", required = false) Long shopId,
+                                                  @RequestParam(value = "userId", required = false) Long userId,
                                                   @RequestParam(value = "byShop", required = false) Boolean byShop,
                                                   @RequestParam(value = "showExpired", required = false) Boolean showExpired,
                                                   @RequestParam(value = "code", required = false) String code,
@@ -207,6 +216,7 @@ public class CouponController {
                 codes,
                 code,
                 shopId,
+                userId,
                 byShop,
                 showExpired,
                 ids,
@@ -217,9 +227,9 @@ public class CouponController {
     /**
      * Deletes all coupons for a specific shop or globally.
      *
-     * @param shopId optional shop ID
-     * @param currUser the current authenticated seller
-     * @return success message
+     * @param shopId optional shop ID.
+     * @param currUser the current authenticated seller.
+     * @return success message.
      */
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:coupon')")

@@ -1,24 +1,34 @@
 package com.ring.bookstore.repository;
 
+import com.ring.bookstore.base.AbstractRepositoryTest;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class ShopRepositoryTest {
-
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+class ShopRepositoryTest extends AbstractRepositoryTest {
 
     @Autowired
     private ShopRepository shopRepo;
+
+    @Test
+    public void whenFindShopsDisplay_ThenReturnProperResults() {
+        // Setup test data
+        // Example: Save specific Shop, User, and Image entities relevant to the query
+        // Then use this test to verify the returned data matches the saved entities
+
+    }
+
+    @Test
+    public void givenFollowedShops_whenFindShopsDisplay_ThenReturnFollowedShops() {
+        // Setup test data with followed accounts
+        // Use the query to filter for followed shops, and assert expected results
+
+    }
+
+    @Test
+    public void givenUnfollowedShops_whenFindShopsDisplay_ThenReturnUnfollowedShops() {
+        // Setup test data with unfollowed accounts
+        // Use the query to filter for unfollowed shops, and assert expected results
+    }
 
 //    @BeforeEach
 //    void setUp() {

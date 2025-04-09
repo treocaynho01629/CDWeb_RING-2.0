@@ -236,7 +236,8 @@ public class BookServiceImpl implements BookService {
 
         //Images
         if (images != null && images.length != 0) {
-            imageService.uploadMultiple(Arrays.asList(images), FileUploadUtil.PRODUCT_FOLDER).forEach(currDetail::addImage);
+            imageService.uploadMultiple(Arrays.asList(images), FileUploadUtil.PRODUCT_FOLDER)
+                    .forEach(currDetail::addImage);
         }
         detailRepo.save(currDetail); //Save new details to database
 
@@ -263,8 +264,9 @@ public class BookServiceImpl implements BookService {
         return bookMapper.bookToResponseDTO(updatedBook);
     }
 
-    public StatDTO getAnalytics(Long shopId) {
-        return dashMapper.statToDTO(bookRepo.getBookAnalytics(shopId),
+    public StatDTO getAnalytics(Long shopId,
+                                Long userId) {
+        return dashMapper.statToDTO(bookRepo.getBookAnalytics(shopId, userId),
                 "books",
                 "Sản phẩm");
     }

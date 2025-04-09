@@ -6,6 +6,8 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.util.List;
+
 /**
  * Represents an entity as {@link Coupon} for coupons.
  */
@@ -51,6 +53,18 @@ public class Coupon extends Auditable {
     @JoinColumn(name = "shop_id")
     @JsonIgnore
     private Shop shop;
+
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            mappedBy = "coupon",
+            fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<OrderReceipt> couponReceipts;
+
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            mappedBy = "coupon",
+            fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<OrderDetail> couponOrderDetails;
 
     @Transient
     private Boolean isUsable = false;

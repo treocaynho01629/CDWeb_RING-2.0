@@ -44,9 +44,9 @@ public class BookController {
     /**
      * Retrieves a random selection of books.
      *
-     * @param amount number of random books to return (default is 5)
-     * @param withDesc if true, includes descriptions in the response
-     * @return a {@link ResponseEntity} containing the list of random books
+     * @param amount number of random books to return (default is 5).
+     * @param withDesc if true, includes descriptions in the response.
+     * @return a {@link ResponseEntity} containing the list of random books.
      */
     @GetMapping("/random")
     public ResponseEntity<?> getRandomBooks(@RequestParam(value = "amount", defaultValue = "5") Integer amount,
@@ -58,8 +58,8 @@ public class BookController {
     /**
      * Retrieves a list of books by their IDs.
      *
-     * @param ids list of book IDs
-     * @return a {@link ResponseEntity} containing the list of books
+     * @param ids list of book IDs.
+     * @return a {@link ResponseEntity} containing the list of books.
      */
     @GetMapping("/find")
     public ResponseEntity<?> getBooksInIds(@RequestParam(value = "ids") List<Long> ids) {
@@ -70,22 +70,22 @@ public class BookController {
     /**
      * Retrieves books with optional filters and pagination.
      *
-     * @param pageSize  size of each page
-     * @param pageNo    page number
-     * @param sortBy    sorting field
-     * @param sortDir   sorting direction
-     * @param keyword   keyword to filter books
-     * @param cateId    optional category ID
-     * @param pubIds    optional list of publisher IDs
-     * @param types     optional list of book types
-     * @param shopId    optional shop ID
-     * @param userId    optional user ID
-     * @param fromRange minimum price range (default is 0)
-     * @param toRange   maximum price range (default is 10000000)
-     * @param rating    minimum rating (default is 0)
-     * @param amount    minimum amount (default is 1)
-     * @param withDesc  if true, includes descriptions
-     * @return a {@link ResponseEntity} containing a paginated list of books
+     * @param pageSize  size of each page.
+     * @param pageNo    page number.
+     * @param sortBy    sorting field.
+     * @param sortDir   sorting direction.
+     * @param keyword   keyword to filter books.
+     * @param cateId    optional category ID.
+     * @param pubIds    optional list of publisher IDs.
+     * @param types     optional list of book types.
+     * @param shopId    optional shop ID.
+     * @param userId    optional user ID.
+     * @param fromRange minimum price range (default is 0).
+     * @param toRange   maximum price range (default is 10000000).
+     * @param rating    minimum rating (default is 0).
+     * @param amount    minimum amount (default is 1).
+     * @param withDesc  if true, includes descriptions.
+     * @return a {@link ResponseEntity} containing a paginated list of books.
      */
     @GetMapping
     public ResponseEntity<?> getBooks(@RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
@@ -125,8 +125,8 @@ public class BookController {
     /**
      * Retrieves a book by its ID.
      *
-     * @param bookId the ID of the book
-     * @return a {@link ResponseEntity} containing the book
+     * @param bookId the ID of the book.
+     * @return a {@link ResponseEntity} containing the book.
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> getBook(@PathVariable("id") Long bookId) {
@@ -136,8 +136,8 @@ public class BookController {
     /**
      * Retrieves detailed information of a book by its ID.
      *
-     * @param bookId the ID of the book
-     * @return a {@link ResponseEntity} containing the book details
+     * @param bookId the ID of the book.
+     * @return a {@link ResponseEntity} containing the book details.
      */
     @GetMapping("/detail/{id}")
     public ResponseEntity<?> getBookDetailById(@PathVariable("id") Long bookId) {
@@ -147,8 +147,8 @@ public class BookController {
     /**
      * Retrieves detailed information of a book by its slug.
      *
-     * @param slug the slug identifier of the book
-     * @return a {@link ResponseEntity} containing the book details
+     * @param slug the slug identifier of the book.
+     * @return a {@link ResponseEntity} containing the book details.
      */
     @GetMapping("/slug/{slug}")
     public ResponseEntity<?> getBookDetailBySlug(@PathVariable("slug") String slug) {
@@ -158,8 +158,8 @@ public class BookController {
     /**
      * Retrieves keyword suggestions for books.
      *
-     * @param keyword search keyword
-     * @return a {@link ResponseEntity} containing list of keyword suggestions
+     * @param keyword search keyword.
+     * @return a {@link ResponseEntity} containing list of keyword suggestions.
      */
     @GetMapping("/suggest")
     public ResponseEntity<?> getBooksSuggestion(@RequestParam(value = "keyword", defaultValue = "") String keyword) {
@@ -170,23 +170,24 @@ public class BookController {
     /**
      * Retrieves book analytics, optionally filtered by shop.
      *
-     * @param shopId optional shop ID
-     * @return a {@link ResponseEntity} containing analytics data
+     * @param shopId optional shop ID.
+     * @return a {@link ResponseEntity} containing analytics data.
      */
     @GetMapping("/analytics")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:book')")
-    public ResponseEntity<?> getBookAnalytics(@RequestParam(value = "shopId", required = false) Long shopId) {
-        return new ResponseEntity<>(bookService.getAnalytics(shopId), HttpStatus.OK);
+    public ResponseEntity<?> getBookAnalytics(@RequestParam(value = "shopId", required = false) Long shopId,
+                                              @RequestParam(value = "userId", required = false) Long userId) {
+        return new ResponseEntity<>(bookService.getAnalytics(shopId, userId), HttpStatus.OK);
     }
 
     /**
      * Creates a new book.
      *
-     * @param request the book creation request
-     * @param thumbnail book thumbnail image
-     * @param images optional additional images
-     * @param currUser the currently authenticated seller
-     * @return a {@link ResponseEntity} containing the created book
+     * @param request the book creation request.
+     * @param thumbnail book thumbnail image.
+     * @param images optional additional images.
+     * @param currUser the currently authenticated seller.
+     * @return a {@link ResponseEntity} containing the created book.
      */
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasRole('SELLER') and hasAuthority('create:book')")
@@ -201,12 +202,12 @@ public class BookController {
     /**
      * Updates an existing book.
      *
-     * @param id the ID of the book to update
-     * @param request the book update request
-     * @param thumbnail optional new thumbnail image
-     * @param images optional new images
-     * @param currUser the currently authenticated seller
-     * @return a {@link ResponseEntity} containing the updated book
+     * @param id the ID of the book to update.
+     * @param request the book update request.
+     * @param thumbnail optional new thumbnail image.
+     * @param images optional new images.
+     * @param currUser the currently authenticated seller.
+     * @return a {@link ResponseEntity} containing the updated book.
      */
     @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasRole('SELLER') and hasAuthority('update:book')")
@@ -222,9 +223,9 @@ public class BookController {
     /**
      * Deletes a book by its ID.
      *
-     * @param id the ID of the book to delete
-     * @param currUser the currently authenticated seller
-     * @return a {@link ResponseEntity} containing a success message
+     * @param id the ID of the book to delete.
+     * @param currUser the currently authenticated seller.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:book')")
@@ -236,9 +237,9 @@ public class BookController {
     /**
      * Deletes multiple books by a list of IDs.
      *
-     * @param ids list of book IDs to delete
-     * @param currUser the currently authenticated seller
-     * @return a {@link ResponseEntity} containing a success message
+     * @param ids list of book IDs to delete.
+     * @param currUser the currently authenticated seller.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:book')")
@@ -251,19 +252,19 @@ public class BookController {
     /**
      * Deletes books that are NOT in the given list of IDs.
      *
-     * @param keyword keyword filter
-     * @param cateId optional category ID
-     * @param pubIds optional publisher IDs
-     * @param types optional book types
-     * @param shopId optional shop ID
-     * @param userId optional user ID
-     * @param fromRange minimum price range
-     * @param toRange maximum price range
-     * @param rating minimum rating
-     * @param amount minimum amount
-     * @param ids list of IDs to exclude from deletion
-     * @param currUser the currently authenticated seller
-     * @return a {@link ResponseEntity} containing a success message
+     * @param keyword keyword filter.
+     * @param cateId optional category ID.
+     * @param pubIds optional publisher IDs.
+     * @param types optional book types.
+     * @param shopId optional shop ID.
+     * @param userId optional user ID.
+     * @param fromRange minimum price range.
+     * @param toRange maximum price range.
+     * @param rating minimum rating.
+     * @param amount minimum amount.
+     * @param ids list of IDs to exclude from deletion.
+     * @param currUser the currently authenticated seller.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/delete-inverse")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:book')")
@@ -297,9 +298,9 @@ public class BookController {
     /**
      * Deletes all books, optionally filtered by shop ID.
      *
-     * @param shopId optional shop ID
-     * @param currUser the currently authenticated seller
-     * @return a {@link ResponseEntity} containing a success message
+     * @param shopId optional shop ID.
+     * @param currUser the currently authenticated seller.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:book')")

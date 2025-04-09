@@ -36,9 +36,9 @@ public class OrderController {
     /**
      * Calculates the total price of an order before checkout.
      *
-     * @param request   the calculate request with items and options
-     * @param currUser  the current authenticated user
-     * @return a DTO containing calculated price details
+     * @param request   the calculate request with items and options.
+     * @param currUser  the current authenticated user.
+     * @return a DTO containing calculated price details.
      */
     @PostMapping("/calculate")
     @PreAuthorize("hasRole('USER') and hasAuthority('read:order')")
@@ -52,10 +52,10 @@ public class OrderController {
     /**
      * Commits the checkout process and creates an order.
      *
-     * @param checkRequest  the order request data
-     * @param request       the HTTP servlet request
-     * @param currUser      the current authenticated user
-     * @return a DTO representing the receipt
+     * @param checkRequest  the order request data.
+     * @param request       the HTTP servlet request.
+     * @param currUser      the current authenticated user.
+     * @return a DTO representing the receipt.
      */
     @PostMapping
     @PreAuthorize("hasRole('USER') and hasAuthority('create:order')")
@@ -69,14 +69,14 @@ public class OrderController {
     /**
      * Gets a paginated list of receipt summaries filtered by shop or book.
      *
-     * @param shopId   optional shop ID
-     * @param bookId   optional book ID
-     * @param pageSize size of each page
-     * @param pageNo   page number
-     * @param sortBy   sorting field
-     * @param sortDir  sorting direction
-     * @param currUser the current authenticated seller
-     * @return a page of receipt summaries
+     * @param shopId   optional shop ID.
+     * @param bookId   optional book ID.
+     * @param pageSize size of each page.
+     * @param pageNo   page number.
+     * @param sortBy   sorting field.
+     * @param sortDir  sorting direction.
+     * @param currUser the current authenticated seller.
+     * @return a page of receipt summaries.
      */
     @GetMapping("/summaries")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:order')")
@@ -94,15 +94,15 @@ public class OrderController {
     /**
      * Retrieves all receipts with optional filters.
      *
-     * @param shopId   optional shop ID
-     * @param status   order status
-     * @param keyword  keyword to search
-     * @param pageSize size of each page
-     * @param pageNo   page number
-     * @param sortBy   field to sort by
-     * @param sortDir  sorting direction
-     * @param currUser the current authenticated seller
-     * @return a page of receipt DTOs
+     * @param shopId   optional shop ID.
+     * @param status   order status.
+     * @param keyword  keyword to search.
+     * @param pageSize size of each page.
+     * @param pageNo   page number.
+     * @param sortBy   field to sort by.
+     * @param sortDir  sorting direction.
+     * @param currUser the current authenticated seller.
+     * @return a page of receipt DTOs.
      */
     @GetMapping("/receipts")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:order')")
@@ -121,8 +121,8 @@ public class OrderController {
     /**
      * Retrieves a single receipt by its ID.
      *
-     * @param id the receipt ID
-     * @return the receipt DTO
+     * @param id the receipt ID.
+     * @return the receipt DTO.
      */
     @GetMapping("/receipts/{id}")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:order')")
@@ -134,9 +134,9 @@ public class OrderController {
     /**
      * Retrieves order details for the given order ID.
      *
-     * @param id       order ID
-     * @param currUser the current authenticated user
-     * @return order detail DTO
+     * @param id       order ID.
+     * @param currUser the current authenticated user.
+     * @return order detail DTO.
      */
     @GetMapping("/detail/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('read:order')")
@@ -149,12 +149,12 @@ public class OrderController {
     /**
      * Retrieves paginated list of orders for the current user.
      *
-     * @param status   filter by status
-     * @param keyword  search keyword
-     * @param pageSize size of each page
-     * @param pageNo   page number
-     * @param currUser the current authenticated user
-     * @return a page of order DTOs
+     * @param status   filter by status.
+     * @param keyword  search keyword.
+     * @param pageSize size of each page.
+     * @param pageNo   page number.
+     * @param currUser the current authenticated user.
+     * @return a page of order DTOs.
      */
     @GetMapping("/user")
     @PreAuthorize("hasRole('USER') and hasAuthority('read:order')")
@@ -170,12 +170,12 @@ public class OrderController {
     /**
      * Retrieves orders for a specific book ID.
      *
-     * @param id       book ID
-     * @param pageSize size of each page
-     * @param pageNo   page number
-     * @param sortBy   field to sort
-     * @param sortDir  sorting direction
-     * @return a page of order DTOs
+     * @param id       book ID.
+     * @param pageSize size of each page.
+     * @param pageNo   page number.
+     * @param sortBy   field to sort.
+     * @param sortDir  sorting direction.
+     * @return a page of order DTOs.
      */
     @GetMapping("/book/{id}")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:order')")
@@ -191,10 +191,10 @@ public class OrderController {
     /**
      * Cancels an order.
      *
-     * @param id       order ID
-     * @param reason   cancellation reason
-     * @param currUser current authenticated user
-     * @return confirmation message
+     * @param id       order ID.
+     * @param reason   cancellation reason.
+     * @param currUser current authenticated user.
+     * @return confirmation message.
      */
     @PutMapping("/cancel/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('update:order')")
@@ -210,10 +210,10 @@ public class OrderController {
     /**
      * Requests a refund for an order.
      *
-     * @param id       order ID
-     * @param reason   reason for refund
-     * @param currUser current authenticated user
-     * @return confirmation message
+     * @param id       order ID.
+     * @param reason   reason for refund.
+     * @param currUser current authenticated user.
+     * @return confirmation message.
      */
     @PutMapping("/refund/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('update:order')")
@@ -229,9 +229,9 @@ public class OrderController {
     /**
      * Confirms that the order was received successfully.
      *
-     * @param id       order ID
-     * @param currUser current authenticated user
-     * @return confirmation message
+     * @param id       order ID.
+     * @param currUser current authenticated user.
+     * @return confirmation message.
      */
     @PutMapping("/confirm/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('update:order')")
@@ -244,10 +244,10 @@ public class OrderController {
     /**
      * Changes the status of an order.
      *
-     * @param id       order ID
-     * @param status   new order status
-     * @param currUser current authenticated seller
-     * @return confirmation message
+     * @param id       order ID.
+     * @param status   new order status.
+     * @param currUser current authenticated seller.
+     * @return confirmation message.
      */
     @PutMapping("/status/{id}")
     @PreAuthorize("hasAnyRole('SELLER') and hasAuthority('update:order')")
@@ -261,9 +261,9 @@ public class OrderController {
     /**
      * Gets analytics for the current user or specified shop.
      *
-     * @param shopId   optional shop ID
-     * @param currUser current authenticated seller
-     * @return analytics data
+     * @param shopId   optional shop ID.
+     * @param currUser current authenticated seller.
+     * @return analytics data.
      */
     @GetMapping("/analytics")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:order')")
@@ -275,10 +275,10 @@ public class OrderController {
     /**
      * Gets monthly sales statistics for charting.
      *
-     * @param shopId   optional shop ID
-     * @param year     optional year filter
-     * @param currUser current authenticated seller
-     * @return sales data grouped by month
+     * @param shopId   optional shop ID.
+     * @param year     optional year filter.
+     * @param currUser current authenticated seller.
+     * @return sales data grouped by month.
      */
     @GetMapping("/sales")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:order')")

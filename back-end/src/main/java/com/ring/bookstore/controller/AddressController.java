@@ -30,8 +30,8 @@ public class AddressController {
     /**
      * Retrieves user's default address.
      *
-     * @param currUser the currently authenticated user
-     * @return a {@link ResponseEntity} containing the address
+     * @param currUser the currently authenticated user.
+     * @return a {@link ResponseEntity} containing the address.
      */
     @GetMapping
     public ResponseEntity<?> getAddress(@CurrentAccount Account currUser) {
@@ -42,8 +42,8 @@ public class AddressController {
     /**
      * Retrieves all user's addresses.
      *
-     * @param currUser the currently authenticated user
-     * @return a {@link ResponseEntity} containing a list of addresses
+     * @param currUser the currently authenticated user.
+     * @return a {@link ResponseEntity} containing a list of addresses.
      */
     @GetMapping("/saved")
     @PreAuthorize("hasRole('USER') and hasAuthority('read:address')")
@@ -55,8 +55,8 @@ public class AddressController {
     /**
      * Retrieves an address by its ID.
      *
-     * @param id the ID of the address to retrieve
-     * @return a {@link ResponseEntity} containing the address
+     * @param id the ID of the address to retrieve.
+     * @return a {@link ResponseEntity} containing the address.
      */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','GUEST') and hasAuthority('read:address')")
@@ -67,9 +67,9 @@ public class AddressController {
     /**
      * Creates a new address.
      *
-     * @param request the address creation details
-     * @param currUser the currently authenticated user
-     * @return a {@link ResponseEntity} containing the created address
+     * @param request the address creation details.
+     * @param currUser the currently authenticated user.
+     * @return a {@link ResponseEntity} containing the created address.
      */
     @PostMapping()
     @PreAuthorize("hasRole('USER') and hasAuthority('create:address')")
@@ -81,10 +81,10 @@ public class AddressController {
     /**
      * Updates an existing address by its ID.
      *
-     * @param id the ID of the address to update
-     * @param request the address update details
-     * @param currUser the currently authenticated user
-     * @return a {@link ResponseEntity} containing the updated address
+     * @param id the ID of the address to update.
+     * @param request the address update details.
+     * @param currUser the currently authenticated user.
+     * @return a {@link ResponseEntity} containing the updated address.
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('update:address')")
@@ -97,8 +97,8 @@ public class AddressController {
     /**
      * Deletes an address by its ID.
      *
-     * @param id the ID of the address to delete
-     * @return a {@link ResponseEntity} containing the deleted address
+     * @param id the ID of the address to delete.
+     * @return a {@link ResponseEntity} containing the deleted address.
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('delete:address')")

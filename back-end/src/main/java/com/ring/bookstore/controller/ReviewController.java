@@ -29,15 +29,15 @@ public class ReviewController {
     /**
      * Retrieves all reviews with optional filters and pagination.
      *
-     * @param bookId   optional filter by book ID
-     * @param userId   optional filter by user ID
-     * @param rating   optional filter by rating
-     * @param keyword  optional keyword to search in reviews
-     * @param pageSize size of each page
-     * @param pageNo   page number
-     * @param sortBy   sorting field
-     * @param sortDir  sorting direction
-     * @return a {@link ResponseEntity} containing paginated reviews
+     * @param bookId   optional filter by book ID.
+     * @param userId   optional filter by user ID.
+     * @param rating   optional filter by rating.
+     * @param keyword  optional keyword to search in reviews.
+     * @param pageSize size of each page.
+     * @param pageNo   page number.
+     * @param sortBy   sorting field.
+     * @param sortDir  sorting direction.
+     * @return a {@link ResponseEntity} containing paginated reviews.
      */
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','GUEST') and hasAuthority('read:review')")
@@ -56,9 +56,9 @@ public class ReviewController {
     /**
      * Retrieves the current user's review for a specific book.
      *
-     * @param bookId    the ID of the book
-     * @param currUser  the current authenticated user
-     * @return a {@link ResponseEntity} containing the user's review
+     * @param bookId    the ID of the book.
+     * @param currUser  the current authenticated user.
+     * @return a {@link ResponseEntity} containing the user's review.
      */
     @GetMapping("/book/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('read:review')")
@@ -70,13 +70,13 @@ public class ReviewController {
     /**
      * Retrieves all reviews for a specific book.
      *
-     * @param bookId   the ID of the book
-     * @param rating   optional filter by rating
-     * @param pageSize size of each page
-     * @param pageNo   page number
-     * @param sortBy   sorting field
-     * @param sortDir  sorting direction
-     * @return a {@link ResponseEntity} containing the book's reviews
+     * @param bookId   the ID of the book.
+     * @param rating   optional filter by rating.
+     * @param pageSize size of each page.
+     * @param pageNo   page number.
+     * @param sortBy   sorting field.
+     * @param sortDir  sorting direction.
+     * @return a {@link ResponseEntity} containing the book's reviews.
      */
     @GetMapping("/books/{id}")
     public ResponseEntity<?> getReviewsByBook(@PathVariable("id") Long bookId,
@@ -91,13 +91,13 @@ public class ReviewController {
     /**
      * Retrieves reviews written by the current user.
      *
-     * @param rating    optional filter by rating
-     * @param pageSize  size of each page
-     * @param pageNo    page number
-     * @param sortBy    sorting field
-     * @param sortDir   sorting direction
-     * @param currUser  the current authenticated user
-     * @return a {@link ResponseEntity} containing the user's reviews
+     * @param rating    optional filter by rating.
+     * @param pageSize  size of each page.
+     * @param pageNo    page number.
+     * @param sortBy    sorting field.
+     * @param sortDir   sorting direction.
+     * @param currUser  the current authenticated user.
+     * @return a {@link ResponseEntity} containing the user's reviews.
      */
     @GetMapping("/user")
     @PreAuthorize("hasRole('USER') and hasAuthority('read:review')")
@@ -113,10 +113,10 @@ public class ReviewController {
     /**
      * Creates a review for a specific book.
      *
-     * @param bookId   the ID of the book
-     * @param request  the {@link ReviewRequest} data
-     * @param currUser the current authenticated user
-     * @return a {@link ResponseEntity} containing the created review
+     * @param bookId   the ID of the book.
+     * @param request  the {@link ReviewRequest} data.
+     * @param currUser the current authenticated user.
+     * @return a {@link ResponseEntity} containing the created review.
      */
     @PostMapping("/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('create:review')")
@@ -129,10 +129,10 @@ public class ReviewController {
     /**
      * Updates a review for a specific book.
      *
-     * @param bookId   the ID of the book
-     * @param request  the updated review {@link ReviewRequest} data
-     * @param currUser the current authenticated user
-     * @return a {@link ResponseEntity} containing the updated review
+     * @param bookId   the ID of the book.
+     * @param request  the updated review {@link ReviewRequest} data.
+     * @param currUser the current authenticated user.
+     * @return a {@link ResponseEntity} containing the updated review.
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('update:review')")
@@ -145,8 +145,8 @@ public class ReviewController {
     /**
      * Hides a review by its ID.
      *
-     * @param id the ID of the review to hide
-     * @return a {@link ResponseEntity} with a success message
+     * @param id the ID of the review to hide.
+     * @return a {@link ResponseEntity} with a success message.
      */
     @PutMapping("/hide/{id}")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('update:review')")
@@ -158,8 +158,8 @@ public class ReviewController {
     /**
      * Unhides a review by its ID.
      *
-     * @param id the ID of the review to unhide
-     * @return a {@link ResponseEntity} with a success message
+     * @param id the ID of the review to unhide.
+     * @return a {@link ResponseEntity} with a success message.
      */
     @PutMapping("/unhide/{id}")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('update:review')")
@@ -171,8 +171,8 @@ public class ReviewController {
     /**
      * Deletes a review by its ID.
      *
-     * @param id the ID of the review to delete
-     * @return a {@link ResponseEntity} with a success message
+     * @param id the ID of the review to delete.
+     * @return a {@link ResponseEntity} with a success message.
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:review')")
@@ -184,8 +184,8 @@ public class ReviewController {
     /**
      * Deletes multiple reviews by a list of IDs.
      *
-     * @param ids list of review IDs to delete
-     * @return a {@link ResponseEntity} with a success message
+     * @param ids list of review IDs to delete.
+     * @return a {@link ResponseEntity} with a success message.
      */
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:review')")
@@ -197,12 +197,12 @@ public class ReviewController {
     /**
      * Deletes reviews that are NOT in the given list of IDs.
      *
-     * @param bookId   optional filter by book ID
-     * @param userId   optional filter by user ID
-     * @param rating   optional filter by rating
-     * @param keyword  optional keyword to search in reviews
-     * @param ids      list of IDs to exclude from deletion
-     * @return a {@link ResponseEntity} with a success message
+     * @param bookId   optional filter by book ID.
+     * @param userId   optional filter by user ID.
+     * @param rating   optional filter by rating.
+     * @param keyword  optional keyword to search in reviews.
+     * @param ids      list of IDs to exclude from deletion.
+     * @return a {@link ResponseEntity} with a success message.
      */
     @DeleteMapping("/delete-inverse")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:review')")
@@ -218,7 +218,7 @@ public class ReviewController {
     /**
      * Deletes all reviews in the system.
      *
-     * @return a {@link ResponseEntity} with a success message
+     * @return a {@link ResponseEntity} with a success message.
      */
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:review')")

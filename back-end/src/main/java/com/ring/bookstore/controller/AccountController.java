@@ -40,13 +40,13 @@ public class AccountController {
     /**
      * Retrieves all accounts with pagination and filtering options.
      *
-     * @param pageSize size of each page
-     * @param pageNo   page number
-     * @param sortBy   sorting field
-     * @param sortDir  sorting direction
-     * @param keyword a search keyword to filter accounts (default is an empty string)
-     * @param role the role to filter accounts (optional)
-     * @return a {@link ResponseEntity} containing a list of accounts wrapped in a {@link Page} object
+     * @param pageSize size of each page.
+     * @param pageNo   page number.
+     * @param sortBy   sorting field.
+     * @param sortDir  sorting direction.
+     * @param keyword  a search keyword to filter accounts (default is an empty string).
+     * @param role     the role to filter accounts (optional).
+     * @return a {@link ResponseEntity} containing a list of accounts wrapped in a {@link Page} object.
      */
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','GUEST') and hasAuthority('read:user')")
@@ -64,8 +64,8 @@ public class AccountController {
     /**
      * Retrieves an account by its ID.
      *
-     * @param accountId the ID of the account to retrieve
-     * @return a {@link ResponseEntity} containing the account details
+     * @param accountId the ID of the account to retrieve.
+     * @return a {@link ResponseEntity} containing the account details.
      */
     @GetMapping("{id}")
     @PreAuthorize("hasAnyRole('ADMIN','GUEST') and hasAuthority('read:user')")
@@ -76,7 +76,7 @@ public class AccountController {
     /**
      * Retrieves account analytics.
      *
-     * @return a {@link ResponseEntity} containing account analytics data
+     * @return a {@link ResponseEntity} containing account analytics data.
      */
     @GetMapping("/analytics")
     @PreAuthorize("hasAnyRole('ADMIN','GUEST') and hasAuthority('read:user')")
@@ -87,9 +87,9 @@ public class AccountController {
     /**
      * Creates a new account through the Admin dashboard.
      *
-     * @param request the account creation details
-     * @param file an optional profile image
-     * @return a {@link ResponseEntity} containing the created account
+     * @param request the account creation details.
+     * @param file    an optional profile image.
+     * @return a {@link ResponseEntity} containing the created account.
      */
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('create:user')")
@@ -101,24 +101,30 @@ public class AccountController {
     /**
      * Updates an existing account by its ID.
      *
-     * @param accountId the ID of the account to update
-     * @param request the account update details
-     * @param file an optional profile image
-     * @return a {@link ResponseEntity} containing the updated account
+     * @param accountId the ID of the account to update.
+     * @param request   the account update details.
+     * @param file      an optional profile image.
+     * @param currUser  the current authenticated admin
+     * @return a {@link ResponseEntity} containing the updated account.
      */
     @PutMapping(value = "{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('update:user')")
     public ResponseEntity<Account> updateAccount(@PathVariable("id") Long accountId,
                                                  @Valid @RequestPart AccountRequest request,
+                                                 @CurrentAccount Account currUser,
                                                  @RequestPart(name = "image", required = false) MultipartFile file) {
-        return new ResponseEntity<>(accountService.updateAccount(request, file, accountId), HttpStatus.OK);
+        return new ResponseEntity<>(accountService.updateAccount(
+                request,
+                file,
+                currUser,
+                accountId), HttpStatus.OK);
     }
 
     /**
      * Deletes an account by its ID.
      *
-     * @param accountId the ID of the account to delete
-     * @return a {@link ResponseEntity} containing a success message
+     * @param accountId the ID of the account to delete.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:user')")
@@ -130,8 +136,8 @@ public class AccountController {
     /**
      * Deletes multiple accounts by a list of IDs.
      *
-     * @param ids a list of account IDs to delete
-     * @return a {@link ResponseEntity} containing a success message
+     * @param ids a list of account IDs to delete.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:user')")
@@ -143,10 +149,10 @@ public class AccountController {
     /**
      * Deletes accounts that are not in the provided list of IDs.
      *
-     * @param keyword a search keyword to filter accounts (default is an empty string)
-     * @param role the role to filter accounts (optional)
-     * @param ids a list of account IDs to exclude from deletion
-     * @return a {@link ResponseEntity} containing a success message
+     * @param keyword a search keyword to filter accounts (default is an empty string).
+     * @param role    the role to filter accounts (optional).
+     * @param ids     a list of account IDs to exclude from deletion.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/delete-inverse")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:user')")
@@ -160,7 +166,7 @@ public class AccountController {
     /**
      * Deletes all accounts from the repository.
      *
-     * @return a {@link ResponseEntity} containing a success message
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:user')")
@@ -172,8 +178,8 @@ public class AccountController {
     /**
      * Retrieves the profile of the currently authenticated user.
      *
-     * @param currUser the currently authenticated user
-     * @return a {@link ResponseEntity} containing the user's profile
+     * @param currUser the currently authenticated user.
+     * @return a {@link ResponseEntity} containing the user's profile.
      */
     @GetMapping("/profile")
     @PreAuthorize("hasRole('USER') and hasAuthority('read:profile')")
@@ -185,10 +191,10 @@ public class AccountController {
     /**
      * Updates the profile of the currently authenticated user.
      *
-     * @param request the profile update details
-     * @param file an optional profile image
-     * @param currUser the currently authenticated user
-     * @return a {@link ResponseEntity} containing the updated profile
+     * @param request  the profile update details.
+     * @param file     an optional profile image.
+     * @param currUser the currently authenticated user.
+     * @return a {@link ResponseEntity} containing the updated profile.
      */
     @PutMapping(value = "/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasRole('USER') and hasAuthority('update:profile')")
@@ -202,9 +208,9 @@ public class AccountController {
     /**
      * Changes the password for the currently authenticated user.
      *
-     * @param request the password change request
-     * @param currUser the currently authenticated user
-     * @return a {@link ResponseEntity} containing a success or failure message
+     * @param request  the password change request.
+     * @param currUser the currently authenticated user.
+     * @return a {@link ResponseEntity} containing a success or failure message.
      */
     @PutMapping("/change-password")
     @PreAuthorize("hasRole('USER') and hasAuthority('update:profile')")

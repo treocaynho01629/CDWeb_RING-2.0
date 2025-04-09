@@ -1,17 +1,12 @@
 package com.ring.bookstore.repository;
 
+import com.ring.bookstore.base.AbstractRepositoryTest;
 import com.ring.bookstore.model.dto.projection.accounts.IAddress;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.entity.AccountProfile;
 import com.ring.bookstore.model.entity.Address;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,14 +14,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class AddressRepositoryTest {
-
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+class AddressRepositoryTest extends AbstractRepositoryTest {
 
     @Autowired
     private AddressRepository addressRepo;
@@ -36,18 +24,24 @@ class AddressRepositoryTest {
 
     @Test
     public void givenNewAddress_whenSaveAddress_ThenReturnAddress() {
+
+        // Given
         Address address = Address.builder()
                 .address("123/abc/j12")
                 .build();
 
+        // When
         Address savedAddress = addressRepo.save(address);
 
+        // Then
         assertNotNull(savedAddress);
         assertNotNull(savedAddress.getId());
     }
 
     @Test
     public void whenUpdateProfile_ThenReturnProfile() {
+
+        // Given
         Address address = Address.builder()
                 .address("123/abc/j12")
                 .build();
@@ -56,12 +50,15 @@ class AddressRepositoryTest {
 
         Address foundAddress = addressRepo.findById(address.getId()).orElse(null);
         assertNotNull(foundAddress);
+
+        // When
         foundAddress.setCity("city");
         foundAddress.setName("test");
         foundAddress.setIsDefault(true);
 
         Address updatedAddress = addressRepo.save(foundAddress);
 
+        // Then
         assertNotNull(updatedAddress);
         assertNotNull(updatedAddress.getCity());
         assertTrue(updatedAddress.getIsDefault());
@@ -70,14 +67,18 @@ class AddressRepositoryTest {
 
     @Test
     public void whenDeleteProfile_ThenFindNull() {
+
+        // Given
         Address address = Address.builder()
                 .address("123/abc/j12")
                 .build();
 
         addressRepo.save(address);
 
+        // When
         addressRepo.deleteById(address.getId());
 
+        // Then
         Address foundAddress = addressRepo.findById(address.getId()).orElse(null);
 
         assertNull(foundAddress);
@@ -85,6 +86,8 @@ class AddressRepositoryTest {
 
     @Test
     public void whenFindAddressesByProfile_ThenReturnAddressList() {
+
+        // Given
         Account account = Account.builder()
                 .username("username")
                 .pass("asd")
@@ -109,14 +112,18 @@ class AddressRepositoryTest {
         profileRepo.save(profile);
         addressRepo.saveAll(List.of(address1, address2));
 
+        // When
         List<IAddress> foundAddresses = addressRepo.findAddressesByProfile(profile.getId());
 
+        // Then
         assertNotNull(foundAddresses);
         assertFalse(foundAddresses.isEmpty());
     }
 
     @Test
     public void whenFindAddressByProfile_ThenReturnAddress() {
+
+        // Given
         Address address = Address.builder()
                 .address("Main Street")
                 .city("Main City")
@@ -135,9 +142,10 @@ class AddressRepositoryTest {
 
         profileRepo.save(profile);
 
+        // When
         IAddress foundAddress = addressRepo.findAddressByProfile(profile.getId());
 
+        // Then
         assertNotNull(foundAddress);
     }
-
 }

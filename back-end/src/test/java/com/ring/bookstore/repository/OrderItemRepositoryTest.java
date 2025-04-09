@@ -1,20 +1,15 @@
 package com.ring.bookstore.repository;
 
+import com.ring.bookstore.base.AbstractRepositoryTest;
 import com.ring.bookstore.model.dto.projection.orders.IOrderDetailItem;
 import com.ring.bookstore.model.dto.projection.orders.IOrderItem;
-import com.ring.bookstore.model.enums.OrderStatus;
 import com.ring.bookstore.model.entity.*;
+import com.ring.bookstore.model.enums.OrderStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,14 +17,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class OrderItemRepositoryTest {
-
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+class OrderItemRepositoryTest extends AbstractRepositoryTest {
 
     @Autowired
     private ShopRepository shopRepo;
@@ -58,6 +46,7 @@ class OrderItemRepositoryTest {
     private Account account;
     private OrderDetail detail;
     private OrderItem item;
+    private Book book;
 
     @BeforeEach
     void setUp() {
@@ -76,7 +65,7 @@ class OrderItemRepositoryTest {
         Image image = Image.builder().name("image").build();
         Image image2 = Image.builder().name("image2").build();
 
-        Book book = Book.builder()
+        book = Book.builder()
                 .title("test")
                 .image(image)
                 .shop(savedShop)
@@ -140,26 +129,34 @@ class OrderItemRepositoryTest {
 
     @Test
     public void givenNewOrderItem_whenSaveOrderItem_ThenReturnOrderItem() {
+
+        // Given
         OrderItem item4 = OrderItem.builder()
                 .detail(detail)
                 .build();
         itemRepo.save(item4);
 
+        // When
         OrderItem savedItem = itemRepo.save(item4);
 
+        // Then
         assertNotNull(savedItem);
         assertNotNull(savedItem.getId());
     }
 
     @Test
     public void whenUpdateOrderDetail_ThenReturnUpdatedOrderDetail() {
+
+        // Given
         OrderItem foundItem = itemRepo.findById(item.getId()).orElse(null);
         assertNotNull(foundItem);
+
+        // When
         foundItem.setQuantity((short) 1);
         foundItem.setDiscount(BigDecimal.valueOf(0.3));
-
         OrderItem updatedItem = itemRepo.save(foundItem);
 
+        // Then
         assertNotNull(updatedItem);
         assertNotNull(updatedItem.getDiscount());
         assertEquals((short) 1, updatedItem.getQuantity());
@@ -167,25 +164,38 @@ class OrderItemRepositoryTest {
 
     @Test
     public void whenDeleteOrderItem_ThenFindNull() {
+
+        // When
         itemRepo.deleteById(item.getId());
 
+        // Then
         OrderItem foundItem = itemRepo.findById(item.getId()).orElse(null);
+        OrderDetail foundDetail = detailRepo.findById(detail.getId()).orElse(null);
+        Book foundBook = bookRepo.findById(book.getId()).orElse(null);
 
         assertNull(foundItem);
+        assertNotNull(foundBook);
+        assertNotNull(foundDetail);
     }
 
     @Test
     public void whenFindItemsWithDetailIds_ThenReturnItems() {
+
+        // When
         List<IOrderItem> foundItems = itemRepo.findAllWithDetailIds(List.of(detail.getId()));
 
+        // Then
         assertNotNull(foundItems);
         assertEquals(2, foundItems.size());
     }
 
     @Test
     public void whenFindOrderDetailItems_ThenReturnList() {
+
+        // When
         List<IOrderDetailItem> foundList = itemRepo.findOrderDetailItems(detail.getId(), account.getId());
 
+        // Then
         assertNotNull(foundList);
         assertEquals(2, foundList.size());
     }

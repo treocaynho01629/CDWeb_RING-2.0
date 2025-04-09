@@ -47,15 +47,18 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
 	 *         or an empty Optional if no account is found with the specified ID
 	 */
 	@Query("""
-		select a.id as id, a.username as username, a.email as email,
-			p.name as name, p.phone as phone, size(a.roles) as roles,
+		select distinct a.id as id, a.username as username, a.email as email,
+			p.name as name, p.phone as phone,
+			array_agg(r.roleName) over (partition by a.id order by a.id) as roles,
 			p.gender as gender, p.dob as dob, a.createdDate as joinedDate,
 			size(a.following) as totalFollows, size(a.userReviews) as totalReviews,
 			i as image
 		from Account a
 		left join a.profile p
 		left join p.image i
+		join a.roles r
 		where a.id = :id
+		group by a.id, p.id, i.id, r.roleName
 	""")
     Optional<IAccountDetail> findDetailById(Long id);
 }

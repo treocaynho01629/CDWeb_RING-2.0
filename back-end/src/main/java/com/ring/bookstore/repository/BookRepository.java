@@ -57,10 +57,11 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                     from OrderItem o
                     group by o.book.id) od on b.id = od.book_id
                 where concat (b.title, b.author, s.name) ilike %:keyword%
-                and (coalesce(:shopId) is null or b.shop.id = :shopId)
                 and (coalesce(:cateId) is null or b.cate.id = :cateId or b.cate.parent.id = :cateId)
                 and (coalesce(:pubIds) is null or b.publisher.id in :pubIds)
                 and (coalesce(:types) is null or b.type in :types)
+                and (coalesce(:shopId) is null or b.shop.id = :shopId)
+                and (coalesce(:userId) is null or b.shop.owner.id = :userId)
                 and coalesce(rv.rating, 0) >= :rating
                 and b.price * (1 - b.discount) between :fromRange and :toRange
                 and b.amount >= :amount
@@ -233,6 +234,8 @@ public interface BookRepository extends JpaRepository<Book, Long> {
      *
      * @param shopId the identifier of the shop for which analytics is to be retrieved;
      *               if null, analytics is calculated for all shops
+     * @param userId the identifier of the shop owner which analytics is to be retrieved;
+     *               if null, analytics is calculated for all owners
      * @return an object of type {@code IStat} containing the book analytics, including the total count,
      *         current month count, and last month count
      */
@@ -243,8 +246,9 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                     and b.createdDate < date_trunc('month', current date) then 1 end) lastMonth
                 from Book b
                 where (coalesce(:shopId) is null or b.shop.id = :shopId)
+                and (coalesce(:userId) is null or b.shop.owner.id = :userId)
             """)
-    IStat getBookAnalytics(Long shopId);
+    IStat getBookAnalytics(Long shopId, Long userId);
 
     /**
      * Retrieves a list of suggested keywords that match the given keyword, based on the database query.

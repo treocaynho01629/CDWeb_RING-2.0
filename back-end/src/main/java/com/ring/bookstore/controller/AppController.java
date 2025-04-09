@@ -22,7 +22,7 @@ public class AppController {
     /**
      * Endpoint for checking the health of the application.
      *
-     * @return a {@link ResponseEntity} containing the health check message and current timestamp
+     * @return a {@link ResponseEntity} containing the health check message and current timestamp.
      */
     @GetMapping("/ping")
     public ResponseEntity<?> ping() {
@@ -34,7 +34,7 @@ public class AppController {
     /**
      * Endpoint for retrieving application enums.
      *
-     * @return a {@link ResponseEntity} containing the enums data
+     * @return a {@link ResponseEntity} containing the enums data.
      */
     @GetMapping("/enums")
     public ResponseEntity<?> getEnums() {

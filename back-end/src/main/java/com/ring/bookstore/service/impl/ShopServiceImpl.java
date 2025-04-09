@@ -120,8 +120,9 @@ public class ShopServiceImpl implements ShopService {
         return shopDTO;
     }
 
-    public StatDTO getAnalytics() {
-        return dashMapper.statToDTO(shopRepo.getShopAnalytics(),
+    public StatDTO getAnalytics(Long userId, Account user) {
+        boolean isAdmin = isAuthAdmin();
+        return dashMapper.statToDTO(shopRepo.getShopAnalytics(isAdmin ? userId : user.getId()),
                 "shops",
                 "Cửa hàng");
     }

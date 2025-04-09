@@ -32,7 +32,7 @@ public class ImageController {
     /**
      * Retrieves all images in the system.
      *
-     * @return list of all images
+     * @return list of all images.
      */
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','GUEST') and hasAuthority('read:user')")
@@ -43,9 +43,9 @@ public class ImageController {
     /**
      * Uploads a single image.
      *
-     * @param file the image file
-     * @param folder optional folder to upload the image into
-     * @return the URL of the uploaded image
+     * @param file the image file.
+     * @param folder optional folder to upload the image into.
+     * @return the URL of the uploaded image.
      */
     @PostMapping("/upload")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('create:image')")
@@ -58,9 +58,9 @@ public class ImageController {
     /**
      * Uploads multiple images.
      *
-     * @param files array of image files
-     * @param folder optional folder to upload the images into
-     * @return list of messages confirming each upload
+     * @param files array of image files.
+     * @param folder optional folder to upload the images into.
+     * @return list of messages confirming each upload.
      */
     @PostMapping("/upload-multiple")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('create:image')")
@@ -78,9 +78,9 @@ public class ImageController {
     /**
      * Replaces an existing image with a new file.
      *
-     * @param file the new image file
-     * @param id the ID of the image to replace
-     * @return the URL of the new image
+     * @param file the new image file.
+     * @param id the ID of the image to replace.
+     * @return the URL of the new image.
      */
     @PutMapping("/replace")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('update:image')")
@@ -93,8 +93,8 @@ public class ImageController {
     /**
      * Deletes an image using its public ID.
      *
-     * @param publicId the public ID of the image to delete
-     * @return deletion result message
+     * @param publicId the public ID of the image to delete.
+     * @return deletion result message.
      */
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:image')")
@@ -106,8 +106,8 @@ public class ImageController {
     /**
      * Deletes an image by its database ID.
      *
-     * @param id the ID of the image to delete
-     * @return deletion result message
+     * @param id the ID of the image to delete.
+     * @return deletion result message.
      */
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:image')")
@@ -120,9 +120,9 @@ public class ImageController {
      * Deletes multiple images by either public IDs or database IDs.
      * At least one of the two lists must be provided.
      *
-     * @param publicIds list of public IDs to delete (optional)
-     * @param ids list of database IDs to delete (optional)
-     * @return result of the deletion operation
+     * @param publicIds list of public IDs to delete (optional).
+     * @param ids list of database IDs to delete (optional).
+     * @return result of the deletion operation.
      */
     @DeleteMapping("/delete-multiple")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:image')")

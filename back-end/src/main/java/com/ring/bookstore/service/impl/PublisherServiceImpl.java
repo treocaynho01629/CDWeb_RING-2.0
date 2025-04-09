@@ -1,26 +1,25 @@
 package com.ring.bookstore.service.impl;
 
-import java.util.List;
-
+import com.ring.bookstore.exception.ResourceNotFoundException;
+import com.ring.bookstore.model.dto.request.PublisherRequest;
 import com.ring.bookstore.model.dto.response.publishers.PublisherDTO;
-import com.ring.bookstore.model.mappers.PublisherMapper;
 import com.ring.bookstore.model.entity.Image;
 import com.ring.bookstore.model.entity.Publisher;
+import com.ring.bookstore.model.mappers.PublisherMapper;
+import com.ring.bookstore.repository.PublisherRepository;
 import com.ring.bookstore.service.ImageService;
+import com.ring.bookstore.service.PublisherService;
 import com.ring.bookstore.ultils.FileUploadUtil;
-import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.repository.PublisherRepository;
-import com.ring.bookstore.service.PublisherService;
-
-import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -35,7 +34,7 @@ public class PublisherServiceImpl implements PublisherService {
                                             Integer pageSize,
                                             String sortBy,
                                             String sortDir) {
-       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
 
@@ -67,7 +66,8 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Transactional
-    public Publisher addPublisher(String name, MultipartFile file) {
+    public Publisher addPublisher(PublisherRequest request,
+                                  MultipartFile file) {
         Image image = null;
 
         //Image upload
@@ -75,7 +75,7 @@ public class PublisherServiceImpl implements PublisherService {
 
         //Create new publisher
         var publisher = Publisher.builder()
-                .name(name)
+                .name(request.getName())
                 .image(image)
                 .build();
         Publisher addedPub = pubRepo.save(publisher); //Save to database
@@ -83,9 +83,12 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Transactional
-    public Publisher updatePublisher(Integer id, String name, MultipartFile file) {
+    public Publisher updatePublisher(Integer id,
+                                     PublisherRequest request,
+                                     MultipartFile file) {
         //Get original publisher
-        Publisher publisher = pubRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
+        Publisher publisher = pubRepo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Publisher not found"));
 
         //Image upload/replace
         if (file != null) { //Contain new image >> upload/replace
@@ -96,7 +99,7 @@ public class PublisherServiceImpl implements PublisherService {
             publisher.setImage(savedImage); //Set new image
         }
 
-        publisher.setName(name);
+        publisher.setName(request.getName());
 
         //Update
         Publisher updatedPub = pubRepo.save(publisher);

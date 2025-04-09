@@ -7,10 +7,12 @@ import com.ring.bookstore.model.dto.projection.accounts.IAccountDetail;
 import com.ring.bookstore.model.dto.projection.accounts.IProfile;
 import com.ring.bookstore.model.dto.response.accounts.*;
 import com.ring.bookstore.model.dto.projection.images.IImage;
+import com.ring.bookstore.model.entity.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -38,7 +40,7 @@ public class AccountMapper {
                 projection.getName(),
                 projection.getPhone(),
                 url,
-                projection.getRoles().get(projection.getRoles().size() - 1).getRoleName());
+                projection.getRoles());
     }
 
     public AccountDetailDTO projectionToDetailDTO(IAccountDetail projection) {

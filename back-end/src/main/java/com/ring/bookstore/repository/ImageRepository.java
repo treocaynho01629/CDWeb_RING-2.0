@@ -34,19 +34,18 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     Optional<IImage> findByProfile(Long id);
 
     @Query("""
-        select i
-        from Image i
-        left join i.detail d
+        select i from Image i
         left join Book b on b.image.id = i.id
-        where (b.id = :bookId or d.book.id = :bookId)
+        left join i.detail d
+        where (b.id = :bookId or d.id = :bookId)
         and i.id = :imageId
     """)
     Optional<Image> findBookImage(Long bookId, Long imageId);
 
     @Query("""
         select i.publicId from Image i
-        left join i.detail d
         left join Book b on b.image.id = i.id
+        left join i.detail d
         where (b.id = :bookId or d.book.id = :bookId)
         and i.id in :imageIds
     """)

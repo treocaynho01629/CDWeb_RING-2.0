@@ -29,14 +29,14 @@ public class ShopController {
     /**
      * Retrieves shops for display with pagination, sorting, and optional filters.
      *
-     * @param keyword   optional keyword to search in shop names or descriptions
-     * @param pageSize  size of each page
-     * @param pageNo    page number
-     * @param sortBy    sorting field
-     * @param sortDir   sorting direction
-     * @param followed  optional filter to show only followed shops
-     * @param currUser  the current authenticated user
-     * @return a {@link ResponseEntity} containing the list of shops
+     * @param keyword   optional keyword to search in shop names or descriptions.
+     * @param pageSize  size of each page.
+     * @param pageNo    page number.
+     * @param sortBy    sorting field.
+     * @param sortDir   sorting direction.
+     * @param followed  optional filter to show only followed shops.
+     * @param currUser  the current authenticated user.
+     * @return a {@link ResponseEntity} containing the list of shops.
      */
     @GetMapping("/find")
     public ResponseEntity<?> getDisplayShops(
@@ -60,14 +60,14 @@ public class ShopController {
     /**
      * Retrieves all shops with pagination, sorting, and optional filters.
      *
-     * @param keyword   optional keyword to search in shop names or descriptions
-     * @param pageSize  size of each page
-     * @param pageNo    page number
-     * @param sortBy    sorting field
-     * @param sortDir   sorting direction
-     * @param userId    optional filter by user ID
-     * @param currUser  the current authenticated seller
-     * @return a {@link ResponseEntity} containing the list of shops
+     * @param keyword   optional keyword to search in shop names or descriptions.
+     * @param pageSize  size of each page.
+     * @param pageNo    page number.
+     * @param sortBy    sorting field.
+     * @param sortDir   sorting direction.
+     * @param userId    optional filter by user ID.
+     * @param currUser  the current authenticated seller.
+     * @return a {@link ResponseEntity} containing the list of shops.
      */
     @GetMapping
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:shop')")
@@ -92,8 +92,8 @@ public class ShopController {
     /**
      * Retrieves a preview of shops for selection.
      *
-     * @param currUser the current authenticated seller
-     * @return a {@link ResponseEntity} containing a preview list of shops
+     * @param currUser the current authenticated seller.
+     * @return a {@link ResponseEntity} containing a preview list of shops.
      */
     @GetMapping("/preview")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:shop')")
@@ -104,9 +104,9 @@ public class ShopController {
     /**
      * Retrieves detailed information about a specific shop.
      *
-     * @param id        the shop ID
-     * @param currUser  the current authenticated user
-     * @return a {@link ResponseEntity} containing shop information
+     * @param id        the shop ID.
+     * @param currUser  the current authenticated user.
+     * @return a {@link ResponseEntity} containing shop information.
      */
     @GetMapping("info/{id}")
     public ResponseEntity<?> getShopInfo(@PathVariable("id") Long id,
@@ -117,9 +117,9 @@ public class ShopController {
     /**
      * Retrieves display details for a specific shop.
      *
-     * @param id        the shop ID
-     * @param currUser  the current authenticated user
-     * @return a {@link ResponseEntity} containing shop display details
+     * @param id        the shop ID.
+     * @param currUser  the current authenticated user.
+     * @return a {@link ResponseEntity} containing shop display details.
      */
     @GetMapping("{id}")
     public ResponseEntity<?> getShopDisplayDetail(@PathVariable("id") Long id,
@@ -130,9 +130,9 @@ public class ShopController {
     /**
      * Retrieves detailed information for a shop.
      *
-     * @param id        the shop ID
-     * @param currUser  the current authenticated user
-     * @return a {@link ResponseEntity} containing detailed shop information
+     * @param id        the shop ID.
+     * @param currUser  the current authenticated user.
+     * @return a {@link ResponseEntity} containing detailed shop information.
      */
     @GetMapping("/detail/{id}")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:shop')")
@@ -144,20 +144,23 @@ public class ShopController {
     /**
      * Retrieves shop analytics.
      *
-     * @return a {@link ResponseEntity} containing analytics data
+     * @param userId    the shop owner ID.
+     * @param currUser  the current authenticated user.
+     * @return a {@link ResponseEntity} containing analytics data.
      */
     @GetMapping("/analytics")
-    @PreAuthorize("hasAnyRole('ADMIN','GUEST') and hasAuthority('read:shop')")
-    public ResponseEntity<?> getShopAnalytics() {
-        return new ResponseEntity<>(shopService.getAnalytics(), HttpStatus.OK);
+    @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:shop')")
+    public ResponseEntity<?> getShopAnalytics(@RequestParam(value = "userId", required = false) Long userId,
+                                              @CurrentAccount Account currUser) {
+        return new ResponseEntity<>(shopService.getAnalytics(userId, currUser), HttpStatus.OK);
     }
 
     /**
      * Follows a specific shop.
      *
-     * @param id        the shop ID
-     * @param currUser  the current authenticated user
-     * @return a {@link ResponseEntity} with a success message
+     * @param id        the shop ID.
+     * @param currUser  the current authenticated user.
+     * @return a {@link ResponseEntity} with a success message.
      */
     @PutMapping("/follow/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('update:profile')")
@@ -170,9 +173,9 @@ public class ShopController {
     /**
      * Unfollows a specific shop.
      *
-     * @param id        the shop ID
-     * @param currUser  the current authenticated user
-     * @return a {@link ResponseEntity} with a success message
+     * @param id        the shop ID.
+     * @param currUser  the current authenticated user.
+     * @return a {@link ResponseEntity} with a success message.
      */
     @PutMapping("/unfollow/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('update:profile')")
@@ -185,13 +188,13 @@ public class ShopController {
     /**
      * Creates a new shop.
      *
-     * @param request   the {@link ShopRequest} data
-     * @param file      optional image for the shop
-     * @param currUser  the current authenticated seller
-     * @return a {@link ResponseEntity} with the created shop data
+     * @param request   the {@link ShopRequest} data.
+     * @param file      optional image for the shop.
+     * @param currUser  the current authenticated seller.
+     * @return a {@link ResponseEntity} with the created shop data.
      */
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @PreAuthorize("hasRole('SELLER')  and hasAuthority('create:Shop')")
+    @PreAuthorize("hasRole('SELLER')  and hasAuthority('create:shop')")
     public ResponseEntity<?> createShop(@Valid @RequestPart("request") ShopRequest request,
                                         @RequestPart(name = "image", required = false) MultipartFile file,
                                         @CurrentAccount Account currUser) {
@@ -201,14 +204,14 @@ public class ShopController {
     /**
      * Updates an existing shop.
      *
-     * @param id        the shop ID
-     * @param request   the updated {@link ShopRequest} data
-     * @param file      optional new image for the shop
-     * @param currUser  the current authenticated seller
-     * @return a {@link ResponseEntity} with the updated shop data
+     * @param id        the shop ID.
+     * @param request   the updated {@link ShopRequest} data.
+     * @param file      optional new image for the shop.
+     * @param currUser  the current authenticated seller.
+     * @return a {@link ResponseEntity} with the updated shop data.
      */
     @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @PreAuthorize("hasRole('SELLER')  and hasAuthority('update:Shop')")
+    @PreAuthorize("hasRole('SELLER')  and hasAuthority('update:shop')")
     public ResponseEntity<?> updateShop(@PathVariable("id") Long id,
                                         @Valid @RequestPart("request") ShopRequest request,
                                         @RequestPart(name = "image", required = false) MultipartFile file,
@@ -219,12 +222,12 @@ public class ShopController {
     /**
      * Deletes a shop by its ID.
      *
-     * @param id        the shop ID
-     * @param currUser  the current authenticated seller
-     * @return a {@link ResponseEntity} with a success message
+     * @param id        the shop ID.
+     * @param currUser  the current authenticated seller.
+     * @return a {@link ResponseEntity} with a success message.
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('SELLER')  and hasAuthority('delete:Shop')")
+    @PreAuthorize("hasRole('SELLER')  and hasAuthority('delete:shop')")
     public ResponseEntity<?> deleteShop(@PathVariable("id") Long id, @CurrentAccount Account currUser) {
         return new ResponseEntity<>(shopService.deleteShop(id, currUser), HttpStatus.OK);
     }
@@ -232,12 +235,12 @@ public class ShopController {
     /**
      * Deletes multiple books by a list of IDs.
      *
-     * @param ids       the list of shop IDs to delete
-     * @param currUser  the current authenticated seller
-     * @return a {@link ResponseEntity} with a success message
+     * @param ids       the list of shop IDs to delete.
+     * @param currUser  the current authenticated seller.
+     * @return a {@link ResponseEntity} with a success message.
      */
     @DeleteMapping("/delete-multiples")
-    @PreAuthorize("hasRole('SELLER')  and hasAuthority('delete:Shop')")
+    @PreAuthorize("hasRole('SELLER')  and hasAuthority('delete:shop')")
     public ResponseEntity<?> deleteCoupons(@RequestParam("ids") List<Long> ids,
                                            @CurrentAccount Account currUser
     ) {
@@ -248,14 +251,14 @@ public class ShopController {
     /**
      * Deletes shops that are NOT in the given list of IDs.
      *
-     * @param keyword   optional filter by keyword
-     * @param userId    optional filter by user ID
-     * @param ids       list of shop IDs to exclude from deletion
-     * @param currUser  the current authenticated seller
-     * @return a {@link ResponseEntity} with a success message
+     * @param keyword   optional filter by keyword.
+     * @param userId    optional filter by user ID.
+     * @param ids       list of shop IDs to exclude from deletion.
+     * @param currUser  the current authenticated seller.
+     * @return a {@link ResponseEntity} with a success message.
      */
     @DeleteMapping("/delete-inverse")
-    @PreAuthorize("hasRole('SELLER')  and hasAuthority('delete:Shop')")
+    @PreAuthorize("hasRole('SELLER')  and hasAuthority('delete:shop')")
     public ResponseEntity<?> deleteCouponsInverse(@RequestParam(value = "keyword", defaultValue = "") String keyword,
                                                   @RequestParam(value = "userId", required = false) Long userId,
                                                   @RequestParam("ids") List<Long> ids,
@@ -269,13 +272,13 @@ public class ShopController {
     }
 
     /**
-     * Deletes all shops
+     * Deletes all shops.
      *
-     * @param currUser the current authenticated seller
-     * @return a {@link ResponseEntity} with a success message
+     * @param currUser the current authenticated seller.
+     * @return a {@link ResponseEntity} with a success message.
      */
     @DeleteMapping("/delete-all")
-    @PreAuthorize("hasRole('SELLER')  and hasAuthority('delete:Shop')")
+    @PreAuthorize("hasRole('SELLER')  and hasAuthority('delete:shop')")
     public ResponseEntity<?> deleteAllShops(@CurrentAccount Account currUser) {
         shopService.deleteAllShops(currUser);
         return new ResponseEntity<>("All shops deleted successfully!", HttpStatus.OK);

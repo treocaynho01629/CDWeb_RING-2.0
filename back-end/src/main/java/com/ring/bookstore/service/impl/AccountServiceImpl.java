@@ -1,32 +1,33 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.model.dto.projection.accounts.IAccount;
-import com.ring.bookstore.model.dto.projection.accounts.IAccountDetail;
-import com.ring.bookstore.model.dto.projection.accounts.IProfile;
-import com.ring.bookstore.model.dto.response.accounts.*;
-import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
-import com.ring.bookstore.model.mappers.AccountMapper;
-import com.ring.bookstore.model.mappers.DashboardMapper;
-import com.ring.bookstore.model.enums.UserRole;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.listener.reset.OnResetPasswordCompletedEvent;
+import com.ring.bookstore.model.dto.projection.accounts.IAccount;
+import com.ring.bookstore.model.dto.projection.accounts.IAccountDetail;
+import com.ring.bookstore.model.dto.projection.accounts.IProfile;
+import com.ring.bookstore.model.dto.request.AccountRequest;
+import com.ring.bookstore.model.dto.request.ChangePassRequest;
+import com.ring.bookstore.model.dto.request.ProfileRequest;
+import com.ring.bookstore.model.dto.response.accounts.AccountDTO;
+import com.ring.bookstore.model.dto.response.accounts.AccountDetailDTO;
+import com.ring.bookstore.model.dto.response.accounts.ProfileDTO;
+import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.entity.AccountProfile;
 import com.ring.bookstore.model.entity.Image;
 import com.ring.bookstore.model.entity.Role;
+import com.ring.bookstore.model.enums.UserRole;
+import com.ring.bookstore.model.mappers.AccountMapper;
+import com.ring.bookstore.model.mappers.DashboardMapper;
 import com.ring.bookstore.repository.AccountProfileRepository;
 import com.ring.bookstore.repository.AccountRepository;
-import com.ring.bookstore.model.dto.request.AccountRequest;
-import com.ring.bookstore.model.dto.request.ChangePassRequest;
-import com.ring.bookstore.model.dto.request.ProfileRequest;
+import com.ring.bookstore.repository.RoleRepository;
 import com.ring.bookstore.service.AccountService;
 import com.ring.bookstore.service.ImageService;
-import com.ring.bookstore.service.RoleService;
 import com.ring.bookstore.ultils.FileUploadUtil;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,9 +35,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -44,8 +47,8 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepo;
     private final AccountProfileRepository profileRepo;
+    private final RoleRepository roleRepo;
 
-    private final RoleService roleService;
     private final ImageService imageService;
 
     private final AccountMapper accountMapper;
@@ -91,15 +94,15 @@ public class AccountServiceImpl implements AccountService {
         }
 
         //Set role
-        Role role = roleService.findByRoleName(request.getRole()).orElseThrow(
-                () -> new ResourceNotFoundException("Role not found!"));
+        List<Role> roles = roleRepo.findAllByRoleNameIn(request.getRoles());
+        if (roles.isEmpty()) throw new ResourceNotFoundException("Roles not found!");
 
         //Create account
         var acc = Account.builder()
                 .username(request.getUsername())
                 .pass(passwordEncoder.encode(request.getPass()))
                 .email(request.getEmail())
-                .roles(List.of(role))
+                .roles(roles)
                 .build();
 
         Account savedAccount = accountRepo.save(acc); //Save to Database
@@ -121,14 +124,18 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Transactional
-    public Account updateAccount(AccountRequest request, MultipartFile file, Long id) {
+    public Account updateAccount(AccountRequest request,
+                                 MultipartFile file,
+                                 Account user,
+                                 Long id) {
+
         //Check Account exists?
-        Account currUser = accountRepo.findById(id)
+        Account changeUser = accountRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         //Check if Account with these username and email has exists >> throw exception
-        if (!request.getUsername().equals(currUser.getUsername())
-                && !request.getEmail().equals(currUser.getEmail())
+        if (!request.getUsername().equals(changeUser.getUsername())
+                && !request.getEmail().equals(changeUser.getEmail())
                 && accountRepo.existsByUsernameOrEmail(request.getUsername(), request.getEmail())) {
             throw new HttpResponseException(
                     HttpStatus.CONFLICT,
@@ -138,16 +145,20 @@ public class AccountServiceImpl implements AccountService {
         }
 
         // Set role
-        Role role = roleService.findByRoleName(request.getRole()).orElseThrow(
-                () -> new ResourceNotFoundException("Role not found!"));
-        currUser.setRoles(List.of(role));
+        if (Objects.equals(user.getId(), changeUser.getId())
+                && !request.getRoles().contains(UserRole.ROLE_ADMIN)) {
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Can not remove your ADMIN role!");
+        }
+        List<Role> roles = roleRepo.findAllByRoleNameIn(request.getRoles());
+        if (roles.isEmpty()) throw new ResourceNotFoundException("Roles not found!");
+        changeUser.setRoles(roles);
 
         //Set new info
-        currUser.setUsername(request.getUsername());
-        currUser.setEmail(request.getEmail());
-        if (!request.isKeepOldPass()) currUser.setPass(passwordEncoder.encode(request.getPass()));
+        changeUser.setUsername(request.getUsername());
+        changeUser.setEmail(request.getEmail());
+        if (request.getPass() != null) changeUser.setPass(passwordEncoder.encode(request.getPass()));
 
-        Account updatedAccount = accountRepo.save(currUser); //Save to Database
+        Account updatedAccount = accountRepo.save(changeUser); //Save to Database
 
         //Get current profile
         AccountProfile profile = updatedAccount.getProfile();

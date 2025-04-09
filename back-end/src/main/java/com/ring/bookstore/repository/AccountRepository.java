@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import com.ring.bookstore.model.dto.projection.accounts.IAccount;
 import com.ring.bookstore.model.dto.projection.dashboard.IStat;
-import com.ring.bookstore.model.entity.AccountProfile;
 import com.ring.bookstore.model.enums.UserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -127,14 +126,17 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	 * @return a page of projections containing account information, including ID, username, email, profile name, phone, roles, and associated image
 	 */
 	@Query("""
-		select a.id as id, a.username as username, a.email as email,
-			p.name as name, p.phone as phone, a.roles as roles, i as image
-		from Account a
-		left join a.profile p
+		select distinct t.id as id, t.username as username, t.email as email, p.name as name,
+			p.phone as phone, t.roles as roles, i as image, t.createdDate as createdDate
+		from (select a.id as id, a.username as username, a.email as email, a.createdDate as createdDate,
+			array_agg(r.roleName) over (partition by a.id order by a.id) as roles
+			from Account a
+			join a.roles r
+			where concat (a.email, a.username) ilike %:keyword%
+			and (coalesce(:role) is null or r.roleName = :role)
+			group by a.id, r.roleName) t
+		left join AccountProfile p on p.id = t.id
 		left join p.image i
-		join a.roles r
-		where concat (a.email, a.username) ilike %:keyword%
-		and (coalesce(:role) is null or r.roleName = :role)
 	""")
 	Page<IAccount> findAccountsWithFilter(String keyword, UserRole role, Pageable pageable);
 

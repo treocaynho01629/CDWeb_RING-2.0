@@ -28,7 +28,7 @@ public class BookRequest {
 	@Max(value = 10000000, message = "Giá dưới 10.000.000 ₫")
 	private Double price;
 
-	@DecimalMin(value = "0.0", inclusive = false)
+	@DecimalMin(value = "0.0", inclusive = true)
 	@Digits(integer=1, fraction=4)
 	private BigDecimal discount;
 

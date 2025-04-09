@@ -1,4 +1,4 @@
-import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
+import { createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "@ring/redux";
 
 const shopsAdapter = createEntityAdapter({});
@@ -192,20 +192,3 @@ export const {
   useUnfollowShopMutation,
   usePrefetch: usePrefetchShops,
 } = shopsApiSlice;
-
-export const selectShopsResult =
-  shopsApiSlice.endpoints.getDisplayShops.select();
-
-const selectShopsData = createSelector(
-  selectShopsResult,
-  (shopsResult) => shopsResult.data // normalized state object with ids & entities
-);
-
-export const {
-  selectAll: selectAllShops,
-  selectById: selectShopById,
-  selectIds: selectShopIds,
-  selectEntities: selectShopEntities,
-} = shopsAdapter.getSelectors(
-  (state) => selectShopsData(state) ?? initialState
-);

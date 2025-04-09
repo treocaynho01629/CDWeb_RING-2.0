@@ -120,13 +120,15 @@ public enum UserRole {
             "warning",
             List.of(
                     PrivilegeType.READ_BOOK,
+                    PrivilegeType.READ_USER,
                     PrivilegeType.READ_PROFILE,
                     PrivilegeType.READ_ADDRESS,
                     PrivilegeType.READ_BANNER,
                     PrivilegeType.READ_COUPON,
                     PrivilegeType.READ_ORDER,
                     PrivilegeType.READ_SHOP,
-                    PrivilegeType.READ_REVIEW
+                    PrivilegeType.READ_REVIEW,
+                    PrivilegeType.READ_ROLE
             ));
 
     private final String value;

@@ -75,12 +75,14 @@ public interface AccountService {
      * @param id the ID of the account to update.
      * @param request the account update details.
      * @param file an optional profile image.
+     * @param user the current authenticated admin.
      * @return the updated {@link Account} object reflecting the latest changes.
      * @throws ResourceNotFoundException if the account or the specified role is not found.
      * @throws HttpResponseException if a username or email conflict occurs with an existing account.
      */
     Account updateAccount(AccountRequest request,
                           MultipartFile file,
+                          Account user,
                           Long id);
 
     /**

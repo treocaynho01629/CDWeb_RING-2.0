@@ -1,8 +1,7 @@
 package com.ring.bookstore.model.dto.projection.accounts;
 
 import com.ring.bookstore.model.dto.projection.images.IImage;
-import com.ring.bookstore.model.dto.request.AccountRequest;
-import com.ring.bookstore.model.entity.Role;
+import com.ring.bookstore.model.enums.UserRole;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ public interface IAccount {
 
     String getPhone();
 
-    List<Role> getRoles();
+    List<UserRole> getRoles();
 
     IImage getImage();
 }

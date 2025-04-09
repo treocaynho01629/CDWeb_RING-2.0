@@ -28,7 +28,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
 		from Review r
 		join r.book b
-		join r.user u
+		left join r.user u
 		left join u.profile p
 		left join p.image i
 		where (coalesce(:userId) is null or u.id = :userId)
@@ -49,7 +49,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 	 */
 	@Query("""
 		select r.id from Review r
-		join r.user u
+		left join r.user u
 		where (coalesce(:userId) is null or r.user.id = :userId)
 		and (coalesce(:bookId) is null or r.book.id = :bookId)
 		and (coalesce(:rating) is null or  r.rating = :rating)
@@ -72,7 +72,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 		select r as review, u.id as userId, u.username as username, i as image,
 		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
 		from Review r join r.book b
-		join r.user u
+		left join r.user u
 		left join u.profile p
 		left join p.image i
 		where b.id = :id
@@ -91,7 +91,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 		select r as review, u.id as userId, u.username as username, i as image,
 		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
 		from Review r join r.book b
-		join r.user u
+		left join r.user u
 		left join u.profile p
 		left join p.image i
 		where r.user.id = :id
@@ -110,7 +110,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 		select r as review, u.id as userId, u.username as username, i as image,
 		b.id as bookId, b.title as bookTitle, b.slug as bookSlug
 		from Review r join r.book b
-		join r.user u
+		left join r.user u
 		left join u.profile p
 		left join p.image i
 		where r.user.id = :userId and b.id = :bookId

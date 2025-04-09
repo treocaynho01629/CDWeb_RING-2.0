@@ -2,6 +2,7 @@ package com.ring.bookstore.service;
 
 import java.util.List;
 
+import com.ring.bookstore.model.dto.request.PublisherRequest;
 import com.ring.bookstore.model.dto.response.publishers.PublisherDTO;
 import com.ring.bookstore.model.entity.Publisher;
 import org.springframework.data.domain.Page;
@@ -20,11 +21,11 @@ public interface PublisherService {
 
 	PublisherDTO getPublisher(Integer id);
 
-	Publisher addPublisher(String name,
+	Publisher addPublisher(PublisherRequest request,
 						   MultipartFile file);
 
 	Publisher updatePublisher(Integer id,
-							  String name,
+							  PublisherRequest request,
 							  MultipartFile file);
 
 	void deletePublisher(Integer id);

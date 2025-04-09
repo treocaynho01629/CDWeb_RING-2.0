@@ -27,14 +27,14 @@ public class BannerController {
     /**
      * Retrieves banners with optional filtering by shop, keyword, and pagination.
      *
-     * @param shopId   optional shop ID to filter banners
-     * @param byShop   if true, filters banners created by shops, if false, filters banners created by system, null will return both
-     * @param keyword  search keyword for filtering banners
-     * @param pageSize size of each page
-     * @param pageNo   page number
-     * @param sortBy   sorting field
-     * @param sortDir  sorting direction
-     * @return a {@link ResponseEntity} containing a paginated list of banners
+     * @param shopId   optional shop ID to filter banners.
+     * @param byShop   if true, filters banners created by shops, if false, filters banners created by system, null will return both.
+     * @param keyword  search keyword for filtering banners.
+     * @param pageSize size of each page.
+     * @param pageNo   page number.
+     * @param sortBy   sorting field.
+     * @param sortDir  sorting direction.
+     * @return a {@link ResponseEntity} containing a paginated list of banners.
      */
     @GetMapping
     public ResponseEntity<?> getBanners(@RequestParam(value = "shopId", required = false) Long shopId,
@@ -50,9 +50,9 @@ public class BannerController {
     /**
      * Creates a new banner.
      *
-     * @param request  the banner creation request
-     * @param currUser the currently authenticated seller
-     * @return a {@link ResponseEntity} containing the created banner
+     * @param request  the banner creation request.
+     * @param currUser the currently authenticated seller.
+     * @return a {@link ResponseEntity} containing the created banner.
      */
     @PostMapping
     @PreAuthorize("hasRole('SELLER') and hasAuthority('create:banner')")
@@ -64,10 +64,10 @@ public class BannerController {
     /**
      * Updates an existing banner by its ID.
      *
-     * @param id        the ID of the banner to update
-     * @param request   the banner update request
-     * @param currUser  the currently authenticated seller
-     * @return a {@link ResponseEntity} containing the updated banner
+     * @param id        the ID of the banner to update.
+     * @param request   the banner update request.
+     * @param currUser  the currently authenticated seller.
+     * @return a {@link ResponseEntity} containing the updated banner.
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('update:banner')")
@@ -80,9 +80,9 @@ public class BannerController {
     /**
      * Deletes a banner by its ID.
      *
-     * @param id        the ID of the banner to delete
-     * @param currUser  the currently authenticated seller
-     * @return a {@link ResponseEntity} containing a success message
+     * @param id        the ID of the banner to delete.
+     * @param currUser  the currently authenticated seller.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:banner')")
@@ -93,9 +93,9 @@ public class BannerController {
     /**
      * Deletes multiple banners specified by a list of IDs.
      *
-     * @param ids       list of banner IDs to delete
-     * @param currUser  the currently authenticated seller
-     * @return a {@link ResponseEntity} containing a success message
+     * @param ids       list of banner IDs to delete.
+     * @param currUser  the currently authenticated seller.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/delete-multiples")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:banner')")
@@ -109,12 +109,12 @@ public class BannerController {
     /**
      * Deletes banners that are NOT in the given list of IDs.
      *
-     * @param shopId    optional shop ID for filtering
-     * @param byShop    if true, filters banners created by shops, if false, filters banners created by system, null will return both
-     * @param keyword   search keyword for filtering banners
-     * @param ids       list of banner IDs to exclude from deletion
-     * @param currUser  the currently authenticated seller
-     * @return a {@link ResponseEntity} containing a success message
+     * @param shopId    optional shop ID for filtering.
+     * @param byShop    if true, filters banners created by shops, if false, filters banners created by system, null will return both.
+     * @param keyword   search keyword for filtering banners.
+     * @param ids       list of banner IDs to exclude from deletion.
+     * @param currUser  the currently authenticated seller.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/delete-inverse")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:banner')")
@@ -130,9 +130,9 @@ public class BannerController {
     /**
      * Deletes all banners, optionally filtered by shop.
      *
-     * @param shopId    optional shop ID for filtering
-     * @param currUser  the currently authenticated seller
-     * @return a {@link ResponseEntity} containing a success message
+     * @param shopId    optional shop ID for filtering.
+     * @param currUser  the currently authenticated seller.
+     * @return a {@link ResponseEntity} containing a success message.
      */
     @DeleteMapping("/delete-all")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:banner')")

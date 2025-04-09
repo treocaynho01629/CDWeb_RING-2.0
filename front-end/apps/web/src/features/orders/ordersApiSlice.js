@@ -1,4 +1,4 @@
-import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
+import { createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "@ring/redux";
 import { isEqual } from "lodash-es";
 import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
@@ -79,8 +79,9 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
           return endpointName;
         }
       },
-      merge: (currentCache, newItems) => {
+      merge: (currentCache, newItems, { arg: currentArg }) => {
         currentCache.page = newItems.page;
+        if (!currentArg?.loadMore) ordersAdapter.removeAll(currentCache);
         ordersAdapter.upsertMany(
           currentCache,
           ordersSelector.selectAll(newItems)
@@ -159,20 +160,3 @@ export const {
   useRefundOrderMutation,
   useConfirmOrderMutation,
 } = ordersApiSlice;
-
-export const selectOrdersResult =
-  ordersApiSlice.endpoints.getOrdersByUser.select();
-
-const selectOrdersData = createSelector(
-  selectOrdersResult,
-  (ordersResult) => ordersResult.data // normalized state object with ids & entities
-);
-
-export const {
-  selectAll: selectAllOrders,
-  selectById: selectOrderById,
-  selectIds: selectOrderIds,
-  selectEntities: selectOrderEntities,
-} = ordersAdapter.getSelectors(
-  (state) => selectOrdersData(state) ?? initialState
-);

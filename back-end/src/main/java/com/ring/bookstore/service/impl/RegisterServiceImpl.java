@@ -13,9 +13,9 @@ import com.ring.bookstore.model.entity.AccountProfile;
 import com.ring.bookstore.model.entity.Role;
 import com.ring.bookstore.model.enums.UserRole;
 import com.ring.bookstore.repository.AccountRepository;
+import com.ring.bookstore.repository.RoleRepository;
 import com.ring.bookstore.service.CaptchaService;
 import com.ring.bookstore.service.RegisterService;
-import com.ring.bookstore.service.RoleService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -31,8 +31,8 @@ import java.util.Set;
 public class RegisterServiceImpl implements RegisterService {
 
 	private final AccountRepository accountRepo;
+	private final RoleRepository roleRepo;
 
-	private final RoleService roleService;
 	private final CaptchaService captchaService;
 	private final ResetTokenServiceImpl resetService;
 
@@ -62,7 +62,7 @@ public class RegisterServiceImpl implements RegisterService {
 		} else {
 			//Set role for USER
 			Set<Role> roles = new HashSet<>();
-			roles.add(roleService.findByRoleName(UserRole.ROLE_USER)
+			roles.add(roleRepo.findByRoleName(UserRole.ROLE_USER)
 					.orElseThrow(() -> new ResourceNotFoundException("No roles has been set!")));
 
 			//Create and set new Account info

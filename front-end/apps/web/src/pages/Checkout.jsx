@@ -147,10 +147,8 @@ const Checkout = () => {
   const scrollRef = useRef(null);
   const prevPayload = useRef();
   const [activeStep, setActiveStep] = useState(0);
-  const [delivery, setDelivery] = useState(
-    Object.values(ShippingType)[0].value
-  );
-  const [payment, setPayment] = useState(Object.values(PaymentType)[0].value);
+  const [delivery, setDelivery] = useState(Object.keys(ShippingType)[0]);
+  const [payment, setPayment] = useState(Object.keys(PaymentType)[0]);
 
   const [pending, setPending] = useState(false);
   const maxSteps = 3;

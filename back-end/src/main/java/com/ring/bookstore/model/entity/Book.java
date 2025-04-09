@@ -44,8 +44,7 @@ public class Book extends Auditable {
 
     @OneToOne(fetch = FetchType.LAZY,
             orphanRemoval = true,
-            cascade = CascadeType.ALL,
-            optional = false)
+            cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id")
     @JsonIgnore
     @EqualsAndHashCode.Exclude
@@ -125,5 +124,11 @@ public class Book extends Auditable {
     public void removeReview(Review review) {
         bookReviews.remove(review);
         review.setBook(null);
+    }
+
+    @PreRemove
+    private void detachImageFromBook() {
+        if (this.image == null) return;
+        this.image = null;
     }
 }

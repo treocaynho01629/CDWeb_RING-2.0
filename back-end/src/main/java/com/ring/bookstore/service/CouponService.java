@@ -23,6 +23,7 @@ public interface CouponService {
                                List<String> codes,
                                String code,
                                Long shopId,
+                               Long userId,
                                Boolean byShop,
                                Boolean showExpired,
                                Double cValue,
@@ -39,7 +40,9 @@ public interface CouponService {
     CouponDTO recommendCoupon(Long shopId,
                               CartStateRequest state);
 
-    StatDTO getAnalytics(Long shopId);
+    StatDTO getAnalytics(Long shopId,
+                         Long userId,
+                         Account user);
 
     Coupon addCoupon(CouponRequest request,
                      Account user);
@@ -64,6 +67,7 @@ public interface CouponService {
                               List<String> codes,
                               String code,
                               Long shopId,
+                              Long userId,
                               Boolean byShop,
                               Boolean showExpired,
                               List<Long> ids,

@@ -59,7 +59,10 @@ export default function Navbar({ open, setOpen }) {
   const [openSetting, setOpenSetting] = useState(false);
   const [anchorEl, setAnchorEl] = useState(undefined);
   const openShop = Boolean(anchorEl);
-  const currRole = UserRole[roles?.find((role) => role.startsWith("ROLE_"))];
+  const roleIndexes = roles?.map((r) => Object.keys(UserRole).indexOf(r)) || [
+    0,
+  ];
+  const currRole = UserRole[Object.keys(UserRole)[Math.max(...roleIndexes)]];
 
   //Shop select
   const { data, isLoading, isSuccess, isError } = useGetPreviewShopsQuery(

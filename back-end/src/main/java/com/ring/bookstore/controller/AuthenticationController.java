@@ -36,7 +36,7 @@ public class AuthenticationController {
 	 *
 	 * @param registerRequest 	The registration request containing user details.
 	 * @param request 			The HTTP request containing reCAPTCHA score in the header.
-	 * @return a {@link ResponseEntity} containing a success or failure message
+	 * @return a {@link ResponseEntity} containing a success or failure message.
 	 */
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest,

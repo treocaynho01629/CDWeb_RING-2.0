@@ -69,7 +69,8 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         select od.id
         from OrderDetail od
         join od.items oi
-        where oi.book.id = :id
+        left join oi.book b
+        where b.id = :id
         group by od.id
         order by od.id desc
     """)

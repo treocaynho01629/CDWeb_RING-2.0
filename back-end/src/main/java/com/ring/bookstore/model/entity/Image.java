@@ -43,7 +43,6 @@ public class Image {
     @Column(name = "type")
     private String type;
 
-    //Image relation
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "detail_id")
     @JsonIgnore
