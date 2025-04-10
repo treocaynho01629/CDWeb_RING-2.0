@@ -50,6 +50,7 @@ public class CouponMapper {
         return new CouponDTO(coupon.getId(),
                 coupon.getCode(),
                 coupon.getIsUsable(),
+                coupon.getIsUsed(),
                 detail.getType(),
                 summary,
                 condition,

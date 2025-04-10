@@ -10,6 +10,7 @@ import java.time.LocalDate;
 public record CouponDTO(Long id,
                         String code,
                         Boolean isUsable,
+                        Boolean isUsed,
                         CouponType type,
                         String summary,
                         String condition,

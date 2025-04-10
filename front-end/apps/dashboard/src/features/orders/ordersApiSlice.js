@@ -1,5 +1,7 @@
+import { createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "@ring/redux";
 
+const ordersAdapter = createEntityAdapter({});
 const initialState = ordersAdapter.getInitialState({
   page: {
     number: 0,

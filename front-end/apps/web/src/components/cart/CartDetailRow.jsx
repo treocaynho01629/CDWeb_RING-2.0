@@ -424,7 +424,9 @@ const CartDetailRow = ({
                   ? isGroupSelected
                     ? `Đã giảm ${currencyFormat.format(discount)}`
                     : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
-                  : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
+                  : coupon?.isUsable
+                    ? `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
+                    : "Đổi mã giảm giá"
                 : "Thêm mã giảm giá"}
             </span>
             <KeyboardArrowRight fontSize="small" />

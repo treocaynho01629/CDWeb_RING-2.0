@@ -365,7 +365,7 @@ const CouponDialog = ({
     const isDisabled =
       selectMode && (!currCoupon?.isUsable || currCoupon?.shopId != shopId);
     const isUsed =
-      selectMode && (!currCoupon?.isUsed || currCoupon?.shopId != shopId);
+      selectMode && (currCoupon?.isUsed || currCoupon?.shopId != shopId);
     const isSelected = tempCoupon?.id == currCoupon?.id;
 
     topCoupon = (
