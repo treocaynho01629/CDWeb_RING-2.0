@@ -1,4 +1,8 @@
-import { booksApiSlice as initialsApiSlice } from "@ring/redux";
+import {
+  booksAdapter,
+  booksInitialState as initialState,
+  booksApiSlice as initialsApiSlice,
+} from "@ring/redux";
 
 export const booksApiSlice = initialsApiSlice.injectEndpoints({
   endpoints: (builder) => ({

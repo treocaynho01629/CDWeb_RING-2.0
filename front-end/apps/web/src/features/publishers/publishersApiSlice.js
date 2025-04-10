@@ -1,4 +1,9 @@
-import { publishersApiSlice as initialsApiSlice } from "@ring/redux";
+import {
+  publishersApiSlice as initialsApiSlice,
+  pubsInitialState as initialState,
+  pubsAdapter,
+  pubsSelector,
+} from "@ring/redux";
 
 export const publishersApiSlice = initialsApiSlice.injectEndpoints({
   endpoints: (builder) => ({

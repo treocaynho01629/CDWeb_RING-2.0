@@ -1,4 +1,8 @@
-import { couponsApiSlice as initialsApiSlice } from "@ring/redux";
+import {
+  couponsAdapter,
+  couponsApiSlice as initialsApiSlice,
+  couponsInitialState as initialState,
+} from "@ring/redux";
 
 export const couponsApiSlice = initialsApiSlice.injectEndpoints({
   endpoints: (builder) => ({

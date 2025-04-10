@@ -1,4 +1,9 @@
-import { categoriesApiSlice as initialsApiSlice } from "@ring/redux";
+import {
+  catesAdapter,
+  catesInitialState as initialState,
+  categoriesApiSlice as initialsApiSlice,
+  catesSelector,
+} from "@ring/redux";
 
 export const categoriesApiSlice = initialsApiSlice.injectEndpoints({
   endpoints: (builder) => ({

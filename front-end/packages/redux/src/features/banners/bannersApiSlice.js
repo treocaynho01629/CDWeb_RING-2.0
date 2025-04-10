@@ -1,8 +1,8 @@
 import { createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "@ring/redux";
 
-const bannersAdapter = createEntityAdapter({});
-const initialState = bannersAdapter.getInitialState({
+export const bannersAdapter = createEntityAdapter({});
+export const bannersInitialState = bannersAdapter.getInitialState({
   page: {
     number: 0,
     size: 0,
@@ -37,7 +37,7 @@ export const bannersApiSlice = apiSlice.injectEndpoints({
         const { content, page } = responseData;
         return bannersAdapter.setAll(
           {
-            ...initialState,
+            ...bannersInitialState,
             page,
           },
           content

@@ -3,9 +3,9 @@ import { apiSlice } from "@ring/redux";
 import { isEqual } from "lodash-es";
 import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
 
-const pubsAdapter = createEntityAdapter({});
-const pubsSelector = pubsAdapter.getSelectors();
-const initialState = pubsAdapter.getInitialState({
+export const pubsAdapter = createEntityAdapter({});
+export const pubsSelector = pubsAdapter.getSelectors();
+export const pubsInitialState = pubsAdapter.getInitialState({
   page: {
     number: 0,
     size: 0,
@@ -47,7 +47,7 @@ export const publishersApiSlice = apiSlice.injectEndpoints({
         const { content, page } = responseData;
         return pubsAdapter.setAll(
           {
-            ...initialState,
+            ...pubsInitialState,
             page,
           },
           content

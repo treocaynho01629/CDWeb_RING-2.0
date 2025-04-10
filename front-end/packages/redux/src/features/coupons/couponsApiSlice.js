@@ -3,9 +3,9 @@ import { apiSlice } from "@ring/redux";
 import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
 import { isEqual } from "lodash-es";
 
-const couponsAdapter = createEntityAdapter({});
-const couponsSelector = couponsAdapter.getSelectors();
-const initialState = couponsAdapter.getInitialState({
+export const couponsAdapter = createEntityAdapter({});
+export const couponsSelector = couponsAdapter.getSelectors();
+export const couponsInitialState = couponsAdapter.getInitialState({
   page: {
     number: 0,
     size: 0,
@@ -61,7 +61,7 @@ export const couponsApiSlice = apiSlice.injectEndpoints({
         const { content, page } = responseData;
         return couponsAdapter.setAll(
           {
-            ...initialState,
+            ...couponsInitialState,
             page,
           },
           content

@@ -30,6 +30,7 @@ import { trackWindowScroll } from "react-lazy-load-image-component";
 import CouponItem from "./CouponItem";
 import styled from "@emotion/styled";
 import useCoupon from "../../hooks/useCoupon";
+import { compact } from "lodash-es";
 
 //#region styled
 const TitleContainer = styled.div`
@@ -320,33 +321,43 @@ const CouponDialog = ({
   } else if (isSuccess) {
     const { ids, entities } = data;
 
-    coupons = ids?.length ? (
-      <>
-        <DetailTitle>{saved ? "Mã đã lưu" : "Mã giảm giá"}</DetailTitle>
-        {ids?.map((id, index) => {
-          const coupon = entities[id];
-          const summary = CouponType[coupon?.type];
-          const isDisabled = selectMode && !coupon.isUsable;
-          const isSelected = tempCoupon?.id == id;
-          const isSaved = savedCoupons?.indexOf(coupon?.code) != -1;
+    let content = ids?.length
+      ? ids?.map((id, index) => {
+          if (id != currCoupon?.id) {
+            const coupon = entities[id];
+            const summary = CouponType[coupon?.type];
+            const isDisabled = selectMode && !coupon.isUsable;
+            const isSelected = tempCoupon?.id == id;
+            const isSaved = savedCoupons?.indexOf(coupon?.code) != -1;
 
-          return (
-            <CouponItem
-              key={`coupon-${id}-${index}`}
-              {...{
-                coupon,
-                summary,
-                selectMode,
-                isDisabled,
-                isSelected,
-                isSaved,
-                onClickApply: setTempCoupon,
-              }}
-            />
-          );
-        })}
+            return (
+              <CouponItem
+                key={`coupon-${id}-${index}`}
+                {...{
+                  coupon,
+                  summary,
+                  selectMode,
+                  isDisabled,
+                  isSelected,
+                  isSaved,
+                  onClickApply: setTempCoupon,
+                }}
+              />
+            );
+          }
+        })
+      : null;
+
+    content = compact(content); // Removes undefined
+
+    coupons = (
+      <>
+        {content?.length > 0 && (
+          <DetailTitle>{saved ? "Mã đã lưu" : "Mã giảm giá"}</DetailTitle>
+        )}
+        {content}
       </>
-    ) : null;
+    );
   }
 
   if (currCoupon) {

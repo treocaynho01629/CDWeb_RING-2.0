@@ -515,15 +515,30 @@ const CartContent = ({ confirm }) => {
     handleClose();
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (isSelected(id)) handleSelect(id);
-    removeProduct(id);
-    handleClose();
+    const confirmation = await confirm();
+    if (confirmation) {
+      removeProduct(id);
+      handleClose();
+    } else {
+      console.log("Cancel");
+    }
   };
 
-  const handleDecrease = (quantity, id) => {
-    if (quantity == 1 && isSelected(id)) handleSelect(id); //Unselect if remove
-    decreaseAmount(id);
+  const handleDecrease = async (quantity, id) => {
+    if (quantity == 1) {
+      if (isSelected(id)) handleSelect(id); //Unselect if remove
+
+      const confirmation = await confirm();
+      if (confirmation) {
+        decreaseAmount(id);
+      } else {
+        console.log("Cancel");
+      }
+    } else {
+      decreaseAmount(id);
+    }
   };
 
   const handleChangeQuantity = (quantity, id) => {

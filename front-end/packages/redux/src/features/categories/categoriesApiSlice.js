@@ -3,9 +3,9 @@ import { apiSlice } from "@ring/redux";
 import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
 import { isEqual } from "lodash-es";
 
-const catesAdapter = createEntityAdapter({});
-const catesSelector = catesAdapter.getSelectors();
-const initialState = catesAdapter.getInitialState({
+export const catesAdapter = createEntityAdapter({});
+export const catesSelector = catesAdapter.getSelectors();
+export const catesInitialState = catesAdapter.getInitialState({
   page: {
     number: 0,
     size: 0,
@@ -49,7 +49,7 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
         const { content, page } = responseData;
         return catesAdapter.setAll(
           {
-            ...initialState,
+            ...catesInitialState,
             page,
           },
           content

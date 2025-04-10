@@ -3,9 +3,9 @@ import { apiSlice } from "@ring/redux";
 import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
 import { isEqual } from "lodash-es";
 
-const booksAdapter = createEntityAdapter({});
-const booksSelector = booksAdapter.getSelectors();
-const initialState = booksAdapter.getInitialState({
+export const booksAdapter = createEntityAdapter({});
+export const booksSelector = booksAdapter.getSelectors();
+export const booksInitialState = booksAdapter.getInitialState({
   page: {
     number: 0,
     size: 0,
@@ -66,7 +66,7 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         const { content, page } = responseData;
         return booksAdapter.setAll(
           {
-            ...initialState,
+            ...booksInitialState,
             page,
           },
           content
