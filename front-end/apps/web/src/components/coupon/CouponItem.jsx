@@ -203,9 +203,10 @@ const CouponIcon = styled.div`
 `;
 
 const ShopImage = styled(LazyLoadImage)`
-  height: 40px;
+  height: 45px;
   aspect-ratio: 1/1;
   border-radius: 50%;
+  border: 1px solid ${({ theme }) => theme.palette.success.main};
 `;
 
 const ShopName = styled.span`

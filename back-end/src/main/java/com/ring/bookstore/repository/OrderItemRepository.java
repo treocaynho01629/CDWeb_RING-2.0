@@ -35,7 +35,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
         left join od.shop s
         left join oi.book b
         left join b.image i
-        where od.id in (:ids)
+        where od.id in :ids
         order by oi.detail.id desc
     """)
     List<IOrderItem> findAllWithDetailIds(List<Long> ids);

@@ -120,7 +120,7 @@ public class PublisherController {
      * @param ids list of publisher IDs to delete.
      * @return a {@link ResponseEntity} containing a success message.
      */
-    @DeleteMapping("/delete-multiples")
+    @DeleteMapping("/delete-multiple")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:publisher')")
     public ResponseEntity<?> deletePublishers(@RequestParam("ids") List<Integer> ids) {
         pubService.deletePublishers(ids);

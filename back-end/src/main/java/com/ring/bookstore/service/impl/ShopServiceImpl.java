@@ -148,10 +148,6 @@ public class ShopServiceImpl implements ShopService {
     //Add shop (SELLER)
     @Transactional
     public Shop addShop(ShopRequest request, MultipartFile file, Account user) {
-        Image image = null;
-
-        //Image upload
-        if (file != null) image = imageService.upload(file, FileUploadUtil.SHOP_FOLDER);
 
         //Create address
         AddressRequest addressRequest = request.getAddressRequest();
@@ -170,7 +166,6 @@ public class ShopServiceImpl implements ShopService {
         var shop = Shop.builder()
                 .name(request.getName())
                 .description(request.getDescription())
-                .image(image)
                 .owner(user)
                 .address(savedAddress)
                 .build();
@@ -190,15 +185,6 @@ public class ShopServiceImpl implements ShopService {
 
         //Check if correct seller or admin
         if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
-
-        //Image upload/replace
-        if (file != null) { //Contain new image >> upload/replace
-            Long imageId = shop.getImage().getId();
-            if (imageId != null) imageService.deleteImage(imageId); //Delete old image
-
-            Image savedImage = imageService.upload(file, FileUploadUtil.SHOP_FOLDER); //Upload new image
-            shop.setImage(savedImage); //Set new image
-        }
 
         //Update address
         AddressRequest addressRequest = request.getAddressRequest();
@@ -280,7 +266,7 @@ public class ShopServiceImpl implements ShopService {
     }
 
     protected Shop changeShopPic(MultipartFile file, String image, Shop shop) {
-        if (file != null) { //Contain new image >> upload/replace
+        if (file != null) { // Contain new image >> upload/replace
             if (shop.getImage() != null) imageService.deleteImage(shop.getImage().getId()); //Delete old image
             Image savedImage = imageService.upload(file, FileUploadUtil.SHOP_FOLDER); //Upload new image
             shop.setImage(savedImage); //Set new image

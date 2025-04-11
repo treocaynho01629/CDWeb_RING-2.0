@@ -78,7 +78,7 @@ const ManageAuthorities = () => {
         } else if (err?.status === 409) {
           setErrMsg(err?.data?.message);
         } else if (err?.status === 403) {
-          setErrMsg("Lỗi xác thực!");
+          setErrMsg("Bạn không có quyền làm điều này!");
         } else if (err?.status === 400) {
           setErrMsg("Sai định dạng thông tin!");
         } else {

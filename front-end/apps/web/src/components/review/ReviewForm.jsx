@@ -126,6 +126,8 @@ const ReviewForm = ({
             setErrMsg("Server không phản hồi!");
           } else if (err?.status === 400) {
             setErrMsg(err.data.errors.content);
+          } else if (err?.status === 403) {
+            setErrMsg("Bạn không có quyền làm điều này!");
           } else if (err?.status === 409) {
             setErrMsg(err.data.message);
           } else {
@@ -159,6 +161,8 @@ const ReviewForm = ({
             setErrMsg("Server không phản hồi!");
           } else if (err?.status === 400) {
             setErrMsg(err.data.errors.content);
+          } else if (err?.status === 403) {
+            setErrMsg("Bạn không có quyền làm điều này!");
           } else if (err?.status === 409) {
             setErrMsg(err.data.message);
           } else {

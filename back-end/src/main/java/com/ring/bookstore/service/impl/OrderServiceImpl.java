@@ -2,9 +2,7 @@ package com.ring.bookstore.service.impl;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -255,13 +253,25 @@ public class OrderServiceImpl implements OrderService {
                 Sort.by(sortBy).descending());
         boolean isAdmin = isAuthAdmin();
 
-        Page<Long> receiptIds = orderRepo.findAllIds(shopId, isAdmin ? null : user.getId(), status, keyword, pageable); //Fetch from database
-        List<IOrderDetail> detailsList = detailRepo.findAllByReceiptIds(receiptIds.getContent());
+        Page<Long> pagedIds = orderRepo.findAllIds(shopId,
+                isAdmin ? null : user.getId(),
+                status,
+                keyword,
+                pageable); //Fetch from database
+        List<Long> receiptIds = pagedIds.getContent();
+        List<IOrderDetail> detailsList = detailRepo.findAllByReceiptIds(receiptIds);
+
+        // Sort by detail ids
+        Map<Long, Integer> idOrder = new HashMap<>();
+        for (int i = 0; i < receiptIds.size(); i++) idOrder.put(receiptIds.get(i), i);
+        detailsList.sort(Comparator.comparingInt(o -> idOrder.get(o.getOrderId())));
+
+        // Map
         List<ReceiptDTO> ordersList = orderMapper.detailsToReceiptDTOS(detailsList);
         Page<ReceiptDTO> ordersDTOS = new PageImpl<ReceiptDTO>(
                 ordersList,
                 pageable,
-                receiptIds.getTotalElements()
+                pagedIds.getTotalElements()
         );
 
         return ordersDTOS;
@@ -281,7 +291,10 @@ public class OrderServiceImpl implements OrderService {
                 Sort.by(sortBy).descending());
         boolean isAdmin = isAuthAdmin();
 
-        Page<IReceiptSummary> summariesList = orderRepo.findAllSummaries(shopId, isAdmin ? null : user.getId(), bookId, pageable);
+        Page<IReceiptSummary> summariesList = orderRepo.findAllSummaries(shopId,
+                isAdmin ? null : user.getId(),
+                bookId,
+                pageable);
         if (summariesList == null) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
         Page<ReceiptSummaryDTO> summariesDTOS = summariesList.map(orderMapper::summaryToDTO);
@@ -299,14 +312,22 @@ public class OrderServiceImpl implements OrderService {
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
 
-        //Same as getOrdersByUser
-        Page<Long> orderIds = detailRepo.findAllIdsByBookId(id, pageable);
-        List<IOrderItem> itemsList = itemRepo.findAllWithDetailIds(orderIds.getContent());
+        // Same as getOrdersByUser
+        Page<Long> pagedIds = detailRepo.findAllIdsByBookId(id, pageable);
+        List<Long> orderIds = pagedIds.getContent();
+        List<IOrderItem> itemsList = itemRepo.findAllWithDetailIds(orderIds);
+
+        // Sort by order ids
+        Map<Long, Integer> idOrder = new HashMap<>();
+        for (int i = 0; i < orderIds.size(); i++) idOrder.put(orderIds.get(i), i);
+        itemsList.sort(Comparator.comparingInt(i -> idOrder.get(i.getDetailId())));
+
+        // Map
         List<OrderDTO> ordersList = orderMapper.itemsToDetailDTO(itemsList);
         Page<OrderDTO> ordersDTO = new PageImpl<OrderDTO>(
                 ordersList,
                 pageable,
-                orderIds.getTotalElements()
+                pagedIds.getTotalElements()
         );
         return ordersDTO;
     }

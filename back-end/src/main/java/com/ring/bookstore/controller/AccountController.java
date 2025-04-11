@@ -139,7 +139,7 @@ public class AccountController {
      * @param ids a list of account IDs to delete.
      * @return a {@link ResponseEntity} containing a success message.
      */
-    @DeleteMapping("/delete-multiples")
+    @DeleteMapping("/delete-multiple")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:user')")
     public ResponseEntity<?> deleteAccounts(@RequestParam("ids") List<Long> ids) {
         accountService.deleteAccounts(ids);

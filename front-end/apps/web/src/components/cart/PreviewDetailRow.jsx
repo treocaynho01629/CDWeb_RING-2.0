@@ -281,8 +281,12 @@ const PreviewDetailRow = ({ shop, coupon, discount, handleOpenDialog }) => {
               &nbsp;
               {coupon
                 ? discount
-                  ? `Đã giảm ${currencyFormat.format(discount)}`
-                  : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
+                  ? true
+                    ? `Đã giảm ${currencyFormat.format(discount)}`
+                    : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
+                  : coupon?.isUsable
+                    ? `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
+                    : "Đổi mã giảm giá"
                 : "Thêm mã giảm giá"}
             </span>
             <KeyboardArrowRight fontSize="small" />

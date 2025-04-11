@@ -114,7 +114,14 @@ public class OrderController {
                                             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
                                             @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
                                             @CurrentAccount Account currUser) {
-        Page<ReceiptDTO> orders = orderService.getAllReceipts(currUser, shopId, status, keyword, pageNo, pageSize, sortBy, sortDir);
+        Page<ReceiptDTO> orders = orderService.getAllReceipts(currUser,
+                shopId,
+                status,
+                keyword,
+                pageNo,
+                pageSize,
+                sortBy,
+                sortDir);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 

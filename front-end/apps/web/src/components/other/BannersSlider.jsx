@@ -222,7 +222,7 @@ function Item({ banner, index }) {
               }
             />
           </BackdropContainer>
-          <StyledLink>
+          <StyledLink to={banner?.url}>
             <StyledLazyImage
               src={banner?.image.url}
               srcSet={Object.values(ImageSize)

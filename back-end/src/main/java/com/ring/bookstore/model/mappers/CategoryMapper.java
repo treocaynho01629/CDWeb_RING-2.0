@@ -2,10 +2,10 @@ package com.ring.bookstore.model.mappers;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
+import com.ring.bookstore.model.dto.projection.categories.ICategory;
 import com.ring.bookstore.model.dto.response.categories.CategoryDTO;
 import com.ring.bookstore.model.dto.response.categories.CategoryDetailDTO;
 import com.ring.bookstore.model.dto.response.categories.PreviewCategoryDTO;
-import com.ring.bookstore.model.dto.projection.categories.ICategory;
 import com.ring.bookstore.model.entity.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class CategoryMapper {
                 category.getParent() != null ? category.getParent().getId() : null);
     }
 
-    public List<CategoryDTO> parendAndChildsToCateDTOS(List<ICategory> all, List<Integer> orderedIds) {
+    public List<CategoryDTO> parentAndChildToCateDTOS(List<ICategory> all) {
         Map<Integer, CategoryDTO> catesMap = new LinkedHashMap<>();
         Collections.reverse(all);
 
@@ -58,13 +58,8 @@ public class CategoryMapper {
 
         }
 
-        //Reordered to list
-        List<CategoryDTO> result = new ArrayList<>();
-        for (Integer id : orderedIds) {
-            if (catesMap.containsKey(id)) {
-                result.add(catesMap.get(id));
-            }
-        }
+        //Convert & return
+        List<CategoryDTO> result = new ArrayList<CategoryDTO>(catesMap.values());
         return result;
     }
 

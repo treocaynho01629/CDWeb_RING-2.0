@@ -177,7 +177,7 @@ public class CouponController {
      * @param currUser the current authenticated seller.
      * @return success message.
      */
-    @DeleteMapping("/delete-multiples")
+    @DeleteMapping("/delete-multiple")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:coupon')")
     public ResponseEntity<?> deleteCoupons(@RequestParam("ids") List<Long> ids,
                                            @CurrentAccount Account currUser

@@ -97,7 +97,7 @@ public class BannerController {
      * @param currUser  the currently authenticated seller.
      * @return a {@link ResponseEntity} containing a success message.
      */
-    @DeleteMapping("/delete-multiples")
+    @DeleteMapping("/delete-multiple")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:banner')")
     public ResponseEntity<?> deleteBanners(@RequestParam("ids") List<Integer> ids,
                                            @CurrentAccount Account currUser

@@ -146,7 +146,7 @@ public class CategoryController {
      * @param ids list of category IDs to delete.
      * @return a {@link ResponseEntity} containing a success message.
      */
-    @DeleteMapping("/delete-multiples")
+    @DeleteMapping("/delete-multiple")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:category')")
     public ResponseEntity<?> deleteCategories(@RequestParam(value = "parentId", required = false) Integer parentId,
                                               @RequestParam("ids") List<Integer> ids

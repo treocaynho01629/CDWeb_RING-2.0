@@ -1,9 +1,11 @@
+import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
 import {
   catesAdapter,
   catesInitialState as initialState,
   categoriesApiSlice as initialsApiSlice,
   catesSelector,
 } from "@ring/redux";
+import { isEqual } from "lodash-es";
 
 export const categoriesApiSlice = initialsApiSlice.injectEndpoints({
   endpoints: (builder) => ({

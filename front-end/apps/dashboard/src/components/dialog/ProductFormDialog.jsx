@@ -373,7 +373,7 @@ const ProductFormDialog = ({
           } else if (err?.status === 409) {
             setErrMsg(err?.data?.message);
           } else if (err?.status === 403) {
-            setErrMsg("Chưa có ảnh kèm theo!");
+            setErrMsg("Bạn không có quyền làm điều này!");
           } else if (err?.status === 400) {
             setErrMsg("Sai định dạng thông tin!");
           } else if (err?.status === 417) {
@@ -403,7 +403,7 @@ const ProductFormDialog = ({
           } else if (err?.status === 409) {
             setErrMsg(err?.data?.message);
           } else if (err?.status === 403) {
-            setErrMsg("Chưa có ảnh kèm theo!");
+            setErrMsg("Bạn không có quyền làm điều này!");
           } else if (err?.status === 400) {
             setErrMsg("Sai định dạng thông tin!");
           } else if (err?.status === 417) {

@@ -93,7 +93,7 @@ const ResetTab = ({
         } else if (err?.status === 404) {
           setErrMsg("Link không hợp lệ!");
         } else if (err?.status === 403) {
-          setErrMsg("Lỗi xác thực!");
+          setErrMsg("Bạn không có quyền làm điều này!");
         } else if (err?.status === 412) {
           setChallenge(true);
           setErrMsg("Yêu cầu của bạn cần xác thực lại!");

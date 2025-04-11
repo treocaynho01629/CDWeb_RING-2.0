@@ -4,6 +4,7 @@ import {
   pubsAdapter,
   pubsSelector,
 } from "@ring/redux";
+import { isEqual } from "lodash-es";
 
 export const publishersApiSlice = initialsApiSlice.injectEndpoints({
   endpoints: (builder) => ({

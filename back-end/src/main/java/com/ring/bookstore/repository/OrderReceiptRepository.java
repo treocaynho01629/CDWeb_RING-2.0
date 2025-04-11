@@ -52,7 +52,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
      */
     @Query(value = """
         select distinct o.id as id, i as image, a.name as name,
-        o.createdDate as date, o.total - o.totalDiscount as totalPrice,
+        o.lastModifiedDate as date, o.total - o.totalDiscount as totalPrice,
         sum(oi.quantity) as totalItems
         from OrderReceipt o
         join o.details od
@@ -66,7 +66,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         where (coalesce(:shopId) is null or s.id = :shopId)
         and (coalesce(:userId) is null or s.owner.id = :userId)
         and (coalesce(:bookId) is null or b.id = :bookId)
-        group by o.id, i.id, a.name, o.createdDate
+        group by o.id, i.id, a.name, o.lastModifiedDate
     """,
     countQuery = """
         select count(o.id)
@@ -124,16 +124,16 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
     //Exclude shipping fee?
     @Query("""
         select t.currentMonth as total, t.currentMonth as currentMonth, t.lastMonth as lastMonth
-        from (select coalesce(sum(case when o.createdDate >= date_trunc('month', current date)
+        from (select coalesce(sum(case when o.lastModifiedDate >= date_trunc('month', current date)
                     then (od.totalPrice - od.discount) end), 0) as currentMonth,
-            coalesce(sum(case when o.createdDate >= date_trunc('month', current date) - 1 month
-                and o.createdDate < date_trunc('month', current date)
+            coalesce(sum(case when o.lastModifiedDate >= date_trunc('month', current date) - 1 month
+                and o.lastModifiedDate < date_trunc('month', current date)
                     then (od.totalPrice - od.discount) end), 0) lastMonth
             from OrderDetail od
                 join od.order o
                 left join od.shop s
             where od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
-            and o.createdDate >= date_trunc('month', current date) - 1 month
+            and o.lastModifiedDate >= date_trunc('month', current date) - 1 month
             and (coalesce(:shopId) is null or s.id = :shopId)
             and (coalesce(:userId) is null or s.owner.id = :userId)
         ) t
@@ -151,7 +151,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
      *         including keys for the month (name), total sales (sales), and total discounts (discount)
      */
     @Query("""
-        select month(o.createdDate) as name,
+        select month(o.lastModifiedDate) as name,
             coalesce(sum(distinct od.discount), 0) as discount,
             coalesce(sum(distinct o.total) , 0) as sales
         from OrderReceipt o
@@ -160,8 +160,8 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         where od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
         and (coalesce(:shopId) is null or s.id = :shopId)
         and (coalesce(:userId) is null or s.owner.id = :userId)
-        and (coalesce(:year) is null or year(o.createdDate) = :year)
-        group by month(o.createdDate)
+        and (coalesce(:year) is null or year(o.lastModifiedDate) = :year)
+        group by month(o.lastModifiedDate)
     """)
     List<Map<String, Object>> getMonthlySales(Long shopId,
                                               Long userId,

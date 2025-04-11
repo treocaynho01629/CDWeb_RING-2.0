@@ -29,9 +29,10 @@ public class OrderMapper {
 
         //If user deleted
         String username = user != null ? user.getUsername() : "Người dùng RING!";
+        String email = order.getEmail() != null ? order.getEmail() : "Người dùng RING!";
 
         return new ReceiptDTO(order.getId(),
-                order.getEmail(),
+                email,
                 address.getCompanyName() != null ? address.getCompanyName() : address.getName(),
                 null,
                 address.getPhone(),
@@ -81,9 +82,10 @@ public class OrderMapper {
 
                 //If user deleted
                 String username = projectedDetail.getUsername() != null ? projectedDetail.getUsername() : "Người dùng RING!";
+                String email = projectedDetail.getEmail() != null ? projectedDetail.getEmail() : "Người dùng RING!";
 
                 var newReceipt = ReceiptDTO.builder().id(projectedDetail.getOrderId())
-                        .email(projectedDetail.getEmail())
+                        .email(email)
                         .name(projectedDetail.getName())
                         .image(url)
                         .phone(projectedDetail.getPhone())

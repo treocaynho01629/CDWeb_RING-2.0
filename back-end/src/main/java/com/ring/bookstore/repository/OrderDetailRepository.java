@@ -1,15 +1,13 @@
 package com.ring.bookstore.repository;
 
 import com.ring.bookstore.model.dto.projection.orders.IOrderDetail;
-import com.ring.bookstore.model.entity.Coupon;
+import com.ring.bookstore.model.entity.OrderDetail;
 import com.ring.bookstore.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import com.ring.bookstore.model.entity.OrderDetail;
 
 import java.util.List;
 import java.util.Optional;
@@ -86,10 +84,10 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
      *         containing detailed information about the orders
      */
     @Query("""
-        select distinct od as detail,
+        select od as detail,
         o.id as orderId, s.name as shopName, u.email as email, u.username as username,
         a.phone as phone, a.name as name, i as image, a.address as address, o.orderMessage as message,
-        o.createdDate as date, o.total as total, o.totalDiscount as totalDiscount,
+        o.lastModifiedDate as date, o.total as total, o.totalDiscount as totalDiscount,
         sum(oi.quantity) as totalItems
         from OrderDetail od
         join od.order o
@@ -99,7 +97,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         left join o.user u
         left join u.profile p
         left join p.image i
-        where o.id in (:ids)
+        where o.id in :ids
         group by o.id, i.id, a.name, s.name, u.email, u.username, od.id, a.phone, a.address
     """)
     List<IOrderDetail> findAllByReceiptIds(List<Long> ids);

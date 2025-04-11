@@ -3,8 +3,11 @@ import { useTitle } from "@ring/shared";
 import { HeaderContainer } from "../components/custom/Components";
 import TableReviews from "../components/table/TableReviews";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
+import { useState } from "react";
 
 const ManageReviews = () => {
+  const [pending, setPending] = useState(false);
+
   //Set title
   useTitle("Đánh giá");
 
@@ -18,7 +21,7 @@ const ManageReviews = () => {
           </CustomBreadcrumbs>
         </div>
       </HeaderContainer>
-      <TableReviews />
+      <TableReviews {...{ pending, setPending }} />
     </>
   );
 };

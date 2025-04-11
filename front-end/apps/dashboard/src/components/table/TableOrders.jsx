@@ -396,7 +396,7 @@ export default function TableOrders({ shop }) {
     number: 0,
     size: 10,
     totalPages: 0,
-    sortBy: "createdDate",
+    sortBy: "lastModifiedDate",
     sortDir: "desc",
   });
 

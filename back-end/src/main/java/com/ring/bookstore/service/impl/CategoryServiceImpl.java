@@ -40,13 +40,22 @@ public class CategoryServiceImpl implements CategoryService {
         Page<CategoryDTO> cateDTOS = null;
 
         if (include != null && include.equalsIgnoreCase("children")) {
-            Page<Integer> cateIds = cateRepo.findCateIdsByParent(parentId, pageable);
-            List<ICategory> fullList = cateRepo.findParentAndSubCatesWithParentIds(cateIds.getContent());
-            List<CategoryDTO> catesList = cateMapper.parendAndChildsToCateDTOS(fullList, cateIds.getContent());
+            Page<Integer> pagedIds = cateRepo.findCateIdsByParent(parentId, pageable);
+            List<Integer> cateIds = pagedIds.getContent();
+            List<ICategory> fullList = cateRepo.findParentAndSubCatesWithParentIds(cateIds);
+
+            // Map
+            List<CategoryDTO> catesList = cateMapper.parentAndChildToCateDTOS(fullList);
+
+            // Sort by parent ids
+            Map<Integer, Integer> idOrder = new HashMap<>();
+            for (int i = 0; i < cateIds.size(); i++) idOrder.put(cateIds.get(i), i);
+            catesList.sort(Comparator.comparingInt(c -> idOrder.get(c.id())));
+
             cateDTOS = new PageImpl<CategoryDTO>(
                     catesList,
                     pageable,
-                    cateIds.getTotalElements()
+                    pagedIds.getTotalElements()
             );
             return cateDTOS;
         } else {
@@ -70,8 +79,14 @@ public class CategoryServiceImpl implements CategoryService {
         List<Integer> joinedIds = new ArrayList<>(joinedIdsSet.stream().toList());
         List<ICategory> fullList = cateRepo.findCatesWithIds(joinedIds);
 
-        Collections.reverse(joinedIds);
-        List<CategoryDTO> catesList = cateMapper.parendAndChildsToCateDTOS(fullList, joinedIds);
+        // Map
+        List<CategoryDTO> catesList = cateMapper.parentAndChildToCateDTOS(fullList);
+
+        // Sort by parent ids
+        Map<Integer, Integer> idOrder = new HashMap<>();
+        for (int i = 0; i < joinedIds.size(); i++) idOrder.put(joinedIds.get(i), i);
+        catesList.sort(Comparator.comparingInt(c -> idOrder.get(c.id())));
+
         Page<CategoryDTO> cateDTOS = new PageImpl<CategoryDTO>(
                 catesList,
                 pageable,

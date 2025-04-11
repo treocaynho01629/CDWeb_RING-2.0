@@ -50,7 +50,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
      * @param byShop a boolean flag to determine whether to include coupons linked with a shop
      * @param showExpired a boolean flag to include expired*/
     @Query("""
-            	select c as coupon, s.name as shopName, i as image
+            	select c as coupon, s.name as shopName, i as shopImage
                 from Coupon c
                 join fetch c.detail cd
                 left join c.shop s

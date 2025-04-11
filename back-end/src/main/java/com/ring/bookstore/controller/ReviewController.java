@@ -187,7 +187,7 @@ public class ReviewController {
      * @param ids list of review IDs to delete.
      * @return a {@link ResponseEntity} with a success message.
      */
-    @DeleteMapping("/delete-multiples")
+    @DeleteMapping("/delete-multiple")
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:review')")
     public ResponseEntity<?> deleteReviews(@RequestParam("ids") List<Long> ids) {
         reviewService.deleteReviews(ids);

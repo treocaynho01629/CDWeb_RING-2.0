@@ -225,7 +225,7 @@ public class BookController {
      *
      * @param id the ID of the book to delete.
      * @param currUser the currently authenticated seller.
-     * @return a {@link ResponseEntity} containing a success message.
+     * @return a {@link ResponseEntity} containing a deleted book DTO.
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:book')")
@@ -241,7 +241,7 @@ public class BookController {
      * @param currUser the currently authenticated seller.
      * @return a {@link ResponseEntity} containing a success message.
      */
-    @DeleteMapping("/delete-multiples")
+    @DeleteMapping("/delete-multiple")
     @PreAuthorize("hasRole('SELLER') and hasAuthority('delete:book')")
     public ResponseEntity<?> deleteBooks(@RequestParam("ids") List<Long> ids,
                                          @CurrentAccount Account currUser) {
