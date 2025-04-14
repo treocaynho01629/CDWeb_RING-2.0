@@ -126,9 +126,28 @@ public class Book extends Auditable {
         review.setBook(null);
     }
 
+    public void removeAllReviews() {
+        bookReviews.forEach(review -> review.setBook(null));
+        this.bookReviews.clear();
+    }
+
+    public void addOrderItem(OrderItem orderItem) {
+        orderItems.add(orderItem);
+        orderItem.setBook(this);
+    }
+
+    public void removeOrderItem(OrderItem orderItem) {
+        orderItems.remove(orderItem);
+        orderItem.setBook(null);
+    }
+
+    public void removeAllOrderItems() {
+        orderItems.forEach(orderItem -> orderItem.setBook(null));
+        this.orderItems.clear();
+    }
+
     @PreRemove
     private void detachImageFromBook() {
-        if (this.image == null) return;
         this.image = null;
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -83,7 +84,7 @@ class OrderDetailRepositoryTest extends AbstractRepositoryTest {
                 .build();
         book.setCreatedDate(LocalDateTime.now());
         book2.setCreatedDate(LocalDateTime.now());
-        bookRepo.saveAll(List.of(book, book2));
+        bookRepo.saveAll(new ArrayList<>(List.of(book, book2)));
 
         Address address = Address.builder()
                 .address("123/abc/j12")
@@ -92,7 +93,7 @@ class OrderDetailRepositoryTest extends AbstractRepositoryTest {
                 .address("321/abc/j12")
                 .build();
 
-        addressRepo.saveAll(List.of(address, address2));
+        addressRepo.saveAll(new ArrayList<>(List.of(address, address2)));
 
         receipt = OrderReceipt.builder()
                 .user(account)
@@ -104,7 +105,7 @@ class OrderDetailRepositoryTest extends AbstractRepositoryTest {
                 .build();
         receipt.setCreatedDate(LocalDateTime.now());
         receipt2.setCreatedDate(LocalDateTime.now());
-        List<OrderReceipt> receipts = List.of(receipt, receipt2);
+        List<OrderReceipt> receipts = new ArrayList<>(List.of(receipt, receipt2));
         receiptRepo.saveAll(receipts);
 
         detail = OrderDetail.builder()
@@ -122,7 +123,7 @@ class OrderDetailRepositoryTest extends AbstractRepositoryTest {
                 .status(OrderStatus.COMPLETED)
                 .shop(shop)
                 .build();
-        List<OrderDetail> details = List.of(detail, detail2, detail3);
+        List<OrderDetail> details = new ArrayList<>(List.of(detail, detail2, detail3));
         detailRepo.saveAll(details);
 
         item = OrderItem.builder()
@@ -137,7 +138,7 @@ class OrderDetailRepositoryTest extends AbstractRepositoryTest {
                 .detail(detail3)
                 .book(book2)
                 .build();
-        List<OrderItem> items = List.of(item, item2, item3);
+        List<OrderItem> items = new ArrayList<>(List.of(item, item2, item3));
         itemRepo.saveAll(items);
         entityManager.flush();
         entityManager.clear();
@@ -254,7 +255,8 @@ class OrderDetailRepositoryTest extends AbstractRepositoryTest {
     public void whenFindAllByReceiptIds_ThenReturnOrderDetails() {
 
         // When
-        List<IOrderDetail> orderDetails = detailRepo.findAllByReceiptIds(List.of(receipt.getId()));
+        List<IOrderDetail> orderDetails = detailRepo.findAllByReceiptIds(
+                new ArrayList<>(List.of(receipt.getId())));
 
         // Then
         assertNotNull(orderDetails);

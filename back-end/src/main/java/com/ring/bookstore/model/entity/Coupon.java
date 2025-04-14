@@ -71,4 +71,34 @@ public class Coupon extends Auditable {
 
     @Transient
     private Boolean isUsed = false;
+
+    public void addCouponReceipt(OrderReceipt receipt) {
+        this.couponReceipts.add(receipt);
+        receipt.setCoupon(this);
+    }
+
+    public void removeCouponReceipt(OrderReceipt receipt) {
+        this.couponReceipts.remove(receipt);
+        receipt.setCoupon(null);
+    }
+
+    public void removeAllCouponReceipts() {
+        couponReceipts.forEach(receipt -> receipt.setCoupon(null));
+        this.couponReceipts.clear();
+    }
+
+    public void addCouponOrderDetail(OrderDetail detail) {
+        this.couponOrderDetails.add(detail);
+        detail.setCoupon(this);
+    }
+
+    public void removeCouponOrderDetail(OrderDetail detail) {
+        this.couponOrderDetails.remove(detail);
+        detail.setCoupon(null);
+    }
+
+    public void removeAllCouponOrderDetails() {
+        couponOrderDetails.forEach(detail -> detail.setCoupon(null));
+        this.couponOrderDetails.clear();
+    }
 }

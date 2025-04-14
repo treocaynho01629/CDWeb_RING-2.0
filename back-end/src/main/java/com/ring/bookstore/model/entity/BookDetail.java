@@ -65,4 +65,9 @@ public class BookDetail {
         previewImages.remove(image);
         image.setDetail(null);
     }
+
+    public void removeAllImages() {
+        previewImages.forEach(image -> image.setDetail(null));
+        this.previewImages.clear();
+    }
 }

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,9 +41,6 @@ class BookDetailRepositoryTest extends AbstractRepositoryTest {
     @Autowired
     private ImageRepository imageRepo;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     private Book book;
     private BookDetail detail;
 
@@ -68,6 +66,7 @@ class BookDetailRepositoryTest extends AbstractRepositoryTest {
 
         Image image = Image.builder().name("image").build();
         Image image2 = Image.builder().name("image2").build();
+        Image image3 = Image.builder().name("image3").build();
 
         book = Book.builder()
                 .image(image)
@@ -95,18 +94,19 @@ class BookDetailRepositoryTest extends AbstractRepositoryTest {
                 .build();
         book.setCreatedDate(LocalDateTime.now().minusMonths(1));
         book2.setCreatedDate(LocalDateTime.now().minusMonths(1));
-        List<Book> books = List.of(book, book2);
+        List<Book> books = new ArrayList<>(List.of(book, book2));
         bookRepo.saveAll(books);
 
         detail = BookDetail.builder()
                 .book(book)
                 .pages(123)
+                .previewImages(new ArrayList<>(List.of(image3)))
                 .build();
         BookDetail detail2 = BookDetail.builder()
                 .book(book2)
                 .pages(123)
                 .build();
-        List<BookDetail> details = List.of(detail, detail2);
+        List<BookDetail> details = new ArrayList<>(List.of(detail, detail2));
         detailRepo.saveAll(details);
     }
 
@@ -155,24 +155,16 @@ class BookDetailRepositoryTest extends AbstractRepositoryTest {
     @Test
     public void whenDeleteBookDetail_ThenFindNull() {
 
-        // Given
-        Image image = Image.builder().name("image3").detail(detail).build();
-        imageRepo.save(image);
-
-        entityManager.flush();
-        entityManager.clear();
-
         // When
         detailRepo.deleteById(detail.getId());
 
         // Then
         BookDetail foundDetail = detailRepo.findById(detail.getId()).orElse(null);
         Book foundBook = bookRepo.findById(book.getId()).orElse(null);
-        Image foundImage = imageRepo.findById(image.getId()).orElse(null);
-
+        List<Image> foundImages = imageRepo.findAll();
         assertNull(foundDetail);
-        assertNull(foundImage);
         assertNotNull(foundBook);
+        assertEquals(2, foundImages.size());
     }
 
     @Test

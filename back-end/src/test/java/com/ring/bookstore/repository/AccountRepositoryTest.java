@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -62,14 +63,14 @@ class AccountRepositoryTest extends AbstractRepositoryTest {
     void setUp() {
         Privilege privilege = Privilege.builder().privilegeType(PrivilegeType.CREATE_ADDRESS).build();
         Privilege savedPrivilege = privilegeRepo.save(privilege);
-        Role role = Role.builder().roleName(UserRole.ROLE_GUEST).privileges(List.of(savedPrivilege)).build();
+        Role role = Role.builder().roleName(UserRole.ROLE_GUEST).privileges(new ArrayList<>(List.of(savedPrivilege))).build();
         Role savedRole = roleRepo.save(role);
 
         account = Account.builder()
                 .username("initial")
                 .pass("asd")
                 .email("initialEmail@initial.com")
-                .roles(List.of(savedRole))
+                .roles(new ArrayList<>(List.of(savedRole)))
                 .resetToken("reset123")
                 .build();
         Account account2 = Account.builder()
@@ -77,19 +78,19 @@ class AccountRepositoryTest extends AbstractRepositoryTest {
                 .pass("password")
                 .email("test1@example.com")
                 .resetToken("reset321")
-                .roles(List.of(savedRole))
+                .roles(new ArrayList<>(List.of(savedRole)))
                 .build();
         Account account3 = Account.builder()
                 .username("testUser2")
                 .pass("password")
                 .email("test2@example.com")
                 .resetToken("reset234")
-                .roles(List.of(savedRole))
+                .roles(new ArrayList<>(List.of(savedRole)))
                 .build();
         account.setCreatedDate(LocalDateTime.now().minusMonths(1));
         account2.setCreatedDate(LocalDateTime.now().minusMonths(1));
         account3.setCreatedDate(LocalDateTime.now());
-        List<Account> accounts = List.of(account, account2, account3);
+        List<Account> accounts = new ArrayList<>(List.of(account, account2, account3));
         accountRepo.saveAll(accounts);
 
         token = RefreshToken.builder()

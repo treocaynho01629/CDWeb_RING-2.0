@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,7 +80,7 @@ class CouponRepositoryTest extends AbstractRepositoryTest {
         coupon.setCreatedDate(LocalDateTime.now().minusMonths(1));
         coupon2.setCreatedDate(LocalDateTime.now().minusMonths(1));
         coupon3.setCreatedDate(LocalDateTime.now());
-        List<Coupon> coupons = List.of(coupon, coupon2, coupon3);
+        List<Coupon> coupons = new ArrayList<>(List.of(coupon, coupon2, coupon3));
         couponRepo.saveAll(coupons);
 
         detail = CouponDetail.builder()
@@ -109,7 +110,7 @@ class CouponRepositoryTest extends AbstractRepositoryTest {
                 .type(CouponType.SHIPPING)
                 .coupon(coupon3)
                 .build();
-        List<CouponDetail> details = List.of(detail, detail2, detail3);
+        List<CouponDetail> details = new ArrayList<>(List.of(detail, detail2, detail3));
         detailRepo.saveAll(details);
 
         receipt = OrderReceipt.builder()
@@ -249,8 +250,8 @@ class CouponRepositoryTest extends AbstractRepositoryTest {
                 null,
                 null,
                 null,
-                true,
                 null,
+                true,
                 foundIds);
 
         // Then
@@ -262,7 +263,7 @@ class CouponRepositoryTest extends AbstractRepositoryTest {
     public void whenFindRecommendCoupons_ThenReturnCoupons() {
 
         // When
-        List<ICoupon> foundCoupons = couponRepo.recommendCoupons(List.of(shop.getId()));
+        List<ICoupon> foundCoupons = couponRepo.recommendCoupons(new ArrayList<>(List.of(shop.getId())));
 
         // Then
         assertNotNull(foundCoupons);
@@ -273,7 +274,7 @@ class CouponRepositoryTest extends AbstractRepositoryTest {
     public void whenFindCouponsInCodes_ThenReturnCoupons() {
 
         // When
-        List<ICoupon> foundCoupons = couponRepo.findCouponInCodes(List.of("TEST1", "TEST2"));
+        List<ICoupon> foundCoupons = couponRepo.findCouponInCodes(new ArrayList<>(List.of("TEST1", "TEST2")));
 
         // Then
         assertNotNull(foundCoupons);

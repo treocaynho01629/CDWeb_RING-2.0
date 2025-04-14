@@ -149,7 +149,7 @@ public class ShopServiceImpl implements ShopService {
     @Transactional
     public Shop addShop(ShopRequest request, MultipartFile file, Account user) {
 
-        //Create address
+        // Create address
         AddressRequest addressRequest = request.getAddressRequest();
         var address = Address.builder()
                 .name(addressRequest.getName())
@@ -162,7 +162,7 @@ public class ShopServiceImpl implements ShopService {
 
         Address savedAddress = addressRepo.save(address); //Save address
 
-        //Create new shop
+        // Create new shop
         var shop = Shop.builder()
                 .name(request.getName())
                 .description(request.getDescription())
@@ -170,7 +170,7 @@ public class ShopServiceImpl implements ShopService {
                 .address(savedAddress)
                 .build();
 
-        //Image upload/replace
+        // Image upload/replace
         shop = this.changeShopPic(file, request.getImage(), shop);
 
         Shop addedShop = shopRepo.save(shop); //Save to database
@@ -179,6 +179,7 @@ public class ShopServiceImpl implements ShopService {
 
     @Transactional
     public Shop updateShop(Long id, ShopRequest request, MultipartFile file, Account user) {
+
         //Get original shop
         Shop shop = shopRepo.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Shop not found"));

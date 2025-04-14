@@ -56,6 +56,11 @@ public class Role {
         user.getRoles().remove(this);
     }
 
+    public void removeAllUsers() {
+        users.forEach(user -> user.getRoles().remove(this));
+        this.users.clear();
+    }
+
     public void addPrivilege(Privilege privilege) {
         this.privileges.add(privilege);
         privilege.getRoles().add(this);
@@ -64,5 +69,10 @@ public class Role {
     public void removePrivilege(Privilege privilege) {
         this.privileges.add(privilege);
         privilege.getRoles().remove(this);
+    }
+
+    public void removeAllPrivileges() {
+        privileges.forEach(privilege -> privilege.getRoles().remove(this));
+        this.privileges.clear();
     }
 }

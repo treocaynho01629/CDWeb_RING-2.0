@@ -87,12 +87,17 @@ public class OrderDetail {
     private CouponDTO couponDTO;
 
     public void addOrderItem(OrderItem item) {
-        items.add(item);
+        this.items.add(item);
         item.setDetail(this);
     }
 
     public void removeOrderItem(OrderItem item) {
-        items.remove(item);
+        this.items.remove(item);
         item.setDetail(null);
+    }
+
+    public void removeAllOrderItems() {
+        items.forEach(item -> item.setDetail(null));
+        this.items.clear();
     }
 }

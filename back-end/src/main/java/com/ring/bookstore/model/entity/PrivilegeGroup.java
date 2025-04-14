@@ -27,7 +27,23 @@ public class PrivilegeGroup {
     private String groupName;
 
     @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true,
             mappedBy = "group",
             fetch = FetchType.EAGER)
     private Collection<Privilege> groupPrivileges;
+
+    public void addPrivilege(Privilege privilege) {
+        this.groupPrivileges.add(privilege);
+        privilege.setGroup(this);
+    }
+
+    public void removePrivilege(Privilege privilege) {
+        this.groupPrivileges.remove(privilege);
+        privilege.setGroup(null);
+    }
+
+    public void removeAllPrivileges() {
+        groupPrivileges.forEach(privilege -> privilege.setGroup(null));
+        this.groupPrivileges.clear();
+    }
 }

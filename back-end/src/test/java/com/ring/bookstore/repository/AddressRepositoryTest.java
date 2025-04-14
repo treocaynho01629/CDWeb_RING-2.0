@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -110,7 +111,7 @@ class AddressRepositoryTest extends AbstractRepositoryTest {
                 .build();
 
         profileRepo.save(profile);
-        addressRepo.saveAll(List.of(address1, address2));
+        addressRepo.saveAll(new ArrayList<>(List.of(address1, address2)));
 
         // When
         List<IAddress> foundAddresses = addressRepo.findAddressesByProfile(profile.getId());

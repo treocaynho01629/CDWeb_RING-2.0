@@ -142,6 +142,7 @@ public class CouponServiceImpl implements CouponService {
     //Add coupon (SELLER)
     @Transactional
     public Coupon addCoupon(CouponRequest request, Account user) {
+
         //Create new coupon
         var coupon = Coupon.builder()
                 .code(request.getCode())
@@ -150,15 +151,10 @@ public class CouponServiceImpl implements CouponService {
         //Shop validation
         if (request.getShopId() != null) {
             Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found!"));
-            if (isOwnerValid(shop, user)) {
-                coupon.setShop(shop);
-            } else {
-                throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
-            }
+            if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            coupon.setShop(shop);
         } else {
-            if (!isAuthAdmin()) {
-                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");
-            }
+            if (!isAuthAdmin()) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");
         }
         Coupon addedCoupon = couponRepo.save(coupon); //Save to database
 
@@ -180,8 +176,10 @@ public class CouponServiceImpl implements CouponService {
 
     @Transactional
     public Coupon updateCoupon(Long id, CouponRequest request, Account user) {
+
         //Get original coupon
-        Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
+        Coupon coupon = couponRepo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Coupon not found!"));
 
         //Check if correct seller or admin
         if (!isOwnerValid(coupon.getShop(), user))
@@ -190,15 +188,10 @@ public class CouponServiceImpl implements CouponService {
         //Shop validation + set
         if (request.getShopId() != null) {
             Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found!"));
-            if (isOwnerValid(shop, user)) {
-                coupon.setShop(shop);
-            } else {
-                throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
-            }
+            if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            coupon.setShop(shop);
         } else {
-            if (!isAuthAdmin()) {
-                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");
-            }
+            if (!isAuthAdmin()) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");
         }
 
         //Set new details info

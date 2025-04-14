@@ -56,6 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			SecurityContextHolder.getContext().setAuthentication(authentication); //All good >> security context
 			user = (Account) authentication.getPrincipal();
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new BadCredentialsException("Invalid Username or Password!");
 		}
 

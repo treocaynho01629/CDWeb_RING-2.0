@@ -145,7 +145,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         // Set role
-        if (Objects.equals(user.getId(), changeUser.getId())
+        if (Objects.equals(user.getId(), id)
                 && !request.getRoles().contains(UserRole.ROLE_ADMIN)) {
             throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Can not remove your ADMIN role!");
         }

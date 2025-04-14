@@ -106,12 +106,17 @@ public class OrderReceipt extends Auditable {
     private CouponDTO couponDTO;
 
     public void addOrderDetail(OrderDetail detail) {
-        details.add(detail);
+        this.details.add(detail);
     	detail.setOrder(this);
     }
  
     public void removeOrderDetail(OrderDetail detail) {
-        details.remove(detail);
+        this.details.remove(detail);
     	detail.setOrder(null);
+    }
+
+    public void removeAllOrderDetails() {
+        details.forEach(detail -> detail.setOrder(null));
+        this.details.clear();
     }
 }

@@ -59,10 +59,10 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
             	and (coalesce(:codes) is null or c.code in :codes)
             	and (coalesce(:code) is null or c.code = :code)
             	and (coalesce(:types) is null or cd.type in :types)
-            	and (coalesce(:shopId) is null or c.shop.id = :shopId)
-            	and (coalesce(:userId) is null or c.shop.owner.id = :userId)
+            	and (coalesce(:shopId) is null or s.id = :shopId)
+            	and (coalesce(:userId) is null or s.owner.id = :userId)
             	and (coalesce(:byShop) is null or case when :byShop = true
-            		then c.shop.id is not null else c.shop.id is null end)
+            		then s.id is not null else s.id is null end)
             	group by c.id, cd.id, s.name, i.id
             """)
     Page<ICoupon> findCoupons(List<CouponType> types,
@@ -98,15 +98,17 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
      * @param shopId       The ID of the shop to filter by, or {@code null} to ignore this filter.
      * @param byShop       A {@code Boolean} determining whether to*/
     @Query("""
-            	select c.id from Coupon c join c.detail cd
+            	select c.id from Coupon c
+                join c.detail cd
+                left join c.shop s
             	where (coalesce(:showExpired) is null or (cd.expDate > current date and cd.usage > 0))
                 and (coalesce(:codes) is null or c.code in :codes)
             	and (coalesce(:code) is null or c.code = :code)
             	and (coalesce(:types) is null or cd.type in :types)
-            	and (coalesce(:shopId) is null or c.shop.id = :shopId)
-                and (coalesce(:userId) is null or c.shop.owner.id = :userId)
+            	and (coalesce(:shopId) is null or s.id = :shopId)
+                and (coalesce(:userId) is null or s.owner.id = :userId)
             	and (coalesce(:byShop) is null or case when :byShop = true
-            		then c.shop.id is not null else c.shop.id is null end)
+            		then s.id is not null else s.id is null end)
             	and c.id not in :ids
             	group by c.id, cd.id
             """)
@@ -180,12 +182,12 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
                 left join c.shop s
                 left join s.image i
             	where (cd.expDate > current date and cd.usage > 0)
-            	and (case when coalesce(:shopId) is null then c.shop.id is null else c.shop.id = :shopId end)
+            	and (case when coalesce(:shopId) is null then s.id is null else s.id = :shopId end)
             	and (coalesce(:value) is null or (cd.type in (com.ring.bookstore.model.enums.CouponType.MIN_VALUE,
             			com.ring.bookstore.model.enums.CouponType.SHIPPING) and cd.attribute < :value)
             		or (coalesce(:quantity) is null
             			or (cd.type = com.ring.bookstore.model.enums.CouponType.MIN_AMOUNT and cd.attribute < :quantity)))
-            	group by c.shop.id, c.id, cd.id, cd.attribute, cd.discount, cd.maxDiscount, s.name, i.id
+            	group by s.id, c.id, cd.id, cd.attribute, cd.discount, cd.maxDiscount, s.name, i.id
             	order by cd.attribute asc, cd.discount desc, cd.maxDiscount desc
             	limit 1
             """)

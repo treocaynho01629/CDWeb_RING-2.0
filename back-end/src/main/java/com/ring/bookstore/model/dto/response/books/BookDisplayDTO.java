@@ -1,12 +1,14 @@
 package com.ring.bookstore.model.dto.response.books;
 
 import com.ring.bookstore.model.dto.response.images.ImageDTO;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
 /**
  * Represents a book slim response as {@link BookDisplayDTO}.
  */
+@Builder
 public record BookDisplayDTO(Long id,
                              String slug,
                              String title,

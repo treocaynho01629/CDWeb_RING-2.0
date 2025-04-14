@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -77,7 +78,7 @@ class OrderItemRepositoryTest extends AbstractRepositoryTest {
                 .build();
         book.setCreatedDate(LocalDateTime.now());
         book2.setCreatedDate(LocalDateTime.now());
-        bookRepo.saveAll(List.of(book, book2));
+        bookRepo.saveAll(new ArrayList<>(List.of(book, book2)));
 
         Address address = Address.builder()
                 .address("123/abc/j12")
@@ -86,7 +87,7 @@ class OrderItemRepositoryTest extends AbstractRepositoryTest {
                 .address("321/abc/j12")
                 .build();
 
-        addressRepo.saveAll(List.of(address, address2));
+        addressRepo.saveAll(new ArrayList<>(List.of(address, address2)));
 
         OrderReceipt receipt = OrderReceipt.builder()
                 .user(account)
@@ -105,7 +106,7 @@ class OrderItemRepositoryTest extends AbstractRepositoryTest {
                 .status(OrderStatus.COMPLETED)
                 .shop(shop)
                 .build();
-        List<OrderDetail> details = List.of(detail, detail2);
+        List<OrderDetail> details = new ArrayList<>(List.of(detail, detail2));
         detailRepo.saveAll(details);
 
         item = OrderItem.builder()
@@ -121,7 +122,7 @@ class OrderItemRepositoryTest extends AbstractRepositoryTest {
                 .detail(detail2)
                 .book(book2)
                 .build();
-        List<OrderItem> items = List.of(item, item2, item3);
+        List<OrderItem> items = new ArrayList<>(List.of(item, item2, item3));
         itemRepo.saveAll(items);
         entityManager.flush();
         entityManager.clear();
@@ -182,7 +183,7 @@ class OrderItemRepositoryTest extends AbstractRepositoryTest {
     public void whenFindItemsWithDetailIds_ThenReturnItems() {
 
         // When
-        List<IOrderItem> foundItems = itemRepo.findAllWithDetailIds(List.of(detail.getId()));
+        List<IOrderItem> foundItems = itemRepo.findAllWithDetailIds(new ArrayList<>(List.of(detail.getId())));
 
         // Then
         assertNotNull(foundItems);

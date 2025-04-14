@@ -5,6 +5,7 @@ import com.ring.bookstore.model.dto.response.banners.BannerDTO;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.entity.Banner;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,10 +20,12 @@ public interface BannerService {
                                Boolean byShop);
 
     Banner addBanner(BannerRequest request,
+                     MultipartFile file,
                      Account user);
 
     Banner updateBanner(Integer id,
                         BannerRequest request,
+                        MultipartFile file,
                         Account user);
 
     Banner deleteBanner(Integer id,

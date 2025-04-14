@@ -655,6 +655,8 @@ const ProductFormDialog = ({
                   setThumbnailId,
                   remove,
                   setRemove,
+                  isMissing:
+                    !(files.length > 0) && err?.data?.errors?.thumbnail,
                   images: product
                     ? product?.previews
                       ? [product?.image].concat(product?.previews)

@@ -27,7 +27,7 @@ public class Category {
     private Integer id;
 
     @Column(length = 200)
-    @Nationalized 
+    @Nationalized
     private String name;
 
     @Column(length = 500)
@@ -66,9 +66,26 @@ public class Category {
         subCate.setParent(null);
     }
 
-    @PreRemove
-    private void updateOrRemoveBooks() {
-        if (this.cateBooks == null || this.cateBooks.isEmpty()) return;
+    public void removeAllSubCates() {
+        subCates.forEach(subCate -> subCate.setParent(null));
+        this.subCates.clear();
+    }
+
+    public void addBook(Book book) {
+        cateBooks.add(book);
+        book.setCate(this);
+    }
+
+    public void removeBook(Book book) {
+        cateBooks.remove(book);
+        if (this.parent != null) {
+            book.setCate(this.parent);
+        } else {
+            book.setCate(null);
+        }
+    }
+
+    public void removeAllBooks() {
         for (Book b : this.cateBooks) {
             if (this.parent != null) {
                 b.setCate(this.parent);
@@ -76,5 +93,12 @@ public class Category {
                 b.setCate(null);
             }
         }
+        this.cateBooks.clear();
+    }
+
+    @PreRemove
+    private void updateOrRemoveBooksAndCate() {
+        removeAllBooks();
+        removeAllSubCates();
     }
 }

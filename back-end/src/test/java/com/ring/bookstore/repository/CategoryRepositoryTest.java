@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,7 +64,7 @@ class CategoryRepositoryTest extends AbstractRepositoryTest {
                 .name("test2")
                 .slug("test2")
                 .build();
-        List<Category> categories = List.of(cate, cate2);
+        List<Category> categories = new ArrayList<>(List.of(cate, cate2));
         cateRepo.saveAll(categories);
 
         childCate = Category.builder()
@@ -94,7 +95,7 @@ class CategoryRepositoryTest extends AbstractRepositoryTest {
         book.setCreatedDate(LocalDateTime.now());
         bookwithChild.setCreatedDate(LocalDateTime.now());
         book3.setCreatedDate(LocalDateTime.now());
-        List<Book> books = List.of(book, bookwithChild, book3);
+        List<Book> books = new ArrayList<>(List.of(book, bookwithChild, book3));
         bookRepo.saveAll(books);
 
         entityManager.flush();
@@ -145,6 +146,8 @@ class CategoryRepositoryTest extends AbstractRepositoryTest {
 
         // When
         cateRepo.deleteById(cate.getId());
+        entityManager.flush();
+        entityManager.clear();
 
         // Then
         Category foundCate = cateRepo.findById(cate.getId()).orElse(null);
@@ -208,7 +211,7 @@ class CategoryRepositoryTest extends AbstractRepositoryTest {
     public void whenFindParentAndSubCategories_ThenReturnCorrectList() {
 
         // When
-        List<Integer> ids = List.of(cate.getId());
+        List<Integer> ids = new ArrayList<>(List.of(cate.getId()));
         List<ICategory> foundCates = cateRepo.findParentAndSubCatesWithParentIds(ids);
 
         // Then

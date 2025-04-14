@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -112,7 +113,7 @@ class BookRepositoryTest extends AbstractRepositoryTest {
         book.setCreatedDate(LocalDateTime.now().minusMonths(1));
         book2.setCreatedDate(LocalDateTime.now().minusMonths(1));
         book3.setCreatedDate(LocalDateTime.now());
-        List<Book> books = List.of(book, book2, book3);
+        List<Book> books = new ArrayList<>(List.of(book, book2, book3));
         bookRepo.saveAll(books);
     }
 

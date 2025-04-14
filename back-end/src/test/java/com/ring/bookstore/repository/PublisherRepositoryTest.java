@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,6 @@ class PublisherRepositoryTest extends AbstractRepositoryTest {
 
     private Category cate;
     private Publisher pub;
-    private Book book;
     private Image pubImage;
 
     @BeforeEach
@@ -52,7 +52,7 @@ class PublisherRepositoryTest extends AbstractRepositoryTest {
         pub = Publisher.builder().name("test").image(pubImage).build();
         Publisher pub2 = Publisher.builder().name("test2").build();
         Publisher pub3 = Publisher.builder().name("test3").build();
-        pubRepo.saveAll(List.of(pub, pub2, pub3));
+        pubRepo.saveAll(new ArrayList<>(List.of(pub, pub2, pub3)));
 
         cate = Category.builder().name("test").slug("test").build();
         Category savedCate = cateRepo.save(cate);
@@ -63,7 +63,7 @@ class PublisherRepositoryTest extends AbstractRepositoryTest {
                 .build();
         cateRepo.save(cate2);
 
-        book = Book.builder()
+        Book book = Book.builder()
                 .image(image)
                 .cate(cate)
                 .publisher(pub)
@@ -81,7 +81,7 @@ class PublisherRepositoryTest extends AbstractRepositoryTest {
         book.setCreatedDate(LocalDateTime.now());
         book2.setCreatedDate(LocalDateTime.now());
         book3.setCreatedDate(LocalDateTime.now());
-        List<Book> books = List.of(book, book2, book3);
+        List<Book> books = new ArrayList<>(List.of(book, book2, book3));
         bookRepo.saveAll(books);
 
         entityManager.flush();

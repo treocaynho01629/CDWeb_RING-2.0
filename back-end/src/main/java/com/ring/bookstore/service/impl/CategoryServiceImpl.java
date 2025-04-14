@@ -34,7 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Page<CategoryDTO> getCategories(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
                                            String include, Integer parentId) {
-       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending());
         Page<CategoryDTO> cateDTOS = null;

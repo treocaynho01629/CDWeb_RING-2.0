@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,7 +73,7 @@ class BannerRepositoryTest extends AbstractRepositoryTest {
                 .image(image3)
                 .shop(savedShop)
                 .build();
-        List<Banner> banners = List.of(banner, banner2, banner3);
+        List<Banner> banners = new ArrayList<>(List.of(banner, banner2, banner3));
         bannerRepo.saveAll(banners);
     }
 

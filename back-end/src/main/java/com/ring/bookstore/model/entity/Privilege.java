@@ -51,4 +51,9 @@ public class Privilege {
         this.roles.add(role);
         role.getPrivileges().remove(this);
     }
+
+    public void removeAllRoles() {
+        roles.forEach(role -> role.getPrivileges().remove(this));
+        this.roles.clear();
+    }
 }

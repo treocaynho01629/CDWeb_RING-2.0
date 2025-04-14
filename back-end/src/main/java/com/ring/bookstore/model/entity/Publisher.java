@@ -50,11 +50,23 @@ public class Publisher {
     @JsonIgnore
     private Set<Book> publisherBooks;
 
+    public void addBook(Book book) {
+        publisherBooks.add(book);
+        book.setPublisher(this);
+    }
+
+    public void removeBook(Book book) {
+        publisherBooks.remove(book);
+        book.setPublisher(null);
+    }
+
+    public void removeAllBooks() {
+        publisherBooks.forEach(book -> book.setPublisher(null));
+        this.publisherBooks.clear();
+    }
+
     @PreRemove
     private void detachBooksFromPublisher() {
-        if (this.publisherBooks == null || this.publisherBooks.isEmpty()) return;
-        for (Book b : this.publisherBooks) {
-            b.setPublisher(null);
-        }
+        this.removeAllBooks();
     }
 }

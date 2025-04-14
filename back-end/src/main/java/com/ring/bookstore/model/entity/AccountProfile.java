@@ -67,7 +67,7 @@ public class AccountProfile {
 
     @OneToOne(fetch = FetchType.LAZY,
             orphanRemoval = true,
-            cascade = CascadeType.PERSIST)
+            cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
     @JsonIgnore
     @EqualsAndHashCode.Exclude
@@ -79,4 +79,19 @@ public class AccountProfile {
             fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Address> addresses;
+
+    public void addAddress(Address address) {
+        addresses.add(address);
+        address.setProfile(this);
+    }
+
+    public void removeAddress(Address address) {
+        addresses.remove(address);
+        address.setProfile(null);
+    }
+
+    public void removeAllAddresses() {
+        addresses.forEach(address -> address.setProfile(null));
+        this.addresses.clear();
+    }
 }

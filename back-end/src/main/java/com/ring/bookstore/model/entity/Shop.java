@@ -24,6 +24,7 @@ import java.util.Set;
 @SQLRestriction("active=true")
 @EqualsAndHashCode(callSuper = true)
 public class Shop extends Auditable {
+
 	@Id
     @Column(nullable = false, updatable = false)
     @SequenceGenerator(
@@ -95,19 +96,69 @@ public class Shop extends Auditable {
     @JsonIgnore
     private Address address;
 
+    public void addBook(Book book) {
+        this.books.add(book);
+        book.setShop(this);
+    }
+
+    public void removeBook(Book book) {
+        this.books.remove(book);
+        book.setShop(null);
+    }
+
     public void removeAllBooks() {
         books.forEach(book -> book.setShop(null));
         this.books.clear();
     }
 
+    public void addCoupon(Coupon coupon) {
+        this.coupons.add(coupon);
+        coupon.setShop(this);
+    }
+
+    public void removeCoupon(Coupon coupon) {
+        this.coupons.remove(coupon);
+        coupon.setShop(null);
+    }
+
+    public void removeAllCoupons() {
+        coupons.forEach(coupon -> coupon.setShop(null));
+        this.coupons.clear();
+    }
+
+    public void addOrderDetail(OrderDetail orderDetail) {
+        this.shopOrderDetails.add(orderDetail);
+        orderDetail.setShop(this);
+    }
+
+    public void removeOrderDetail(OrderDetail orderDetail) {
+        this.shopOrderDetails.remove(orderDetail);
+        orderDetail.setShop(null);
+    }
+
+    public void removeAllOrderDetails() {
+        shopOrderDetails.forEach(orderDetail -> orderDetail.setShop(null));
+        this.shopOrderDetails.clear();
+    }
+
     public void addFollower(Account user) {
         this.followers.add(user);
+        user.followShop(this);
     }
 
     public void removeFollower(Account user) {
-        this.followers.stream()
-                .filter(f -> f.getId().equals(user.getId()))
-                .findFirst()
-                .ifPresent(removeUser -> this.followers.remove(removeUser));
+        this.followers.remove(user);
+        user.unfollowShop(this);
+    }
+
+    public void removeAllFollowers() {
+        this.followers.forEach(user -> user.unfollowShop(this));
+        this.followers.clear();
+    }
+
+    @PreRemove
+    private void detachImageAndAddressFromShop() {
+        this.image = null;
+        this.address = null;
     }
 }

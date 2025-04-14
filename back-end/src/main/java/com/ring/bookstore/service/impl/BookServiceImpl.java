@@ -142,19 +142,19 @@ public class BookServiceImpl implements BookService {
                                    MultipartFile thumbnail,
                                    MultipartFile[] images,
                                    Account user) {
-        //Validation
+        // Validation
         Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
         Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
         if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid owner!");
 
-        //Thumbnail
+        // Thumbnail
         Image savedThumbnail = imageService.upload(thumbnail, FileUploadUtil.PRODUCT_FOLDER);
 
-        //Slugify
+        // Slugify
         String slug = slg.slugify(request.getTitle());
 
-        //Create new book
+        // Create new book
         var book = Book.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -212,18 +212,18 @@ public class BookServiceImpl implements BookService {
         //Check if correct owner
         if (!isOwnerValid(book.getShop(), user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
-        //Image upload/replace
-        if (thumbnail != null) { //Contain new image >> upload/replace
+        // Image upload/replace
+        if (thumbnail != null) { // Contain new image >> upload/replace
             Image oldImage = book.getImage();
             Image savedImage = imageService.upload(thumbnail, FileUploadUtil.PRODUCT_FOLDER); //Upload new image
-            book.setImage(savedImage); //Set new image
-            currDetail.addImage(oldImage);
+            book.setImage(savedImage); // Set new thumbnail
+            currDetail.addImage(oldImage); // Put old thumbnail to preview
         } else if (request.getThumbnailId() != null
                 && !request.getThumbnailId().equals(book.getImage().getId())) {
             Image oldImage = book.getImage();
             Image newImage = imageRepo.findBookImage(id, request.getThumbnailId())
                     .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
-            book.setImage(newImage); //Set new image
+            book.setImage(newImage); // Set new image
             currDetail.addImage(oldImage);
         }
 

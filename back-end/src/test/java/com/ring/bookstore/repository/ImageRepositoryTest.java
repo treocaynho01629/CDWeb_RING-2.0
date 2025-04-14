@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,7 @@ class ImageRepositoryTest extends AbstractRepositoryTest {
         image = Image.builder().name("image").publicId("image").build();
         Image image3 = Image.builder().name("image3").publicId("image3").build();
         Image image4 = Image.builder().name("image4").publicId("image4").build();
-        List<Image> images = List.of(image, image3, image4);
+        List<Image> images = new ArrayList<>(List.of(image, image3, image4));
         imageRepo.saveAll(images);
 
         Account account = Account.builder()
@@ -192,7 +193,8 @@ class ImageRepositoryTest extends AbstractRepositoryTest {
     public void whenFindBookImagePublicIds_ThenReturnPublicIds() {
 
         // When
-        List<String> foundPublicIds = imageRepo.findBookImagePublicIds(book.getId(), List.of(image.getId(), image2.getId()));
+        List<String> foundPublicIds = imageRepo.findBookImagePublicIds(book.getId(),
+                new ArrayList<>(List.of(image.getId(), image2.getId())));
 
         // Then
         assertNotNull(foundPublicIds);

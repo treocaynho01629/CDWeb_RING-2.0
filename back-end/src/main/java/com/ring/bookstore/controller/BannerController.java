@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -57,8 +58,11 @@ public class BannerController {
     @PostMapping
     @PreAuthorize("hasRole('SELLER') and hasAuthority('create:banner')")
     public ResponseEntity<?> createBanner(@Valid @RequestPart("request") BannerRequest request,
+                                          @RequestPart("image") MultipartFile file,
                                           @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(bannerService.addBanner(request, currUser), HttpStatus.CREATED);
+        return new ResponseEntity<>(bannerService.addBanner(request,
+                file,
+                currUser), HttpStatus.CREATED);
     }
 
     /**
@@ -73,8 +77,12 @@ public class BannerController {
     @PreAuthorize("hasRole('SELLER') and hasAuthority('update:banner')")
     public ResponseEntity<?> updateBanner(@PathVariable("id") Integer id,
                                           @Valid @RequestPart("request") BannerRequest request,
+                                          @RequestPart(name = "image", required = false) MultipartFile file,
                                           @CurrentAccount Account currUser) {
-        return new ResponseEntity<>(bannerService.updateBanner(id, request, currUser), HttpStatus.CREATED);
+        return new ResponseEntity<>(bannerService.updateBanner(id,
+                request,
+                file,
+                currUser), HttpStatus.CREATED);
     }
 
     /**

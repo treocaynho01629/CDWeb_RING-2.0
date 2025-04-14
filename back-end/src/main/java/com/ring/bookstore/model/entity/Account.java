@@ -170,8 +170,6 @@ public class Account extends Auditable implements UserDetails {
 		return this.isActive();
 	}
 
-	public int getRolesSize() { return this.roles.size();}
-
 	public void setProfile(AccountProfile profile) {
 		if (profile == null) {
 			if (this.profile != null) {
@@ -183,10 +181,45 @@ public class Account extends Auditable implements UserDetails {
 		this.profile = profile;
 	}
 
+	public void addShop(Shop shop) {
+		this.shops.add(shop);
+		shop.setOwner(this);
+	}
+
+	public void removeShop(Shop shop) {
+		this.shops.remove(shop);
+		shop.setOwner(null);
+	}
+
+	public void removeAllShops() {
+		shops.forEach(shop -> shop.setOwner(null));
+        this.shops.clear();
+	}
+
+	public void addOrder(OrderReceipt receipt) {
+		this.userOrderReceipts.add(receipt);
+		receipt.setUser(this);
+	}
+
+	public void removeOrder(OrderReceipt receipt) {
+		this.userOrderReceipts.remove(receipt);
+		receipt.setUser(null);
+	}
+
 	public void removeAllOrders() {
 		userOrderReceipts.forEach(order -> order.setUser(null));
         this.userOrderReceipts.clear();
     }
+
+	public void addReview(Review review) {
+		this.userReviews.add(review);
+		review.setUser(this);
+	}
+
+	public void removeReview(Review review) {
+		this.userReviews.remove(review);
+		review.setUser(null);
+	}
 	
 	public void removeAllReviews() {
         userReviews.forEach(review -> review.setUser(null));
@@ -209,10 +242,17 @@ public class Account extends Auditable implements UserDetails {
 
 	public void followShop(Shop shop) {
 		this.following.add(shop);
+		shop.addFollower(this);
 	}
 
 	public void unfollowShop(Shop shop) {
 		this.following.remove(shop);
+		shop.removeFollower(this);
+	}
+
+	public void removeAllFollowings() {
+		following.forEach(shop -> shop.removeFollower(this));
+		this.following.clear();
 	}
 
 	public void addRefreshToken(RefreshToken token) {
@@ -223,5 +263,10 @@ public class Account extends Auditable implements UserDetails {
 	public void removeRefreshToken(RefreshToken token) {
 		this.refreshTokens.remove(token);
 		token.setUser(null);
+	}
+
+	public void removeAllRefreshTokens() {
+		refreshTokens.forEach(token -> token.setUser(null));
+		this.refreshTokens.clear();
 	}
 }

@@ -1,17 +1,18 @@
 package com.ring.bookstore.service.impl;
 
 import com.ring.bookstore.model.dto.response.banners.BannerDTO;
+import com.ring.bookstore.model.entity.*;
 import com.ring.bookstore.model.mappers.BannerMapper;
 import com.ring.bookstore.model.dto.projection.banners.IBanner;
 import com.ring.bookstore.model.enums.UserRole;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.model.entity.Account;
-import com.ring.bookstore.model.entity.Banner;
-import com.ring.bookstore.model.entity.Shop;
 import com.ring.bookstore.repository.BannerRepository;
 import com.ring.bookstore.model.dto.request.BannerRequest;
+import com.ring.bookstore.repository.ShopRepository;
 import com.ring.bookstore.service.BannerService;
+import com.ring.bookstore.service.ImageService;
+import com.ring.bookstore.ultils.FileUploadUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -30,6 +32,10 @@ import java.util.List;
 public class BannerServiceImpl implements BannerService {
 
     private final BannerRepository bannerRepo;
+    private final ShopRepository shopRepo;
+
+    private final ImageService imageService;
+
     private final BannerMapper bannerMapper;
 
     @Override
@@ -50,18 +56,70 @@ public class BannerServiceImpl implements BannerService {
         return bannerDTOS;
     }
 
-    //Add banner (SELLER)
     @Transactional
     public Banner addBanner(BannerRequest request,
+                            MultipartFile file,
                             Account user) {
-        return null;
+        
+        // Create new banner
+        var banner = Banner.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .url(request.getUrl())
+                .build();
+
+        // Shop validation
+        if (request.getShopId() != null) {
+            Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() ->
+                    new ResourceNotFoundException("Shop not found!"));
+            if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            banner.setShop(shop);
+        } else {
+            if (!isAuthAdmin()) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");
+        }
+
+        // Image upload
+        banner = this.changeBannerPic(file, banner);
+
+        Banner addedBanner = bannerRepo.save(banner); //Save to database
+        return addedBanner;
     }
 
     @Transactional
     public Banner updateBanner(Integer id,
                                BannerRequest request,
+                               MultipartFile file,
                                Account user) {
-        return null;
+
+        // Get original banner
+        Banner banner = bannerRepo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Banner not found!"));
+
+        // Check if correct seller or admin
+        if (!isOwnerValid(banner.getShop(), user))
+            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+
+        // Shop validation + set
+        if (request.getShopId() != null) {
+            Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() ->
+                    new ResourceNotFoundException("Shop not found!"));
+            if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            banner.setShop(shop);
+        } else {
+            if (!isAuthAdmin()) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");
+        }
+
+        //Set new info
+        banner.setName(request.getName());
+        banner.setDescription(request.getDescription());
+        banner.setUrl(request.getUrl());
+
+        // Replace image
+        banner = this.changeBannerPic(file, banner);
+
+        //Update
+        Banner updatedBanner = bannerRepo.save(banner);
+        return updatedBanner;
     }
 
     @Override
@@ -69,7 +127,7 @@ public class BannerServiceImpl implements BannerService {
                                Account user) {
         Banner banner = bannerRepo.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Banner not found"));
-        //Check if correct seller or admin
+        // Check if correct seller or admin
         if (!isOwnerValid(banner.getShop(), user))
             throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
@@ -131,5 +189,15 @@ public class BannerServiceImpl implements BannerService {
         if (shop != null) {
             return shop.getOwner().getId().equals(user.getId()) || isAdmin;
         } else return isAdmin;
+    }
+
+    protected Banner changeBannerPic(MultipartFile file, Banner banner) {
+        if (file != null) {
+            if (banner.getImage() != null) imageService.deleteImage(banner.getImage().getId()); //Delete old image
+            Image savedImage = imageService.upload(file, FileUploadUtil.BANNER_FOLDER); //Upload new image
+            banner.setImage(savedImage); //Set new image
+        }
+
+        return banner;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -103,7 +104,7 @@ class AccountProfileRepositoryTest extends AbstractRepositoryTest {
                 .user(account)
                 .image(image)
                 .address(address)
-                .addresses(List.of(address))
+                .addresses(new ArrayList<>(List.of(address)))
                 .build();
         profileRepo.save(profile);
 
@@ -157,7 +158,7 @@ class AccountProfileRepositoryTest extends AbstractRepositoryTest {
                 .username("username")
                 .pass("asd")
                 .email("email")
-                .roles(List.of(role))
+                .roles(new ArrayList<>(List.of(role)))
                 .build();
         account.setCreatedDate(LocalDateTime.now());
         AccountProfile profile = AccountProfile.builder()
