@@ -1,5 +1,6 @@
 package com.ring.bookstore.service.impl;
 
+import com.ring.bookstore.exception.EntityOwnershipException;
 import com.ring.bookstore.model.dto.response.banners.BannerDTO;
 import com.ring.bookstore.model.entity.*;
 import com.ring.bookstore.model.mappers.BannerMapper;
@@ -60,7 +61,7 @@ public class BannerServiceImpl implements BannerService {
     public Banner addBanner(BannerRequest request,
                             MultipartFile file,
                             Account user) {
-        
+
         // Create new banner
         var banner = Banner.builder()
                 .name(request.getName())
@@ -70,9 +71,11 @@ public class BannerServiceImpl implements BannerService {
 
         // Shop validation
         if (request.getShopId() != null) {
-            Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() ->
-                    new ResourceNotFoundException("Shop not found!"));
-            if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            Shop shop = shopRepo.findById(request.getShopId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
+                            "Không tìm thấy cửa hàng yêu cầu!"));
+            if (!isOwnerValid(shop, user)) throw new EntityOwnershipException("Invalid ownership!",
+                    "Người dùng không sở hữu của hàng này!");
             banner.setShop(shop);
         } else {
             if (!isAuthAdmin()) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");
@@ -92,18 +95,22 @@ public class BannerServiceImpl implements BannerService {
                                Account user) {
 
         // Get original banner
-        Banner banner = bannerRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Banner not found!"));
+        Banner banner = bannerRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Banner not found!",
+                        "Không tìm thấy sự kiện yêu cầu!"));
 
         // Check if correct seller or admin
         if (!isOwnerValid(banner.getShop(), user))
-            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            throw new EntityOwnershipException("Invalid ownership!",
+                    "Người dùng không có quyền chỉnh sửa sự kiện này!");
 
         // Shop validation + set
         if (request.getShopId() != null) {
-            Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() ->
-                    new ResourceNotFoundException("Shop not found!"));
-            if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            Shop shop = shopRepo.findById(request.getShopId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
+                            "Không tìm thấy cửa hàng yêu cầu!"));
+            if (!isOwnerValid(shop, user)) throw new EntityOwnershipException("Invalid ownership!",
+                    "Người dùng không sở hữu cửa hàng này!");
             banner.setShop(shop);
         } else {
             if (!isAuthAdmin()) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");
@@ -125,11 +132,13 @@ public class BannerServiceImpl implements BannerService {
     @Override
     public Banner deleteBanner(Integer id,
                                Account user) {
-        Banner banner = bannerRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Banner not found"));
+        Banner banner = bannerRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Banner not found",
+                        "Không tìm thấy sự kiện yêu cầu!"));
         // Check if correct seller or admin
         if (!isOwnerValid(banner.getShop(), user))
-            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            throw new EntityOwnershipException("Invalid ownership!",
+                    "Người dùng không có quyền xoá sự kiện này!");
 
         bannerRepo.deleteById(id); //Delete from database
         return banner;

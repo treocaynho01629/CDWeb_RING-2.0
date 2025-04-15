@@ -99,8 +99,8 @@ public class CouponServiceImpl implements CouponService {
     }
 
     public CouponDetailDTO getCoupon(Long id) {
-        ICoupon coupon = couponRepo.findCouponById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Coupon not found!",
+        ICoupon coupon = couponRepo.findCouponById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Coupon not found!",
                         "Không tìm thấy mã giảm giá yêu cầu!"));
         return couponMapper.couponToDetailDTO(coupon);
     }
@@ -110,8 +110,8 @@ public class CouponServiceImpl implements CouponService {
                                      Long shopId,
                                      Double cValue,
                                      Integer cQuantity) {
-        ICoupon projection = couponRepo.findCouponByCode(code).orElseThrow(() ->
-                new ResourceNotFoundException("Coupon not found!",
+        ICoupon projection = couponRepo.findCouponByCode(code)
+                .orElseThrow(() -> new ResourceNotFoundException("Coupon not found!",
                         "Không tìm thấy mã giảm giá yêu cầu!"));
         if (cValue != null || cQuantity != null) {
             CartStateRequest request = CartStateRequest.builder()
@@ -158,7 +158,8 @@ public class CouponServiceImpl implements CouponService {
 
         //Shop validation
         if (request.getShopId() != null) {
-            Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
+            Shop shop = shopRepo.findById(request.getShopId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
                     "Không tìm thấy cửa hàng yêu cầu!"));
             if (!isOwnerValid(shop, user)) throw new EntityOwnershipException("Invalid ownership!",
                     "Người dùng không phải chủ sở hữu của cửa hàng này!");
@@ -188,18 +189,19 @@ public class CouponServiceImpl implements CouponService {
     public Coupon updateCoupon(Long id, CouponRequest request, Account user) {
 
         //Get original coupon
-        Coupon coupon = couponRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Coupon not found!",
+        Coupon coupon = couponRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Coupon not found!",
                         "Không tìm thấy mã giảm giá yêu cầu!"));
 
         //Check if correct seller or admin
         if (!isOwnerValid(coupon.getShop(), user))
             throw new EntityOwnershipException("Invalid ownership!",
-                    "Người dùng không phải chủ sở hữu của mã giảm giá này!");
+                    "Người dùng không có quyền chỉnh suửa mã giảm giá này!");
 
         //Shop validation + set
         if (request.getShopId() != null) {
-            Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
+            Shop shop = shopRepo.findById(request.getShopId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
                     "Không tìm thấy cửa hàng yêu cầu!"));
             if (!isOwnerValid(shop, user)) throw new EntityOwnershipException("Invalid ownership!",
                     "Người dùng không phải chủ sở hữu của cửa hàng này!");
@@ -227,12 +229,13 @@ public class CouponServiceImpl implements CouponService {
 
     @Transactional
     public Coupon deleteCoupon(Long id, Account user) {
-        Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found",
+        Coupon coupon = couponRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Coupon not found",
                 "Không tìm thấy mã giảm giá yêu cầu!"));
         //Check if correct seller or admin
         if (!isOwnerValid(coupon.getShop(), user))
             throw new EntityOwnershipException("Invalid ownership!",
-                    "Người dùng không phải chủ sở hữu của mã giảm giá này!");
+                    "Người dùng không có quyền xoá mã giảm giá này!");
 
         couponRepo.deleteById(id); //Delete from database
         return coupon;

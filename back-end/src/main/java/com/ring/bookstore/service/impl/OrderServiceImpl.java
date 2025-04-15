@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.ring.bookstore.exception.EntityOwnershipException;
 import com.ring.bookstore.model.dto.projection.orders.IOrderDetail;
 import com.ring.bookstore.model.dto.projection.orders.IOrderDetailItem;
 import com.ring.bookstore.model.dto.projection.orders.IOrderItem;
@@ -146,13 +147,15 @@ public class OrderServiceImpl implements OrderService {
     public void cancel(Long id,
                        String reason,
                        Account user) {
-        OrderDetail detail = detailRepo.findDetailById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Order detail not found"));
+        OrderDetail detail = detailRepo.findDetailById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order detail not found!",
+                        "Không tìm thấy chi tiết đơn hàng yêu cầu!"));
         OrderReceipt order = detail.getOrder();
 
         //Check if correct user
         if (!isUserValid(order, user)) {
-            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid user!");
+            throw new EntityOwnershipException("Invalid user!",
+                    "Người dùng không có quyền huỷ đơn hàng này!");
         }
 
         //Check valid status for cancel
@@ -174,12 +177,14 @@ public class OrderServiceImpl implements OrderService {
     public void refund(Long id,
                        String reason,
                        Account user) {
-        OrderDetail detail = detailRepo.findDetailById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Order detail not found"));
+        OrderDetail detail = detailRepo.findDetailById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order detail not found!",
+                        "Không tìm thấy chi tiết đơn hàng yêu cầu!"));
 
         //Check if correct user
         if (!isUserValid(detail.getOrder(), user))
-            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid user!");
+            throw new EntityOwnershipException("Invalid user!",
+                    "Người dùng không có quyền hoàn trả đơn hàng này!");
 
         //Check valid status for cancel
         OrderStatus currStatus = detail.getStatus();
@@ -197,12 +202,14 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void confirm(Long id,
                         Account user) {
-        OrderDetail detail = detailRepo.findDetailById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Order detail not found"));
+        OrderDetail detail = detailRepo.findDetailById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order detail not found!",
+                        "Không tìm thấy chi tiết đơn hàng yêu cầu!"));
 
         //Check if correct user
         if (!isUserValid(detail.getOrder(), user))
-            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid user!");
+            throw new EntityOwnershipException("Invalid user!",
+                    "Người dùng không có quyền xác nhận đơn hàng này!");
 
         //Check valid status for cancel
         OrderStatus currStatus = detail.getStatus();
@@ -219,13 +226,15 @@ public class OrderServiceImpl implements OrderService {
     public void changeStatus(Long id,
                              OrderStatus status,
                              Account user) {
-        OrderDetail detail = detailRepo.findDetailById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Order detail not found"));
+        OrderDetail detail = detailRepo.findDetailById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order detail not found!",
+                        "Không tìm thấy chi tiết đơn hàng yêu cầu!"));
         OrderReceipt order = detail.getOrder();
 
         //Check if correct user
         if (!isOwnerValid(detail.getShop(), user))
-            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            throw new EntityOwnershipException("Invalid ownership!",
+                    "Người dùng không có quyền chỉnh sửa đơn hàng này!");
 
         detail.setStatus(status);
         detailRepo.save(detail);
@@ -295,7 +304,8 @@ public class OrderServiceImpl implements OrderService {
                 isAdmin ? null : user.getId(),
                 bookId,
                 pageable);
-        if (summariesList == null) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+        if (summariesList == null) throw new EntityOwnershipException("Invalid role!",
+                "Người dùng không có quyền truy xuất dữ liệu này!");
 
         Page<ReceiptSummaryDTO> summariesDTOS = summariesList.map(orderMapper::summaryToDTO);
         return summariesDTOS;
@@ -357,7 +367,9 @@ public class OrderServiceImpl implements OrderService {
     //Get order by {id}
     @Override
     public ReceiptDTO getReceipt(Long id) {
-        OrderReceipt order = orderRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found!"));
+        OrderReceipt order = orderRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found!",
+                        "Không tìm thấy đơn hàng yêu cầu!"));
         ReceiptDTO receiptDTO = orderMapper.orderToDTO(order); //Map to DTO
         return receiptDTO;
     }
@@ -366,7 +378,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDetailDTO getOrderDetail(Long id, Account user) {
         List<IOrderDetailItem> itemsList = itemRepo.findOrderDetailItems(id, isAuthAdmin() ? null : user.getId());
-        if (itemsList.isEmpty()) throw new ResourceNotFoundException("Detail not found!");
+        if (itemsList.isEmpty()) throw new ResourceNotFoundException("Order detail not found!",
+                "Không tìm thấy chi tiết đơn hàng yêu cầu!");
         OrderDetailDTO detailDTO = orderMapper.detailItemsToDTO(itemsList); //Map to DTO
         return detailDTO;
     }
@@ -551,7 +564,8 @@ public class OrderServiceImpl implements OrderService {
         Shop shop = shops.get(detail.getShopId());
         List<CartItemRequest> items = detail.getItems();
         if (shop == null || items == null || items.isEmpty()) {
-            if (isCheckout) throw new ResourceNotFoundException("Shop not found!");
+            if (isCheckout) throw new ResourceNotFoundException("Shop not found!",
+                    "Không tìm thấy cửa hàng yêu cầu!");
 
             //Return temp detail
             return OrderDetail.builder()
@@ -584,7 +598,8 @@ public class OrderServiceImpl implements OrderService {
             //Book validation
             Book book = books.get(item.getId());
             if (book == null || !book.getShop().getId().equals(shop.getId())) {
-                if (isCheckout) throw new ResourceNotFoundException("Book not found!");
+                if (isCheckout) throw new ResourceNotFoundException("Product not found!",
+                        "Không tìm thấy sản phẩm yêu cầu!");
 
                 //Create temp item
                 var orderItem = OrderItem.builder()

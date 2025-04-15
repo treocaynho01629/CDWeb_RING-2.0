@@ -30,8 +30,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Transactional
     public Role findRole(UserRole userRole) {
-        return roleRepo.findRoleWithPrivileges(userRole).orElseThrow(() ->
-                new ResourceNotFoundException("Role not found!"));
+        return roleRepo.findRoleWithPrivileges(userRole)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found!",
+                        "Không tìm thấy chức vụ yêu cầu!"));
     }
 
     @Override
@@ -41,9 +42,11 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void updateRole(List<PrivilegeType> privileges, UserRole userRole) {
-        if (userRole == UserRole.ROLE_ADMIN) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Can not edit Admin role!");
-        Role role = roleRepo.findByRoleName(userRole).orElseThrow(() ->
-                new ResourceNotFoundException("Role not found!"));
+        if (userRole == UserRole.ROLE_ADMIN)
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Can not edit Admin role!");
+        Role role = roleRepo.findByRoleName(userRole)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found!",
+                        "Không tìm thấy chức vụ yêu cầu!"));
         List<Privilege> rolePrivileges = privilegeRepo.findAllByPrivilegeTypeIn(privileges);
 
         role.setPrivileges(rolePrivileges);

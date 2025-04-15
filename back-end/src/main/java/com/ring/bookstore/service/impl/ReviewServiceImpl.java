@@ -43,8 +43,8 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public Review review(Long id, ReviewRequest request, Account user) {
         //Book validation
-        Book book = bookRepo.findById(id).orElseThrow(()
-                -> new ResourceNotFoundException("Product not found!",
+        Book book = bookRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found!",
                 "Không tìm thấy sản phẩm yêu cầu!"));
         //Check if user had bought it yet
         if (!orderRepo.hasUserBoughtBook(id, user.getId())) throw new HttpResponseException(
@@ -123,8 +123,8 @@ public class ReviewServiceImpl implements ReviewService {
                     "User have not bought the product!",
                     "Hãy mua sản phẩm để có thể đánh giá!"
             );
-        IReview projection = reviewRepo.findUserBookReview(id, user.getId()).orElseThrow(()
-                -> new ResourceNotFoundException(
+        IReview projection = reviewRepo.findUserBookReview(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(
                 "Review not found",
                 "Người dùng chưa đánh giá sản phẩm này!"
         ));
@@ -135,12 +135,13 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public ReviewDTO updateReview(Long id, ReviewRequest request, Account user) {
         //Check review exists
-        Review review = reviewRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Review not found!",
+        Review review = reviewRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found!",
                 "Không tìm thấy đánh giá yêu cầu!"));
 
         //Check if correct user or admin
         if (!isUserValid(review, user)) throw new EntityOwnershipException("Invalid ownership!",
-                "Người dùng không phải người thực hiện đánh giá này!");
+                "Người dùng không có quyền chỉnh sửa đánh giá này!");
 
         //Set new review content
         review.setRating(request.getRating());
@@ -182,8 +183,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void hideReview(Long id) {
-        Review review = reviewRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Review not found!",
+        Review review = reviewRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found!",
                         "Không tìm thấy đánh giá yêu cầu!"));
         review.setHidden(true);
         reviewRepo.save(review);
@@ -191,8 +192,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void unhideReview(Long id) {
-        Review review = reviewRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Review not found",
+        Review review = reviewRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found",
                         "Không tìm thấy đánh giá yêu cầu!"));
         review.setHidden(false);
         reviewRepo.save(review);

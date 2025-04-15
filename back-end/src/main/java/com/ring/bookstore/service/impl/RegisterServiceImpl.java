@@ -63,7 +63,8 @@ public class RegisterServiceImpl implements RegisterService {
 			//Set role for USER
 			Set<Role> roles = new HashSet<>();
 			roles.add(roleRepo.findByRoleName(UserRole.ROLE_USER)
-					.orElseThrow(() -> new ResourceNotFoundException("No roles has been set!")));
+					.orElseThrow(() -> new ResourceNotFoundException("No roles has been set!",
+							"Không tìm thấy các chức vụ yêu cầu!")));
 
 			//Create and set new Account info
 			var user = Account.builder()
@@ -98,8 +99,9 @@ public class RegisterServiceImpl implements RegisterService {
 		captchaService.validate(recaptchaToken, source, CaptchaServiceImpl.FORGOT_ACTION);
 
 		//Get all accounts with this email
-		Account user = accountRepo.findByEmail(email).orElseThrow(()
-				-> new ResourceNotFoundException("User with this email does not exist!"));
+		Account user = accountRepo.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException("User with this email does not exist!",
+				"Không tìm thấy người dùng với tên tài khoản và email yêu cầu!"));
 
 		//Generate reset password token
 		String token = resetService.generateResetToken(user);

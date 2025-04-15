@@ -58,8 +58,8 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     public PublisherDTO getPublisher(Integer id) {
-        Publisher publisher = pubRepo.findWithImageById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Publisher not found!",
+        Publisher publisher = pubRepo.findWithImageById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Publisher not found!",
                         "Không tìm thấy nhà xuất bản yêu cầu!"));
 
         PublisherDTO publisherDTO = pubMapper.apply(publisher); //Map to DTO
@@ -88,8 +88,9 @@ public class PublisherServiceImpl implements PublisherService {
                                      PublisherRequest request,
                                      MultipartFile file) {
         //Get original publisher
-        Publisher publisher = pubRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Publisher not found"));
+        Publisher publisher = pubRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Publisher not found",
+                        "Không tìm thấy nhà xuất bản yêu cầu!"));
 
         //Image upload/replace
         if (file != null) { //Contain new image >> upload/replace

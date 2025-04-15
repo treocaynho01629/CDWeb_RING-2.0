@@ -70,8 +70,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public AccountDetailDTO getAccountById(Long id) {
-        IAccountDetail account = profileRepo.findDetailById(id).orElseThrow(()
-                -> new ResourceNotFoundException("User not found!",
+        IAccountDetail account = profileRepo.findDetailById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!",
                 "Không tìm thấy người dùng yêu cầu!"));
         return accountMapper.projectionToDetailDTO(account);
     }
@@ -207,15 +207,15 @@ public class AccountServiceImpl implements AccountService {
 
     public ProfileDTO getProfile(Account user) {
         IProfile currProfile = profileRepo.findProfileByUser(user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Roles not found!",
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found!",
                         "Không tìm thấy hồ sơ yêu cầu!"));
         return accountMapper.projectionToProfileDTO(currProfile);
     }
 
     @Transactional
     public AccountProfile updateProfile(ProfileRequest request, MultipartFile file, Account user) {
-        AccountProfile profile = profileRepo.findById(user.getProfile().getId()).orElseThrow(()
-                -> new ResourceNotFoundException("Roles not found!",
+        AccountProfile profile = profileRepo.findById(user.getProfile().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found!",
                 "Không tìm thấy hồ sơ yêu cầu!"));
 
         //Image upload/replace

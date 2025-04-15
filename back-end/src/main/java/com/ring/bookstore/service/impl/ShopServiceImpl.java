@@ -97,8 +97,8 @@ public class ShopServiceImpl implements ShopService {
     @Override
     public ShopInfoDTO getShopInfo(Long id, Account user) {
         Long userId = user != null ? user.getId() : null;
-        IShopInfo shop = shopRepo.findShopInfoById(id, userId).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found!",
+        IShopInfo shop = shopRepo.findShopInfoById(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
                         "Không tìm thấy cửa hàng yêu cầu!"));
         ShopInfoDTO shopDTO = shopMapper.infoToDTO(shop); //Map to DTO
         return shopDTO;
@@ -107,8 +107,8 @@ public class ShopServiceImpl implements ShopService {
     @Override
     public ShopDisplayDetailDTO getShopDisplayDetail(Long id, Account user) {
         Long userId = user != null ? user.getId() : null;
-        IShopDisplayDetail shop = shopRepo.findShopDisplayDetailById(id, userId).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found!",
+        IShopDisplayDetail shop = shopRepo.findShopDisplayDetailById(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
                         "Không tìm thấy cửa hàng yêu cầu!"));
         ShopDisplayDetailDTO shopDTO = shopMapper.displayDetailToDTO(shop); //Map to DTO
         return shopDTO;
@@ -117,8 +117,8 @@ public class ShopServiceImpl implements ShopService {
     @Override
     public ShopDetailDTO getShopDetail(Long id, Account user) {
         IShopDetail shop = shopRepo.findShopDetailById(id,
-                isAuthAdmin() ? null : user.getId()).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found!",
+                isAuthAdmin() ? null : user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
                         "Không tìm thấy cửa hàng yêu cầu!"));
         ShopDetailDTO shopDTO = shopMapper.detailToDTO(shop); //Map to DTO
         return shopDTO;
@@ -133,11 +133,11 @@ public class ShopServiceImpl implements ShopService {
 
     @Transactional
     public void follow(Long id, Account user) {
-        Shop shop = shopRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found!",
+        Shop shop = shopRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
                         "Không tìm thấy cửa hàng yêu cầu!"));
-        Account currUser = accountRepo.findByUsername(user.getUsername()).orElseThrow(() ->
-                new ResourceNotFoundException("User not found!",
+        Account currUser = accountRepo.findByUsername(user.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!",
                         "Không tìm thấy người dùng yêu cầu!"));
         shop.addFollower(currUser);
         shopRepo.save(shop);
@@ -145,8 +145,8 @@ public class ShopServiceImpl implements ShopService {
 
     @Transactional
     public void unfollow(Long id, Account user) {
-        Shop shop = shopRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found!",
+        Shop shop = shopRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
                         "Không tìm thấy cửa hàng yêu cầu!"));
         shop.removeFollower(user);
         shopRepo.save(shop);
@@ -188,13 +188,13 @@ public class ShopServiceImpl implements ShopService {
     public Shop updateShop(Long id, ShopRequest request, MultipartFile file, Account user) {
 
         //Get original shop
-        Shop shop = shopRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found!",
+        Shop shop = shopRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
                         "Không tìm thấy cửa hàng yêu cầu!"));
 
         //Check if correct seller or admin
         if (!isOwnerValid(shop, user)) throw new EntityOwnershipException("Invalid ownership!",
-                "Người dùng không phải chủ sở hữu của hàng này!");
+                "Người dùng không có quyền chỉnh sửa cửa hàng này!");
 
         //Update address
         AddressRequest addressRequest = request.getAddressRequest();
@@ -225,12 +225,12 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public Shop deleteShop(Long id, Account user) {
-        Shop shop = shopRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found!",
+        Shop shop = shopRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
                         "Không tìm thấy cửa hàng yêu cầu!"));
         //Check if correct seller or admin
-        if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid ownership!",
-                "Người dùng không phải chủ sở hữu của cửa hàng này!");
+        if (!isOwnerValid(shop, user)) throw new EntityOwnershipException("Invalid ownership!",
+                "Người dùng không có quyền xoá cửa hàng này!");
 
         shopRepo.deleteById(id); //Delete from database
         return shop;

@@ -106,19 +106,19 @@ public class CategoryServiceImpl implements CategoryService {
         CategoryDetailDTO result = null;
 
         if (include != null && include.equalsIgnoreCase("children")) {
-            Category cate = cateRepo.findCateWithChildren(id, slug).orElseThrow(() ->
-                    new ResourceNotFoundException("Category not found!",
-                        "Không tìm thấy danh mục yêu cầu!"));
+            Category cate = cateRepo.findCateWithChildren(id, slug)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
+                            "Không tìm thấy danh mục yêu cầu!"));
             result = cateMapper.cateToDetailDTO(cate, "children");
         } else if (include != null && include.equalsIgnoreCase("parent")) {
-            Category cate = cateRepo.findCateWithParent(id, slug).orElseThrow(() ->
-                    new ResourceNotFoundException("Category not found!",
-                        "Không tìm thấy danh mục yêu cầu!"));
+            Category cate = cateRepo.findCateWithParent(id, slug)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
+                            "Không tìm thấy danh mục yêu cầu!"));
             result = cateMapper.cateToDetailDTO(cate, "parent");
         } else {
-            Category cate = cateRepo.findCate(id, slug).orElseThrow(() ->
-                    new ResourceNotFoundException("Category not found!",
-                        "Không tìm thấy danh mục yêu cầu!"));
+            Category cate = cateRepo.findCate(id, slug)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
+                            "Không tìm thấy danh mục yêu cầu!"));
             result = cateMapper.cateToDetailDTO(cate);
         }
 
@@ -140,8 +140,10 @@ public class CategoryServiceImpl implements CategoryService {
         //Set parent
         if (request.getParentId() != null) {
             Category parent = cateRepo.findById(request.getParentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Parent category not found!"));
-            if (parent.getParent().getId() != null) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid parent category!");
+                    .orElseThrow(() -> new ResourceNotFoundException("Parent category not found!",
+                            "Không tìm thấy danh mục yêu cầu!"));
+            if (parent.getParent().getId() != null)
+                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid parent category!");
             category.setParent(parent);
         }
 
@@ -153,7 +155,8 @@ public class CategoryServiceImpl implements CategoryService {
     public Category updateCategory(Integer id, CategoryRequest request) {
         //Get original category
         Category category = cateRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
+                        "Không tìm thấy danh mục yêu cầu!"));
 
         //Set new info
         String slug = slg.slugify(request.getName());
@@ -165,10 +168,13 @@ public class CategoryServiceImpl implements CategoryService {
 
         //Parent
         if (request.getParentId() != null && !request.getParentId().equals(category.getParent().getId())) {
-            if (!category.getSubCates().isEmpty()) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid child category!");
+            if (!category.getSubCates().isEmpty())
+                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid child category!");
             Category parent = cateRepo.findById(request.getParentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Parent category not found!"));
-            if (parent.getParent().getId() != null) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid parent category!");
+                    .orElseThrow(() -> new ResourceNotFoundException("Parent category not found!",
+                            "Không tìm thấy danh mục yêu cầu!"));
+            if (parent.getParent().getId() != null)
+                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid parent category!");
             category.setParent(parent);
         }
 

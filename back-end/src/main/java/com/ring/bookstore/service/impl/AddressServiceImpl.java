@@ -1,5 +1,6 @@
 package com.ring.bookstore.service.impl;
 
+import com.ring.bookstore.exception.EntityOwnershipException;
 import com.ring.bookstore.model.dto.response.accounts.AddressDTO;
 import com.ring.bookstore.model.mappers.AddressMapper;
 import com.ring.bookstore.model.dto.projection.accounts.IAddress;
@@ -42,16 +43,17 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public Address getAddress(Long id) {
-        Address address = addressRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Address not found!"));
+        Address address = addressRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found!",
+                        "Không tìm thấy địa chỉ yêu cầu!"));
         return address;
     }
 
     @Transactional
     public Address addAddress(AddressRequest request, Account user) {
-        AccountProfile profile = profileRepo.findById(user.getProfile().getId()).orElseThrow(()
-                -> new ResourceNotFoundException("Roles not found!",
-                "Không tìm thấy hồ sơ yêu cầu!"));
+        AccountProfile profile = profileRepo.findById(user.getProfile().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found!",
+                        "Không tìm thấy hồ sơ yêu cầu!"));
 
         //Limit size
         int MAX_SIZE = 5;
@@ -74,7 +76,9 @@ public class AddressServiceImpl implements AddressService {
         Address savedAddress = addressRepo.save(address); //Save address
 
         //Default address
-        if (request.getIsDefault() || currSize == 0) { profile.setAddress(savedAddress);}
+        if (request.getIsDefault() || currSize == 0) {
+            profile.setAddress(savedAddress);
+        }
 
         profileRepo.save(profile); //Save profile
         return savedAddress;
@@ -82,11 +86,13 @@ public class AddressServiceImpl implements AddressService {
 
     @Transactional
     public Address updateAddress(AddressRequest request, Long id, Account user) {
-        Address address = addressRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Address not found!"));
+        Address address = addressRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found!",
+                        "Không tìm thấy địa chỉ yêu cầu!"));
         AccountProfile profile = user.getProfile();
         if (profile == null || !address.getProfile().getId().equals(profile.getId())) {
-            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid user!");
+            throw new EntityOwnershipException("Invalid user!",
+                    "Người dùng không có quyền chỉnh sửa hồ sơ này!");
         }
 
         //Update
@@ -114,11 +120,13 @@ public class AddressServiceImpl implements AddressService {
 
     @Transactional
     public Address deleteAddress(Long id, Account user) {
-        Address address = addressRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Address not found!"));
+        Address address = addressRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found!",
+                        "Không tìm thấy địa chỉ yêu cầu!"));
 
         if (!address.getProfile().getId().equals(user.getProfile().getId())) {
-            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid user!");
+            throw new EntityOwnershipException("Invalid user!",
+                    "Người dùng không có quyền chỉnh sửa địa chỉ này!");
         }
 
         addressRepo.deleteById(id); //Delete from database

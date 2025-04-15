@@ -47,8 +47,9 @@ public class ImageServiceImpl implements ImageService {
             if (file.isEmpty()) {
                 throw new HttpResponseException(HttpStatus.BAD_REQUEST, "File not found!");
             }
-            Image image = imageRepo.findById(id).orElseThrow(() ->
-                    new ResourceNotFoundException("Image not found!"));
+            Image image = imageRepo.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Image not found!",
+                            "Không tim thấy hình ảnh yêu cầu!"));
 
             BufferedImage imageBuffer = ImageIO.read(file.getInputStream());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -128,7 +129,8 @@ public class ImageServiceImpl implements ImageService {
 
     public String deleteImage(Long id) {
         Image image = imageRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found!",
+                        "Không tim thấy hình ảnh yêu cầu!"));
         return deleteImage(image.getPublicId());
     }
 

@@ -107,8 +107,8 @@ public class BookServiceImpl implements BookService {
     }
 
     public BookDTO getBook(Long id) {
-        IBook book = detailRepo.findBook(id).orElseThrow(() ->
-                new ResourceNotFoundException("Product not found!",
+        IBook book = detailRepo.findBook(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found!",
                         "Không tìm thấy sản phẩm yêu cầu!"));
         List<Long> imageIds = book.getPreviews() != null ? book.getPreviews() : new ArrayList<>();
         imageIds.add(book.getImage());
@@ -120,16 +120,16 @@ public class BookServiceImpl implements BookService {
 
     //Get book with detail
     public BookDetailDTO getBookDetail(Long id) {
-        IBookDetail book = detailRepo.findBookDetail(id, null).orElseThrow(() ->
-                new ResourceNotFoundException("Product not found!",
+        IBookDetail book = detailRepo.findBookDetail(id, null)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found!",
                         "Không tìm thấy sản phẩm yêu cầu!"));
         BookDetailDTO bookDetailDTO = bookMapper.detailToDTO(book); //Map to DTO
         return bookDetailDTO;
     }
 
     public BookDetailDTO getBookDetail(String slug) {
-        IBookDetail book = detailRepo.findBookDetail(null, slug).orElseThrow(() ->
-                new ResourceNotFoundException("Product not found!",
+        IBookDetail book = detailRepo.findBookDetail(null, slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found!",
                         "Không tìm thấy sản phẩm yêu cầu!"));
         BookDetailDTO bookDetailDTO = bookMapper.detailToDTO(book); //Map to DTO
         return bookDetailDTO;
@@ -154,7 +154,8 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
                         "Không tìm thấy danh mục yêu cầu!"));
         Shop shop = shopRepo.findById(request.getShopId())
-                .orElseThrow(() -> new ResourceNotFoundException("Shop not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
+                        "Không tìm thấy cửa hàng yêu cầu!"));
         if (!isOwnerValid(shop, user))
             throw new EntityOwnershipException("Invalid ownership!",
                     "Người dùng không phải chủ sở hữu của cửa hàng này!");
@@ -241,7 +242,8 @@ public class BookServiceImpl implements BookService {
                 && !request.getThumbnailId().equals(book.getImage().getId())) {
             Image oldImage = book.getImage();
             Image newImage = imageRepo.findBookImage(id, request.getThumbnailId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Image not found!",
+                            "Không tìm thấy hình ảnh yêu cầu!"));
             book.setImage(newImage); // Set new image
             currDetail.addImage(oldImage);
         }
@@ -293,9 +295,12 @@ public class BookServiceImpl implements BookService {
     //Delete book (SELLER)
     @Transactional
     public BookResponseDTO deleteBook(Long id, Account user) {
-        Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        Book book = bookRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found!",
+                "Không tìm thấy sản phẩm yêu cầu!"));
         //Check if correct owner
-        if (!isOwnerValid(book.getShop(), user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+        if (!isOwnerValid(book.getShop(), user)) throw new EntityOwnershipException("Invalid ownership!",
+                "Người dùng không có quyền chỉnh sửa sản phẩm này!");
 
         bookRepo.deleteById(id); //Delete from database
         return bookMapper.bookToResponseDTO(book);
