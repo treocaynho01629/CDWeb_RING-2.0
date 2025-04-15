@@ -1,5 +1,6 @@
 package com.ring.bookstore.service.impl;
 
+import com.ring.bookstore.exception.EntityOwnershipException;
 import com.ring.bookstore.model.dto.response.coupons.CouponDTO;
 import com.ring.bookstore.model.dto.response.coupons.CouponDetailDTO;
 import com.ring.bookstore.model.dto.response.coupons.CouponDiscountDTO;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -82,6 +84,7 @@ public class CouponServiceImpl implements CouponService {
             CartStateRequest request = CartStateRequest.builder()
                     .value(cValue)
                     .quantity(cQuantity)
+                    .shopId(shopId)
                     .build();
             Page<CouponDTO> couponDTOS = couponsList.map((projection) -> {
                 Coupon coupon = projection.getCoupon();
@@ -97,14 +100,19 @@ public class CouponServiceImpl implements CouponService {
 
     public CouponDetailDTO getCoupon(Long id) {
         ICoupon coupon = couponRepo.findCouponById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Coupon not found!"));
+                new ResourceNotFoundException("Coupon not found!",
+                        "Không tìm thấy mã giảm giá yêu cầu!"));
         return couponMapper.couponToDetailDTO(coupon);
     }
 
     @Override
-    public CouponDTO getCouponByCode(String code, Double cValue, Integer cQuantity) {
+    public CouponDTO getCouponByCode(String code,
+                                     Long shopId,
+                                     Double cValue,
+                                     Integer cQuantity) {
         ICoupon projection = couponRepo.findCouponByCode(code).orElseThrow(() ->
-                new ResourceNotFoundException("Coupon not found!"));
+                new ResourceNotFoundException("Coupon not found!",
+                        "Không tìm thấy mã giảm giá yêu cầu!"));
         if (cValue != null || cQuantity != null) {
             CartStateRequest request = CartStateRequest.builder()
                     .value(cValue)
@@ -150,8 +158,10 @@ public class CouponServiceImpl implements CouponService {
 
         //Shop validation
         if (request.getShopId() != null) {
-            Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found!"));
-            if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
+                    "Không tìm thấy cửa hàng yêu cầu!"));
+            if (!isOwnerValid(shop, user)) throw new EntityOwnershipException("Invalid ownership!",
+                    "Người dùng không phải chủ sở hữu của cửa hàng này!");
             coupon.setShop(shop);
         } else {
             if (!isAuthAdmin()) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");
@@ -179,16 +189,20 @@ public class CouponServiceImpl implements CouponService {
 
         //Get original coupon
         Coupon coupon = couponRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Coupon not found!"));
+                new ResourceNotFoundException("Coupon not found!",
+                        "Không tìm thấy mã giảm giá yêu cầu!"));
 
         //Check if correct seller or admin
         if (!isOwnerValid(coupon.getShop(), user))
-            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            throw new EntityOwnershipException("Invalid ownership!",
+                    "Người dùng không phải chủ sở hữu của mã giảm giá này!");
 
         //Shop validation + set
         if (request.getShopId() != null) {
-            Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found!"));
-            if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
+                    "Không tìm thấy cửa hàng yêu cầu!"));
+            if (!isOwnerValid(shop, user)) throw new EntityOwnershipException("Invalid ownership!",
+                    "Người dùng không phải chủ sở hữu của cửa hàng này!");
             coupon.setShop(shop);
         } else {
             if (!isAuthAdmin()) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Shop is required!");
@@ -213,10 +227,12 @@ public class CouponServiceImpl implements CouponService {
 
     @Transactional
     public Coupon deleteCoupon(Long id, Account user) {
-        Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
+        Coupon coupon = couponRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Coupon not found",
+                "Không tìm thấy mã giảm giá yêu cầu!"));
         //Check if correct seller or admin
         if (!isOwnerValid(coupon.getShop(), user))
-            throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+            throw new EntityOwnershipException("Invalid ownership!",
+                    "Người dùng không phải chủ sở hữu của mã giảm giá này!");
 
         couponRepo.deleteById(id); //Delete from database
         return coupon;
@@ -315,16 +331,26 @@ public class CouponServiceImpl implements CouponService {
     }
 
     protected boolean isUsable(Coupon coupon, CartStateRequest request) {
+
+        boolean result;
+
+        // Check shop
+        if (request.getShopId() != null) {
+            result = coupon.getShop() != null && Objects.equals(coupon.getShop().getId(), request.getShopId());
+        } else {
+            result = coupon.getShop() == null;
+        }
+        if (!result) return result;
+
         CouponDetail couponDetail = coupon.getDetail();
         CouponType type = couponDetail.getType();
         double attribute = couponDetail.getAttribute();
-        boolean result = false;
 
-        //Current
+        // Current
         double currValue = request.getValue() != null ? request.getValue() : -1;
         int currQuantity = request.getQuantity() != null ? request.getQuantity() : -1;
 
-        //Check conditions & apply
+        // Check conditions & apply
         if (type.equals(CouponType.MIN_AMOUNT) && currValue > -1) {
             result = currQuantity >= attribute;
         } else if (currValue > -1 &&
@@ -338,7 +364,8 @@ public class CouponServiceImpl implements CouponService {
     //Check valid role function
     protected boolean isAuthAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
+        return (auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
     }
 
     protected boolean isOwnerValid(Shop shop, Account user) {

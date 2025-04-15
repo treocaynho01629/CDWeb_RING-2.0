@@ -107,15 +107,18 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (include != null && include.equalsIgnoreCase("children")) {
             Category cate = cateRepo.findCateWithChildren(id, slug).orElseThrow(() ->
-                    new ResourceNotFoundException("Category not found!"));
+                    new ResourceNotFoundException("Category not found!",
+                        "Không tìm thấy danh mục yêu cầu!"));
             result = cateMapper.cateToDetailDTO(cate, "children");
         } else if (include != null && include.equalsIgnoreCase("parent")) {
             Category cate = cateRepo.findCateWithParent(id, slug).orElseThrow(() ->
-                    new ResourceNotFoundException("Category not found!"));
+                    new ResourceNotFoundException("Category not found!",
+                        "Không tìm thấy danh mục yêu cầu!"));
             result = cateMapper.cateToDetailDTO(cate, "parent");
         } else {
             Category cate = cateRepo.findCate(id, slug).orElseThrow(() ->
-                    new ResourceNotFoundException("Category not found!"));
+                    new ResourceNotFoundException("Category not found!",
+                        "Không tìm thấy danh mục yêu cầu!"));
             result = cateMapper.cateToDetailDTO(cate);
         }
 

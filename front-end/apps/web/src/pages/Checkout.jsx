@@ -57,6 +57,7 @@ const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 const ReCaptcha = lazy(() => import("@ring/auth/ReCaptcha"));
 const CouponDialog = lazy(() => import("../components/coupon/CouponDialog"));
 const PaymentSelect = lazy(() => import("../components/cart/PaymentSelect"));
+const ConfirmDialog = lazy(() => import("@ring/shared/ConfirmDialog"));
 
 //#region styled
 const Wrapper = styled.div``;
@@ -157,6 +158,7 @@ const Checkout = () => {
   const { cartProducts, clearCart } = useCart();
   const { estimateCart, syncCart } = useCheckout();
   const { state: checkoutState } = useLocation();
+  const [openWarning, setOpenWarning] = useState(undefined);
   const selected = checkoutState?.selected;
 
   //Coupon
@@ -337,7 +339,8 @@ const Checkout = () => {
       coupon,
       setCoupon,
       shopCoupon,
-      setShopCoupon
+      setShopCoupon,
+      handleOpenWarning
     );
   };
 
@@ -396,6 +399,7 @@ const Checkout = () => {
   const handleCloseDialog = () => {
     setOpenAddress(false);
   };
+
   const handleOpenCouponDialog = (shopId) => {
     setOpenCoupon(true);
     setContextShop(shopId);
@@ -427,6 +431,13 @@ const Checkout = () => {
 
   const handleChangeShipping = (e) => {
     setDelivery(e.target.value);
+  };
+
+  const handleOpenWarning = () => {
+    setOpenWarning(true);
+  };
+  const handleCloseWarning = () => {
+    setOpenWarning(false);
   };
 
   const validAddressInfo = [
@@ -751,6 +762,18 @@ const Checkout = () => {
                 numSelected: selected.length,
                 selectMode: true,
                 onSubmit: handleChangeCoupon,
+              }}
+            />
+          )}
+        </Suspense>
+        <Suspense fallback={null}>
+          {openWarning !== undefined && (
+            <ConfirmDialog
+              {...{
+                open: openWarning,
+                title: "Đã gỡ các sản phẩm!",
+                message: "Một số sản phẩm đã bị gỡ khỏi trang!",
+                handleConfirm: handleCloseWarning,
               }}
             />
           )}

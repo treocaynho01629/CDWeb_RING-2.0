@@ -479,7 +479,7 @@ public class OrderServiceImpl implements OrderService {
             }
 
             CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(coupon,
-                    new CartStateRequest(value, shipping, totalQuantity), user);
+                    new CartStateRequest(value, shipping, totalQuantity, null), user);
 
             if (discountFromCoupon != null) {
                 //Decrease usage on checkout
@@ -632,7 +632,7 @@ public class OrderServiceImpl implements OrderService {
                 && shopCoupon.getCoupon().getShop().getId().equals(shop.getId())
                 && !couponService.isExpired(shopCoupon.getCoupon())) {
             CouponDiscountDTO discountFromCoupon = couponService.applyCoupon(shopCoupon.getCoupon(),
-                    new CartStateRequest(detailTotal - discountDeal, shippingFee, detailQuantity), user);
+                    new CartStateRequest(detailTotal - discountDeal, shippingFee, detailQuantity, shop.getId()), user);
 
             //Apply coupon
             if (couponRepo.hasUserUsedCoupon(shopCoupon.getCoupon().getId(), user.getId())) {

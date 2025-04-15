@@ -27,27 +27,31 @@ const ConfirmDialog = ({
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button
-          variant="outlined"
-          color="error"
-          size="large"
-          autoFocus
-          sx={{ mb: 1 }}
-          onClick={handleCancel}
-          startIcon={<Close />}
-        >
-          Huỷ
-        </Button>
-        <Button
-          variant="contained"
-          size="large"
-          autoFocus
-          sx={{ mb: 1 }}
-          onClick={handleConfirm}
-          startIcon={<Check />}
-        >
-          Đồng ý
-        </Button>
+        {handleCancel && (
+          <Button
+            variant="outlined"
+            color="error"
+            size="large"
+            autoFocus
+            sx={{ mb: 1 }}
+            onClick={handleCancel}
+            startIcon={<Close />}
+          >
+            Huỷ
+          </Button>
+        )}
+        {handleConfirm && (
+          <Button
+            variant="contained"
+            size="large"
+            autoFocus
+            sx={{ mb: 1 }}
+            onClick={handleConfirm}
+            startIcon={<Check />}
+          >
+            Đồng ý
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

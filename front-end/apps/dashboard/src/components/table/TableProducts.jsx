@@ -808,7 +808,7 @@ export default function TableProducts({
                 style={{ display: "flex", alignItems: "center" }}
               >
                 <LazyLoadImage
-                  src={book?.image?.srcSet[ImageSize.TINY.value]}
+                  src={book?.image?.srcSet[ImageSize?.TINY?.value]}
                   height={45}
                   width={45}
                   style={{ marginRight: "10px" }}

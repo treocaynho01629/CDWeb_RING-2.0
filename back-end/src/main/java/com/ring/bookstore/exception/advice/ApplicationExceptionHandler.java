@@ -110,6 +110,16 @@ public class ApplicationExceptionHandler{
         );
     }
 
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(EntityOwnershipException.class)
+    public ExceptionResponse handleEntityOwnershipException(EntityOwnershipException e) {
+        return new ExceptionResponse(
+                HttpStatus.FORBIDDEN.value(),
+                e.getError(),
+                e.getMessage()
+        );
+    }
+
     @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
     @ExceptionHandler(ImageResizerException.class)
     public ExceptionResponse handleImageResizerException(ImageResizerException e) {

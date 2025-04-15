@@ -11,10 +11,12 @@ import com.ring.bookstore.model.dto.response.publishers.PublisherDTO;
 import com.ring.bookstore.model.dto.response.reviews.ReviewsInfoDTO;
 import com.ring.bookstore.model.enums.BookLanguage;
 import com.ring.bookstore.model.enums.BookType;
+import lombok.Builder;
 
 /**
  * Represents a book detail response as {@link BookDetailDTO}.
  */
+@Builder
 public record BookDetailDTO(Long id,
                             String slug,
                             ImageDTO image,

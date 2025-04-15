@@ -32,6 +32,7 @@ public interface CouponService {
     CouponDetailDTO getCoupon(Long id);
 
     CouponDTO getCouponByCode(String code,
+                              Long shopId,
                               Double cValue,
                               Integer cQuantity);
 

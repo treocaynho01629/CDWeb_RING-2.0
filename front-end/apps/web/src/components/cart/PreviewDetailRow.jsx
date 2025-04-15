@@ -177,7 +177,7 @@ function ItemRow({ product, index }) {
       <StyledTableCell className="preview" component="th" scope="row">
         <ItemContainer>
           <StyledLazyImage
-            src={product?.image.srcSet[ImageSize.TINY.value]}
+            src={product?.image?.srcSet[ImageSize?.TINY?.value]}
             alt={`${product.title} Cart item`}
             placeholder={
               <StyledSkeleton variant="rectangular" animation={false} />

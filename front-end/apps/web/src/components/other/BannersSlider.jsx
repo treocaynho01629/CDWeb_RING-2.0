@@ -215,7 +215,7 @@ function Item({ banner, index }) {
           <BackdropContainer>
             <BackdropImage
               aria-hidden
-              src={banner?.image?.srcSet[ImageSize.TINY.value]}
+              src={banner?.image?.srcSet[ImageSize?.TINY?.value]}
               visibleByDefault={index == 0}
               placeholder={
                 <BackdropPlaceholder variant="rectangular" animation={false} />
@@ -227,7 +227,8 @@ function Item({ banner, index }) {
               src={banner?.image.url}
               srcSet={Object.values(ImageSize)
                 .map(
-                  (size) => `${banner?.image.srcSet[size.value]} ${size.width}w`
+                  (size) =>
+                    `${banner?.image?.srcSet[size?.value]} ${size?.width}w`
                 )
                 .concat(`${banner?.image.url} 600w`)
                 .join(", ")}
@@ -257,7 +258,7 @@ function ExtraItem({ banner }) {
       <ExtraContainer>
         <StyledLink to={banner?.url}>
           <StyledLazyImage
-            src={banner?.image?.srcSet[ImageSize.MEDIUM.value]}
+            src={banner?.image?.srcSet[ImageSize?.MEDIUM?.value]}
             alt={banner?.name}
             visibleByDefault={true}
             placeholder={

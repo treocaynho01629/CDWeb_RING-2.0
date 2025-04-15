@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.slugify.Slugify;
+import com.ring.bookstore.exception.EntityOwnershipException;
 import com.ring.bookstore.model.dto.projection.books.IBook;
 import com.ring.bookstore.model.dto.projection.books.IBookDetail;
 import com.ring.bookstore.model.dto.projection.books.IBookDisplay;
@@ -107,7 +108,8 @@ public class BookServiceImpl implements BookService {
 
     public BookDTO getBook(Long id) {
         IBook book = detailRepo.findBook(id).orElseThrow(() ->
-                new ResourceNotFoundException("Product not found!"));
+                new ResourceNotFoundException("Product not found!",
+                        "Không tìm thấy sản phẩm yêu cầu!"));
         List<Long> imageIds = book.getPreviews() != null ? book.getPreviews() : new ArrayList<>();
         imageIds.add(book.getImage());
 
@@ -119,14 +121,16 @@ public class BookServiceImpl implements BookService {
     //Get book with detail
     public BookDetailDTO getBookDetail(Long id) {
         IBookDetail book = detailRepo.findBookDetail(id, null).orElseThrow(() ->
-                new ResourceNotFoundException("Product not found!"));
+                new ResourceNotFoundException("Product not found!",
+                        "Không tìm thấy sản phẩm yêu cầu!"));
         BookDetailDTO bookDetailDTO = bookMapper.detailToDTO(book); //Map to DTO
         return bookDetailDTO;
     }
 
     public BookDetailDTO getBookDetail(String slug) {
         IBookDetail book = detailRepo.findBookDetail(null, slug).orElseThrow(() ->
-                new ResourceNotFoundException("Product not found!"));
+                new ResourceNotFoundException("Product not found!",
+                        "Không tìm thấy sản phẩm yêu cầu!"));
         BookDetailDTO bookDetailDTO = bookMapper.detailToDTO(book); //Map to DTO
         return bookDetailDTO;
     }
@@ -143,10 +147,17 @@ public class BookServiceImpl implements BookService {
                                    MultipartFile[] images,
                                    Account user) {
         // Validation
-        Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
-        Shop shop = shopRepo.findById(request.getShopId()).orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
-        if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid owner!");
+        Category cate = cateRepo.findById(request.getCateId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
+                        "Không tìm thấy danh mục yêu cầu!"));
+        Publisher pub = pubRepo.findById(request.getPubId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
+                        "Không tìm thấy danh mục yêu cầu!"));
+        Shop shop = shopRepo.findById(request.getShopId())
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found!"));
+        if (!isOwnerValid(shop, user))
+            throw new EntityOwnershipException("Invalid ownership!",
+                    "Người dùng không phải chủ sở hữu của cửa hàng này!");
 
         // Thumbnail
         Image savedThumbnail = imageService.upload(thumbnail, FileUploadUtil.PRODUCT_FOLDER);
@@ -202,15 +213,23 @@ public class BookServiceImpl implements BookService {
                                       MultipartFile[] images,
                                       Account user) {
         //Check book exists & category, publisher validation
-        Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
-        Category cate = cateRepo.findById(request.getCateId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        Publisher pub = pubRepo.findById(request.getPubId()).orElseThrow(() -> new ResourceNotFoundException("Publisher not found"));
+        Book book = bookRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found!",
+                        "Không tìm thấy sản phẩm yêu cầu!"));
+        Category cate = cateRepo.findById(request.getCateId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
+                        "Không tìm thấy danh mục yêu cầu!"));
+        Publisher pub = pubRepo.findById(request.getPubId())
+                .orElseThrow(() -> new ResourceNotFoundException("Publisher not found!",
+                        "Không tìm thấy nhà xuất bản yêu cầu!"));
         BookDetail currDetail = book.getDetail();
         List<Long> removeImageIds = request.getRemoveIds();
         boolean isRemove = removeImageIds != null && !removeImageIds.isEmpty();
 
         //Check if correct owner
-        if (!isOwnerValid(book.getShop(), user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+        if (!isOwnerValid(book.getShop(), user))
+            throw new EntityOwnershipException("Invalid ownership!",
+                    "Người dùng không phải chủ sở hữu của sản phẩm này!");
 
         // Image upload/replace
         if (thumbnail != null) { // Contain new image >> upload/replace
@@ -274,7 +293,7 @@ public class BookServiceImpl implements BookService {
     //Delete book (SELLER)
     @Transactional
     public BookResponseDTO deleteBook(Long id, Account user) {
-        Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+        Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         //Check if correct owner
         if (!isOwnerValid(book.getShop(), user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
 
@@ -338,7 +357,8 @@ public class BookServiceImpl implements BookService {
     //Check valid role function
     protected boolean isAuthAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
+        return (auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
     }
 
     protected boolean isOwnerValid(Shop shop, Account user) {

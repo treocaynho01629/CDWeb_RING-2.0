@@ -50,7 +50,8 @@ public class AddressServiceImpl implements AddressService {
     @Transactional
     public Address addAddress(AddressRequest request, Account user) {
         AccountProfile profile = profileRepo.findById(user.getProfile().getId()).orElseThrow(()
-                -> new ResourceNotFoundException("Profile not found!"));
+                -> new ResourceNotFoundException("Roles not found!",
+                "Không tìm thấy hồ sơ yêu cầu!"));
 
         //Limit size
         int MAX_SIZE = 5;

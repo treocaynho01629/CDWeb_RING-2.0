@@ -95,9 +95,10 @@ public class CouponController {
      */
     @GetMapping("/code/{code}")
     public ResponseEntity<?> getCoupon(@PathVariable("code") String code,
+                                       @RequestParam(value = "shopId", required = false) Long shopId,
                                        @RequestParam(value = "cValue", required = false) Double checkValue,
                                        @RequestParam(value = "cQuantity", required = false) Integer checkQuantity) {
-        return new ResponseEntity<>(couponService.getCouponByCode(code, checkValue, checkQuantity), HttpStatus.OK);
+        return new ResponseEntity<>(couponService.getCouponByCode(code, shopId, checkValue, checkQuantity), HttpStatus.OK);
     }
 
     /**

@@ -71,7 +71,8 @@ public class AccountServiceImpl implements AccountService {
 
     public AccountDetailDTO getAccountById(Long id) {
         IAccountDetail account = profileRepo.findDetailById(id).orElseThrow(()
-                -> new ResourceNotFoundException("User not found!"));
+                -> new ResourceNotFoundException("User not found!",
+                "Không tìm thấy người dùng yêu cầu!"));
         return accountMapper.projectionToDetailDTO(account);
     }
 
@@ -95,7 +96,8 @@ public class AccountServiceImpl implements AccountService {
 
         //Set role
         List<Role> roles = roleRepo.findAllByRoleNameIn(request.getRoles());
-        if (roles.isEmpty()) throw new ResourceNotFoundException("Roles not found!");
+        if (roles.isEmpty()) throw new ResourceNotFoundException("Roles not found!",
+                "Không tìm thấy các chức vụ yêu cầu!");
 
         //Create account
         var acc = Account.builder()
@@ -131,7 +133,8 @@ public class AccountServiceImpl implements AccountService {
 
         //Check Account exists?
         Account changeUser = accountRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!",
+                        "Không tìm thấy người dùng yêu cầu!"));
 
         //Check if Account with these username and email has exists >> throw exception
         if (!request.getUsername().equals(changeUser.getUsername())
@@ -147,10 +150,12 @@ public class AccountServiceImpl implements AccountService {
         // Set role
         if (Objects.equals(user.getId(), id)
                 && !request.getRoles().contains(UserRole.ROLE_ADMIN)) {
-            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Can not remove your ADMIN role!");
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Cannot remove your own Admin role!",
+                    "Người dùng không thể loại bỏ quyền Admin của chính mình!");
         }
         List<Role> roles = roleRepo.findAllByRoleNameIn(request.getRoles());
-        if (roles.isEmpty()) throw new ResourceNotFoundException("Roles not found!");
+        if (roles.isEmpty()) throw new ResourceNotFoundException("Roles not found!",
+                "Không tìm thấy các chức vụ yêu cầu!");
         changeUser.setRoles(roles);
 
         //Set new info
@@ -202,14 +207,16 @@ public class AccountServiceImpl implements AccountService {
 
     public ProfileDTO getProfile(Account user) {
         IProfile currProfile = profileRepo.findProfileByUser(user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Profile not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Roles not found!",
+                        "Không tìm thấy hồ sơ yêu cầu!"));
         return accountMapper.projectionToProfileDTO(currProfile);
     }
 
     @Transactional
     public AccountProfile updateProfile(ProfileRequest request, MultipartFile file, Account user) {
         AccountProfile profile = profileRepo.findById(user.getProfile().getId()).orElseThrow(()
-                -> new ResourceNotFoundException("Profile not found!"));
+                -> new ResourceNotFoundException("Roles not found!",
+                "Không tìm thấy hồ sơ yêu cầu!"));
 
         //Image upload/replace
         profile = this.changeProfilePic(file, request.getImage(), profile);
@@ -256,8 +263,8 @@ public class AccountServiceImpl implements AccountService {
      * Updates the profile picture of a user account. This method allows uploading
      * a new profile picture, replacing an existing one, or removing the profile picture.
      *
-     * @param file the new image file to be uploaded as the profile picture, can be null for removing the image
-     * @param image the identifier of the image, used for determining if an image should be removed, can be null
+     * @param file    the new image file to be uploaded as the profile picture, can be null for removing the image
+     * @param image   the identifier of the image, used for determining if an image should be removed, can be null
      * @param profile the account profile to be updated
      * @return the updated account profile with the modified profile picture
      */

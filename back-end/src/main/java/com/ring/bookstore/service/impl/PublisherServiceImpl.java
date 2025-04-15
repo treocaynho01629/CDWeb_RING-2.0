@@ -59,7 +59,8 @@ public class PublisherServiceImpl implements PublisherService {
     @Override
     public PublisherDTO getPublisher(Integer id) {
         Publisher publisher = pubRepo.findWithImageById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Publisher not found!"));
+                new ResourceNotFoundException("Publisher not found!",
+                        "Không tìm thấy nhà xuất bản yêu cầu!"));
 
         PublisherDTO publisherDTO = pubMapper.apply(publisher); //Map to DTO
         return publisherDTO;

@@ -245,6 +245,7 @@ const CouponContainer = styled.div`
   background-color: ${({ theme }) => theme.palette.background.default};
   border: 0.5px solid ${({ theme }) => theme.palette.divider};
   box-shadow: ${({ theme }) => theme.shadows[1]};
+  transition: all 0.2s ease;
 
   &.active {
     background-color: ${({ theme }) => alpha(theme.palette.primary.light, 0.1)};
@@ -278,9 +279,6 @@ const CouponContainer = styled.div`
       border: 1px solid ${({ theme }) => theme.palette.divider};
       border-radius: 6px;
       transform: rotate(-10deg);
-    }
-
-    ${CouponAction} {
       pointer-events: none;
     }
 
@@ -431,13 +429,15 @@ const CouponItem = ({
       {coupon ? (
         <CouponContainer
           className={
-            selectMode && isUsed
-              ? "disabled used"
-              : selectMode && isDisabled
-                ? "disabled"
-                : isSelected
-                  ? "active"
-                  : className
+            selectMode
+              ? isSelected
+                ? isUsed
+                  ? "disabled used"
+                  : isDisabled
+                    ? "disabled"
+                    : "active"
+                : className
+              : className
           }
         >
           <CouponEdge

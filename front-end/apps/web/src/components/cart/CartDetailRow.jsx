@@ -234,7 +234,7 @@ function ItemRow({
         <ItemContainer>
           <Link to={`/product/${product.slug}`}>
             <StyledLazyImage
-              src={product?.image?.srcSet[ImageSize.SMALL.value]}
+              src={product?.image?.srcSet[ImageSize?.SMALL?.value]}
               alt={`${product.title} Cart item`}
               placeholder={
                 <StyledSkeleton variant="rectangular" animation={false} />

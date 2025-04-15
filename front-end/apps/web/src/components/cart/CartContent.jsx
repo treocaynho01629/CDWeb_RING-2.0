@@ -47,6 +47,7 @@ import useCheckout from "../../hooks/useCheckout";
 
 const Menu = lazy(() => import("@mui/material/Menu"));
 const CouponDialog = lazy(() => import("../coupon/CouponDialog"));
+const ConfirmDialog = lazy(() => import("@ring/shared/ConfirmDialog"));
 
 //#region styled
 const TitleContainer = styled.div`
@@ -205,6 +206,7 @@ const CartContent = ({ confirm }) => {
   const [contextState, setContextState] = useState(null);
   const [contextCoupon, setContextCoupon] = useState(null);
   const [openDialog, setOpenDialog] = useState(undefined);
+  const [openWarning, setOpenWarning] = useState(undefined);
   const [anchorEl, setAnchorEl] = useState(null);
 
   const open = Boolean(anchorEl);
@@ -215,6 +217,7 @@ const CartContent = ({ confirm }) => {
     data: recommend,
     isLoading: loadRecommend,
     isSuccess: doneRecommend,
+    isError: errorRecommend,
   } = useGetRecommendCouponsQuery({ shopIds }, { skip: !shopIds.length });
 
   //For get similar
@@ -261,7 +264,7 @@ const CartContent = ({ confirm }) => {
   }, [recommend, loadRecommend]);
 
   const handleCartChange = () => {
-    if (selected.length > 0 && cartProducts.length > 0 && doneRecommend) {
+    if (selected.length > 0 && cartProducts.length > 0) {
       //Reduce cart
       const selectedCart = cartProducts.reduce(
         (result, item) => {
@@ -289,7 +292,7 @@ const CartContent = ({ confirm }) => {
       );
 
       handleEstimate(selectedCart); //Estimate price
-      handleCalculate(selectedCart); //Calculate price
+      if (doneRecommend || errorRecommend) handleCalculate(selectedCart); //Calculate price
     } else {
       //Reset
       handleEstimate(null);
@@ -356,7 +359,8 @@ const CartContent = ({ confirm }) => {
       coupon,
       setCoupon,
       shopCoupon,
-      setShopCoupon
+      setShopCoupon,
+      handleOpenWarning
     );
   };
 
@@ -405,6 +409,10 @@ const CartContent = ({ confirm }) => {
     setContextProduct(product);
   };
 
+  const handleOpenWarning = () => {
+    setOpenWarning(true);
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
     setContextProduct(null);
@@ -423,9 +431,10 @@ const CartContent = ({ confirm }) => {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setContextShop(null);
-    setContextState(null);
-    setContextCoupon(null);
+  };
+
+  const handleCloseWarning = () => {
+    setOpenWarning(false);
   };
 
   //Selected?
@@ -709,6 +718,18 @@ const CartContent = ({ confirm }) => {
               <ListItemText>Tìm sản phẩm tương tự</ListItemText>
             </MenuItem>
           </Menu>
+        )}
+      </Suspense>
+      <Suspense fallback={null}>
+        {openWarning !== undefined && (
+          <ConfirmDialog
+            {...{
+              open: openWarning,
+              title: "Đã gỡ các sản phẩm!",
+              message: "Một số sản phẩm đã bị gỡ khỏi trang!",
+              handleConfirm: handleCloseWarning,
+            }}
+          />
         )}
       </Suspense>
     </Grid>

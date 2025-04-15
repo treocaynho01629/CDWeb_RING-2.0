@@ -24,4 +24,6 @@ public class CartStateRequest {
 
 	@Min(value = 0, message = "Số lượng tối thiểu từ 0 trở lên")
 	private Integer quantity;
+
+	private Long shopId;
 }

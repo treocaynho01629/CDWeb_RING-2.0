@@ -8,10 +8,11 @@ export const couponsApiSlice = initialsApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getCoupon: builder.query({
       query: (args) => {
-        const { code, cValue, cQuantity } = args || {};
+        const { code, shopId, cValue, cQuantity } = args || {};
 
         //Params
         const params = new URLSearchParams();
+        if (shopId) params.append("shopId", shopId);
         if (cValue) params.append("cValue", cValue);
         if (cQuantity) params.append("cQuantity", cQuantity);
 

@@ -136,7 +136,7 @@ const CheckoutDialog = ({
                     </CheckoutPrice>
                     {!calculating && displayInfo.totalDiscount > 0 && (
                       <SavePrice>
-                        Tiết kiệm{" "}
+                        Tiết kiệm&nbsp;
                         {currencyFormat.format(displayInfo.totalDiscount)}
                       </SavePrice>
                     )}

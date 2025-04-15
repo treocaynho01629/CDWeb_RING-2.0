@@ -117,7 +117,7 @@ const ProductSimple = ({ book, scrollPosition }) => {
         <Link to={`/product/${book?.slug}`} style={{ width: "100%" }}>
           <ImgContainer>
             <StyledLazyImage
-              src={book?.image?.srcSet[ImageSize.SMALL.value]}
+              src={book?.image?.srcSet[ImageSize?.SMALL?.value]}
               alt={`${book?.title} Thumbnail`}
               width={"100%"}
               scrollPosition={scrollPosition}

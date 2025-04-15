@@ -156,7 +156,7 @@ const ProductItem = ({ book, scrollPosition }) => {
     <ItemContainer>
       {book ? (
         <StyledLazyImage
-          src={book?.image?.srcSet[ImageSize.SMALL.value]}
+          src={book?.image?.srcSet[ImageSize?.SMALL?.value]}
           alt={`Top item: ${book?.title}`}
           scrollPosition={scrollPosition}
           placeholder={

@@ -1,5 +1,6 @@
 package com.ring.bookstore.service.impl;
 
+import com.ring.bookstore.exception.EntityOwnershipException;
 import com.ring.bookstore.model.dto.projection.shops.*;
 import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
 import com.ring.bookstore.model.mappers.DashboardMapper;
@@ -97,7 +98,8 @@ public class ShopServiceImpl implements ShopService {
     public ShopInfoDTO getShopInfo(Long id, Account user) {
         Long userId = user != null ? user.getId() : null;
         IShopInfo shop = shopRepo.findShopInfoById(id, userId).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found!"));
+                new ResourceNotFoundException("Shop not found!",
+                        "Không tìm thấy cửa hàng yêu cầu!"));
         ShopInfoDTO shopDTO = shopMapper.infoToDTO(shop); //Map to DTO
         return shopDTO;
     }
@@ -106,7 +108,8 @@ public class ShopServiceImpl implements ShopService {
     public ShopDisplayDetailDTO getShopDisplayDetail(Long id, Account user) {
         Long userId = user != null ? user.getId() : null;
         IShopDisplayDetail shop = shopRepo.findShopDisplayDetailById(id, userId).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found!"));
+                new ResourceNotFoundException("Shop not found!",
+                        "Không tìm thấy cửa hàng yêu cầu!"));
         ShopDisplayDetailDTO shopDTO = shopMapper.displayDetailToDTO(shop); //Map to DTO
         return shopDTO;
     }
@@ -115,7 +118,8 @@ public class ShopServiceImpl implements ShopService {
     public ShopDetailDTO getShopDetail(Long id, Account user) {
         IShopDetail shop = shopRepo.findShopDetailById(id,
                 isAuthAdmin() ? null : user.getId()).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found!"));
+                new ResourceNotFoundException("Shop not found!",
+                        "Không tìm thấy cửa hàng yêu cầu!"));
         ShopDetailDTO shopDTO = shopMapper.detailToDTO(shop); //Map to DTO
         return shopDTO;
     }
@@ -130,9 +134,11 @@ public class ShopServiceImpl implements ShopService {
     @Transactional
     public void follow(Long id, Account user) {
         Shop shop = shopRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found"));
+                new ResourceNotFoundException("Shop not found!",
+                        "Không tìm thấy cửa hàng yêu cầu!"));
         Account currUser = accountRepo.findByUsername(user.getUsername()).orElseThrow(() ->
-                new ResourceNotFoundException("User not found"));
+                new ResourceNotFoundException("User not found!",
+                        "Không tìm thấy người dùng yêu cầu!"));
         shop.addFollower(currUser);
         shopRepo.save(shop);
     }
@@ -140,7 +146,8 @@ public class ShopServiceImpl implements ShopService {
     @Transactional
     public void unfollow(Long id, Account user) {
         Shop shop = shopRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found"));
+                new ResourceNotFoundException("Shop not found!",
+                        "Không tìm thấy cửa hàng yêu cầu!"));
         shop.removeFollower(user);
         shopRepo.save(shop);
     }
@@ -182,10 +189,12 @@ public class ShopServiceImpl implements ShopService {
 
         //Get original shop
         Shop shop = shopRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found"));
+                new ResourceNotFoundException("Shop not found!",
+                        "Không tìm thấy cửa hàng yêu cầu!"));
 
         //Check if correct seller or admin
-        if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+        if (!isOwnerValid(shop, user)) throw new EntityOwnershipException("Invalid ownership!",
+                "Người dùng không phải chủ sở hữu của hàng này!");
 
         //Update address
         AddressRequest addressRequest = request.getAddressRequest();
@@ -217,9 +226,11 @@ public class ShopServiceImpl implements ShopService {
     @Override
     public Shop deleteShop(Long id, Account user) {
         Shop shop = shopRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Shop not found"));
+                new ResourceNotFoundException("Shop not found!",
+                        "Không tìm thấy cửa hàng yêu cầu!"));
         //Check if correct seller or admin
-        if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+        if (!isOwnerValid(shop, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid ownership!",
+                "Người dùng không phải chủ sở hữu của cửa hàng này!");
 
         shopRepo.deleteById(id); //Delete from database
         return shop;
@@ -254,19 +265,23 @@ public class ShopServiceImpl implements ShopService {
 
     //Check valid role function
     protected boolean isAuthAdmin() {
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        return (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
+        return (auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
     }
 
     //Check valid role function
     protected boolean isOwnerValid(Shop shop, Account user) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //Get current auth
-        boolean isAdmin = (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
+
+        boolean isAdmin = isAuthAdmin();
+
         //Check if is admin or valid owner id
         return shop.getOwner().getId().equals(user.getId()) || isAdmin;
     }
 
     protected Shop changeShopPic(MultipartFile file, String image, Shop shop) {
+
         if (file != null) { // Contain new image >> upload/replace
             if (shop.getImage() != null) imageService.deleteImage(shop.getImage().getId()); //Delete old image
             Image savedImage = imageService.upload(file, FileUploadUtil.SHOP_FOLDER); //Upload new image

@@ -2,6 +2,7 @@ package com.ring.bookstore.service.impl;
 
 import java.util.List;
 
+import com.ring.bookstore.exception.EntityOwnershipException;
 import com.ring.bookstore.model.dto.projection.reviews.IReview;
 import com.ring.bookstore.model.enums.UserRole;
 import com.ring.bookstore.model.entity.Account;
@@ -43,7 +44,8 @@ public class ReviewServiceImpl implements ReviewService {
     public Review review(Long id, ReviewRequest request, Account user) {
         //Book validation
         Book book = bookRepo.findById(id).orElseThrow(()
-                -> new ResourceNotFoundException("Book not found"));
+                -> new ResourceNotFoundException("Product not found!",
+                "Không tìm thấy sản phẩm yêu cầu!"));
         //Check if user had bought it yet
         if (!orderRepo.hasUserBoughtBook(id, user.getId())) throw new HttpResponseException(
                 HttpStatus.FORBIDDEN,
@@ -133,10 +135,12 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public ReviewDTO updateReview(Long id, ReviewRequest request, Account user) {
         //Check review exists
-        Review review = reviewRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Review not found"));
+        Review review = reviewRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Review not found!",
+                "Không tìm thấy đánh giá yêu cầu!"));
 
         //Check if correct user or admin
-        if (!isUserValid(review, user)) throw new HttpResponseException(HttpStatus.FORBIDDEN, "Invalid role!");
+        if (!isUserValid(review, user)) throw new EntityOwnershipException("Invalid ownership!",
+                "Người dùng không phải người thực hiện đánh giá này!");
 
         //Set new review content
         review.setRating(request.getRating());
@@ -179,7 +183,8 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void hideReview(Long id) {
         Review review = reviewRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Review not found"));
+                new ResourceNotFoundException("Review not found!",
+                        "Không tìm thấy đánh giá yêu cầu!"));
         review.setHidden(true);
         reviewRepo.save(review);
     }
@@ -187,7 +192,8 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void unhideReview(Long id) {
         Review review = reviewRepo.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Review not found"));
+                new ResourceNotFoundException("Review not found",
+                        "Không tìm thấy đánh giá yêu cầu!"));
         review.setHidden(false);
         reviewRepo.save(review);
     }

@@ -115,17 +115,6 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
     scrollToTop();
   };
 
-  //Search params
-  const updatePath = () => {
-    filters?.status == ""
-      ? searchParams.delete("status")
-      : searchParams.set("status", filters.status);
-    filters?.keyword == ""
-      ? searchParams.delete("k")
-      : searchParams.set("k", filters.keyword);
-    setSearchParams(searchParams, { replace: true });
-  };
-
   //Rebuy
   const handleAddToCart = async (detail) => {
     if (fetching || pending) return;
