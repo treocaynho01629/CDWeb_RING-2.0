@@ -151,8 +151,8 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
                         "Không tìm thấy danh mục yêu cầu!"));
         Publisher pub = pubRepo.findById(request.getPubId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
-                        "Không tìm thấy danh mục yêu cầu!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Publisher not found!",
+                        "Không tìm thấy nhà xuất bản yêu cầu!"));
         Shop shop = shopRepo.findById(request.getShopId())
                 .orElseThrow(() -> new ResourceNotFoundException("Shop not found!",
                         "Không tìm thấy cửa hàng yêu cầu!"));

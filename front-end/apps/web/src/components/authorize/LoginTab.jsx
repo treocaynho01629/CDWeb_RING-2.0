@@ -37,6 +37,7 @@ const LoginTab = ({
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
+  const fromState = location.state?.from?.state;
   const errRef = useRef();
 
   //Login value
@@ -82,7 +83,7 @@ const LoginTab = ({
 
         //Queue snack
         enqueueSnackbar("Đăng nhập thành công", { variant: "success" });
-        navigate(from, { replace: true }); //Redirect to previous page
+        navigate(from, { replace: true, state: fromState }); //Redirect to previous page
         setUsername("");
         setPassword("");
         setErrMsg("");

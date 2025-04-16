@@ -322,7 +322,7 @@ class AccountServiceTest extends AbstractServiceTest {
 
         HttpResponseException exception =
                 assertThrows(HttpResponseException.class, () -> accountService.updateAccount(request, null, existingAccount, id));
-        assertEquals("Can not remove your ADMIN role!", exception.getError());
+        assertEquals("Cannot remove your own Admin role!", exception.getError());
 
         // Verify
         verify(accountRepo, times(1)).findById(id);

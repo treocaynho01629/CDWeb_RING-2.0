@@ -148,8 +148,12 @@ const CheckoutDialog = ({
                 size="large"
                 fullWidth
                 sx={{ maxWidth: "42%" }}
-                disabled={!numSelected || calculating}
-                onClick={() => navigate("/checkout", { state: checkoutCart })}
+                disabled={!numSelected}
+                onClick={() =>
+                  navigate("/checkout", {
+                    state: { checkoutState: checkoutCart },
+                  })
+                }
               >
                 {loggedIn ? `Thanh toán (${numSelected})` : "Đăng nhập"}
               </CheckoutButton>
@@ -209,8 +213,12 @@ const CheckoutDialog = ({
                 size="large"
                 fullWidth
                 sx={{ maxWidth: "35%" }}
-                disabled={!numSelected || calculating}
-                onClick={() => navigate("/checkout", { state: checkoutCart })}
+                disabled={!numSelected}
+                onClick={() =>
+                  navigate("/checkout", {
+                    state: { checkoutState: checkoutCart },
+                  })
+                }
                 startIcon={<ShoppingCartCheckout />}
               >
                 {loggedIn ? "Thanh toán" : "Đăng nhập"}
@@ -250,8 +258,12 @@ const CheckoutDialog = ({
                 size="large"
                 fullWidth
                 sx={{ padding: "11px", mt: 1 }}
-                disabled={!numSelected || calculating}
-                onClick={() => navigate("/checkout", { state: checkoutCart })}
+                disabled={!numSelected}
+                onClick={() =>
+                  navigate("/checkout", {
+                    state: { checkoutState: checkoutCart },
+                  })
+                }
                 startIcon={<ShoppingCartCheckout />}
               >
                 {loggedIn
@@ -270,7 +282,6 @@ const CheckoutDialog = ({
             onOpen={() => toggleDrawer(true)}
             onClose={() => toggleDrawer(false)}
             disableSwipeToOpen={true}
-            disabled={calculating}
           >
             <CheckoutBox>
               <CheckoutTitle>THANH TOÁN</CheckoutTitle>

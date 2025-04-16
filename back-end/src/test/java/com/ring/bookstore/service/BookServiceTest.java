@@ -3,6 +3,7 @@ package com.ring.bookstore.service;
 import com.cloudinary.api.ApiResponse;
 import com.github.slugify.Slugify;
 import com.ring.bookstore.base.AbstractServiceTest;
+import com.ring.bookstore.exception.EntityOwnershipException;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.dto.projection.books.IBook;
@@ -282,7 +283,6 @@ class BookServiceTest extends AbstractServiceTest {
                 assertThrows(ResourceNotFoundException.class, () -> bookService.getBook(id));
         assertEquals("Product not found!", exception.getError());
 
-
         // Verify
         verify(detailRepo, times(1)).findBook(id);
     }
@@ -498,9 +498,9 @@ class BookServiceTest extends AbstractServiceTest {
         when(shopRepo.findById(request.getShopId())).thenReturn(Optional.of(shop));
 
         // Then
-        HttpResponseException exception =
-                assertThrows(HttpResponseException.class, () -> bookService.addBook(request, file, new MultipartFile[0], altAccount));
-        assertEquals("Invalid owner!", exception.getError());
+        EntityOwnershipException exception =
+                assertThrows(EntityOwnershipException.class, () -> bookService.addBook(request, file, new MultipartFile[0], altAccount));
+        assertEquals("Invalid ownership!", exception.getError());
 
         // Verify
         verify(cateRepo, times(1)).findById(request.getCateId());
@@ -514,7 +514,7 @@ class BookServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void whenUpdateBook_ThenReturnsUpdatedBook() {
+    public void whenUpdateBook_ThenReturnsUpdatedBookResponseDTO() {
 
         // Given
         setupSecurityContext(account);
@@ -563,7 +563,7 @@ class BookServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void whenUpdateNonExistingBook_ThenReturnsUpdatedBook() {
+    public void whenUpdateNonExistingBook_ThenThrowsException() {
 
         // Given
         Long id = 1L;
@@ -591,7 +591,7 @@ class BookServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void whenUpdateBookToInvalidCategory_ThenReturnsUpdatedBook() {
+    public void whenUpdateBookToInvalidCategory_ThenThrowsException() {
 
         // Given
         Long id = 1L;
@@ -620,7 +620,7 @@ class BookServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void whenUpdateBookToInvalidPublisher_ThenReturnsUpdatedBook() {
+    public void whenUpdateBookToInvalidPublisher_ThenThrowsException() {
 
         // Given
         Long id = 1L;
@@ -650,7 +650,7 @@ class BookServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void whenUpdateBookToNonExistingImage_ThenThrowsError() {
+    public void whenUpdateBookToNonExistingImage_ThenThrowsException() {
 
         // Given
         setupSecurityContext(account);
@@ -686,7 +686,7 @@ class BookServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void whenUpdateSomeoneElseBook_ThenThrowsError() {
+    public void whenUpdateSomeoneElseBook_ThenThrowsException() {
 
         // Given
         Long id = 1L;
@@ -706,9 +706,9 @@ class BookServiceTest extends AbstractServiceTest {
         when(pubRepo.findById(request.getPubId())).thenReturn(Optional.of(mock(Publisher.class)));
 
         // Then
-        HttpResponseException exception =
-                assertThrows(HttpResponseException.class, () -> bookService.updateBook(id, request, null, images, altAccount));
-        assertEquals("Invalid role!", exception.getError());
+        EntityOwnershipException exception =
+                assertThrows(EntityOwnershipException.class, () -> bookService.updateBook(id, request, null, images, altAccount));
+        assertEquals("Invalid ownership!", exception.getError());
 
         // Verify
         verify(bookRepo, times(1)).findById(id);
@@ -724,102 +724,219 @@ class BookServiceTest extends AbstractServiceTest {
         verify(bookMapper, never()).bookToResponseDTO(any(Book.class));
     }
 
-//    @Test
-//    public void whenDeleteBook_ThenReturnsDeletedBook() {
-//
-//        // Given
-//        setupSecurityContext(account);
-//        Long id = 1L;
-//        Book expected = Book.builder()
-//                .id(id)
-//                .title(request.getTitle())
-//                .description(request.getDescription())
-//                .price(request.getPrice())
-//                .discount(request.getDiscount())
-//                .amount(request.getAmount())
-//                .shop(shop)
-//                .build();
-//
-//        // When
-//        when(bookRepo.findById(id)).thenReturn(Optional.of(expected));
-//        doNothing().when(bookRepo).deleteById(id);
-//
-//        // Then
-//        Book result = bookService.deleteBook(id, account);
-//
-//        assertNotNull(result);
-//        assertEquals(expected, result);
-//
-//        // Verify
-//        verify(bookRepo, times(1)).findById(id);
-//        verify(bookRepo, times(1)).deleteById(id);
-//    }
-//
-//    // Edge case: Test for deleting a book
-//    @Test
-//    public void whenDeleteBook_ThenReturnsDeletedBook() {
-//        Long id = 1L;
-//        Book expected = Book.builder()
-//                .id(id)
-//                .title(request.getTitle())
-//                .description(request.getDescription())
-//                .price(request.getPrice())
-//                .discount(request.getDiscount())
-//                .amount(request.getAmount())
-//                .shop(shop)
-//                .build();
-//
-//        setupSecurityContext(account);
-//
-//        when(bookRepo.findById(id)).thenReturn(Optional.of(expected));
-//        doNothing().when(bookRepo).deleteById(id);
-//
-//        Book result = bookService.deleteBook(id, account);
-//
-//        assertNotNull(result);
-//        assertEquals(expected.getTitle(), result.getTitle());
-//        verify(bookRepo, times(1)).findById(id);
-//        verify(bookRepo, times(1)).deleteById(id);
-//    }
-//
-//    // Edge case: Test for deleting multiple books
-//    @Test
-//    public void whenDeleteBooks_ThenSuccess() {
-//        List<Long> ids = List.of(1L, 2L, 3L);
-//
-//        setupSecurityContext(account);
-//        doNothing().when(bookRepo).deleteAllById(ids);
-//
-//        bookService.deleteBooks(ids, account);
-//
-//        verify(bookRepo, times(1)).deleteAllById(ids);
-//    }
-//
-//    // Edge case: Test for deleting books with an inverse condition
-//    @Test
-//    public void whenDeleteBooksInverse_ThenSuccess() {
-//        List<Long> ids = List.of(1L, 2L, 3L);
-//        List<Long> inverseIds = List.of(4L);
-//
-//        when(bookRepo.findInverseIds(eq(""), eq(null), eq(null), eq(null), eq(null), eq(null), eq(null), eq(null), eq(null), eq(null), eq(null), eq(ids)))
-//                .thenReturn(inverseIds);
-//
-//        doNothing().when(bookRepo).deleteAllById(inverseIds);
-//
-//        bookService.deleteBooksInverse("", null, null, null, null, ids, account);
-//
-//        verify(bookRepo, times(1)).findInverseIds(eq(""), eq(null), eq(null), eq(null), eq(null), eq(null), eq(null), eq(null), eq(null), eq(null), eq(null), eq(ids));
-//        verify(bookRepo, times(1)).deleteAllById(inverseIds);
-//    }
-//
-//    // Edge case: Test for deleting all books
-//    @Test
-//    public void whenDeleteAllBooks_ThenSuccess() {
-//        setupSecurityContext(account);
-//        doNothing().when(bookRepo).deleteAll();
-//
-//        bookService.deleteAllBooks(null, account);
-//
-//        verify(bookRepo, times(1)).deleteAll();
-//    }
+    @Test
+    public void whenDeleteBook_ThenReturnsDeletedBookResponseDTO() {
+
+        // Given
+        setupSecurityContext(account);
+        Long id = 1L;
+        Book book = Book.builder().id(id).shop(shop).build();
+        BookResponseDTO expected = BookResponseDTO.builder()
+                .title(request.getTitle())
+                .price(request.getPrice())
+                .discount(request.getDiscount())
+                .build();
+
+        // When
+        when(bookRepo.findById(id)).thenReturn(Optional.of(book));
+        when(bookMapper.bookToResponseDTO(any(Book.class))).thenReturn(expected);
+        doNothing().when(bookRepo).deleteById(id);
+
+        // Then
+        BookResponseDTO result = bookService.deleteBook(id, account);
+
+        assertNotNull(result);
+        assertEquals(expected, result);
+
+        // Verify
+        verify(bookRepo, times(1)).findById(id);
+        verify(bookMapper, times(1)).bookToResponseDTO(any(Book.class));
+        verify(bookRepo, times(1)).deleteById(id);
+    }
+
+    @Test
+    public void whenDeleteBookNonExistingBook_ThenThrowsException() {
+
+        // Given
+        Long id = 1L;
+
+        // When
+        when(bookRepo.findById(id)).thenReturn(Optional.empty());
+
+        // Then
+        ResourceNotFoundException exception =
+                assertThrows(ResourceNotFoundException.class, () -> bookService.deleteBook(id, account));
+        assertEquals("Product not found!", exception.getError());
+
+        // Verify
+        verify(bookRepo, times(1)).findById(id);
+        verify(bookMapper, never()).bookToResponseDTO(any(Book.class));
+        verify(bookRepo, never()).deleteById(id);
+    }
+
+    @Test
+    public void whenDeleteSomeoneElseBook_ThenThrowsException() {
+
+        // Given
+        Long id = 1L;
+        Book book = Book.builder().id(id).shop(shop).build();
+        Account altAccount = Account.builder()
+                .id(2L)
+                .roles(List.of(Role.builder().roleName(UserRole.ROLE_SELLER).build()))
+                .build();
+        setupSecurityContext(altAccount);
+
+        // When
+        when(bookRepo.findById(id)).thenReturn(Optional.of(book));
+
+        // Then
+        EntityOwnershipException exception =
+                assertThrows(EntityOwnershipException.class, () -> bookService.deleteBook(id, account));
+        assertEquals("Invalid ownership!", exception.getError());
+
+        // Verify
+        verify(bookRepo, times(1)).findById(id);
+        verify(bookMapper, never()).bookToResponseDTO(any(Book.class));
+        verify(bookRepo, never()).deleteById(id);
+    }
+
+    @Test
+    public void whenDeleteBooks_ThenSuccess() {
+
+        // Given
+        List<Long> ids = List.of(1L, 2L, 3L);
+
+        // When
+        doNothing().when(bookRepo).deleteAllById(ids);
+
+        // Then
+        bookService.deleteBooks(ids, account);
+
+        // Verify
+        verify(bookRepo, times(1)).deleteAllById(ids);
+    }
+
+    @Test
+    public void whenDeleteBooksInverse_ThenSuccess() {
+
+        // Given
+        List<Long> ids = List.of(1L, 2L, 3L);
+        List<Long> inverseIds = List.of(4L);
+
+        // When
+        when(bookRepo.findInverseIds(eq(""),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                eq(0.0),
+                eq(1000000.0),
+                eq(0),
+                eq(0),
+                eq(ids))).thenReturn(inverseIds);
+        doNothing().when(bookRepo).deleteAllById(inverseIds);
+
+        // Then
+        bookService.deleteBooksInverse("",
+                0,
+                0,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0.0,
+                1000000.0,
+                ids,
+                account);
+
+        // Verify
+        verify(bookRepo, times(1)).findInverseIds(eq(""),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                eq(0.0),
+                eq(1000000.0),
+                eq(0),
+                eq(0),
+                eq(ids));
+        verify(bookRepo, times(1)).deleteAllById(inverseIds);
+    }
+
+    @Test
+    public void whenDeleteAllBooks_ThenSuccess() {
+
+        // Given
+        setupSecurityContext(account);
+
+        // When
+        doNothing().when(bookRepo).deleteAll();
+
+        // Then
+        bookService.deleteAllBooks(null, account);
+
+        // Verify
+        verify(bookRepo, times(1)).deleteAll();
+    }
+
+    @Test
+    public void whenDeleteAllShopBooks_ThenSuccess() {
+
+        // Given
+        setupSecurityContext(account);
+        Long id = 1L;
+
+        // When
+        doNothing().when(bookRepo).deleteAllByShopId(id);
+
+        // Then
+        bookService.deleteAllBooks(id, account);
+
+        // Verify
+        verify(bookRepo, times(1)).deleteAllByShopId(id);
+    }
+
+    @Test
+    public void whenDeleteAllUserBooks_ThenSuccess() {
+
+        // Given
+        Account altAccount = Account.builder()
+                .id(2L)
+                .roles(List.of(Role.builder().roleName(UserRole.ROLE_SELLER).build()))
+                .build();
+        setupSecurityContext(altAccount);
+
+        // When
+        doNothing().when(bookRepo).deleteAllByShop_Owner(altAccount);
+
+        // Then
+        bookService.deleteAllBooks(null, altAccount);
+
+        // Verify
+        verify(bookRepo, times(1)).deleteAllByShop_Owner(altAccount);
+    }
+
+    @Test
+    public void whenDeleteAllUserShopBooks_ThenSuccess() {
+
+        // Given
+        Account altAccount = Account.builder()
+                .id(2L)
+                .roles(List.of(Role.builder().roleName(UserRole.ROLE_SELLER).build()))
+                .build();
+        setupSecurityContext(altAccount);
+        Long id = 1L;
+
+        // When
+        doNothing().when(bookRepo).deleteAllByShopIdAndShop_Owner(id, altAccount);
+
+        // Then
+        bookService.deleteAllBooks(id, altAccount);
+
+        // Verify
+        verify(bookRepo, times(1)).deleteAllByShopIdAndShop_Owner(id, altAccount);
+    }
 }

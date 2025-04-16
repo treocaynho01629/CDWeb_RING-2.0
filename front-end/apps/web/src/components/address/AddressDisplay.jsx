@@ -156,9 +156,7 @@ const AddressDisplay = ({
     <>
       <Title>Giao tới</Title>
       <AddressDisplayContainer
-        className={
-          loadAddress ? "" : isValid ? "" : !addressInfo ? "" : "error"
-        }
+        className={!loadAddress && isValid ? "" : !addressInfo ? "" : "error"}
       >
         <AddressContainer>
           {!addressInfo && loadAddress ? (

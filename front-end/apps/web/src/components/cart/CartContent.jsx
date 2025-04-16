@@ -221,7 +221,7 @@ const CartContent = ({ confirm }) => {
   } = useGetRecommendCouponsQuery({ shopIds }, { skip: !shopIds.length });
 
   //For get similar
-  const [getBook] = booksApiSlice.useLazyGetBooksQuery();
+  const [getBook] = booksApiSlice.useLazyGetBookDetailQuery();
 
   //Estimate/calculate price
   const [estimated, setEstimated] = useState({
@@ -575,10 +575,12 @@ const CartContent = ({ confirm }) => {
   const handleFindSimilar = async () => {
     getBook({ id: contextProduct?.id })
       .unwrap()
-      .then((book) =>
-        navigate(`/store/${book?.category?.slug}?cate=${book?.category?.id}
-                &pubs=${book?.publisher?.id}&types=${book?.type}`)
-      )
+      .then((book) => {
+        navigate(`/store/${book?.category?.slug}
+                ?cate=${book?.category?.id}
+                &pubs=${book?.publisher?.id}
+                &types=${book?.type}`);
+      })
       .catch((rejected) => console.error(rejected));
     handleClose();
   };
@@ -688,6 +690,7 @@ const CartContent = ({ confirm }) => {
               numSelected: selected.length,
               selectedCoupon: contextCoupon,
               selectMode: true,
+              loggedIn: username != null,
               onSubmit: handleChangeCoupon,
             }}
           />

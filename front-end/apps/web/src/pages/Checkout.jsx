@@ -157,8 +157,9 @@ const Checkout = () => {
   //Cart
   const { cartProducts, clearCart } = useCart();
   const { estimateCart, syncCart } = useCheckout();
-  const { state: checkoutState } = useLocation();
   const [openWarning, setOpenWarning] = useState(undefined);
+  const location = useLocation();
+  const checkoutState = location.state?.checkoutState;
   const selected = checkoutState?.selected;
 
   //Coupon
@@ -175,7 +176,6 @@ const Checkout = () => {
   //Address
   const [openAddress, setOpenAddress] = useState(false);
   const [addressInfo, setAddressInfo] = useState(null);
-  const [validPhone, setValidPhone] = useState(false);
   const [message, setMessage] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [err, setErr] = useState([]);
@@ -207,12 +207,6 @@ const Checkout = () => {
   //Other
   const navigate = useNavigate();
 
-  useEffect(() => {
-    //Check phone number
-    const result = PHONE_REGEX.test(addressInfo?.phone);
-    setValidPhone(result);
-  }, [addressInfo?.phone]);
-
   useDeepEffect(() => {
     handleCartChange();
   }, [cartProducts, shopCoupon, coupon, addressInfo, delivery]);
@@ -229,7 +223,7 @@ const Checkout = () => {
   useTitle("Thanh toán");
 
   const handleCartChange = () => {
-    if (selected.length > 0 && cartProducts.length > 0) {
+    if (selected?.length > 0 && cartProducts.length > 0) {
       const checkoutCart = getCheckoutCart(); //Include address, shipping method, payment method ...
       handleEstimate(checkoutCart); //Estimate price
       handleCalculate(checkoutCart); //Calculate price
@@ -243,13 +237,13 @@ const Checkout = () => {
 
   //Filter out unusable coupons
   const getCheckoutCart = () => {
-    if (selected.length > 0 && cartProducts.length > 0) {
+    if (selected?.length > 0 && cartProducts.length > 0) {
       //Reduce cart
       const checkoutCart = cartProducts.reduce(
         (result, item) => {
           const { id, shopId } = item;
 
-          if (selected.indexOf(id) !== -1) {
+          if (selected?.indexOf(id) !== -1) {
             //Get selected items in redux store
             //Find or create shop
             let detail = result.cart.find(
@@ -347,7 +341,7 @@ const Checkout = () => {
   //Separate by shop
   const reduceCart = () => {
     let selectedCart = cartProducts.filter((product) =>
-      selected.includes(product.id)
+      selected?.includes(product.id)
     );
     let resultCart = selectedCart.reduce((result, item) => {
       if (!result[item.shopId]) {
@@ -445,7 +439,8 @@ const Checkout = () => {
     addressInfo?.phone,
     addressInfo?.city,
     addressInfo?.address,
-    validPhone,
+    PHONE_REGEX.test(addressInfo?.phone),
+    !loadAddress,
   ].every(Boolean);
 
   //Submit checkout
@@ -759,7 +754,7 @@ const Checkout = () => {
                 shopId: contextShop,
                 checkState: contextState,
                 selectedCoupon: contextCoupon,
-                numSelected: selected.length,
+                numSelected: selected?.length,
                 selectMode: true,
                 onSubmit: handleChangeCoupon,
               }}

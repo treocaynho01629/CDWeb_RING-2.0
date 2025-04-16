@@ -282,6 +282,16 @@ const CouponContainer = styled.div`
       pointer-events: none;
     }
 
+    ${CouponAction} {
+      pointer-events: none;
+    }
+
+    &.active {
+      ${CouponAction} {
+        pointer-events: all;
+      }
+    }
+
     &.used {
       &::after {
         content: "ĐÃ QUA SỬ DỤNG";
@@ -428,17 +438,13 @@ const CouponItem = ({
     <Wrapper className={className}>
       {coupon ? (
         <CouponContainer
-          className={
-            selectMode
-              ? isSelected
-                ? isUsed
-                  ? "disabled used"
-                  : isDisabled
-                    ? "disabled"
-                    : "active"
+          className={`${selectMode && isSelected ? "active " : " "}${
+            selectMode && isUsed
+              ? "disabled used"
+              : isDisabled
+                ? "disabled"
                 : className
-              : className
-          }
+          }`}
         >
           <CouponEdge
             elevation={className == "display" ? 0 : 24}

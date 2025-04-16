@@ -1,6 +1,7 @@
 package com.ring.bookstore.service;
 
 import com.ring.bookstore.base.AbstractServiceTest;
+import com.ring.bookstore.exception.EntityOwnershipException;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.dto.projection.accounts.IAddress;
@@ -282,8 +283,8 @@ class AddressServiceTest extends AbstractServiceTest {
         when(addressRepo.findById(id)).thenReturn(Optional.of(address));
 
         // Then
-        HttpResponseException exception =
-                assertThrows(HttpResponseException.class, () -> addressService.updateAddress(request, id, account));
+        EntityOwnershipException exception =
+                assertThrows(EntityOwnershipException.class, () -> addressService.updateAddress(request, id, account));
         assertEquals("Invalid user!", exception.getError());
 
         // Verify
@@ -349,8 +350,8 @@ class AddressServiceTest extends AbstractServiceTest {
         when(addressRepo.findById(id)).thenReturn(Optional.of(address));
 
         // Then
-        HttpResponseException exception =
-                assertThrows(HttpResponseException.class, () -> addressService.deleteAddress(id, account));
+        EntityOwnershipException exception =
+                assertThrows(EntityOwnershipException.class, () -> addressService.deleteAddress(id, account));
         assertEquals("Invalid user!", exception.getError());
 
         // Verify

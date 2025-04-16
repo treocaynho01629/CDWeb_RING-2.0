@@ -1,6 +1,7 @@
 package com.ring.bookstore.service;
 
 import com.ring.bookstore.base.AbstractServiceTest;
+import com.ring.bookstore.exception.EntityOwnershipException;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.dto.projection.banners.IBanner;
@@ -182,9 +183,9 @@ class BannerServiceTest extends AbstractServiceTest {
         when(shopRepo.findById(request.getShopId())).thenReturn(Optional.of(shop));
 
         // Then
-        HttpResponseException exception =
-                assertThrows(HttpResponseException.class, () -> bannerService.addBanner(request, file, altAccount));
-        assertEquals("Invalid role!", exception.getError());
+        EntityOwnershipException exception =
+                assertThrows(EntityOwnershipException.class, () -> bannerService.addBanner(request, file, altAccount));
+        assertEquals("Invalid ownership!", exception.getError());
 
         // Verify
         verify(shopRepo, times(1)).findById(request.getShopId());
@@ -300,9 +301,9 @@ class BannerServiceTest extends AbstractServiceTest {
         when(bannerRepo.findById(id)).thenReturn(Optional.of(expected));
 
         // Then
-        HttpResponseException exception =
-                assertThrows(HttpResponseException.class, () -> bannerService.updateBanner(id, request, file, altAccount));
-        assertEquals("Invalid role!", exception.getError());
+        EntityOwnershipException exception =
+                assertThrows(EntityOwnershipException.class, () -> bannerService.updateBanner(id, request, file, altAccount));
+        assertEquals("Invalid ownership!", exception.getError());
 
         // Verify
         verify(bannerRepo, times(1)).findById(id);
@@ -336,9 +337,9 @@ class BannerServiceTest extends AbstractServiceTest {
         when(shopRepo.findById(request.getShopId())).thenReturn(Optional.of(shop));
 
         // Then
-        HttpResponseException exception =
-                assertThrows(HttpResponseException.class, () -> bannerService.updateBanner(id, request, file, altAccount));
-        assertEquals("Invalid role!", exception.getError());
+        EntityOwnershipException exception =
+                assertThrows(EntityOwnershipException.class, () -> bannerService.updateBanner(id, request, file, altAccount));
+        assertEquals("Invalid ownership!", exception.getError());
 
         // Verify
         verify(bannerRepo, times(1)).findById(id);
@@ -427,9 +428,9 @@ class BannerServiceTest extends AbstractServiceTest {
         when(bannerRepo.findById(id)).thenReturn(Optional.of(expected));
 
         // Then
-        HttpResponseException exception =
-                assertThrows(HttpResponseException.class, () -> bannerService.deleteBanner(id, altAccount));
-        assertEquals("Invalid role!", exception.getError());
+        EntityOwnershipException exception =
+                assertThrows(EntityOwnershipException.class, () -> bannerService.deleteBanner(id, altAccount));
+        assertEquals("Invalid ownership!", exception.getError());
 
         // Verify
         verify(bannerRepo, times(1)).findById(id);

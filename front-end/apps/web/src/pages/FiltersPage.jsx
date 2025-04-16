@@ -131,7 +131,7 @@ const FiltersPage = () => {
     });
   const { data: currCate, isLoading: loadCate } = useGetCategoryQuery(
     { slug: filters.cate.slug, include: "parent" },
-    { skip: !filters.cate.id || !filters.cate.slug || true }
+    { skip: !filters.cate.id || !filters.cate.slug }
   );
 
   const updateFilters = () => {

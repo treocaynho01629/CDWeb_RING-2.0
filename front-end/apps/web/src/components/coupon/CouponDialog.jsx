@@ -90,6 +90,7 @@ const DEFAULT_PAGINATON = {
 const CouponDialog = ({
   numSelected,
   selectMode = false,
+  loggedIn,
   shopId,
   checkState,
   open,
@@ -281,11 +282,13 @@ const CouponDialog = ({
     setSavedPagination(DEFAULT_PAGINATON);
   };
 
+  const checkDisabled = (coupon) =>
+    selectMode && (!loggedIn || !coupon?.isUsable || coupon?.shopId != shopId);
+
   //Display contents
   let coupons;
   let shippingCoupons;
   let savedCoupons;
-
   let loadingComponent = (
     <Box
       display="flex"
@@ -313,7 +316,7 @@ const CouponDialog = ({
             coupon: currCoupon,
             summary: CouponType[currCoupon?.type],
             selectMode,
-            isDisabled: selectMode && !currCoupon?.isUsable,
+            isDisabled: checkDisabled(currCoupon),
             isSelected: tempCoupon?.id == currCoupon?.id,
             isUsed: selectMode && currCoupon?.isUsed,
             isSaved: savedCodes?.indexOf(currCoupon?.code) != -1,
@@ -328,8 +331,7 @@ const CouponDialog = ({
           if (id != currCoupon?.id) {
             const coupon = entities[id];
             const summary = CouponType[coupon?.type];
-            const isDisabled =
-              selectMode && (!coupon?.isUsable || coupon?.shopId != shopId);
+            const isDisabled = checkDisabled(coupon);
             const isUsed = selectMode && coupon?.isUsed;
             const isSelected = tempCoupon?.id == id;
             const isSaved = savedCodes?.indexOf(coupon?.code) != -1;
@@ -381,7 +383,7 @@ const CouponDialog = ({
             coupon: currCoupon,
             summary: CouponType[currCoupon?.type],
             selectMode,
-            isDisabled: selectMode && !currCoupon?.isUsable,
+            isDisabled: checkDisabled(currCoupon),
             isSelected: tempCoupon?.id == currCoupon?.id,
             isUsed: selectMode && currCoupon?.isUsed,
             isSaved: savedCodes?.indexOf(currCoupon?.code) != -1,
@@ -396,8 +398,7 @@ const CouponDialog = ({
           if (id != currCoupon?.id) {
             const coupon = entities[id];
             const summary = CouponType[coupon?.type];
-            const isDisabled =
-              selectMode && (!coupon?.isUsable || coupon?.shopId != shopId);
+            const isDisabled = checkDisabled(coupon);
             const isUsed = selectMode && coupon?.isUsed;
             const isSelected = tempCoupon?.id == id;
             const isSaved = savedCodes?.indexOf(coupon?.code) != -1;
@@ -440,8 +441,7 @@ const CouponDialog = ({
           if (id != currCoupon?.id) {
             const coupon = entities[id];
             const summary = CouponType[coupon?.type];
-            const isDisabled =
-              selectMode && (!coupon?.isUsable || coupon?.shopId != shopId);
+            const isDisabled = checkDisabled(coupon);
             const isUsed = selectMode && tempCoupon?.isUsed;
             const isSelected = tempCoupon?.id == id;
             const isSaved = savedCodes?.indexOf(coupon?.code) != -1;
@@ -513,7 +513,7 @@ const CouponDialog = ({
               error={errorCode}
               size="small"
               fullWidth
-              disabled={!numSelected}
+              disabled={!numSelected || !loggedIn}
               slotProps={{
                 input: {
                   startAdornment: (
@@ -527,7 +527,7 @@ const CouponDialog = ({
             <Button
               variant="contained"
               sx={{ width: 125, ml: 1, boxShadow: "none" }}
-              disabled={!numSelected}
+              disabled={!numSelected || !loggedIn}
               onClick={handleChangeInput}
             >
               Áp dụng
@@ -536,7 +536,11 @@ const CouponDialog = ({
           <Instruction>
             {errorCode
               ? "Mã không hợp lệ"
-              : !numSelected && "Vui lòng chọn sản phẩm để sử dụng mã"}
+              : !loggedIn
+                ? "Vui lòng đăng nhập để áp dụng mã"
+                : !numSelected
+                  ? "Vui lòng chọn sản phẩm để sử dụng mã"
+                  : ""}
           </Instruction>
           {couponInput && code && (
             <CouponItem
@@ -545,8 +549,7 @@ const CouponDialog = ({
                 coupon: code,
                 summary: CouponType[code?.type],
                 selectMode,
-                isDisabled:
-                  selectMode && (!code?.isUsable || code?.shopId != shopId),
+                isDisabled: checkDisabled(code),
                 isUsed: selectMode && code?.isUsed,
                 isSelected: tempCoupon?.id == code?.id,
                 onClickApply: setTempCoupon,
