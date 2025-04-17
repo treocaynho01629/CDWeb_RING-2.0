@@ -6,7 +6,6 @@ import com.ring.bookstore.model.dto.response.accounts.AddressDTO;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.entity.Address;
 import com.ring.bookstore.model.dto.request.AddressRequest;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 

@@ -25,26 +25,18 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class Shop extends Auditable {
 
-	@Id
+    @Id
     @Column(nullable = false, updatable = false)
-    @SequenceGenerator(
-            name = "primary_sequence",
-            sequenceName = "primary_sequence",
-            allocationSize = 1,
-            initialValue = 10000
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "primary_sequence"
-    )
+    @SequenceGenerator(name = "primary_sequence", sequenceName = "primary_sequence", allocationSize = 1, initialValue = 10000)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "primary_sequence")
     @JsonIgnore
     private Long id;
-	
-	@Column(length = 250)
-	@Nationalized 
+
+    @Column(length = 250)
+    @Nationalized
     private String name;
 
-	@Column(length = 500)
+    @Column(length = 500)
     @Nationalized
     private String description;
 
@@ -53,45 +45,31 @@ public class Shop extends Auditable {
     @JsonIgnore
     private Account owner;
 
-    @OneToOne(cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "image_id")
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Image image;
 
-    @OneToMany(cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            mappedBy = "shop",
-            fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "shop", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Book> books;
 
-    @OneToMany(cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            mappedBy = "shop",
-            fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "shop", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Coupon> coupons;
 
-    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
-            mappedBy = "shop",
-            fetch = FetchType.LAZY)
+    @OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST }, mappedBy = "shop", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<OrderDetail> shopOrderDetails;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(	name = "shops_followers",
-            joinColumns = @JoinColumn(name = "shop_id"),
-            inverseJoinColumns = @JoinColumn(name = "follower_id"))
+    @JoinTable(name = "shops_followers", joinColumns = @JoinColumn(name = "shop_id"), inverseJoinColumns = @JoinColumn(name = "follower_id"))
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Set<Account> followers = new HashSet<>();
 
-    @OneToOne(cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     @JsonIgnore
     private Address address;
@@ -143,12 +121,10 @@ public class Shop extends Auditable {
 
     public void addFollower(Account user) {
         this.followers.add(user);
-        user.followShop(this);
     }
 
     public void removeFollower(Account user) {
         this.followers.remove(user);
-        user.unfollowShop(this);
     }
 
     public void removeAllFollowers() {

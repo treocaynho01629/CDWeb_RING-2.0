@@ -32,50 +32,33 @@ public class Account extends Auditable implements UserDetails {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-    @Column(nullable = false, updatable = false)
-    @SequenceGenerator(
-            name = "primary_sequence",
-            sequenceName = "primary_sequence",
-            allocationSize = 1,
-            initialValue = 10000
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "primary_sequence"
-    )
-    private Long id;
+	@Column(nullable = false, updatable = false)
+	@SequenceGenerator(name = "primary_sequence", sequenceName = "primary_sequence", allocationSize = 1, initialValue = 10000)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "primary_sequence")
+	private Long id;
 
-    @Column(unique = true, nullable = false, length = 30)
-    private String username;
+	@Column(unique = true, nullable = false, length = 30)
+	private String username;
 
-    @Column(nullable = false, length = 500)
-    @JsonIgnore
-    private String pass;
+	@Column(nullable = false, length = 500)
+	@JsonIgnore
+	private String pass;
 
-    @Column(unique = true, nullable = false, length = 100)
-    private String email;
+	@Column(unique = true, nullable = false, length = 100)
+	private String email;
 
-    @OneToOne(cascade = CascadeType.ALL,
-			fetch = FetchType.LAZY,
-    		mappedBy = "user",
-    		orphanRemoval = true,
-			optional = false)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true, optional = false)
 	@PrimaryKeyJoinColumn
 	@JsonIgnore
-    @EqualsAndHashCode.Exclude
+	@EqualsAndHashCode.Exclude
 	private AccountProfile profile;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    @JsonIgnore
-    private Collection<Role> roles;
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@JsonIgnore
+	private Collection<Role> roles;
 
-	@OneToMany(cascade = CascadeType.ALL,
-			orphanRemoval = true,
-			mappedBy = "user",
-			fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user", fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<RefreshToken> refreshTokens = new ArrayList<>();
 
@@ -83,28 +66,19 @@ public class Account extends Auditable implements UserDetails {
 	@JsonIgnore
 	private String resetToken;
 
-	@OneToMany(cascade = CascadeType.ALL,
-			orphanRemoval = true,
-			mappedBy = "owner",
-			fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "owner", fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Shop> shops;
-    
-    @OneToMany(cascade = CascadeType.ALL,
-			orphanRemoval = true,
-			mappedBy = "user",
-			fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Review> userReviews;
-    
-    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
-			mappedBy = "user",
-			fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<OrderReceipt> userOrderReceipts;
 
-	@ManyToMany(fetch = FetchType.LAZY,
-			mappedBy = "followers")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user", fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<Review> userReviews;
+
+	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST }, mappedBy = "user", fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<OrderReceipt> userOrderReceipts;
+
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "followers")
 	@JsonIgnore
 	@EqualsAndHashCode.Exclude
 	private Set<Shop> following = new HashSet<>();
@@ -145,7 +119,7 @@ public class Account extends Auditable implements UserDetails {
 	public String getUsername() {
 		return this.username;
 	}
-	
+
 	@Override
 	@JsonIgnore
 	public boolean isAccountNonExpired() {
@@ -193,7 +167,7 @@ public class Account extends Auditable implements UserDetails {
 
 	public void removeAllShops() {
 		shops.forEach(shop -> shop.setOwner(null));
-        this.shops.clear();
+		this.shops.clear();
 	}
 
 	public void addOrder(OrderReceipt receipt) {
@@ -208,8 +182,8 @@ public class Account extends Auditable implements UserDetails {
 
 	public void removeAllOrders() {
 		userOrderReceipts.forEach(order -> order.setUser(null));
-        this.userOrderReceipts.clear();
-    }
+		this.userOrderReceipts.clear();
+	}
 
 	public void addReview(Review review) {
 		this.userReviews.add(review);
@@ -220,11 +194,11 @@ public class Account extends Auditable implements UserDetails {
 		this.userReviews.remove(review);
 		review.setUser(null);
 	}
-	
+
 	public void removeAllReviews() {
-        userReviews.forEach(review -> review.setUser(null));
-        this.userReviews.clear();
-    }
+		userReviews.forEach(review -> review.setUser(null));
+		this.userReviews.clear();
+	}
 
 	public void addRole(Role role) {
 		this.roles.add(role);
@@ -237,17 +211,15 @@ public class Account extends Auditable implements UserDetails {
 	}
 
 	public void removeAllRoles() {
-        this.roles.clear();
-    }
+		this.roles.clear();
+	}
 
 	public void followShop(Shop shop) {
 		this.following.add(shop);
-		shop.addFollower(this);
 	}
 
 	public void unfollowShop(Shop shop) {
 		this.following.remove(shop);
-		shop.removeFollower(this);
 	}
 
 	public void removeAllFollowings() {

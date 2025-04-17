@@ -2,11 +2,8 @@ package com.ring.bookstore.controller;
 
 import java.util.List;
 
-import com.ring.bookstore.model.dto.request.CategoryRequest;
 import com.ring.bookstore.model.dto.request.PublisherRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

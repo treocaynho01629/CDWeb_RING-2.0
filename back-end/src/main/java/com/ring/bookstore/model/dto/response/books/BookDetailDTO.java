@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.ring.bookstore.model.dto.response.banners.BannerDTO;
 import com.ring.bookstore.model.dto.response.categories.CategoryDTO;
 import com.ring.bookstore.model.dto.response.images.ImageDTO;
 import com.ring.bookstore.model.dto.response.publishers.PublisherDTO;

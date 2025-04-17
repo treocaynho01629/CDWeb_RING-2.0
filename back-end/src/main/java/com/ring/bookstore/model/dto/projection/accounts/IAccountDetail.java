@@ -1,7 +1,6 @@
 package com.ring.bookstore.model.dto.projection.accounts;
 
 import com.ring.bookstore.model.dto.projection.images.IImage;
-import com.ring.bookstore.model.entity.Role;
 import com.ring.bookstore.model.enums.Gender;
 import com.ring.bookstore.model.enums.UserRole;
 

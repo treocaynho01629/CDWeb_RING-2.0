@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.model.dto.response.dashboard.ChartDTO;
 import com.ring.bookstore.model.dto.response.accounts.AccountDTO;
 import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
 import com.ring.bookstore.model.enums.UserRole;
@@ -17,7 +16,6 @@ import com.ring.bookstore.model.entity.AccountProfile;
 import com.ring.bookstore.model.dto.request.AccountRequest;
 import com.ring.bookstore.model.dto.request.ChangePassRequest;
 import com.ring.bookstore.model.dto.request.ProfileRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 /**

@@ -19,10 +19,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
- * A component that loads initial setup data into the application when the Spring application context is refreshed.
+ * A component that loads initial setup data into the application when the
+ * Spring application context is refreshed.
  */
 @Component
 @RequiredArgsConstructor
@@ -40,19 +40,22 @@ public class SetupDataLoader implements
     /**
      * This method is called when the application context is refreshed.
      * <p>
-     * It is used to load initial data or perform any setup tasks that need to run when the application is started.
+     * It is used to load initial data or perform any setup tasks that need to run
+     * when the application is started.
      * </p>
      *
-     * @param event The event that indicates the application context has been refreshed.
+     * @param event The event that indicates the application context has been
+     *              refreshed.
      */
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        if (alreadySetup) return;
+        if (alreadySetup)
+            return;
 
-        //Check
+        // Check
         if (privilegeRepo.count() != PrivilegeType.values().length) {
-            //Create initial privileges
+            // Create initial privileges
             List<Privilege> privileges = new ArrayList<>();
             for (PrivilegeGroupType groupType : PrivilegeGroupType.values()) {
                 PrivilegeGroup group = createPrivilegeGroupIfNotFound(groupType);
@@ -63,20 +66,21 @@ public class SetupDataLoader implements
                 }
             }
 
-            //Create initial roles
+            // Create initial roles
             Map<UserRole, Role> roles = new HashMap<>();
             for (UserRole userRole : UserRole.values()) {
                 List<Privilege> rolePrivileges = new ArrayList<>();
 
                 for (Privilege privilege : privileges) {
-                    if (userRole.getPrivileges().contains(privilege.getPrivilegeType())) rolePrivileges.add(privilege);
+                    if (userRole.getPrivileges().contains(privilege.getPrivilegeType()))
+                        rolePrivileges.add(privilege);
                 }
 
                 Role role = createRoleIfNotFound(userRole, rolePrivileges);
                 roles.put(userRole, role);
             }
 
-            //Create initial user
+            // Create initial user
             createUserIfNotFound("test@test.com",
                     "Test",
                     "Test",
@@ -86,7 +90,6 @@ public class SetupDataLoader implements
                     "Guest123",
                     List.of(roles.get(UserRole.ROLE_GUEST)));
         }
-
 
         alreadySetup = true;
     }
@@ -130,9 +133,9 @@ public class SetupDataLoader implements
 
     @Transactional
     public Account createUserIfNotFound(final String email,
-                                        final String username,
-                                        final String password,
-                                        final Collection<Role> roles) {
+            final String username,
+            final String password,
+            final Collection<Role> roles) {
         Account user = accountRepo.findByUsername(username).orElse(null);
         if (user == null) {
             user = new Account();

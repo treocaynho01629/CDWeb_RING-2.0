@@ -2,11 +2,8 @@ package com.ring.bookstore.controller;
 
 import java.util.List;
 
-import com.ring.bookstore.config.CurrentAccount;
 import com.ring.bookstore.model.dto.response.categories.PreviewCategoryDTO;
 import com.ring.bookstore.model.dto.request.CategoryRequest;
-import com.ring.bookstore.model.entity.Account;
-import com.ring.bookstore.model.enums.BookType;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

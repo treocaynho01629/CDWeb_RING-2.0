@@ -5,11 +5,9 @@ import com.ring.bookstore.exception.EntityOwnershipException;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.dto.projection.accounts.IAddress;
-import com.ring.bookstore.model.dto.request.AccountRequest;
 import com.ring.bookstore.model.dto.request.AddressRequest;
 import com.ring.bookstore.model.dto.response.accounts.AddressDTO;
 import com.ring.bookstore.model.entity.*;
-import com.ring.bookstore.model.enums.UserRole;
 import com.ring.bookstore.model.mappers.AddressMapper;
 import com.ring.bookstore.repository.AccountProfileRepository;
 import com.ring.bookstore.repository.AddressRepository;
@@ -18,8 +16,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,8 +123,8 @@ class AddressServiceTest extends AbstractServiceTest {
         when(addressRepo.findById(id)).thenReturn(Optional.empty());
 
         // Then
-        ResourceNotFoundException exception =
-                assertThrows(ResourceNotFoundException.class, () -> addressService.getAddress(id));
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> addressService.getAddress(id));
         assertEquals("Address not found!", exception.getError());
 
         // Verify
@@ -174,8 +170,8 @@ class AddressServiceTest extends AbstractServiceTest {
         when(profileRepo.findById(account.getProfile().getId())).thenReturn(Optional.empty());
 
         // Then
-        ResourceNotFoundException exception =
-                assertThrows(ResourceNotFoundException.class, () -> addressService.addAddress(request, account));
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> addressService.addAddress(request, account));
         assertEquals("Profile not found!", exception.getError());
 
         // Verify
@@ -200,8 +196,8 @@ class AddressServiceTest extends AbstractServiceTest {
         when(profileRepo.findById(account.getProfile().getId())).thenReturn(Optional.of(profile));
 
         // Then
-        HttpResponseException exception =
-                assertThrows(HttpResponseException.class, () -> addressService.addAddress(request, account));
+        HttpResponseException exception = assertThrows(HttpResponseException.class,
+                () -> addressService.addAddress(request, account));
         assertEquals("Can not add more than 5 addresses!", exception.getError());
 
         // Verify
@@ -253,8 +249,8 @@ class AddressServiceTest extends AbstractServiceTest {
         when(addressRepo.findById(id)).thenReturn(Optional.empty());
 
         // Then
-        ResourceNotFoundException exception =
-                assertThrows(ResourceNotFoundException.class, () -> addressService.updateAddress(request, id, account));
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> addressService.updateAddress(request, id, account));
         assertEquals("Address not found!", exception.getError());
 
         // Verify
@@ -283,8 +279,8 @@ class AddressServiceTest extends AbstractServiceTest {
         when(addressRepo.findById(id)).thenReturn(Optional.of(address));
 
         // Then
-        EntityOwnershipException exception =
-                assertThrows(EntityOwnershipException.class, () -> addressService.updateAddress(request, id, account));
+        EntityOwnershipException exception = assertThrows(EntityOwnershipException.class,
+                () -> addressService.updateAddress(request, id, account));
         assertEquals("Invalid user!", exception.getError());
 
         // Verify
@@ -325,8 +321,8 @@ class AddressServiceTest extends AbstractServiceTest {
         when(addressRepo.findById(id)).thenReturn(Optional.empty());
 
         // Then
-        ResourceNotFoundException exception =
-                assertThrows(ResourceNotFoundException.class, () -> addressService.deleteAddress(id, account));
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> addressService.deleteAddress(id, account));
         assertEquals("Address not found!", exception.getError());
 
         // Verify
@@ -350,8 +346,8 @@ class AddressServiceTest extends AbstractServiceTest {
         when(addressRepo.findById(id)).thenReturn(Optional.of(address));
 
         // Then
-        EntityOwnershipException exception =
-                assertThrows(EntityOwnershipException.class, () -> addressService.deleteAddress(id, account));
+        EntityOwnershipException exception = assertThrows(EntityOwnershipException.class,
+                () -> addressService.deleteAddress(id, account));
         assertEquals("Invalid user!", exception.getError());
 
         // Verify

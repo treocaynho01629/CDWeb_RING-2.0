@@ -1,7 +1,6 @@
 package com.ring.bookstore.model.dto.response.orders;
 
 import com.ring.bookstore.model.dto.response.coupons.CouponDTO;
-import com.ring.bookstore.model.dto.response.images.ImageDTO;
 
 import java.util.List;
 

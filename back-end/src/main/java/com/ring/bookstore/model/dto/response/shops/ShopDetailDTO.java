@@ -1,7 +1,6 @@
 package com.ring.bookstore.model.dto.response.shops;
 
 import com.ring.bookstore.model.dto.response.accounts.AddressDTO;
-import com.ring.bookstore.model.dto.response.reviews.ReviewsInfoDTO;
 
 import java.time.LocalDateTime;
 
