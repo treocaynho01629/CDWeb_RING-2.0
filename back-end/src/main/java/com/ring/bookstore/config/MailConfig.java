@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import java.util.Properties;
+
 /**
  * Configuration class to set up the mail service for sending emails.
  */
@@ -23,6 +25,15 @@ public class MailConfig {
 
     @Value("${spring.mail.password}")
     private String mailPassword;
+
+    @Value("${spring.mail.properties.mail.smtp.auth}")
+    private Boolean mailAuth;
+
+    @Value("${spring.mail.properties.mail.smtp.starttls.enable}")
+    private Boolean mailStartTLS;
+
+    @Value("${spring.mail.properties.mail.smtp.starttls.required}")
+    private Boolean mailStartTLSRequired;
 
     /**
      * Configures and returns a {@link JavaMailSender} bean for sending emails.
@@ -42,15 +53,30 @@ public class MailConfig {
                 return new JavaMailSenderImpl(); //Return default
             }
 
-            JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-            mailSender.setHost(mailHost);
-            mailSender.setPort(mailPort);
-            mailSender.setUsername(mailUsername);
-            mailSender.setPassword(mailPassword);
+            JavaMailSenderImpl mailSender = getJavaMailSender();
             return mailSender;
         } catch (Exception e) {
             System.err.println("Error initializing JavaMailSender: " + e.getMessage());
             return new JavaMailSenderImpl(); //Return default
         }
+    }
+
+    private JavaMailSenderImpl getJavaMailSender() {
+
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+
+        mailSender.setHost(mailHost);
+        mailSender.setPort(mailPort);
+        mailSender.setUsername(mailUsername);
+        mailSender.setPassword(mailPassword);
+
+        // Set mail properties
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", mailAuth);
+        properties.put("mail.smtp.starttls.enable", mailStartTLS);
+        properties.put("mail.smtp.starttls.required", mailStartTLSRequired);
+        mailSender.setJavaMailProperties(properties);
+
+        return mailSender;
     }
 }

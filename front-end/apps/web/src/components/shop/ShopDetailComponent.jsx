@@ -48,13 +48,13 @@ const ShopDetailComponent = ({ shop, name }) => {
     if (!shop || following || unfollowing || !username) return;
 
     if (shop?.followed) {
-      unfollowShop(id)
+      unfollowShop(shop?.id)
         .unwrap()
         .catch((err) => {
           console.error(err);
         });
     } else {
-      followShop(id)
+      followShop(shop?.id)
         .unwrap()
         .catch((err) => {
           console.error(err);
