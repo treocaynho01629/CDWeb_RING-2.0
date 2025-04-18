@@ -18,7 +18,6 @@ import com.ring.bookstore.service.RoleService;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +29,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Transactional
     public Role findRole(UserRole userRole) {
+
         return roleRepo.findRoleWithPrivileges(userRole)
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found!",
                         "Không tìm thấy chức vụ yêu cầu!"));
@@ -37,11 +37,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<PrivilegeGroup> getPrivileges() {
+
         return groupRepo.findAllWithPrivileges();
     }
 
     @Override
     public void updateRole(List<PrivilegeType> privileges, UserRole userRole) {
+
         if (userRole == UserRole.ROLE_ADMIN)
             throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Can not edit Admin role!");
         Role role = roleRepo.findByRoleName(userRole)

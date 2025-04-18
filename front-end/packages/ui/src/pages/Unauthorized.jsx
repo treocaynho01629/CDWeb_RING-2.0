@@ -21,7 +21,8 @@ const Wrapper = styled.div`
     height: 100%;
     z-index: -1;
     mask-image: linear-gradient(200deg, transparent, transparent 75%, #000000);
-    background: radial-gradient(
+    background:
+      radial-gradient(
         circle,
         transparent 25%,
         ${({ theme }) => theme.palette.background.default} 26%
@@ -125,9 +126,9 @@ const Unauthorized = () => {
         </ErrorContainer>
         <h3>Bạn không có quyền truy cập vào trang này</h3>
         <p>Liên hệ ringbookstore@ring.com hoặc đăng nhập tài khoản khác.</p>
-        <Link to={-1}>
+        <Link to={"/auth/login"}>
           <Button sx={{ marginTop: 2 }} variant="outlined" color="primary">
-            Quay trở lại
+            Đăng nhập lại
           </Button>
         </Link>
       </Content>

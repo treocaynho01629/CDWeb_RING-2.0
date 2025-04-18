@@ -38,26 +38,31 @@ public class MailConfig {
     /**
      * Configures and returns a {@link JavaMailSender} bean for sending emails.
      * <p>
-     * This method reads the required properties (host, port, username, password) from the configuration
-     * and sets them in a {@link JavaMailSenderImpl} instance. If any configuration is missing or invalid,
-     * the method returns a default {@link JavaMailSenderImpl} with minimal configuration.
+     * This method reads the required properties (host, port, username, password)
+     * from the configuration
+     * and sets them in a {@link JavaMailSenderImpl} instance. If any configuration
+     * is missing or invalid,
+     * the method returns a default {@link JavaMailSenderImpl} with minimal
+     * configuration.
      * </p>
      *
-     * @return The {@link JavaMailSender} bean configured with mail server details or a default one if configurations are missing.
+     * @return The {@link JavaMailSender} bean configured with mail server details
+     * or a default one if configurations are missing.
      */
     @Bean
     public JavaMailSender javaMailSender() {
         try {
             if (mailHost == null || mailPort == null || mailUsername == null || mailPassword == null) {
-                System.err.println("Mail configuration is invalid or missing. Mail functionality will not be available.");
-                return new JavaMailSenderImpl(); //Return default
+                System.err
+                        .println("Mail configuration is invalid or missing. Mail functionality will not be available.");
+                return new JavaMailSenderImpl(); // Return default
             }
 
             JavaMailSenderImpl mailSender = getJavaMailSender();
             return mailSender;
         } catch (Exception e) {
             System.err.println("Error initializing JavaMailSender: " + e.getMessage());
-            return new JavaMailSenderImpl(); //Return default
+            return new JavaMailSenderImpl(); // Return default
         }
     }
 

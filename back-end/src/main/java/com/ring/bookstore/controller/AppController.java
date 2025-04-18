@@ -40,4 +40,6 @@ public class AppController {
     public ResponseEntity<?> getEnums() {
         return new ResponseEntity<>(configService.getEnums(), HttpStatus.OK);
     }
+
+
 }

@@ -2,6 +2,7 @@ package com.ring.bookstore.model.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.List;
 /**
  * Represents an order detail request as {@link CartDetailRequest}.
  */
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

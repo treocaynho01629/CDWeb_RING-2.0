@@ -77,8 +77,6 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenReview_ThenReturnsNewReview() {
-        // Given
-        setupSecurityContext(account);
 
         // When
         when(bookRepo.findById(anyLong())).thenReturn(Optional.of(book));
@@ -101,6 +99,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenReviewNonExistingBook_ThenThrowsException() {
+
         // When
         when(bookRepo.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -118,6 +117,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenReviewNotBoughtBook_ThenThrowsException() {
+
         // When
         when(bookRepo.findById(anyLong())).thenReturn(Optional.of(book));
         when(orderRepo.hasUserBoughtBook(anyLong(), anyLong())).thenReturn(false);
@@ -137,6 +137,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenReviewAlreadyReviewed_ThenThrowsException() {
+
         // When
         when(bookRepo.findById(anyLong())).thenReturn(Optional.of(book));
         when(orderRepo.hasUserBoughtBook(anyLong(), anyLong())).thenReturn(true);
@@ -157,6 +158,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenGetReviews_ThenReturnsPage() {
+
         // Given
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
         IReview projection = mock(IReview.class);
@@ -235,6 +237,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenGetReviewByBook_ThenReturnsDTO() {
+
         // Given
         IReview projection = mock(IReview.class);
         ReviewDTO expected = mock(ReviewDTO.class);
@@ -258,6 +261,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenGetReviewByBookNotBought_ThenThrowsException() {
+
         // When
         when(orderRepo.hasUserBoughtBook(anyLong(), anyLong())).thenReturn(false);
 
@@ -275,6 +279,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenGetReviewByBookNotReviewed_ThenThrowsException() {
+
         // When
         when(orderRepo.hasUserBoughtBook(anyLong(), anyLong())).thenReturn(true);
         when(reviewRepo.findUserBookReview(anyLong(), anyLong())).thenReturn(Optional.empty());
@@ -282,7 +287,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
         // Then
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> reviewService.getReviewByBook(1L, account));
-        assertEquals("Review not found", exception.getError());
+        assertEquals("Review not found!", exception.getError());
 
         // Verify
         verify(orderRepo, times(1)).hasUserBoughtBook(anyLong(), anyLong());
@@ -292,8 +297,8 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenUpdateReview_ThenReturnsDTO() {
+
         // Given
-        setupSecurityContext(account);
         ReviewDTO expected = mock(ReviewDTO.class);
 
         // When
@@ -315,6 +320,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenUpdateNonExistingReview_ThenThrowsException() {
+
         // When
         when(reviewRepo.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -331,6 +337,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenUpdateSomeoneElseReview_ThenThrowsException() {
+
         // Given
         Account altAccount = Account.builder()
                 .id(2L)
@@ -354,6 +361,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenDeleteReview_ThenSuccess() {
+
         // When
         doNothing().when(reviewRepo).deleteById(anyLong());
 
@@ -366,6 +374,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenDeleteReviews_ThenSuccess() {
+
         // Given
         List<Long> ids = List.of(1L, 2L);
 
@@ -381,6 +390,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenDeleteReviewsInverse_ThenSuccess() {
+
         // Given
         List<Long> ids = List.of(1L, 2L);
         List<Long> inverseIds = List.of(3L);
@@ -400,6 +410,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenDeleteAllReviews_ThenSuccess() {
+
         // When
         doNothing().when(reviewRepo).deleteAll();
 
@@ -412,6 +423,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenHideReview_ThenSuccess() {
+
         // When
         when(reviewRepo.findById(anyLong())).thenReturn(Optional.of(review));
         when(reviewRepo.save(any(Review.class))).thenReturn(review);
@@ -426,6 +438,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenHideNonExistingReview_ThenThrowsException() {
+
         // When
         when(reviewRepo.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -441,6 +454,7 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenUnhideReview_ThenSuccess() {
+
         // When
         when(reviewRepo.findById(anyLong())).thenReturn(Optional.of(review));
         when(reviewRepo.save(any(Review.class))).thenReturn(review);
@@ -455,13 +469,14 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenUnhideNonExistingReview_ThenThrowsException() {
-        // When
+        
+
         when(reviewRepo.findById(anyLong())).thenReturn(Optional.empty());
 
         // Then
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> reviewService.unhideReview(1L));
-        assertEquals("Review not found", exception.getError());
+        assertEquals("Review not found!", exception.getError());
 
         // Verify
         verify(reviewRepo, times(1)).findById(anyLong());

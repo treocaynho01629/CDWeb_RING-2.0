@@ -29,7 +29,8 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * Service implementation named {@link TokenServiceImpl} for managing authentication tokens.
+ * Service implementation named {@link TokenServiceImpl} for managing
+ * authentication tokens.
  */
 @Service
 @RequiredArgsConstructor
@@ -40,7 +41,8 @@ public class TokenServiceImpl implements TokenService {
     private final Cloudinary cloudinary;
 
     /**
-     * Generates an authentication token with user details claims for the specified user details.
+     * Generates an authentication token with user details claims for the specified
+     * user details.
      *
      * @param user The user to include in the token.
      * @return The generated authentication token.
@@ -52,13 +54,13 @@ public class TokenServiceImpl implements TokenService {
 
         if (image != null) {
             String url = cloudinary.url().transformation(new Transformation()
-                            .aspectRatio("1.0")
-                            .width(35)
-                            .crop("thumb")
-                            .chain()
-                            .radius("max")
-                            .quality("auto")
-                            .fetchFormat("auto"))
+                    .aspectRatio("1.0")
+                    .width(35)
+                    .crop("thumb")
+                    .chain()
+                    .radius("max")
+                    .quality("auto")
+                    .fetchFormat("auto"))
                     .secure(true).generate(image.getPublicId());
             extraClaims.put("image", url);
         }
@@ -111,7 +113,7 @@ public class TokenServiceImpl implements TokenService {
      * @return The generated custom token.
      */
     public String generateCustomToken(String username, long expTime, String key) {
-        //Hash the key string
+        // Hash the key string
         String sha256hex = Hashing.sha256()
                 .hashString(key, StandardCharsets.UTF_8)
                 .toString();
@@ -151,7 +153,7 @@ public class TokenServiceImpl implements TokenService {
      * @return The extracted username.
      */
     public String extractCustomUsername(String token, String key) {
-        //Hash the key string
+        // Hash the key string
         String sha256hex = Hashing.sha256()
                 .hashString(key, StandardCharsets.UTF_8)
                 .toString();
@@ -173,16 +175,17 @@ public class TokenServiceImpl implements TokenService {
     }
 
     /**
-     * Checks whether the authentication token is valid for the provided user details.
+     * Checks whether the authentication token is valid for the provided user
+     * details.
      *
      * @param token       The authentication token.
      * @param userDetails The user details to validate against.
      * @return True if the token is valid; otherwise, false.
      */
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token); //Extract username
+        final String username = extractUsername(token); // Extract username
         return (username.equals(userDetails.getUsername()))
-                && !isTokenExpired(token, tokenSettings.getSecretKey()); //Check expiration and valid username
+                && !isTokenExpired(token, tokenSettings.getSecretKey()); // Check expiration and valid username
     }
 
     /**
@@ -193,9 +196,9 @@ public class TokenServiceImpl implements TokenService {
      * @return True if the refresh token is valid; otherwise, false.
      */
     public boolean isRefreshTokenValid(String token, String username) {
-        final String extractedUsername = extractRefreshUsername(token); //Extract username
+        final String extractedUsername = extractRefreshUsername(token); // Extract username
         return (extractedUsername.equals(username))
-                && !isTokenExpired(token, tokenSettings.getSecretRefreshKey()); //Check expiration and valid username
+                && !isTokenExpired(token, tokenSettings.getSecretRefreshKey()); // Check expiration and valid username
     }
 
     /**
@@ -207,13 +210,13 @@ public class TokenServiceImpl implements TokenService {
      * @return True if the custom token is valid; otherwise, false.
      */
     public boolean isCustomTokenValid(String token, String username, String key) {
-        //Hash the key string
+        // Hash the key string
         String sha256hex = Hashing.sha256()
                 .hashString(key, StandardCharsets.UTF_8)
                 .toString();
-        final String extractedUsername = extractCustomUsername(token, key); //Extract username
+        final String extractedUsername = extractCustomUsername(token, key); // Extract username
         return (extractedUsername.equals(username))
-                && !isTokenExpired(token, sha256hex); //Check expiration and valid username
+                && !isTokenExpired(token, sha256hex); // Check expiration and valid username
     }
 
     /**
@@ -241,6 +244,7 @@ public class TokenServiceImpl implements TokenService {
         return ResponseCookie
                 .from("refreshToken", value)
                 .path("/api/auth")
+                .domain(tokenSettings.getCookieDomain())
                 .maxAge(tokenSettings.getRefreshTokenExpiration())
                 .httpOnly(true)
                 .secure(true)
@@ -272,7 +276,8 @@ public class TokenServiceImpl implements TokenService {
     }
 
     /**
-     * Builds a JWT token using the provided claims, user details, expiration time, and signing key.
+     * Builds a JWT token using the provided claims, user details, expiration time,
+     * and signing key.
      *
      * @param extraClaims Additional claims to embed in the token.
      * @param userDetails The user details to extract subject and roles.
@@ -284,9 +289,8 @@ public class TokenServiceImpl implements TokenService {
             Map<String, Object> extraClaims,
             UserDetails userDetails,
             long expiration,
-            String key
-    ) {
-        //Add roles with token
+            String key) {
+        // Add roles with token
         List<String> roles = new ArrayList<>();
         userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -294,18 +298,19 @@ public class TokenServiceImpl implements TokenService {
                 .forEach(roles::add);
         extraClaims.put("roles", roles);
 
-        return Jwts //Create JWT
+        return Jwts // Create JWT
                 .builder()
-                .setClaims(extraClaims) //Claims
-                .setSubject(userDetails.getUsername()) //Name
-                .setIssuedAt(new Date(System.currentTimeMillis())) //Create date
-                .setExpiration(new Date(System.currentTimeMillis() + expiration)) //Expiration date
-                .signWith(getSignInKey(key), SignatureAlgorithm.HS256) //Encrypt
+                .setClaims(extraClaims) // Claims
+                .setSubject(userDetails.getUsername()) // Name
+                .setIssuedAt(new Date(System.currentTimeMillis())) // Create date
+                .setExpiration(new Date(System.currentTimeMillis() + expiration)) // Expiration date
+                .signWith(getSignInKey(key), SignatureAlgorithm.HS256) // Encrypt
                 .compact();
     }
 
     /**
-     * Builds a custom JWT token with the given username, expiration time, and signing key.
+     * Builds a custom JWT token with the given username, expiration time, and
+     * signing key.
      *
      * @param username   The username to include as the token's subject.
      * @param expiration The expiration time for the token in milliseconds.
@@ -315,14 +320,13 @@ public class TokenServiceImpl implements TokenService {
     private String buildCustomToken(
             String username,
             long expiration,
-            String key
-    ) {
-        return Jwts //Create JWT
+            String key) {
+        return Jwts // Create JWT
                 .builder()
-                .setSubject(username) //Name
-                .setIssuedAt(new Date(System.currentTimeMillis())) //Create date
-                .setExpiration(new Date(System.currentTimeMillis() + expiration)) //Expiration date
-                .signWith(getSignInKey(key), SignatureAlgorithm.HS256) //Encrypt
+                .setSubject(username) // Name
+                .setIssuedAt(new Date(System.currentTimeMillis())) // Create date
+                .setExpiration(new Date(System.currentTimeMillis() + expiration)) // Expiration date
+                .signWith(getSignInKey(key), SignatureAlgorithm.HS256) // Encrypt
                 .compact();
     }
 
@@ -357,14 +361,14 @@ public class TokenServiceImpl implements TokenService {
      * @return The claims extracted from the token.
      */
     private Claims extractAllClaims(String token, Key key) {
-        try { //Get Claims from valid token
+        try { // Get Claims from valid token
             return Jwts
                     .parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (ExpiredJwtException e) { //Get Claims from expired token
+        } catch (ExpiredJwtException e) { // Get Claims from expired token
             return e.getClaims();
         }
     }

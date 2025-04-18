@@ -35,6 +35,13 @@ function App() {
             },
           },
           {
+            path: "payment/cancel",
+            lazy: async () => {
+              let Cancel = await import("./pages/Cancel");
+              return { Component: Cancel.default };
+            },
+          },
+          {
             path: "*",
             lazy: async () => {
               let Missing = await import("@ring/ui/Missing");
@@ -46,6 +53,13 @@ function App() {
             lazy: async () => {
               let AuthPage = await import("./pages/AuthPage");
               return { Component: AuthPage.default };
+            },
+          },
+          {
+            path: "payment",
+            lazy: async () => {
+              let Payment = await import("./pages/Payment");
+              return { Component: Payment.default };
             },
           },
           {

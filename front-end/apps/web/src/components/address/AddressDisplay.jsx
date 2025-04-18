@@ -186,7 +186,13 @@ const AddressDisplay = ({
           sx={{ display: { xs: "none", sm: "flex" }, whiteSpace: "nowrap" }}
           aria-label="toggle address dialog"
           variant="outlined"
-          color={!isValid ? "error" : "primary"}
+          color={
+            !loadAddress && isValid
+              ? "primary"
+              : !addressInfo
+                ? "primary"
+                : "error"
+          }
           disabled={loadAddress}
           onClick={handleOpen}
         >
@@ -196,7 +202,13 @@ const AddressDisplay = ({
           sx={{ mr: -1, display: { xs: "block", sm: "none" } }}
           aria-label="mobile toggle address dialog"
           onClick={handleOpen}
-          color={!isValid ? "error" : "primary"}
+          color={
+            !loadAddress && isValid
+              ? "primary"
+              : !addressInfo
+                ? "primary"
+                : "error"
+          }
           disabled={loadAddress}
           edge="end"
         >
@@ -206,7 +218,7 @@ const AddressDisplay = ({
       <Title>Hình thức giao hàng</Title>
       <RadioGroup value={value} onChange={handleChange}>
         {Object.values(ShippingType).map((item, index) => {
-          const Icon = iconList[item.icon];
+          const Icon = iconList[item?.icon];
           return (
             <StyledForm
               key={index}

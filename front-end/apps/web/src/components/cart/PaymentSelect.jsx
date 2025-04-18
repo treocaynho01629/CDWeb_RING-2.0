@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
-import { getPaymentContent, getPaymentType } from "@ring/shared";
+import { getPaymentContent, getPaymentType, iconList } from "@ring/shared";
+import { Suspense } from "react";
 
 //#region styled
 const StyledForm = styled(FormControlLabel)`
@@ -51,29 +52,49 @@ const PaymentContainer = styled.div`
 //#endregion
 
 const PaymentType = getPaymentType();
+const TempPaymentTypep = Object.freeze({
+  CASH: {
+    value: "CASH",
+    label: "Thanh toán tiền mặt",
+    description: "",
+    icon: "LocalAtm",
+  },
+  ONLINE_PAYMENT: {
+    value: "ONLINE_PAYMENT",
+    label: "Thanh toán online",
+    description: "Quét Mã QR từ ứng dụng hoặc chuyển khoản",
+    icon: "BookOnline",
+  },
+});
 
 const PaymentSelect = ({ value, handleChange }) => {
   return (
     <>
       <RadioContainer>
         <RadioGroup spacing={1} row value={value} onChange={handleChange}>
-          {Object.values(PaymentType).map((item, index) => (
-            <StyledForm
-              key={index}
-              sx={{ width: "100%" }}
-              value={item.value}
-              control={<Radio />}
-              label={
-                <FormContent>
-                  <ItemTitle>
-                    {item.icon}
-                    {item.label}
-                  </ItemTitle>
-                  <Description>{item.description}</Description>
-                </FormContent>
-              }
-            />
-          ))}
+          {Object.values(TempPaymentTypep).map((item, index) => {
+            const Icon = iconList[item.icon];
+
+            return (
+              <StyledForm
+                key={index}
+                sx={{ width: "100%" }}
+                value={item.value}
+                control={<Radio />}
+                label={
+                  <FormContent>
+                    <ItemTitle>
+                      <Suspense fallback={null}>
+                        <Icon />
+                      </Suspense>
+                      {item.label}
+                    </ItemTitle>
+                    <Description>{item.description}</Description>
+                  </FormContent>
+                }
+              />
+            );
+          })}
         </RadioGroup>
       </RadioContainer>
       <PaymentContainer>{getPaymentContent(value)}</PaymentContainer>

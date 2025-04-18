@@ -1,8 +1,13 @@
 package com.ring.bookstore.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ring.bookstore.model.dto.request.RegisterRequest;
 import com.ring.bookstore.model.dto.response.orders.*;
 import com.ring.bookstore.model.enums.OrderStatus;
 import com.ring.bookstore.model.dto.request.CalculateRequest;
+import com.ring.bookstore.service.PayOSService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -19,6 +24,13 @@ import com.ring.bookstore.service.OrderService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import vn.payos.PayOS;
+import vn.payos.type.CheckoutResponseData;
+import vn.payos.type.Webhook;
+import vn.payos.type.WebhookData;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Controller named {@link OrderController} for handling order-related operations.
@@ -32,6 +44,8 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 
     private final OrderService orderService;
+    private final PayOS payOS;
+    private final PayOSService payOSService;
 
     /**
      * Calculates the total price of an order before checkout.
@@ -293,5 +307,73 @@ public class OrderController {
                                              @RequestParam(value = "year", required = false) Integer year,
                                              @CurrentAccount Account currUser) {
         return new ResponseEntity<>(orderService.getMonthlySales(currUser, shopId, year), HttpStatus.OK);
+    }
+
+    @PostMapping("/create-payment-link")
+    @PreAuthorize("hasRole('USER') and hasAuthority('read:order')")
+    public ResponseEntity<?> createTest(@RequestBody ReceiptDTO testBody) {
+
+//        ReceiptDTO receipt = ReceiptDTO.builder()
+//                .id(1L)
+//                .details(List.of(
+//                        OrderDTO.builder()
+//                                .id(1L)
+//                                .items(List.of(
+//                                        OrderItemDTO.builder()
+//                                                .bookTitle("Book 1")
+//                                                .price(100000.0)
+//                                                .quantity((short) 1)
+//                                                .build()))
+//                                .build()))
+//                .build();
+
+        CheckoutResponseData test = payOSService.checkout(testBody);
+        return new ResponseEntity<>(test, HttpStatus.OK);
+    }
+
+    @PostMapping("/payos_transfer_handler")
+    public ObjectNode payosTransferHandler(@RequestBody ObjectNode body)
+            throws JsonProcessingException, IllegalArgumentException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode response = objectMapper.createObjectNode();
+        Webhook webhookBody = objectMapper.treeToValue(body, Webhook.class);
+
+        try {
+            // Init Response
+            response.put("error", 0);
+            response.put("message", "Webhook delivered");
+            response.set("data", null);
+
+            WebhookData data = payOS.verifyPaymentWebhookData(webhookBody);
+            System.out.println(data);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("error", -1);
+            response.put("message", e.getMessage());
+            response.set("data", null);
+            return response;
+        }
+    }
+
+    @PostMapping("/confirm-webhook")
+    public ObjectNode confirmWebhook(@RequestBody Map<String, String> requestBody) {
+        System.out.println("test");
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode response = objectMapper.createObjectNode();
+        try {
+            String str = payOS.confirmWebhook(requestBody.get("webhookUrl"));
+            response.set("data", objectMapper.valueToTree(str));
+            response.put("error", 0);
+            response.put("message", "ok");
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("error", -1);
+            response.put("message", e.getMessage());
+            response.set("data", null);
+            return response;
+        }
     }
 }

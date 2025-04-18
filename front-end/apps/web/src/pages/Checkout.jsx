@@ -52,6 +52,7 @@ import PreviewDetailRow from "../components/cart/PreviewDetailRow";
 import FinalCheckoutDialog from "../components/cart/FinalCheckoutDialog";
 import useCart from "../hooks/useCart";
 import useCheckout from "../hooks/useCheckout";
+import TestCheckout from "../components/cart/TestCheckout";
 
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 const ReCaptcha = lazy(() => import("@ring/auth/ReCaptcha"));
@@ -142,6 +143,20 @@ const StyledStepContent = styled(StepContent)(({ theme }) => ({
 
 const PaymentType = getPaymentType();
 const ShippingType = getShippingType();
+const TempPaymentTypep = Object.freeze({
+  CASH: {
+    value: "CASH",
+    label: "Thanh toán tiền mặt",
+    description: "",
+    icon: "LocalAtm",
+  },
+  ONLINE_PAYMENT: {
+    value: "ONLINE_PAYMENT",
+    label: "Thanh toán online",
+    description: "Quét Mã QR từ ứng dụng hoặc chuyển khoản",
+    icon: "BookOnline",
+  },
+});
 
 const Checkout = () => {
   //#region construct
@@ -149,7 +164,7 @@ const Checkout = () => {
   const prevPayload = useRef();
   const [activeStep, setActiveStep] = useState(0);
   const [delivery, setDelivery] = useState(Object.keys(ShippingType)[0]);
-  const [payment, setPayment] = useState(Object.keys(PaymentType)[0]);
+  const [payment, setPayment] = useState(Object.keys(TempPaymentTypep)[0]);
 
   const [pending, setPending] = useState(false);
   const maxSteps = 3;
@@ -478,9 +493,9 @@ const Checkout = () => {
     })
       .unwrap()
       .then((data) => {
-        enqueueSnackbar("Đặt hàng thành công!", { variant: "success" });
+        // enqueueSnackbar("Đặt hàng thành công!", { variant: "success" });
         clearCart();
-        navigate("/cart", { replace: true });
+        navigate("/payment", { replace: true, state: { test: data } });
         setChallenge(false);
         setPending(false);
       })

@@ -1,0 +1,146 @@
+import styled from "@emotion/styled";
+import { Link } from "react-router";
+import { Button } from "@mui/material";
+import { ReactComponent as EmptyIcon } from "@ring/shared/assets/empty";
+import SimpleNavbar from "@ring/ui/SimpleNavbar";
+
+//#region styled
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100dvh;
+`;
+
+const RandomShape = styled.span`
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 150dvh;
+  width: 50%;
+  opacity: 0.7;
+  background: hsl(
+    from ${({ theme }) => theme.palette.primary.main} h s l / 0.4
+  );
+  z-index: -1;
+  transform: translate(60%, 0%) rotate(25deg);
+
+  &:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: 100%;
+    background: hsl(
+      from ${({ theme }) => theme.palette.primary.main} calc(h + 30) s l / 0.3
+    );
+    transform: translate(-80%, -60%) rotate(85deg);
+  }
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 200%;
+    background: hsl(
+      from ${({ theme }) => theme.palette.primary.main} calc(h - 30) s l / 0.2
+    );
+    transform: rotate(-130deg) translate(-35%, -60%);
+    z-index: -5;
+  }
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    transform: translate(75%, 5%) rotate(25deg);
+  }
+`;
+
+const Content = styled.div`
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: ${({ theme }) => theme.spacing(1)};
+
+  h2 {
+    font-size: 2.25em;
+    margin: 0;
+  }
+
+  h3 {
+    font-size: 1.5em;
+    font-weight: 400;
+  }
+
+  p {
+    margin: 0;
+    color: ${({ theme }) => theme.palette.text.secondary};
+  }
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    font-size: 12px;
+
+    p {
+      font-size: 1.25em;
+      text-align: center;
+    }
+  }
+`;
+
+const StyledEmptyIcon = styled(EmptyIcon)`
+  height: 0.75em;
+  width: 0.75em;
+  fill: ${({ theme }) => theme.palette.background.default};
+  stroke: ${({ theme }) => theme.palette.error.main};
+  stroke-width: 10px;
+  overflow: visible;
+`;
+
+const ErrorCode = styled.h1`
+  font-size: 13em;
+  color: ${({ theme }) => theme.palette.background.default};
+  margin: 0;
+  text-shadow:
+    3px 3px 0 ${({ theme }) => theme.palette.error.main},
+    -3px 3px 0 ${({ theme }) => theme.palette.error.main},
+    -3px -3px 0 ${({ theme }) => theme.palette.error.main},
+    3px -3px 0 ${({ theme }) => theme.palette.error.main};
+  border-bottom: 0.02em solid ${({ theme }) => theme.palette.primary.main};
+`;
+
+const ErrorContainer = styled("div")(({ theme }) => ({
+  mixBlendMode: "darken",
+  ...theme.applyStyles("dark", {
+    mixBlendMode: "lighten",
+  }),
+}));
+//#endregion
+
+const Cancel = () => {
+  return (
+    <Wrapper>
+      <SimpleNavbar />
+      <RandomShape></RandomShape>
+      <Content>
+        <h2>Thanh toán thất bại!</h2>
+        <ErrorContainer>
+          <ErrorCode>
+            <StyledEmptyIcon />
+          </ErrorCode>
+        </ErrorContainer>
+        <h3>Không thể hoàn tất thanh toán</h3>
+        <Link to="/profile/order">
+          <Button sx={{ marginTop: 2 }} variant="outlined" color="primary">
+            Xem đơn hàng
+          </Button>
+        </Link>
+      </Content>
+    </Wrapper>
+  );
+};
+
+export default Cancel;

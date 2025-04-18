@@ -71,7 +71,7 @@ const useCheckout = () => {
   ) => {
     if (!cartProducts?.length) return;
     const details = cart?.details;
-    const isWarning = false;
+    let isWarning = false;
     let shopsDiscountValue = 0;
 
     details.forEach((detail, index) => {

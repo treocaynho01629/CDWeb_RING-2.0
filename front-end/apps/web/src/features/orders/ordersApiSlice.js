@@ -103,6 +103,14 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
         } else return [{ type: "Order", id: "LIST" }];
       },
     }),
+    createPaymentLink: builder.mutation({
+      query: (test) => ({
+        url: "/api/orders/create-payment-link",
+        method: "POST",
+        credentials: "include",
+        body: { ...test },
+      }),
+    }),
     calculate: builder.mutation({
       query: (currCart) => ({
         url: "/api/orders/calculate",
@@ -154,6 +162,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
 export const {
   useGetOrderDetailQuery,
   useGetOrdersByUserQuery,
+  useCreatePaymentLinkMutation,
   useCalculateMutation,
   useCheckoutMutation,
   useCancelOrderMutation,

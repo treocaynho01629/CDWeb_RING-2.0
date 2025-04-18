@@ -6,14 +6,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * Configuration class named {@link TokenSettings} for token parameters used in authentication and authorization.
-*/
+ * Configuration class named {@link TokenSettings} for token parameters used in
+ * authentication and authorization.
+ */
 @Getter
 @Setter
 @Component
 @ConfigurationProperties(prefix = "application.security.jwt")
 public class TokenSettings {
 
+    private String cookieDomain;
     private String secretKey;
     private String secretRefreshKey;
     private long tokenExpiration; // Minutes

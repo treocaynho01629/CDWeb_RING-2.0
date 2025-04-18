@@ -10,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
- * Service implementation for managing password reset tokens associated with user accounts.
+ * Service implementation for managing password reset tokens associated with
+ * user accounts.
  */
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class ResetTokenServiceImpl implements ResetTokenService {
      */
     @Transactional
     public String generateResetToken(Account user) {
+
         String token = tokenService.generateCustomToken(user.getUsername(),
                 EXPIRE_TOKEN_TIME,
                 user.getPassword());
@@ -39,19 +41,21 @@ public class ResetTokenServiceImpl implements ResetTokenService {
     }
 
     /**
-     * Verifies whether the reset token associated with the given user is valid and not expired.
+     * Verifies whether the reset token associated with the given user is valid and
+     * not expired.
      *
      * @param user The user account to verify the reset token against.
      * @return True if the reset token is valid; otherwise, false.
      */
     public boolean verifyResetToken(Account user) {
+
         String key = user.getPassword();
         String token = user.getResetToken();
-        String username = tokenService.extractCustomUsername(token, key); //Verify with sign in key
+        String username = tokenService.extractCustomUsername(token, key); // Verify with sign in key
 
         if (username != null) {
-            if (!tokenService.isCustomTokenValid(token, username, key)) { //Invalidate token
-                user.setResetToken(null); //Set empty
+            if (!tokenService.isCustomTokenValid(token, username, key)) { // Invalidate token
+                user.setResetToken(null); // Set empty
                 accRepo.save(user);
                 throw new ResetPasswordException(token, "Reset token expired. Please make a new request!");
             }
@@ -61,12 +65,14 @@ public class ResetTokenServiceImpl implements ResetTokenService {
     }
 
     /**
-     * Clears or invalidates the specified reset token, preventing it from being reused.
+     * Clears or invalidates the specified reset token, preventing it from being
+     * reused.
      *
      * @param token The reset token to clear or invalidate.
      */
     @Transactional
     public void clearResetToken(String token) {
+
         accRepo.clearResetToken(token);
     }
 }
