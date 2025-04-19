@@ -64,7 +64,7 @@ public class AuthenticationController {
 		//Set refresh token
 		ResponseCookie refreshCookie;
 		if (persist) {
-			refreshCookie = refreshService.generateRefreshCookie(auth);
+			refreshCookie = refreshService.generateRefreshCookie(auth, request);
 		} else {
 			refreshCookie = refreshService.clearRefreshCookie();
 		}

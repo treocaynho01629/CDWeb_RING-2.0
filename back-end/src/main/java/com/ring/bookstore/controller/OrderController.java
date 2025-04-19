@@ -359,7 +359,6 @@ public class OrderController {
 
     @PostMapping("/confirm-webhook")
     public ObjectNode confirmWebhook(@RequestBody Map<String, String> requestBody) {
-        System.out.println("test");
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode response = objectMapper.createObjectNode();
         try {

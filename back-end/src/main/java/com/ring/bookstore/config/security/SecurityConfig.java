@@ -83,8 +83,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET)
                         .permitAll()
                         .requestMatchers(
-                                "/api/orders/payos_transfer_handler",
                                 "/api/auth/**",
+                                "/api/orders/payos_transfer_handler",
                                 "/v2/api-docs",
                                 "/v3/api-docs",
                                 "/v3/api-docs/**",

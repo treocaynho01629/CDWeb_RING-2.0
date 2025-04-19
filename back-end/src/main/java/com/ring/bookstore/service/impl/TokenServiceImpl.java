@@ -240,10 +240,11 @@ public class TokenServiceImpl implements TokenService {
      * @param value The refresh token value to store in the cookie.
      * @return The generated response cookie.
      */
-    public ResponseCookie generateRefreshCookie(String value) {
+    public ResponseCookie generateRefreshCookie(String value, String domain) {
         return ResponseCookie
                 .from("refreshToken", value)
                 .path("/api/auth")
+                .domain(domain)
                 .maxAge(tokenSettings.getRefreshTokenExpiration())
                 .httpOnly(true)
                 .secure(true)
@@ -259,7 +260,7 @@ public class TokenServiceImpl implements TokenService {
      */
     public String getRefreshTokenFromCookie(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, "refreshToken");
-        return cookie.getValue();
+        return cookie != null ? cookie.getValue() : null;
     }
 
     /**

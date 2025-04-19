@@ -6,8 +6,6 @@ import SimpleNavbar from "@ring/ui/SimpleNavbar";
 import TestCheckout from "../components/cart/TestCheckout";
 
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
-const ForgotTab = lazy(() => import("../components/authorize/ForgotTab"));
-const ResetTab = lazy(() => import("../components/authorize/ResetTab"));
 
 //#region styled
 const Wrapper = styled.div`
@@ -45,7 +43,6 @@ function Payment() {
   const [pending, setPending] = useState(false);
   const location = useLocation();
   const test = location.state?.test;
-  console.log(test);
 
   //Recaptcha
   const { reCaptchaLoaded, generateReCaptchaToken } = useReCaptcha();

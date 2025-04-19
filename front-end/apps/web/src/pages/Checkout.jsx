@@ -52,7 +52,6 @@ import PreviewDetailRow from "../components/cart/PreviewDetailRow";
 import FinalCheckoutDialog from "../components/cart/FinalCheckoutDialog";
 import useCart from "../hooks/useCart";
 import useCheckout from "../hooks/useCheckout";
-import TestCheckout from "../components/cart/TestCheckout";
 
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 const ReCaptcha = lazy(() => import("@ring/auth/ReCaptcha"));

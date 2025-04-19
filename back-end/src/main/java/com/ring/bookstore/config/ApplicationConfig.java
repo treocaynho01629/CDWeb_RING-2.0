@@ -14,6 +14,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
@@ -34,6 +36,9 @@ public class ApplicationConfig {
     @Value("${ring.dashboard-url}")
     private String dashboardUrl;
 
+    @Value("${allowed.origins}")
+    private String[] allowedOrigins;
+
     /**
      * Configures CORS settings for the application.
      *
@@ -41,8 +46,12 @@ public class ApplicationConfig {
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
+        List<String> allowedOriginsList = new ArrayList<>(List.of(clientUrl, dashboardUrl));
+        allowedOriginsList.addAll(Arrays.asList(allowedOrigins));
+
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:4173", "http://localhost:3001", clientUrl, dashboardUrl));
+        corsConfiguration.setAllowedOrigins(allowedOriginsList);
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         corsConfiguration.setAllowedHeaders(List.of("*"));

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePayOS } from "@payos/payos-checkout";
 import { useCreatePaymentLinkMutation } from "../../features/orders/ordersApiSlice";
-import { AuthTitle, ConfirmButton, Message } from "@ring/ui";
+// import { AuthTitle, ConfirmButton, Message } from "@ring/ui";
 import { Box, Stack } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import styled from "@emotion/styled";
@@ -22,7 +22,6 @@ const TestCheckout = ({ pending, setPending, test }) => {
   const initRef = useRef(false);
   const [createPaymentLink, { isLoading, isError }] =
     useCreatePaymentLinkMutation();
-
   const [payOSConfig, setPayOSConfig] = useState({
     RETURN_URL: window.location.origin + "/profile/order", // required
     ELEMENT_ID: "embedded-payment-container", // required
@@ -35,16 +34,12 @@ const TestCheckout = ({ pending, setPending, test }) => {
       enqueueSnackbar("Thanh toán thành công!", { variant: "success" });
     },
   });
-
   const { open, exit } = usePayOS(payOSConfig);
-
   const handleGetPaymentLink = async () => {
     if (pending || !test) return;
     setPending(true);
     exit();
-
     const { enqueueSnackbar } = await import("notistack");
-
     createPaymentLink(test)
       .unwrap()
       .then((data) => {
@@ -54,7 +49,6 @@ const TestCheckout = ({ pending, setPending, test }) => {
           ...oldConfig,
           CHECKOUT_URL: data.checkoutUrl,
         }));
-
         setIsOpen(true);
         setPending(false);
       })
@@ -64,19 +58,16 @@ const TestCheckout = ({ pending, setPending, test }) => {
         setPending(false);
       });
   };
-
   useEffect(() => {
     if (initRef.current) return;
     initRef.current = true;
     handleGetPaymentLink();
   }, []);
-
   useEffect(() => {
     if (payOSConfig.CHECKOUT_URL != null) {
       open();
     }
   }, [payOSConfig]);
-
   return message ? (
     <div className="main-box">
       <AuthTitle>Thanh toán thành công</AuthTitle>

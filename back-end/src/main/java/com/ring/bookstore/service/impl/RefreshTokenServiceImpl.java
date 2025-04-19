@@ -1,5 +1,7 @@
 package com.ring.bookstore.service.impl;
 
+import com.google.common.net.HttpHeaders;
+import com.google.common.net.InternetDomainName;
 import com.ring.bookstore.exception.TokenRefreshException;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.entity.RefreshToken;
@@ -12,6 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.print.DocFlavor;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 @Service
 @RequiredArgsConstructor
@@ -48,16 +54,21 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 	 * Generates a response cookie containing a refresh token for the given user account.
 	 *
 	 * @param user The user account for which the refresh token cookie is to be generated.
+	 * @param request The HTTP request.
 	 * @return A {@link ResponseCookie} containing the refresh token.
 	 */
 	@Transactional
-	public ResponseCookie generateRefreshCookie(Account user){
+	public ResponseCookie generateRefreshCookie(Account user, HttpServletRequest request){
+
 		String token = tokenService.generateRefreshToken(user); //Generate refresh token
 		RefreshToken refreshToken = RefreshToken.builder().refreshToken(token).user(user).build();
 
+		String domain = getRefererDomain(request);
+		System.out.println(domain);
+
 		//Set token
 		refreshTokenRepo.save(refreshToken);
-		return tokenService.generateRefreshCookie(token);
+		return tokenService.generateRefreshCookie(token, domain);
 	}
 
 	/**
@@ -95,5 +106,21 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 		}
 
 		return true;
+	}
+
+	private String getRefererDomain(HttpServletRequest request) {
+
+		String referer = request.getHeader(HttpHeaders.REFERER);
+
+		if (referer != null) {
+			try {
+				URL url = new URL(referer);
+				return url.getHost();
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return null;
 	}
 }
