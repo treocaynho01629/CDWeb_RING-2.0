@@ -244,7 +244,6 @@ public class TokenServiceImpl implements TokenService {
         return ResponseCookie
                 .from("refreshToken", value)
                 .path("/api/auth")
-                .domain(tokenSettings.getCookieDomain())
                 .maxAge(tokenSettings.getRefreshTokenExpiration())
                 .httpOnly(true)
                 .secure(true)
