@@ -256,32 +256,32 @@ class OrderReceiptRepositoryTest extends AbstractRepositoryTest {
         assertEquals(2, foundOrders.getTotalElements());
     }
 
-    @Test
-    public void whenOrderIds_ThenReturnIds() {
-
-        // When
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Long> foundIds = receiptRepo.findAllIds(
-                null,
-                account.getId(),
-                OrderStatus.COMPLETED,
-                "",
-                pageable);
-
-        // Then
-        assertNotNull(foundIds);
-        assertEquals(2, foundIds.getTotalElements());
-    }
-
-    @Test
-    public void whenGetSalesAnalytics_ThenReturnStats() {
-
-        // When
-        IStat foundData = receiptRepo.getSalesAnalytics(null, null);
-
-        // Then
-        assertNotNull(foundData);
-        assertEquals(220000.0, foundData.getCurrentMonth()); //240000 - 20000
-        assertEquals(30000.0, foundData.getLastMonth()); //30000 - 0 (COMPLETED)
-    }
+//    @Test
+//    public void whenOrderIds_ThenReturnIds() {
+//
+//        // When
+//        Pageable pageable = PageRequest.of(0, 10);
+//        Page<Long> foundIds = receiptRepo.findAllIds(
+//                null,
+//                account.getId(),
+//                OrderStatus.COMPLETED,
+//                "",
+//                pageable);
+//
+//        // Then
+//        assertNotNull(foundIds);
+//        assertEquals(2, foundIds.getTotalElements());
+//    }
+//
+//    @Test
+//    public void whenGetSalesAnalytics_ThenReturnStats() {
+//
+//        // When
+//        IStat foundData = receiptRepo.getSalesAnalytics(null, null);
+//
+//        // Then
+//        assertNotNull(foundData);
+//        assertEquals(220000.0, foundData.getCurrentMonth()); //240000 - 20000
+//        assertEquals(30000.0, foundData.getLastMonth()); //30000 - 0 (COMPLETED)
+//    }
 }

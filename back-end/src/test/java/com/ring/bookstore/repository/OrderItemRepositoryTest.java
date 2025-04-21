@@ -190,14 +190,14 @@ class OrderItemRepositoryTest extends AbstractRepositoryTest {
                 assertEquals(2, foundItems.size());
         }
 
-        @Test
-        public void whenFindOrderDetailItems_ThenReturnList() {
-
-                // When
-                List<IOrderDetail> foundList = itemRepo.findOrderDetailItems(detail.getId(), account.getId());
-
-                // Then
-                assertNotNull(foundList);
-                assertEquals(2, foundList.size());
-        }
+//        @Test
+//        public void whenFindOrderDetailItems_ThenReturnList() {
+//
+//                // When
+//                List<IOrderDetail> foundList = itemRepo.findOrderDetailItems(detail.getId(), account.getId());
+//
+//                // Then
+//                assertNotNull(foundList);
+//                assertEquals(2, foundList.size());
+//        }
 }

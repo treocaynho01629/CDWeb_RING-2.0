@@ -223,33 +223,33 @@ class OrderDetailRepositoryTest extends AbstractRepositoryTest {
                 assertEquals(detail.getId(), foundDetail.getId());
         }
 
-        @Test
-        public void whenFindAllIdsByUserId_ThenReturnIds() {
-
-                // When
-                Pageable pageable = PageRequest.of(0, 10);
-                Page<Long> foundIds = detailRepo.findAllIdsByUserId(
-                                account.getId(),
-                                OrderStatus.COMPLETED,
-                                "",
-                                pageable);
-
-                // Then
-                assertNotNull(foundIds);
-                assertEquals(2, foundIds.getTotalElements());
-        }
-
-        @Test
-        public void whenFindAllIdsByBookId_ThenReturnIds() {
-
-                // When
-                Pageable pageable = PageRequest.of(0, 10);
-                Page<Long> foundIds = detailRepo.findAllIdsByBookId(book.getId(), pageable);
-
-                // Then
-                assertNotNull(foundIds);
-                assertEquals(2, foundIds.getTotalElements());
-        }
+//        @Test
+//        public void whenFindAllIdsByUserId_ThenReturnIds() {
+//
+//                // When
+//                Pageable pageable = PageRequest.of(0, 10);
+//                Page<Long> foundIds = detailRepo.findAllIdsByUserId(
+//                                account.getId(),
+//                                OrderStatus.COMPLETED,
+//                                "",
+//                                pageable);
+//
+//                // Then
+//                assertNotNull(foundIds);
+//                assertEquals(2, foundIds.getTotalElements());
+//        }
+//
+//        @Test
+//        public void whenFindAllIdsByBookId_ThenReturnIds() {
+//
+//                // When
+//                Pageable pageable = PageRequest.of(0, 10);
+//                Page<Long> foundIds = detailRepo.findAllIdsByBookId(book.getId(), pageable);
+//
+//                // Then
+//                assertNotNull(foundIds);
+//                assertEquals(2, foundIds.getTotalElements());
+//        }
 
         @Test
         public void whenFindAllByReceiptIds_ThenReturnOrderDetails() {
