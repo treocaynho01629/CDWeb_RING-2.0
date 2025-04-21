@@ -105,7 +105,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 	 * @return a list of Shop entities corresponding to the provided IDs
 	 */
 	@Query("""
-		select s from Shop s
+		select s from Shop s join fetch s.address a
         where s.id in :ids
 	""")
 	List<Shop> findShopsInIds(List<Long> ids);

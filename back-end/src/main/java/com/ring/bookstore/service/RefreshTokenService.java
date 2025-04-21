@@ -21,10 +21,9 @@ public interface RefreshTokenService {
      * Generates a response cookie containing a refresh token for the given user account.
      *
      * @param user The user account for which the refresh token cookie is to be generated.
-     * @param request The HTTP request.
      * @return A {@link ResponseCookie} containing the refresh token.
      */
-    ResponseCookie generateRefreshCookie(Account user, HttpServletRequest request);
+    ResponseCookie generateRefreshCookie(Account user);
 
     /**
      * Clears the refresh token cookie by generating an empty cookie.

@@ -555,13 +555,10 @@ const Navbar = () => {
   const windowScrollListener = useCallback(handleWindowScroll, []);
 
   useEffect(() => {
-    if (tabletMode) {
-      window.addEventListener("scroll", windowScrollListener);
-      handleResetOpacity();
-    } else {
-      window.removeEventListener("scroll", windowScrollListener);
-      handleResetStyles();
-    }
+    window.removeEventListener("scroll", windowScrollListener);
+    if (tabletMode) window.addEventListener("scroll", windowScrollListener);
+    handleResetStyles();
+
     return () => {
       window.removeEventListener("scroll", windowScrollListener);
       handleResetStyles();

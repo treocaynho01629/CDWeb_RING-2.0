@@ -904,9 +904,9 @@ public class OrderServiceTest extends AbstractServiceTest {
                 // Given
                 setupSecurityContext(account);
                 Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
-                IOrderDetail projection = mock(IOrderDetail.class);
+                IOrder projection = mock(IOrder.class);
                 Page<Long> pagedIds = new PageImpl<>(List.of(1L), pageable, 1);
-                List<IOrderDetail> detailsList = new ArrayList<>(List.of(projection));
+                List<IOrder> detailsList = new ArrayList<>(List.of(projection));
                 List<ReceiptDTO> expectedDTOS = List.of(mock(ReceiptDTO.class));
 
                 // When
@@ -1123,8 +1123,8 @@ public class OrderServiceTest extends AbstractServiceTest {
 
                 // Given
                 setupSecurityContext(account);
-                IOrderDetailItem projection = mock(IOrderDetailItem.class);
-                List<IOrderDetailItem> itemsList = List.of(projection);
+                IOrderDetail projection = mock(IOrderDetail.class);
+                List<IOrderDetail> itemsList = List.of(projection);
                 OrderDetailDTO expected = mock(OrderDetailDTO.class);
 
                 // When

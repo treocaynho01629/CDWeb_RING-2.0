@@ -7,20 +7,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.ring.bookstore.exception.EntityOwnershipException;
-import com.ring.bookstore.model.dto.projection.orders.IOrderDetail;
-import com.ring.bookstore.model.dto.projection.orders.IOrderDetailItem;
-import com.ring.bookstore.model.dto.projection.orders.IOrderItem;
-import com.ring.bookstore.model.dto.projection.orders.IReceiptSummary;
+import com.ring.bookstore.model.dto.projection.orders.*;
 import com.ring.bookstore.model.dto.request.*;
 import com.ring.bookstore.model.dto.response.coupons.CouponDiscountDTO;
 import com.ring.bookstore.model.dto.projection.coupons.ICoupon;
 import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
+import com.ring.bookstore.model.enums.PaymentType;
 import com.ring.bookstore.model.mappers.CouponMapper;
 import com.ring.bookstore.model.mappers.DashboardMapper;
 import com.ring.bookstore.model.dto.response.dashboard.ChartDTO;
 import com.ring.bookstore.model.mappers.CalculateMapper;
 import com.ring.bookstore.model.dto.response.orders.*;
 import com.ring.bookstore.model.enums.OrderStatus;
+import com.ring.bookstore.model.enums.PaymentStatus;
 import com.ring.bookstore.model.enums.ShippingType;
 import com.ring.bookstore.model.enums.UserRole;
 import com.ring.bookstore.listener.checkout.OnCheckoutCompletedEvent;
@@ -40,9 +39,11 @@ import com.ring.bookstore.model.mappers.OrderMapper;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.service.OrderService;
+import com.ring.bookstore.service.PayOSService;
 
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+import vn.payos.type.CheckoutResponseData;
 
 @RequiredArgsConstructor
 @Service
@@ -58,6 +59,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final CouponService couponService;
     private final CaptchaService captchaService;
+    private final PayOSService payOSService;
 
     private final OrderMapper orderMapper;
     private final CalculateMapper calculateMapper;
@@ -85,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
         OrderReceipt calculatedReceipt = processOrder(request.getCart(),
                 request.getCoupon(),
                 address,
-                request.getShippingType(),
+                null,
                 user,
                 false);
 
@@ -118,21 +120,27 @@ public class OrderServiceImpl implements OrderService {
         OrderReceipt orderReceipt = processOrder(checkRequest.getCart(),
                 checkRequest.getCoupon(),
                 savedAddress,
-                checkRequest.getShippingType(),
+                checkRequest.getPaymentMethod(),
                 user,
                 true);
+
+        // Payment
+        PaymentInfo paymentInfo = PaymentInfo.builder()
+                .paymentType(checkRequest.getPaymentMethod())
+                .paymentStatus(PaymentStatus.PENDING)
+                .build();
 
         // Set relevant values
         orderReceipt.setUser(user);
         orderReceipt.setEmail(user.getEmail());
         orderReceipt.setAddress(savedAddress);
-        orderReceipt.setOrderMessage(checkRequest.getMessage());
-        orderReceipt.setShippingType(checkRequest.getShippingType());
-        orderReceipt.setPaymentType(checkRequest.getPaymentMethod());
 
-        // Save to database
-        OrderReceipt savedOrder = orderRepo.save(orderReceipt);
-        ReceiptDTO receiptDTO = orderMapper.orderToDTO(savedOrder);
+        ReceiptDTO receiptDTO = orderMapper.orderToDTO(orderReceipt);
+        CheckoutResponseData checkoutResponse = payOSService.checkout(receiptDTO);
+
+        // Do stuff later
+        orderReceipt.setPayment(paymentInfo);
+        orderRepo.save(orderReceipt);
 
         // Trigger email event
         eventPublisher.publishEvent(new OnCheckoutCompletedEvent(
@@ -142,6 +150,13 @@ public class OrderServiceImpl implements OrderService {
                 orderReceipt.getShippingFee(),
                 receiptDTO));
         return receiptDTO;
+    }
+
+    @Override
+    public CheckoutResponseData createPaymentLink(Long id) {
+
+        ReceiptDTO receipt = this.getReceipt(id);
+        return payOSService.checkout(receipt);
     }
 
     @Transactional
@@ -162,7 +177,9 @@ public class OrderServiceImpl implements OrderService {
 
         // Check valid status for cancel
         OrderStatus currStatus = detail.getStatus();
-        if (!(currStatus.equals(OrderStatus.SHIPPING) || currStatus.equals(OrderStatus.PENDING))) {
+        if (!(currStatus.equals(OrderStatus.SHIPPING)
+                || currStatus.equals(OrderStatus.PENDING)
+                || currStatus.equals(OrderStatus.PENDING_PAYMENT))) {
             throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid order status!");
         }
 
@@ -215,8 +232,7 @@ public class OrderServiceImpl implements OrderService {
 
         // Check valid status for cancel
         OrderStatus currStatus = detail.getStatus();
-        if (!(currStatus.equals(OrderStatus.SHIPPING)
-                || currStatus.equals(OrderStatus.PENDING))) {
+        if (!currStatus.equals(OrderStatus.SHIPPING)) {
             throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid order status!");
         }
 
@@ -265,28 +281,22 @@ public class OrderServiceImpl implements OrderService {
                 sortDir.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());
         boolean isAdmin = isAuthAdmin();
 
-        Page<Long> pagedIds = orderRepo.findAllIds(shopId,
+        Page<IOrderReceipt> receipts = orderRepo.findAllBy(shopId,
                 isAdmin ? null : user.getId(),
                 status,
                 keyword,
                 pageable); // Fetch from database
-        List<Long> receiptIds = pagedIds.getContent();
-        List<IOrderDetail> detailsList = detailRepo.findAllByReceiptIds(receiptIds);
-
-        // Sort by detail ids
-        Map<Long, Integer> idOrder = new HashMap<>();
-        for (int i = 0; i < receiptIds.size(); i++)
-            idOrder.put(receiptIds.get(i), i);
-        detailsList.sort(Comparator.comparingInt(o -> idOrder.get(o.getOrderId())));
+        List<Long> receiptIds = receipts.getContent().stream().map(IOrderReceipt::getId).collect(Collectors.toList());
+        List<IOrder> details = detailRepo.findAllByReceiptIds(receiptIds);
 
         // Map
-        List<ReceiptDTO> ordersList = orderMapper.detailsToReceiptDTOS(detailsList);
-        Page<ReceiptDTO> ordersDTOS = new PageImpl<ReceiptDTO>(
+        List<ReceiptDTO> ordersList = orderMapper.receiptsAndDetailsProjectionToReceiptDTOS(receipts.getContent(), details);
+        Page<ReceiptDTO> receiptDTOS = new PageImpl<>(
                 ordersList,
                 pageable,
-                pagedIds.getTotalElements());
+                receipts.getTotalElements());
 
-        return ordersDTOS;
+        return receiptDTOS;
     }
 
     // Get all order summaries
@@ -325,23 +335,14 @@ public class OrderServiceImpl implements OrderService {
         Pageable pageable = PageRequest.of(pageNo, pageSize,
                 sortDir.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());
 
-        // Same as getOrdersByUser
-        Page<Long> pagedIds = detailRepo.findAllIdsByBookId(id, pageable);
-        List<Long> orderIds = pagedIds.getContent();
-        List<IOrderItem> itemsList = itemRepo.findAllWithDetailIds(orderIds);
-
-        // Sort by order ids
-        Map<Long, Integer> idOrder = new HashMap<>();
-        for (int i = 0; i < orderIds.size(); i++)
-            idOrder.put(orderIds.get(i), i);
-        itemsList.sort(Comparator.comparingInt(i -> idOrder.get(i.getDetailId())));
-
-        // Map
-        List<OrderDTO> ordersList = orderMapper.itemsToDetailDTO(itemsList);
-        Page<OrderDTO> ordersDTO = new PageImpl<OrderDTO>(
+        Page<IOrder> details = detailRepo.findAllByBookId(id, pageable);
+        List<Long> orderIds = details.getContent().stream().map(IOrder::getId).collect(Collectors.toList());
+        List<IOrderItem> items = itemRepo.findAllWithDetailIds(orderIds);
+        List<OrderDTO> ordersList = orderMapper.ordersAndItemsProjectionToDTOS(details.getContent(), items);
+        Page<OrderDTO> ordersDTO = new PageImpl<>(
                 ordersList,
                 pageable,
-                pagedIds.getTotalElements());
+                details.getTotalElements());
         return ordersDTO;
     }
 
@@ -355,18 +356,14 @@ public class OrderServiceImpl implements OrderService {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
-        // Get list ids with pagination (avoid applying in memory warning from Fetch
-        // Join)
-        // Find items then map back to details list using Map (the other way around cost
-        // more memory if used projection)
-        Page<Long> orderIds = detailRepo.findAllIdsByUserId(user.getId(), status, keyword, pageable); // Fetch from
-                                                                                                      // database
-        List<IOrderItem> itemsList = itemRepo.findAllWithDetailIds(orderIds.getContent());
-        List<OrderDTO> ordersList = orderMapper.itemsToDetailDTO(itemsList);
-        Page<OrderDTO> ordersDTO = new PageImpl<OrderDTO>(
+        Page<IOrder> details = detailRepo.findAllByUserId(user.getId(), status, keyword, pageable);
+        List<Long> orderIds = details.getContent().stream().map(IOrder::getId).collect(Collectors.toList());
+        List<IOrderItem> items = itemRepo.findAllWithDetailIds(orderIds);
+        List<OrderDTO> ordersList = orderMapper.ordersAndItemsProjectionToDTOS(details.getContent(), items);
+        Page<OrderDTO> ordersDTO = new PageImpl<>(
                 ordersList,
                 pageable,
-                orderIds.getTotalElements());
+                details.getTotalElements());
         return ordersDTO;
     }
 
@@ -385,18 +382,18 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDetailDTO getOrderDetail(Long id, Account user) {
 
-        List<IOrderDetailItem> itemsList = itemRepo.findOrderDetailItems(id, isAuthAdmin() ? null : user.getId());
-        if (itemsList.isEmpty())
-            throw new ResourceNotFoundException("Order detail not found!",
-                    "Không tìm thấy chi tiết đơn hàng yêu cầu!");
-        OrderDetailDTO detailDTO = orderMapper.detailItemsToDTO(itemsList); // Map to DTO
+        IOrderDetail detailProjection = detailRepo.findOrderDetail(id, isAuthAdmin() ? null : user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Order detail not found!",
+                                "Không tìm thấy chi tiết đơn hàng yêu cầu!"));
+        List<IOrderItem> items = itemRepo.findAllWithDetailIds(List.of(detailProjection.getId()));
+        OrderDetailDTO detailDTO = orderMapper.detailAndItemsProjectionToDetailDTO(detailProjection, items); // Map to DTO
         return detailDTO;
     }
 
     public StatDTO getAnalytics(Account user, Long shopId) {
 
         boolean isAdmin = isAuthAdmin();
-        return dashMapper.statToDTO(orderRepo.getSalesAnalytics(shopId, isAdmin ? null : user.getId()),
+        return dashMapper.statToDTO(detailRepo.getSalesAnalytics(shopId, isAdmin ? null : user.getId()),
                 "sales",
                 "Doanh thu tháng này");
     }
@@ -413,7 +410,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderReceipt processOrder(List<CartDetailRequest> cart,
             String orderCoupon,
             Address address,
-            ShippingType shippingType,
+            PaymentType paymentMethod,
             Account user,
             boolean isCheckout) {
 
@@ -459,7 +456,7 @@ public class OrderServiceImpl implements OrderService {
                     books,
                     coupons,
                     address,
-                    shippingType,
+                    paymentMethod,
                     user,
                     isCheckout);
 
@@ -571,7 +568,7 @@ public class OrderServiceImpl implements OrderService {
             Map<Long, Book> books,
             Map<String, ICoupon> coupons,
             Address address,
-            ShippingType shippingType,
+            PaymentType paymentMethod,
             Account user,
             boolean isCheckout) {
         // Shop validation
@@ -594,13 +591,16 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // New detail
+        OrderStatus status = paymentMethod == PaymentType.CASH
+                ? OrderStatus.PENDING
+                : OrderStatus.PENDING_PAYMENT;
         OrderDetail orderDetail = OrderDetail.builder()
-                .status(OrderStatus.PENDING)
+                .status(status)
                 .shop(shop)
                 .items(new ArrayList<>()).build();
 
         // Initial value
-        double shippingFee = calculateShippingFee(address, shop.getAddress(), shippingType);
+        double shippingFee = calculateShippingFee(shop.getAddress(), address, detail.getShippingType());
         double detailTotal = 0.0;
         double discountDeal = 0.0;
         double discountCoupon = 0.0;
@@ -712,6 +712,8 @@ public class OrderServiceImpl implements OrderService {
         orderDetail.setCouponDiscount(discountCoupon);
         orderDetail.setShippingDiscount(discountShipping);
         orderDetail.setTotalQuantity(detailQuantity);
+        orderDetail.setShippingType(detail.getShippingType());
+        orderDetail.setNote(detail.getNote());
 
         if (isCheckout) {
             orderDetail.setCoupon(shopCoupon != null ? shopCoupon.getCoupon() : null);
@@ -725,20 +727,29 @@ public class OrderServiceImpl implements OrderService {
     private double calculateShippingFee(Address origin,
             Address destination,
             ShippingType type) {
-        double shippingFee = origin != null ? distanceCalculation(origin, destination) : 10000;
-        if (type != null) {
-            if (type.equals(ShippingType.ECONOMY))
-                shippingFee *= 0.2;
-            if (type.equals(ShippingType.EXPRESS))
-                shippingFee *= 1.5;
-        }
+        double shippingFee = !(destination == null || origin == null) ? distanceCalculation(origin, destination) : 10000;
+        if (type != null) shippingFee = shippingFee * type.getMultiplier().doubleValue();
         return shippingFee;
     }
 
-    // Return fixed amount of shipping fee for now :<
+    // Mock for now
     private double distanceCalculation(Address origin,
             Address destination) {
-        return 10000.0;
+
+        double baseFee = 10000;
+        return baseFee;
+//        if (destination == null) return baseFee;
+//
+//        // Mock shipping fee calculation based on address hash codes
+//        // Using hash codes ensures consistent results for same addresses
+//        int originHash = origin.hashCode();
+//        int destHash = destination.hashCode();
+//
+//        // Add variation based on address differences
+//        double distanceFactor = Math.abs(originHash - destHash) % 50000;
+//
+//        // Ensure minimum fee of 20000 and maximum of 100000
+//        return Math.min(100000, Math.max(baseFee, baseFee + distanceFactor));
     }
 
     // Check valid role function

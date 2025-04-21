@@ -86,20 +86,16 @@ const ReviewsList = ({ mobileMode, tabletMode, pending, setPending }) => {
   const windowScrollListener = useCallback(debounce(handleWindowScroll, 500), [
     data,
   ]);
-
   const scrollListener = useCallback(debounce(handleScroll, 500), [data]);
 
   useEffect(() => {
-    if (tabletMode) {
-      window.removeEventListener("scroll", windowScrollListener);
-    } else {
-      window.addEventListener("scroll", windowScrollListener);
-    }
+    window.removeEventListener("scroll", windowScrollListener);
+    if (!tabletMode) window.addEventListener("scroll", windowScrollListener);
 
     return () => {
       window.removeEventListener("scroll", windowScrollListener);
     };
-  }, [tabletMode]);
+  }, [tabletMode, data]);
 
   let reviewsContent;
 

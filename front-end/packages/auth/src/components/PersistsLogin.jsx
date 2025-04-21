@@ -5,13 +5,13 @@ import { useRefreshMutation, useSignOutMutation } from "@ring/redux";
 import useAuth from "../hooks/useAuth";
 import useLogout from "../hooks/useLogout";
 
-const PendingModal = lazy(() => import("@ring/ui"));
+const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 
 const PersistLogin = () => {
   const { token, exp, persist } = useAuth();
   const [pending, setPending] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [refresh, { isLoading, isSuccess }] = useRefreshMutation();
+  const [refresh, { isLoading, isSuccess, isError }] = useRefreshMutation();
   const [logout] = useSignOutMutation();
   const location = useLocation();
   const signOut = useLogout();
@@ -47,7 +47,7 @@ const PersistLogin = () => {
 
   return (
     <>
-      {errorMsg && !pending ? (
+      {isError && errorMsg && !pending ? (
         <Navigate
           to="/auth/login"
           state={{ from: location, errorMsg }}
@@ -56,7 +56,7 @@ const PersistLogin = () => {
       ) : !persist || token ? (
         <Outlet />
       ) : isLoading || pending ? (
-        <Suspense>
+        <Suspense fallback={null}>
           <PendingModal open={true} message="Đang xác thực đăng nhập ...">
             <Button variant="contained" color="error" onClick={() => signOut()}>
               Đăng xuất?

@@ -5,10 +5,7 @@ import java.util.stream.Collectors;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
-import com.ring.bookstore.model.dto.projection.orders.IOrderDetail;
-import com.ring.bookstore.model.dto.projection.orders.IOrderDetailItem;
-import com.ring.bookstore.model.dto.projection.orders.IOrderItem;
-import com.ring.bookstore.model.dto.projection.orders.IReceiptSummary;
+import com.ring.bookstore.model.dto.projection.orders.*;
 import com.ring.bookstore.model.dto.response.orders.*;
 import com.ring.bookstore.model.entity.*;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +20,12 @@ public class OrderMapper {
     // Order/Receipt
     public ReceiptDTO orderToDTO(OrderReceipt order) {
         List<OrderDetail> orderDetails = order.getDetails();
-        List<OrderDTO> detailDTOS = orderDetails.stream().map(this::detailToOrderDTO).collect(Collectors.toList());
+        List<OrderDTO> detailDTOS = orderDetails.stream().map(this::detailToOrderDTO)
+                .collect(Collectors.toList());
         Account user = order.getUser();
         Address address = order.getAddress();
 
-        //If user deleted
+        // If user deleted
         String username = user != null ? user.getUsername() : "Người dùng RING!";
         String email = order.getEmail() != null ? order.getEmail() : "Người dùng RING!";
 
@@ -37,33 +35,55 @@ public class OrderMapper {
                 null,
                 address.getPhone(),
                 address.getCity() + ", " + address.getAddress(),
-                order.getOrderMessage(),
                 order.getLastModifiedDate(),
                 order.getTotal(),
                 order.getTotalDiscount(),
                 username,
-                detailDTOS
-        );
+                detailDTOS);
     }
 
-    public List<ReceiptDTO> detailsToReceiptDTOS(List<IOrderDetail> details) {
+    public List<ReceiptDTO> receiptsAndDetailsProjectionToReceiptDTOS(List<IOrderReceipt> receipts, List<IOrder> details) {
         Map<Long, ReceiptDTO> receiptsMap = new LinkedHashMap<>();
 
-        for (IOrderDetail projectedDetail : details) {
-            OrderDetail detail = projectedDetail.getDetail(); //Get detail
+        for (IOrderReceipt receipt : receipts) {
 
-            String url = projectedDetail.getImage() != null ?
-                    cloudinary.url().transformation(new Transformation()
-                                    .aspectRatio("1.0")
-                                    .width(90)
-                                    .quality("auto")
-                                    .fetchFormat("auto"))
-                            .secure(true).generate(projectedDetail.getImage().getPublicId())
+            String url = receipt.getImage() != null
+                    ? cloudinary.url().transformation(new Transformation()
+                            .aspectRatio("1.0")
+                            .width(90)
+                            .quality("auto")
+                            .fetchFormat("auto"))
+                    .secure(true).generate(receipt.getImage().getPublicId())
                     : null;
 
-            //If shop deleted
-            String shopName = projectedDetail.getShopName() != null ? projectedDetail.getShopName() : "Cửa hàng RING!";
-            Long shopId = detail.getShop() != null ? detail.getShop().getId() : -1;
+            // If user deleted
+            String username = receipt.getUsername() != null ? receipt.getUsername()
+                    : "Người dùng RING!";
+            String email = receipt.getEmail() != null ? receipt.getEmail()
+                    : "Người dùng RING!";
+
+            ReceiptDTO receiptDTO = ReceiptDTO.builder().id(receipt.getId())
+                    .email(email)
+                    .name(receipt.getName())
+                    .image(url)
+                    .phone(receipt.getPhone())
+                    .address(receipt.getAddress())
+                    .date(receipt.getDate())
+                    .total(receipt.getTotal())
+                    .totalDiscount(receipt.getTotalDiscount())
+                    .username(username)
+                    .details(new ArrayList<>())
+                    .build();
+
+            receiptsMap.put(receipt.getId(), receiptDTO);
+        }
+
+        for (IOrder detail : details) {
+
+            // If shop deleted
+            String shopName = detail.getShopName() != null ? detail.getShopName()
+                    : "Cửa hàng RING!";
+            Long shopId = detail.getShopId() != null ? detail.getShopId() : -1;
 
             var newDetail = OrderDTO.builder().id(detail.getId())
                     .shopId(shopId)
@@ -72,38 +92,15 @@ public class OrderMapper {
                     .totalDiscount(detail.getDiscount())
                     .shippingFee(detail.getShippingFee())
                     .shippingDiscount(detail.getShippingDiscount())
-                    .totalItems(projectedDetail.getTotalItems())
+                    .totalItems(detail.getTotalItems())
                     .status(detail.getStatus())
+                    .note(detail.getNote())
                     .build();
 
-            if (!receiptsMap.containsKey(projectedDetail.getOrderId())) { //Insert if not exist
-                List<OrderDTO> detailsList = new ArrayList<>(); //New list
-                detailsList.add(newDetail);
-
-                //If user deleted
-                String username = projectedDetail.getUsername() != null ? projectedDetail.getUsername() : "Người dùng RING!";
-                String email = projectedDetail.getEmail() != null ? projectedDetail.getEmail() : "Người dùng RING!";
-
-                var newReceipt = ReceiptDTO.builder().id(projectedDetail.getOrderId())
-                        .email(email)
-                        .name(projectedDetail.getName())
-                        .image(url)
-                        .phone(projectedDetail.getPhone())
-                        .address(projectedDetail.getAddress())
-                        .message(projectedDetail.getMessage())
-                        .date(projectedDetail.getDate())
-                        .total(projectedDetail.getTotal())
-                        .totalDiscount(projectedDetail.getTotalDiscount())
-                        .username(username)
-                        .details(detailsList)
-                        .build();
-                receiptsMap.put(projectedDetail.getOrderId(), newReceipt);
-            } else { //Add to existing list
-                receiptsMap.get(projectedDetail.getOrderId()).details().add(newDetail);
-            }
+            receiptsMap.get(detail.getOrderId()).details().add(newDetail);
         }
 
-        //Convert & return
+        // Convert & return
         List<ReceiptDTO> result = new ArrayList<ReceiptDTO>(receiptsMap.values());
         return result;
     }
@@ -113,7 +110,7 @@ public class OrderMapper {
         List<OrderItemDTO> itemDTOS = orderItems.stream().map(this::itemToDTO).collect(Collectors.toList());
         Shop shop = detail.getShop();
 
-        //If shop deleted
+        // If shop deleted
         String shopName = shop != null ? shop.getName() : "Cửa hàng RING!";
         Long shopId = shop != null ? shop.getId() : -1;
 
@@ -124,54 +121,57 @@ public class OrderMapper {
                 detail.getDiscount(),
                 detail.getShippingFee(),
                 detail.getShippingDiscount(),
+                detail.getShippingType(),
+                detail.getNote(),
                 null,
                 detail.getStatus(),
                 itemDTOS);
     }
 
-    public OrderDetailDTO detailItemsToDTO(List<IOrderDetailItem> items) {
-        IOrderDetailItem firstItem = items.get(0);
-        ArrayList<OrderItemDTO> itemDTOS = new ArrayList<>();
+    public OrderDetailDTO detailAndItemsProjectionToDetailDTO(IOrderDetail detail, List<IOrderItem> items) {
 
-        //If shop deleted
-        String shopName = firstItem.getShopName() != null ? firstItem.getShopName() : "Cửa hàng RING!";
-        Long shopId = firstItem.getShopId() != null ? firstItem.getShopId() : -1;
+        // If shop deleted
+        String shopName = detail.getShopName() != null ? detail.getShopName() : "Cửa hàng RING!";
+        Long shopId = detail.getShopId() != null ? detail.getShopId() : -1;
 
-        OrderDetailDTO result = new OrderDetailDTO(firstItem.getOrderId(),
-                firstItem.getCompanyName() != null ? firstItem.getCompanyName() : firstItem.getName(),
-                firstItem.getPhone(),
-                firstItem.getCity() + ", " + firstItem.getAddress(),
-                firstItem.getMessage(),
-                firstItem.getOrderedDate(),
-                firstItem.getDate(),
-                firstItem.getDetailId(),
-                shopId,
-                shopName,
-                firstItem.getTotalPrice(),
-                firstItem.getDiscount(),
-                firstItem.getShippingFee(),
-                firstItem.getShippingDiscount(),
-                firstItem.getShippingType(),
-                firstItem.getPaymentType(),
-                firstItem.getStatus(),
-                itemDTOS);
+        OrderDetailDTO result = OrderDetailDTO.builder().orderId(detail.getOrderId())
+                .name(detail.getCompanyName() != null ? detail.getCompanyName() : detail.getName())
+                .phone(detail.getPhone())
+                .address(detail.getCity() + ", " + detail.getAddress())
+                .note(detail.getNote())
+                .orderedDate(detail.getOrderedDate())
+                .date(detail.getDate())
+                .id(detail.getId())
+                .shopId(shopId)
+                .shopName(shopName)
+                .totalPrice(detail.getTotalPrice())
+                .totalDiscount(detail.getDiscount())
+                .shippingType(detail.getShippingType())
+                .shippingFee(detail.getShippingFee())
+                .shippingDiscount(detail.getShippingDiscount())
+                .paymentType(detail.getPaymentType())
+                .status(detail.getStatus())
+                .items(new ArrayList<>())
+                .build();
 
-        for (IOrderDetailItem projectedItem : items) {
-            OrderItem item = projectedItem.getItem(); //Get Item
+        System.out.println(items.size());
 
-            String url = projectedItem.getImage() != null ?
-                    cloudinary.url().transformation(new Transformation()
-                                    .aspectRatio("1.0")
-                                    .width(90)
-                                    .quality("auto")
-                                    .fetchFormat("auto"))
-                            .secure(true).generate(projectedItem.getImage().getPublicId())
+        for (IOrderItem item : items) {
+
+            String url = item.getImage() != null
+                    ? cloudinary.url().transformation(new Transformation()
+                            .aspectRatio("1.0")
+                            .width(90)
+                            .quality("auto")
+                            .fetchFormat("auto"))
+                    .secure(true).generate(item.getImage().getPublicId())
                     : null;
 
-            //If product deleted
-            String bookTitle = projectedItem.getTitle() != null ? projectedItem.getTitle() : "Cửa hàng RING!";
-            Long bookId = projectedItem.getBookId() != null ? projectedItem.getBookId() : -1;
-            String bookSlug = projectedItem.getSlug() != null ? projectedItem.getSlug() : null;
+            // If product deleted
+            String bookTitle = item.getTitle() != null ? item.getTitle()
+                    : "Cửa hàng RING!";
+            Long bookId = item.getBookId() != null ? item.getBookId() : -1;
+            String bookSlug = item.getSlug() != null ? item.getSlug() : null;
 
             var newItem = OrderItemDTO.builder().id(item.getId())
                     .quantity(item.getQuantity())
@@ -190,25 +190,42 @@ public class OrderMapper {
     }
 
     // Detail
-    public List<OrderDTO> itemsToDetailDTO(List<IOrderItem> items) {
+    public List<OrderDTO> ordersAndItemsProjectionToDTOS(List<IOrder> details, List<IOrderItem> items) {
         Map<Long, OrderDTO> ordersMap = new LinkedHashMap<>();
 
-        for (IOrderItem projectedItem : items) {
-            OrderItem item = projectedItem.getItem(); //Get Item
+        for (IOrder detail : details) {
+            OrderDTO order = OrderDTO.builder()
+                    .id(detail.getId())
+                    .shopId(detail.getShopId())
+                    .shopName(detail.getShopName())
+                    .totalPrice(detail.getTotalPrice())
+                    .totalDiscount(detail.getDiscount())
+                    .shippingFee(detail.getShippingFee())
+                    .shippingDiscount(detail.getShippingDiscount())
+                    .status(detail.getStatus())
+                    .items(new ArrayList<>())
+                    .note(detail.getNote())
+                    .build();
 
-            String url = projectedItem.getImage() != null ?
-                    cloudinary.url().transformation(new Transformation()
-                                    .aspectRatio("1.0")
-                                    .width(90)
-                                    .quality("auto")
-                                    .fetchFormat("auto"))
-                            .secure(true).generate(projectedItem.getImage().getPublicId())
+            ordersMap.put(detail.getId(), order);
+        }
+
+        for (IOrderItem item : items) {
+
+            String url = item.getImage() != null
+                    ? cloudinary.url().transformation(new Transformation()
+                            .aspectRatio("1.0")
+                            .width(90)
+                            .quality("auto")
+                            .fetchFormat("auto"))
+                    .secure(true).generate(item.getImage().getPublicId())
                     : null;
 
-            //If product deleted
-            String bookTitle = projectedItem.getTitle() != null ? projectedItem.getTitle() : "Cửa hàng RING!";
-            Long bookId = projectedItem.getBookId() != null ? projectedItem.getBookId() : -1;
-            String bookSlug = projectedItem.getSlug() != null ? projectedItem.getSlug() : null;
+            // If product deleted
+            String bookTitle = item.getTitle() != null ? item.getTitle()
+                    : "Cửa hàng RING!";
+            Long bookId = item.getBookId() != null ? item.getBookId() : -1;
+            String bookSlug = item.getSlug() != null ? item.getSlug() : null;
 
             var newItem = OrderItemDTO.builder().id(item.getId())
                     .quantity(item.getQuantity())
@@ -220,32 +237,11 @@ public class OrderMapper {
                     .image(url)
                     .build();
 
-            if (!ordersMap.containsKey(projectedItem.getDetailId())) { //Insert if not exist
-                List<OrderItemDTO> itemsList = new ArrayList<>(); //New list
-                itemsList.add(newItem);
-
-                //If shop deleted
-                String shopName = projectedItem.getShopName() != null ? projectedItem.getShopName() : "Cửa hàng RING!";
-                Long shopId = projectedItem.getShopId() != null ? projectedItem.getShopId() : -1;
-
-                var newOrder = OrderDTO.builder().id(projectedItem.getDetailId())
-                        .totalPrice(projectedItem.getTotalPrice())
-                        .shippingFee(projectedItem.getShippingFee())
-                        .totalDiscount(projectedItem.getDiscount())
-                        .shippingDiscount(projectedItem.getShippingDiscount())
-                        .status(projectedItem.getStatus())
-                        .shopId(shopId)
-                        .shopName(shopName)
-                        .items(itemsList)
-                        .build();
-                ordersMap.put(projectedItem.getDetailId(), newOrder);
-            } else { //Add to existing list
-                ordersMap.get(projectedItem.getDetailId()).items().add(newItem);
-            }
+            ordersMap.get(item.getDetailId()).items().add(newItem);
         }
 
-        //Convert & return
-        List<OrderDTO> result = new ArrayList<OrderDTO>(ordersMap.values());
+        // Convert & return
+        List<OrderDTO> result = new ArrayList<>(ordersMap.values());
         return result;
     }
 
@@ -261,7 +257,7 @@ public class OrderMapper {
                 .secure(true).generate(book.getImage().getPublicId())
                 : null;
 
-        //If product deleted
+        // If product deleted
         String bookTitle = book != null ? book.getTitle() : "Cửa hàng RING!";
         Long bookId = book != null ? book.getId() : -1;
         String bookSlug = book != null ? book.getSlug() : null;
@@ -278,16 +274,15 @@ public class OrderMapper {
 
     // Summary
     public ReceiptSummaryDTO summaryToDTO(IReceiptSummary projection) {
-        String url = projection.getImage() != null ?
-                cloudinary.url().transformation(new Transformation()
-                                .aspectRatio("1.0")
-                                .width(55)
-                                .crop("thumb")
-                                .chain()
-                                .radius("max")
-                                .quality(50)
-                                .fetchFormat("auto"))
-                        .secure(true).generate(projection.getImage().getPublicId())
+        String url = projection.getImage() != null ? cloudinary.url().transformation(new Transformation()
+                        .aspectRatio("1.0")
+                        .width(55)
+                        .crop("thumb")
+                        .chain()
+                        .radius("max")
+                        .quality(50)
+                        .fetchFormat("auto"))
+                .secure(true).generate(projection.getImage().getPublicId())
                 : null;
 
         return new ReceiptSummaryDTO(projection.getId(),
@@ -295,7 +290,6 @@ public class OrderMapper {
                 projection.getName(),
                 projection.getDate(),
                 projection.getTotalPrice(),
-                projection.getTotalItems()
-        );
+                projection.getTotalItems());
     }
 }

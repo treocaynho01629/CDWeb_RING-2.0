@@ -4,10 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.ring.bookstore.model.dto.response.coupons.CouponDTO;
 import com.ring.bookstore.model.enums.OrderStatus;
+import com.ring.bookstore.model.enums.ShippingType;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+
+import org.hibernate.annotations.Nationalized;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 /**
  * Represents an entity as {@link OrderDetail} for order details.
@@ -18,25 +24,19 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-public class OrderDetail {
+@SQLDelete(sql = "UPDATE OrderDetail SET active = false WHERE id=?")
+@SQLRestriction("active=true")
+@EqualsAndHashCode(callSuper = true)
+public class OrderDetail extends Auditable {
 
     @Id
     @Column(nullable = false, updatable = false)
-    @SequenceGenerator(
-            name = "primary_sequence",
-            sequenceName = "primary_sequence",
-            allocationSize = 1,
-            initialValue = 10000
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "primary_sequence"
-    )
+    @SequenceGenerator(name = "primary_sequence", sequenceName = "primary_sequence", allocationSize = 1, initialValue = 10000)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "primary_sequence")
     private Long id;
 
     @Column
-    private Double totalPrice; //Product's price
+    private Double totalPrice; // Product's price
 
     @Column
     private Double shippingFee;
@@ -45,11 +45,19 @@ public class OrderDetail {
     private Double shippingDiscount;
 
     @Column
-    private Double discount; //Coupon discount + deal
+    private Double discount; // Coupon discount + deal
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private OrderStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private ShippingType shippingType;
+
+    @Column(length = 300)
+    @Nationalized
+    private String note;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
@@ -66,19 +74,16 @@ public class OrderDetail {
     @JsonIgnore
     private Coupon coupon;
 
-    @OneToMany(cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            mappedBy = "detail",
-            fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "detail", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<OrderItem> items;
 
-    //For mapping DTO result
+    // For mapping DTO result
     @Transient
     private Double couponDiscount;
 
     @Transient
-    private Double dealDiscount; //Product's discount * price
+    private Double dealDiscount; // Product's discount * price
 
     @Transient
     private Integer totalQuantity;

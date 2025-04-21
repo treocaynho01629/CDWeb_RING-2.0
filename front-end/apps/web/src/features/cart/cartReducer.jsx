@@ -44,7 +44,7 @@ export const cartSlice = createSlice({
         if (item.quantity == 1) {
           //Remove if < 0
           state.products = state.products.filter(
-            (item) => item.id !== action.payload,
+            (item) => item.id !== action.payload
           );
         } else {
           item.quantity--;
@@ -72,7 +72,7 @@ export const cartSlice = createSlice({
         } else if (quantity < 1) {
           //Remove if < 1
           state.products = state.products.filter(
-            (item) => item.id !== action.payload.id,
+            (item) => item.id !== action.payload.id
           );
         } else if (quantity > (item.amount ?? 199)) {
           //Cap quantity to max stock amount
@@ -85,13 +85,19 @@ export const cartSlice = createSlice({
     //Remove product from cart
     removeItem: (state, action) => {
       state.products = state.products.filter(
-        (item) => item.id !== action.payload,
+        (item) => item.id !== action.payload
+      );
+    },
+    //Remove products from cart
+    removeItems: (state, action) => {
+      state.products = state.products.filter(
+        (item) => !action.payload.includes(item.id)
       );
     },
     //Remove shop product
     removeShopItem: (state, action) => {
       state.products = state.products.filter(
-        (item) => item.shopId !== action.payload,
+        (item) => item.shopId !== action.payload
       );
     },
     //Clear cart
@@ -108,6 +114,7 @@ export const {
   decreaseQuantity,
   changeQuantity,
   removeItem,
+  removeItems,
   removeShopItem,
   resetCart,
 } = cartSlice.actions;

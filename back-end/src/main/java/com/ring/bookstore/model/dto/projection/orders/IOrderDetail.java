@@ -1,41 +1,52 @@
 package com.ring.bookstore.model.dto.projection.orders;
 
-import com.ring.bookstore.model.dto.projection.images.IImage;
-import com.ring.bookstore.model.entity.OrderDetail;
+import com.ring.bookstore.model.enums.OrderStatus;
+import com.ring.bookstore.model.enums.PaymentType;
+import com.ring.bookstore.model.enums.ShippingType;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
- * Represents an order detail projection as {@link IOrderDetail}, containing the details of an order
- * including information about the order, shop, customer, items, discounts, and the order date.
+ * Represents an order detail & item projection as {@link IOrderDetail}
  */
 public interface IOrderDetail {
 
-    OrderDetail getDetail();
+    Long getId();
 
     Long getOrderId();
 
-    String getShopName();
+    String getName();
 
-    String getEmail();
+    String getCompanyName();
 
     String getPhone();
 
-    String getName();
-
-    IImage getImage();
+    String getCity();
 
     String getAddress();
 
-    String getMessage();
+    String getNote();
+
+    LocalDateTime getOrderedDate();
 
     LocalDateTime getDate();
 
-    Double getTotal();
+    Double getTotalPrice();
 
-    Double getTotalDiscount();
+    Double getShippingFee();
 
-    Integer getTotalItems();
+    Double getShippingDiscount();
 
-    String getUsername();
+    Double getDiscount();
+
+    ShippingType getShippingType();
+
+    PaymentType getPaymentType();
+
+    OrderStatus getStatus();
+
+    Long getShopId();
+
+    String getShopName();
 }

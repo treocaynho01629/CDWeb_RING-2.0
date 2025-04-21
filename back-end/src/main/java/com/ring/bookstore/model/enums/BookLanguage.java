@@ -8,16 +8,14 @@ import lombok.Getter;
  */
 @Getter
 public enum BookLanguage {
-    VN("VN", "Tiếng Việt"),
-    EN("EN", "Tiếng Anh"),
-    CN("CN", "Tiếng Trung"),
-    JP("JP", "Tiếng Nhật");
+    VN("Tiếng Việt"),
+    EN("Tiếng Anh"),
+    CN("Tiếng Trung"),
+    JP("Tiếng Nhật");
 
-    private final String value;
     private final String label;
 
-    private BookLanguage(String value, String label) {
-        this.value = value;
+    private BookLanguage(String label) {
         this.label = label;
     }
 

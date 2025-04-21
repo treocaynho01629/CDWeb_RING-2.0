@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { usePayOS } from "@payos/payos-checkout";
 import { useCreatePaymentLinkMutation } from "../../features/orders/ordersApiSlice";
-// import { AuthTitle, ConfirmButton, Message } from "@ring/ui";
+import { AuthTitle, ConfirmButton, Message } from "@ring/ui";
 import { Box, Stack } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import styled from "@emotion/styled";

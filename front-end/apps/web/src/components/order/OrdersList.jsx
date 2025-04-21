@@ -159,20 +159,21 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
 
   //Show more
   const handleShowMore = () => {
+    const currentPage = data?.page;
     if (
       isFetching ||
-      typeof data?.page?.number !== "number" ||
-      data?.page?.number < pagination?.number
+      typeof currentPage?.number !== "number" ||
+      currentPage?.number < pagination?.number
     )
       return;
-    const nextPage = data?.page?.number + 1;
-    if (nextPage < data?.page?.totalPages)
+    const nextPage = currentPage?.number + 1;
+    if (nextPage < currentPage?.totalPages)
       setPagination((prev) => ({ ...prev, number: nextPage }));
   };
 
   const handleWindowScroll = (e) => {
     const trigger =
-      document.body.scrollHeight - 300 < window.scrollY + window.innerHeight;
+      document.body.scrollHeight - 700 < window.scrollY + window.innerHeight;
     if (trigger) handleShowMore();
   };
 
@@ -185,20 +186,16 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
   const windowScrollListener = useCallback(debounce(handleWindowScroll, 500), [
     data,
   ]);
-
   const scrollListener = useCallback(debounce(handleScroll, 500), [data]);
 
   useEffect(() => {
-    if (tabletMode) {
-      window.removeEventListener("scroll", windowScrollListener);
-    } else {
-      window.addEventListener("scroll", windowScrollListener);
-    }
+    window.removeEventListener("scroll", windowScrollListener);
+    if (!tabletMode) window.addEventListener("scroll", windowScrollListener);
 
     return () => {
       window.removeEventListener("scroll", windowScrollListener);
     };
-  }, [tabletMode]);
+  }, [tabletMode, data]);
 
   let ordersContent;
 

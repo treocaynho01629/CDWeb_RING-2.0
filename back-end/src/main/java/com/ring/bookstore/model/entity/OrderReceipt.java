@@ -1,8 +1,6 @@
 package com.ring.bookstore.model.entity;
 
 import com.ring.bookstore.model.dto.response.coupons.CouponDTO;
-import com.ring.bookstore.model.enums.PaymentType;
-import com.ring.bookstore.model.enums.ShippingType;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -22,44 +20,30 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE Coupon SET active = false WHERE id=?")
+@SQLDelete(sql = "UPDATE OrderReceipt SET active = false WHERE id=?")
 @SQLRestriction("active=true")
 @EqualsAndHashCode(callSuper = true)
 public class OrderReceipt extends Auditable {
 
     @Id
     @Column(nullable = false, updatable = false)
-    @SequenceGenerator(
-            name = "primary_sequence",
-            sequenceName = "primary_sequence",
-            allocationSize = 1,
-            initialValue = 10000
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "primary_sequence"
-    )
+    @SequenceGenerator(name = "primary_sequence", sequenceName = "primary_sequence", allocationSize = 1, initialValue = 10000)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "primary_sequence")
     private Long id;
 
     @Column(length = 200)
     private String email;
 
-    @OneToOne(cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     @JsonIgnore
     private Address address;
 
-    @Column(length = 300)
-    @Nationalized 
-    private String orderMessage;
+    @Column
+    private Double total; // Products price - deal + shipping fee
 
     @Column
-    private Double total; //Products price - deal + shipping fee
-
-    @Column
-    private Double totalDiscount; //Coupon discount + deal + shipping discount
+    private Double totalDiscount; // Coupon discount + deal + shipping discount
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -71,22 +55,16 @@ public class OrderReceipt extends Auditable {
     @JsonIgnore
     private Coupon coupon;
 
-    @OneToMany(cascade = CascadeType.ALL, 
-    		orphanRemoval = true,  
-    		mappedBy = "order", 
-    		fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "order", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<OrderDetail> details;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 30)
-    private ShippingType shippingType;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    @JsonIgnore
+    private PaymentInfo payment;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 30)
-    private PaymentType paymentType;
-
-    //For mapping DTO result
+    // For mapping DTO result
     @Transient
     private Double productsPrice;
 
@@ -97,7 +75,7 @@ public class OrderReceipt extends Auditable {
     private Double shippingDiscount;
 
     @Transient
-    private Double dealDiscount; //Product's discount * price
+    private Double dealDiscount; // Product's discount * price
 
     @Transient
     private Double couponDiscount;
@@ -107,12 +85,12 @@ public class OrderReceipt extends Auditable {
 
     public void addOrderDetail(OrderDetail detail) {
         this.details.add(detail);
-    	detail.setOrder(this);
+        detail.setOrder(this);
     }
- 
+
     public void removeOrderDetail(OrderDetail detail) {
         this.details.remove(detail);
-    	detail.setOrder(null);
+        detail.setOrder(null);
     }
 
     public void removeAllOrderDetails() {

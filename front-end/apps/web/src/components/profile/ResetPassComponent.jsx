@@ -31,7 +31,7 @@ const ResetPassComponent = ({
   //Submit change pass mutation
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (pending || changing) return;
+    if (pending || changing || refreshing) return;
 
     if (!validNewPass) {
       setErrMsg("Sai định dạng thông tin!");

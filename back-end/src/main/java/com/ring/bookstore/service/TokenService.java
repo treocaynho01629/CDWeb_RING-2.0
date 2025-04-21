@@ -137,7 +137,7 @@ public interface TokenService {
      * @param value The refresh token value to store in the cookie.
      * @return The generated response cookie.
      */
-    ResponseCookie generateRefreshCookie(String value, String domain);
+    ResponseCookie generateRefreshCookie(String value);
 
     /**
      * Extracts the refresh token value from an HTTP request's cookies.

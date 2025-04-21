@@ -607,18 +607,6 @@ const CouponDialog = ({
         </CouponsContainer>
       </DialogContent>
       <DialogActions>
-        {selectMode && (
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            sx={{ marginY: "10px" }}
-            startIcon={<Check />}
-            onClick={() => handleClickApply(tempCoupon, shopId)}
-          >
-            Xác nhận
-          </Button>
-        )}
         <Button
           variant="outlined"
           color="error"
@@ -629,6 +617,18 @@ const CouponDialog = ({
         >
           Đóng
         </Button>
+        {selectMode && (
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            sx={{ marginY: "10px" }}
+            startIcon={<Check />}
+            onClick={() => handleClickApply(tempCoupon, shopId)}
+          >
+            Chọn
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

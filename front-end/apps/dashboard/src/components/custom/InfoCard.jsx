@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import { TrendingDown, TrendingFlat, TrendingUp } from "@mui/icons-material";
-import { alpha, Paper, Skeleton } from "@mui/material";
+import { Paper, Skeleton } from "@mui/material";
+import { numFormat } from "@ring/shared";
 
 //#region preStyled
 const InfoWrapper = styled(Paper)`
@@ -86,7 +87,7 @@ const InfoCard = ({ info, icon, color }) => {
           </span>
           <h2>
             {info != null ? (
-              info?.value
+              new Intl.NumberFormat("vi-VN").format(info?.value)
             ) : (
               <Skeleton variant="text" width="80px" />
             )}
@@ -102,7 +103,7 @@ const InfoCard = ({ info, icon, color }) => {
           ) : (
             <TrendingFlat />
           )}
-          &nbsp;{diff * 100}%&nbsp;<span>tháng trước</span>
+          &nbsp;{(diff * 100).toFixed(2)}%&nbsp;<span>tháng trước</span>
         </Diff>
       )}
     </InfoWrapper>

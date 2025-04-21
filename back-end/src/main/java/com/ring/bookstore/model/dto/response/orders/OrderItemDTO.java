@@ -9,12 +9,12 @@ import java.math.BigDecimal;
  */
 @Builder
 public record OrderItemDTO(Long id,
-                           Double price,
-                           BigDecimal discount,
-                           Short quantity,
-                           Long bookId,
-                           String bookSlug,
-                           String image,
-                           String bookTitle) {
+        Double price,
+        BigDecimal discount,
+        Short quantity,
+        Long bookId,
+        String bookSlug,
+        String image,
+        String bookTitle) {
 
 }

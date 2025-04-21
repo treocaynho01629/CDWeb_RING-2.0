@@ -16,7 +16,6 @@ import {
   ProductionQuantityLimits,
 } from "@mui/icons-material";
 import {
-  TextareaAutosize,
   Button,
   Table,
   TableBody,
@@ -28,7 +27,6 @@ import {
   Typography,
   Box,
   Grid2 as Grid,
-  TextField,
 } from "@mui/material";
 import { Navigate, NavLink, useLocation, useNavigate } from "react-router";
 import { useGetMyAddressQuery } from "../features/addresses/addressesApiSlice";
@@ -43,7 +41,7 @@ import {
   getPaymentType,
   getShippingType,
 } from "@ring/shared";
-import { useReCaptcha } from "@ring/auth";
+import { useAuth, useReCaptcha } from "@ring/auth";
 import { isEqual } from "lodash-es";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 import AddressDisplay from "../components/address/AddressDisplay";
@@ -56,6 +54,9 @@ import useCheckout from "../hooks/useCheckout";
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 const ReCaptcha = lazy(() => import("@ring/auth/ReCaptcha"));
 const CouponDialog = lazy(() => import("../components/coupon/CouponDialog"));
+const ShippingSelectDialog = lazy(
+  () => import("../components/address/ShippingSelectDialog")
+);
 const PaymentSelect = lazy(() => import("../components/cart/PaymentSelect"));
 const ConfirmDialog = lazy(() => import("@ring/shared/ConfirmDialog"));
 
@@ -142,34 +143,19 @@ const StyledStepContent = styled(StepContent)(({ theme }) => ({
 
 const PaymentType = getPaymentType();
 const ShippingType = getShippingType();
-const TempPaymentTypep = Object.freeze({
-  CASH: {
-    value: "CASH",
-    label: "Thanh toán tiền mặt",
-    description: "",
-    icon: "LocalAtm",
-  },
-  ONLINE_PAYMENT: {
-    value: "ONLINE_PAYMENT",
-    label: "Thanh toán online",
-    description: "Quét Mã QR từ ứng dụng hoặc chuyển khoản",
-    icon: "BookOnline",
-  },
-});
 
 const Checkout = () => {
   //#region construct
   const scrollRef = useRef(null);
   const prevPayload = useRef();
+  const { username } = useAuth();
   const [activeStep, setActiveStep] = useState(0);
-  const [delivery, setDelivery] = useState(Object.keys(ShippingType)[0]);
-  const [payment, setPayment] = useState(Object.keys(TempPaymentTypep)[0]);
-
+  const [payment, setPayment] = useState(Object.keys(PaymentType)[0]);
   const [pending, setPending] = useState(false);
   const maxSteps = 3;
 
   //Cart
-  const { cartProducts, clearCart } = useCart();
+  const { cartProducts, removeProducts } = useCart();
   const { estimateCart, syncCart } = useCheckout();
   const [openWarning, setOpenWarning] = useState(undefined);
   const location = useLocation();
@@ -177,20 +163,24 @@ const Checkout = () => {
   const selected = checkoutState?.selected;
 
   //Coupon
-  const [openCoupon, setOpenCoupon] = useState(false);
   const [contextShop, setContextShop] = useState(null);
+  const [openCoupon, setOpenCoupon] = useState(false);
   const [contextState, setContextState] = useState(null);
   const [contextCoupon, setContextCoupon] = useState(null);
   const [coupon, setCoupon] = useState(checkoutState?.coupon || "");
   const [shopCoupon, setShopCoupon] = useState(checkoutState?.shopCoupon || "");
   const [discount, setDiscount] = useState(0);
   const [shopDiscount, setShopDiscount] = useState([]);
+
+  // Shipping
+  const [openShipping, setOpenShipping] = useState(false);
+  const [shopShipping, setShopShipping] = useState([]);
+  const [shopNote, setShopNote] = useState([]);
   const [checkState, setCheckState] = useState(null);
 
   //Address
   const [openAddress, setOpenAddress] = useState(false);
   const [addressInfo, setAddressInfo] = useState(null);
-  const [message, setMessage] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [err, setErr] = useState([]);
 
@@ -223,7 +213,7 @@ const Checkout = () => {
 
   useDeepEffect(() => {
     handleCartChange();
-  }, [cartProducts, shopCoupon, coupon, addressInfo, delivery]);
+  }, [cartProducts, shopCoupon, coupon, addressInfo, shopShipping]);
 
   useEffect(() => {
     scrollToTop();
@@ -269,6 +259,9 @@ const Checkout = () => {
               detail = {
                 shopId,
                 items: [],
+                note: shopNote[shopId],
+                shippingType:
+                  shopShipping[shopId] || Object.keys(ShippingType)[0],
                 coupon: coupon?.isUsable ? coupon?.code : null,
               };
               result.cart.push(detail);
@@ -292,7 +285,6 @@ const Checkout = () => {
               }
             : null,
           paymentMethod: payment,
-          shippingType: delivery,
           coupon: coupon?.isUsable ? coupon?.code : null,
           cart: [],
         }
@@ -315,7 +307,14 @@ const Checkout = () => {
 
   //Calculate server side
   const handleCalculate = useCallback(async (cart) => {
-    if (isLoading || cart == null || isEqual(prevPayload.current, cart)) return;
+    if (
+      isLoading ||
+      loadAddress ||
+      cart == null ||
+      cart.length == 0 ||
+      isEqual(prevPayload.current, cart)
+    )
+      return;
 
     calculate(cart)
       .unwrap()
@@ -425,6 +424,15 @@ const Checkout = () => {
     setContextCoupon(null);
   };
 
+  const handleOpenShippingDialog = (shopId) => {
+    setOpenShipping(true);
+    setContextShop(shopId);
+  };
+  const handleCloseShippingDialog = () => {
+    setOpenShipping(false);
+    setContextShop(null);
+  };
+
   const handleChangeCoupon = (coupon, shopId) => {
     if (shopId) {
       setShopCoupon((prev) => ({ ...prev, [shopId]: coupon }));
@@ -433,12 +441,13 @@ const Checkout = () => {
     }
   };
 
-  const handleChangeMethod = (e) => {
-    setPayment(e.target.value);
+  const handleChangeShipping = (value) => {
+    setShopShipping((prev) => ({ ...prev, [contextShop]: value }));
+    setOpenShipping(false);
   };
 
-  const handleChangeShipping = (e) => {
-    setDelivery(e.target.value);
+  const handleChangeMethod = (e) => {
+    setPayment(e.target.value);
   };
 
   const handleOpenWarning = () => {
@@ -492,8 +501,7 @@ const Checkout = () => {
     })
       .unwrap()
       .then((data) => {
-        // enqueueSnackbar("Đặt hàng thành công!", { variant: "success" });
-        clearCart();
+        removeProducts(selected);
         navigate("/payment", { replace: true, state: { test: data } });
         setChallenge(false);
         setPending(false);
@@ -519,6 +527,10 @@ const Checkout = () => {
         setPending(false);
       });
   };
+
+  const calculatedContextShop = calculated?.details?.find(
+    (detail) => detail?.shopId == contextShop
+  );
   //#endregion
 
   if (selected?.length) {
@@ -585,8 +597,6 @@ const Checkout = () => {
                         isValid: validAddressInfo,
                         handleOpen: handleOpenDialog,
                         loadAddress,
-                        value: delivery,
-                        handleChange: handleChangeShipping,
                       }}
                     />
                     <AddressSelectDialog
@@ -636,12 +646,20 @@ const Checkout = () => {
                       &nbsp;Kiểm tra lại sản phẩm
                     </SemiTitle>
                   </StepLabel>
-                  <StyledStepContent TransitionProps={{ unmountOnExit: false }}>
+                  <StyledStepContent
+                    slotProps={{ transition: { unmountOnExit: false } }}
+                  >
                     <TableContainer>
                       <Table aria-label="checkout-table">
                         <TableBody>
                           {Object.keys(reducedCart).map((shopId, index) => {
                             const shop = reducedCart[shopId];
+                            const calculatedShop = calculated?.details?.find(
+                              (detail) => detail?.shopId == shopId
+                            );
+                            const shippingFee = calculatedShop?.shippingFee;
+                            const shippingDiscount =
+                              calculatedShop?.shippingDiscount;
 
                             return (
                               <PreviewDetailRow
@@ -650,7 +668,13 @@ const Checkout = () => {
                                   shop: { ...shop, id: shopId },
                                   coupon: shopCoupon[shopId],
                                   discount: shopDiscount[shopId],
-                                  handleOpenDialog: handleOpenCouponDialog,
+                                  shopNote: shopNote[shopId],
+                                  setShopNote,
+                                  shipping: shopShipping[shopId],
+                                  shippingFee,
+                                  shippingDiscount,
+                                  handleOpenCouponDialog,
+                                  handleOpenShippingDialog,
                                 }}
                               />
                             );
@@ -658,26 +682,6 @@ const Checkout = () => {
                         </TableBody>
                       </Table>
                     </TableContainer>
-                    <MiniTitle>Ghi chú khi giao hàng: </MiniTitle>
-                    <TextField
-                      margin="dense"
-                      id="message"
-                      placeholder="Nhập ghi chú cho đơn hàng ..."
-                      fullWidth
-                      multiline
-                      minRows={6}
-                      sx={{ bgcolor: "background.paper" }}
-                      slotProps={{
-                        inputComponent: TextareaAutosize,
-                        inputProps: {
-                          minRows: 6,
-                          style: { resize: "auto" },
-                        },
-                      }}
-                      variant="outlined"
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                    />
                     <Button
                       disabled={!validAddressInfo || calculating}
                       variant="contained"
@@ -688,6 +692,23 @@ const Checkout = () => {
                     >
                       Tiếp tục
                     </Button>
+                    <Suspense fallback={null}>
+                      {openCoupon !== undefined && (
+                        <ShippingSelectDialog
+                          {...{
+                            open: openShipping,
+                            handleClose: handleCloseShippingDialog,
+                            selectedShipping:
+                              shopShipping[contextShop] ||
+                              Object.keys(ShippingType)[0],
+                            shippingFee: calculatedContextShop?.shippingFee,
+                            shippingDiscount:
+                              calculatedContextShop?.shippingDiscount,
+                            onSubmit: handleChangeShipping,
+                          }}
+                        />
+                      )}
+                    </Suspense>
                   </StyledStepContent>
                 </Step>
                 <Step key={2}>
@@ -770,11 +791,13 @@ const Checkout = () => {
                 selectedCoupon: contextCoupon,
                 numSelected: selected?.length,
                 selectMode: true,
+                loggedIn: username != null,
                 onSubmit: handleChangeCoupon,
               }}
             />
           )}
         </Suspense>
+
         <Suspense fallback={null}>
           {openWarning !== undefined && (
             <ConfirmDialog

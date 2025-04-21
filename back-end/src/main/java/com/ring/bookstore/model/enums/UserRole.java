@@ -11,8 +11,7 @@ import java.util.List;
 @Getter
 public enum UserRole {
 
-    ROLE_USER("ROLE_USER",
-            "Thành viên",
+    ROLE_USER("Thành viên",
             "default",
             List.of(
                     PrivilegeType.READ_PROFILE,
@@ -28,8 +27,7 @@ public enum UserRole {
                     PrivilegeType.CREATE_REVIEW,
                     PrivilegeType.UPDATE_REVIEW
             )),
-    ROLE_SELLER("ROLE_SELLER",
-            "Người bán",
+    ROLE_SELLER("Người bán",
             "info",
             List.of(
                     PrivilegeType.READ_BOOK,
@@ -62,8 +60,7 @@ public enum UserRole {
                     PrivilegeType.UPDATE_REVIEW,
                     PrivilegeType.DELETE_REVIEW
             )),
-    ROLE_ADMIN("ROLE_ADMIN",
-            "Quản trị viên",
+    ROLE_ADMIN("Quản trị viên",
             "primary",
             List.of(
                     PrivilegeType.READ_BOOK,
@@ -115,8 +112,7 @@ public enum UserRole {
                     PrivilegeType.DELETE_REVIEW
             )),
 
-    ROLE_GUEST("ROLE_GUEST",
-            "Khách",
+    ROLE_GUEST("Khách",
             "warning",
             List.of(
                     PrivilegeType.READ_BOOK,
@@ -131,13 +127,11 @@ public enum UserRole {
                     PrivilegeType.READ_ROLE
             ));
 
-    private final String value;
     private final String label;
     private final String color;
     private final List<PrivilegeType> privileges;
 
-    private UserRole(String value, String label, String color, List<PrivilegeType> privileges) {
-        this.value = value;
+    private UserRole(String label, String color, List<PrivilegeType> privileges) {
         this.label = label;
         this.color = color;
         this.privileges = privileges;

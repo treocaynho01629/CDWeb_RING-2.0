@@ -3,37 +3,33 @@ package com.ring.bookstore.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ring.bookstore.model.dto.request.RegisterRequest;
-import com.ring.bookstore.model.dto.response.orders.*;
-import com.ring.bookstore.model.enums.OrderStatus;
+import com.ring.bookstore.config.CurrentAccount;
 import com.ring.bookstore.model.dto.request.CalculateRequest;
-import com.ring.bookstore.service.PayOSService;
+import com.ring.bookstore.model.dto.request.OrderRequest;
+import com.ring.bookstore.model.dto.response.orders.*;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.enums.OrderStatus;
+import com.ring.bookstore.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import com.ring.bookstore.config.CurrentAccount;
-import com.ring.bookstore.model.entity.Account;
-import com.ring.bookstore.model.dto.request.OrderRequest;
-import com.ring.bookstore.service.OrderService;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import vn.payos.PayOS;
 import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.Webhook;
 import vn.payos.type.WebhookData;
 
-import java.util.List;
 import java.util.Map;
 
 /**
- * Controller named {@link OrderController} for handling order-related operations.
+ * Controller named {@link OrderController} for handling order-related
+ * operations.
  * Provides endpoints for calculating prices, managing orders,
  * viewing summaries and analytics, and updating order status.
  * Exposes endpoints under "/api/orders".
@@ -45,37 +41,35 @@ public class OrderController {
 
     private final OrderService orderService;
     private final PayOS payOS;
-    private final PayOSService payOSService;
 
     /**
      * Calculates the total price of an order before checkout.
      *
-     * @param request   the calculate request with items and options.
-     * @param currUser  the current authenticated user.
+     * @param request  the calculate request with items and options.
+     * @param currUser the current authenticated user.
      * @return a DTO containing calculated price details.
      */
     @PostMapping("/calculate")
     @PreAuthorize("hasRole('USER') and hasAuthority('read:order')")
     public ResponseEntity<CalculateDTO> calculate(@RequestBody @Valid CalculateRequest request,
-                                                  @CurrentAccount Account currUser) {
+            @CurrentAccount Account currUser) {
         CalculateDTO calculateResult = orderService.calculate(request, currUser);
         return new ResponseEntity<>(calculateResult, HttpStatus.CREATED);
     }
 
-
     /**
      * Commits the checkout process and creates an order.
      *
-     * @param checkRequest  the order request data.
-     * @param request       the HTTP servlet request.
-     * @param currUser      the current authenticated user.
+     * @param checkRequest the order request data.
+     * @param request      the HTTP servlet request.
+     * @param currUser     the current authenticated user.
      * @return a DTO representing the receipt.
      */
     @PostMapping
     @PreAuthorize("hasRole('USER') and hasAuthority('create:order')")
     public ResponseEntity<ReceiptDTO> checkout(@RequestBody @Valid OrderRequest checkRequest,
-                                               HttpServletRequest request,
-                                               @CurrentAccount Account currUser) {
+            HttpServletRequest request,
+            @CurrentAccount Account currUser) {
         ReceiptDTO result = orderService.checkout(checkRequest, request, currUser);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
@@ -95,13 +89,14 @@ public class OrderController {
     @GetMapping("/summaries")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:order')")
     public ResponseEntity<?> getSummaries(@RequestParam(value = "shopId", required = false) Long shopId,
-                                          @RequestParam(value = "bookId", required = false) Long bookId,
-                                          @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
-                                          @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                          @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-                                          @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
-                                          @CurrentAccount Account currUser) {
-        Page<ReceiptSummaryDTO> summaries = orderService.getSummariesWithFilter(currUser, shopId, bookId, pageNo, pageSize, sortBy, sortDir);
+            @RequestParam(value = "bookId", required = false) Long bookId,
+            @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+            @CurrentAccount Account currUser) {
+        Page<ReceiptSummaryDTO> summaries = orderService.getSummariesWithFilter(currUser, shopId, bookId, pageNo,
+                pageSize, sortBy, sortDir);
         return new ResponseEntity<>(summaries, HttpStatus.OK);
     }
 
@@ -121,13 +116,13 @@ public class OrderController {
     @GetMapping("/receipts")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:order')")
     public ResponseEntity<?> getAllReceipts(@RequestParam(value = "shopId", required = false) Long shopId,
-                                            @RequestParam(value = "status", defaultValue = "") OrderStatus status,
-                                            @RequestParam(value = "keyword", defaultValue = "") String keyword,
-                                            @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
-                                            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                            @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-                                            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
-                                            @CurrentAccount Account currUser) {
+            @RequestParam(value = "status", defaultValue = "") OrderStatus status,
+            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+            @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+            @CurrentAccount Account currUser) {
         Page<ReceiptDTO> orders = orderService.getAllReceipts(currUser,
                 shopId,
                 status,
@@ -162,7 +157,7 @@ public class OrderController {
     @GetMapping("/detail/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('read:order')")
     public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id,
-                                            @CurrentAccount Account currUser) {
+            @CurrentAccount Account currUser) {
         OrderDetailDTO order = orderService.getOrderDetail(id, currUser);
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
@@ -180,10 +175,10 @@ public class OrderController {
     @GetMapping("/user")
     @PreAuthorize("hasRole('USER') and hasAuthority('read:order')")
     public ResponseEntity<?> getOrdersByUser(@RequestParam(value = "status", defaultValue = "") OrderStatus status,
-                                             @RequestParam(value = "keyword", defaultValue = "") String keyword,
-                                             @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
-                                             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                             @CurrentAccount Account currUser) {
+            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+            @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+            @CurrentAccount Account currUser) {
         Page<OrderDTO> orders = orderService.getOrdersByUser(currUser, status, keyword, pageNo, pageSize);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
@@ -201,10 +196,10 @@ public class OrderController {
     @GetMapping("/book/{id}")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:order')")
     public ResponseEntity<?> getOrdersByBookId(@PathVariable("id") Long id,
-                                               @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
-                                               @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                               @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
-                                               @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
+            @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
+            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
         Page<OrderDTO> orders = orderService.getOrdersByBookId(id, pageNo, pageSize, sortBy, sortDir);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
@@ -220,10 +215,8 @@ public class OrderController {
     @PutMapping("/cancel/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('update:order')")
     public ResponseEntity<?> cancelOrder(@PathVariable("id") Long id,
-                                         @RequestParam(value = "reason")
-                                         @NotBlank(message = "Lý do không được bỏ trống!")
-                                         @Size(max = 300, message = "Lý do không quá quá 300 kí tự!") String reason,
-                                         @CurrentAccount Account currUser) {
+            @RequestParam(value = "reason") @NotBlank(message = "Lý do không được bỏ trống!") @Size(max = 300, message = "Lý do không quá quá 300 kí tự!") String reason,
+            @CurrentAccount Account currUser) {
         orderService.cancel(id, reason, currUser);
         return new ResponseEntity<>("Order canceled successfully!", HttpStatus.CREATED);
     }
@@ -239,10 +232,8 @@ public class OrderController {
     @PutMapping("/refund/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('update:order')")
     public ResponseEntity<?> refundOrder(@PathVariable("id") Long id,
-                                         @RequestParam(value = "reason")
-                                         @NotBlank(message = "Lý do không được bỏ trống!")
-                                         @Size(max = 300, message = "Lý do không quá quá 300 kí tự!") String reason,
-                                         @CurrentAccount Account currUser) {
+            @RequestParam(value = "reason") @NotBlank(message = "Lý do không được bỏ trống!") @Size(max = 300, message = "Lý do không quá quá 300 kí tự!") String reason,
+            @CurrentAccount Account currUser) {
         orderService.refund(id, reason, currUser);
         return new ResponseEntity<>("Order refunded successfully!", HttpStatus.CREATED);
     }
@@ -257,7 +248,7 @@ public class OrderController {
     @PutMapping("/confirm/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('update:order')")
     public ResponseEntity<?> confirmOrder(@PathVariable("id") Long id,
-                                          @CurrentAccount Account currUser) {
+            @CurrentAccount Account currUser) {
         orderService.confirm(id, currUser);
         return new ResponseEntity<>("Order confirmed successfully!", HttpStatus.CREATED);
     }
@@ -273,8 +264,8 @@ public class OrderController {
     @PutMapping("/status/{id}")
     @PreAuthorize("hasAnyRole('SELLER') and hasAuthority('update:order')")
     public ResponseEntity<?> changeOrderStatus(@PathVariable("id") Long id,
-                                               @RequestParam(value = "status", defaultValue = "COMPLETED") OrderStatus status,
-                                               @CurrentAccount Account currUser) {
+            @RequestParam(value = "status", defaultValue = "COMPLETED") OrderStatus status,
+            @CurrentAccount Account currUser) {
         orderService.changeStatus(id, status, currUser);
         return new ResponseEntity<>("Order status changed successfully!", HttpStatus.CREATED);
     }
@@ -289,7 +280,7 @@ public class OrderController {
     @GetMapping("/analytics")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:order')")
     public ResponseEntity<?> getUserAnalytics(@RequestParam(value = "shopId", required = false) Long shopId,
-                                              @CurrentAccount Account currUser) {
+            @CurrentAccount Account currUser) {
         return new ResponseEntity<>(orderService.getAnalytics(currUser, shopId), HttpStatus.OK);
     }
 
@@ -304,31 +295,17 @@ public class OrderController {
     @GetMapping("/sales")
     @PreAuthorize("hasAnyRole('SELLER','GUEST') and hasAuthority('read:order')")
     public ResponseEntity<?> getMonthlySales(@RequestParam(value = "shopId", required = false) Long shopId,
-                                             @RequestParam(value = "year", required = false) Integer year,
-                                             @CurrentAccount Account currUser) {
+            @RequestParam(value = "year", required = false) Integer year,
+            @CurrentAccount Account currUser) {
         return new ResponseEntity<>(orderService.getMonthlySales(currUser, shopId, year), HttpStatus.OK);
     }
 
-    @PostMapping("/create-payment-link")
+    @PostMapping("/create-payment-link/{id}")
     @PreAuthorize("hasRole('USER') and hasAuthority('read:order')")
-    public ResponseEntity<?> createTest(@RequestBody ReceiptDTO testBody) {
+    public ResponseEntity<?> createPaymentLink(@PathVariable("id") Long id) {
 
-//        ReceiptDTO receipt = ReceiptDTO.builder()
-//                .id(1L)
-//                .details(List.of(
-//                        OrderDTO.builder()
-//                                .id(1L)
-//                                .items(List.of(
-//                                        OrderItemDTO.builder()
-//                                                .bookTitle("Book 1")
-//                                                .price(100000.0)
-//                                                .quantity((short) 1)
-//                                                .build()))
-//                                .build()))
-//                .build();
-
-        CheckoutResponseData test = payOSService.checkout(testBody);
-        return new ResponseEntity<>(test, HttpStatus.OK);
+        CheckoutResponseData checkoutResponse = orderService.createPaymentLink(id);
+        return new ResponseEntity<>(checkoutResponse, HttpStatus.OK);
     }
 
     @PostMapping("/payos_transfer_handler")

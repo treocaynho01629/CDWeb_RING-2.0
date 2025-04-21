@@ -110,6 +110,16 @@ public class ApplicationExceptionHandler{
         );
     }
 
+    @ResponseStatus(HttpStatus.PAYMENT_REQUIRED)
+    @ExceptionHandler(PaymentException.class)
+    public ExceptionResponse handlePaymentException(PaymentException e) {
+        return new ExceptionResponse(
+                HttpStatus.PAYMENT_REQUIRED.value(),
+                e.getError(),
+                e.getMessage()
+        );
+    }
+
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(EntityOwnershipException.class)
     public ExceptionResponse handleEntityOwnershipException(EntityOwnershipException e) {

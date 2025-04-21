@@ -52,27 +52,13 @@ const PaymentContainer = styled.div`
 //#endregion
 
 const PaymentType = getPaymentType();
-const TempPaymentTypep = Object.freeze({
-  CASH: {
-    value: "CASH",
-    label: "Thanh toán tiền mặt",
-    description: "",
-    icon: "LocalAtm",
-  },
-  ONLINE_PAYMENT: {
-    value: "ONLINE_PAYMENT",
-    label: "Thanh toán online",
-    description: "Quét Mã QR từ ứng dụng hoặc chuyển khoản",
-    icon: "BookOnline",
-  },
-});
 
 const PaymentSelect = ({ value, handleChange }) => {
   return (
     <>
       <RadioContainer>
         <RadioGroup spacing={1} row value={value} onChange={handleChange}>
-          {Object.values(TempPaymentTypep).map((item, index) => {
+          {Object.values(PaymentType).map((item, index) => {
             const Icon = iconList[item.icon];
 
             return (

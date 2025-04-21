@@ -14,13 +14,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class CalculateMapper {
-    private final CouponMapper couponMapper;
 
     public CalculateDetailDTO detailToDTO(OrderDetail detail) {
         List<OrderItem> orderItems = detail.getItems();
         List<CalculateItemDTO> itemDTOS = orderItems.stream().map(this::itemToDTO).collect(Collectors.toList());
 
-        //Shop
+        // Shop
         Shop shop = detail.getShop();
         String shopName = (shopName = shop.getName()) != null ? shopName : null;
 
@@ -64,7 +63,6 @@ public class CalculateMapper {
                 order.getCouponDiscount(),
                 order.getShippingDiscount(),
                 order.getCouponDTO() != null ? order.getCouponDTO() : null,
-                detailDTOS
-        );
+                detailDTOS);
     }
 }

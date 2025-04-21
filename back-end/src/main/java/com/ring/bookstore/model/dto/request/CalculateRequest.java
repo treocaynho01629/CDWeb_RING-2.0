@@ -1,6 +1,5 @@
 package com.ring.bookstore.model.dto.request;
 
-import com.ring.bookstore.model.enums.ShippingType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -25,8 +24,6 @@ public class CalculateRequest {
 	private List<CartDetailRequest> cart;
 
 	private String coupon;
-
-	private ShippingType shippingType;
 
 	@Valid
 	private AddressRequest address;

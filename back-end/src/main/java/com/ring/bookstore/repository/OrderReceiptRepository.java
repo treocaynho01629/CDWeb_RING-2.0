@@ -3,9 +3,8 @@ package com.ring.bookstore.repository;
 import java.util.List;
 import java.util.Map;
 
-import com.ring.bookstore.model.dto.projection.dashboard.IStat;
+import com.ring.bookstore.model.dto.projection.orders.IOrderReceipt;
 import com.ring.bookstore.model.dto.projection.orders.IReceiptSummary;
-import com.ring.bookstore.model.entity.OrderItem;
 import com.ring.bookstore.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -84,21 +83,17 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
                                            Long bookId,
                                            Pageable pageable);
 
-    /**
-     * Finds all order receipt IDs based on the provided filters.
-     *
-     * @param shopId   the ID of the shop to filter by, can be null to ignore this filter
-     * @param userId   the ID of the shop owner to filter by, can be null to ignore this filter
-     * @param status   the status of the order to filter by, can be null to ignore this filter
-     * @param keyword  a keyword to search within book titles and order IDs, matching using a case-insensitive search
-     * @param pageable the pagination information
-     * @return a {@code Page<Long>} containing the order receipt IDs matching the filters
-     */
     @Query("""
-        select o.id
+        select o.id as id, o.email as email, a.phone as phone, a.name as name,
+            u.username as username, i as image, a.address as address, o.lastModifiedDate as date,
+            o.total as total, o.totalDiscount as totalDiscount
         from OrderReceipt o
         join o.details od
         join od.items oi
+        join o.address a
+        left join o.user u
+        left join u.profile p
+        left join p.image i
         left join od.shop s
         left join Book b on oi.book.id = b.id
         where (coalesce(:shopId) is null or s.id = :shopId)
@@ -107,39 +102,11 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         and concat (b.title, o.id) ilike %:keyword%
         group by o.id
     """)
-    Page<Long> findAllIds(Long shopId,
-                          Long userId,
-                          OrderStatus status,
-                          String keyword,
-                          Pageable pageable);
-
-    /**
-     * Retrieves sales analytics for a shop or user, including total sales for the current and last month.
-     * The query calculates the total revenue after applying discounts and excludes shipping fees.
-     *
-     * @param shopId the ID of the shop to filter the analytics. If null, analytics for all shops are included.
-     * @param userId the ID of the user (shop owner) to filter the analytics. If null, analytics for all users are included.
-     * @return statistics containing total sales for the current month and the previous month.
-     */
-    //Exclude shipping fee?
-    @Query("""
-        select t.currentMonth as total, t.currentMonth as currentMonth, t.lastMonth as lastMonth
-        from (select coalesce(sum(case when o.lastModifiedDate >= date_trunc('month', current date)
-                    then (od.totalPrice - od.discount) end), 0) as currentMonth,
-            coalesce(sum(case when o.lastModifiedDate >= date_trunc('month', current date) - 1 month
-                and o.lastModifiedDate < date_trunc('month', current date)
-                    then (od.totalPrice - od.discount) end), 0) lastMonth
-            from OrderDetail od
-                join od.order o
-                left join od.shop s
-            where od.status = com.ring.bookstore.model.enums.OrderStatus.COMPLETED
-            and o.lastModifiedDate >= date_trunc('month', current date) - 1 month
-            and (coalesce(:shopId) is null or s.id = :shopId)
-            and (coalesce(:userId) is null or s.owner.id = :userId)
-        ) t
-    """)
-    IStat getSalesAnalytics(Long shopId,
-                            Long userId);
+    Page<IOrderReceipt> findAllBy(Long shopId,
+                                Long userId,
+                                OrderStatus status,
+                                String keyword,
+                                Pageable pageable);
 
     /**
      * Retrieves monthly sales data, including sales totals and discounts, grouped by month.

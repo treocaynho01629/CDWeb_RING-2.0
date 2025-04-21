@@ -1,16 +1,21 @@
 package com.ring.bookstore.model.dto.projection.orders;
 
 import com.ring.bookstore.model.dto.projection.images.IImage;
-import com.ring.bookstore.model.enums.OrderStatus;
-import com.ring.bookstore.model.entity.OrderItem;
+
+import java.math.BigDecimal;
 
 /**
- * Represents an order item projection as {@link IOrderItem}, containing details about a specific item
- * in an order, including book details, pricing, discounts, shipping, status, and shop information.
+ * Represents an order item projection as {@link IOrderItem}
  */
 public interface IOrderItem {
 
-    OrderItem getItem();
+    Long getId();
+
+    Short getQuantity();
+
+    Double getPrice();
+
+    BigDecimal getDiscount();
 
     Long getBookId();
 
@@ -22,17 +27,4 @@ public interface IOrderItem {
 
     Long getDetailId();
 
-    Double getTotalPrice();
-
-    Double getShippingFee();
-
-    Double getShippingDiscount();
-
-    Double getDiscount();
-
-    OrderStatus getStatus();
-
-    Long getShopId();
-
-    String getShopName();
 }

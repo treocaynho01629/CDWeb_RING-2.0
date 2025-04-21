@@ -417,6 +417,7 @@ const CartDetailRow = ({
         <StyledTableCell align="left" colSpan={6}>
           <CouponButton onClick={() => handleOpenDialog(shop?.id)}>
             <span>
+              &nbsp;
               <LocalActivityOutlined color="error" />
               &nbsp;
               {coupon

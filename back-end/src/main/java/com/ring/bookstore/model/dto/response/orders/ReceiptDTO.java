@@ -10,16 +10,15 @@ import java.util.List;
  */
 @Builder
 public record ReceiptDTO(Long id,
-                         String email,
-                         String name,
-                         String image,
-                         String phone,
-                         String address,
-                         String message,
-                         LocalDateTime date,
-                         Double total,
-                         Double totalDiscount,
-                         String username,
-                         List<OrderDTO> details) {
+        String email,
+        String name,
+        String image,
+        String phone,
+        String address,
+        LocalDateTime date,
+        Double total,
+        Double totalDiscount,
+        String username,
+        List<OrderDTO> details) {
 
 }

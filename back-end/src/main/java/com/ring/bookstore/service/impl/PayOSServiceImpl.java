@@ -3,6 +3,7 @@ package com.ring.bookstore.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ring.bookstore.exception.PaymentException;
 import com.ring.bookstore.model.dto.response.CloudinaryResponse;
 import com.ring.bookstore.model.dto.response.ConfirmWebhookResponse;
 import com.ring.bookstore.model.dto.response.orders.OrderDTO;
@@ -31,7 +32,7 @@ public class PayOSServiceImpl implements PayOSService {
         final String description = "Thanh toán đơn hàng: #" + order.id();
         final String returnUrl = clientUrl + "/profile/order";
         final String cancelUrl = clientUrl + "/payment/cancel";
-        final int price = 2000;
+        final int totalPrice = 2000;
 
         // Create items data
         List<ItemData> items = new ArrayList<>();
@@ -52,7 +53,7 @@ public class PayOSServiceImpl implements PayOSService {
 
         PaymentData paymentData = PaymentData.builder()
                 .orderCode(orderCode)
-                .amount(price)
+                .amount(totalPrice)
                 .description(description)
                 .items(items)
                 .returnUrl(returnUrl)
@@ -60,10 +61,10 @@ public class PayOSServiceImpl implements PayOSService {
                 .build();
 
         try {
-            CheckoutResponseData data = payOS.createPaymentLink(paymentData);
-            return data;
+            CheckoutResponseData reponse = payOS.createPaymentLink(paymentData);
+            return reponse;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new PaymentException("Payment gateway error!", "Không thể tạo đường dẫn thanh toán!", e);
         }
     }
 

@@ -5,6 +5,7 @@ import {
   decreaseQuantity,
   increaseQuantity,
   removeItem,
+  removeItems,
   resetCart,
   selectCartProducts,
   replaceInCart,
@@ -31,7 +32,7 @@ const useCart = () => {
         shopId: item.shopId,
         shopName: item.shopName,
         quantity,
-      }),
+      })
     );
   };
   const replaceProduct = (item) => {
@@ -45,7 +46,7 @@ const useCart = () => {
         amount: item.amount,
         shopId: item.shopId,
         shopName: item.shopName,
-      }),
+      })
     );
   };
   const increaseAmount = (id) => dispatch(increaseQuantity(id));
@@ -53,6 +54,7 @@ const useCart = () => {
   const changeAmount = ({ id, quantity }) =>
     dispatch(changeQuantity({ id, quantity }));
   const removeProduct = (id) => dispatch(removeItem(id));
+  const removeProducts = (ids) => dispatch(removeItems(ids));
   const removeShopProduct = (id) => dispatch(removeShopItem(id));
   const clearCart = () => dispatch(resetCart());
 
@@ -64,6 +66,7 @@ const useCart = () => {
     increaseAmount,
     changeAmount,
     removeProduct,
+    removeProducts,
     removeShopProduct,
     clearCart,
   };

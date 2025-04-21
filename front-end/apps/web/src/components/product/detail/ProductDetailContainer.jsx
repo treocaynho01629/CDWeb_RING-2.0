@@ -133,6 +133,7 @@ const ProductDetailContainer = ({ loading, book, tabletMode }) => {
       }
     }
 
+    window.removeEventListener("resize", updateShowmore);
     window.addEventListener("resize", updateShowmore);
     updateShowmore();
     return () => window.removeEventListener("resize", updateShowmore);

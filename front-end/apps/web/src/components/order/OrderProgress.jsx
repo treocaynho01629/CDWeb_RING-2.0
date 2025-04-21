@@ -334,7 +334,11 @@ const OrderProgress = ({
             <SummaryIcon>
               {order?.status == OrderStatus.CANCELED.value
                 ? cancelSteps[detailSummary?.step]?.icon
-                : order?.status == OrderStatus.REFUNDED.value
+                : [
+                      OrderStatus.PENDING_RETURN.value,
+                      OrderStatus.PENDING_REFUND.value,
+                      OrderStatus.REFUNDED.value,
+                    ]?.includes(order?.status)
                   ? refundSteps[detailSummary?.step]?.icon
                   : steps[detailSummary?.step]?.icon}
             </SummaryIcon>
