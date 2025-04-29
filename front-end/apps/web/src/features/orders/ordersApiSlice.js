@@ -16,6 +16,15 @@ const initialState = ordersAdapter.getInitialState({
 
 export const ordersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    getReceiptDetail: builder.query({
+      query: (id) => ({
+        url: `/api/orders/receipts/detail/${id}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result?.isError;
+        },
+      }),
+      providesTags: (result, error, id) => [{ type: "Receipt", id }],
+    }),
     getOrderDetail: builder.query({
       query: (id) => ({
         url: `/api/orders/detail/${id}`,
@@ -25,6 +34,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, id) => [{ type: "Order", id }],
     }),
+
     getOrdersByUser: builder.query({
       query: (args) => {
         const { status, keyword, page, size } = args || {};
@@ -103,14 +113,6 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
         } else return [{ type: "Order", id: "LIST" }];
       },
     }),
-    createPaymentLink: builder.mutation({
-      query: (test) => ({
-        url: "/api/orders/create-payment-link",
-        method: "POST",
-        credentials: "include",
-        body: { ...test },
-      }),
-    }),
     calculate: builder.mutation({
       query: (currCart) => ({
         url: "/api/orders/calculate",
@@ -138,6 +140,30 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Order", id }],
     }),
+    cancelUnpaidOrders: builder.mutation({
+      query: ({ orderId, reason }) => ({
+        url: `/api/orders/cancel-unpaid/${orderId}?reason=${reason}`,
+        method: "PUT",
+        credentials: "include",
+        responseHandler: "text",
+      }),
+      invalidatesTags: (result, error, { orderId }) => [
+        { type: "Receipt", orderId },
+        { type: "Order", id: "LIST" },
+      ],
+    }),
+    changePaymentMethod: builder.mutation({
+      query: ({ orderId, paymentMethod }) => ({
+        url: `/api/orders/payment/${orderId}?paymentMethod=${paymentMethod}`,
+        method: "PUT",
+        credentials: "include",
+        responseHandler: "text",
+      }),
+      invalidatesTags: (result, error, { orderId }) => [
+        { type: "Receipt", orderId },
+        { type: "Order", id: "LIST" },
+      ],
+    }),
     refundOrder: builder.mutation({
       query: ({ id, reason }) => ({
         url: `/api/orders/refund/${id}?reason=${reason}`,
@@ -156,16 +182,27 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [{ type: "Order", id }],
     }),
+    createPaymentLink: builder.mutation({
+      query: ({ token, source, id }) => ({
+        url: `/api/payments/create-payment-link/${id}`,
+        method: "POST",
+        credentials: "include",
+        headers: { response: token, source },
+      }),
+    }),
   }),
 });
 
 export const {
   useGetOrderDetailQuery,
   useGetOrdersByUserQuery,
-  useCreatePaymentLinkMutation,
+  useGetReceiptDetailQuery,
   useCalculateMutation,
   useCheckoutMutation,
   useCancelOrderMutation,
+  useCancelUnpaidOrdersMutation,
+  useChangePaymentMethodMutation,
   useRefundOrderMutation,
   useConfirmOrderMutation,
+  useCreatePaymentLinkMutation,
 } = ordersApiSlice;

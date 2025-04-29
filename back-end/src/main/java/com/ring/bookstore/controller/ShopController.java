@@ -167,7 +167,7 @@ public class ShopController {
     public ResponseEntity<?> followShop(@PathVariable("id") Long id,
                                         @CurrentAccount Account currUser) {
         shopService.follow(id, currUser);
-        return new ResponseEntity<>("Shop followed successfully!", HttpStatus.CREATED);
+        return new ResponseEntity<>("Shop followed successfully!", HttpStatus.OK);
     }
 
     /**
@@ -182,7 +182,7 @@ public class ShopController {
     public ResponseEntity<?> unfollowShop(@PathVariable("id") Long id,
                                         @CurrentAccount Account currUser) {
         shopService.unfollow(id, currUser);
-        return new ResponseEntity<>("Shop unfollowed successfully!", HttpStatus.CREATED);
+        return new ResponseEntity<>("Shop unfollowed successfully!", HttpStatus.OK);
     }
 
     /**

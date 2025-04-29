@@ -34,7 +34,9 @@ import { getOrderStatus } from "@ring/shared";
 import useCart from "../../hooks/useCart";
 import OrderItem from "./OrderItem";
 
-const CancelRefundForm = lazy(() => import("./CancelRefundForm"));
+const CancelAndRefundDetailForm = lazy(
+  () => import("./CancelAndRefundDetailForm")
+);
 
 const OrderStatus = getOrderStatus();
 const defaultSize = 5;
@@ -314,7 +316,7 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
       >
         {open && (
           <Suspense fallback={null}>
-            <CancelRefundForm
+            <CancelAndRefundDetailForm
               {...{
                 pending,
                 setPending,

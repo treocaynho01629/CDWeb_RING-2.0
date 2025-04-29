@@ -306,36 +306,39 @@ const Checkout = () => {
   );
 
   //Calculate server side
-  const handleCalculate = useCallback(async (cart) => {
-    if (
-      isLoading ||
-      loadAddress ||
-      cart == null ||
-      cart.length == 0 ||
-      isEqual(prevPayload.current, cart)
-    )
-      return;
+  const handleCalculate = useCallback(
+    async (cart) => {
+      if (
+        isLoading ||
+        address == null ||
+        cart == null ||
+        cart.length == 0 ||
+        isEqual(prevPayload.current, cart)
+      )
+        return;
 
-    calculate(cart)
-      .unwrap()
-      .then((data) => {
-        setCalculated(data);
-        handleSyncCart(data);
-        prevPayload.current = cart;
-      })
-      .catch((err) => {
-        console.error(err);
-        if (!err?.status) {
-          console.error("Server không phản hồi!");
-        } else if (err?.status === 409) {
-          console.error(err?.data?.message);
-        } else if (err?.status === 400) {
-          console.error("Sai định dạng giỏ hàng!");
-        } else {
-          console.error("Tính trước đơn hàng thất bại!");
-        }
-      });
-  }, []);
+      calculate(cart)
+        .unwrap()
+        .then((data) => {
+          setCalculated(data);
+          handleSyncCart(data);
+          prevPayload.current = cart;
+        })
+        .catch((err) => {
+          console.error(err);
+          if (!err?.status) {
+            console.error("Server không phản hồi!");
+          } else if (err?.status === 409) {
+            console.error(err?.data?.message);
+          } else if (err?.status === 400) {
+            console.error("Sai định dạng giỏ hàng!");
+          } else {
+            console.error("Tính trước đơn hàng thất bại!");
+          }
+        });
+    },
+    [addressInfo]
+  );
 
   //Sync checkout cart between client and server
   const handleSyncCart = (cart) => {
@@ -502,7 +505,11 @@ const Checkout = () => {
       .unwrap()
       .then((data) => {
         removeProducts(selected);
-        navigate("/payment", { replace: true, state: { test: data } });
+        if (payment == PaymentType.ONLINE_PAYMENT.value) {
+          navigate(`/payment/${data?.id}`, { replace: true });
+        } else {
+          navigate("/payment?state=success", { replace: true });
+        }
         setChallenge(false);
         setPending(false);
       })

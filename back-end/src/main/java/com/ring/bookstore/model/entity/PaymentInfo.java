@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Nationalized;
+
+import java.time.LocalDateTime;
 
 /**
  * Represents an entity as {@link OrderReceipt} for order receipts.
@@ -39,9 +42,17 @@ public class PaymentInfo {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 30)
-    private PaymentStatus paymentStatus;
+    private PaymentStatus status;
+
+    @Column(length = 250)
+    private String checkoutUrl;
 
     @Column
-    private Integer total;
+    private Integer amount;
 
+    @Column(length = 500)
+    private String description;
+
+    @Column
+    private LocalDateTime expiredAt;
 }

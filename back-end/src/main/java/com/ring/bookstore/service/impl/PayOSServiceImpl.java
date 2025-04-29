@@ -1,22 +1,27 @@
 package com.ring.bookstore.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.PaymentException;
-import com.ring.bookstore.model.dto.response.CloudinaryResponse;
-import com.ring.bookstore.model.dto.response.ConfirmWebhookResponse;
+import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.dto.response.orders.OrderDTO;
 import com.ring.bookstore.model.dto.response.orders.OrderItemDTO;
 import com.ring.bookstore.model.dto.response.orders.ReceiptDTO;
 import com.ring.bookstore.service.PayOSService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import vn.payos.PayOS;
-import vn.payos.type.*;
+import vn.payos.type.CheckoutResponseData;
+import vn.payos.type.ItemData;
+import vn.payos.type.PaymentData;
+import vn.payos.type.PaymentLinkData;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -30,8 +35,8 @@ public class PayOSServiceImpl implements PayOSService {
     public CheckoutResponseData checkout(ReceiptDTO order) {
 
         final String description = "Thanh toán đơn hàng: #" + order.id();
-        final String returnUrl = clientUrl + "/profile/order";
-        final String cancelUrl = clientUrl + "/payment/cancel";
+        final String returnUrl = clientUrl + "/payment?state=success";
+        final String cancelUrl = clientUrl + "/payment?state=cancel";
         final int totalPrice = 2000;
 
         // Create items data
@@ -47,41 +52,55 @@ public class PayOSServiceImpl implements PayOSService {
             }
         }
 
-        // Gen order code
-        String currentTimeString = String.valueOf(new Date().getTime());
-        long orderCode = Long.parseLong(currentTimeString.substring(currentTimeString.length() - 6));
+        // Timestamp
+        LocalDateTime expired = LocalDateTime.now().plusDays(1);
+        ZonedDateTime zonedDateTime = expired.atZone(ZoneId.systemDefault());
+        long unixTimestamp = zonedDateTime.toEpochSecond();
 
         PaymentData paymentData = PaymentData.builder()
-                .orderCode(orderCode)
+                .orderCode(order.id())
                 .amount(totalPrice)
                 .description(description)
                 .items(items)
                 .returnUrl(returnUrl)
                 .cancelUrl(cancelUrl)
+                .expiredAt(unixTimestamp)
                 .build();
 
         try {
-            CheckoutResponseData reponse = payOS.createPaymentLink(paymentData);
-            return reponse;
+            CheckoutResponseData response = payOS.createPaymentLink(paymentData);
+            return response;
         } catch (Exception e) {
-            throw new PaymentException("Payment gateway error!", "Không thể tạo đường dẫn thanh toán!", e);
+            e.printStackTrace();
+            throw new PaymentException("Payment gateway error!",
+                    "Không thể tạo đường dẫn thanh toán!", e);
         }
     }
 
-    public ConfirmWebhookResponse confirmWebhook(String webhookUrl) {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
+    public PaymentLinkData cancel(Long id, String reason) {
         try {
-            String str = payOS.confirmWebhook(webhookUrl);
-            JsonNode json = objectMapper.valueToTree(str);
-            return ConfirmWebhookResponse.builder()
-                    .code(Integer.parseInt(json.get("code").asText()))
-                    .desc(json.get("desc").asText())
-                    .build();
+            return payOS.cancelPaymentLink(id, reason);
+        } catch (Exception e) {
+            throw new PaymentException("Payment cancel failed!");
+        }
+    }
+
+    public PaymentLinkData getPaymentLinkData(Long id) {
+        try {
+            PaymentLinkData order = payOS.getPaymentLinkInformation(id);
+            return order;
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Payment data not found!",
+                    "Không thể tìm thông tin thanh toán!");
+        }
+    }
+
+    public String confirmWebhook(String webhookUrl) {
+        try {
+            return payOS.confirmWebhook(webhookUrl);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid webhook!", e);
         }
     }
 }

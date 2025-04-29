@@ -147,7 +147,7 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('delete:category')")
     public ResponseEntity<?> deleteCategories(@RequestParam(value = "parentId", required = false) Integer parentId,
                                               @RequestParam("ids") List<Integer> ids
-    ) {
+    ) { //FIX
         cateService.deleteCategories(ids);
         return new ResponseEntity<>("Categories deleted successfully!", HttpStatus.OK);
     }

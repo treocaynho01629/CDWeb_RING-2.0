@@ -1,6 +1,7 @@
 package com.ring.bookstore.model.dto.response.orders;
 
 import com.ring.bookstore.model.enums.OrderStatus;
+import com.ring.bookstore.model.enums.PaymentStatus;
 import com.ring.bookstore.model.enums.ShippingType;
 import lombok.Builder;
 
@@ -11,6 +12,7 @@ import java.util.List;
  */
 @Builder
 public record OrderDTO(Long id,
+                Long orderId,
                 Long shopId,
                 String shopName,
                 Double totalPrice,

@@ -35,13 +35,6 @@ function App() {
             },
           },
           {
-            path: "payment/cancel",
-            lazy: async () => {
-              let Cancel = await import("./pages/Cancel");
-              return { Component: Cancel.default };
-            },
-          },
-          {
             path: "*",
             lazy: async () => {
               let Missing = await import("@ring/ui/Missing");
@@ -56,15 +49,15 @@ function App() {
             },
           },
           {
-            path: "payment",
-            lazy: async () => {
-              let Payment = await import("./pages/Payment");
-              return { Component: Payment.default };
-            },
-          },
-          {
             element: <PersistLogin />,
             children: [
+              {
+                path: "payment/:id?",
+                lazy: async () => {
+                  let Payment = await import("./pages/Payment");
+                  return { Component: Payment.default };
+                },
+              },
               {
                 element: <PageLayout />,
                 children: [
@@ -165,6 +158,15 @@ function App() {
                                 "./pages/OrderDetail"
                               );
                               return { Component: OrderDetail.default };
+                            },
+                          },
+                          {
+                            path: "profile/order/checkout/:id",
+                            lazy: async () => {
+                              let CheckoutDetail = await import(
+                                "./pages/CheckoutDetail"
+                              );
+                              return { Component: CheckoutDetail.default };
                             },
                           },
                           {

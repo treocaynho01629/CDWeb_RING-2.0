@@ -23,6 +23,7 @@ import {
   currencyFormat,
   dateFormatter,
   getOrderStatus,
+  getPaymentStatus,
   getShippingType,
   iconList,
   idFormatter,
@@ -33,11 +34,13 @@ import { Link } from "react-router";
 import { booksApiSlice } from "../../features/books/booksApiSlice";
 import { MobileExtendButton } from "@ring/ui/Components";
 import { useConfirmOrderMutation } from "../../features/orders/ordersApiSlice";
-import OrderReceipt from "./OrderReceipt";
+import OrderDetailItems from "./OrderDetailItems";
 import useCart from "../../hooks/useCart";
 
 const OrderProgress = lazy(() => import("./OrderProgress"));
-const CancelRefundForm = lazy(() => import("./CancelRefundForm"));
+const CancelAndRefundDetailForm = lazy(
+  () => import("./CancelAndRefundDetailForm")
+);
 
 //#region styled
 const TitleContainer = styled.div`
@@ -232,15 +235,15 @@ const MainButtonContainer = styled.div`
 
 const OrderStatus = getOrderStatus();
 const ShippingType = getShippingType();
-const tempShippingFee = 10000;
+const PaymentStatus = getPaymentStatus();
 
-function getDetailSummary(detail) {
+function getStepContent(detail) {
   const date = new Date(detail?.date);
 
   switch (detail?.status) {
     case OrderStatus.PENDING_PAYMENT.value:
       return {
-        step: 0,
+        step: 1,
         summary: "Đang chờ thanh toán đơn hàng.",
       };
     case OrderStatus.PENDING.value:
@@ -373,7 +376,7 @@ const OrderDetailComponent = ({
     setOpenRefund(false);
   };
 
-  const detailSummary = getDetailSummary(order);
+  const stepContent = getStepContent(order);
   const orderedDate = new Date(order?.orderedDate);
   const date = new Date(order?.date);
   const shippingSummary = ShippingType[order?.shippingType];
@@ -439,8 +442,8 @@ const OrderDetailComponent = ({
           >
             <OrderProgress
               {...{
-                order,
-                detailSummary,
+                status: order?.status,
+                stepContent,
                 detailStatus,
                 orderedDate,
                 date,
@@ -472,7 +475,7 @@ const OrderDetailComponent = ({
                   {!order ? (
                     <Skeleton variant="text" width={280} />
                   ) : (
-                    detailSummary?.summary
+                    stepContent?.summary
                   )}
                 </SubText>
               </Box>
@@ -487,8 +490,7 @@ const OrderDetailComponent = ({
                   >
                     Đang tải
                   </MainButton>
-                ) : order?.status == OrderStatus.PENDING.value ||
-                  order?.status == OrderStatus.PENDING_PAYMENT.value ? (
+                ) : order?.status == OrderStatus.PENDING.value ? (
                   <>
                     <MainButton
                       variant="outlined"
@@ -501,28 +503,17 @@ const OrderDetailComponent = ({
                       Huỷ đơn hàng
                     </MainButton>
                   </>
-                ) : order?.status == OrderStatus.SHIPPING.value ? (
-                  <>
-                    <MainButton
-                      variant="contained"
-                      color="success"
-                      size="large"
-                      fullWidth
-                      onClick={handleConfirmOrder}
-                    >
-                      Đã nhận hàng
-                    </MainButton>
-                    <MainButton
-                      variant="outlined"
-                      color="error"
-                      size="large"
-                      fullWidth
-                      sx={{ mt: 1 }}
-                      onClick={handleCancelOrder}
-                    >
-                      Huỷ đơn hàng
-                    </MainButton>
-                  </>
+                ) : order?.status == OrderStatus.SHIPPING.value &&
+                  order?.paymentStatus == PaymentStatus.PAID.value ? (
+                  <MainButton
+                    variant="contained"
+                    color="success"
+                    size="large"
+                    fullWidth
+                    onClick={handleConfirmOrder}
+                  >
+                    Đã nhận hàng
+                  </MainButton>
                 ) : (
                   <>
                     <MainButton
@@ -622,7 +613,7 @@ const OrderDetailComponent = ({
                     {!order ? (
                       <Skeleton variant="text" width={190} />
                     ) : (
-                      `Phí vận chuyển ${currencyFormat.format(tempShippingFee * shippingSummary?.multiplier)}`
+                      `Phí vận chuyển ${currencyFormat.format(order?.shippingFee)}`
                     )}
                   </InfoText>
                 </Box>
@@ -648,7 +639,7 @@ const OrderDetailComponent = ({
           <Inbox />
           &nbsp;Kiện hàng
         </Title>
-        <OrderReceipt {...{ order, tabletMode }} />
+        <OrderDetailItems {...{ order, tabletMode }} />
         <ButtonContainer>
           {!order ? (
             <MobileButton>
@@ -657,9 +648,7 @@ const OrderDetailComponent = ({
                 <KeyboardArrowRight fontSize="small" />
               </MobileExtendButton>
             </MobileButton>
-          ) : order?.status == OrderStatus.PENDING.value ||
-            order?.status == OrderStatus.PENDING_PAYMENT.value ||
-            order?.status == OrderStatus.SHIPPING.value ? (
+          ) : order?.status == OrderStatus.PENDING.value ? (
             <MobileButton onClick={handleCancelOrder}>
               <span>
                 <Close fontSize="small" color="error" />
@@ -730,7 +719,7 @@ const OrderDetailComponent = ({
       >
         {open && (
           <Suspense fallback={null}>
-            <CancelRefundForm
+            <CancelAndRefundDetailForm
               {...{
                 pending,
                 setPending,

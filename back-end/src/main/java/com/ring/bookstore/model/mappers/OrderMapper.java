@@ -86,6 +86,7 @@ public class OrderMapper {
             Long shopId = detail.getShopId() != null ? detail.getShopId() : -1;
 
             var newDetail = OrderDTO.builder().id(detail.getId())
+                    .orderId(detail.getOrderId())
                     .shopId(shopId)
                     .shopName(shopName)
                     .totalPrice(detail.getTotalPrice())
@@ -115,6 +116,7 @@ public class OrderMapper {
         Long shopId = shop != null ? shop.getId() : -1;
 
         return new OrderDTO(detail.getId(),
+                detail.getOrder().getId(),
                 shopId,
                 shopName,
                 detail.getTotalPrice(),
@@ -128,7 +130,7 @@ public class OrderMapper {
                 itemDTOS);
     }
 
-    public OrderDetailDTO detailAndItemsProjectionToDetailDTO(IOrderDetail detail, List<IOrderItem> items) {
+    public OrderDetailDTO orderDetailAndItemsProjectionToOrderDetailDTO(IOrderDetail detail, List<IOrderItem> items) {
 
         // If shop deleted
         String shopName = detail.getShopName() != null ? detail.getShopName() : "Cửa hàng RING!";
@@ -151,10 +153,9 @@ public class OrderMapper {
                 .shippingDiscount(detail.getShippingDiscount())
                 .paymentType(detail.getPaymentType())
                 .status(detail.getStatus())
+                .paymentStatus(detail.getPaymentStatus())
                 .items(new ArrayList<>())
                 .build();
-
-        System.out.println(items.size());
 
         for (IOrderItem item : items) {
 
@@ -189,6 +190,25 @@ public class OrderMapper {
         return result;
     }
 
+    public ReceiptDetailDTO receiptDetailAndDetailsDTOToReceiptDetailDTO(IReceiptDetail receipt, List<OrderDTO> details) {
+
+        ReceiptDetailDTO result = ReceiptDetailDTO.builder().id(receipt.getId())
+                .name(receipt.getCompanyName() != null ? receipt.getCompanyName() : receipt.getName())
+                .phone(receipt.getPhone())
+                .address(receipt.getCity() + ", " + receipt.getAddress())
+                .orderedDate(receipt.getOrderedDate())
+                .date(receipt.getDate())
+                .total(receipt.getTotal())
+                .totalDiscount(receipt.getTotalDiscount())
+                .paymentType(receipt.getPaymentType())
+                .paymentStatus(receipt.getPaymentStatus())
+                .expiredAt(receipt.getExpiredAt())
+                .details(details)
+                .build();
+
+        return result;
+    }
+
     // Detail
     public List<OrderDTO> ordersAndItemsProjectionToDTOS(List<IOrder> details, List<IOrderItem> items) {
         Map<Long, OrderDTO> ordersMap = new LinkedHashMap<>();
@@ -196,6 +216,7 @@ public class OrderMapper {
         for (IOrder detail : details) {
             OrderDTO order = OrderDTO.builder()
                     .id(detail.getId())
+                    .orderId(detail.getOrderId())
                     .shopId(detail.getShopId())
                     .shopName(detail.getShopName())
                     .totalPrice(detail.getTotalPrice())

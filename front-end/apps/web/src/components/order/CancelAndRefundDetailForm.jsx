@@ -35,7 +35,7 @@ const refundOptions = [
   "Không còn nhu cầu sử dụng (sẽ trả nguyên trạng sản phẩm)",
 ];
 
-const CancelRefundForm = ({
+const CancelAndRefundDetailForm = ({
   id,
   pending,
   setPending,
@@ -186,4 +186,4 @@ const CancelRefundForm = ({
   );
 };
 
-export default CancelRefundForm;
+export default CancelAndRefundDetailForm;

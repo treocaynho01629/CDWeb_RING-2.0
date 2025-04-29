@@ -114,7 +114,7 @@ const CustomTooltip = ({ active, payload, label, theme }) => {
   return null;
 };
 
-const ChartSales = () => {
+const ChartSales = ({ shop }) => {
   const [year, setYear] = useState(new Date().getFullYear());
   const axisFormat = new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -125,7 +125,7 @@ const ChartSales = () => {
   });
   const theme = useTheme();
 
-  const { data, isLoading } = useGetSalesQuery({ year });
+  const { data, isLoading } = useGetSalesQuery({ year, shopId: shop });
   const yearSales = data?.reduce(
     (result, month) => {
       let data = month?.data;

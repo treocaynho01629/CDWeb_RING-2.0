@@ -34,6 +34,7 @@ public class CaptchaServiceImpl implements CaptchaService {
     public static final String FORGOT_ACTION = "forgot";
     public static final String RESET_ACTION = "reset";
     public static final String CHECKOUT_ACTION = "checkout";
+    public static final String PAYMENT_ACTION = "payment";
 
     public void validate(String recaptchaToken, String source, final String action) throws ReCaptchaInvalidException {
         if (captchaProtectionService.isBlocked(getClientIP())) {

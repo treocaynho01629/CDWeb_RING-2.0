@@ -385,7 +385,7 @@ const PreviewDetailRow = ({
         </StyledTableCell>
       </StyledTableRow>
       <StyledTableRow className="center" role="shipping-row">
-        <StyledTableCell className="option" align="left" colSpan={3}>
+        <StyledTableCell className="option" align="left" colSpan={6}>
           <Box
             display="flex"
             width="100%"
@@ -443,7 +443,7 @@ const PreviewDetailRow = ({
         </StyledTableCell>
       </StyledTableRow>
       <StyledTableRow className="bottom" role="total-row">
-        <StyledTableCell align="right" colSpan={3}>
+        <StyledTableCell align="right" colSpan={6}>
           <PriceContainer>
             &nbsp;Tổng số tiền ({totalQuantity} sản phẩm):&emsp;
             <Price className="final">{currencyFormat.format(total)}</Price>

@@ -5,8 +5,8 @@ package com.ring.bookstore.model.enums;
  */
 public enum PaymentStatus {
     PENDING,
-    SUCCESS,
-    CANCELLED,
+    PAID,
+    CANCELED,
     PENDING_REFUND,
     REFUNDED
 }

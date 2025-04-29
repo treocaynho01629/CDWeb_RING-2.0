@@ -1,6 +1,7 @@
 package com.ring.bookstore.model.dto.projection.orders;
 
 import com.ring.bookstore.model.enums.OrderStatus;
+import com.ring.bookstore.model.enums.PaymentStatus;
 import com.ring.bookstore.model.enums.PaymentType;
 import com.ring.bookstore.model.enums.ShippingType;
 
@@ -45,6 +46,8 @@ public interface IOrderDetail {
     PaymentType getPaymentType();
 
     OrderStatus getStatus();
+
+    PaymentStatus getPaymentStatus();
 
     Long getShopId();
 

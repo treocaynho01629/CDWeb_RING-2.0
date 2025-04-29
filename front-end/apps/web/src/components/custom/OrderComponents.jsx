@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Skeleton } from "@mui/material";
+import { Skeleton, Typography, alpha } from "@mui/material";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
 export const ItemTitle = styled.p`
@@ -136,5 +136,183 @@ export const ToggleArrow = styled.span`
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     display: flex;
+  }
+`;
+
+export const OrderItemContainer = styled.div`
+  border: 0.5px solid;
+  border-color: ${({ theme }) => theme.palette.action.focus};
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    margin-bottom: 0;
+  }
+`;
+
+export const StuffContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    align-items: flex-end;
+  }
+`;
+
+export const BotContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  padding: ${({ theme }) => theme.spacing(2)};
+  border-top: 0.5px solid;
+  border-color: ${({ theme }) => theme.palette.action.focus};
+
+  &.alt {
+    border: 0;
+  }
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    padding: ${({ theme }) => theme.spacing(1)};
+    font-size: 14px;
+    align-items: flex-start;
+  }
+`;
+
+export const FinalPriceContainer = styled.div`
+  width: 100%;
+  max-width: 400px;
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    max-width: 100%;
+  }
+`;
+
+export const PriceRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: ${({ theme }) => theme.spacing(0.75)} 0;
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    padding: ${({ theme }) => theme.spacing(0.5)} 0;
+  }
+`;
+
+export const PriceText = styled.span`
+  font-size: 16px;
+  font-weight: 450;
+  white-space: nowrap;
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.main || theme.palette.text.primary};
+
+  &.secondary {
+    font-weight: 400;
+    color: ${({ theme }) => theme.palette.text.secondary};
+  }
+
+  &.discount {
+    color: ${({ theme }) => theme.palette.success.dark};
+  }
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    font-size: 14px;
+  }
+`;
+
+export const FinalPrice = styled.span`
+  font-size: 18px;
+  font-weight: bold;
+  color: ${({ theme }) => theme.palette.error.main};
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    font-size: 16px;
+  }
+`;
+
+export const PriceContainer = styled.div`
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    display: flex;
+  }
+`;
+
+export const Price = styled.p`
+  font-size: 15px;
+  font-weight: 450;
+  text-align: left;
+  color: ${({ theme }) => theme.palette.primary.main};
+  margin: 0;
+
+  &.total {
+    color: ${({ theme }) => theme.palette.warning.light};
+  }
+`;
+
+export const Discount = styled.p`
+  font-size: 12px;
+  color: ${({ theme }) => theme.palette.text.disabled};
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  text-align: center;
+  text-decoration: line-through;
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    margin-left: ${({ theme }) => theme.spacing(1)};
+  }
+`;
+
+export const Amount = styled.span`
+  font-size: 14px;
+  font-weight: 350;
+  color: ${({ theme }) => theme.palette.text.secondary};
+
+  b {
+    color: ${({ theme }) => theme.palette.warning.main};
+  }
+
+  &.mobile {
+    display: none;
+  }
+
+  ${({ theme }) => theme.breakpoints.down("md")} {
+    display: none;
+
+    &.mobile {
+      display: block;
+    }
+  }
+`;
+
+export const StatusTag = styled(Typography)`
+  text-transform: uppercase;
+  font-weight: 450;
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    font-size: 14px;
+  }
+`;
+
+export const StatusContent = styled.div`
+  background-color: ${({ theme, color }) =>
+    alpha(theme.palette[color]?.light ?? theme.palette.primary.light, 0.3)};
+  color: ${({ theme, color }) =>
+    theme.palette[color]?.main ?? theme.palette.primary.main};
+  border: 0.5px solid;
+  border-color: currentColor;
+  padding: ${({ theme }) => `${theme.spacing(1)} ${theme.spacing(2)}`};
+  font-weight: 500;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+
+  p {
+    text-transform: none;
+    font-size: 14px;
+    margin: ${({ theme }) => theme.spacing(1)} 0 0;
+    filter: brightness(0.9);
   }
 `;

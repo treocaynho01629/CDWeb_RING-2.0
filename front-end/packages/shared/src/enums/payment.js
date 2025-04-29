@@ -14,3 +14,17 @@ export const getPaymentType = () => {
     },
   });
 };
+
+export const getPaymentStatus = () => {
+  return Object.freeze({
+    PENDING: { value: "PENDING", label: "Chờ thanh toán", color: "warning" },
+    PAID: { value: "PAID", label: "Đã thanh toán", color: "success" },
+    CANCELED: { value: "CANCELED", label: "Đã huỷ", color: "error" },
+    PENDING_REFUND: {
+      value: "PENDING_REFUND",
+      label: "Chờ hoàn tiền",
+      color: "warning",
+    },
+    REFUNDED: { value: "REFUNDED", label: "Đã hoàn tiền", color: "error" },
+  });
+};

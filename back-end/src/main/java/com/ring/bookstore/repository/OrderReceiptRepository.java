@@ -1,10 +1,9 @@
 package com.ring.bookstore.repository;
 
-import java.util.List;
-import java.util.Map;
-
 import com.ring.bookstore.model.dto.projection.orders.IOrderReceipt;
+import com.ring.bookstore.model.dto.projection.orders.IReceiptDetail;
 import com.ring.bookstore.model.dto.projection.orders.IReceiptSummary;
+import com.ring.bookstore.model.entity.OrderReceipt;
 import com.ring.bookstore.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +11,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.ring.bookstore.model.entity.OrderReceipt;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Repository interface named {@link OrderReceiptRepository} for managing {@link OrderReceipt} entities.
@@ -37,6 +38,20 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
     """)
     boolean hasUserBoughtBook(Long id,
                               Long userId); //Check if user have bought this book before
+
+    @Query("""
+                            select o.id as id, a.name as name, a.companyName as companyName,
+                            a.city as city, a.address as address, a.phone as phone, o.createdDate as orderedDate,
+                            o.lastModifiedDate as date, p.paymentType as paymentType, p.status as paymentStatus,
+                            o.total as total, o.totalDiscount as totalDiscount, p.expiredAt as expiredAt
+                            from OrderReceipt o
+                            join o.payment p
+                            join o.address a
+                            where o.id = :id
+                            and (coalesce(:userId) is null or o.user.id = :userId)
+                            group by o.id, a.id, p.id
+                        """)
+    Optional<IReceiptDetail> findReceiptDetail(Long id, Long userId);
 
     /**
      * Retrieves a paginated list of receipt summaries based on the provided filtering criteria.
@@ -100,7 +115,7 @@ public interface OrderReceiptRepository extends JpaRepository<OrderReceipt, Long
         and (coalesce(:userId) is null or s.owner.id = :userId)
         and (coalesce(:status) is null or od.status = :status)
         and concat (b.title, o.id) ilike %:keyword%
-        group by o.id
+        group by o.id, a.id, u.id, i.id
     """)
     Page<IOrderReceipt> findAllBy(Long shopId,
                                 Long userId,

@@ -1,12 +1,15 @@
 package com.ring.bookstore.service.impl;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.ring.bookstore.exception.EntityOwnershipException;
+import com.ring.bookstore.exception.PaymentException;
 import com.ring.bookstore.model.dto.projection.orders.*;
 import com.ring.bookstore.model.dto.request.*;
 import com.ring.bookstore.model.dto.response.coupons.CouponDiscountDTO;
@@ -44,6 +47,7 @@ import com.ring.bookstore.service.PayOSService;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import vn.payos.type.CheckoutResponseData;
+import vn.payos.type.PaymentLinkData;
 
 @RequiredArgsConstructor
 @Service
@@ -56,6 +60,7 @@ public class OrderServiceImpl implements OrderService {
     private final ShopRepository shopRepo;
     private final CouponRepository couponRepo;
     private final AddressRepository addressRepo;
+    private final PaymentInfoRepository paymentRepo;
 
     private final CouponService couponService;
     private final CaptchaService captchaService;
@@ -70,18 +75,18 @@ public class OrderServiceImpl implements OrderService {
 
     // Calculate
     public CalculateDTO calculate(CalculateRequest request,
-            Account user) {
+                                  Account user) {
         // Create address
         AddressRequest addressRequest = request.getAddress();
         var address = addressRequest != null
                 ? Address.builder()
-                        .name(addressRequest.getName())
-                        .companyName(addressRequest.getCompanyName())
-                        .phone(addressRequest.getPhone())
-                        .city(addressRequest.getCity())
-                        .address(addressRequest.getAddress())
-                        .type(addressRequest.getType())
-                        .build()
+                .name(addressRequest.getName())
+                .companyName(addressRequest.getCompanyName())
+                .phone(addressRequest.getPhone())
+                .city(addressRequest.getCity())
+                .address(addressRequest.getAddress())
+                .type(addressRequest.getType())
+                .build()
                 : null;
 
         OrderReceipt calculatedReceipt = processOrder(request.getCart(),
@@ -97,8 +102,8 @@ public class OrderServiceImpl implements OrderService {
     // Commit order
     @Transactional
     public ReceiptDTO checkout(OrderRequest checkRequest,
-            HttpServletRequest request,
-            Account user) {
+                               HttpServletRequest request,
+                               Account user) {
 
         // Recaptcha
         final String recaptchaToken = request.getHeader("response");
@@ -127,7 +132,8 @@ public class OrderServiceImpl implements OrderService {
         // Payment
         PaymentInfo paymentInfo = PaymentInfo.builder()
                 .paymentType(checkRequest.getPaymentMethod())
-                .paymentStatus(PaymentStatus.PENDING)
+                .status(PaymentStatus.PENDING)
+                .amount((int) Math.floor(orderReceipt.getTotal() - orderReceipt.getTotalDiscount()))
                 .build();
 
         // Set relevant values
@@ -135,12 +141,27 @@ public class OrderServiceImpl implements OrderService {
         orderReceipt.setEmail(user.getEmail());
         orderReceipt.setAddress(savedAddress);
 
-        ReceiptDTO receiptDTO = orderMapper.orderToDTO(orderReceipt);
-        CheckoutResponseData checkoutResponse = payOSService.checkout(receiptDTO);
-
-        // Do stuff later
         orderReceipt.setPayment(paymentInfo);
         orderRepo.save(orderReceipt);
+
+        ReceiptDTO receiptDTO = orderMapper.orderToDTO(orderReceipt);
+
+        if (checkRequest.getPaymentMethod().equals(PaymentType.ONLINE_PAYMENT)) {
+            try {
+                CheckoutResponseData checkoutResponse = payOSService.checkout(receiptDTO);
+
+                paymentInfo.setCheckoutUrl(checkoutResponse.getCheckoutUrl());
+                paymentInfo.setStatus(PaymentStatus.valueOf(checkoutResponse.getStatus()));
+                paymentInfo.setAmount(checkoutResponse.getAmount());
+                paymentInfo.setDescription(checkoutResponse.getDescription());
+                paymentInfo.setExpiredAt(Instant.ofEpochSecond(checkoutResponse.getExpiredAt())
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime());
+
+                orderRepo.save(orderReceipt);
+            } catch (PaymentException ignored) {
+            }
+        }
 
         // Trigger email event
         eventPublisher.publishEvent(new OnCheckoutCompletedEvent(
@@ -149,25 +170,93 @@ public class OrderServiceImpl implements OrderService {
                 orderReceipt.getProductsPrice(),
                 orderReceipt.getShippingFee(),
                 receiptDTO));
+
         return receiptDTO;
     }
 
-    @Override
-    public CheckoutResponseData createPaymentLink(Long id) {
+    @Transactional
+    public PaymentInfo createPaymentLink(HttpServletRequest request,
+                                         Long id) {
 
-        ReceiptDTO receipt = this.getReceipt(id);
-        return payOSService.checkout(receipt);
+        // Recaptcha
+        final String recaptchaToken = request.getHeader("response");
+        final String source = request.getHeader("source");
+        captchaService.validate(recaptchaToken, source, CaptchaServiceImpl.PAYMENT_ACTION);
+
+        PaymentInfo paymentInfo = paymentRepo.findByOrder(id).orElseThrow(
+                () -> new ResourceNotFoundException("Payment for this Order not found!",
+                        "Không thể tìm thấy đường dẫn thanh toán cho đơn hàng yêu cầu!")
+        );
+
+        if (paymentInfo.getPaymentType().equals(PaymentType.ONLINE_PAYMENT)
+                && paymentInfo.getStatus().equals(PaymentStatus.PENDING)
+                && paymentInfo.getCheckoutUrl() == null) {
+            ReceiptDTO receiptDTO = this.getReceipt(id);
+            CheckoutResponseData checkoutResponse = payOSService.checkout(receiptDTO);
+
+            LocalDateTime expiredAt = LocalDateTime.ofInstant(
+                    Instant.ofEpochSecond(checkoutResponse.getExpiredAt()),
+                    ZoneId.systemDefault()
+            );
+
+            paymentInfo.setCheckoutUrl(checkoutResponse.getCheckoutUrl());
+            paymentInfo.setStatus(PaymentStatus.valueOf(checkoutResponse.getStatus()));
+            paymentInfo.setAmount(checkoutResponse.getAmount());
+            paymentInfo.setDescription(checkoutResponse.getDescription());
+            paymentInfo.setExpiredAt(expiredAt);
+
+            paymentRepo.save(paymentInfo);
+        }
+
+        return paymentInfo;
+    }
+
+    @Override
+    public PaymentLinkData getPaymentLinkData(Long id) {
+        return payOSService.getPaymentLinkData(id);
     }
 
     @Transactional
     public void cancel(Long id,
-            String reason,
-            Account user) {
+                       String reason,
+                       Account user) {
 
         OrderDetail detail = detailRepo.findDetailById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order detail not found!",
                         "Không tìm thấy chi tiết đơn hàng yêu cầu!"));
+
+        // Check valid status for cancel
+        OrderStatus currStatus = detail.getStatus();
+        if (!currStatus.equals(OrderStatus.PENDING)) {
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid order status!");
+        }
+
+        // Check if correct user
         OrderReceipt order = detail.getOrder();
+        if (!isUserValid(order, user)) {
+            throw new EntityOwnershipException("Invalid user!",
+                    "Người dùng không có quyền huỷ đơn hàng này!");
+        }
+
+        detail.setStatus(OrderStatus.CANCELED);
+        detail.setNote(reason);
+        detailRepo.save(detail);
+
+        // Subtract price & discount
+        order.setTotal(order.getTotal() - detail.getTotalPrice() - detail.getShippingFee());
+        order.setTotalDiscount(order.getTotalDiscount() - detail.getDiscount() - detail.getShippingDiscount());
+
+        orderRepo.save(order);
+    }
+
+    @Transactional
+    public void cancelUnpaidOrder(Long orderId,
+                                  String reason,
+                                  Account user) {
+
+        OrderReceipt order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found!",
+                        "Không tìm thấy đơn hàng yêu cầu!"));
 
         // Check if correct user
         if (!isUserValid(order, user)) {
@@ -175,60 +264,100 @@ public class OrderServiceImpl implements OrderService {
                     "Người dùng không có quyền huỷ đơn hàng này!");
         }
 
-        // Check valid status for cancel
-        OrderStatus currStatus = detail.getStatus();
-        if (!(currStatus.equals(OrderStatus.SHIPPING)
-                || currStatus.equals(OrderStatus.PENDING)
-                || currStatus.equals(OrderStatus.PENDING_PAYMENT))) {
-            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid order status!");
-        }
+        PaymentInfo paymentInfo = paymentRepo.findByOrder(order.getId()).orElseThrow(
+                () -> new ResourceNotFoundException("Payment for this Order not found!",
+                        "Không thể tìm thấy đường dẫn thanh toán cho đơn hàng yêu cầu!")
+        );
 
-        detail.setStatus(OrderStatus.CANCELED);
-        detailRepo.save(detail);
+        if (!paymentInfo.getStatus().equals(PaymentStatus.PENDING))
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid payment status!");
+
+        // Cancel all details
+        detailRepo.cancelUnpaidByOrderId(order.getId(), reason);
 
         // Subtract price & discount
-        order.setTotal(order.getTotal() - detail.getTotalPrice() - detail.getShippingFee());
-        order.setTotalDiscount(order.getTotalDiscount() - detail.getDiscount() - detail.getShippingDiscount());
+        order.setTotal(0.0);
+        order.setTotalDiscount(0.0);
+
+        if (paymentInfo.getPaymentType().equals(PaymentType.ONLINE_PAYMENT)) {
+            // Cancel payment
+            try {
+                PaymentLinkData paymentData = payOSService.cancel(order.getId(), reason);
+                paymentInfo.setExpiredAt(null);
+                paymentInfo.setStatus(PaymentStatus.valueOf(paymentData.getStatus()));
+            } catch (Exception ignored) {
+                paymentInfo.setStatus(PaymentStatus.CANCELED);
+            }
+        } else {
+            paymentInfo.setStatus(PaymentStatus.CANCELED);
+        }
+
+        paymentRepo.save(paymentInfo);
         orderRepo.save(order);
     }
 
     @Transactional
     public void refund(Long id,
-            String reason,
-            Account user) {
+                       String reason,
+                       Account user) {
         OrderDetail detail = detailRepo.findDetailById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order detail not found!",
                         "Không tìm thấy chi tiết đơn hàng yêu cầu!"));
-
-        // Check if correct user
-        if (!isUserValid(detail.getOrder(), user))
-            throw new EntityOwnershipException("Invalid user!",
-                    "Người dùng không có quyền hoàn trả đơn hàng này!");
 
         // Check valid status for cancel
         OrderStatus currStatus = detail.getStatus();
         if (!currStatus.equals(OrderStatus.COMPLETED))
             throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid order status!");
 
-        if (detail.getOrder().getLastModifiedDate()
+        // Check if correct user
+        OrderReceipt order = detail.getOrder();
+        if (!isUserValid(order, user))
+            throw new EntityOwnershipException("Invalid user!",
+                    "Người dùng không có quyền hoàn trả đơn hàng này!");
+
+
+        if (order.getLastModifiedDate()
                 .plus(1, ChronoUnit.WEEKS).isAfter(LocalDateTime.now()))
             throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid date!");
 
         detail.setStatus(OrderStatus.PENDING_REFUND);
+        detail.setNote(reason);
         detailRepo.save(detail);
     }
 
     @Transactional
+    public void changePaymentMethod(Long orderId,
+                                    PaymentType paymentMethod,
+                                    Account user) {
+
+        OrderReceipt order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found!",
+                        "Không tìm thấy đơn hàng yêu cầu!"));
+
+        // Check if correct user
+        if (!isUserValid(order, user))
+            throw new EntityOwnershipException("Invalid user!",
+                    "Người dùng không có quyền thay đổi hình thức thanh toán cho đơn hàng này!");
+
+        PaymentInfo paymentInfo = paymentRepo.findByOrder(order.getId()).orElseThrow(
+                () -> new ResourceNotFoundException("Payment for this Order not found!",
+                        "Không thể tìm thấy đường dẫn thanh toán cho đơn hàng yêu cầu!")
+        );
+
+        // Check valid status for cancel
+        if (!paymentInfo.getStatus().equals(PaymentStatus.PENDING))
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid payment status!");
+
+        paymentInfo.setPaymentType(paymentMethod);
+        paymentRepo.save(paymentInfo);
+    }
+
+    @Transactional
     public void confirm(Long id,
-            Account user) {
+                        Account user) {
         OrderDetail detail = detailRepo.findDetailById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order detail not found!",
                         "Không tìm thấy chi tiết đơn hàng yêu cầu!"));
-
-        // Check if correct user
-        if (!isUserValid(detail.getOrder(), user))
-            throw new EntityOwnershipException("Invalid user!",
-                    "Người dùng không có quyền xác nhận đơn hàng này!");
 
         // Check valid status for cancel
         OrderStatus currStatus = detail.getStatus();
@@ -236,14 +365,43 @@ public class OrderServiceImpl implements OrderService {
             throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid order status!");
         }
 
+        PaymentInfo paymentInfo = paymentRepo.findByOrder(detail.getOrder().getId()).orElseThrow(
+                () -> new ResourceNotFoundException("Payment for this Order not found!",
+                        "Không thể tìm thấy đường dẫn thanh toán cho đơn hàng yêu cầu!")
+        );
+
+        if (!paymentInfo.getStatus().equals(PaymentStatus.PAID)) {
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid payment status!");
+        }
+
+        // Check if correct user
+        if (!isUserValid(detail.getOrder(), user))
+            throw new EntityOwnershipException("Invalid user!",
+                    "Người dùng không có quyền xác nhận đơn hàng này!");
+
         detail.setStatus(OrderStatus.COMPLETED);
         detailRepo.save(detail);
     }
 
     @Transactional
+    public void confirmPayment(Long id) {
+
+        // Update payment status
+        PaymentInfo paymentInfo = paymentRepo.findByOrder(id).orElseThrow(
+                () -> new ResourceNotFoundException("Payment for this Order not found!",
+                        "Không thể tìm thấy đường dẫn thanh toán cho đơn hàng yêu cầu!")
+        );
+        paymentInfo.setStatus(PaymentStatus.PAID);
+        paymentRepo.save(paymentInfo);
+
+        // Update details status
+        detailRepo.confirmPaymentByOrderId(id);
+    }
+
+    @Transactional
     public void changeStatus(Long id,
-            OrderStatus status,
-            Account user) {
+                             OrderStatus status,
+                             Account user) {
 
         OrderDetail detail = detailRepo.findDetailById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order detail not found!",
@@ -269,13 +427,13 @@ public class OrderServiceImpl implements OrderService {
     // Get all orders
     @Transactional
     public Page<ReceiptDTO> getAllReceipts(Account user,
-            Long shopId,
-            OrderStatus status,
-            String keyword,
-            Integer pageNo,
-            Integer pageSize,
-            String sortBy,
-            String sortDir) {
+                                           Long shopId,
+                                           OrderStatus status,
+                                           String keyword,
+                                           Integer pageNo,
+                                           Integer pageSize,
+                                           String sortBy,
+                                           String sortDir) {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize,
                 sortDir.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());
@@ -302,12 +460,12 @@ public class OrderServiceImpl implements OrderService {
     // Get all order summaries
     @Transactional
     public Page<ReceiptSummaryDTO> getSummariesWithFilter(Account user,
-            Long shopId,
-            Long bookId,
-            Integer pageNo,
-            Integer pageSize,
-            String sortBy,
-            String sortDir) {
+                                                          Long shopId,
+                                                          Long bookId,
+                                                          Integer pageNo,
+                                                          Integer pageSize,
+                                                          String sortBy,
+                                                          String sortDir) {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize,
                 sortDir.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());
@@ -328,10 +486,10 @@ public class OrderServiceImpl implements OrderService {
     // Get order with book's {id}
     @Override
     public Page<OrderDTO> getOrdersByBookId(Long id,
-            Integer pageNo,
-            Integer pageSize,
-            String sortBy,
-            String sortDir) {
+                                            Integer pageNo,
+                                            Integer pageSize,
+                                            String sortBy,
+                                            String sortDir) {
         Pageable pageable = PageRequest.of(pageNo, pageSize,
                 sortDir.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());
 
@@ -349,10 +507,10 @@ public class OrderServiceImpl implements OrderService {
     // Get current user's orders
     @Transactional
     public Page<OrderDTO> getOrdersByUser(Account user,
-            OrderStatus status,
-            String keyword,
-            Integer pageNo,
-            Integer pageSize) {
+                                          OrderStatus status,
+                                          String keyword,
+                                          Integer pageNo,
+                                          Integer pageSize) {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
@@ -367,7 +525,6 @@ public class OrderServiceImpl implements OrderService {
         return ordersDTO;
     }
 
-    // Get order by {id}
     @Override
     public ReceiptDTO getReceipt(Long id) {
 
@@ -378,16 +535,29 @@ public class OrderServiceImpl implements OrderService {
         return receiptDTO;
     }
 
-    // Get detail order by {detail's id}
     @Transactional
     public OrderDetailDTO getOrderDetail(Long id, Account user) {
 
         IOrderDetail detailProjection = detailRepo.findOrderDetail(id, isAuthAdmin() ? null : user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Order detail not found!",
-                                "Không tìm thấy chi tiết đơn hàng yêu cầu!"));
+                        "Không tìm thấy chi tiết đơn hàng yêu cầu!"));
         List<IOrderItem> items = itemRepo.findAllWithDetailIds(List.of(detailProjection.getId()));
-        OrderDetailDTO detailDTO = orderMapper.detailAndItemsProjectionToDetailDTO(detailProjection, items); // Map to DTO
+        OrderDetailDTO detailDTO = orderMapper.orderDetailAndItemsProjectionToOrderDetailDTO(detailProjection, items); // Map to DTO
         return detailDTO;
+    }
+
+    @Transactional
+    public ReceiptDetailDTO getReceiptDetail(Long id, Account user) {
+
+        IReceiptDetail receiptProjection = orderRepo.findReceiptDetail(id, isAuthAdmin() ? null : user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found!",
+                        "Không tìm thấy đơn hàng yêu cầu!"));
+        List<IOrder> details = detailRepo.findAllByReceiptId(id);
+        List<Long> orderIds = details.stream().map(IOrder::getId).collect(Collectors.toList());
+        List<IOrderItem> items = itemRepo.findAllWithDetailIds(orderIds);
+        List<OrderDTO> ordersList = orderMapper.ordersAndItemsProjectionToDTOS(details, items);
+        ReceiptDetailDTO orderDTO = orderMapper.receiptDetailAndDetailsDTOToReceiptDetailDTO(receiptProjection, ordersList); // Map to DTO
+        return orderDTO;
     }
 
     public StatDTO getAnalytics(Account user, Long shopId) {
@@ -408,11 +578,11 @@ public class OrderServiceImpl implements OrderService {
 
     // Process cart order
     private OrderReceipt processOrder(List<CartDetailRequest> cart,
-            String orderCoupon,
-            Address address,
-            PaymentType paymentMethod,
-            Account user,
-            boolean isCheckout) {
+                                      String orderCoupon,
+                                      Address address,
+                                      PaymentType paymentMethod,
+                                      Account user,
+                                      boolean isCheckout) {
 
         // Create receipt
         var orderReceipt = OrderReceipt.builder()
@@ -475,8 +645,8 @@ public class OrderServiceImpl implements OrderService {
         // Apply main coupon
         ICoupon cProjection = orderCoupon == null ? null // Null => User not select any coupon
                 : coupons.containsKey(orderCoupon) ? coupons.get(orderCoupon)
-                        : (couponRepo.recommendCoupon(null, totalPrice - totalDealDiscount, totalQuantity)
-                                .orElse(null));
+                : (couponRepo.recommendCoupon(null, totalPrice - totalDealDiscount, totalQuantity)
+                .orElse(null));
 
         Coupon coupon = cProjection != null ? cProjection.getCoupon() : null;
         if (coupon != null && coupon.getShop() == null
@@ -564,13 +734,13 @@ public class OrderServiceImpl implements OrderService {
 
     // Process detail (Shop's items)
     private OrderDetail processOrderDetail(CartDetailRequest detail,
-            Map<Long, Shop> shops,
-            Map<Long, Book> books,
-            Map<String, ICoupon> coupons,
-            Address address,
-            PaymentType paymentMethod,
-            Account user,
-            boolean isCheckout) {
+                                           Map<Long, Shop> shops,
+                                           Map<Long, Book> books,
+                                           Map<String, ICoupon> coupons,
+                                           Address address,
+                                           PaymentType paymentMethod,
+                                           Account user,
+                                           boolean isCheckout) {
         // Shop validation
         Shop shop = shops.get(detail.getShopId());
         List<CartItemRequest> items = detail.getItems();
@@ -656,8 +826,8 @@ public class OrderServiceImpl implements OrderService {
         // Check coupon
         ICoupon shopCoupon = detail.getCoupon() == null ? null // Null => User not select any coupon
                 : coupons.containsKey(detail.getCoupon()) ? coupons.get(detail.getCoupon())
-                        : couponRepo.recommendCoupon(shop.getId(), detailTotal - discountDeal, detailQuantity)
-                                .orElse(null);
+                : couponRepo.recommendCoupon(shop.getId(), detailTotal - discountDeal, detailQuantity)
+                .orElse(null);
 
         // Validate + apply coupon
         if (shopCoupon != null
@@ -725,8 +895,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private double calculateShippingFee(Address origin,
-            Address destination,
-            ShippingType type) {
+                                        Address destination,
+                                        ShippingType type) {
         double shippingFee = !(destination == null || origin == null) ? distanceCalculation(origin, destination) : 10000;
         if (type != null) shippingFee = shippingFee * type.getMultiplier().doubleValue();
         return shippingFee;
@@ -734,7 +904,7 @@ public class OrderServiceImpl implements OrderService {
 
     // Mock for now
     private double distanceCalculation(Address origin,
-            Address destination) {
+                                       Address destination) {
 
         double baseFee = 10000;
         return baseFee;
@@ -761,7 +931,7 @@ public class OrderServiceImpl implements OrderService {
 
     // Check valid role function
     protected boolean isOwnerValid(Shop shop,
-            Account user) {
+                                   Account user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); // Get current auth
         boolean isAdmin = (auth != null && auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));
@@ -770,7 +940,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     protected boolean isUserValid(OrderReceipt receipt,
-            Account user) {
+                                  Account user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication(); // Get current auth
         boolean isAdmin = (auth != null && auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals(UserRole.ROLE_ADMIN.toString())));

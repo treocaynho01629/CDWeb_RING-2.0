@@ -8,6 +8,7 @@ import com.ring.bookstore.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -99,12 +100,26 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         List<IOrder> findAllByReceiptIds(List<Long> ids);
 
         @Query("""
+                    select o.id as orderId, od.id as id, s.id as shopId, s.name as shopName, od.note as note,
+                    od.lastModifiedDate as date, od.totalPrice as totalPrice, od.discount as discount,
+                    od.shippingFee as shippingFee, od.shippingDiscount as shippingDiscount, sum(oi.quantity) as totalItems,
+                    od.status as status
+                    from OrderDetail od
+                    join od.order o
+                    join OrderItem oi on od.id = oi.detail.id
+                    left join Shop s on od.shop.id = s.id
+                    where o.id = :id
+                    group by o.id, s.id, od.id
+                """)
+        List<IOrder> findAllByReceiptId(Long id);
+
+        @Query("""
                             select od.id as id, o.id as orderId, a.name as name, a.companyName as companyName,
                             a.city as city, a.address as address, od.note as note, a.phone as phone,
                             od.createdDate as orderedDate, od.lastModifiedDate as date, p.paymentType as paymentType,
                             od.totalPrice as totalPrice, od.shippingFee as shippingFee, od.shippingType as shippingType,
                             od.shippingDiscount as shippingDiscount, od.discount as discount, od.status as status,
-                            s.id as shopId, s.name as shopName
+                            s.id as shopId, s.name as shopName, p.status as paymentStatus
                             from OrderDetail od
                             join od.items oi
                             join od.order o
@@ -147,4 +162,23 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
                         """)
         IStat getSalesAnalytics(Long shopId,
                         Long userId);
+
+        @Modifying
+        @Query("""
+                update OrderDetail od
+                set od.status = com.ring.bookstore.model.enums.OrderStatus.CANCELED,
+                    od.note = :reason
+                where od.order.id = :id
+                and od.status = com.ring.bookstore.model.enums.OrderStatus.PENDING_PAYMENT
+            """)
+        void cancelUnpaidByOrderId(Long id, String reason);
+
+        @Modifying
+        @Query("""
+                update OrderDetail od
+                set od.status = com.ring.bookstore.model.enums.OrderStatus.PENDING
+                where od.order.id = :id
+                and od.status = com.ring.bookstore.model.enums.OrderStatus.PENDING_PAYMENT
+            """)
+        void confirmPaymentByOrderId(Long id);
 }
