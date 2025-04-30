@@ -387,12 +387,12 @@ public class OrderServiceImpl implements OrderService {
     public void confirmPayment(Long id) {
 
         // Update payment status
-        PaymentInfo paymentInfo = paymentRepo.findByOrder(id).orElseThrow(
-                () -> new ResourceNotFoundException("Payment for this Order not found!",
-                        "Không thể tìm thấy đường dẫn thanh toán cho đơn hàng yêu cầu!")
-        );
-        paymentInfo.setStatus(PaymentStatus.PAID);
-        paymentRepo.save(paymentInfo);
+        PaymentInfo paymentInfo = paymentRepo.findByOrder(id).orElse(null);
+
+        if (paymentInfo != null) {
+            paymentInfo.setStatus(PaymentStatus.PAID);
+            paymentRepo.save(paymentInfo);
+        }
 
         // Update details status
         detailRepo.confirmPaymentByOrderId(id);
