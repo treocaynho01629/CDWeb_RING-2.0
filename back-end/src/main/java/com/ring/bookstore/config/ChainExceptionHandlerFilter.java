@@ -13,16 +13,33 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Custom filter for handling exceptions that occur during the request processing pipeline.
+ */
 @Component
 @RequiredArgsConstructor
 public class ChainExceptionHandlerFilter extends OncePerRequestFilter {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    @Qualifier("handlerExceptionResolver")
     private HandlerExceptionResolver resolver;
 
+    @Autowired
+    public ChainExceptionHandlerFilter(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+        this.resolver = resolver;
+    }
+
+    /**
+     * The main filtering logic that catches any exceptions thrown by subsequent filters in the chain.
+     * <p>
+     * If an exception is caught, it logs the error and delegates the exception handling to the
+     * provided {@link HandlerExceptionResolver}.
+     * </p>
+     *
+     * @param request The HTTP request being processed.
+     * @param response The HTTP response to be sent back to the client.
+     * @param filterChain The chain of filters through which the request passes.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

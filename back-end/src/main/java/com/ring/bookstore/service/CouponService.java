@@ -1,21 +1,18 @@
 package com.ring.bookstore.service;
 
-import com.ring.bookstore.dtos.coupons.CouponDTO;
-import com.ring.bookstore.dtos.coupons.CouponDetailDTO;
-import com.ring.bookstore.dtos.coupons.CouponDiscountDTO;
-import com.ring.bookstore.dtos.coupons.ICoupon;
-import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.enums.CouponType;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Coupon;
-import com.ring.bookstore.request.CartStateRequest;
-import com.ring.bookstore.request.CouponRequest;
+import com.ring.bookstore.model.dto.request.CartStateRequest;
+import com.ring.bookstore.model.dto.request.CouponRequest;
+import com.ring.bookstore.model.dto.response.coupons.CouponDTO;
+import com.ring.bookstore.model.dto.response.coupons.CouponDetailDTO;
+import com.ring.bookstore.model.dto.response.coupons.CouponDiscountDTO;
+import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.Coupon;
+import com.ring.bookstore.model.enums.CouponType;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface CouponService {
 
     Page<CouponDTO> getCoupons(Integer pageNo,
@@ -26,6 +23,7 @@ public interface CouponService {
                                List<String> codes,
                                String code,
                                Long shopId,
+                               Long userId,
                                Boolean byShop,
                                Boolean showExpired,
                                Double cValue,
@@ -34,6 +32,7 @@ public interface CouponService {
     CouponDetailDTO getCoupon(Long id);
 
     CouponDTO getCouponByCode(String code,
+                              Long shopId,
                               Double cValue,
                               Integer cQuantity);
 
@@ -42,7 +41,9 @@ public interface CouponService {
     CouponDTO recommendCoupon(Long shopId,
                               CartStateRequest state);
 
-    StatDTO getAnalytics(Long shopId);
+    StatDTO getAnalytics(Long shopId,
+                         Long userId,
+                         Account user);
 
     Coupon addCoupon(CouponRequest request,
                      Account user);
@@ -67,6 +68,7 @@ public interface CouponService {
                               List<String> codes,
                               String code,
                               Long shopId,
+                              Long userId,
                               Boolean byShop,
                               Boolean showExpired,
                               List<Long> ids,

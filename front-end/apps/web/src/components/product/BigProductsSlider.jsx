@@ -188,7 +188,7 @@ function Item({ book, index }) {
                   srcSet={Object.values(ImageSize)
                     .map(
                       (size) =>
-                        `${book.image.srcSet[size.value]} ${size.width}w`
+                        `${book.image?.srcSet[size?.value]} ${size?.width}w`
                     )
                     .join(", ")}
                   alt={`${book.title} Big product item`}

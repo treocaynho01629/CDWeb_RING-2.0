@@ -338,8 +338,10 @@ const ShopDetail = () => {
         <CustomBreadcrumbs separator="›" maxItems={4} aria-label="breadcrumb">
           {data ? (
             [
-              <NavLink to={"/shop"}>Danh sách cửa hàng</NavLink>,
-              <NavLink to="#" key={"shop-name"}>
+              <NavLink to={"/shop"} key="shop">
+                Danh sách cửa hàng
+              </NavLink>,
+              <NavLink to="#" key="shop-name">
                 {data?.name}
               </NavLink>,
             ]

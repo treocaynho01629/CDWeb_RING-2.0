@@ -34,7 +34,9 @@ import { getOrderStatus } from "@ring/shared";
 import useCart from "../../hooks/useCart";
 import OrderItem from "./OrderItem";
 
-const CancelRefundForm = lazy(() => import("./CancelRefundForm"));
+const CancelAndRefundDetailForm = lazy(
+  () => import("./CancelAndRefundDetailForm")
+);
 
 const OrderStatus = getOrderStatus();
 const defaultSize = 5;
@@ -115,17 +117,6 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
     scrollToTop();
   };
 
-  //Search params
-  const updatePath = () => {
-    filters?.status == ""
-      ? searchParams.delete("status")
-      : searchParams.set("status", filters.status);
-    filters?.keyword == ""
-      ? searchParams.delete("k")
-      : searchParams.set("k", filters.keyword);
-    setSearchParams(searchParams, { replace: true });
-  };
-
   //Rebuy
   const handleAddToCart = async (detail) => {
     if (fetching || pending) return;
@@ -170,20 +161,21 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
 
   //Show more
   const handleShowMore = () => {
+    const currentPage = data?.page;
     if (
       isFetching ||
-      typeof data?.page?.number !== "number" ||
-      data?.page?.number < pagination?.number
+      typeof currentPage?.number !== "number" ||
+      currentPage?.number < pagination?.number
     )
       return;
-    const nextPage = data?.page?.number + 1;
-    if (nextPage < data?.page?.totalPages)
+    const nextPage = currentPage?.number + 1;
+    if (nextPage < currentPage?.totalPages)
       setPagination((prev) => ({ ...prev, number: nextPage }));
   };
 
   const handleWindowScroll = (e) => {
     const trigger =
-      document.body.scrollHeight - 300 < window.scrollY + window.innerHeight;
+      document.body.scrollHeight - 700 < window.scrollY + window.innerHeight;
     if (trigger) handleShowMore();
   };
 
@@ -196,20 +188,16 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
   const windowScrollListener = useCallback(debounce(handleWindowScroll, 500), [
     data,
   ]);
-
   const scrollListener = useCallback(debounce(handleScroll, 500), [data]);
 
   useEffect(() => {
-    if (tabletMode) {
-      window.removeEventListener("scroll", windowScrollListener);
-    } else {
-      window.addEventListener("scroll", windowScrollListener);
-    }
+    window.removeEventListener("scroll", windowScrollListener);
+    if (!tabletMode) window.addEventListener("scroll", windowScrollListener);
 
     return () => {
       window.removeEventListener("scroll", windowScrollListener);
     };
-  }, [tabletMode]);
+  }, [tabletMode, data]);
 
   let ordersContent;
 
@@ -328,7 +316,7 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
       >
         {open && (
           <Suspense fallback={null}>
-            <CancelRefundForm
+            <CancelAndRefundDetailForm
               {...{
                 pending,
                 setPending,

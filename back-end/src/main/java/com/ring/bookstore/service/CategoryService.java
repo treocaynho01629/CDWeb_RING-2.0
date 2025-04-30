@@ -2,11 +2,11 @@ package com.ring.bookstore.service;
 
 import java.util.List;
 
-import com.ring.bookstore.dtos.categories.CategoryDTO;
-import com.ring.bookstore.dtos.categories.CategoryDetailDTO;
-import com.ring.bookstore.dtos.categories.PreviewCategoryDTO;
-import com.ring.bookstore.model.Category;
-import com.ring.bookstore.request.CategoryRequest;
+import com.ring.bookstore.model.dto.response.categories.CategoryDTO;
+import com.ring.bookstore.model.dto.response.categories.CategoryDetailDTO;
+import com.ring.bookstore.model.dto.response.categories.PreviewCategoryDTO;
+import com.ring.bookstore.model.entity.Category;
+import com.ring.bookstore.model.dto.request.CategoryRequest;
 import org.springframework.data.domain.Page;
 
 public interface CategoryService {
@@ -35,9 +35,10 @@ public interface CategoryService {
 
     void deleteCategory(Integer id);
 
-    void deleteCategories(Integer parentId,
-                          List<Integer> ids,
-                          Boolean isInverse);
+    void deleteCategories(List<Integer> ids);
+
+    void deleteCategoriesInverse(Integer parentId,
+                          List<Integer> ids);
 
     void deleteAllCategories();
 }

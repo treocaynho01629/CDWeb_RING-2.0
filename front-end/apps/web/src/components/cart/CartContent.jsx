@@ -47,6 +47,7 @@ import useCheckout from "../../hooks/useCheckout";
 
 const Menu = lazy(() => import("@mui/material/Menu"));
 const CouponDialog = lazy(() => import("../coupon/CouponDialog"));
+const ConfirmDialog = lazy(() => import("@ring/shared/ConfirmDialog"));
 
 //#region styled
 const TitleContainer = styled.div`
@@ -205,6 +206,7 @@ const CartContent = ({ confirm }) => {
   const [contextState, setContextState] = useState(null);
   const [contextCoupon, setContextCoupon] = useState(null);
   const [openDialog, setOpenDialog] = useState(undefined);
+  const [openWarning, setOpenWarning] = useState(undefined);
   const [anchorEl, setAnchorEl] = useState(null);
 
   const open = Boolean(anchorEl);
@@ -215,10 +217,11 @@ const CartContent = ({ confirm }) => {
     data: recommend,
     isLoading: loadRecommend,
     isSuccess: doneRecommend,
+    isError: errorRecommend,
   } = useGetRecommendCouponsQuery({ shopIds }, { skip: !shopIds.length });
 
   //For get similar
-  const [getBook] = booksApiSlice.useLazyGetBooksQuery();
+  const [getBook] = booksApiSlice.useLazyGetBookDetailQuery();
 
   //Estimate/calculate price
   const [estimated, setEstimated] = useState({
@@ -261,7 +264,7 @@ const CartContent = ({ confirm }) => {
   }, [recommend, loadRecommend]);
 
   const handleCartChange = () => {
-    if (selected.length > 0 && cartProducts.length > 0 && doneRecommend) {
+    if (selected.length > 0 && cartProducts.length > 0) {
       //Reduce cart
       const selectedCart = cartProducts.reduce(
         (result, item) => {
@@ -289,7 +292,7 @@ const CartContent = ({ confirm }) => {
       );
 
       handleEstimate(selectedCart); //Estimate price
-      handleCalculate(selectedCart); //Calculate price
+      if (doneRecommend || errorRecommend) handleCalculate(selectedCart); //Calculate price
     } else {
       //Reset
       handleEstimate(null);
@@ -356,7 +359,8 @@ const CartContent = ({ confirm }) => {
       coupon,
       setCoupon,
       shopCoupon,
-      setShopCoupon
+      setShopCoupon,
+      handleOpenWarning
     );
   };
 
@@ -405,6 +409,10 @@ const CartContent = ({ confirm }) => {
     setContextProduct(product);
   };
 
+  const handleOpenWarning = () => {
+    setOpenWarning(true);
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
     setContextProduct(null);
@@ -423,9 +431,10 @@ const CartContent = ({ confirm }) => {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setContextShop(null);
-    setContextState(null);
-    setContextCoupon(null);
+  };
+
+  const handleCloseWarning = () => {
+    setOpenWarning(false);
   };
 
   //Selected?
@@ -515,15 +524,30 @@ const CartContent = ({ confirm }) => {
     handleClose();
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (isSelected(id)) handleSelect(id);
-    removeProduct(id);
-    handleClose();
+    const confirmation = await confirm();
+    if (confirmation) {
+      removeProduct(id);
+      handleClose();
+    } else {
+      console.log("Cancel");
+    }
   };
 
-  const handleDecrease = (quantity, id) => {
-    if (quantity == 1 && isSelected(id)) handleSelect(id); //Unselect if remove
-    decreaseAmount(id);
+  const handleDecrease = async (quantity, id) => {
+    if (quantity == 1) {
+      if (isSelected(id)) handleSelect(id); //Unselect if remove
+
+      const confirmation = await confirm();
+      if (confirmation) {
+        decreaseAmount(id);
+      } else {
+        console.log("Cancel");
+      }
+    } else {
+      decreaseAmount(id);
+    }
   };
 
   const handleChangeQuantity = (quantity, id) => {
@@ -551,10 +575,12 @@ const CartContent = ({ confirm }) => {
   const handleFindSimilar = async () => {
     getBook({ id: contextProduct?.id })
       .unwrap()
-      .then((book) =>
-        navigate(`/store/${book?.category?.slug}?cate=${book?.category?.id}
-                &pubs=${book?.publisher?.id}&types=${book?.type}`)
-      )
+      .then((book) => {
+        navigate(`/store/${book?.category?.slug}
+                ?cate=${book?.category?.id}
+                &pubs=${book?.publisher?.id}
+                &types=${book?.type}`);
+      })
       .catch((rejected) => console.error(rejected));
     handleClose();
   };
@@ -664,6 +690,7 @@ const CartContent = ({ confirm }) => {
               numSelected: selected.length,
               selectedCoupon: contextCoupon,
               selectMode: true,
+              loggedIn: username != null,
               onSubmit: handleChangeCoupon,
             }}
           />
@@ -694,6 +721,18 @@ const CartContent = ({ confirm }) => {
               <ListItemText>Tìm sản phẩm tương tự</ListItemText>
             </MenuItem>
           </Menu>
+        )}
+      </Suspense>
+      <Suspense fallback={null}>
+        {openWarning !== undefined && (
+          <ConfirmDialog
+            {...{
+              open: openWarning,
+              title: "Đã gỡ các sản phẩm!",
+              message: "Một số sản phẩm đã bị gỡ khỏi trang!",
+              handleConfirm: handleCloseWarning,
+            }}
+          />
         )}
       </Suspense>
     </Grid>

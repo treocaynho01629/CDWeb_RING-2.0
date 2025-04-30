@@ -1,14 +1,11 @@
 package com.ring.bookstore.service;
 
 import com.cloudinary.api.ApiResponse;
-import org.springframework.stereotype.Service;
+import com.ring.bookstore.model.entity.Image;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.ring.bookstore.model.Image;
 
 import java.util.List;
 
-@Service
 public interface ImageService {
 
     List<Image> getAllImages();

@@ -1,14 +1,17 @@
 package com.ring.bookstore.config;
 
-import com.ring.bookstore.enums.PrivilegeName;
-import com.ring.bookstore.enums.UserRole;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Privilege;
-import com.ring.bookstore.model.Role;
+import com.ring.bookstore.model.entity.PrivilegeGroup;
+import com.ring.bookstore.model.enums.PrivilegeGroupType;
+import com.ring.bookstore.model.enums.PrivilegeType;
+import com.ring.bookstore.model.enums.UserRole;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.Privilege;
+import com.ring.bookstore.model.entity.Role;
 import com.ring.bookstore.repository.AccountRepository;
+import com.ring.bookstore.repository.PrivilegeGroupRepository;
 import com.ring.bookstore.repository.PrivilegeRepository;
 import com.ring.bookstore.repository.RoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,65 +20,102 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+/**
+ * A component that loads initial setup data into the application when the
+ * Spring application context is refreshed.
+ */
 @Component
+@RequiredArgsConstructor
 public class SetupDataLoader implements
         ApplicationListener<ContextRefreshedEvent> {
 
     boolean alreadySetup = false;
 
-    @Autowired
-    private AccountRepository accountRepo;
+    private final AccountRepository accountRepo;
+    private final RoleRepository roleRepo;
+    private final PrivilegeRepository privilegeRepo;
+    private final PrivilegeGroupRepository groupRepo;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RoleRepository roleRepo;
-
-    @Autowired
-    private PrivilegeRepository privilegeRepo;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
+    /**
+     * This method is called when the application context is refreshed.
+     * <p>
+     * It is used to load initial data or perform any setup tasks that need to run
+     * when the application is started.
+     * </p>
+     *
+     * @param event The event that indicates the application context has been
+     *              refreshed.
+     */
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        if (alreadySetup) return;
+        if (alreadySetup)
+            return;
 
-        //Create initial privileges
-        final Privilege readPrivilege = createPrivilegeIfNotFound(PrivilegeName.READ_PRIVILEGE);
-        final Privilege createPrivilege = createPrivilegeIfNotFound(PrivilegeName.CREATE_PRIVILEGE);
-        final Privilege updatePrivilege = createPrivilegeIfNotFound(PrivilegeName.UPDATE_PRIVILEGE);
-        final Privilege deletePrivilege = createPrivilegeIfNotFound(PrivilegeName.DELETE_PRIVILEGE);
+        // Check
+        if (privilegeRepo.count() != PrivilegeType.values().length) {
+            // Create initial privileges
+            List<Privilege> privileges = new ArrayList<>();
+            for (PrivilegeGroupType groupType : PrivilegeGroupType.values()) {
+                PrivilegeGroup group = createPrivilegeGroupIfNotFound(groupType);
 
-        List<Privilege> fullPrivileges = Arrays.asList(readPrivilege, createPrivilege, updatePrivilege, deletePrivilege);
+                for (PrivilegeType privilegeType : groupType.getPrivileges()) {
+                    Privilege privilege = createPrivilegeIfNotFound(privilegeType, group);
+                    privileges.add(privilege);
+                }
+            }
 
-        //Create initial roles
-        createRoleIfNotFound(UserRole.ROLE_USER, Collections.emptyList());
-        createRoleIfNotFound(UserRole.ROLE_SELLER, fullPrivileges);
-        final Role adminRole = createRoleIfNotFound(UserRole.ROLE_ADMIN, fullPrivileges);
-        final Role guestRole = createRoleIfNotFound(UserRole.ROLE_GUEST, Arrays.asList(readPrivilege));
+            // Create initial roles
+            Map<UserRole, Role> roles = new HashMap<>();
+            for (UserRole userRole : UserRole.values()) {
+                List<Privilege> rolePrivileges = new ArrayList<>();
 
-        //Create initial user
-        createUserIfNotFound("test@test.com",
-                "Test",
-                "Test",
-                new ArrayList<>(Arrays.asList(adminRole)));
-        createUserIfNotFound("guest@guest.com",
-                "Guest",
-                "Guest123",
-                new ArrayList<>(Arrays.asList(guestRole)));
+                for (Privilege privilege : privileges) {
+                    if (userRole.getPrivileges().contains(privilege.getPrivilegeType()))
+                        rolePrivileges.add(privilege);
+                }
+
+                Role role = createRoleIfNotFound(userRole, rolePrivileges);
+                roles.put(userRole, role);
+            }
+
+            // Create initial user
+            createUserIfNotFound("test@test.com",
+                    "Test",
+                    "Test",
+                    List.of(roles.get(UserRole.ROLE_ADMIN)));
+            createUserIfNotFound("guest@guest.com",
+                    "Guest",
+                    "Guest123",
+                    List.of(roles.get(UserRole.ROLE_GUEST)));
+        }
 
         alreadySetup = true;
     }
 
     @Transactional
-    public Privilege createPrivilegeIfNotFound(PrivilegeName privilegeName) {
-        Privilege privilege = privilegeRepo.findByPrivilegeName(privilegeName).orElse(null);
+    public Privilege createPrivilegeIfNotFound(PrivilegeType privilegeType, PrivilegeGroup group) {
+        Privilege privilege = privilegeRepo.findByPrivilegeType(privilegeType).orElse(null);
         if (privilege == null) {
             privilege = new Privilege();
-            privilege.setPrivilegeName(privilegeName);
+            privilege.setLabel(privilegeType.getLabel());
+            privilege.setPrivilegeType(privilegeType);
+            privilege.setGroup(group);
             privilegeRepo.save(privilege);
         }
         return privilege;
+    }
+
+    @Transactional
+    public PrivilegeGroup createPrivilegeGroupIfNotFound(PrivilegeGroupType groupType) {
+        PrivilegeGroup group = groupRepo.findByGroupName(groupType.getLabel()).orElse(null);
+        if (group == null) {
+            group = new PrivilegeGroup();
+            group.setGroupName(groupType.getLabel());
+            groupRepo.save(group);
+        }
+        return group;
     }
 
     @Transactional
@@ -83,18 +123,19 @@ public class SetupDataLoader implements
         Role role = roleRepo.findByRoleName(userRole).orElse(null);
         if (role == null) {
             role = new Role();
+            role.setLabel(userRole.getLabel());
             role.setRoleName(userRole);
-            role.setPrivileges(privileges);
-            roleRepo.save(role);
         }
+        role.setPrivileges(privileges);
+        roleRepo.save(role);
         return role;
     }
 
     @Transactional
     public Account createUserIfNotFound(final String email,
-                                        final String username,
-                                        final String password,
-                                        final Collection<Role> roles) {
+            final String username,
+            final String password,
+            final Collection<Role> roles) {
         Account user = accountRepo.findByUsername(username).orElse(null);
         if (user == null) {
             user = new Account();

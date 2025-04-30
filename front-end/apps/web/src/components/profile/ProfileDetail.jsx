@@ -256,7 +256,6 @@ const ProfileDetail = ({
       .then((data) => {
         setErrMsg("");
         setErr([]);
-        refresh;
         enqueueSnackbar("Cập nhật hồ sơ thành công!", { variant: "success" });
         setPending(false);
         verifyRefreshToken(); //Refresh
@@ -268,6 +267,8 @@ const ProfileDetail = ({
           setErrMsg("Server không phản hồi");
         } else if (err?.status === 400) {
           setErrMsg("Sai định dạng thông tin!");
+        } else if (err?.status === 403) {
+          setErrMsg("Bạn không có quyền làm điều này!");
         } else {
           setErrMsg("Cập nhật hồ sơ thất bại");
         }

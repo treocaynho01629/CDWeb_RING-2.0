@@ -1,33 +1,24 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.books.IBook;
-import com.ring.bookstore.dtos.books.IBookDetail;
-import com.ring.bookstore.model.*;
+import com.ring.bookstore.base.AbstractRepositoryTest;
+import com.ring.bookstore.model.dto.projection.books.IBook;
+import com.ring.bookstore.model.dto.projection.books.IBookDetail;
+import com.ring.bookstore.model.entity.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class BookDetailRepositoryTest {
-
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+class BookDetailRepositoryTest extends AbstractRepositoryTest {
 
     @Autowired
     private BookDetailRepository detailRepo;
@@ -46,6 +37,9 @@ class BookDetailRepositoryTest {
 
     @Autowired
     private AccountRepository accountRepo;
+
+    @Autowired
+    private ImageRepository imageRepo;
 
     private Book book;
     private BookDetail detail;
@@ -72,6 +66,7 @@ class BookDetailRepositoryTest {
 
         Image image = Image.builder().name("image").build();
         Image image2 = Image.builder().name("image2").build();
+        Image image3 = Image.builder().name("image3").build();
 
         book = Book.builder()
                 .image(image)
@@ -99,23 +94,26 @@ class BookDetailRepositoryTest {
                 .build();
         book.setCreatedDate(LocalDateTime.now().minusMonths(1));
         book2.setCreatedDate(LocalDateTime.now().minusMonths(1));
-        List<Book> books = List.of(book, book2);
+        List<Book> books = new ArrayList<>(List.of(book, book2));
         bookRepo.saveAll(books);
 
         detail = BookDetail.builder()
                 .book(book)
                 .pages(123)
+                .previewImages(new ArrayList<>(List.of(image3)))
                 .build();
         BookDetail detail2 = BookDetail.builder()
                 .book(book2)
                 .pages(123)
                 .build();
-        List<BookDetail> details = List.of(detail, detail2);
+        List<BookDetail> details = new ArrayList<>(List.of(detail, detail2));
         detailRepo.saveAll(details);
     }
 
     @Test
     public void givenNewBookDetail_whenSaveBookDetail_ThenReturnBookDetail() {
+
+        // Given
         Image image = Image.builder().name("image3").build();
         Book book = Book.builder()
                 .image(image)
@@ -127,21 +125,28 @@ class BookDetailRepositoryTest {
                 .bWeight(1.2)
                 .build();
 
+        // When
         BookDetail savedDetail = detailRepo.save(bookDetail);
 
+        // Then
         assertNotNull(savedDetail);
         assertNotNull(savedDetail.getId());
     }
 
     @Test
     public void whenUpdateBookDetail_ThenReturnUpdatedBookDetail() {
+
+        // Given
         BookDetail foundDetail = detailRepo.findById(detail.getId()).orElse(null);
         assertNotNull(foundDetail);
+
+        // When
         foundDetail.setPages(320);
         foundDetail.setBDate(LocalDate.now());
 
         BookDetail updatedDetail = detailRepo.save(foundDetail);
 
+        // Then
         assertNotNull(updatedDetail);
         assertNotNull(updatedDetail.getBDate());
         assertEquals(320, updatedDetail.getPages());
@@ -149,18 +154,27 @@ class BookDetailRepositoryTest {
 
     @Test
     public void whenDeleteBookDetail_ThenFindNull() {
+
+        // When
         detailRepo.deleteById(detail.getId());
 
+        // Then
         BookDetail foundDetail = detailRepo.findById(detail.getId()).orElse(null);
-
+        Book foundBook = bookRepo.findById(book.getId()).orElse(null);
+        List<Image> foundImages = imageRepo.findAll();
         assertNull(foundDetail);
+        assertNotNull(foundBook);
+        assertEquals(2, foundImages.size());
     }
 
     @Test
     public void whenFindBookDetail_ThenReturnCorrectDetail() {
+
+        // When
         IBookDetail foundDetail = detailRepo.findBookDetail(book.getId(), null).orElse(null);
         IBookDetail foundDetail2 = detailRepo.findBookDetail(null, book.getSlug()).orElse(null);
 
+        // Then
         assertNotNull(foundDetail);
         assertNotNull(foundDetail2);
         assertEquals(foundDetail.getId(), foundDetail2.getId());
@@ -168,8 +182,11 @@ class BookDetailRepositoryTest {
 
     @Test
     public void whenFindBook_ThenReturnBook() {
+
+        // When
         IBook foundBook = detailRepo.findBook(book.getId()).orElse(null);
 
+        // Then
         assertNotNull(foundBook);
         assertEquals(book.getId(), foundBook.getId());
     }

@@ -3,7 +3,7 @@ package com.ring.bookstore.service.impl;
 import com.ring.bookstore.config.captcha.CaptchaSettings;
 import com.ring.bookstore.exception.ReCaptchaInvalidException;
 import com.ring.bookstore.exception.ReCaptchaSuspiciousException;
-import com.ring.bookstore.response.RecaptchaResponse;
+import com.ring.bookstore.model.dto.response.RecaptchaResponse;
 import com.ring.bookstore.service.CaptchaService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +34,7 @@ public class CaptchaServiceImpl implements CaptchaService {
     public static final String FORGOT_ACTION = "forgot";
     public static final String RESET_ACTION = "reset";
     public static final String CHECKOUT_ACTION = "checkout";
+    public static final String PAYMENT_ACTION = "payment";
 
     public void validate(String recaptchaToken, String source, final String action) throws ReCaptchaInvalidException {
         if (captchaProtectionService.isBlocked(getClientIP())) {

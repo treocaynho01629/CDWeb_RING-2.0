@@ -1,15 +1,13 @@
 package com.ring.bookstore.service;
 
-import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.dtos.shops.*;
-import com.ring.bookstore.exception.ImageResizerException;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.Shop;
-import com.ring.bookstore.request.ShopRequest;
+import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
+import com.ring.bookstore.model.dto.response.shops.*;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.Shop;
+import com.ring.bookstore.model.dto.request.ShopRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface ShopService {
@@ -36,12 +34,13 @@ public interface ShopService {
                             Account user);
 
     ShopDisplayDetailDTO getShopDisplayDetail(Long id,
-                            Account user);
+                                              Account user);
 
     ShopDetailDTO getShopDetail(Long id,
                                 Account user);
 
-    StatDTO getAnalytics();
+    StatDTO getAnalytics(Long userId,
+                         Account user);
 
     void follow(Long id,
                 Account user);

@@ -234,7 +234,7 @@ function ItemRow({
         <ItemContainer>
           <Link to={`/product/${product.slug}`}>
             <StyledLazyImage
-              src={product?.image?.srcSet[ImageSize.SMALL.value]}
+              src={product?.image?.srcSet[ImageSize?.SMALL?.value]}
               alt={`${product.title} Cart item`}
               placeholder={
                 <StyledSkeleton variant="rectangular" animation={false} />
@@ -417,6 +417,7 @@ const CartDetailRow = ({
         <StyledTableCell align="left" colSpan={6}>
           <CouponButton onClick={() => handleOpenDialog(shop?.id)}>
             <span>
+              &nbsp;
               <LocalActivityOutlined color="error" />
               &nbsp;
               {coupon
@@ -424,7 +425,9 @@ const CartDetailRow = ({
                   ? isGroupSelected
                     ? `Đã giảm ${currencyFormat.format(discount)}`
                     : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
-                  : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
+                  : coupon?.isUsable
+                    ? `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
+                    : "Đổi mã giảm giá"
                 : "Thêm mã giảm giá"}
             </span>
             <KeyboardArrowRight fontSize="small" />

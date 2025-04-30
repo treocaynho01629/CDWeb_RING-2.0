@@ -16,7 +16,6 @@ import {
   Button,
   useMediaQuery,
   Box,
-  Skeleton,
   TextField,
   CircularProgress,
 } from "@mui/material";
@@ -25,8 +24,9 @@ import {
   useGetCouponsQuery,
 } from "../../features/coupons/couponsApiSlice";
 import { getCouponType } from "@ring/shared";
-import { Instruction } from "@ring/ui/Components";
+import { Instruction, Message } from "@ring/ui/Components";
 import { trackWindowScroll } from "react-lazy-load-image-component";
+import { compact } from "lodash-es";
 import CouponItem from "./CouponItem";
 import styled from "@emotion/styled";
 import useCoupon from "../../hooks/useCoupon";
@@ -90,6 +90,7 @@ const DEFAULT_PAGINATON = {
 const CouponDialog = ({
   numSelected,
   selectMode = false,
+  loggedIn,
   shopId,
   checkState,
   open,
@@ -98,19 +99,21 @@ const CouponDialog = ({
   onSubmit,
   scrollPosition,
 }) => {
-  const { coupons: savedCoupons } = useCoupon();
+  const { coupons: savedCodes } = useCoupon();
   const fullScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const inputRef = useRef(null);
   const [couponInput, setCouponInput] = useState("");
   const [currCoupon, setCurrCoupon] = useState(selectedCoupon);
   const [tempCoupon, setTempCoupon] = useState(selectedCoupon);
-  const [saved, setSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [shipPagination, setShipPagination] = useState(DEFAULT_PAGINATON);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATON);
+  const [savedPagination, setSavedPagination] = useState(DEFAULT_PAGINATON);
 
   //Fetch coupons
   const {
     data: shipping,
+    currentData: currentShipping,
     isLoading: loadShipping,
     isFetching: fetchShipping,
     isSuccess: doneShipping,
@@ -126,20 +129,13 @@ const CouponDialog = ({
       page: shipPagination.number,
       loadMore: shipPagination.isMore,
     },
-    { skip: (!shopId && !selectMode) || saved }
+    { skip: (!shopId && !selectMode) || isSaved }
   );
-  const { data, isLoading, isFetching, isSuccess, isError } =
+  const { data, currentData, isLoading, isFetching, isSuccess, isError } =
     useGetCouponsQuery(
       {
         shopId,
-        types: saved
-          ? []
-          : [CouponType.MIN_VALUE.value, CouponType.MIN_AMOUNT.value],
-        codes: saved
-          ? savedCoupons?.length > 0
-            ? savedCoupons
-            : ["temp"]
-          : [],
+        types: [CouponType.MIN_VALUE.value, CouponType.MIN_AMOUNT.value],
         byShop: shopId != null,
         cValue: checkState?.value,
         cQuantity: checkState?.quantity,
@@ -147,8 +143,28 @@ const CouponDialog = ({
         page: pagination.number,
         loadMore: pagination.isMore,
       },
-      { skip: !shopId && !selectMode }
+      { skip: (!shopId && !selectMode) || isSaved }
     );
+  const {
+    data: saved,
+    currentData: currentSaved,
+    isLoading: loadSaved,
+    isFetching: fetchSaved,
+    isSuccess: doneSaved,
+    isError: errorSaved,
+  } = useGetCouponsQuery(
+    {
+      codes: savedCodes,
+      shopId,
+      byShop: shopId != null,
+      cValue: checkState?.value,
+      cQuantity: checkState?.quantity,
+      size: savedPagination.size,
+      page: savedPagination.number,
+      loadMore: savedPagination.isMore,
+    },
+    { skip: !isSaved && !selectMode && savedCodes?.length > 0 }
+  );
 
   //Fetch coupon by code
   const {
@@ -159,6 +175,7 @@ const CouponDialog = ({
   } = useGetCouponQuery(
     {
       code: couponInput,
+      shopId: shopId,
       cValue: checkState?.value,
       cQuantity: checkState?.quantity,
     },
@@ -172,15 +189,11 @@ const CouponDialog = ({
     setTempCoupon(selectedCoupon);
   }, [shopId, selectedCoupon]);
 
-  useEffect(() => {
-    setPagination(DEFAULT_PAGINATON);
-  }, [saved]);
-
   //Update selected/input coupon
   useEffect(() => {
-    if (doneCode && !loadCode && code) {
-      setCurrCoupon(code);
-      if (code?.isUsable && code?.shopId == shopId) setTempCoupon(code);
+    if (couponInput && doneCode && !loadCode && code) {
+      setTempCoupon(code);
+      if (code?.shopId == shopId) setCurrCoupon(code);
     }
   }, [code, loadCode, selectedCoupon]);
 
@@ -192,7 +205,7 @@ const CouponDialog = ({
         totalPages: data.page.totalPages,
       });
     }
-  }, [data]);
+  }, [data, isLoading]);
 
   useEffect(() => {
     if (shipping && !loadShipping && doneShipping) {
@@ -204,12 +217,22 @@ const CouponDialog = ({
     }
   }, [shipping]);
 
+  useEffect(() => {
+    if (saved && !loadSaved && doneSaved) {
+      setSavedPagination({
+        ...savedPagination,
+        number: saved.page.number,
+        totalPages: saved.page.totalPages,
+      });
+    }
+  }, [saved]);
+
   const handleChangeInput = () => {
     setCouponInput(inputRef?.current?.value);
   };
   const handleClickApply = (coupon, shopId) => {
     if (onSubmit) onSubmit(coupon, shopId);
-    handleClose();
+    onClose();
   };
 
   const handleShowMoreShipping = () => {
@@ -236,15 +259,36 @@ const CouponDialog = ({
       setPagination((prev) => ({ ...prev, number: nextPage }));
   };
 
-  const toggleSaved = () => {
-    setSaved((prev) => !prev);
+  const handleShowMoreSaved = () => {
+    if (
+      fetchSaved ||
+      typeof saved?.page?.number !== "number" ||
+      saved?.page?.number < savedPagination?.number
+    )
+      return;
+    const nextPage = saved?.page?.number + 1;
+    if (nextPage < saved?.page?.totalPages)
+      setSavedPagination((prev) => ({ ...prev, number: nextPage }));
   };
+
+  const toggleSaved = () => {
+    setIsSaved((prev) => !prev);
+  };
+
+  const onClose = () => {
+    handleClose();
+    setPagination(DEFAULT_PAGINATON);
+    setShipPagination(DEFAULT_PAGINATON);
+    setSavedPagination(DEFAULT_PAGINATON);
+  };
+
+  const checkDisabled = (coupon) =>
+    selectMode && (!loggedIn || !coupon?.isUsable || coupon?.shopId != shopId);
 
   //Display contents
   let coupons;
   let shippingCoupons;
-  let topCoupon;
-
+  let savedCoupons;
   let loadingComponent = (
     <Box
       display="flex"
@@ -256,130 +300,189 @@ const CouponDialog = ({
     </Box>
   );
 
-  if (loadShipping || errorShipping) {
+  if (doneShipping && currentShipping) {
+    const { ids, entities } = currentShipping;
+
+    let content = [];
+
+    if (
+      currCoupon &&
+      CouponType[currCoupon?.type]?.value == CouponType.SHIPPING.value
+    ) {
+      content.push(
+        <CouponItem
+          key={`coupon-${currCoupon?.id}`}
+          {...{
+            coupon: currCoupon,
+            summary: CouponType[currCoupon?.type],
+            selectMode,
+            isDisabled: checkDisabled(currCoupon),
+            isSelected: tempCoupon?.id == currCoupon?.id,
+            isUsed: selectMode && currCoupon?.isUsed,
+            isSaved: savedCodes?.indexOf(currCoupon?.code) != -1,
+            onClickApply: setTempCoupon,
+          }}
+        />
+      );
+    }
+
+    let fetchContent = ids?.length
+      ? ids?.map((id, index) => {
+          if (id != currCoupon?.id) {
+            const coupon = entities[id];
+            const summary = CouponType[coupon?.type];
+            const isDisabled = checkDisabled(coupon);
+            const isUsed = selectMode && coupon?.isUsed;
+            const isSelected = tempCoupon?.id == id;
+            const isSaved = savedCodes?.indexOf(coupon?.code) != -1;
+
+            return (
+              <CouponItem
+                key={`coupon-${id}-${index}`}
+                {...{
+                  coupon,
+                  summary,
+                  selectMode,
+                  isDisabled,
+                  isSelected,
+                  isUsed,
+                  isSaved,
+                  onClickApply: setTempCoupon,
+                  scrollPosition,
+                }}
+              />
+            );
+          }
+        })
+      : [];
+
+    content = content.concat(fetchContent);
+    content = compact(content); // Removes undefined
+
     shippingCoupons = (
       <>
-        <Skeleton
-          variant="text"
-          sx={{
-            fontSize: "17px",
-            margin: { xs: "5px 0 5px 10px", sm: "10px 0" },
-          }}
-          width="30%"
-        />
-        {loadingComponent}
+        {content?.length > 0 && <DetailTitle>Mã vận chuyển</DetailTitle>}
+        {content}
       </>
     );
-  } else if (doneShipping) {
-    const { ids, entities } = shipping;
-
-    shippingCoupons = ids?.length ? (
-      <>
-        <DetailTitle>Mã vận chuyển</DetailTitle>
-        {ids?.map((id, index) => {
-          const coupon = entities[id];
-          const summary = CouponType[coupon?.type];
-          const isDisabled = selectMode && !coupon.isUsable;
-          const isSelected = tempCoupon?.id == id;
-          const isSaved = savedCoupons?.indexOf(coupon?.code) != -1;
-
-          return (
-            <CouponItem
-              key={`coupon-${id}-${index}`}
-              {...{
-                coupon,
-                summary,
-                selectMode,
-                isDisabled,
-                isSelected,
-                isSaved,
-                onClickApply: setTempCoupon,
-                scrollPosition,
-              }}
-            />
-          );
-        })}
-      </>
-    ) : null;
   }
 
-  if (isLoading || isError) {
+  if (isSuccess && currentData) {
+    const { ids, entities } = currentData;
+
+    let content = [];
+
+    if (
+      currCoupon &&
+      CouponType[currCoupon?.type]?.value != CouponType.SHIPPING.value
+    ) {
+      content.push(
+        <CouponItem
+          key={`coupon-${currCoupon?.id}`}
+          {...{
+            coupon: currCoupon,
+            summary: CouponType[currCoupon?.type],
+            selectMode,
+            isDisabled: checkDisabled(currCoupon),
+            isSelected: tempCoupon?.id == currCoupon?.id,
+            isUsed: selectMode && currCoupon?.isUsed,
+            isSaved: savedCodes?.indexOf(currCoupon?.code) != -1,
+            onClickApply: setTempCoupon,
+          }}
+        />
+      );
+    }
+
+    let fetchContent = ids?.length
+      ? ids?.map((id, index) => {
+          if (id != currCoupon?.id) {
+            const coupon = entities[id];
+            const summary = CouponType[coupon?.type];
+            const isDisabled = checkDisabled(coupon);
+            const isUsed = selectMode && coupon?.isUsed;
+            const isSelected = tempCoupon?.id == id;
+            const isSaved = savedCodes?.indexOf(coupon?.code) != -1;
+
+            return (
+              <CouponItem
+                key={`coupon-${id}-${index}`}
+                {...{
+                  coupon,
+                  summary,
+                  selectMode,
+                  isDisabled,
+                  isSelected,
+                  isUsed,
+                  isSaved,
+                  onClickApply: setTempCoupon,
+                }}
+              />
+            );
+          }
+        })
+      : [];
+
+    content = content.concat(fetchContent);
+    content = compact(content); // Removes undefined
+
     coupons = (
       <>
-        <Skeleton
-          variant="text"
-          sx={{
-            fontSize: "17px",
-            margin: { xs: "5px 0 5px 10px", sm: "10px 0" },
-          }}
-          width="30%"
-        />
-        {loadingComponent}
+        {content?.length > 0 && <DetailTitle>Mã giảm giá</DetailTitle>}
+        {content}
       </>
     );
-  } else if (isSuccess) {
-    const { ids, entities } = data;
-
-    coupons = ids?.length ? (
-      <>
-        <DetailTitle>{saved ? "Mã đã lưu" : "Mã giảm giá"}</DetailTitle>
-        {ids?.map((id, index) => {
-          const coupon = entities[id];
-          const summary = CouponType[coupon?.type];
-          const isDisabled = selectMode && !coupon.isUsable;
-          const isSelected = tempCoupon?.id == id;
-          const isSaved = savedCoupons?.indexOf(coupon?.code) != -1;
-
-          return (
-            <CouponItem
-              key={`coupon-${id}-${index}`}
-              {...{
-                coupon,
-                summary,
-                selectMode,
-                isDisabled,
-                isSelected,
-                isSaved,
-                onClickApply: setTempCoupon,
-              }}
-            />
-          );
-        })}
-      </>
-    ) : null;
   }
 
-  if (currCoupon) {
-    const summary = CouponType[currCoupon?.type];
-    const isDisabled =
-      selectMode && (!currCoupon?.isUsable || currCoupon?.shopId != shopId);
-    const isUsed =
-      selectMode && (!currCoupon?.isUsed || currCoupon?.shopId != shopId);
-    const isSelected = tempCoupon?.id == currCoupon?.id;
+  if (doneSaved && currentSaved) {
+    const { ids, entities } = currentSaved;
 
-    topCoupon = (
-      <CouponItem
-        key={`top-coupon-${currCoupon?.id}`}
-        {...{
-          coupon: currCoupon,
-          summary,
-          selectMode,
-          isDisabled,
-          isUsed,
-          isSelected,
-          onClickApply: setTempCoupon,
-        }}
-      />
+    let content = ids?.length
+      ? ids?.map((id, index) => {
+          if (id != currCoupon?.id) {
+            const coupon = entities[id];
+            const summary = CouponType[coupon?.type];
+            const isDisabled = checkDisabled(coupon);
+            const isUsed = selectMode && tempCoupon?.isUsed;
+            const isSelected = tempCoupon?.id == id;
+            const isSaved = savedCodes?.indexOf(coupon?.code) != -1;
+
+            return (
+              <CouponItem
+                key={`coupon-${id}-${index}`}
+                {...{
+                  coupon,
+                  summary,
+                  selectMode,
+                  isDisabled,
+                  isSelected,
+                  isUsed,
+                  isSaved,
+                  onClickApply: setTempCoupon,
+                }}
+              />
+            );
+          }
+        })
+      : [];
+
+    content = compact(content); // Removes undefined
+
+    savedCoupons = (
+      <>
+        {content?.length > 0 && <DetailTitle>Mã đã lưu</DetailTitle>}
+        {content}
+      </>
     );
   }
 
   return (
     <Dialog
       open={open}
+      aria-hidden={!open}
       scroll={"paper"}
       maxWidth={"sm"}
       fullWidth
-      onClose={handleClose}
+      onClose={onClose}
       fullScreen={fullScreen}
       closeAfterTransition={false}
     >
@@ -391,11 +494,11 @@ const CouponDialog = ({
         {selectMode && (
           <Button
             size="small"
-            color={saved ? "" : "warning"}
-            startIcon={saved ? <KeyboardArrowLeft /> : <SaveAlt />}
+            color={isSaved ? "" : "warning"}
+            startIcon={isSaved ? <KeyboardArrowLeft /> : <SaveAlt />}
             onClick={toggleSaved}
           >
-            {saved ? "Trở về" : "Đã lưu"}
+            {isSaved ? "Trở về" : "Đã lưu"}
           </Button>
         )}
       </DialogTitle>
@@ -410,7 +513,7 @@ const CouponDialog = ({
               error={errorCode}
               size="small"
               fullWidth
-              disabled={!numSelected}
+              disabled={!numSelected || !loggedIn}
               slotProps={{
                 input: {
                   startAdornment: (
@@ -424,7 +527,7 @@ const CouponDialog = ({
             <Button
               variant="contained"
               sx={{ width: 125, ml: 1, boxShadow: "none" }}
-              disabled={!numSelected}
+              disabled={!numSelected || !loggedIn}
               onClick={handleChangeInput}
             >
               Áp dụng
@@ -433,14 +536,43 @@ const CouponDialog = ({
           <Instruction>
             {errorCode
               ? "Mã không hợp lệ"
-              : !numSelected && "Vui lòng chọn sản phẩm để sử dụng mã"}
+              : !loggedIn
+                ? "Vui lòng đăng nhập để áp dụng mã"
+                : !numSelected
+                  ? "Vui lòng chọn sản phẩm để sử dụng mã"
+                  : ""}
           </Instruction>
-          {topCoupon}
+          {couponInput && code && (
+            <CouponItem
+              key={`top-coupon-${code?.id}`}
+              {...{
+                coupon: code,
+                summary: CouponType[code?.type],
+                selectMode,
+                isDisabled: checkDisabled(code),
+                isUsed: selectMode && code?.isUsed,
+                isSelected: tempCoupon?.id == code?.id,
+                onClickApply: setTempCoupon,
+              }}
+            />
+          )}
         </CouponContainer>
       )}
       <DialogContent sx={{ pt: 0, px: { xs: 1, sm: 3 }, height: "100dvh" }}>
         <CouponsContainer>
-          {!saved && (
+          {isSaved ? (
+            <>
+              {savedCoupons}
+              {!loadSaved &&
+                savedPagination.totalPages > savedPagination.number + 1 && (
+                  <Showmore onClick={handleShowMoreSaved}>
+                    Xem thêm
+                    <ExpandMore />
+                  </Showmore>
+                )}
+              {fetchSaved && loadingComponent}
+            </>
+          ) : (
             <>
               {shippingCoupons}
               {!loadShipping &&
@@ -450,30 +582,41 @@ const CouponDialog = ({
                     <ExpandMore />
                   </Showmore>
                 )}
-              {fetchShipping && !loadShipping && loadingComponent}
+              {coupons}
+              {!isLoading && pagination.totalPages > pagination.number + 1 && (
+                <Showmore onClick={handleShowMore}>
+                  Xem thêm
+                  <ExpandMore />
+                </Showmore>
+              )}
+              {(isFetching || fetchShipping) && loadingComponent}
             </>
           )}
-          {coupons}
-          {!isLoading && pagination.totalPages > pagination.number + 1 && (
-            <Showmore onClick={handleShowMore}>
-              Xem thêm
-              <ExpandMore />
-            </Showmore>
-          )}
-          {isFetching && !isLoading && loadingComponent}
-          {!coupons && (saved || !shippingCoupons) && (
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              padding={6}
-            >
-              Hiện không có khuyến mãi
-            </Box>
+          {((isSaved && !savedCoupons && !fetchSaved) ||
+            (!isSaved &&
+              !coupons &&
+              !shippingCoupons &&
+              !isFetching &&
+              !fetchShipping)) && (
+            <Message>
+              {isError || errorShipping || errorSaved
+                ? "Đã xảy ra lỗi!"
+                : "Hiện không có khuyến mãi"}
+            </Message>
           )}
         </CouponsContainer>
       </DialogContent>
       <DialogActions>
+        <Button
+          variant="outlined"
+          color="error"
+          size="large"
+          sx={{ marginY: "10px" }}
+          startIcon={<Close />}
+          onClick={onClose}
+        >
+          Đóng
+        </Button>
         {selectMode && (
           <Button
             variant="contained"
@@ -483,19 +626,9 @@ const CouponDialog = ({
             startIcon={<Check />}
             onClick={() => handleClickApply(tempCoupon, shopId)}
           >
-            Xác nhận
+            Chọn
           </Button>
         )}
-        <Button
-          variant="outlined"
-          color="error"
-          size="large"
-          sx={{ marginY: "10px" }}
-          startIcon={<Close />}
-          onClick={handleClose}
-        >
-          Đóng
-        </Button>
       </DialogActions>
     </Dialog>
   );

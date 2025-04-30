@@ -320,7 +320,7 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
     setPending(true);
     const { enqueueSnackbar } = await import("notistack");
 
-    deleteUser({ id })
+    deleteUser(id)
       .unwrap()
       .then((data) => {
         //Unselected
@@ -472,7 +472,7 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
         const user = entities[id];
         const isItemSelected = isSelected(id);
         const labelId = `enhanced-table-checkbox-${index}`;
-        const roleItem = UserRole[user.role];
+        const roleItem = UserRole[user.roles?.[0]];
 
         return (
           <TableRow hover aria-checked={isItemSelected} tabIndex={-1} key={id}>
@@ -516,7 +516,7 @@ export default function TableUsers({ handleOpenEdit, pending, setPending }) {
             <TableCell align="left">
               <Chip
                 variant="outlined"
-                label={roleItem?.label}
+                label={`${roleItem?.label}${user?.roles?.length > 1 ? " +" + (user.roles.length - 1) : ""}`}
                 color={roleItem?.color}
                 sx={{ fontWeight: "bold" }}
               />

@@ -171,12 +171,7 @@ function ReviewFilters({ filters, setFilters }) {
   );
 }
 
-export default function TableReviews({
-  shop,
-  handleOpenEdit,
-  pending,
-  setPending,
-}) {
+export default function TableReviews({ pending, setPending }) {
   //#region construct
   const [selected, setSelected] = useState([]);
   const [deselected, setDeseletected] = useState([]);
@@ -202,7 +197,7 @@ export default function TableReviews({
   const openContext = Boolean(anchorEl);
 
   //Delete hook
-  const [deleteReview] = useDeleteReviewsMutation();
+  const [deleteReview] = useDeleteReviewMutation();
   const [deleteReviews] = useDeleteReviewsMutation();
   const [deleteReviewsInverse] = useDeleteReviewsInverseMutation();
   const [deleteAll] = useDeleteAllReviewsMutation();
@@ -341,7 +336,7 @@ export default function TableReviews({
     setPending(true);
     const { enqueueSnackbar } = await import("notistack");
 
-    deleteBook(id)
+    deleteReview(id)
       .unwrap()
       .then((data) => {
         //Unselected

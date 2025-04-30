@@ -117,13 +117,13 @@ const Background = styled.div`
   width: 35%;
   right: 0;
   z-index: -1;
-  transform-origin: 132.5% 50%;
+  transform-origin: 70vh 50vh;
   animation: ${flowIn} 1s ${({ theme }) => theme.transitions.easing.easOut};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     width: 100%;
     height: 25%;
-    transform-origin: 50% -350%;
+    transform-origin: 50vw -60vw;
     right: auto;
     top: -7.5%;
   }

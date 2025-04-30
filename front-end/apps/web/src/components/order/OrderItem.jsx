@@ -3,6 +3,7 @@ import { Box, Button, Typography } from "@mui/material";
 import {
   DeliveryDiningOutlined,
   KeyboardArrowRight,
+  Payment,
   Storefront,
 } from "@mui/icons-material";
 import { currencyFormat, getOrderStatus } from "@ring/shared";
@@ -17,18 +18,10 @@ import {
   BodyContainer,
   StyledLazyImage,
   StyledSkeleton,
+  StatusTag,
 } from "../custom/OrderComponents";
 
 //#region styled
-const StatusTag = styled(Typography)`
-  text-transform: uppercase;
-  font-weight: 450;
-
-  ${({ theme }) => theme.breakpoints.down("sm")} {
-    font-size: 14px;
-  }
-`;
-
 const Amount = styled.span`
   font-size: 14px;
   font-weight: 450;
@@ -116,7 +109,7 @@ const OrderItem = ({ order, handleAddToCart, handleCancelOrder }) => {
   return (
     <OrderItemContainer>
       <HeadContainer>
-        <Link to={`/store/${order?.shopId}`}>
+        <Link to={`/shops/${order?.shopId}`}>
           <Shop>
             <ShopTag>Đối tác</ShopTag>
             <Storefront />
@@ -125,13 +118,15 @@ const OrderItem = ({ order, handleAddToCart, handleCancelOrder }) => {
           </Shop>
         </Link>
         <Link to={`/profile/order/detail/${order?.id}`}>
-          <StatusTag color={detailStatus.color}>{detailStatus.label}</StatusTag>
+          <StatusTag color={detailStatus?.color}>
+            {detailStatus?.label}
+          </StatusTag>
         </Link>
       </HeadContainer>
       {order?.items?.map((item, itemIndex) => (
         <Link
           key={`item-${item?.id}-${itemIndex}`}
-          to={`/product/${item?.bookSlug}`}
+          to={`/profile/order/detail/${order?.id}`}
         >
           <BodyContainer
             className={
@@ -172,15 +167,27 @@ const OrderItem = ({ order, handleAddToCart, handleCancelOrder }) => {
         </Link>
       ))}
       <BotContainer>
-        <Link
-          to={`/profile/order/detail/${order?.id}`}
-          style={{ color: "inherit", display: "flex", alignItems: "center" }}
-        >
-          <DetailText>
-            <DeliveryDiningOutlined />
-            &nbsp;Chi tiết đơn hàng
-          </DetailText>
-        </Link>
+        {order?.status == OrderStatus.PENDING_PAYMENT.value ? (
+          <Link
+            to={`/profile/order/checkout/${order?.orderId}`}
+            style={{ color: "inherit", display: "flex", alignItems: "center" }}
+          >
+            <DetailText>
+              <Payment />
+              &nbsp;Chi tiết thanh toán
+            </DetailText>
+          </Link>
+        ) : (
+          <Link
+            to={`/profile/order/detail/${order?.id}`}
+            style={{ color: "inherit", display: "flex", alignItems: "center" }}
+          >
+            <DetailText>
+              <DeliveryDiningOutlined />
+              &nbsp;Chi tiết đơn hàng
+            </DetailText>
+          </Link>
+        )}
         <Box>
           <Box
             sx={{
@@ -199,8 +206,7 @@ const OrderItem = ({ order, handleAddToCart, handleCancelOrder }) => {
             </Price>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-            {order?.status == OrderStatus.PENDING.value ||
-            order?.status == OrderStatus.SHIPPING.value ? (
+            {order?.status == OrderStatus.PENDING.value ? (
               <MainButton
                 variant="outlined"
                 color="error"
@@ -208,6 +214,12 @@ const OrderItem = ({ order, handleAddToCart, handleCancelOrder }) => {
               >
                 Huỷ đơn hàng
               </MainButton>
+            ) : order?.status == OrderStatus.PENDING_PAYMENT.value ? (
+              <Link to={`/payment/${order?.orderId}`}>
+                <MainButton variant="contained" color="info">
+                  Thanh toán
+                </MainButton>
+              </Link>
             ) : (
               <MainButton
                 variant="contained"

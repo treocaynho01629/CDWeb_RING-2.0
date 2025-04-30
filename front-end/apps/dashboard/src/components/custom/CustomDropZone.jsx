@@ -9,7 +9,7 @@ const getColor = (props) => {
   if (props.isDragAccept) {
     return props.theme.palette.success.main;
   }
-  if (props.isDragReject) {
+  if (props.isDragReject || props.isMissing) {
     return props.theme.palette.error.main;
   }
   if (props.isFocused) {
@@ -186,6 +186,7 @@ const CustomDropZone = ({
   images,
   files,
   setFiles,
+  isMissing,
 }) => {
   const {
     getRootProps,
@@ -381,7 +382,7 @@ const CustomDropZone = ({
   return (
     <section>
       <DropZoneContainer
-        {...getRootProps({ isFocused, isDragAccept, isDragReject })}
+        {...getRootProps({ isFocused, isDragAccept, isDragReject, isMissing })}
       >
         <input {...getInputProps()} style={{ display: "none" }} />
         <DropZoneContent>

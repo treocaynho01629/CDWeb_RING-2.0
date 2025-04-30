@@ -74,7 +74,7 @@ const CouponFormDialog = ({
   const [expireDate, setExpireDate] = useState(dayjs());
   const [currShop, setCurrShop] = useState(shop ?? "");
   const [openShop, setOpenShop] = useState(false);
-  const [type, setType] = useState(Object.values(CouponType)[0].value);
+  const [type, setType] = useState(Object.keys(CouponType)[0]);
   const [err, setErr] = useState([]);
   const [errMsg, setErrMsg] = useState("");
 
@@ -110,7 +110,7 @@ const CouponFormDialog = ({
     setDiscount(0);
     setUsage(0);
     setExpireDate(dayjs());
-    setType(Object.values(CouponType)[0].value);
+    setType(Object.keys(CouponType)[0]);
     setCurrShop(currShop);
     setErr([]);
     setErrMsg("");
@@ -175,7 +175,7 @@ const CouponFormDialog = ({
           } else if (err?.status === 409) {
             setErrMsg(err?.data?.message);
           } else if (err?.status === 403) {
-            setErrMsg("Chưa có ảnh kèm theo!");
+            setErrMsg("Bạn không có quyền làm điều này!");
           } else if (err?.status === 400) {
             setErrMsg("Sai định dạng thông tin!");
           } else {
@@ -207,7 +207,7 @@ const CouponFormDialog = ({
           } else if (err?.status === 409) {
             setErrMsg(err?.data?.message);
           } else if (err?.status === 403) {
-            setErrMsg("Chưa có ảnh kèm theo!");
+            setErrMsg("Bạn không có quyền làm điều này!");
           } else if (err?.status === 400) {
             setErrMsg("Sai định dạng thông tin!");
           } else {
@@ -267,7 +267,7 @@ const CouponFormDialog = ({
                 value={type}
                 onChange={(e) => setType(e.target.value)}
               >
-                {Object.values(BookType).map((option) => (
+                {Object.values(CouponType).map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>

@@ -36,7 +36,6 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
-          //To delete cookie
           await queryFulfilled;
           console.log("Logged out");
         } catch (error) {

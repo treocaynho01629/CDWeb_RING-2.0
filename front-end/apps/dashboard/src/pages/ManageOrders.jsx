@@ -35,7 +35,7 @@ const ManageOrders = () => {
         />
       </Box>
       <Box mb={3}>
-        <ChartSales />
+        <ChartSales shop={shop} />
       </Box>
       <TableOrders shop={shop} />
     </>

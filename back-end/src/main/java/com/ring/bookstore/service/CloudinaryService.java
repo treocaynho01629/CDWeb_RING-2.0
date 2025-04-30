@@ -1,12 +1,10 @@
 package com.ring.bookstore.service;
 
 import com.cloudinary.api.ApiResponse;
-import com.ring.bookstore.response.CloudinaryResponse;
-import org.springframework.stereotype.Service;
+import com.ring.bookstore.model.dto.response.CloudinaryResponse;
 
 import java.util.List;
 
-@Service
 public interface CloudinaryService {
 
     CloudinaryResponse replace(byte[] data, String publicId);

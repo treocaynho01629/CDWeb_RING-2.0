@@ -35,6 +35,9 @@ const useOffset = (overlapRef) => {
     //Check initially
     scrollListener();
 
+    window.removeEventListener("scroll", scrollListener);
+    window.removeEventListener("resize", scrollListener);
+
     window.addEventListener("scroll", scrollListener);
     window.addEventListener("resize", scrollListener);
 

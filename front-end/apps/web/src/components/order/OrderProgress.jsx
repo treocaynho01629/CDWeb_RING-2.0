@@ -27,7 +27,7 @@ import {
 } from "@mui/icons-material";
 import { dateFormatter, getOrderStatus, timeFormatter } from "@ring/shared";
 import { useState } from "react";
-import { ToggleArrow } from "../custom/OrderComponents";
+import { StatusContent, ToggleArrow } from "../custom/OrderComponents";
 import PropTypes from "prop-types";
 
 //#region styled
@@ -137,29 +137,6 @@ const StyledStepIconRoot = styled("div")(({ theme, color, ownerState }) => ({
   },
 }));
 
-const StatusTag = styled.div`
-  background-color: ${({ theme, color }) =>
-    alpha(theme.palette[color]?.light ?? theme.palette.primary.light, 0.3)};
-  color: ${({ theme, color }) =>
-    theme.palette[color]?.main ?? theme.palette.primary.main};
-  border: 0.5px solid;
-  border-color: currentColor;
-  padding: ${({ theme }) => `${theme.spacing(1)} ${theme.spacing(2)}`};
-  font-weight: 500;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-
-  p {
-    text-transform: none;
-    font-size: 14px;
-    margin: ${({ theme }) => theme.spacing(1)} 0 0;
-    filter: brightness(0.9);
-  }
-`;
-
 const StyledStepLabel = styled(StepLabel)`
   ${({ theme }) => theme.breakpoints.down("md")} {
     .${stepLabelClasses.label} {
@@ -241,8 +218,8 @@ const cancelSteps = [
 ];
 
 const OrderProgress = ({
-  order,
-  detailSummary,
+  status,
+  stepContent,
   detailStatus,
   orderedDate,
   date,
@@ -259,13 +236,13 @@ const OrderProgress = ({
       <Stepper
         alternativeLabel={!tabletMode}
         connector={<StyledStepConnector color={detailStatus?.color} />}
-        activeStep={detailSummary?.step}
+        activeStep={stepContent?.step}
         orientation={tabletMode ? "vertical" : "horizontal"}
       >
-        {(order?.status == OrderStatus.CANCELED.value
+        {(status == OrderStatus.CANCELED.value
           ? cancelSteps
-          : order?.status == OrderStatus.PENDING_REFUND.value ||
-              order?.status === OrderStatus.REFUNDED.value
+          : status == OrderStatus.PENDING_REFUND.value ||
+              status === OrderStatus.REFUNDED.value
             ? refundSteps
             : steps
         ).map((step, index) => (
@@ -287,19 +264,19 @@ const OrderProgress = ({
                     <p>{dateFormatter(orderedDate)}</p>
                   </DateText>
                 )}
-                {index == detailSummary?.step && (
+                {index == stepContent?.step && (
                   <DateText>
                     <span>{timeFormatter(date)}&nbsp;</span>
                     <p>{dateFormatter(date)}</p>
                   </DateText>
                 )}
               </div>
-              {detailSummary?.step >= index && (
+              {stepContent?.step >= index && (
                 <LabelCheck color={detailStatus?.color}>
-                  {order?.status == OrderStatus.CANCELED.value ? (
+                  {status == OrderStatus.CANCELED.value ? (
                     <Close />
-                  ) : order?.status == OrderStatus.PENDING_REFUND.value ||
-                    order?.status === OrderStatus.REFUNDED.value ? (
+                  ) : status == OrderStatus.PENDING_REFUND.value ||
+                    status === OrderStatus.REFUNDED.value ? (
                     <KeyboardReturn />
                   ) : (
                     <Check />
@@ -317,7 +294,7 @@ const OrderProgress = ({
     <>
       {tabletMode ? (
         <Paper elevation={3} sx={{ width: "90%", mx: "auto", my: 1 }}>
-          <StatusTag color={detailStatus?.color} onClick={toggleStepper}>
+          <StatusContent color={detailStatus?.color} onClick={toggleStepper}>
             <div>
               <Box display="flex" alignItems="center">
                 {detailStatus?.label}
@@ -329,16 +306,20 @@ const OrderProgress = ({
                   )}
                 </ToggleArrow>
               </Box>
-              <p>{detailSummary?.summary}</p>
+              <p>{stepContent?.summary}</p>
             </div>
             <SummaryIcon>
-              {order?.status == OrderStatus.CANCELED.value
-                ? cancelSteps[detailSummary?.step]?.icon
-                : order?.status == OrderStatus.REFUNDED.value
-                  ? refundSteps[detailSummary?.step]?.icon
-                  : steps[detailSummary?.step]?.icon}
+              {status == OrderStatus.CANCELED.value
+                ? cancelSteps[stepContent?.step]?.icon
+                : [
+                      OrderStatus.PENDING_RETURN.value,
+                      OrderStatus.PENDING_REFUND.value,
+                      OrderStatus.REFUNDED.value,
+                    ]?.includes(status)
+                  ? refundSteps[stepContent?.step]?.icon
+                  : steps[stepContent?.step]?.icon}
             </SummaryIcon>
-          </StatusTag>
+          </StatusContent>
           <Collapse in={open} timeout="auto" unmountOnExit>
             {stepper}
           </Collapse>

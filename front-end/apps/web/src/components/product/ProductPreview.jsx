@@ -124,7 +124,7 @@ const ProductPreview = ({ book, scrollPosition }) => {
       {book ? (
         <Link to={`/product/${book?.slug}`} style={{ width: "100%" }}>
           <StyledLazyImage
-            src={book?.image?.srcSet[ImageSize.SMALL.value]}
+            src={book?.image?.srcSet[ImageSize?.SMALL?.value]}
             alt={`${book?.title} Thumbnail`}
             width={"100%"}
             scrollPosition={scrollPosition}

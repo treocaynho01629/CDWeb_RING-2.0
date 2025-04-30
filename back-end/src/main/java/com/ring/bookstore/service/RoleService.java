@@ -1,15 +1,17 @@
 package com.ring.bookstore.service;
 
-import org.springframework.stereotype.Service;
+import com.ring.bookstore.model.entity.PrivilegeGroup;
+import com.ring.bookstore.model.entity.Role;
+import com.ring.bookstore.model.enums.PrivilegeType;
+import com.ring.bookstore.model.enums.UserRole;
 
-import com.ring.bookstore.enums.UserRole;
-import com.ring.bookstore.model.Role;
+import java.util.List;
 
-import java.util.Optional;
-
-@Service
 public interface RoleService {
-	
-    Optional<Role> findByRoleName(UserRole userRole);
-    void save(Role role);
+
+    Role findRole(UserRole userRole);
+
+    List<PrivilegeGroup> getPrivileges();
+
+    void updateRole(List<PrivilegeType> privileges, UserRole userRole) ;
 }

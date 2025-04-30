@@ -1,30 +1,33 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.accounts.*;
-import com.ring.bookstore.dtos.dashboard.ChartDTO;
-import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.dtos.mappers.AccountMapper;
-import com.ring.bookstore.dtos.mappers.DashboardMapper;
-import com.ring.bookstore.enums.UserRole;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.listener.reset.OnResetPasswordCompletedEvent;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.AccountProfile;
-import com.ring.bookstore.model.Image;
-import com.ring.bookstore.model.Role;
+import com.ring.bookstore.model.dto.projection.accounts.IAccount;
+import com.ring.bookstore.model.dto.projection.accounts.IAccountDetail;
+import com.ring.bookstore.model.dto.projection.accounts.IProfile;
+import com.ring.bookstore.model.dto.request.AccountRequest;
+import com.ring.bookstore.model.dto.request.ChangePassRequest;
+import com.ring.bookstore.model.dto.request.ProfileRequest;
+import com.ring.bookstore.model.dto.response.accounts.AccountDTO;
+import com.ring.bookstore.model.dto.response.accounts.AccountDetailDTO;
+import com.ring.bookstore.model.dto.response.accounts.ProfileDTO;
+import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.AccountProfile;
+import com.ring.bookstore.model.entity.Image;
+import com.ring.bookstore.model.entity.Role;
+import com.ring.bookstore.model.enums.UserRole;
+import com.ring.bookstore.model.mappers.AccountMapper;
+import com.ring.bookstore.model.mappers.DashboardMapper;
 import com.ring.bookstore.repository.AccountProfileRepository;
 import com.ring.bookstore.repository.AccountRepository;
-import com.ring.bookstore.request.AccountRequest;
-import com.ring.bookstore.request.ChangePassRequest;
-import com.ring.bookstore.request.ProfileRequest;
+import com.ring.bookstore.repository.RoleRepository;
 import com.ring.bookstore.service.AccountService;
 import com.ring.bookstore.service.ImageService;
-import com.ring.bookstore.service.RoleService;
 import com.ring.bookstore.ultils.FileUploadUtil;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,9 +35,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -42,8 +47,8 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepo;
     private final AccountProfileRepository profileRepo;
+    private final RoleRepository roleRepo;
 
-    private final RoleService roleService;
     private final ImageService imageService;
 
     private final AccountMapper accountMapper;
@@ -51,7 +56,6 @@ public class AccountServiceImpl implements AccountService {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
 
-    //Get all accounts
     public Page<AccountDTO> getAllAccounts(Integer pageNo,
                                            Integer pageSize,
                                            String sortBy,
@@ -65,10 +69,10 @@ public class AccountServiceImpl implements AccountService {
         return accountsList.map(accountMapper::projectionToDTO);
     }
 
-    //Get account by {id}
     public AccountDetailDTO getAccountById(Long id) {
-        IAccountDetail account = profileRepo.findDetailById(id).orElseThrow(()
-                -> new ResourceNotFoundException("User not found!"));
+        IAccountDetail account = profileRepo.findDetailById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!",
+                "Không tìm thấy người dùng yêu cầu!"));
         return accountMapper.projectionToDetailDTO(account);
     }
 
@@ -78,7 +82,6 @@ public class AccountServiceImpl implements AccountService {
                 "Thành viên mới");
     }
 
-    //Create account (ADMIN)
     @Transactional
     public Account saveAccount(AccountRequest request, MultipartFile file) {
 
@@ -91,20 +94,10 @@ public class AccountServiceImpl implements AccountService {
             );
         }
 
-        //Set roles: 1 USER, 2 SELLER, 3 ADMIN
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleService.findByRoleName(UserRole.ROLE_USER).orElseThrow(
-                () -> new ResourceNotFoundException("No roles has been set!")));
-
-        if (request.getRoles() >= 2) {
-            roles.add(roleService.findByRoleName(UserRole.ROLE_SELLER).orElseThrow(
-                    () -> new ResourceNotFoundException("Role not found!")));
-        }
-
-        if (request.getRoles() >= 3) {
-            roles.add(roleService.findByRoleName(UserRole.ROLE_ADMIN).orElseThrow(
-                    () -> new ResourceNotFoundException("Role not found!")));
-        }
+        //Set role
+        List<Role> roles = roleRepo.findAllByRoleNameIn(request.getRoles());
+        if (roles.isEmpty()) throw new ResourceNotFoundException("Roles not found!",
+                "Không tìm thấy các chức vụ yêu cầu!");
 
         //Create account
         var acc = Account.builder()
@@ -132,16 +125,20 @@ public class AccountServiceImpl implements AccountService {
         return savedAccount; //Return created account
     }
 
-    //Update account (ADMIN)
     @Transactional
-    public Account updateAccount(AccountRequest request, MultipartFile file, Long id) {
+    public Account updateAccount(AccountRequest request,
+                                 MultipartFile file,
+                                 Account user,
+                                 Long id) {
+
         //Check Account exists?
-        Account currUser = accountRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+        Account changeUser = accountRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!",
+                        "Không tìm thấy người dùng yêu cầu!"));
 
         //Check if Account with these username and email has exists >> throw exception
-        if (!request.getUsername().equals(currUser.getUsername())
-                && !request.getEmail().equals(currUser.getEmail())
+        if (!request.getUsername().equals(changeUser.getUsername())
+                && !request.getEmail().equals(changeUser.getEmail())
                 && accountRepo.existsByUsernameOrEmail(request.getUsername(), request.getEmail())) {
             throw new HttpResponseException(
                     HttpStatus.CONFLICT,
@@ -150,29 +147,23 @@ public class AccountServiceImpl implements AccountService {
             );
         }
 
-        //Set roles: 1 USER, 2 SELLER, 3 ADMIN
-        if (currUser.getRolesSize() != request.getRoles()) {
-            Set<Role> roles = new HashSet<>();
-            roles.add(roleService.findByRoleName(UserRole.ROLE_USER).orElseThrow(
-                    () -> new ResourceNotFoundException("No roles has been set!")));
-
-            if (request.getRoles() >= 2) {
-                roles.add(roleService.findByRoleName(UserRole.ROLE_SELLER).orElseThrow(
-                        () -> new ResourceNotFoundException("Role not found!")));
-            }
-            if (request.getRoles() >= 3) {
-                roles.add(roleService.findByRoleName(UserRole.ROLE_ADMIN).orElseThrow(
-                        () -> new ResourceNotFoundException("Role not found!")));
-            }
-            currUser.setRoles(roles);
+        // Set role
+        if (Objects.equals(user.getId(), id)
+                && !request.getRoles().contains(UserRole.ROLE_ADMIN)) {
+            throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Cannot remove your own Admin role!",
+                    "Người dùng không thể loại bỏ quyền Admin của chính mình!");
         }
+        List<Role> roles = roleRepo.findAllByRoleNameIn(request.getRoles());
+        if (roles.isEmpty()) throw new ResourceNotFoundException("Roles not found!",
+                "Không tìm thấy các chức vụ yêu cầu!");
+        changeUser.setRoles(roles);
 
         //Set new info
-        currUser.setUsername(request.getUsername());
-        currUser.setEmail(request.getEmail());
-        if (!request.isKeepOldPass()) currUser.setPass(passwordEncoder.encode(request.getPass()));
+        changeUser.setUsername(request.getUsername());
+        changeUser.setEmail(request.getEmail());
+        if (request.getPass() != null) changeUser.setPass(passwordEncoder.encode(request.getPass()));
 
-        Account updatedAccount = accountRepo.save(currUser); //Save to Database
+        Account updatedAccount = accountRepo.save(changeUser); //Save to Database
 
         //Get current profile
         AccountProfile profile = updatedAccount.getProfile();
@@ -190,13 +181,11 @@ public class AccountServiceImpl implements AccountService {
         return updatedAccount; //Return updated account
     }
 
-    //Delete account
     @Transactional
     public void deleteAccount(Long id) {
         accountRepo.deleteById(id);
     }
 
-    //Delete multiples accounts
     @Transactional
     public void deleteAccounts(List<Long> ids) {
         accountRepo.deleteAllById(ids);
@@ -211,24 +200,23 @@ public class AccountServiceImpl implements AccountService {
         accountRepo.deleteAllById(deleteIds);
     }
 
-    //Delete all accounts (ADMIN)
     @Transactional
     public void deleteAllAccounts() {
         accountRepo.deleteAll();
     }
 
-    //Get account's profile
     public ProfileDTO getProfile(Account user) {
         IProfile currProfile = profileRepo.findProfileByUser(user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Profile not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found!",
+                        "Không tìm thấy hồ sơ yêu cầu!"));
         return accountMapper.projectionToProfileDTO(currProfile);
     }
 
-    //Update account's profile
     @Transactional
     public AccountProfile updateProfile(ProfileRequest request, MultipartFile file, Account user) {
-        AccountProfile profile = profileRepo.findById(user.getProfile().getId()).orElseThrow(()
-                -> new ResourceNotFoundException("Profile not found!"));
+        AccountProfile profile = profileRepo.findById(user.getProfile().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found!",
+                "Không tìm thấy hồ sơ yêu cầu!"));
 
         //Image upload/replace
         profile = this.changeProfilePic(file, request.getImage(), profile);
@@ -239,11 +227,9 @@ public class AccountServiceImpl implements AccountService {
         profile.setDob(request.getDob());
         profile.setGender(request.getGender());
 
-        AccountProfile updatedProfile = profileRepo.save(profile); //Save to Database
-        return updatedProfile;
+        return profileRepo.save(profile); //Save to Database
     }
 
-    //Change password
     @Override
     public Account changePassword(ChangePassRequest request, Account user) {
         //Check current password
@@ -273,20 +259,15 @@ public class AccountServiceImpl implements AccountService {
         return savedAccount; //Return updated account
     }
 
-    //Get top users FIX
-    public List<ChartDTO> getTopAccount() {
-//        List<Map<String,Object>> result = accountRepo.getTopUser();
-//        return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
-        return null;
-    }
-
-    //Get top sellers
-    public List<ChartDTO> getTopSeller() {
-//        List<Map<String,Object>> result = accountRepo.getTopSeller();
-//        return result.stream().map(chartMapper::apply).collect(Collectors.toList()); //Return chart data
-        return null;
-    }
-
+    /**
+     * Updates the profile picture of a user account. This method allows uploading
+     * a new profile picture, replacing an existing one, or removing the profile picture.
+     *
+     * @param file    the new image file to be uploaded as the profile picture, can be null for removing the image
+     * @param image   the identifier of the image, used for determining if an image should be removed, can be null
+     * @param profile the account profile to be updated
+     * @return the updated account profile with the modified profile picture
+     */
     protected AccountProfile changeProfilePic(MultipartFile file, String image, AccountProfile profile) {
         if (file != null) { //Contain new image >> upload/replace
             if (profile.getImage() != null) imageService.deleteImage(profile.getImage().getId()); //Delete old image

@@ -1,4 +1,4 @@
-import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
+import { createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "@ring/redux";
 
 const shopsAdapter = createEntityAdapter({});
@@ -20,7 +20,7 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
           return response.status === 200 && !result?.isError;
         },
       }),
-      providesTags: (result, error, { id }) => [{ type: "Shop", id }],
+      providesTags: (result, error, id) => [{ type: "Shop", id }],
     }),
     getShops: builder.query({
       query: (args) => {
@@ -83,9 +83,13 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
       },
     }),
     getShopAnalytics: builder.query({
-      query: () => {
+      query: (userId) => {
+        //Params
+        const params = new URLSearchParams();
+        if (userId) params.append("userId", userId);
+
         return {
-          url: "/api/shops/analytics",
+          url: `/api/shops/analytics?${params.toString()}`,
           validateStatus: (response, result) => {
             return response.status === 200 && !result?.isError;
           },
@@ -171,19 +175,3 @@ export const {
   useDeleteAllShopsMutation,
   usePrefetch: usePrefetchShops,
 } = shopsApiSlice;
-
-export const selectShopsResult = shopsApiSlice.endpoints.getShops.select();
-
-const selectShopsData = createSelector(
-  selectShopsResult,
-  (shopsResult) => shopsResult.data // normalized state object with ids & entities
-);
-
-export const {
-  selectAll: selectAllShops,
-  selectById: selectShopById,
-  selectIds: selectShopIds,
-  selectEntities: selectShopEntities,
-} = shopsAdapter.getSelectors(
-  (state) => selectShopsData(state) ?? initialState
-);

@@ -3,7 +3,7 @@ package com.ring.bookstore.service.impl;
 import com.cloudinary.api.ApiResponse;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ImageUploadException;
-import com.ring.bookstore.response.CloudinaryResponse;
+import com.ring.bookstore.model.dto.response.CloudinaryResponse;
 import com.ring.bookstore.service.CloudinaryService;
 import com.ring.bookstore.ultils.FileUploadUtil;
 import org.apache.commons.io.FilenameUtils;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.model.Image;
+import com.ring.bookstore.model.entity.Image;
 import com.ring.bookstore.repository.ImageRepository;
 import com.ring.bookstore.service.ImageService;
 
@@ -47,8 +47,9 @@ public class ImageServiceImpl implements ImageService {
             if (file.isEmpty()) {
                 throw new HttpResponseException(HttpStatus.BAD_REQUEST, "File not found!");
             }
-            Image image = imageRepo.findById(id).orElseThrow(() ->
-                    new ResourceNotFoundException("Image not found!"));
+            Image image = imageRepo.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Image not found!",
+                            "Không tim thấy hình ảnh yêu cầu!"));
 
             BufferedImage imageBuffer = ImageIO.read(file.getInputStream());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -128,7 +129,8 @@ public class ImageServiceImpl implements ImageService {
 
     public String deleteImage(Long id) {
         Image image = imageRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Image not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found!",
+                        "Không tim thấy hình ảnh yêu cầu!"));
         return deleteImage(image.getPublicId());
     }
 

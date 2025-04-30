@@ -2,10 +2,12 @@ package com.ring.bookstore.exception.advice;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.ring.bookstore.exception.*;
+import com.ring.bookstore.model.dto.response.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,12 +15,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * {@link ApplicationExceptionHandler} is a global exception handler for the application.
+ * It handles different types of exceptions and returns appropriate {@link ExceptionResponse} for each.
+ */
 @RestControllerAdvice
 public class ApplicationExceptionHandler{
 
@@ -60,6 +67,20 @@ public class ApplicationExceptionHandler{
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ExceptionResponse handleMissingServletRequestPart(MissingServletRequestPartException e) {
+        Map<String, String> errorsMap = new HashMap<>();
+
+        errorsMap.put(e.getRequestPartName(), "Phải bao gồm " + e.getRequestPartName() + "!");
+        return new ExceptionResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Missing required part!",
+                errorsMap,
+                e.getLocalizedMessage()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingRequestCookieException.class)
     public ExceptionResponse handleMissingCookie(MissingRequestCookieException e) {
         return new ExceptionResponse(
@@ -84,6 +105,26 @@ public class ApplicationExceptionHandler{
     public ExceptionResponse handleResourceNotFoundException(ResourceNotFoundException e) {
         return new ExceptionResponse(
                 HttpStatus.NOT_FOUND.value(),
+                e.getError(),
+                e.getMessage()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.PAYMENT_REQUIRED)
+    @ExceptionHandler(PaymentException.class)
+    public ExceptionResponse handlePaymentException(PaymentException e) {
+        return new ExceptionResponse(
+                HttpStatus.PAYMENT_REQUIRED.value(),
+                e.getError(),
+                e.getMessage()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(EntityOwnershipException.class)
+    public ExceptionResponse handleEntityOwnershipException(EntityOwnershipException e) {
+        return new ExceptionResponse(
+                HttpStatus.FORBIDDEN.value(),
                 e.getError(),
                 e.getMessage()
         );
@@ -125,6 +166,16 @@ public class ApplicationExceptionHandler{
         return new ExceptionResponse(
                 HttpStatus.TOO_MANY_REQUESTS.value() ,
                 e.getStatusText(),
+                e.getLocalizedMessage()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ExceptionResponse handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        return new ExceptionResponse(
+                HttpStatus.FORBIDDEN.value() ,
+                "Authorization failed!",
                 e.getLocalizedMessage()
         );
     }
@@ -184,8 +235,7 @@ public class ApplicationExceptionHandler{
     public ExceptionResponse handleValidationException(HttpMessageNotReadableException e) {
         String errorMessage = "";
 
-        if (e.getCause() instanceof InvalidFormatException) {
-            InvalidFormatException ifx = (InvalidFormatException) e.getCause();
+        if (e.getCause() instanceof InvalidFormatException ifx) {
             if (ifx.getTargetType() != null && ifx.getTargetType().isEnum()) {
                 errorMessage = String.format("Invalid enum value: '%s' for the field: '%s'. The value must be one of: %s.",
                         ifx.getValue(), ifx.getPath().get(ifx.getPath().size()-1).getFieldName(), Arrays.toString(ifx.getTargetType().getEnumConstants()));

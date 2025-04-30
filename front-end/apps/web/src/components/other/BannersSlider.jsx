@@ -150,7 +150,7 @@ const ExtraWrapper = styled.div`
 `;
 
 const ExtraSlider = styled.div`
-  --scroll-offset: -1;
+  --scroll-offset: 0;
 
   position: absolute;
   width: 100%;
@@ -215,19 +215,20 @@ function Item({ banner, index }) {
           <BackdropContainer>
             <BackdropImage
               aria-hidden
-              src={banner?.image?.srcSet[ImageSize.TINY.value]}
+              src={banner?.image?.srcSet[ImageSize?.TINY?.value]}
               visibleByDefault={index == 0}
               placeholder={
                 <BackdropPlaceholder variant="rectangular" animation={false} />
               }
             />
           </BackdropContainer>
-          <StyledLink>
+          <StyledLink to={banner?.url}>
             <StyledLazyImage
               src={banner?.image.url}
               srcSet={Object.values(ImageSize)
                 .map(
-                  (size) => `${banner?.image.srcSet[size.value]} ${size.width}w`
+                  (size) =>
+                    `${banner?.image?.srcSet[size?.value]} ${size?.width}w`
                 )
                 .concat(`${banner?.image.url} 600w`)
                 .join(", ")}
@@ -257,7 +258,7 @@ function ExtraItem({ banner }) {
       <ExtraContainer>
         <StyledLink to={banner?.url}>
           <StyledLazyImage
-            src={banner?.image?.srcSet[ImageSize.MEDIUM.value]}
+            src={banner?.image?.srcSet[ImageSize?.MEDIUM?.value]}
             alt={banner?.name}
             visibleByDefault={true}
             placeholder={
@@ -281,7 +282,7 @@ const ExtraBanners = ({ extraBanners, slideIndex, totalBanners }) => {
 
   useEffect(() => {
     let newIndex =
-      totalBanners <= 1 ? -1 : slideIndex >= totalBanners - 1 ? -1 : slideIndex;
+      totalBanners <= 1 ? 0 : slideIndex >= totalBanners - 1 ? -1 : slideIndex;
     scrollRef.current.style.setProperty("--scroll-offset", newIndex);
   }, [slideIndex]);
 
@@ -304,7 +305,11 @@ const BannersSlider = () => {
 
   if (isLoading || isError) {
     bannersContent = <Item />;
-    extraBanners = [<ExtraItem key={"temp-1"} />, <ExtraItem key={"temp-2"} />];
+    extraBanners = [
+      <ExtraItem key={"temp-1"} />,
+      <ExtraItem key={"temp-2"} />,
+      <ExtraItem key={"temp-3"} />,
+    ];
   } else if (isSuccess) {
     const { ids, entities } = data;
 
@@ -339,6 +344,7 @@ const BannersSlider = () => {
       extraBanners = [
         <ExtraItem key={"temp-1"} />,
         <ExtraItem key={"temp-2"} />,
+        <ExtraItem key={"temp-3"} />,
       ];
     }
   }

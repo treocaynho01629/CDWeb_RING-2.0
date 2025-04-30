@@ -270,7 +270,7 @@ const TopItem = ({ book, scrollPosition }) => {
     <ItemContainer>
       {book ? (
         <StyledLazyImage
-          src={book?.image?.srcSet[ImageSize.TINY.value]}
+          src={book?.image?.srcSet[ImageSize?.TINY?.value]}
           alt={`Top item: ${book?.title}`}
           scrollPosition={scrollPosition}
           placeholder={
@@ -418,7 +418,7 @@ const ProductsTop = ({
             srcSet={Object.values(ImageSize)
               .map(
                 (size) =>
-                  `${selectedBook?.image.srcSet[size.value]} ${size.width}w`
+                  `${selectedBook?.image?.srcSet[size?.value]} ${size?.width}w`
               )
               .join(", ")}
             sizes="(min-width: 450px) 450px, 100vw"

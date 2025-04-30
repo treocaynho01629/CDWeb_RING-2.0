@@ -7,7 +7,7 @@ import {
   TextField,
 } from "@mui/material";
 import { Logout } from "@mui/icons-material";
-import { useNavigate, useLocation, Link } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { useAuthenticateMutation } from "@ring/redux";
 import {
   AuthActionContainer,

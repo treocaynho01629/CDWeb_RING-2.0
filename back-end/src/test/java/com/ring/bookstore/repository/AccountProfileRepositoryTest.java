@@ -1,37 +1,27 @@
 package com.ring.bookstore.repository;
 
-import com.ring.bookstore.dtos.accounts.IAccountDetail;
-import com.ring.bookstore.dtos.accounts.IProfile;
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.model.AccountProfile;
-import com.ring.bookstore.model.Address;
-import com.ring.bookstore.model.Image;
+import com.ring.bookstore.base.AbstractRepositoryTest;
+import com.ring.bookstore.model.dto.projection.accounts.IAccountDetail;
+import com.ring.bookstore.model.dto.projection.accounts.IProfile;
+import com.ring.bookstore.model.entity.*;
+import com.ring.bookstore.model.enums.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Testcontainers
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class AccountProfileRepositoryTest {
+import static org.junit.jupiter.api.Assertions.*;
 
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+class AccountProfileRepositoryTest extends AbstractRepositoryTest {
 
     @Autowired
     private AccountProfileRepository profileRepo;
+
+    @Autowired
+    private AccountRepository accountRepo;
 
     @Autowired
     private AddressRepository addressRepo;
@@ -39,8 +29,13 @@ class AccountProfileRepositoryTest {
     @Autowired
     private ImageRepository imageRepo;
 
+    @Autowired
+    private RoleRepository roleRepo;
+
     @Test
     public void givenNewProfile_whenSaveProfile_ThenReturnProfile() {
+
+        // Given
         Account account = Account.builder()
                 .username("username")
                 .pass("asd")
@@ -51,14 +46,18 @@ class AccountProfileRepositoryTest {
                 .user(account)
                 .build();
 
+        // When
         AccountProfile savedProfile = profileRepo.save(profile);
 
+        // Then
         assertNotNull(savedProfile);
         assertNotNull(savedProfile.getId());
     }
 
     @Test
     public void whenUpdateProfile_ThenReturnProfile() {
+
+        // Given
         Account account = Account.builder()
                 .username("username")
                 .pass("asd")
@@ -73,11 +72,14 @@ class AccountProfileRepositoryTest {
 
         AccountProfile foundProfile = profileRepo.findById(profile.getId()).orElse(null);
         assertNotNull(foundProfile);
+
+        // When
         foundProfile.setName("new name");
         foundProfile.setPhone("01234");
 
         AccountProfile updatedProfile = profileRepo.save(foundProfile);
 
+        // Then
         assertNotNull(updatedProfile);
         assertNotNull(updatedProfile.getPhone());
         assertEquals("new name", updatedProfile.getName());
@@ -85,6 +87,8 @@ class AccountProfileRepositoryTest {
 
     @Test
     public void whenDeleteProfile_ThenFindNull() {
+
+        // Given
         Account account = Account.builder()
                 .username("username")
                 .pass("asd")
@@ -95,32 +99,34 @@ class AccountProfileRepositoryTest {
         Address address = Address.builder()
                 .address("123/abc/j12")
                 .build();
-        Address address2 = Address.builder()
-                .address("321/abc/j12")
-                .build();
         AccountProfile profile = AccountProfile.builder()
                 .dob(LocalDate.now())
                 .user(account)
                 .image(image)
                 .address(address)
-                .addresses(List.of(address2))
+                .addresses(new ArrayList<>(List.of(address)))
                 .build();
-
         profileRepo.save(profile);
 
+        // When
         profileRepo.deleteById(profile.getId());
 
+        // Then
         AccountProfile foundProfile = profileRepo.findById(profile.getId()).orElse(null);
+        Account foundAccount = accountRepo.findById(account.getId()).orElse(null);
         Image foundImage = imageRepo.findById(image.getId()).orElse(null);
-        List<Address> foundAddresses = addressRepo.findAllById(List.of(address.getId(), address2.getId()));
+        Address foundAddress = addressRepo.findById(address.getId()).orElse(null);
 
         assertNull(foundProfile);
         assertNull(foundImage);
-        assertTrue(foundAddresses.isEmpty());
+        assertNull(foundAddress);
+        assertNotNull(foundAccount);
     }
 
     @Test
     public void whenFindProfileByUser_ThenReturnResultWithSameEmail() {
+
+        // Given
         Account account = Account.builder()
                 .username("username")
                 .pass("asd")
@@ -134,18 +140,25 @@ class AccountProfileRepositoryTest {
 
         AccountProfile savedProfile = profileRepo.save(profile);
 
+        // When
         IProfile profileProjection = profileRepo.findProfileByUser(savedProfile.getUser().getId()).orElse(null);
 
+        // Then
         assertNotNull(profileProjection);
         assertEquals(account.getEmail(), profileProjection.getEmail());
     }
 
     @Test
     public void whenFindDetailAccount_ThenReturnResultWithSameId() {
+
+        // Given
+        Role role = Role.builder().roleName(UserRole.ROLE_ADMIN).build();
+        roleRepo.save(role);
         Account account = Account.builder()
                 .username("username")
                 .pass("asd")
                 .email("email")
+                .roles(new ArrayList<>(List.of(role)))
                 .build();
         account.setCreatedDate(LocalDateTime.now());
         AccountProfile profile = AccountProfile.builder()
@@ -155,8 +168,10 @@ class AccountProfileRepositoryTest {
 
         AccountProfile savedProfile = profileRepo.save(profile);
 
+        // When
         IAccountDetail detailProjection = profileRepo.findDetailById(savedProfile.getUser().getId()).orElse(null);
 
+        // Then
         assertNotNull(detailProjection);
         assertEquals(account.getId(), detailProjection.getId());
     }

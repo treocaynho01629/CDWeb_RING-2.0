@@ -1,17 +1,19 @@
 package com.ring.bookstore.service;
 
-import java.util.List;
-
-import com.ring.bookstore.dtos.dashboard.StatDTO;
-import com.ring.bookstore.dtos.orders.*;
-import com.ring.bookstore.dtos.dashboard.ChartDTO;
-import com.ring.bookstore.enums.OrderStatus;
-import com.ring.bookstore.request.CalculateRequest;
+import com.ring.bookstore.model.dto.request.CalculateRequest;
+import com.ring.bookstore.model.dto.request.OrderRequest;
+import com.ring.bookstore.model.dto.response.dashboard.ChartDTO;
+import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
+import com.ring.bookstore.model.dto.response.orders.*;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.model.entity.PaymentInfo;
+import com.ring.bookstore.model.enums.OrderStatus;
+import com.ring.bookstore.model.enums.PaymentType;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
+import vn.payos.type.PaymentLinkData;
 
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.request.OrderRequest;
+import java.util.List;
 
 public interface OrderService {
 
@@ -46,6 +48,9 @@ public interface OrderService {
 
     ReceiptDTO getReceipt(Long id);
 
+    ReceiptDetailDTO getReceiptDetail(Long id,
+                                      Account user);
+
     OrderDetailDTO getOrderDetail(Long id,
                                   Account user);
 
@@ -58,9 +63,22 @@ public interface OrderService {
                         HttpServletRequest request,
                         Account user);
 
+    PaymentInfo createPaymentLink(HttpServletRequest request,
+                                  Long id);
+
+    PaymentLinkData getPaymentLinkData(Long id);
+
     void cancel(Long id,
                 String reason,
                 Account user);
+
+    void cancelUnpaidOrder(Long orderId,
+                           String reason,
+                           Account user);
+
+    void changePaymentMethod(Long orderId,
+                             PaymentType paymentMethod,
+                             Account user);
 
     void refund(Long id,
                 String reason,
@@ -68,6 +86,8 @@ public interface OrderService {
 
     void confirm(Long id,
                  Account user);
+
+    void confirmPayment(Long id);
 
     void changeStatus(Long id,
                       OrderStatus status,

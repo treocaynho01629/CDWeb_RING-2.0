@@ -4,7 +4,7 @@ import {
   LocalActivityOutlined,
   Inventory,
 } from "@mui/icons-material";
-import { Box, Skeleton } from "@mui/material";
+import { Box, Skeleton, TextField } from "@mui/material";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import {
   StyledItemTableRow,
@@ -12,7 +12,12 @@ import {
   SpaceTableRow,
   StyledTableCell,
 } from "../custom/TableComponents";
-import { currencyFormat, getImageSize } from "@ring/shared";
+import {
+  currencyFormat,
+  getImageSize,
+  iconList,
+  getShippingType,
+} from "@ring/shared";
 
 //#region styled
 const ItemContainer = styled.div`
@@ -81,9 +86,15 @@ const Shop = styled.span`
   }
 `;
 
-const CouponButton = styled.b`
+const ShippingContainer = styled.div`
+  text-align: right;
+  cursor: pointer;
+`;
+
+const OptionButton = styled.b`
   font-size: 15px;
   white-space: nowrap;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -103,10 +114,47 @@ const CouponButton = styled.b`
   }
 `;
 
+const ButtonLabel = styled.span`
+  display: flex;
+  align-items: center;
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    flex-direction: row-reverse;
+
+    .hide-on-mobile {
+      display: none;
+    }
+  }
+`;
+
 const ItemAction = styled.div`
   justify-content: space-between;
   align-items: flex-end;
   display: flex;
+`;
+
+const NoteInput = styled(TextField)`
+  width: 100%;
+  border-color: red;
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    border: 0;
+  }
+`;
+
+const PriceContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin: ${({ theme }) => theme.spacing(0.5)} 0;
+
+  ${({ theme }) => theme.breakpoints.down("sm")} {
+    justify-content: space-between;
+  }
+`;
+
+const ShippingInfo = styled.p`
+  color: ${({ theme }) => theme.palette.info.main};
 `;
 
 const Price = styled.p`
@@ -119,6 +167,25 @@ const Price = styled.p`
 
   &.total {
     color: ${({ theme }) => theme.palette.warning.light};
+    text-align: right;
+    margin: 0;
+  }
+
+  &.final {
+    color: ${({ theme }) => theme.palette.error.light};
+    font-weight: 450;
+    font-size: 16px;
+    text-align: right;
+    margin: 0;
+  }
+
+  &.shipping {
+    font-size: 13px;
+    text-align: right;
+    font-weight: 450;
+    margin: 0;
+    margin-left: ${({ theme }) => theme.spacing(1)};
+    color: ${({ theme }) => theme.palette.text.primary};
   }
 `;
 
@@ -164,6 +231,7 @@ const StyledSkeleton = styled(Skeleton)`
 //#endregion
 
 const ImageSize = getImageSize();
+const ShippingType = getShippingType();
 
 function ItemRow({ product, index }) {
   const isDisabled = !product || product.amount < 1;
@@ -177,7 +245,7 @@ function ItemRow({ product, index }) {
       <StyledTableCell className="preview" component="th" scope="row">
         <ItemContainer>
           <StyledLazyImage
-            src={product?.image.srcSet[ImageSize.TINY.value]}
+            src={product?.image?.srcSet[ImageSize?.TINY?.value]}
             alt={`${product.title} Cart item`}
             placeholder={
               <StyledSkeleton variant="rectangular" animation={false} />
@@ -252,11 +320,33 @@ function ItemRow({ product, index }) {
   );
 }
 
-const PreviewDetailRow = ({ shop, coupon, discount, handleOpenDialog }) => {
+const PreviewDetailRow = ({
+  shop,
+  coupon,
+  shipping,
+  discount,
+  shippingFee,
+  shippingDiscount,
+  shopNote,
+  setShopNote,
+  handleOpenCouponDialog,
+  handleOpenShippingDialog,
+}) => {
+  let total = 0;
+  let totalQuantity = 0;
+  const shippingSummary =
+    ShippingType[shipping || Object.keys(ShippingType)[0]];
+  const Icon = iconList[shippingSummary?.icon];
+
+  for (const product of shop?.products) {
+    total += product.quantity * product.price * (1 - (product?.discount || 0));
+    totalQuantity += product.quantity;
+  }
+
   return (
     <>
       <SpaceTableRow />
-      <StyledTableRow className="shop" tabIndex={-1}>
+      <StyledTableRow className="top" tabIndex={-1}>
         <StyledTableCell
           className="preview"
           align="left"
@@ -273,20 +363,91 @@ const PreviewDetailRow = ({ shop, coupon, discount, handleOpenDialog }) => {
       {shop.products?.map((product, index) => (
         <ItemRow key={`item-${product.id}-${index}`} {...{ product, index }} />
       ))}
-      <StyledTableRow role="coupon-row">
+      <StyledTableRow className="top" role="coupon-row">
         <StyledTableCell align="left" colSpan={6}>
-          <CouponButton onClick={() => handleOpenDialog(shop?.id)}>
+          <OptionButton onClick={() => handleOpenCouponDialog(shop?.id)}>
             <span>
+              &nbsp;
               <LocalActivityOutlined color="error" />
               &nbsp;
               {coupon
                 ? discount
-                  ? `Đã giảm ${currencyFormat.format(discount)}`
-                  : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
+                  ? true
+                    ? `Đã giảm ${currencyFormat.format(discount)}`
+                    : `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
+                  : coupon?.isUsable
+                    ? `Mua thêm để ${coupon?.summary.charAt(0).toLowerCase() + coupon?.summary.slice(1)}`
+                    : "Đổi mã giảm giá"
                 : "Thêm mã giảm giá"}
             </span>
             <KeyboardArrowRight fontSize="small" />
-          </CouponButton>
+          </OptionButton>
+        </StyledTableCell>
+      </StyledTableRow>
+      <StyledTableRow className="center" role="shipping-row">
+        <StyledTableCell className="option" align="left" colSpan={6}>
+          <Box
+            display="flex"
+            width="100%"
+            flexDirection={{ xs: "column", sm: "row" }}
+          >
+            <NoteInput
+              placeholder="Lời nhắn cho người bán ..."
+              onChange={(e) =>
+                setShopNote((prev) => ({
+                  ...prev,
+                  [shop?.id]: e.targget.value,
+                }))
+              }
+              value={shopNote}
+              size="small"
+              fullWidth
+              sx={{ mr: 1 }}
+            />
+            <ShippingContainer
+              onClick={() => handleOpenShippingDialog(shop?.id)}
+            >
+              <OptionButton>
+                <ButtonLabel>
+                  &nbsp;Vận chuyển:&emsp;
+                  <Icon color="primary" />
+                  &nbsp;
+                  <span className="hide-on-mobile">&emsp;Thay đổi</span>
+                </ButtonLabel>
+                <KeyboardArrowRight fontSize="small" />
+              </OptionButton>
+              <Box display="flex" justifyContent="space-between">
+                <p>&nbsp;{shippingSummary?.label}</p>
+                <span>
+                  <ShippingInfo>{shippingSummary?.description}</ShippingInfo>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="flex-end"
+                  >
+                    <Discount>
+                      {shippingDiscount > 0
+                        ? currencyFormat.format(shippingDiscount)
+                        : ""}
+                    </Discount>
+                    <Price className="shipping">
+                      {currencyFormat.format(
+                        shippingFee - (shippingDiscount || 0)
+                      )}
+                    </Price>
+                  </Box>
+                </span>
+              </Box>
+            </ShippingContainer>
+          </Box>
+        </StyledTableCell>
+      </StyledTableRow>
+      <StyledTableRow className="bottom" role="total-row">
+        <StyledTableCell align="right" colSpan={6}>
+          <PriceContainer>
+            &nbsp;Tổng số tiền ({totalQuantity} sản phẩm):&emsp;
+            <Price className="final">{currencyFormat.format(total)}</Price>
+          </PriceContainer>
         </StyledTableCell>
       </StyledTableRow>
     </>

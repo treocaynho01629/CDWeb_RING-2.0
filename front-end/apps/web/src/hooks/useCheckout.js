@@ -66,10 +66,13 @@ const useCheckout = () => {
     coupon,
     setCoupon,
     shopCoupon,
-    setShopCoupon
+    setShopCoupon,
+    onWarning
   ) => {
     if (!cartProducts?.length) return;
     const details = cart?.details;
+    let isWarning = false;
+    let shopsDiscountValue = 0;
 
     details.forEach((detail, index) => {
       if (detail.shopName != null) {
@@ -90,11 +93,13 @@ const useCheckout = () => {
             //Remove invalid item
             handleClearSelect();
             removeProduct(item.id);
+            isWarning = true;
           }
         });
 
         //Replace recommended coupons
         const discountValue = detail?.couponDiscount + detail?.shippingDiscount;
+        shopsDiscountValue += discountValue;
         setShopDiscount((prev) => ({
           ...prev,
           [detail?.shopId]: discountValue,
@@ -113,11 +118,13 @@ const useCheckout = () => {
         //Remove all items of the invalid Shop
         handleClearSelect();
         removeShopProduct(detail.shopId);
+        isWarning = true;
       }
     });
 
     //Replace recommend coupon
-    const discountValue = cart?.couponDiscount + cart?.shippingDiscount;
+    const discountValue =
+      cart?.couponDiscount + cart?.shippingDiscount - shopsDiscountValue;
     setDiscount(discountValue);
     if (
       cart?.coupon != null &&
@@ -126,6 +133,8 @@ const useCheckout = () => {
     ) {
       setCoupon(cart.coupon);
     }
+
+    if (isWarning && onWarning) onWarning();
   };
 
   return { estimateCart, syncCart };

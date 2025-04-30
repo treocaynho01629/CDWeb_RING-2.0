@@ -1,4 +1,4 @@
-import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
+import { createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "@ring/redux";
 import { isEqual } from "lodash-es";
 import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
@@ -16,6 +16,15 @@ const initialState = ordersAdapter.getInitialState({
 
 export const ordersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    getReceiptDetail: builder.query({
+      query: (id) => ({
+        url: `/api/orders/receipts/detail/${id}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result?.isError;
+        },
+      }),
+      providesTags: (result, error, id) => [{ type: "Receipt", id }],
+    }),
     getOrderDetail: builder.query({
       query: (id) => ({
         url: `/api/orders/detail/${id}`,
@@ -25,6 +34,7 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, id) => [{ type: "Order", id }],
     }),
+
     getOrdersByUser: builder.query({
       query: (args) => {
         const { status, keyword, page, size } = args || {};
@@ -79,8 +89,9 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
           return endpointName;
         }
       },
-      merge: (currentCache, newItems) => {
+      merge: (currentCache, newItems, { arg: currentArg }) => {
         currentCache.page = newItems.page;
+        if (!currentArg?.loadMore) ordersAdapter.removeAll(currentCache);
         ordersAdapter.upsertMany(
           currentCache,
           ordersSelector.selectAll(newItems)
@@ -129,6 +140,30 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Order", id }],
     }),
+    cancelUnpaidOrders: builder.mutation({
+      query: ({ orderId, reason }) => ({
+        url: `/api/orders/cancel-unpaid/${orderId}?reason=${reason}`,
+        method: "PUT",
+        credentials: "include",
+        responseHandler: "text",
+      }),
+      invalidatesTags: (result, error, { orderId }) => [
+        { type: "Receipt", orderId },
+        { type: "Order", id: "LIST" },
+      ],
+    }),
+    changePaymentMethod: builder.mutation({
+      query: ({ orderId, paymentMethod }) => ({
+        url: `/api/orders/payment/${orderId}?paymentMethod=${paymentMethod}`,
+        method: "PUT",
+        credentials: "include",
+        responseHandler: "text",
+      }),
+      invalidatesTags: (result, error, { orderId }) => [
+        { type: "Receipt", orderId },
+        { type: "Order", id: "LIST" },
+      ],
+    }),
     refundOrder: builder.mutation({
       query: ({ id, reason }) => ({
         url: `/api/orders/refund/${id}?reason=${reason}`,
@@ -147,32 +182,27 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [{ type: "Order", id }],
     }),
+    createPaymentLink: builder.mutation({
+      query: ({ token, source, id }) => ({
+        url: `/api/payments/create-payment-link/${id}`,
+        method: "POST",
+        credentials: "include",
+        headers: { response: token, source },
+      }),
+    }),
   }),
 });
 
 export const {
   useGetOrderDetailQuery,
   useGetOrdersByUserQuery,
+  useGetReceiptDetailQuery,
   useCalculateMutation,
   useCheckoutMutation,
   useCancelOrderMutation,
+  useCancelUnpaidOrdersMutation,
+  useChangePaymentMethodMutation,
   useRefundOrderMutation,
   useConfirmOrderMutation,
+  useCreatePaymentLinkMutation,
 } = ordersApiSlice;
-
-export const selectOrdersResult =
-  ordersApiSlice.endpoints.getOrdersByUser.select();
-
-const selectOrdersData = createSelector(
-  selectOrdersResult,
-  (ordersResult) => ordersResult.data // normalized state object with ids & entities
-);
-
-export const {
-  selectAll: selectAllOrders,
-  selectById: selectOrderById,
-  selectIds: selectOrderIds,
-  selectEntities: selectOrderEntities,
-} = ordersAdapter.getSelectors(
-  (state) => selectOrdersData(state) ?? initialState
-);

@@ -21,23 +21,33 @@ const ProductFormDialog = lazy(
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 
 const ManageProducts = () => {
-  const { shop } = useAuth();
+  const { id, shop, roles } = useAuth();
+  const isAdmin = roles?.find((role) =>
+    ["ROLE_ADMIN", "ROLE_GUEST"].includes(role)
+  );
   const [contextProduct, setContextProduct] = useState(null);
   const [open, setOpen] = useState(undefined);
   const [pending, setPending] = useState(false);
-  const { data: bookAnalytics } = useGetBookAnalyticsQuery(shop ?? null);
+  const { data: bookAnalytics } = useGetBookAnalyticsQuery(
+    { shopId: shop ?? null, userId: isAdmin ? null : id },
+    { skip: !id }
+  );
   const {
     data: bestSeller,
     isLoading: loadBest,
     isSuccess: doneBest,
     isError: errorBest,
-  } = useGetBooksQuery({
-    size: 6,
-    sortBy: "totalOrders",
-    sortDir: "desc",
-    amount: 0,
-    shopId: shop ?? "",
-  });
+  } = useGetBooksQuery(
+    {
+      size: 6,
+      sortBy: "totalOrders",
+      sortDir: "desc",
+      amount: 0,
+      shopId: shop ?? "",
+      userId: isAdmin ? null : id,
+    },
+    { skip: !id }
+  );
   const [getBook, { isLoading }] = booksApiSlice.useLazyGetBookQuery();
 
   //Set title
@@ -111,7 +121,9 @@ const ManageProducts = () => {
           </Grid>
         )}
       </Grid>
-      <TableProducts {...{ shop, handleOpenEdit, pending, setPending }} />
+      <TableProducts
+        {...{ shop, isAdmin, userId: id, handleOpenEdit, pending, setPending }}
+      />
       <Suspense fallback={null}>
         {open !== undefined && (
           <ProductFormDialog

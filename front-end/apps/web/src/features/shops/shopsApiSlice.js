@@ -1,4 +1,4 @@
-import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
+import { createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "@ring/redux";
 
 const shopsAdapter = createEntityAdapter({});
@@ -20,7 +20,7 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
           return response.status === 200 && !result?.isError;
         },
       }),
-      providesTags: (result, error, { id }) => [{ type: "Shop", id }],
+      providesTags: (result, error, id) => [{ type: "Shop", id }],
     }),
     getShopInfo: builder.query({
       query: (id) => ({
@@ -29,7 +29,7 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
           return response.status === 200 && !result?.isError;
         },
       }),
-      providesTags: (result, error, { id }) => [{ type: "Shop", id }],
+      providesTags: (result, error, id) => [{ type: "Shop", id }],
     }),
     getDisplayShops: builder.query({
       query: (args) => {
@@ -78,14 +78,6 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
         responseHandler: "text",
       }),
       async onQueryStarted(id, { dispatch, queryFulfilled, getState }) {
-        const patchResult = dispatch(
-          //Update cache
-          shopsApiSlice.util.updateQueryData("getShop", id, (draft) => {
-            draft.followed = true;
-            draft.totalFollowers++;
-          })
-        );
-
         //Get all Shops cache
         const shopsEntries = shopsApiSlice.util.selectInvalidatedBy(
           getState(),
@@ -95,20 +87,25 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
         const shopsPatches = [];
 
         shopsEntries
-          .filter(({ endpointName }) => endpointName === "getDisplayShops") //Filter out other actions except GET
-          .forEach(({ originalArgs }) => {
+          .filter(({ endpointName }) => endpointName.startsWith("get")) //Filter out other actions except GET
+          .forEach(({ endpointName, originalArgs }) => {
             const patchResult = dispatch(
               //Update
               shopsApiSlice.util.updateQueryData(
-                "getDisplayShops",
+                endpointName,
                 originalArgs,
                 (draft) => {
-                  let updatedShop = {
-                    ...draft.entities[id],
-                    followed: true,
-                    totalFollowers: (draft.entities[id].totalFollowers += 1),
-                  };
-                  shopsAdapter.upsertOne(draft, updatedShop);
+                  if (draft.entities != null) {
+                    let updatedShop = {
+                      ...draft.entities[id],
+                      followed: true,
+                      totalFollowers: (draft.entities[id].totalFollowers += 1),
+                    };
+                    shopsAdapter.upsertOne(draft, updatedShop);
+                  } else {
+                    draft.followed = true;
+                    draft.totalFollowers++;
+                  }
                 }
               )
             );
@@ -133,14 +130,6 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
         responseHandler: "text",
       }),
       async onQueryStarted(id, { dispatch, queryFulfilled, getState }) {
-        const patchResult = dispatch(
-          //Update cache
-          shopsApiSlice.util.updateQueryData("getShop", id, (draft) => {
-            draft.followed = false;
-            draft.totalFollowers--;
-          })
-        );
-
         //Get all Shops cache
         const shopsEntries = shopsApiSlice.util.selectInvalidatedBy(
           getState(),
@@ -150,20 +139,25 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
         const shopsPatches = [];
 
         shopsEntries
-          .filter(({ endpointName }) => endpointName === "getDisplayShops") //Filter out other actions except GET
-          .forEach(({ originalArgs }) => {
+          .filter(({ endpointName }) => endpointName.startsWith("get")) //Filter out other actions except GET
+          .forEach(({ endpointName, originalArgs }) => {
             const patchResult = dispatch(
               //Update
               shopsApiSlice.util.updateQueryData(
-                "getDisplayShops",
+                endpointName,
                 originalArgs,
                 (draft) => {
-                  let updatedShop = {
-                    ...draft.entities[id],
-                    followed: false,
-                    totalFollowers: (draft.entities[id].totalFollowers -= 1),
-                  };
-                  shopsAdapter.upsertOne(draft, updatedShop);
+                  if (draft.entities != null) {
+                    let updatedShop = {
+                      ...draft.entities[id],
+                      followed: false,
+                      totalFollowers: (draft.entities[id].totalFollowers -= 1),
+                    };
+                    shopsAdapter.upsertOne(draft, updatedShop);
+                  } else {
+                    draft.followed = false;
+                    draft.totalFollowers--;
+                  }
                 }
               )
             );
@@ -192,20 +186,3 @@ export const {
   useUnfollowShopMutation,
   usePrefetch: usePrefetchShops,
 } = shopsApiSlice;
-
-export const selectShopsResult =
-  shopsApiSlice.endpoints.getDisplayShops.select();
-
-const selectShopsData = createSelector(
-  selectShopsResult,
-  (shopsResult) => shopsResult.data // normalized state object with ids & entities
-);
-
-export const {
-  selectAll: selectAllShops,
-  selectById: selectShopById,
-  selectIds: selectShopIds,
-  selectEntities: selectShopEntities,
-} = shopsAdapter.getSelectors(
-  (state) => selectShopsData(state) ?? initialState
-);

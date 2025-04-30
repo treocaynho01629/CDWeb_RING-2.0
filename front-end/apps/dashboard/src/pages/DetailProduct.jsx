@@ -61,7 +61,7 @@ const DetailProduct = () => {
         height: 600,
         srcSet: Object.values(ImageSize)
           .map((size, index) => ({
-            src: srcSet[size.value],
+            src: srcSet[size?.value],
             width: size.width,
             height: size.width,
           }))

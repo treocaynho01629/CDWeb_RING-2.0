@@ -73,8 +73,13 @@ const CouponIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   margin: 10px;
   border-radius: 5px;
+
+  &.disabled {
+    filter: grayscale(1);
+  }
 
   svg {
     font-size: 30px;
@@ -149,7 +154,10 @@ const CouponDisplay = ({ coupon }) => {
 
   return (
     <CouponContainer>
-      <CouponIcon color={summary?.color}>
+      <CouponIcon
+        color={summary?.color}
+        className={coupon?.isUsable ? "" : "disabled"}
+      >
         <Suspense fallback={null}>
           <Icon />
         </Suspense>

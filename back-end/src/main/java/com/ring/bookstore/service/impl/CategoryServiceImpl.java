@@ -4,20 +4,20 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.github.slugify.Slugify;
-import com.ring.bookstore.dtos.categories.CategoryDTO;
-import com.ring.bookstore.dtos.categories.CategoryDetailDTO;
-import com.ring.bookstore.dtos.categories.PreviewCategoryDTO;
-import com.ring.bookstore.dtos.mappers.CategoryMapper;
-import com.ring.bookstore.dtos.categories.ICategory;
+import com.ring.bookstore.model.dto.response.categories.CategoryDTO;
+import com.ring.bookstore.model.dto.response.categories.CategoryDetailDTO;
+import com.ring.bookstore.model.dto.response.categories.PreviewCategoryDTO;
+import com.ring.bookstore.model.mappers.CategoryMapper;
+import com.ring.bookstore.model.dto.projection.categories.ICategory;
 import com.ring.bookstore.exception.HttpResponseException;
-import com.ring.bookstore.request.CategoryRequest;
+import com.ring.bookstore.model.dto.request.CategoryRequest;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.ring.bookstore.exception.ResourceNotFoundException;
-import com.ring.bookstore.model.Category;
+import com.ring.bookstore.model.entity.Category;
 import com.ring.bookstore.repository.CategoryRepository;
 import com.ring.bookstore.service.CategoryService;
 
@@ -32,22 +32,35 @@ public class CategoryServiceImpl implements CategoryService {
     private final Slugify slg = Slugify.builder().lowerCase(false).build();
 
     @Override
-    public Page<CategoryDTO> getCategories(Integer pageNo, Integer pageSize, String sortBy, String sortDir,
-                                           String include, Integer parentId) {
-       Pageable pageable = PageRequest.of(pageNo, pageSize, sortDir.equals("asc") ?
-                Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending());
+    public Page<CategoryDTO> getCategories(Integer pageNo,
+            Integer pageSize,
+            String sortBy,
+            String sortDir,
+            String include,
+            Integer parentId) {
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize,
+                sortDir.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());
         Page<CategoryDTO> cateDTOS = null;
 
         if (include != null && include.equalsIgnoreCase("children")) {
-            Page<Integer> cateIds = cateRepo.findCateIdsByParent(parentId, pageable);
-            List<ICategory> fullList = cateRepo.findParentAndSubCatesWithParentIds(cateIds.getContent());
-            List<CategoryDTO> catesList = cateMapper.parendAndChildsToCateDTOS(fullList, cateIds.getContent());
+            Page<Integer> pagedIds = cateRepo.findCateIdsByParent(parentId, pageable);
+            List<Integer> cateIds = pagedIds.getContent();
+            List<ICategory> fullList = cateRepo.findParentAndSubCatesWithParentIds(cateIds);
+
+            // Map
+            List<CategoryDTO> catesList = cateMapper.parentAndChildToCateDTOS(fullList);
+
+            // Sort by parent ids
+            Map<Integer, Integer> idOrder = new HashMap<>();
+            for (int i = 0; i < cateIds.size(); i++)
+                idOrder.put(cateIds.get(i), i);
+            catesList.sort(Comparator.comparingInt(c -> idOrder.get(c.id())));
+
             cateDTOS = new PageImpl<CategoryDTO>(
                     catesList,
                     pageable,
-                    cateIds.getTotalElements()
-            );
+                    pagedIds.getTotalElements());
             return cateDTOS;
         } else {
             Page<ICategory> catesList = cateRepo.findCates(parentId, pageable);
@@ -56,12 +69,14 @@ public class CategoryServiceImpl implements CategoryService {
         return cateDTOS;
     }
 
-    public Page<CategoryDTO> getRelevantCategories(Integer pageNo, Integer pageSize, Long shopId) {
+    public Page<CategoryDTO> getRelevantCategories(Integer pageNo,
+            Integer pageSize,
+            Long shopId) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
 
         Page<Integer[]> cateIds = cateRepo.findRelevantCategories(shopId, pageable);
 
-        //Joined id & parent id
+        // Joined id & parent id
         LinkedHashSet<Integer> joinedIdsSet = new LinkedHashSet<>();
         for (Integer[] arr : cateIds.getContent()) {
             joinedIdsSet.add(arr[0]);
@@ -70,13 +85,19 @@ public class CategoryServiceImpl implements CategoryService {
         List<Integer> joinedIds = new ArrayList<>(joinedIdsSet.stream().toList());
         List<ICategory> fullList = cateRepo.findCatesWithIds(joinedIds);
 
-        Collections.reverse(joinedIds);
-        List<CategoryDTO> catesList = cateMapper.parendAndChildsToCateDTOS(fullList, joinedIds);
+        // Map
+        List<CategoryDTO> catesList = cateMapper.parentAndChildToCateDTOS(fullList);
+
+        // Sort by parent ids
+        Map<Integer, Integer> idOrder = new HashMap<>();
+        for (int i = 0; i < joinedIds.size(); i++)
+            idOrder.put(joinedIds.get(i), i);
+        catesList.sort(Comparator.comparingInt(c -> idOrder.get(c.id())));
+
         Page<CategoryDTO> cateDTOS = new PageImpl<CategoryDTO>(
                 catesList,
                 pageable,
-                cateIds.getTotalElements()
-        );
+                cateIds.getTotalElements());
         return cateDTOS;
     }
 
@@ -86,21 +107,24 @@ public class CategoryServiceImpl implements CategoryService {
         return previews.stream().map(cateMapper::projectionToPreviewDTO).collect(Collectors.toList());
     }
 
-    //Get category
+    // Get category
     public CategoryDetailDTO getCategory(Integer id, String slug, String include) {
         CategoryDetailDTO result = null;
 
         if (include != null && include.equalsIgnoreCase("children")) {
-            Category cate = cateRepo.findCateWithChildren(id, slug).orElseThrow(() ->
-                    new ResourceNotFoundException("Category not found!"));
+            Category cate = cateRepo.findCateWithChildren(id, slug)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
+                            "Không tìm thấy danh mục yêu cầu!"));
             result = cateMapper.cateToDetailDTO(cate, "children");
         } else if (include != null && include.equalsIgnoreCase("parent")) {
-            Category cate = cateRepo.findCateWithParent(id, slug).orElseThrow(() ->
-                    new ResourceNotFoundException("Category not found!"));
+            Category cate = cateRepo.findCateWithParent(id, slug)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
+                            "Không tìm thấy danh mục yêu cầu!"));
             result = cateMapper.cateToDetailDTO(cate, "parent");
         } else {
-            Category cate = cateRepo.findCate(id, slug).orElseThrow(() ->
-                    new ResourceNotFoundException("Category not found!"));
+            Category cate = cateRepo.findCate(id, slug)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
+                            "Không tìm thấy danh mục yêu cầu!"));
             result = cateMapper.cateToDetailDTO(cate);
         }
 
@@ -109,52 +133,60 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional
     public Category addCategory(CategoryRequest request) {
-        //Slugify
+
+        // Slugify
         String slug = slg.slugify(request.getName());
 
-        //Create new category
+        // Create new category
         var category = Category.builder()
                 .slug(slug)
                 .name(request.getName())
                 .description(request.getDescription())
                 .build();
 
-        //Set parent
+        // Set parent
         if (request.getParentId() != null) {
             Category parent = cateRepo.findById(request.getParentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Parent category not found!"));
-            if (parent.getParent().getId() != null) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid parent category!");
+                    .orElseThrow(() -> new ResourceNotFoundException("Parent category not found!",
+                            "Không tìm thấy danh mục yêu cầu!"));
+            if (parent.getParent() != null)
+                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid parent category!");
             category.setParent(parent);
         }
 
-        Category addedCate = cateRepo.save(category); //Save to database
+        Category addedCate = cateRepo.save(category); // Save to database
         return addedCate;
     }
 
     @Transactional
     public Category updateCategory(Integer id, CategoryRequest request) {
-        //Get original category
+        // Get original category
         Category category = cateRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found!",
+                        "Không tìm thấy danh mục yêu cầu!"));
 
-        //Set new info
+        // Set new info
         String slug = slg.slugify(request.getName());
 
-        //Update
+        // Update
         category.setSlug(slug);
         category.setName(request.getName());
         category.setDescription(request.getDescription());
 
-        //Parent
-        if (request.getParentId() != null && !request.getParentId().equals(category.getParent().getId())) {
-            if (!category.getSubCates().isEmpty()) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid child category!");
+        // Parent
+        if (request.getParentId() != null
+                && (category.getParent() == null || !request.getParentId().equals(category.getParent().getId()))) {
+            if (!category.getSubCates().isEmpty())
+                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid child category!");
             Category parent = cateRepo.findById(request.getParentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Parent category not found!"));
-            if (parent.getParent().getId() != null) throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid parent category!");
+                    .orElseThrow(() -> new ResourceNotFoundException("Parent category not found!",
+                            "Không tìm thấy danh mục yêu cầu!"));
+            if (parent.getParent() != null)
+                throw new HttpResponseException(HttpStatus.BAD_REQUEST, "Invalid parent category!");
             category.setParent(parent);
         }
 
-        //Update
+        // Update
         Category updatedCate = cateRepo.save(category);
         return updatedCate;
     }
@@ -165,13 +197,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Transactional
-    public void deleteCategories(Integer parentId, List<Integer> ids, Boolean isInverse) {
-        List<Integer> listDelete = ids;
-        if (isInverse) listDelete = cateRepo.findInverseIds(parentId, ids);
+    public void deleteCategories(List<Integer> ids) {
+        cateRepo.deleteAllByIdInBatch(ids);
+    }
+
+    @Transactional
+    public void deleteCategoriesInverse(Integer parentId, List<Integer> ids) {
+        List<Integer> listDelete = cateRepo.findInverseIds(parentId, ids);
         cateRepo.deleteAllByIdInBatch(listDelete);
     }
 
-    @Override
+    @Transactional
     public void deleteAllCategories() {
         cateRepo.deleteAll();
     }

@@ -239,6 +239,8 @@ function CouponFilters({ filters, setFilters }) {
 
 export default function TableCoupons({
   shop,
+  userId,
+  isAdmin,
   handleOpenEdit,
   pending,
   setPending,
@@ -274,18 +276,26 @@ export default function TableCoupons({
   const [deleteAll] = useDeleteAllCouponsMutation();
 
   //Fetch coupons
-  const { data, isLoading, isSuccess, isError, error } = useGetCouponsQuery({
-    page: pagination?.number,
-    size: pagination?.size,
-    sortBy: pagination?.sortBy,
-    sortDir: pagination?.sortDir,
-    shopId: shop ?? "",
-    code: filters.code,
-    showExpired: filters.showExpired == "all" ? true : null,
-    byShop:
-      filters.byShop == "ring" ? false : filters.byShop == "shop" ? true : null,
-    types: filters.types ?? "",
-  });
+  const { data, isLoading, isSuccess, isError, error } = useGetCouponsQuery(
+    {
+      page: pagination?.number,
+      size: pagination?.size,
+      sortBy: pagination?.sortBy,
+      sortDir: pagination?.sortDir,
+      shopId: shop ?? "",
+      code: filters.code,
+      showExpired: filters.showExpired == "all" ? true : null,
+      byShop:
+        filters.byShop == "ring"
+          ? false
+          : filters.byShop == "shop"
+            ? true
+            : null,
+      types: filters.types ?? "",
+      userId: isAdmin ? null : userId,
+    },
+    { skip: !userId }
+  );
 
   //Set pagination after fetch
   useEffect(() => {

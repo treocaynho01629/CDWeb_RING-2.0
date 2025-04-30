@@ -52,6 +52,13 @@ function App() {
             element: <PersistLogin />,
             children: [
               {
+                path: "payment/:id?",
+                lazy: async () => {
+                  let Payment = await import("./pages/Payment");
+                  return { Component: Payment.default };
+                },
+              },
+              {
                 element: <PageLayout />,
                 children: [
                   {
@@ -151,6 +158,15 @@ function App() {
                                 "./pages/OrderDetail"
                               );
                               return { Component: OrderDetail.default };
+                            },
+                          },
+                          {
+                            path: "profile/order/checkout/:id",
+                            lazy: async () => {
+                              let CheckoutDetail = await import(
+                                "./pages/CheckoutDetail"
+                              );
+                              return { Component: CheckoutDetail.default };
                             },
                           },
                           {

@@ -1,52 +1,72 @@
 package com.ring.bookstore.controller;
 
+import com.ring.bookstore.model.dto.request.AuthenticationRequest;
+import com.ring.bookstore.model.dto.request.RegisterRequest;
+import com.ring.bookstore.model.dto.request.ResetPassRequest;
+import com.ring.bookstore.model.dto.response.AuthenticationResponse;
+import com.ring.bookstore.model.entity.Account;
+import com.ring.bookstore.service.AuthenticationService;
+import com.ring.bookstore.service.RefreshTokenService;
+import com.ring.bookstore.service.RegisterService;
+import com.ring.bookstore.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.ring.bookstore.model.Account;
-import com.ring.bookstore.request.AuthenticationRequest;
-import com.ring.bookstore.request.RegisterRequest;
-import com.ring.bookstore.request.ResetPassRequest;
-import com.ring.bookstore.response.AuthenticationResponse;
-import com.ring.bookstore.service.impl.AuthenticationService;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-
+/**
+ * Controller named {@link AuthenticationController}
+ * for handling authentication-related requests such as registration, login, token refresh.
+ */
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
 	private final AuthenticationService authService;
+	private final RegisterService registerService;
+	private final TokenService tokenService;
+	private final RefreshTokenService refreshService;
 
-	//Register
+	/**
+	 * Registers a new user.
+	 *
+	 * @param registerRequest 	The registration request containing user details.
+	 * @param request 			The HTTP request containing reCAPTCHA score in the header.
+	 * @return a {@link ResponseEntity} containing a success or failure message.
+	 */
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest,
 									  HttpServletRequest request) {
-		authService.register(registerRequest, request);
-		return ResponseEntity.ok("Đăng ký thành công!");
+		Account newUser = registerService.register(registerRequest, request);
+		return ResponseEntity.ok(newUser.getUsername() + " đã đăng ký thành công!");
 	}
 
-	//Authenticate sign in
+	/**
+	 * Logs in a user and returns an access token.
+	 *
+	 * @param authRequest 	The login request containing user credentials.
+	 * @param request 		The HTTP request containing reCAPTCHA score in the header.
+	 * @param persist whether to persist the refresh token.
+	 * @return a {@link ResponseEntity} containing the {@link AuthenticationResponse} with the JWT token and refresh token in headers cookie.
+	 */
 	@PostMapping("/authenticate")
-	public ResponseEntity<AuthenticationResponse> authenticate(
+	public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest authRequest,
 			@RequestParam(value = "persist", defaultValue = "true") Boolean persist,
-			@RequestBody @Valid AuthenticationRequest authRequest,
 			HttpServletRequest request) {
 		//Generate new JWT & refresh token
 		Account auth = authService.authenticate(authRequest, request);
-		String jwtToken = authService.generateToken(auth);
+		String jwtToken = tokenService.generateAccessToken(auth);
 
 		//Set refresh token
 		ResponseCookie refreshCookie;
 		if (persist) {
-			refreshCookie = authService.generateRefreshCookie(auth);
+			refreshCookie = refreshService.generateRefreshCookie(auth);
 		} else {
-			refreshCookie = authService.clearRefreshCookie();
+			refreshCookie = refreshService.clearRefreshCookie();
 		}
 
 		return ResponseEntity.ok()
@@ -54,31 +74,50 @@ public class AuthenticationController {
 				.body(new AuthenticationResponse(jwtToken));
 	}
 
-	//Refresh JWT token
+	/**
+	 * Refreshes the authentication token using the refresh token from the HTTP request.
+	 *
+	 * @param request The HTTP request containing the refresh token in the cookie.
+	 * @return a {@link ResponseEntity} containing the new {@link AuthenticationResponse} with the refreshed JWT token.
+	 */
 	@GetMapping("/refresh-token")
 	public ResponseEntity<AuthenticationResponse> refreshToken(HttpServletRequest request) {
 		//Generate new token
-		Account auth = authService.refreshToken(request);
-		String jwtToken = authService.generateToken(auth);
+		Account auth = refreshService.refreshToken(request);
+		String jwtToken = tokenService.generateAccessToken(auth);
 
 		return ResponseEntity.ok().body(new AuthenticationResponse(jwtToken));
 	}
-	
-	//Send forgot password email
+
+	/**
+	 * Sends a password recovery email to the user.
+	 *
+	 * @param email   The email address of the user requesting password reset.
+	 * @param request The HTTP request containing reCAPTCHA score in the header.
+	 * @return a {@link ResponseEntity} containing a success message.
+	 */
 	@PostMapping("/forgot-password")
 	public ResponseEntity<?> forgotPassword(@RequestParam(value="email") String email,
 											HttpServletRequest request){
-		authService.forgotPassword(email, request);
+		registerService.forgotPassword(email, request);
 
 		return ResponseEntity.ok("Đã gửi email khôi phục mật khẩu!");
 	}
-	
-	//Reset password
+
+	/**
+	 * Resets the user's password using the provided reset token and new password details.
+	 *
+	 * @param token         The reset password token sent to the user's email.
+	 * @param resetRequest  The request body containing the new password details.
+	 * @param request       The HTTP request containing reCAPTCHA score in the header.
+	 * @return a {@link ResponseEntity} containing a success message.
+	 */
 	@PutMapping("/reset-password/{token}")
 	public ResponseEntity<?> resetPassword(@PathVariable("token") String token,
 										   @Valid @RequestBody ResetPassRequest resetRequest,
 											HttpServletRequest request){
-		authService.resetPassword(token, resetRequest, request);
-		return ResponseEntity.ok("Thay đổi mật khẩu thành công!");
+		Account updatedUser = registerService.resetPassword(token, resetRequest, request);
+
+		return ResponseEntity.ok("Người dùng " + updatedUser.getUsername() + " thay đổi mật khẩu thành công!");
 	}
 }

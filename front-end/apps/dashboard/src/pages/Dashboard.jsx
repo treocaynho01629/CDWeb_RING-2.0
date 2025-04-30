@@ -53,14 +53,17 @@ const TopProducts = ({ shop }) => {
 };
 
 const Dashboard = () => {
-  const { roles, username, shop } = useAuth();
-  const { data: bookAnalytics } = useGetBookAnalyticsQuery(shop ?? null);
-  const { data: salesAnalytics } = useGetSalesAnalyticsQuery(shop ?? null);
-  const { data: userAnalytics } = useGetUserAnalyticsQuery();
-  const { data: shopAnalytics } = useGetShopAnalyticsQuery();
+  const { id, roles, username, shop } = useAuth();
   const isAdmin = roles?.find((role) =>
     ["ROLE_ADMIN", "ROLE_GUEST"].includes(role)
   );
+  const { data: bookAnalytics } = useGetBookAnalyticsQuery(
+    { shopId: shop ?? null, userId: isAdmin ? null : id },
+    { skip: !id }
+  );
+  const { data: salesAnalytics } = useGetSalesAnalyticsQuery(shop ?? null);
+  const { data: userAnalytics } = useGetUserAnalyticsQuery();
+  const { data: shopAnalytics } = useGetShopAnalyticsQuery();
 
   //Set title
   useTitle("Dashboard");
@@ -123,7 +126,7 @@ const Dashboard = () => {
           <SummaryTableOrders />
         </Grid>
         <Grid size={isAdmin ? { xs: 12, md: 6, lg: 4 } : { xs: 12, lg: 6 }}>
-          <SummaryTableProducts shop={shop} />
+          <SummaryTableProducts {...{ shop, userId: id, isAdmin }} />
         </Grid>
         {isAdmin && (
           <Grid size={{ xs: 12, md: 6, lg: 4 }}>

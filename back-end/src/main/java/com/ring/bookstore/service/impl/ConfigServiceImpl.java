@@ -1,15 +1,17 @@
 package com.ring.bookstore.service.impl;
 
-import com.ring.bookstore.dtos.enums.EnumsDTO;
-import com.ring.bookstore.enums.*;
+import com.ring.bookstore.model.dto.response.enums.EnumsDTO;
+import com.ring.bookstore.model.enums.*;
 import com.ring.bookstore.service.ConfigService;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class ConfigServiceImpl implements ConfigService {
+
     @Override
     public List<EnumsDTO> getEnums() {
         List<EnumsDTO> enums = new ArrayList<>();
@@ -17,24 +19,14 @@ public class ConfigServiceImpl implements ConfigService {
         //Book types
         Map<String, Map<String, Object>> bookTypes = Arrays.stream(BookType.values())
                 .collect(Collectors.toMap(Enum::name,
-                        type -> {
-                            Map<String, Object> typeData = new LinkedHashMap<>();
-                            typeData.put("value", type.getValue());
-                            typeData.put("label", type.getLabel());
-                            return typeData;
-                        },
+                        this::convertToMap,
                         (x, y) -> y, LinkedHashMap::new));
         enums.add(new EnumsDTO("BookType", bookTypes));
 
         //Book language
         Map<String, Map<String, Object>> bookLanguage = Arrays.stream(BookLanguage.values())
                 .collect(Collectors.toMap(Enum::name,
-                        lang -> {
-                            Map<String, Object> langData = new HashMap<>();
-                            langData.put("value", lang.getValue());
-                            langData.put("label", lang.getLabel());
-                            return langData;
-                        },
+                        this::convertToMap,
                         (x, y) -> y, LinkedHashMap::new));
         enums.add(new EnumsDTO("BookLanguage", bookLanguage));
 
@@ -43,7 +35,7 @@ public class ConfigServiceImpl implements ConfigService {
                 .collect(Collectors.toMap(Enum::name,
                         role -> {
                             Map<String, Object> roleData = new HashMap<>();
-                            roleData.put("value", role.getValue());
+                            roleData.put("value", role.name());
                             roleData.put("label", role.getLabel());
                             roleData.put("color", role.getColor());
                             return roleData;
@@ -54,31 +46,38 @@ public class ConfigServiceImpl implements ConfigService {
         //Shipping types
         Map<String, Map<String, Object>> shippingTypes = Arrays.stream(ShippingType.values())
                 .collect(Collectors.toMap(Enum::name,
-                        type -> {
-                            Map<String, Object> typeData = new HashMap<>();
-                            typeData.put("value", type.getValue());
-                            typeData.put("label", type.getLabel());
-                            typeData.put("description", type.getLabel());
-                            typeData.put("color", type.getColor());
-                            typeData.put("multiplier", type.getMultiplier());
-                            typeData.put("icon", type.getIcon());
-                            return typeData;
-                        },
+                        this::convertToMap,
                         (x, y) -> y, LinkedHashMap::new));
         enums.add(new EnumsDTO("ShippingType", shippingTypes));
 
         //Image sizes
         Map<String, Map<String, Object>> imageSizes = Arrays.stream(ImageSize.values())
                 .collect(Collectors.toMap(Enum::name,
-                        size -> {
-                            Map<String, Object> sizeData = new HashMap<>();
-                            sizeData.put("value", size.getValue());
-                            sizeData.put("width", size.getWidth());
-                            return sizeData;
-                        },
+                        this::convertToMap,
                         (x, y) -> y, LinkedHashMap::new));
         enums.add(new EnumsDTO("ImageSize", imageSizes));
 
         return enums;
+    }
+
+    private Map<String, Object> convertToMap(Enum<?> enumObj) {
+        Map<String, Object> typeData = new HashMap<>();
+
+        // Get all fields of the object's class
+        Field[] fields = enumObj.getClass().getDeclaredFields();
+        typeData.put("value", enumObj.name());
+
+        for (Field field : fields) {
+            field.setAccessible(true); // Ensure we can access private fields
+            try {
+                // Put field name as key and field value as the value in the map
+                if (!field.isEnumConstant() && !field.isSynthetic()) {
+                    typeData.put(field.getName(), field.get(enumObj));
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return typeData;
     }
 }

@@ -11,6 +11,10 @@ export const StyledTableCell = styled(TableCell)`
 
   &.${tableCellClasses.root} {
     border: none;
+
+    &.option {
+      padding-top: 0;
+    }
   }
 
   &.${tableCellClasses.head} {
@@ -138,6 +142,7 @@ export const StyledTableHead = styled(TableHead)`
 
 export const StyledTableRow = styled(TableRow)`
   position: relative;
+  padding: 0;
 
   &:after {
     content: "";
@@ -156,9 +161,22 @@ export const StyledTableRow = styled(TableRow)`
     }
   }
 
-  &.shop {
+  &.top {
     &:after {
       border-bottom: none;
+    }
+  }
+
+  &.center {
+    &:after {
+      border-top: none;
+      border-bottom-style: dashed;
+    }
+  }
+
+  &.bottom {
+    &:after {
+      border-top: none;
     }
   }
 `;

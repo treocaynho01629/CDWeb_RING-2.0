@@ -4,8 +4,9 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.HashMap;
-
+/**
+ * Exception class named {@link ResourceNotFoundException} thrown when the specified resource is not found.
+ */
 @Getter
 @ResponseStatus(code = HttpStatus.NOT_FOUND)
 public class ResourceNotFoundException extends RuntimeException {

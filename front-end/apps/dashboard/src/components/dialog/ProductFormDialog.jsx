@@ -100,10 +100,8 @@ const ProductFormDialog = ({
   });
   const [pub, setPub] = useState("");
   const [cate, setCate] = useState("");
-  const [language, setLanguage] = useState(
-    Object.values(BookLanguage)[0].value
-  );
-  const [type, setType] = useState(Object.values(BookType)[0].value);
+  const [language, setLanguage] = useState(Object.keys(BookLanguage)[0]);
+  const [type, setType] = useState(Object.keys(BookType)[0]);
   const [err, setErr] = useState([]);
   const [errMsg, setErrMsg] = useState("");
   const [pubsPagination, setPubsPagination] = useState({
@@ -375,7 +373,7 @@ const ProductFormDialog = ({
           } else if (err?.status === 409) {
             setErrMsg(err?.data?.message);
           } else if (err?.status === 403) {
-            setErrMsg("Chưa có ảnh kèm theo!");
+            setErrMsg("Bạn không có quyền làm điều này!");
           } else if (err?.status === 400) {
             setErrMsg("Sai định dạng thông tin!");
           } else if (err?.status === 417) {
@@ -405,7 +403,7 @@ const ProductFormDialog = ({
           } else if (err?.status === 409) {
             setErrMsg(err?.data?.message);
           } else if (err?.status === 403) {
-            setErrMsg("Chưa có ảnh kèm theo!");
+            setErrMsg("Bạn không có quyền làm điều này!");
           } else if (err?.status === 400) {
             setErrMsg("Sai định dạng thông tin!");
           } else if (err?.status === 417) {
@@ -657,6 +655,8 @@ const ProductFormDialog = ({
                   setThumbnailId,
                   remove,
                   setRemove,
+                  isMissing:
+                    !(files.length > 0) && err?.data?.errors?.thumbnail,
                   images: product
                     ? product?.previews
                       ? [product?.image].concat(product?.previews)

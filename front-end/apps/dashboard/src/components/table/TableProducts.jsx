@@ -436,6 +436,8 @@ function ProductFilters({ filters, setFilters }) {
 
 export default function TableProducts({
   shop,
+  isAdmin,
+  userId,
   handleOpenEdit,
   pending,
   setPending,
@@ -471,18 +473,23 @@ export default function TableProducts({
   const [deleteAll] = useDeleteAllBooksMutation();
 
   //Fetch books
-  const { data, isLoading, isSuccess, isError, error } = useGetBooksQuery({
-    page: pagination?.number,
-    size: pagination?.size,
-    sortBy: pagination?.sortBy,
-    sortDir: pagination?.sortDir,
-    shopId: shop ?? "",
-    keyword: filters.keyword,
-    cateId: filters.cate,
-    types: filters.types,
-    pubIds: filters.pubIds,
-    amount: 0,
-  });
+  const { data, isLoading, isSuccess, isError, error, refetch } =
+    useGetBooksQuery(
+      {
+        page: pagination?.number,
+        size: pagination?.size,
+        sortBy: pagination?.sortBy,
+        sortDir: pagination?.sortDir,
+        shopId: shop ?? "",
+        userId: isAdmin ? null : userId,
+        keyword: filters.keyword,
+        cateId: filters.cate,
+        types: filters.types,
+        pubIds: filters.pubIds,
+        amount: 0,
+      },
+      { skip: !userId }
+    );
 
   //Set pagination after fetch
   useEffect(() => {
@@ -801,7 +808,7 @@ export default function TableProducts({
                 style={{ display: "flex", alignItems: "center" }}
               >
                 <LazyLoadImage
-                  src={book?.image?.srcSet[ImageSize.TINY.value]}
+                  src={book?.image?.srcSet[ImageSize?.TINY?.value]}
                   height={45}
                   width={45}
                   style={{ marginRight: "10px" }}
@@ -891,6 +898,7 @@ export default function TableProducts({
 
   return (
     <Paper sx={{ width: "100%", height: "100%" }} elevation={3}>
+      <button onClick={refetch}>refetch</button>
       <Toolbar>
         <ProductFilters {...{ filters, setFilters }} />
       </Toolbar>

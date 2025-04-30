@@ -203,9 +203,10 @@ const CouponIcon = styled.div`
 `;
 
 const ShopImage = styled(LazyLoadImage)`
-  height: 40px;
+  height: 45px;
   aspect-ratio: 1/1;
   border-radius: 50%;
+  border: 1px solid ${({ theme }) => theme.palette.success.main};
 `;
 
 const ShopName = styled.span`
@@ -244,6 +245,7 @@ const CouponContainer = styled.div`
   background-color: ${({ theme }) => theme.palette.background.default};
   border: 0.5px solid ${({ theme }) => theme.palette.divider};
   box-shadow: ${({ theme }) => theme.shadows[1]};
+  transition: all 0.2s ease;
 
   &.active {
     background-color: ${({ theme }) => alpha(theme.palette.primary.light, 0.1)};
@@ -277,10 +279,17 @@ const CouponContainer = styled.div`
       border: 1px solid ${({ theme }) => theme.palette.divider};
       border-radius: 6px;
       transform: rotate(-10deg);
+      pointer-events: none;
     }
 
     ${CouponAction} {
       pointer-events: none;
+    }
+
+    &.active {
+      ${CouponAction} {
+        pointer-events: all;
+      }
     }
 
     &.used {
@@ -429,15 +438,13 @@ const CouponItem = ({
     <Wrapper className={className}>
       {coupon ? (
         <CouponContainer
-          className={
+          className={`${selectMode && isSelected ? "active " : " "}${
             selectMode && isUsed
               ? "disabled used"
-              : selectMode && isDisabled
+              : isDisabled
                 ? "disabled"
-                : isSelected
-                  ? "active"
-                  : className
-          }
+                : className
+          }`}
         >
           <CouponEdge
             elevation={className == "display" ? 0 : 24}

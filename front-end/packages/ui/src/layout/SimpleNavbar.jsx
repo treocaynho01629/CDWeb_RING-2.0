@@ -57,9 +57,9 @@ const Logo = styled.img`
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     filter: drop-shadow(
-      0px -1000px 0 ${({ theme }) => theme.palette.text.primary}
+      0px -2000px 0 ${({ theme }) => theme.palette.text.primary}
     );
-    transform: translateY(1000px);
+    transform: translateY(2000px);
   }
 `;
 //#endregion

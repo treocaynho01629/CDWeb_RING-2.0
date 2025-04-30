@@ -1,9 +1,7 @@
-import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
+import { createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "@ring/redux";
-import { isEqual } from "lodash-es";
 
 const reviewsAdapter = createEntityAdapter({});
-const reviewsSelector = reviewsAdapter.getSelectors();
 const initialState = reviewsAdapter.getInitialState({
   page: {
     number: 0,
@@ -61,6 +59,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
       query: (id) => ({
         url: `/api/reviews/${id}`,
         method: "DELETE",
+        responseHandler: "text",
       }),
       invalidatesTags: (result, error, id) => [{ type: "Review", id }],
     }),
@@ -68,6 +67,7 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
       query: (ids) => ({
         url: `/api/reviews/delete-multiple?ids=${ids}`,
         method: "DELETE",
+        responseHandler: "text",
       }),
       invalidatesTags: (result, error) => [{ type: "Review", id: "LIST" }],
     }),
@@ -112,20 +112,3 @@ export const {
   useDeleteAllReviewsMutation,
   usePrefetch: usePrefetchReviews,
 } = reviewsApiSlice;
-
-export const selectReviewsResult =
-  reviewsApiSlice.endpoints.getReviews.select();
-
-const selectReviewsData = createSelector(
-  selectReviewsResult,
-  (reviewsResult) => reviewsResult.data // normalized state object with ids & entities
-);
-
-export const {
-  selectAll: selectAllReviews,
-  selectById: selectReviewById,
-  selectIds: selectReviewIds,
-  selectEntities: selectReviewEntities,
-} = reviewsAdapter.getSelectors(
-  (state) => selectReviewsData(state) ?? initialState
-);

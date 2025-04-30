@@ -35,16 +35,20 @@ const headCells = [
   },
 ];
 
-export default function SummaryTableProducts({ shop }) {
+export default function SummaryTableProducts({ shop, userId, isAdmin }) {
   //#region construct
   //Fetch books
-  const { data, isLoading, isSuccess, isError, error } = useGetBooksQuery({
-    size: 5,
-    sortBy: "createdDate",
-    sortDir: "desc",
-    shopId: shop ?? "",
-    amount: 0,
-  });
+  const { data, isLoading, isSuccess, isError, error } = useGetBooksQuery(
+    {
+      size: 5,
+      sortBy: "createdDate",
+      sortDir: "desc",
+      amount: 0,
+      shopId: shop ?? "",
+      userId: isAdmin ? null : userId,
+    },
+    { skip: !userId }
+  );
   //#endregion
 
   const colSpan = headCells.length + 1;
@@ -79,7 +83,7 @@ export default function SummaryTableProducts({ shop }) {
                 style={{ display: "flex", alignItems: "center" }}
               >
                 <LazyLoadImage
-                  src={book?.image?.srcSet[ImageSize.TINY.value]}
+                  src={book?.image?.srcSet[ImageSize?.TINY?.value]}
                   height={45}
                   width={45}
                   style={{ marginRight: "10px" }}

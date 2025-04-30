@@ -170,7 +170,7 @@ const CateFilter = memo(({ cateId, shopId, onChangeCate }) => {
   });
 
   const { data, isLoading, isFetching, isSuccess, isError } = (
-    shopId ? useGetRelevantCategoriesQuery : useGetCategoriesQuery
+    shopId != null ? useGetRelevantCategoriesQuery : useGetCategoriesQuery
   )({
     include: "children",
     page: pagination?.number,

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Button, useMediaQuery } from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
+import { Button, Checkbox, ListItemText, useMediaQuery } from "@mui/material";
 import {
   TextField,
   Dialog,
@@ -41,8 +41,8 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
   const [dob, setDob] = useState(
     user?.dob ? dayjs(user?.dob) : dayjs("1970-01-01")
   );
-  const [roles, setRoles] = useState(roleTypeItems[0].value);
-  const [gender, setGender] = useState(genderTypeItems[0].value);
+  const [roles, setRoles] = useState([Object.keys(UserRole)[0]]);
+  const [gender, setGender] = useState(Object.keys(GenderType)[0]);
   const [err, setErr] = useState([]);
   const [errMsg, setErrMsg] = useState("");
   const [validPhone, setValidPhone] = useState(false);
@@ -78,6 +78,11 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
     setValidEmail(result);
   }, [email]);
 
+  const handleChangeRoles = useCallback((e) => {
+    const value = e.target.value;
+    if (!roles?.includes(value)) setRoles(value);
+  }, []);
+
   const clearInput = () => {
     setPic("");
     setUserName("");
@@ -85,8 +90,8 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
     setEmail("");
     setName("");
     setPhone("");
-    setRoles(Object.values(UserRole)[0].value);
-    setGender(Object.values(GenderType)[0].value);
+    setRoles([Object.keys(UserRole)[0]]);
+    setGender(Object.keys(GenderType)[0]);
     setDob(dayjs("2001-01-01"));
     setErr([]);
     setErrMsg("");
@@ -121,13 +126,12 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
       username,
       email,
       roles,
-      pass: pass || null,
+      pass: user && !pass ? null : pass,
       name: name || null,
       phone: phone || null,
       gender: gender || null,
       dob: dob.format("YYYY-MM-DD"),
       image: file ? null : pic,
-      keepOldPass: user && !pass ? true : false,
     });
     const blob = new Blob([json], { type: "application/json" });
 
@@ -155,7 +159,7 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
           } else if (err?.status === 409) {
             setErrMsg(err?.data?.message);
           } else if (err?.status === 403) {
-            setErrMsg("Chưa có ảnh kèm theo!");
+            setErrMsg("Bạn không có quyền làm điều này!");
           } else if (err?.status === 400) {
             setErrMsg("Sai định dạng thông tin!");
           } else if (err?.status === 417) {
@@ -180,6 +184,7 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
             variant: "success",
           });
           setPending(false);
+          handleCloseDialog();
         })
         .catch((err) => {
           console.error(err);
@@ -189,7 +194,7 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
           } else if (err?.status === 409) {
             setErrMsg(err?.data?.message);
           } else if (err?.status === 403) {
-            setErrMsg("Chưa có ảnh kèm theo!");
+            setErrMsg("Bạn không có quyền làm điều này!");
           } else if (err?.status === 400) {
             setErrMsg("Sai định dạng thông tin!");
           } else if (err?.status === 417) {
@@ -315,7 +320,7 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
               >
-                {genderTypeItems.map((option) => (
+                {Object.values(GenderType).map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>
@@ -341,16 +346,44 @@ const UserFormDialog = ({ open, handleClose, user, pending, setPending }) => {
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 label="Quyền"
+                id="roles"
                 select
                 required
                 fullWidth
-                id="roles"
-                value={roles}
-                onChange={(e) => setRoles(e.target.value)}
+                slotProps={{
+                  select: {
+                    multiple: true,
+                    value: roles,
+                    onChange: (e) => handleChangeRoles(e),
+                    renderValue: (selected) => {
+                      const filteredLabel = selected?.map(
+                        (value) => UserRole[value].label
+                      );
+                      return filteredLabel.join(", ");
+                    },
+                    MenuProps: {
+                      slotProps: {
+                        paper: {
+                          style: {
+                            maxHeight: 250,
+                          },
+                        },
+                      },
+                    },
+                  },
+                }}
               >
-                {roleTypeItems.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+                {Object.values(UserRole).map((role, index) => (
+                  <MenuItem
+                    key={`role-${role.value}-${index}`}
+                    value={role.value}
+                  >
+                    <Checkbox
+                      sx={{ py: 0.5, pr: 1, pl: 0 }}
+                      disableRipple
+                      checked={roles?.includes(role.value)}
+                    />
+                    <ListItemText primary={role.label} />
                   </MenuItem>
                 ))}
               </TextField>

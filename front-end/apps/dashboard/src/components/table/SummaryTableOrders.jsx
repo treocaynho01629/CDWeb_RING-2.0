@@ -40,11 +40,11 @@ const headCells = [
   },
 ];
 
-export default function SummaryTableOrders({ title, shopId, bookId }) {
+export default function SummaryTableOrders({ shopId, bookId }) {
   //Fetch order summaries
   const { data, isLoading, isSuccess, isError, error } = useGetSummariesQuery({
     size: 5,
-    sortBy: "createdDate",
+    sortBy: "lastModifiedDate",
     sortDir: "desc",
     shopId: shopId ?? "",
     bookId: bookId ?? "",
