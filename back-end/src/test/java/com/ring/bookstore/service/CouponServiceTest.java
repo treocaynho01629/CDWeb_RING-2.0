@@ -8,6 +8,7 @@ import com.ring.bookstore.model.dto.projection.coupons.ICoupon;
 import com.ring.bookstore.model.dto.projection.dashboard.IStat;
 import com.ring.bookstore.model.dto.request.CartStateRequest;
 import com.ring.bookstore.model.dto.request.CouponRequest;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import com.ring.bookstore.model.dto.response.coupons.CouponDTO;
 import com.ring.bookstore.model.dto.response.coupons.CouponDetailDTO;
 import com.ring.bookstore.model.dto.response.coupons.CouponDiscountDTO;
@@ -112,7 +113,13 @@ public class CouponServiceTest extends AbstractServiceTest {
                 Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
                 ICoupon projection = mock(ICoupon.class);
                 Page<ICoupon> page = new PageImpl<>(List.of(projection), pageable, 1);
-                Page<CouponDTO> expectedDTOS = new PageImpl<>(List.of(mock(CouponDTO.class)), pageable, 1);
+                PagingResponse<CouponDTO> expectedDTOS = new PagingResponse<>(
+                                List.of(mock(CouponDTO.class)),
+                                1,
+                                1L,
+                                10,
+                                0,
+                                false);
 
                 // When
                 when(couponRepo.findCoupons(anyList(),
@@ -128,7 +135,7 @@ public class CouponServiceTest extends AbstractServiceTest {
                 when(couponMapper.couponToDTO(projection)).thenReturn(mock(CouponDTO.class));
 
                 // Then
-                Page<CouponDTO> result = couponService.getCoupons(0,
+                PagingResponse<CouponDTO> result = couponService.getCoupons(0,
                                 10,
                                 "id",
                                 "desc",
@@ -143,7 +150,7 @@ public class CouponServiceTest extends AbstractServiceTest {
                                 5);
 
                 assertNotNull(result);
-                assertEquals(expectedDTOS.getNumber(), result.getNumber());
+                assertEquals(expectedDTOS.getPage(), result.getPage());
                 assertEquals(expectedDTOS.getSize(), result.getSize());
                 assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
 

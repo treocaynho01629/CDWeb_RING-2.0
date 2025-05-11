@@ -287,7 +287,7 @@ const ReviewComponent = ({
           <Pagination
             page={pagination?.number}
             size={pagination?.size}
-            count={data?.page?.totalPages ?? 0}
+            count={data?.totalPages ?? 0}
             sizes={[8, 16, 24]}
             onPageChange={handlePageChange}
             onSizeChange={handleChangeSize}

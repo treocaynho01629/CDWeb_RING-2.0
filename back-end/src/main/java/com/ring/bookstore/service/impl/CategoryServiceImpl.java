@@ -11,6 +11,11 @@ import com.ring.bookstore.model.mappers.CategoryMapper;
 import com.ring.bookstore.model.dto.projection.categories.ICategory;
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.model.dto.request.CategoryRequest;
+import com.ring.bookstore.model.dto.response.PagingResponse;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +36,8 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper cateMapper;
     private final Slugify slg = Slugify.builder().lowerCase(false).build();
 
-    @Override
-    public Page<CategoryDTO> getCategories(Integer pageNo,
+    @Cacheable(cacheNames = "categories")
+    public PagingResponse<CategoryDTO> getCategories(Integer pageNo,
             Integer pageSize,
             String sortBy,
             String sortDir,
@@ -41,7 +46,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize,
                 sortDir.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());
-        Page<CategoryDTO> cateDTOS = null;
 
         if (include != null && include.equalsIgnoreCase("children")) {
             Page<Integer> pagedIds = cateRepo.findCateIdsByParent(parentId, pageable);
@@ -57,19 +61,28 @@ public class CategoryServiceImpl implements CategoryService {
                 idOrder.put(cateIds.get(i), i);
             catesList.sort(Comparator.comparingInt(c -> idOrder.get(c.id())));
 
-            cateDTOS = new PageImpl<CategoryDTO>(
+            return new PagingResponse<>(
                     catesList,
-                    pageable,
-                    pagedIds.getTotalElements());
-            return cateDTOS;
+                    pagedIds.getTotalPages(),
+                    pagedIds.getTotalElements(),
+                    pagedIds.getSize(),
+                    pagedIds.getNumber(),
+                    pagedIds.isEmpty());
         } else {
             Page<ICategory> catesList = cateRepo.findCates(parentId, pageable);
-            cateDTOS = catesList.map(cateMapper::projectionToDTO);
+            List<CategoryDTO> cateDTOS = catesList.map(cateMapper::projectionToDTO).toList();
+            return new PagingResponse<>(
+                    cateDTOS,
+                    catesList.getTotalPages(),
+                    catesList.getTotalElements(),
+                    catesList.getSize(),
+                    catesList.getNumber(),
+                    catesList.isEmpty());
         }
-        return cateDTOS;
     }
 
-    public Page<CategoryDTO> getRelevantCategories(Integer pageNo,
+    @Cacheable(cacheNames = "categories")
+    public PagingResponse<CategoryDTO> getRelevantCategories(Integer pageNo,
             Integer pageSize,
             Long shopId) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
@@ -94,20 +107,22 @@ public class CategoryServiceImpl implements CategoryService {
             idOrder.put(joinedIds.get(i), i);
         catesList.sort(Comparator.comparingInt(c -> idOrder.get(c.id())));
 
-        Page<CategoryDTO> cateDTOS = new PageImpl<CategoryDTO>(
+        return new PagingResponse<>(
                 catesList,
-                pageable,
-                cateIds.getTotalElements());
-        return cateDTOS;
+                cateIds.getTotalPages(),
+                cateIds.getTotalElements(),
+                cateIds.getSize(),
+                cateIds.getNumber(),
+                cateIds.isEmpty());
     }
 
-    @Override
+    @Cacheable(cacheNames = "previewCategories")
     public List<PreviewCategoryDTO> getPreviewCategories() {
         List<ICategory> previews = cateRepo.findPreviewCategories();
         return previews.stream().map(cateMapper::projectionToPreviewDTO).collect(Collectors.toList());
     }
 
-    // Get category
+    @Cacheable(cacheNames = "categoryDetail", key = "#id")
     public CategoryDetailDTO getCategory(Integer id, String slug, String include) {
         CategoryDetailDTO result = null;
 
@@ -131,6 +146,7 @@ public class CategoryServiceImpl implements CategoryService {
         return result;
     }
 
+    @CacheEvict(cacheNames = { "categories", "previewCategories" }, allEntries = true)
     @Transactional
     public Category addCategory(CategoryRequest request) {
 
@@ -158,6 +174,8 @@ public class CategoryServiceImpl implements CategoryService {
         return addedCate;
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = { "categories", "previewCategories" }, allEntries = true),
+            @CacheEvict(cacheNames = "categoryDetail", key = "#id") })
     @Transactional
     public Category updateCategory(Integer id, CategoryRequest request) {
         // Get original category
@@ -191,22 +209,27 @@ public class CategoryServiceImpl implements CategoryService {
         return updatedCate;
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = { "categories", "previewCategories" }, allEntries = true),
+            @CacheEvict(cacheNames = "categoryDetail", key = "#id") })
     @Transactional
     public void deleteCategory(Integer id) {
         cateRepo.deleteById(id);
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = { "categories", "previewCategories" }, allEntries = true) })
     @Transactional
     public void deleteCategories(List<Integer> ids) {
         cateRepo.deleteAllByIdInBatch(ids);
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = { "categories", "previewCategories" }, allEntries = true) })
     @Transactional
     public void deleteCategoriesInverse(Integer parentId, List<Integer> ids) {
         List<Integer> listDelete = cateRepo.findInverseIds(parentId, ids);
         cateRepo.deleteAllByIdInBatch(listDelete);
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = { "categories", "previewCategories" }, allEntries = true) })
     @Transactional
     public void deleteAllCategories() {
         cateRepo.deleteAll();

@@ -3,6 +3,7 @@ package com.ring.bookstore.controller;
 import com.ring.bookstore.config.CurrentAccount;
 import com.ring.bookstore.model.dto.request.CalculateRequest;
 import com.ring.bookstore.model.dto.request.OrderRequest;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import com.ring.bookstore.model.dto.response.orders.*;
 import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.enums.OrderStatus;
@@ -88,8 +89,13 @@ public class OrderController {
                                           @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
                                           @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
                                           @CurrentAccount Account currUser) {
-        Page<ReceiptSummaryDTO> summaries = orderService.getSummariesWithFilter(currUser, shopId, bookId, pageNo,
-                pageSize, sortBy, sortDir);
+        PagingResponse<ReceiptSummaryDTO> summaries = orderService.getSummariesWithFilter(currUser,
+                shopId,
+                bookId,
+                pageNo,
+                pageSize,
+                sortBy,
+                sortDir);
         return new ResponseEntity<>(summaries, HttpStatus.OK);
     }
 
@@ -116,7 +122,7 @@ public class OrderController {
                                             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
                                             @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
                                             @CurrentAccount Account currUser) {
-        Page<ReceiptDTO> orders = orderService.getAllReceipts(currUser,
+        PagingResponse<ReceiptDTO> orders = orderService.getAllReceipts(currUser,
                 shopId,
                 status,
                 keyword,
@@ -180,7 +186,11 @@ public class OrderController {
                                              @RequestParam(value = "pSize", defaultValue = "15") Integer pageSize,
                                              @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                              @CurrentAccount Account currUser) {
-        Page<OrderDTO> orders = orderService.getOrdersByUser(currUser, status, keyword, pageNo, pageSize);
+        PagingResponse<OrderDTO> orders = orderService.getOrdersByUser(currUser,
+                status,
+                keyword,
+                pageNo,
+                pageSize);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
@@ -201,7 +211,11 @@ public class OrderController {
                                                @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                                                @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
                                                @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
-        Page<OrderDTO> orders = orderService.getOrdersByBookId(id, pageNo, pageSize, sortBy, sortDir);
+        PagingResponse<OrderDTO> orders = orderService.getOrdersByBookId(id,
+                pageNo,
+                pageSize,
+                sortBy,
+                sortDir);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 

@@ -328,7 +328,7 @@ const Shops = () => {
         <Pagination
           page={pagination?.number}
           size={pagination?.size}
-          count={data?.page?.totalPages ?? 0}
+          count={data?.totalPages ?? 0}
           onPageChange={handleChangePage}
           onSizeChange={handleChangeSize}
         />

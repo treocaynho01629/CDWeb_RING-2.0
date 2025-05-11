@@ -2,6 +2,7 @@ package com.ring.bookstore.controller;
 
 import java.util.List;
 
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import com.ring.bookstore.model.enums.BookType;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -103,7 +104,7 @@ public class BookController {
                                       @RequestParam(value = "rating", defaultValue = "0") Integer rating,
                                       @RequestParam(value = "amount", defaultValue = "1") Integer amount,
                                       @RequestParam(value = "withDesc", defaultValue = "false") Boolean withDesc) {
-        Page<BookDisplayDTO> books = bookService.getBooks(
+        PagingResponse<BookDisplayDTO> books = bookService.getBooks(
                 pageNo,
                 pageSize,
                 sortBy,

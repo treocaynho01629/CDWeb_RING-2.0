@@ -196,9 +196,9 @@ const ProductFormDialog = ({
         .then((data) => {
           setPubsPagination({
             ...pubsPagination,
-            number: data.page.number,
-            totalPages: data.page.totalPages,
-            totalElements: data.page.totalElements,
+            number: data.page,
+            totalPages: data.totalPages,
+            totalElements: data.totalElements,
           });
         })
         .catch((rejected) => console.error(rejected));
@@ -216,9 +216,9 @@ const ProductFormDialog = ({
         .then((data) => {
           setCatesPagination({
             ...catesPagination,
-            number: data.page.number,
-            totalPages: data.page.totalPages,
-            totalElements: data.page.totalElements,
+            number: data.page,
+            totalPages: data.totalPages,
+            totalElements: data.totalElements,
           });
         })
         .catch((rejected) => console.error(rejected));
@@ -240,9 +240,9 @@ const ProductFormDialog = ({
         .then((data) => {
           setPubsPagination({
             ...pubsPagination,
-            number: data.page.number,
-            totalPages: data.page.totalPages,
-            totalElements: data.page.totalElements,
+            number: data.page,
+            totalPages: data.totalPages,
+            totalElements: data.totalElements,
           });
         })
         .catch((rejected) => console.error(rejected));
@@ -261,9 +261,9 @@ const ProductFormDialog = ({
         .then((data) => {
           setCatesPagination({
             ...catesPagination,
-            number: data.page.number,
-            totalPages: data.page.totalPages,
-            totalElements: data.page.totalElements,
+            number: data.page,
+            totalPages: data.totalPages,
+            totalElements: data.totalElements,
           });
         })
         .catch((rejected) => console.error(rejected));

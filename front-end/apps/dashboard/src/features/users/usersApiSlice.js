@@ -3,12 +3,11 @@ import { apiSlice } from "@ring/redux";
 
 const usersAdapter = createEntityAdapter({});
 const initialState = usersAdapter.getInitialState({
-  page: {
-    number: 0,
-    size: 0,
-    totalElements: 0,
-    totalPages: 0,
-  },
+  empty: false,
+  page: 0,
+  size: 0,
+  totalElements: 0,
+  totalPages: 0,
 });
 
 export const usersApiSlice = apiSlice.injectEndpoints({
@@ -43,11 +42,16 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         };
       },
       transformResponse: (responseData) => {
-        const { content, page } = responseData;
+        const { content, empty, page, size, totalElements, totalPages } =
+          responseData;
         return usersAdapter.setAll(
           {
             ...initialState,
+            empty,
             page,
+            size,
+            totalElements,
+            totalPages,
           },
           content
         );

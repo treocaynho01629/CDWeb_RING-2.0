@@ -201,8 +201,8 @@ const CouponDialog = ({
     if (data && !isLoading && isSuccess) {
       setPagination({
         ...pagination,
-        number: data.page.number,
-        totalPages: data.page.totalPages,
+        number: data.page,
+        totalPages: data.totalPages,
       });
     }
   }, [data, isLoading]);
@@ -211,8 +211,8 @@ const CouponDialog = ({
     if (shipping && !loadShipping && doneShipping) {
       setShipPagination({
         ...shipPagination,
-        number: shipping.page.number,
-        totalPages: shipping.page.totalPages,
+        number: shipping.page,
+        totalPages: shipping.totalPages,
       });
     }
   }, [shipping]);
@@ -221,8 +221,8 @@ const CouponDialog = ({
     if (saved && !loadSaved && doneSaved) {
       setSavedPagination({
         ...savedPagination,
-        number: saved.page.number,
-        totalPages: saved.page.totalPages,
+        number: saved.page,
+        totalPages: saved.totalPages,
       });
     }
   }, [saved]);
@@ -238,36 +238,36 @@ const CouponDialog = ({
   const handleShowMoreShipping = () => {
     if (
       fetchShipping ||
-      typeof shipping?.page?.number !== "number" ||
-      shipping?.page?.number < shipPagination?.number
+      typeof shipping?.page !== "number" ||
+      shipping?.page < shipPagination?.number
     )
       return;
-    const nextPage = shipping?.page?.number + 1;
-    if (nextPage < shipping?.page?.totalPages)
+    const nextPage = shipping?.page + 1;
+    if (nextPage < shipping?.totalPages)
       setShipPagination((prev) => ({ ...prev, number: nextPage }));
   };
 
   const handleShowMore = () => {
     if (
       isFetching ||
-      typeof data?.page?.number !== "number" ||
-      data?.page?.number < pagination?.number
+      typeof data?.page !== "number" ||
+      data?.page < pagination?.number
     )
       return;
-    const nextPage = data?.page?.number + 1;
-    if (nextPage < data?.page?.totalPages)
+    const nextPage = data?.page + 1;
+    if (nextPage < data?.totalPages)
       setPagination((prev) => ({ ...prev, number: nextPage }));
   };
 
   const handleShowMoreSaved = () => {
     if (
       fetchSaved ||
-      typeof saved?.page?.number !== "number" ||
-      saved?.page?.number < savedPagination?.number
+      typeof saved?.page !== "number" ||
+      saved?.page < savedPagination?.number
     )
       return;
-    const nextPage = saved?.page?.number + 1;
-    if (nextPage < saved?.page?.totalPages)
+    const nextPage = saved?.page + 1;
+    if (nextPage < saved?.totalPages)
       setSavedPagination((prev) => ({ ...prev, number: nextPage }));
   };
 

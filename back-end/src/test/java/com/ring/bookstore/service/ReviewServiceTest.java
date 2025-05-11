@@ -6,6 +6,7 @@ import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.dto.projection.reviews.IReview;
 import com.ring.bookstore.model.dto.request.ReviewRequest;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import com.ring.bookstore.model.dto.response.reviews.ReviewDTO;
 import com.ring.bookstore.model.entity.*;
 import com.ring.bookstore.model.enums.UserRole;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -157,81 +159,116 @@ public class ReviewServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void whenGetReviews_ThenReturnsPage() {
-
+    public void whenGetReviews_ThenReturnsPagedReviews() {
         // Given
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
-        IReview projection = mock(IReview.class);
-        Page<IReview> page = new PageImpl<>(List.of(projection), pageable, 1);
-        Page<ReviewDTO> expectedDTOS = new PageImpl<>(List.of(mock(ReviewDTO.class)), pageable, 1);
+        Pageable pageable = PageRequest.of(0, 1, Sort.by("id").descending());
+        Page<IReview> reviews = new PageImpl<>(
+                List.of(mock(IReview.class)),
+                pageable,
+                2);
+        ReviewDTO mapped = new ReviewDTO(1L, "Test Review", 5, LocalDateTime.now(), LocalDateTime.now(), 1L,
+                "Test User", null, 1L, "Test Book", "test-book");
+        PagingResponse<ReviewDTO> expectedResponse = new PagingResponse<>(
+                List.of(mapped),
+                2,
+                2L,
+                1,
+                0,
+                false);
 
         // When
-        when(reviewRepo.findReviews(anyLong(), anyLong(), anyInt(), anyString(), any(Pageable.class)))
-                .thenReturn(page);
-        when(reviewMapper.projectionToDTO(any(IReview.class))).thenReturn(mock(ReviewDTO.class));
+        when(reviewRepo.findReviews(any(), any(), any(), any(), any())).thenReturn(reviews);
+        when(reviewMapper.projectionToDTO(any(IReview.class))).thenReturn(mapped);
 
         // Then
-        Page<ReviewDTO> result = reviewService.getReviews(1L, 1L, 5, "", 0, 10, "id", "desc");
+        PagingResponse<ReviewDTO> result = reviewService.getReviews(null, null, null, null, 0, 1, "id", "desc");
 
         assertNotNull(result);
-        assertEquals(expectedDTOS.getNumber(), result.getNumber());
-        assertEquals(expectedDTOS.getSize(), result.getSize());
-        assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
+        assertEquals(expectedResponse.getContent().size(), result.getContent().size());
+        assertEquals(expectedResponse.getTotalPages(), result.getTotalPages());
+        assertEquals(expectedResponse.getTotalElements(), result.getTotalElements());
+        assertEquals(expectedResponse.getSize(), result.getSize());
+        assertEquals(expectedResponse.getPage(), result.getPage());
+        assertEquals(expectedResponse.isEmpty(), result.isEmpty());
 
         // Verify
-        verify(reviewRepo, times(1)).findReviews(anyLong(), anyLong(), anyInt(), anyString(), any(Pageable.class));
+        verify(reviewRepo, times(1)).findReviews(any(), any(), any(), any(), any());
         verify(reviewMapper, times(1)).projectionToDTO(any(IReview.class));
     }
 
     @Test
-    public void whenGetReviewsByBookId_ThenReturnsPage() {
+    public void whenGetReviewsByBookId_ThenReturnsPagedReviews() {
         // Given
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
-        IReview projection = mock(IReview.class);
-        Page<IReview> page = new PageImpl<>(List.of(projection), pageable, 1);
-        Page<ReviewDTO> expectedDTOS = new PageImpl<>(List.of(mock(ReviewDTO.class)), pageable, 1);
+        Pageable pageable = PageRequest.of(0, 1, Sort.by("id").descending());
+        Page<IReview> reviews = new PageImpl<>(
+                List.of(mock(IReview.class)),
+                pageable,
+                2);
+        ReviewDTO mapped = new ReviewDTO(1L, "Test Review", 5, LocalDateTime.now(), LocalDateTime.now(), 1L,
+                "Test User", null, 1L, "Test Book", "test-book");
+        PagingResponse<ReviewDTO> expectedResponse = new PagingResponse<>(
+                List.of(mapped),
+                2,
+                2L,
+                1,
+                0,
+                false);
 
         // When
-        when(reviewRepo.findReviewsByBookId(anyLong(), anyInt(), any(Pageable.class)))
-                .thenReturn(page);
-        when(reviewMapper.projectionToDTO(any(IReview.class))).thenReturn(mock(ReviewDTO.class));
+        when(reviewRepo.findReviewsByBookId(any(), any(), any())).thenReturn(reviews);
+        when(reviewMapper.projectionToDTO(any(IReview.class))).thenReturn(mapped);
 
         // Then
-        Page<ReviewDTO> result = reviewService.getReviewsByBookId(1L, 5, 0, 10, "id", "desc");
+        PagingResponse<ReviewDTO> result = reviewService.getReviewsByBookId(1L, null, 0, 1, "id", "desc");
 
         assertNotNull(result);
-        assertEquals(expectedDTOS.getNumber(), result.getNumber());
-        assertEquals(expectedDTOS.getSize(), result.getSize());
-        assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
+        assertEquals(expectedResponse.getContent().size(), result.getContent().size());
+        assertEquals(expectedResponse.getTotalPages(), result.getTotalPages());
+        assertEquals(expectedResponse.getTotalElements(), result.getTotalElements());
+        assertEquals(expectedResponse.getSize(), result.getSize());
+        assertEquals(expectedResponse.getPage(), result.getPage());
+        assertEquals(expectedResponse.isEmpty(), result.isEmpty());
 
         // Verify
-        verify(reviewRepo, times(1)).findReviewsByBookId(anyLong(), anyInt(), any(Pageable.class));
+        verify(reviewRepo, times(1)).findReviewsByBookId(any(), any(), any());
         verify(reviewMapper, times(1)).projectionToDTO(any(IReview.class));
     }
 
     @Test
-    public void whenGetUserReviews_ThenReturnsPage() {
+    public void whenGetUserReviews_ThenReturnsPagedReviews() {
         // Given
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
-        IReview projection = mock(IReview.class);
-        Page<IReview> page = new PageImpl<>(List.of(projection), pageable, 1);
-        Page<ReviewDTO> expectedDTOS = new PageImpl<>(List.of(mock(ReviewDTO.class)), pageable, 1);
+        Pageable pageable = PageRequest.of(0, 1, Sort.by("id").descending());
+        Page<IReview> reviews = new PageImpl<>(
+                List.of(mock(IReview.class)),
+                pageable,
+                2);
+        ReviewDTO mapped = new ReviewDTO(1L, "Test Review", 5, LocalDateTime.now(), LocalDateTime.now(), 1L,
+                "Test User", null, 1L, "Test Book", "test-book");
+        PagingResponse<ReviewDTO> expectedResponse = new PagingResponse<>(
+                List.of(mapped),
+                2,
+                2L,
+                1,
+                0,
+                false);
 
         // When
-        when(reviewRepo.findUserReviews(anyLong(), anyInt(), any(Pageable.class)))
-                .thenReturn(page);
-        when(reviewMapper.projectionToDTO(any(IReview.class))).thenReturn(mock(ReviewDTO.class));
+        when(reviewRepo.findUserReviews(any(), any(), any())).thenReturn(reviews);
+        when(reviewMapper.projectionToDTO(any(IReview.class))).thenReturn(mapped);
 
         // Then
-        Page<ReviewDTO> result = reviewService.getUserReviews(account, 5, 0, 10, "id", "desc");
+        PagingResponse<ReviewDTO> result = reviewService.getUserReviews(account, null, 0, 1, "id", "desc");
 
         assertNotNull(result);
-        assertEquals(expectedDTOS.getNumber(), result.getNumber());
-        assertEquals(expectedDTOS.getSize(), result.getSize());
-        assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
+        assertEquals(expectedResponse.getContent().size(), result.getContent().size());
+        assertEquals(expectedResponse.getTotalPages(), result.getTotalPages());
+        assertEquals(expectedResponse.getTotalElements(), result.getTotalElements());
+        assertEquals(expectedResponse.getSize(), result.getSize());
+        assertEquals(expectedResponse.getPage(), result.getPage());
+        assertEquals(expectedResponse.isEmpty(), result.isEmpty());
 
         // Verify
-        verify(reviewRepo, times(1)).findUserReviews(anyLong(), anyInt(), any(Pageable.class));
+        verify(reviewRepo, times(1)).findUserReviews(any(), any(), any());
         verify(reviewMapper, times(1)).projectionToDTO(any(IReview.class));
     }
 
@@ -469,7 +506,6 @@ public class ReviewServiceTest extends AbstractServiceTest {
 
     @Test
     public void whenUnhideNonExistingReview_ThenThrowsException() {
-        
 
         when(reviewRepo.findById(anyLong())).thenReturn(Optional.empty());
 

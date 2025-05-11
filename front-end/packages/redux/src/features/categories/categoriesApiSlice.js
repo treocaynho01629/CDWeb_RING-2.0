@@ -6,12 +6,11 @@ import { isEqual } from "lodash-es";
 export const catesAdapter = createEntityAdapter({});
 export const catesSelector = catesAdapter.getSelectors();
 export const catesInitialState = catesAdapter.getInitialState({
-  page: {
-    number: 0,
-    size: 0,
-    totalElements: 0,
-    totalPages: 0,
-  },
+  empty: false,
+  page: 0,
+  size: 0,
+  totalElements: 0,
+  totalPages: 0,
 });
 
 export const categoriesApiSlice = apiSlice.injectEndpoints({
@@ -46,11 +45,16 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
         };
       },
       transformResponse: (responseData) => {
-        const { content, page } = responseData;
+        const { content, empty, page, size, totalElements, totalPages } =
+          responseData;
         return catesAdapter.setAll(
           {
             ...catesInitialState,
+            empty,
             page,
+            size,
+            totalElements,
+            totalPages,
           },
           content
         );

@@ -3,6 +3,7 @@ package com.ring.bookstore.service;
 import com.ring.bookstore.base.AbstractServiceTest;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.dto.request.PublisherRequest;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import com.ring.bookstore.model.dto.response.publishers.PublisherDTO;
 import com.ring.bookstore.model.entity.Image;
 import com.ring.bookstore.model.entity.Publisher;
@@ -63,24 +64,25 @@ public class PublisherServiceTest extends AbstractServiceTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
         Page<Publisher> page = new PageImpl<>(List.of(publisher), pageable, 1);
         PublisherDTO mapped = new PublisherDTO(1, "Test Publisher", "image_url");
-        Page<PublisherDTO> expectedDTOS = new PageImpl<>(List.of(mapped), pageable, 1);
+        PagingResponse<PublisherDTO> expectedDTOS = new PagingResponse<>(List.of(mapped), 1, 1L, 10, 0, false);
 
         // When
         when(pubRepo.findPublishers(any(Pageable.class))).thenReturn(page);
         when(pubMapper.apply(any(Publisher.class))).thenReturn(mapped);
 
         // Then
-        Page<PublisherDTO> result = pubService.getPublishers(pageable.getPageNumber(),
+        PagingResponse<PublisherDTO> result = pubService.getPublishers(pageable.getPageNumber(),
                 pageable.getPageSize(),
                 "id",
                 "desc");
 
         assertNotNull(result);
         assertFalse(result.getContent().isEmpty());
-        assertEquals(expectedDTOS.getNumber(), result.getNumber());
+        assertEquals(expectedDTOS.getPage(), result.getPage());
         assertEquals(expectedDTOS.getSize(), result.getSize());
         assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
-        assertEquals(expectedDTOS.getContent().get(0).id(), result.getContent().get(0).id());
+        assertEquals(expectedDTOS.getContent().stream().findFirst().get().id(),
+                result.getContent().stream().findFirst().get().id());
 
         // Verify
         verify(pubRepo, times(1)).findPublishers(any(Pageable.class));
@@ -95,22 +97,23 @@ public class PublisherServiceTest extends AbstractServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Publisher> page = new PageImpl<>(List.of(publisher), pageable, 1);
         PublisherDTO mapped = new PublisherDTO(1, "Test Publisher", "image_url");
-        Page<PublisherDTO> expectedDTOS = new PageImpl<>(List.of(mapped), pageable, 1);
+        PagingResponse<PublisherDTO> expectedDTOS = new PagingResponse<>(List.of(mapped), 1, 1L, 10, 0, false);
 
         // When
         when(pubRepo.findRelevantPublishers(eq(cateId), any(Pageable.class))).thenReturn(page);
         when(pubMapper.apply(any(Publisher.class))).thenReturn(mapped);
 
         // Then
-        Page<PublisherDTO> result = pubService.getRelevantPublishers(pageable.getPageNumber(),
+        PagingResponse<PublisherDTO> result = pubService.getRelevantPublishers(pageable.getPageNumber(),
                 pageable.getPageSize(),
                 cateId);
 
         assertNotNull(result);
-        assertEquals(expectedDTOS.getNumber(), result.getNumber());
+        assertEquals(expectedDTOS.getPage(), result.getPage());
         assertEquals(expectedDTOS.getSize(), result.getSize());
         assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
-        assertEquals(expectedDTOS.getContent().get(0).id(), result.getContent().get(0).id());
+        assertEquals(expectedDTOS.getContent().stream().findFirst().get().id(),
+                result.getContent().stream().findFirst().get().id());
 
         // Verify
         verify(pubRepo, times(1)).findRelevantPublishers(eq(cateId), any(Pageable.class));

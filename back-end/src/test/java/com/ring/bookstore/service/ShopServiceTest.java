@@ -7,6 +7,7 @@ import com.ring.bookstore.model.dto.projection.shops.*;
 import com.ring.bookstore.model.dto.projection.dashboard.IStat;
 import com.ring.bookstore.model.dto.request.AddressRequest;
 import com.ring.bookstore.model.dto.request.ShopRequest;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
 import com.ring.bookstore.model.dto.response.shops.*;
 import com.ring.bookstore.model.entity.*;
@@ -116,7 +117,10 @@ public class ShopServiceTest extends AbstractServiceTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
         IShopDisplay projection = mock(IShopDisplay.class);
         Page<IShopDisplay> page = new PageImpl<>(List.of(projection), pageable, 1);
-        Page<ShopDisplayDTO> expectedDTOS = new PageImpl<>(List.of(mock(ShopDisplayDTO.class)), pageable, 1);
+        PagingResponse<ShopDisplayDTO> expectedDTOS = new PagingResponse<>(List.of(mock(ShopDisplayDTO.class)), 1, 1L,
+                10,
+                0,
+                false);
 
         // When
         when(shopRepo.findShopsDisplay(anyString(),
@@ -126,7 +130,7 @@ public class ShopServiceTest extends AbstractServiceTest {
         when(shopMapper.displayToDTO(projection)).thenReturn(mock(ShopDisplayDTO.class));
 
         // Then
-        Page<ShopDisplayDTO> result = shopService.getDisplayShops(0,
+        PagingResponse<ShopDisplayDTO> result = shopService.getDisplayShops(0,
                 10,
                 "id",
                 "desc",
@@ -135,7 +139,7 @@ public class ShopServiceTest extends AbstractServiceTest {
                 account);
 
         assertNotNull(result);
-        assertEquals(expectedDTOS.getNumber(), result.getNumber());
+        assertEquals(expectedDTOS.getPage(), result.getPage());
         assertEquals(expectedDTOS.getSize(), result.getSize());
         assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
 
@@ -155,7 +159,7 @@ public class ShopServiceTest extends AbstractServiceTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
         IShop projection = mock(IShop.class);
         Page<IShop> page = new PageImpl<>(List.of(projection), pageable, 1);
-        Page<ShopDTO> expectedDTOS = new PageImpl<>(List.of(mock(ShopDTO.class)), pageable, 1);
+        PagingResponse<ShopDTO> expectedDTOS = new PagingResponse<>(List.of(mock(ShopDTO.class)), 1, 1L, 10, 0, false);
 
         // When
         when(shopRepo.findShops(eq(""),
@@ -164,7 +168,7 @@ public class ShopServiceTest extends AbstractServiceTest {
         when(shopMapper.shopToDTO(projection)).thenReturn(mock(ShopDTO.class));
 
         // Then
-        Page<ShopDTO> result = shopService.getShops(0,
+        PagingResponse<ShopDTO> result = shopService.getShops(0,
                 10,
                 "id",
                 "desc",
@@ -173,7 +177,7 @@ public class ShopServiceTest extends AbstractServiceTest {
                 account);
 
         assertNotNull(result);
-        assertEquals(expectedDTOS.getNumber(), result.getNumber());
+        assertEquals(expectedDTOS.getPage(), result.getPage());
         assertEquals(expectedDTOS.getSize(), result.getSize());
         assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
 

@@ -10,7 +10,12 @@ import com.ring.bookstore.repository.PublisherRepository;
 import com.ring.bookstore.service.ImageService;
 import com.ring.bookstore.service.PublisherService;
 import com.ring.bookstore.ultils.FileUploadUtil;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +34,8 @@ public class PublisherServiceImpl implements PublisherService {
     private final PublisherMapper pubMapper;
     private final ImageService imageService;
 
-    @Override
-    public Page<PublisherDTO> getPublishers(Integer pageNo,
+    @Cacheable(cacheNames = "publishers")
+    public PagingResponse<PublisherDTO> getPublishers(Integer pageNo,
             Integer pageSize,
             String sortBy,
             String sortDir) {
@@ -39,23 +44,35 @@ public class PublisherServiceImpl implements PublisherService {
 
         // Fetch from database
         Page<Publisher> pubsList = pubRepo.findPublishers(pageable);
-        Page<PublisherDTO> pubDTOS = pubsList.map(pubMapper::apply);
-        return pubDTOS;
+        List<PublisherDTO> pubDTOS = pubsList.map(pubMapper::apply).toList();
+        return new PagingResponse<>(
+                pubDTOS,
+                pubsList.getTotalPages(),
+                pubsList.getTotalElements(),
+                pubsList.getSize(),
+                pubsList.getNumber(),
+                pubsList.isEmpty());
     }
 
-    @Override
-    public Page<PublisherDTO> getRelevantPublishers(Integer pageNo,
+    @Cacheable(cacheNames = "publishers")
+    public PagingResponse<PublisherDTO> getRelevantPublishers(Integer pageNo,
             Integer pageSize,
             Integer cateId) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
 
         // Fetch from database
         Page<Publisher> pubsList = pubRepo.findRelevantPublishers(cateId, pageable);
-        Page<PublisherDTO> pubDTOS = pubsList.map(pubMapper::apply);
-        return pubDTOS;
+        List<PublisherDTO> pubDTOS = pubsList.map(pubMapper::apply).toList();
+        return new PagingResponse<>(
+                pubDTOS,
+                pubsList.getTotalPages(),
+                pubsList.getTotalElements(),
+                pubsList.getSize(),
+                pubsList.getNumber(),
+                pubsList.isEmpty());
     }
 
-    @Override
+    @Cacheable(cacheNames = "publisher", key = "#id")
     public PublisherDTO getPublisher(Integer id) {
         Publisher publisher = pubRepo.findWithImageById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Publisher not found!",
@@ -65,6 +82,7 @@ public class PublisherServiceImpl implements PublisherService {
         return publisherDTO;
     }
 
+    @CacheEvict(cacheNames = "publishers")
     @Transactional
     public Publisher addPublisher(PublisherRequest request,
             MultipartFile file) {
@@ -83,6 +101,8 @@ public class PublisherServiceImpl implements PublisherService {
         return addedPub;
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = "publishers"),
+            @CacheEvict(cacheNames = "publisher", key = "#id") })
     @Transactional
     public Publisher updatePublisher(Integer id,
             PublisherRequest request,
@@ -109,22 +129,27 @@ public class PublisherServiceImpl implements PublisherService {
         return updatedPub;
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = "publishers"),
+            @CacheEvict(cacheNames = "publisher", key = "#id") })
     @Transactional
     public void deletePublisher(Integer id) {
         pubRepo.deleteById(id);
     }
 
+    @CacheEvict(cacheNames = "publishers")
     @Transactional
     public void deletePublishers(List<Integer> ids) {
         pubRepo.deleteAllByIdInBatch(ids);
     }
 
+    @CacheEvict(cacheNames = "publishers")
     @Transactional
     public void deletePublishersInverse(List<Integer> ids) {
         List<Integer> listDelete = pubRepo.findInverseIds(ids);
         pubRepo.deleteAllByIdInBatch(listDelete);
     }
 
+    @CacheEvict(cacheNames = "publishers")
     @Transactional
     public void deleteAllPublishers() {
         pubRepo.deleteAll();

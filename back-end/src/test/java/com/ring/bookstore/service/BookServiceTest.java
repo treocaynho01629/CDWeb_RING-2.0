@@ -9,6 +9,7 @@ import com.ring.bookstore.model.dto.projection.books.IBook;
 import com.ring.bookstore.model.dto.projection.books.IBookDetail;
 import com.ring.bookstore.model.dto.projection.books.IBookDisplay;
 import com.ring.bookstore.model.dto.request.BookRequest;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import com.ring.bookstore.model.dto.response.books.BookDTO;
 import com.ring.bookstore.model.dto.response.books.BookDetailDTO;
 import com.ring.bookstore.model.dto.response.books.BookDisplayDTO;
@@ -174,10 +175,13 @@ class BookServiceTest extends AbstractServiceTest {
                                 pageable,
                                 2);
                 BookDisplayDTO mapped = BookDisplayDTO.builder().id(1L).build();
-                Page<BookDisplayDTO> expectedDTOS = new PageImpl<>(
+                PagingResponse<BookDisplayDTO> expectedResponse = new PagingResponse<>(
                                 List.of(mapped),
-                                pageable,
-                                2);
+                                2,
+                                2L,
+                                1,
+                                0,
+                                false);
 
                 // When
                 when(bookRepo.findBooksWithFilter(eq(""),
@@ -195,7 +199,7 @@ class BookServiceTest extends AbstractServiceTest {
                 when(bookMapper.displayToDTO(any(IBookDisplay.class))).thenReturn(mapped);
 
                 // Then
-                Page<BookDisplayDTO> result = bookService.getBooks(0,
+                PagingResponse<BookDisplayDTO> result = bookService.getBooks(0,
                                 1,
                                 "id",
                                 "desc",
@@ -212,11 +216,12 @@ class BookServiceTest extends AbstractServiceTest {
                                 false);
 
                 assertNotNull(result);
-                assertFalse(result.getContent().isEmpty());
-                assertEquals(expectedDTOS.getNumber(), result.getNumber());
-                assertEquals(expectedDTOS.getContent().get(0).id(), result.getContent().get(0).id());
-                assertEquals(expectedDTOS.getTotalPages(), result.getTotalPages());
-                assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
+                assertEquals(expectedResponse.getContent().size(), result.getContent().size());
+                assertEquals(expectedResponse.getTotalPages(), result.getTotalPages());
+                assertEquals(expectedResponse.getTotalElements(), result.getTotalElements());
+                assertEquals(expectedResponse.getSize(), result.getSize());
+                assertEquals(expectedResponse.getPage(), result.getPage());
+                assertEquals(expectedResponse.isEmpty(), result.isEmpty());
 
                 // Verify
                 verify(bookRepo, times(1)).findBooksWithFilter(eq(""),

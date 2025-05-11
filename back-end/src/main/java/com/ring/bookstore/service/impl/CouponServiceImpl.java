@@ -22,8 +22,13 @@ import com.ring.bookstore.repository.ShopRepository;
 import com.ring.bookstore.model.dto.request.CartStateRequest;
 import com.ring.bookstore.model.dto.request.CouponRequest;
 import com.ring.bookstore.service.CouponService;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -50,8 +55,8 @@ public class CouponServiceImpl implements CouponService {
     private final CouponMapper couponMapper;
     private final DashboardMapper dashMapper;
 
-    @Override
-    public Page<CouponDTO> getCoupons(Integer pageNo,
+    @Cacheable(cacheNames = "coupons")
+    public PagingResponse<CouponDTO> getCoupons(Integer pageNo,
             Integer pageSize,
             String sortBy,
             String sortDir,
@@ -85,18 +90,31 @@ public class CouponServiceImpl implements CouponService {
                     .quantity(cQuantity)
                     .shopId(shopId)
                     .build();
-            Page<CouponDTO> couponDTOS = couponsList.map((projection) -> {
+            List<CouponDTO> couponDTOS = couponsList.map((projection) -> {
                 Coupon coupon = projection.getCoupon();
                 coupon.setIsUsable(this.isUsable(coupon, request));
                 return couponMapper.couponToDTO(projection);
-            });
-            return couponDTOS;
+            }).toList();
+            return new PagingResponse<>(
+                    couponDTOS,
+                    couponsList.getTotalPages(),
+                    couponsList.getTotalElements(),
+                    couponsList.getSize(),
+                    couponsList.getNumber(),
+                    couponsList.isEmpty());
         }
 
-        Page<CouponDTO> couponDTOS = couponsList.map(couponMapper::couponToDTO);
-        return couponDTOS;
+        List<CouponDTO> couponDTOS = couponsList.map(couponMapper::couponToDTO).toList();
+        return new PagingResponse<>(
+                couponDTOS,
+                couponsList.getTotalPages(),
+                couponsList.getTotalElements(),
+                couponsList.getSize(),
+                couponsList.getNumber(),
+                couponsList.isEmpty());
     }
 
+    @Cacheable(cacheNames = "couponDetail", key = "#id")
     public CouponDetailDTO getCoupon(Long id) {
         ICoupon coupon = couponRepo.findCouponById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Coupon not found!",
@@ -104,7 +122,7 @@ public class CouponServiceImpl implements CouponService {
         return couponMapper.couponToDetailDTO(coupon);
     }
 
-    @Override
+    @Cacheable(cacheNames = "coupons")
     public CouponDTO getCouponByCode(String code,
             Long shopId,
             Double cValue,
@@ -123,13 +141,14 @@ public class CouponServiceImpl implements CouponService {
         return couponMapper.couponToDTO(projection);
     }
 
+    @Cacheable(cacheNames = "coupons")
     public List<CouponDTO> recommendCoupons(List<Long> shopIds) {
         List<ICoupon> couponsList = couponRepo.recommendCoupons(shopIds);
         List<CouponDTO> couponDTOS = couponsList.stream().map(couponMapper::couponToDTO).collect(Collectors.toList());
         return couponDTOS;
     }
 
-    @Override
+    @Cacheable(cacheNames = "coupon")
     public CouponDTO recommendCoupon(Long shopId, CartStateRequest state) {
         ICoupon coupon = couponRepo.recommendCoupon(shopId, state.getValue(), state.getQuantity()).orElse(null);
         if (coupon == null)
@@ -137,6 +156,7 @@ public class CouponServiceImpl implements CouponService {
         return couponMapper.couponToDTO(coupon);
     }
 
+    @Cacheable(cacheNames = "couponAnalytics")
     public StatDTO getAnalytics(Long shopId,
             Long userId,
             Account user) {
@@ -147,7 +167,7 @@ public class CouponServiceImpl implements CouponService {
                 "Mã giảm giá");
     }
 
-    // Add coupon (SELLER)
+    @CacheEvict(cacheNames = { "coupons", "couponAnalytics" }, allEntries = true)
     @Transactional
     public Coupon addCoupon(CouponRequest request, Account user) {
 
@@ -187,6 +207,8 @@ public class CouponServiceImpl implements CouponService {
         return addedCoupon;
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = { "coupons", "couponAnalytics" }, allEntries = true),
+            @CacheEvict(cacheNames = "couponDetail", key = "#id") })
     @Transactional
     public Coupon updateCoupon(Long id, CouponRequest request, Account user) {
 
@@ -231,6 +253,8 @@ public class CouponServiceImpl implements CouponService {
         return updatedCoupon;
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = { "coupons", "couponAnalytics" }, allEntries = true),
+            @CacheEvict(cacheNames = "couponDetail", key = "#id") })
     @Transactional
     public Coupon deleteCoupon(Long id, Account user) {
         Coupon coupon = couponRepo.findById(id)
@@ -245,6 +269,7 @@ public class CouponServiceImpl implements CouponService {
         return coupon;
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = { "coupons", "couponAnalytics" }, allEntries = true) })
     @Transactional
     public void deleteCoupons(List<Long> ids,
             Account user) {
@@ -252,7 +277,8 @@ public class CouponServiceImpl implements CouponService {
         couponRepo.deleteAllById(deleteIds);
     }
 
-    @Override
+    @Caching(evict = { @CacheEvict(cacheNames = { "coupons", "couponAnalytics" }, allEntries = true) })
+    @Transactional
     public void deleteCouponsInverse(List<CouponType> types,
             List<String> codes,
             String code,
@@ -274,6 +300,7 @@ public class CouponServiceImpl implements CouponService {
         couponRepo.deleteAllById(deleteIds);
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = { "coupons", "couponAnalytics" }, allEntries = true) })
     @Transactional
     public void deleteAllCoupons(Long shopId, Account user) {
         if (isAuthAdmin()) {

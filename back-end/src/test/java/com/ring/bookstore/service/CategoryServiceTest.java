@@ -5,6 +5,7 @@ import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.dto.projection.categories.ICategory;
 import com.ring.bookstore.model.dto.request.CategoryRequest;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import com.ring.bookstore.model.dto.response.categories.CategoryDTO;
 import com.ring.bookstore.model.dto.response.categories.CategoryDetailDTO;
 import com.ring.bookstore.model.dto.response.categories.PreviewCategoryDTO;
@@ -46,17 +47,20 @@ public class CategoryServiceTest extends AbstractServiceTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
         Page<ICategory> page = new PageImpl<>(List.of(mock(ICategory.class)), pageable, 2);
         CategoryDTO mapped = CategoryDTO.builder().id(1).name("fiction").build();
-        Page<CategoryDTO> expectedDTOS = new PageImpl<>(
+        PagingResponse<CategoryDTO> expectedDTOS = new PagingResponse<>(
                 List.of(mapped),
-                pageable,
-                2);
+                1,
+                1L,
+                10,
+                0,
+                false);
 
         // When
         when(cateRepo.findCates(isNull(), any(Pageable.class))).thenReturn(page);
         when(cateMapper.projectionToDTO(any(ICategory.class))).thenReturn(mapped);
 
         // Then
-        Page<CategoryDTO> result = cateService.getCategories(pageable.getPageNumber(),
+        PagingResponse<CategoryDTO> result = cateService.getCategories(pageable.getPageNumber(),
                 pageable.getPageSize(),
                 "id",
                 "desc",
@@ -65,10 +69,11 @@ public class CategoryServiceTest extends AbstractServiceTest {
 
         assertNotNull(result);
         assertFalse(result.getContent().isEmpty());
-        assertEquals(expectedDTOS.getNumber(), result.getNumber());
+        assertEquals(expectedDTOS.getPage(), result.getPage());
         assertEquals(expectedDTOS.getSize(), result.getSize());
         assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
-        assertEquals(expectedDTOS.getContent().get(0).id(), result.getContent().get(0).id());
+        assertEquals(expectedDTOS.getContent().stream().findFirst().get().id(),
+                result.getContent().stream().findFirst().get().id());
 
         // Verify
         verify(cateRepo, times(1)).findCates(isNull(), any(Pageable.class));
@@ -110,10 +115,13 @@ public class CategoryServiceTest extends AbstractServiceTest {
         Page<Integer[]> page = new PageImpl<>(list, pageable, 2);
         List<ICategory> categories = List.of(mock(ICategory.class));
         List<CategoryDTO> expected = new ArrayList<>(List.of(CategoryDTO.builder().id(1).build()));
-        Page<CategoryDTO> expectedDTOS = new PageImpl<>(
+        PagingResponse<CategoryDTO> expectedDTOS = new PagingResponse<>(
                 expected,
-                pageable,
-                2);
+                1,
+                1L,
+                10,
+                0,
+                false);
 
         // When
         when(cateRepo.findRelevantCategories(eq(id), any(Pageable.class))).thenReturn(page);
@@ -121,15 +129,16 @@ public class CategoryServiceTest extends AbstractServiceTest {
         when(cateMapper.parentAndChildToCateDTOS(categories)).thenReturn(expected);
 
         // Then
-        Page<CategoryDTO> result = cateService.getRelevantCategories(pageable.getPageNumber(),
+        PagingResponse<CategoryDTO> result = cateService.getRelevantCategories(pageable.getPageNumber(),
                 pageable.getPageSize(),
                 id);
 
         assertNotNull(result);
-        assertEquals(expectedDTOS.getNumber(), result.getNumber());
+        assertEquals(expectedDTOS.getPage(), result.getPage());
         assertEquals(expectedDTOS.getSize(), result.getSize());
         assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
-        assertEquals(expectedDTOS.getContent().get(0).id(), result.getContent().get(0).id());
+        assertEquals(expectedDTOS.getContent().stream().findFirst().get().id(),
+                result.getContent().stream().findFirst().get().id());
 
         // Verify
         verify(cateRepo, times(1)).findRelevantCategories(eq(id), any(Pageable.class));

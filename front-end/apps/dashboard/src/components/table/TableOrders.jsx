@@ -416,9 +416,9 @@ export default function TableOrders({ shop }) {
     if (!isLoading && isSuccess && data) {
       setPagination({
         ...pagination,
-        totalPages: data?.page?.totalPages,
-        currPage: data?.page?.number,
-        pageSize: data?.page?.size,
+        totalPages: data?.totalPages,
+        currPage: data?.page,
+        pageSize: data?.size,
       });
     }
   }, [data]);
@@ -566,7 +566,7 @@ export default function TableOrders({ shop }) {
       }
 
       setDeselectedOrder(newDeselected);
-      if (newDeselected.length == data?.page?.totalElements) {
+      if (newDeselected.length == data?.totalElements) {
         setDeselectedOrder([]);
         setSelectedAll(false);
       }
@@ -596,7 +596,7 @@ export default function TableOrders({ shop }) {
       }
 
       setSelectedOrder(newSelected);
-      if (newSelected.length == data?.page?.totalElements) {
+      if (newSelected.length == data?.totalElements) {
         setSelectedOrder(true);
         setSelected([]);
       }
@@ -669,7 +669,7 @@ export default function TableOrders({ shop }) {
     (selectedAll && deselectedOrder?.indexOf(orderId) === -1);
   const numSelected = () =>
     selectedAll
-      ? data?.page?.totalElements - [...new Set(deselectedOrder)]?.length
+      ? data?.totalElements - [...new Set(deselectedOrder)]?.length
       : [...new Set(selectedOrder)]?.length;
   const colSpan = () => headCells.length + 1;
   //#endregion
@@ -774,7 +774,7 @@ export default function TableOrders({ shop }) {
           pagination={pagination}
           onPageChange={handleChangePage}
           onSizeChange={handleChangeRowsPerPage}
-          count={data?.page?.totalElements ?? 0}
+          count={data?.totalElements ?? 0}
         />
       </FooterContainer>
     </Paper>

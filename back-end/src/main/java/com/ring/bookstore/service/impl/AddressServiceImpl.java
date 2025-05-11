@@ -15,6 +15,11 @@ import com.ring.bookstore.model.dto.request.AddressRequest;
 import com.ring.bookstore.service.AddressService;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -28,20 +33,20 @@ public class AddressServiceImpl implements AddressService {
     private final AccountProfileRepository profileRepo;
     private final AddressMapper addressMapper;
 
-    @Override
+    @Cacheable(cacheNames = "addresses", key = "#user.id")
     public List<AddressDTO> getMyAddresses(Account user) {
         List<IAddress> addresses = addressRepo.findAddressesByProfile(user.getProfile().getId());
         List<AddressDTO> addressDTOS = addresses.stream().map(addressMapper::projectionToDTO).toList();
         return addressDTOS;
     }
 
-    @Override
+    @Cacheable(cacheNames = "userAddress", key = "#user.id")
     public AddressDTO getMyAddress(Account user) {
         IAddress address = addressRepo.findAddressByProfile(user.getProfile().getId());
         return addressMapper.projectionToDTO(address);
     }
 
-    @Override
+    @Cacheable(cacheNames = "address", key = "#id")
     public Address getAddress(Long id) {
         Address address = addressRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found!",
@@ -49,20 +54,22 @@ public class AddressServiceImpl implements AddressService {
         return address;
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = { "addresses", "userAddress" }, key = "#user.id") }, put = {
+            @CachePut(cacheNames = "address", key = "#result.id", condition = "#result != null") })
     @Transactional
     public Address addAddress(AddressRequest request, Account user) {
         AccountProfile profile = profileRepo.findById(user.getProfile().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found!",
                         "Không tìm thấy hồ sơ yêu cầu!"));
 
-        //Limit size
+        // Limit size
         int MAX_SIZE = 5;
         int currSize = profile.getAddresses() != null ? profile.getAddresses().size() : 0;
         if (currSize >= MAX_SIZE) {
             throw new HttpResponseException(HttpStatus.CONFLICT, "Can not add more than 5 addresses!");
         }
 
-        //Create address
+        // Create address
         var address = Address.builder()
                 .name(request.getName())
                 .companyName(request.getCompanyName())
@@ -73,17 +80,19 @@ public class AddressServiceImpl implements AddressService {
                 .profile(profile)
                 .build();
 
-        Address savedAddress = addressRepo.save(address); //Save address
+        Address savedAddress = addressRepo.save(address); // Save address
 
-        //Default address
+        // Default address
         if (request.getIsDefault() || currSize == 0) {
             profile.setAddress(savedAddress);
         }
 
-        profileRepo.save(profile); //Save profile
+        profileRepo.save(profile); // Save profile
         return savedAddress;
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = { "addresses", "userAddress" }, key = "#user.id") }, put = {
+            @CachePut(cacheNames = "address", key = "#id", condition = "#result != null") })
     @Transactional
     public Address updateAddress(AddressRequest request, Long id, Account user) {
         Address address = addressRepo.findById(id)
@@ -95,7 +104,7 @@ public class AddressServiceImpl implements AddressService {
                     "Người dùng không có quyền chỉnh sửa hồ sơ này!");
         }
 
-        //Update
+        // Update
         address.setName(request.getName());
         address.setCompanyName(request.getCompanyName());
         address.setPhone(request.getPhone());
@@ -103,21 +112,24 @@ public class AddressServiceImpl implements AddressService {
         address.setAddress(request.getAddress());
         address.setType(request.getType());
 
-        //Save
+        // Save
         Address updatedAddress = addressRepo.save(address);
 
-        //Default address
+        // Default address
         if (request.getIsDefault() && !address.getIsDefault()) {
             AccountProfile currProfile = address.getProfile();
 
-            //Set new default
+            // Set new default
             currProfile.setAddress(address);
-            profileRepo.save(currProfile); //Save profile
+            profileRepo.save(currProfile); // Save profile
         }
 
         return updatedAddress;
     }
 
+    @Caching(evict = { @CacheEvict(cacheNames = "address", key = "#id"),
+            @CacheEvict(cacheNames = "userAddress", key = "#user.id"),
+            @CacheEvict(cacheNames = "addresses", key = "#user.id") })
     @Transactional
     public Address deleteAddress(Long id, Account user) {
         Address address = addressRepo.findById(id)
@@ -129,7 +141,7 @@ public class AddressServiceImpl implements AddressService {
                     "Người dùng không có quyền chỉnh sửa địa chỉ này!");
         }
 
-        addressRepo.deleteById(id); //Delete from database
+        addressRepo.deleteById(id); // Delete from database
         return address;
     }
 }

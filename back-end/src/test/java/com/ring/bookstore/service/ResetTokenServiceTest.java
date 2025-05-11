@@ -24,9 +24,8 @@ class ResetTokenServiceTest extends AbstractServiceTest {
         @InjectMocks
         private ResetTokenServiceImpl resetTokenService;
 
-        private String token = "reset-token-123";
-
-        private Account account = Account.builder()
+        private final String token = "reset-token-123";
+        private final Account account = Account.builder()
                         .id(1L)
                         .username("test")
                         .pass("test")
@@ -58,33 +57,32 @@ class ResetTokenServiceTest extends AbstractServiceTest {
         void givenValidToken_whenVerifyResetToken_thenReturnTrue() {
 
                 // When
-                when(tokenService.extractCustomUsername(eq(account.getResetToken()),
+                when(tokenService.extractCustomUsername(eq(token),
                                 eq(account.getPassword()))).thenReturn(account.getUsername());
-                when(tokenService.isCustomTokenValid(eq(account.getResetToken()),
+                when(tokenService.isCustomTokenValid(eq(token),
                                 eq(account.getUsername()),
                                 eq(account.getPassword()))).thenReturn(true);
 
-                // Tnen
+                // Then
                 boolean result = resetTokenService.verifyResetToken(account);
-
                 assertTrue(result);
 
                 // Verify
-                verify(tokenService, times(1)).extractCustomUsername(eq(account.getResetToken()),
+                verify(tokenService, times(1)).extractCustomUsername(eq(token),
                                 eq(account.getPassword()));
-                verify(tokenService).isCustomTokenValid(eq(account.getResetToken()),
+                verify(tokenService).isCustomTokenValid(eq(token),
                                 eq(account.getUsername()),
                                 eq(account.getPassword()));
-                verify(accRepo, times(1)).save(account);
+                verify(accRepo, never()).save(account);
         }
 
         @Test
         void givenExpiredToken_whenVerifyResetToken_thenThrowException() {
 
                 // When
-                when(tokenService.extractCustomUsername(eq(account.getResetToken()),
+                when(tokenService.extractCustomUsername(eq(token),
                                 eq(account.getPassword()))).thenReturn(account.getUsername());
-                when(tokenService.isCustomTokenValid(eq(account.getResetToken()),
+                when(tokenService.isCustomTokenValid(eq(token),
                                 eq(account.getUsername()),
                                 eq(account.getPassword()))).thenReturn(false);
 
@@ -93,9 +91,9 @@ class ResetTokenServiceTest extends AbstractServiceTest {
                                 () -> resetTokenService.verifyResetToken(account));
 
                 // Verify
-                verify(tokenService, times(1)).extractCustomUsername(eq(account.getResetToken()),
+                verify(tokenService, times(1)).extractCustomUsername(eq(token),
                                 eq(account.getPassword()));
-                verify(tokenService, times(1)).isCustomTokenValid(eq(account.getResetToken()),
+                verify(tokenService, times(1)).isCustomTokenValid(eq(token),
                                 eq(account.getUsername()),
                                 eq(account.getPassword()));
                 verify(accRepo, times(1)).save(account);

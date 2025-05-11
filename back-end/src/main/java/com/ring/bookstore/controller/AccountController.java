@@ -2,6 +2,7 @@ package com.ring.bookstore.controller;
 
 import java.util.List;
 
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import com.ring.bookstore.model.dto.response.accounts.AccountDTO;
 import com.ring.bookstore.model.enums.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +58,12 @@ public class AccountController {
                                             @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                             @RequestParam(value = "role", required = false) UserRole role
     ) {
-        Page<AccountDTO> accounts = accountService.getAllAccounts(pageNo, pageSize, sortBy, sortDir, keyword, role);
+        PagingResponse<AccountDTO> accounts = accountService.getAllAccounts(pageNo,
+                pageSize,
+                sortBy,
+                sortDir,
+                keyword,
+                role);
         return new ResponseEntity<>(accounts, HttpStatus.OK);
     }
 

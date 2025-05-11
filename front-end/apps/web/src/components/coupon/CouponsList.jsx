@@ -113,8 +113,8 @@ const CouponsList = ({ scrollPosition, tabletMode }) => {
     if (data && !isLoading && isSuccess) {
       setPagination({
         ...pagination,
-        number: data.page.number,
-        totalPages: data.page.totalPages,
+        number: data.page,
+        totalPages: data.totalPages,
       });
     }
   }, [data]);
@@ -153,12 +153,12 @@ const CouponsList = ({ scrollPosition, tabletMode }) => {
   const handleShowMore = () => {
     if (
       isFetching ||
-      typeof data?.page?.number !== "number" ||
-      data?.page?.number < pagination?.number
+      typeof data?.page !== "number" ||
+      data?.page < pagination?.number
     )
       return;
-    const nextPage = data?.page?.number + 1;
-    if (nextPage < data?.page?.totalPages)
+    const nextPage = data?.page + 1;
+    if (nextPage < data?.totalPages)
       setPagination((prev) => ({ ...prev, number: nextPage }));
   };
 
@@ -295,7 +295,7 @@ const CouponsList = ({ scrollPosition, tabletMode }) => {
             </LoadContainer>
           )}
           {data?.ids?.length > 0 &&
-            data?.ids?.length == data?.page?.totalElements && (
+            data?.ids?.length == data?.totalElements && (
               <Message color="warning">Không còn mã giảm giá nào!</Message>
             )}
         </MainContainer>

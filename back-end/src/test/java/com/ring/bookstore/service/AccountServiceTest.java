@@ -28,6 +28,7 @@ import com.ring.bookstore.repository.AccountRepository;
 import com.ring.bookstore.repository.RoleRepository;
 import com.ring.bookstore.service.impl.AccountServiceImpl;
 import com.ring.bookstore.ultils.FileUploadUtil;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -405,17 +406,20 @@ class AccountServiceTest extends AbstractServiceTest {
                                 pageable,
                                 2);
                 AccountDTO mapped = AccountDTO.builder().id(1L).build();
-                Page<AccountDTO> expectedDTOS = new PageImpl<>(
+                PagingResponse<AccountDTO> expectedResponse = new PagingResponse<>(
                                 List.of(mapped),
-                                pageable,
-                                2);
+                                2,
+                                2L,
+                                1,
+                                0,
+                                false);
 
                 // When
                 when(accountRepo.findAccountsWithFilter(eq(""), isNull(), any(Pageable.class))).thenReturn(accounts);
                 when(accountMapper.projectionToDTO(any(IAccount.class))).thenReturn(mapped);
 
                 // Then
-                Page<AccountDTO> result = accountService.getAllAccounts(pageable.getPageNumber(),
+                PagingResponse<AccountDTO> result = accountService.getAllAccounts(pageable.getPageNumber(),
                                 pageable.getPageSize(),
                                 pageable.getSort().toString(),
                                 pageable.getSort().descending().toString(),
@@ -423,11 +427,12 @@ class AccountServiceTest extends AbstractServiceTest {
                                 null);
 
                 assertNotNull(result);
-                assertFalse(result.getContent().isEmpty());
-                assertEquals(expectedDTOS.getNumber(), result.getNumber());
-                assertEquals(expectedDTOS.getContent().get(0).id(), result.getContent().get(0).id());
-                assertEquals(expectedDTOS.getTotalPages(), result.getTotalPages());
-                assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
+                assertEquals(expectedResponse.getContent().size(), result.getContent().size());
+                assertEquals(expectedResponse.getTotalPages(), result.getTotalPages());
+                assertEquals(expectedResponse.getTotalElements(), result.getTotalElements());
+                assertEquals(expectedResponse.getSize(), result.getSize());
+                assertEquals(expectedResponse.getPage(), result.getPage());
+                assertEquals(expectedResponse.isEmpty(), result.isEmpty());
 
                 // Verify
                 verify(accountRepo, times(1)).findAccountsWithFilter(eq(""), isNull(), any(Pageable.class));

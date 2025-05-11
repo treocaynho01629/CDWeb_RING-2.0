@@ -21,6 +21,9 @@ import com.ring.bookstore.service.ShopService;
 import com.ring.bookstore.ultils.FileUploadUtil;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.ring.bookstore.model.dto.response.PagingResponse;
 
 @RequiredArgsConstructor
 @Service
@@ -45,8 +50,8 @@ public class ShopServiceImpl implements ShopService {
     private final ShopMapper shopMapper;
     private final DashboardMapper dashMapper;
 
-    @Override
-    public Page<ShopDisplayDTO> getDisplayShops(Integer pageNo,
+    @Cacheable(cacheNames = "shops")
+    public PagingResponse<ShopDisplayDTO> getDisplayShops(Integer pageNo,
             Integer pageSize,
             String sortBy,
             String sortDir,
@@ -60,12 +65,18 @@ public class ShopServiceImpl implements ShopService {
 
         // Fetch from database
         Page<IShopDisplay> shopsList = shopRepo.findShopsDisplay(keyword, followed, userId, pageable);
-        Page<ShopDisplayDTO> shopDTOS = shopsList.map(shopMapper::displayToDTO);
-        return shopDTOS;
+        List<ShopDisplayDTO> shopDTOS = shopsList.map(shopMapper::displayToDTO).toList();
+        return new PagingResponse<>(
+                shopDTOS,
+                shopsList.getTotalPages(),
+                shopsList.getTotalElements(),
+                shopsList.getSize(),
+                shopsList.getNumber(),
+                shopsList.isEmpty());
     }
 
-    @Override
-    public Page<ShopDTO> getShops(Integer pageNo,
+    @Cacheable(cacheNames = "shops")
+    public PagingResponse<ShopDTO> getShops(Integer pageNo,
             Integer pageSize,
             String sortBy,
             String sortDir,
@@ -81,11 +92,17 @@ public class ShopServiceImpl implements ShopService {
                 userId != null ? isAdmin ? userId : null
                         : isAdmin ? null : user.getId(),
                 pageable);
-        Page<ShopDTO> shopDTOS = shopsList.map(shopMapper::shopToDTO);
-        return shopDTOS;
+        List<ShopDTO> shopDTOS = shopsList.map(shopMapper::shopToDTO).toList();
+        return new PagingResponse<>(
+                shopDTOS,
+                shopsList.getTotalPages(),
+                shopsList.getTotalElements(),
+                shopsList.getSize(),
+                shopsList.getNumber(),
+                shopsList.isEmpty());
     }
 
-    @Override
+    @Cacheable(cacheNames = "shops")
     public List<ShopPreviewDTO> getShopsPreview(Account user) {
 
         List<IShopPreview> shops = shopRepo.findShopsPreview(user.getId());
@@ -93,7 +110,7 @@ public class ShopServiceImpl implements ShopService {
         return shopDTOS;
     }
 
-    @Override
+    @Cacheable(cacheNames = "shopInfo")
     public ShopInfoDTO getShopInfo(Long id,
             Account user) {
 
@@ -105,7 +122,7 @@ public class ShopServiceImpl implements ShopService {
         return shopDTO;
     }
 
-    @Override
+    @Cacheable(cacheNames = "shop")
     public ShopDisplayDetailDTO getShopDisplayDetail(Long id,
             Account user) {
 
@@ -117,7 +134,7 @@ public class ShopServiceImpl implements ShopService {
         return shopDTO;
     }
 
-    @Override
+    @Cacheable(cacheNames = "shopDetail")
     public ShopDetailDTO getShopDetail(Long id,
             Account user) {
 
@@ -129,6 +146,7 @@ public class ShopServiceImpl implements ShopService {
         return shopDTO;
     }
 
+    @Cacheable(cacheNames = "shopAnalytics")
     public StatDTO getAnalytics(Long userId,
             Account user) {
 
@@ -138,6 +156,7 @@ public class ShopServiceImpl implements ShopService {
                 "Cửa hàng");
     }
 
+    @CacheEvict(cacheNames = { "shopInfo", "shopDetail", "shop" }, allEntries = true)
     @Transactional
     public void follow(Long id,
             Account user) {
@@ -149,6 +168,7 @@ public class ShopServiceImpl implements ShopService {
         shopRepo.save(shop);
     }
 
+    @CacheEvict(cacheNames = { "shopInfo", "shopDetail", "shop" }, allEntries = true)
     @Transactional
     public void unfollow(Long id,
             Account user) {
@@ -160,6 +180,7 @@ public class ShopServiceImpl implements ShopService {
         shopRepo.save(shop);
     }
 
+    @CacheEvict(cacheNames = { "shops", "shopsAnalytics" }, allEntries = true)
     @Transactional
     public Shop addShop(ShopRequest request,
             MultipartFile file,
@@ -193,6 +214,7 @@ public class ShopServiceImpl implements ShopService {
         return addedShop;
     }
 
+    @CacheEvict(cacheNames = { "shopInfo", "shopDetail", "shop", "shops" }, allEntries = true)
     @Transactional
     public Shop updateShop(Long id, ShopRequest request, MultipartFile file, Account user) {
 
@@ -234,7 +256,7 @@ public class ShopServiceImpl implements ShopService {
         return updatedShop;
     }
 
-    @Override
+    @CacheEvict(cacheNames = { "shopInfo", "shopDetail", "shop", "shops", "shopsAnalytics" }, allEntries = true)
     public Shop deleteShop(Long id, Account user) {
 
         Shop shop = shopRepo.findById(id)
@@ -249,6 +271,7 @@ public class ShopServiceImpl implements ShopService {
         return shop;
     }
 
+    @CacheEvict(cacheNames = { "shopInfo", "shopDetail", "shop", "shops", "shopsAnalytics" }, allEntries = true)
     @Transactional
     public void deleteShops(List<Long> ids, Account user) {
 
@@ -256,6 +279,7 @@ public class ShopServiceImpl implements ShopService {
         shopRepo.deleteAllById(deleteIds);
     }
 
+    @CacheEvict(cacheNames = { "shopInfo", "shopDetail", "shop", "shops", "shopsAnalytics" }, allEntries = true)
     @Transactional
     public void deleteShopsInverse(String keyword,
             Long userId,
@@ -269,6 +293,7 @@ public class ShopServiceImpl implements ShopService {
         shopRepo.deleteAllById(deleteIds);
     }
 
+    @CacheEvict(cacheNames = { "shopInfo", "shopDetail", "shop", "shops", "shopsAnalytics" }, allEntries = true)
     @Override
     public void deleteAllShops(Account user) {
 

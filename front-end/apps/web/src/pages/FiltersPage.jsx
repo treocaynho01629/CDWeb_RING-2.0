@@ -473,7 +473,7 @@ const FiltersPage = () => {
           <FilterSortList
             {...{
               pagination,
-              totalPages: data?.page?.totalPages ?? 0,
+              totalPages: data?.totalPages ?? 0,
               mobileMode,
               onOpenFilters: handleOpen,
               isChanged,
@@ -488,7 +488,7 @@ const FiltersPage = () => {
           <Pagination
             page={pagination?.number}
             size={pagination?.size}
-            count={data?.page?.totalPages ?? 0}
+            count={data?.totalPages ?? 0}
             onPageChange={handleChangePage}
             onSizeChange={handleChangeSize}
           />

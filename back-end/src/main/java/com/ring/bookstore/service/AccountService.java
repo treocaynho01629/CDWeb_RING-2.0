@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import com.ring.bookstore.model.dto.response.accounts.AccountDTO;
 import com.ring.bookstore.model.dto.response.dashboard.StatDTO;
 import com.ring.bookstore.model.enums.UserRole;
@@ -34,12 +35,12 @@ public interface AccountService {
      * @param role      the role to filter accounts (optional).
      * @return a paginated list of {@link AccountDTO} objects based on the specified filters and sorting.
      */
-    Page<AccountDTO> getAllAccounts(Integer pageNo,
-                                    Integer pageSize,
-                                    String sortBy,
-                                    String sortDir,
-                                    String keyword,
-                                    UserRole role);
+    PagingResponse<AccountDTO> getAllAccounts(Integer pageNo,
+                                              Integer pageSize,
+                                              String sortBy,
+                                              String sortDir,
+                                              String keyword,
+                                              UserRole role);
 
     /**
      * Retrieves an account by its ID.

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
  * Represents a book response as {@link BookResponseDTO}.
  */
 @Builder
-public record BookResponseDTO(Long id,
+public record BookResponseDTO (Long id,
                               String slug,
                               Double price,
                               BigDecimal discount,

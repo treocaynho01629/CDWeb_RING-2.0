@@ -6,6 +6,7 @@ import com.ring.bookstore.exception.HttpResponseException;
 import com.ring.bookstore.exception.ResourceNotFoundException;
 import com.ring.bookstore.model.dto.projection.banners.IBanner;
 import com.ring.bookstore.model.dto.request.BannerRequest;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import com.ring.bookstore.model.dto.response.banners.BannerDTO;
 import com.ring.bookstore.model.entity.*;
 import com.ring.bookstore.model.enums.UserRole;
@@ -88,17 +89,20 @@ class BannerServiceTest extends AbstractServiceTest {
                                 pageable,
                                 2);
                 BannerDTO mapped = BannerDTO.builder().id(1).build();
-                Page<BannerDTO> expectedDTOS = new PageImpl<>(
+                PagingResponse<BannerDTO> expectedResponse = new PagingResponse<>(
                                 List.of(mapped),
-                                pageable,
-                                2);
+                                2,
+                                2L,
+                                1,
+                                0,
+                                false);
 
                 // When
                 when(bannerRepo.findBanners(eq(""), isNull(), eq(false), any(Pageable.class))).thenReturn(banners);
                 when(bannerMapper.apply(any(IBanner.class))).thenReturn(mapped);
 
                 // Then
-                Page<BannerDTO> result = bannerService.getBanners(pageable.getPageNumber(),
+                PagingResponse<BannerDTO> result = bannerService.getBanners(pageable.getPageNumber(),
                                 pageable.getPageSize(),
                                 pageable.getSort().toString(),
                                 pageable.getSort().descending().toString(),
@@ -107,11 +111,12 @@ class BannerServiceTest extends AbstractServiceTest {
                                 false);
 
                 assertNotNull(result);
-                assertFalse(result.getContent().isEmpty());
-                assertEquals(expectedDTOS.getNumber(), result.getNumber());
-                assertEquals(expectedDTOS.getContent().get(0).id(), result.getContent().get(0).id());
-                assertEquals(expectedDTOS.getTotalPages(), result.getTotalPages());
-                assertEquals(expectedDTOS.getTotalElements(), result.getTotalElements());
+                assertEquals(expectedResponse.getContent().size(), result.getContent().size());
+                assertEquals(expectedResponse.getTotalPages(), result.getTotalPages());
+                assertEquals(expectedResponse.getTotalElements(), result.getTotalElements());
+                assertEquals(expectedResponse.getSize(), result.getSize());
+                assertEquals(expectedResponse.getPage(), result.getPage());
+                assertEquals(expectedResponse.isEmpty(), result.isEmpty());
 
                 // Verify
                 verify(bannerRepo, times(1)).findBanners(eq(""), isNull(), eq(false), any(Pageable.class));
@@ -531,32 +536,43 @@ class BannerServiceTest extends AbstractServiceTest {
         public void whenDeleteAllSellerBanners_ThenSuccess() {
 
                 // Given
-                setupSecurityContext(account);
+                Account altAccount = Account.builder()
+                        .id(2L)
+                        .roles(List.of(Role.builder().roleName(UserRole.ROLE_SELLER).build()))
+                        .build();
+                Shop altShop = Shop.builder().id(2L).owner(altAccount).build();
+                SecurityContextHolder.clearContext();
+                setupSecurityContext(altAccount);
 
                 // When
-                doNothing().when(bannerRepo).deleteAllByShop_Owner(account);
+                doNothing().when(bannerRepo).deleteAllByShop_Owner(altAccount);
 
                 // Then
-                bannerService.deleteAllBanners(null, account);
+                bannerService.deleteAllBanners(null, altAccount);
 
                 // Verify
-                verify(bannerRepo, times(1)).deleteAllByShop_Owner(account);
+                verify(bannerRepo, times(1)).deleteAllByShop_Owner(altAccount);
         }
 
         @Test
         public void whenDeleteAllSellerShopBanners_ThenSuccess() {
 
                 // Given
-                setupSecurityContext(account);
-                Long id = 1L;
+                Account altAccount = Account.builder()
+                        .id(2L)
+                        .roles(List.of(Role.builder().roleName(UserRole.ROLE_SELLER).build()))
+                        .build();
+                Shop altShop = Shop.builder().id(2L).owner(altAccount).build();
+                SecurityContextHolder.clearContext();
+                setupSecurityContext(altAccount);
 
                 // When
-                doNothing().when(bannerRepo).deleteAllByShopIdAndShop_Owner(id, account);
+                doNothing().when(bannerRepo).deleteAllByShopIdAndShop_Owner(altShop.getId(), altAccount);
 
                 // Then
-                bannerService.deleteAllBanners(id, account);
+                bannerService.deleteAllBanners(altShop.getId(), altAccount);
 
                 // Verify
-                verify(bannerRepo, times(1)).deleteAllByShopIdAndShop_Owner(id, account);
+                verify(bannerRepo, times(1)).deleteAllByShopIdAndShop_Owner(altShop.getId(), altAccount);
         }
 }

@@ -1,9 +1,5 @@
 package com.ring.bookstore.model.dto.response.books;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
 import com.ring.bookstore.model.dto.response.categories.CategoryDTO;
 import com.ring.bookstore.model.dto.response.images.ImageDTO;
 import com.ring.bookstore.model.dto.response.publishers.PublisherDTO;
@@ -11,6 +7,10 @@ import com.ring.bookstore.model.dto.response.reviews.ReviewsInfoDTO;
 import com.ring.bookstore.model.enums.BookLanguage;
 import com.ring.bookstore.model.enums.BookType;
 import lombok.Builder;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Represents a book detail response as {@link BookDetailDTO}.

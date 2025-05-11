@@ -9,89 +9,89 @@ import com.ring.bookstore.model.entity.Account;
 import com.ring.bookstore.model.entity.PaymentInfo;
 import com.ring.bookstore.model.enums.OrderStatus;
 import com.ring.bookstore.model.enums.PaymentType;
+import com.ring.bookstore.model.dto.response.PagingResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.data.domain.Page;
 import vn.payos.type.PaymentLinkData;
 
 import java.util.List;
 
 public interface OrderService {
 
-    Page<ReceiptDTO> getAllReceipts(Account user,
-                                    Long shopId,
-                                    OrderStatus status,
-                                    String keyword,
-                                    Integer pageNo,
-                                    Integer pageSize,
-                                    String sortBy,
-                                    String sortDir);
+    PagingResponse<ReceiptDTO> getAllReceipts(Account user,
+            Long shopId,
+            OrderStatus status,
+            String keyword,
+            Integer pageNo,
+            Integer pageSize,
+            String sortBy,
+            String sortDir);
 
-    Page<ReceiptSummaryDTO> getSummariesWithFilter(Account user,
-                                                   Long shopId,
-                                                   Long bookId,
-                                                   Integer pageNo,
-                                                   Integer pageSize,
-                                                   String sortBy,
-                                                   String sortDir);
+    PagingResponse<ReceiptSummaryDTO> getSummariesWithFilter(Account user,
+            Long shopId,
+            Long bookId,
+            Integer pageNo,
+            Integer pageSize,
+            String sortBy,
+            String sortDir);
 
-    Page<OrderDTO> getOrdersByBookId(Long id,
-                                     Integer pageNo,
-                                     Integer pageSize,
-                                     String sortBy,
-                                     String sortDir);
+    PagingResponse<OrderDTO> getOrdersByBookId(Long id,
+            Integer pageNo,
+            Integer pageSize,
+            String sortBy,
+            String sortDir);
 
-    Page<OrderDTO> getOrdersByUser(Account user,
-                                   OrderStatus status,
-                                   String keyword,
-                                   Integer pageNo,
-                                   Integer pageSize);
+    PagingResponse<OrderDTO> getOrdersByUser(Account user,
+            OrderStatus status,
+            String keyword,
+            Integer pageNo,
+            Integer pageSize);
 
     ReceiptDTO getReceipt(Long id);
 
     ReceiptDetailDTO getReceiptDetail(Long id,
-                                      Account user);
+            Account user);
 
     OrderDetailDTO getOrderDetail(Long id,
-                                  Account user);
+            Account user);
 
     StatDTO getAnalytics(Account user,
-                         Long shopId);
+            Long shopId);
 
     CalculateDTO calculate(CalculateRequest request, Account user);
 
     ReceiptDTO checkout(OrderRequest checkRequest,
-                        HttpServletRequest request,
-                        Account user);
+            HttpServletRequest request,
+            Account user);
 
     PaymentInfo createPaymentLink(HttpServletRequest request,
-                                  Long id);
+            Long id);
 
     PaymentLinkData getPaymentLinkData(Long id);
 
     void cancel(Long id,
-                String reason,
-                Account user);
+            String reason,
+            Account user);
 
     void cancelUnpaidOrder(Long orderId,
-                           String reason,
-                           Account user);
+            String reason,
+            Account user);
 
     void changePaymentMethod(Long orderId,
-                             PaymentType paymentMethod,
-                             Account user);
+            PaymentType paymentMethod,
+            Account user);
 
     void refund(Long id,
-                String reason,
-                Account user);
+            String reason,
+            Account user);
 
     void confirm(Long id,
-                 Account user);
+            Account user);
 
     void confirmPayment(Long id);
 
     void changeStatus(Long id,
-                      OrderStatus status,
-                      Account user);
+            OrderStatus status,
+            Account user);
 
     List<ChartDTO> getMonthlySales(Account user, Long shopId, Integer year);
 }

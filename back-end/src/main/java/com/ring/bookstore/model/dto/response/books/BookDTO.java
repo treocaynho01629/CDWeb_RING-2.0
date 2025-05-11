@@ -2,9 +2,9 @@ package com.ring.bookstore.model.dto.response.books;
 
 import com.ring.bookstore.model.dto.response.categories.CategoryDTO;
 import com.ring.bookstore.model.dto.response.publishers.PublisherDTO;
+import com.ring.bookstore.model.entity.Image;
 import com.ring.bookstore.model.enums.BookLanguage;
 import com.ring.bookstore.model.enums.BookType;
-import com.ring.bookstore.model.entity.Image;
 import lombok.Builder;
 
 import java.math.BigDecimal;

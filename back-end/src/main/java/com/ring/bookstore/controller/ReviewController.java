@@ -50,7 +50,14 @@ public class ReviewController {
             @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
             @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir) {
-        return new ResponseEntity<>(reviewService.getReviews(bookId, userId, rating, keyword, pageNo, pageSize, sortBy, sortDir), HttpStatus.OK);
+        return new ResponseEntity<>(reviewService.getReviews(bookId,
+                userId,
+                rating,
+                keyword,
+                pageNo,
+                pageSize,
+                sortBy,
+                sortDir), HttpStatus.OK);
     }
 
     /**

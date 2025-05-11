@@ -3,12 +3,11 @@ import { apiSlice } from "@ring/redux";
 
 export const bannersAdapter = createEntityAdapter({});
 export const bannersInitialState = bannersAdapter.getInitialState({
-  page: {
-    number: 0,
-    size: 0,
-    totalElements: 0,
-    totalPages: 0,
-  },
+  empty: false,
+  page: 0,
+  size: 0,
+  totalElements: 0,
+  totalPages: 0,
 });
 
 export const bannersApiSlice = apiSlice.injectEndpoints({
@@ -34,11 +33,16 @@ export const bannersApiSlice = apiSlice.injectEndpoints({
         };
       },
       transformResponse: (responseData) => {
-        const { content, page } = responseData;
+        const { content, empty, page, size, totalElements, totalPages } =
+          responseData;
         return bannersAdapter.setAll(
           {
             ...bannersInitialState,
+            empty,
             page,
+            size,
+            totalElements,
+            totalPages,
           },
           content
         );

@@ -6,12 +6,11 @@ import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
 export const pubsAdapter = createEntityAdapter({});
 export const pubsSelector = pubsAdapter.getSelectors();
 export const pubsInitialState = pubsAdapter.getInitialState({
-  page: {
-    number: 0,
-    size: 0,
-    totalElements: 0,
-    totalPages: 0,
-  },
+  empty: false,
+  page: 0,
+  size: 0,
+  totalElements: 0,
+  totalPages: 0,
 });
 
 export const publishersApiSlice = apiSlice.injectEndpoints({
@@ -44,11 +43,16 @@ export const publishersApiSlice = apiSlice.injectEndpoints({
         };
       },
       transformResponse: (responseData) => {
-        const { content, page } = responseData;
+        const { content, empty, page, size, totalElements, totalPages } =
+          responseData;
         return pubsAdapter.setAll(
           {
             ...pubsInitialState,
+            empty,
             page,
+            size,
+            totalElements,
+            totalPages,
           },
           content
         );
