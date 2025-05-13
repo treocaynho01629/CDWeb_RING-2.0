@@ -54,12 +54,12 @@ const ReviewsList = ({ mobileMode, tabletMode, pending, setPending }) => {
   const handleShowMore = () => {
     if (
       isFetching ||
-      typeof data?.page?.number !== "number" ||
-      data?.page?.number < pagination?.number
+      typeof data?.page !== "number" ||
+      data?.page < pagination?.number
     )
       return;
-    const nextPage = data?.page?.number + 1;
-    if (nextPage < data?.page?.totalPages)
+    const nextPage = data?.page + 1;
+    if (nextPage < data?.totalPages)
       setPagination((prev) => ({ ...prev, number: nextPage }));
   };
 
@@ -165,7 +165,7 @@ const ReviewsList = ({ mobileMode, tabletMode, pending, setPending }) => {
             </LoadContainer>
           )}
           {data?.ids?.length > 0 &&
-            data?.ids?.length == data?.page?.totalElements && (
+            data?.ids?.length == data?.totalElements && (
               <Message color="warning">Không còn đánh giá nào!</Message>
             )}
         </ReviewsContainer>

@@ -3,12 +3,11 @@ import { apiSlice } from "@ring/redux";
 
 const ordersAdapter = createEntityAdapter({});
 const initialState = ordersAdapter.getInitialState({
-  page: {
-    number: 0,
-    size: 0,
-    totalElements: 0,
-    totalPages: 0,
-  },
+  empty: false,
+  page: 0,
+  size: 0,
+  totalElements: 0,
+  totalPages: 0,
 });
 
 export const ordersApiSlice = apiSlice.injectEndpoints({
@@ -45,11 +44,16 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
         };
       },
       transformResponse: (responseData) => {
-        const { content, page } = responseData;
+        const { content, empty, page, size, totalElements, totalPages } =
+          responseData;
         return ordersAdapter.setAll(
           {
             ...initialState,
+            empty,
             page,
+            size,
+            totalElements,
+            totalPages,
           },
           content
         );
@@ -82,11 +86,16 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
         };
       },
       transformResponse: (responseData) => {
-        const { content, page } = responseData;
+        const { content, empty, page, size, totalElements, totalPages } =
+          responseData;
         return ordersAdapter.setAll(
           {
             ...initialState,
+            empty,
             page,
+            size,
+            totalElements,
+            totalPages,
           },
           content
         );
@@ -121,11 +130,16 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
         };
       },
       transformResponse: (responseData) => {
-        const { content, page } = responseData;
+        const { content, empty, page, size, totalElements, totalPages } =
+          responseData;
         return ordersAdapter.setAll(
           {
             ...initialState,
+            empty,
             page,
+            size,
+            totalElements,
+            totalPages,
           },
           content
         );

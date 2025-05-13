@@ -302,9 +302,9 @@ export default function TableCoupons({
     if (!isLoading && isSuccess && data) {
       setPagination({
         ...pagination,
-        totalPages: data?.page?.totalPages,
-        number: data?.page?.number,
-        size: data?.page?.size,
+        totalPages: data?.totalPages,
+        number: data?.page,
+        size: data?.size,
       });
     }
   }, [data]);
@@ -354,7 +354,7 @@ export default function TableCoupons({
       }
 
       setDeseletected(newDeselected);
-      if (newDeselected.length == data?.page?.totalElements) {
+      if (newDeselected.length == data?.totalElements) {
         setDeseletected([]);
         setSelectedAll(false);
       }
@@ -377,7 +377,7 @@ export default function TableCoupons({
       }
 
       setSelected(newSelected);
-      if (newSelected.length == data?.page?.totalElements) {
+      if (newSelected.length == data?.totalElements) {
         setSelectedAll(true);
         setSelected([]);
       }
@@ -550,7 +550,7 @@ export default function TableCoupons({
     (!selectedAll && selected?.indexOf(id) !== -1) ||
     (selectedAll && deselected?.indexOf(id) === -1);
   const numSelected = selectedAll
-    ? data?.page?.totalElements - deselected?.length
+    ? data?.totalElements - deselected?.length
     : selected?.length;
   const colSpan = headCells.length + 1;
   //#endregion
@@ -693,7 +693,7 @@ export default function TableCoupons({
           pagination={pagination}
           onPageChange={handleChangePage}
           onSizeChange={handleChangeRowsPerPage}
-          count={data?.page?.totalElements ?? 0}
+          count={data?.totalElements ?? 0}
         />
       </FooterContainer>
       <Menu open={openContext} onClose={handleCloseContext} anchorEl={anchorEl}>

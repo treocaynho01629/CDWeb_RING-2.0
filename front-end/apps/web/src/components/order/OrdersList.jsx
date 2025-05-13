@@ -82,8 +82,8 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
     if (data && !isLoading && isSuccess) {
       setPagination({
         ...pagination,
-        number: data.page.number,
-        totalPages: data.page.totalPages,
+        number: data.page,
+        totalPages: data.totalPages,
       });
     }
   }, [data]);
@@ -300,7 +300,7 @@ const OrdersList = ({ pending, setPending, mobileMode, tabletMode }) => {
             </LoadContainer>
           )}
           {data?.ids?.length > 0 &&
-            data?.ids?.length == data?.page?.totalElements && (
+            data?.ids?.length == data?.totalElements && (
               <Message color="warning">Không còn đơn hàng nào!</Message>
             )}
         </MainContainer>

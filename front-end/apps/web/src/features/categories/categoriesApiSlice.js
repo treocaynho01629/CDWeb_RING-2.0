@@ -45,11 +45,16 @@ export const categoriesApiSlice = initialsApiSlice.injectEndpoints({
         };
       },
       transformResponse: (responseData) => {
-        const { content, page } = responseData;
+        const { content, empty, page, size, totalElements, totalPages } =
+          responseData;
         return catesAdapter.setAll(
           {
             ...initialState,
+            empty,
             page,
+            size,
+            totalElements,
+            totalPages,
           },
           content
         );

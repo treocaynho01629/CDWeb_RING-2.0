@@ -3,12 +3,11 @@ import { apiSlice } from "@ring/redux";
 
 const shopsAdapter = createEntityAdapter({});
 const initialState = shopsAdapter.getInitialState({
-  page: {
-    number: 0,
-    size: 0,
-    totalElements: 0,
-    totalPages: 0,
-  },
+  empty: false,
+  page: 0,
+  size: 0,
+  totalElements: 0,
+  totalPages: 0,
 });
 
 export const shopsApiSlice = apiSlice.injectEndpoints({
@@ -52,11 +51,16 @@ export const shopsApiSlice = apiSlice.injectEndpoints({
         };
       },
       transformResponse: (responseData) => {
-        const { content, page } = responseData;
+        const { content, empty, page, size, totalElements, totalPages } =
+          responseData;
         return shopsAdapter.setAll(
           {
             ...initialState,
+            empty,
             page,
+            size,
+            totalElements,
+            totalPages,
           },
           content
         );

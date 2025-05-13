@@ -5,12 +5,11 @@ import { isEqual } from "lodash-es";
 const reviewsAdapter = createEntityAdapter({});
 const reviewsSelector = reviewsAdapter.getSelectors();
 const initialState = reviewsAdapter.getInitialState({
-  page: {
-    number: 0,
-    size: 0,
-    totalElements: 0,
-    totalPages: 0,
-  },
+  empty: false,
+  page: 0,
+  size: 0,
+  totalElements: 0,
+  totalPages: 0,
 });
 
 export const reviewsApiSlice = apiSlice.injectEndpoints({
@@ -46,11 +45,16 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
         };
       },
       transformResponse: (responseData) => {
-        const { content, page } = responseData;
+        const { content, empty, page, size, totalElements, totalPages } =
+          responseData;
         return reviewsAdapter.setAll(
           {
             ...initialState,
+            empty,
             page,
+            size,
+            totalElements,
+            totalPages,
           },
           content
         );
@@ -84,11 +88,16 @@ export const reviewsApiSlice = apiSlice.injectEndpoints({
         };
       },
       transformResponse: (responseData) => {
-        const { content, page } = responseData;
+        const { content, empty, page, size, totalElements, totalPages } =
+          responseData;
         return reviewsAdapter.setAll(
           {
             ...initialState,
+            empty,
             page,
+            size,
+            totalElements,
+            totalPages,
           },
           content
         );

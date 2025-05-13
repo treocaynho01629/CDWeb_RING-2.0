@@ -6,12 +6,11 @@ import { isEqual } from "lodash-es";
 export const booksAdapter = createEntityAdapter({});
 export const booksSelector = booksAdapter.getSelectors();
 export const booksInitialState = booksAdapter.getInitialState({
-  page: {
-    number: 0,
-    size: 0,
-    totalElements: 0,
-    totalPages: 0,
-  },
+  empty: false,
+  page: 0,
+  size: 0,
+  totalElements: 0,
+  totalPages: 0,
 });
 
 export const booksApiSlice = apiSlice.injectEndpoints({
@@ -63,11 +62,16 @@ export const booksApiSlice = apiSlice.injectEndpoints({
         };
       },
       transformResponse: (responseData) => {
-        const { content, page } = responseData;
+        const { content, empty, page, size, totalElements, totalPages } =
+          responseData;
         return booksAdapter.setAll(
           {
             ...booksInitialState,
+            empty,
             page,
+            size,
+            totalElements,
+            totalPages,
           },
           content
         );

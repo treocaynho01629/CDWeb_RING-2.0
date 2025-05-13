@@ -186,9 +186,9 @@ const CateFilter = memo(({ cateId, shopId, onChangeCate }) => {
     if (data && !isLoading && isSuccess) {
       setPagination({
         ...pagination,
-        number: data.page.number,
-        totalPages: data.page.totalPages,
-        totalElements: data.page.totalElements,
+        number: data.page,
+        totalPages: data.totalPages,
+        totalElements: data.totalElements,
       });
     }
   }, [data]);
@@ -388,9 +388,9 @@ const PublisherFilter = memo(({ pubs, cateId, onChangePub }) => {
     if (data && !isLoading && isSuccess) {
       setPagination({
         ...pagination,
-        number: data.page.number,
-        totalPages: data.page.totalPages,
-        totalElements: data.page.totalElements,
+        number: data.page,
+        totalPages: data.totalPages,
+        totalElements: data.totalElements,
       });
     }
   }, [data]);
