@@ -10,8 +10,8 @@
 		<relativePath/>
 	</parent>
 
-	<groupId>com.ring.bookstore</groupId>
-	<artifactId>bookstore</artifactId>
+	<groupId>com.ring</groupId>
+	<artifactId>ring</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Project RING</name>
 	<description>E-Commerce Bookstore Project</description>
