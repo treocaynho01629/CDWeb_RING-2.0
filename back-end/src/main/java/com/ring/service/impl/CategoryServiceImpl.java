@@ -122,7 +122,7 @@ public class CategoryServiceImpl implements CategoryService {
         return previews.stream().map(cateMapper::projectionToPreviewDTO).collect(Collectors.toList());
     }
 
-    @Cacheable(cacheNames = "categoryDetail", key = "#id")
+    @Cacheable(cacheNames = "categoryDetail")
     public CategoryDetailDTO getCategory(Integer id, String slug, String include) {
         CategoryDetailDTO result = null;
 
