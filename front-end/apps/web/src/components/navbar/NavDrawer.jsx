@@ -40,6 +40,7 @@ const DrawerContainer = styled(Box)`
   padding-left: ${({ theme }) => theme.spacing(1.5)};
   padding-right: ${({ theme }) => theme.spacing(1.5)};
   width: auto;
+  height: 100%;
 
   ${({ theme }) => theme.breakpoints.up("xs_sm")} {
     width: 400px;

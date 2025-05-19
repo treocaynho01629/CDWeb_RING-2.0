@@ -456,7 +456,7 @@ const PublisherFilter = memo(({ pubs, cateId, onChangePub }) => {
 
       ids?.forEach((id, index) => {
         const pub = entities[id];
-        const isItemSelected = isSelected(id);
+        const isItemSelected = isSelected(`${id}`);
         if (isItemSelected && !containedSelected)
           containedSelected = isContained(id);
 

@@ -281,19 +281,11 @@ const payments = (
     <PaymentList>
       <Payment>
         <QrCode />
-        QR Code
+        Online Payment
       </Payment>
       <Payment>
         <LocalAtm />
         Tiền mặt
-      </Payment>
-      <Payment>
-        <SystemSecurityUpdateGood />
-        Internet Banking
-      </Payment>
-      <Payment>
-        <CreditCard />
-        Thẻ ATM
       </Payment>
     </PaymentList>
   </>
@@ -308,7 +300,7 @@ const Footer = () => {
   return (
     <Wrapper>
       <Container>
-        <Grid container spacing={1} size="grow">
+        <Grid container spacing={3} size="grow">
           <Grid size={{ xs: 12, lg: "auto" }}>
             <AddressContainer>
               <Logo src="/full-logo.svg" alt="RING! logo" />
@@ -334,8 +326,7 @@ const Footer = () => {
           <Grid
             container
             spacing={0.5}
-            offset={{ xs: 0, lg: "auto" }}
-            size={{ xs: 12, lg: "auto" }}
+            size={{ xs: 12, lg: "grow" }}
             mb={{ xs: 3, sm: 6 }}
           >
             <Grid size={{ xs: 12, sm: 3 }}>

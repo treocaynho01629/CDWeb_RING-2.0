@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import styled from "@emotion/styled";
+import { useEffect } from "react";
 
 const StyledInput = styled(TextField)`
   width: 60px;
@@ -27,13 +28,21 @@ const StyledInput = styled(TextField)`
 `;
 
 const JumpPagination = ({ pagination, onPageChange, open, handleClose }) => {
-  const [page, setPage] = useState(pagination?.number ?? 1);
+  const [page, setPage] = useState(pagination?.number + 1 ?? 1);
+
+  useEffect(() => {
+    setPage(pagination?.number + 1 ?? 1);
+  }, [pagination]);
 
   const handleChange = (value) => {
     let newValue = value;
-    if (newValue < 1) newValue = 1;
     if (newValue > pagination?.totalPages) newValue = pagination?.totalPages;
     setPage(newValue);
+  };
+
+  const handleBlur = () => {
+    if (page < 1) setPage(1);
+    if (page > pagination?.totalPages) setPage(pagination?.totalPages);
   };
 
   const handleConfirm = () => {
@@ -50,7 +59,7 @@ const JumpPagination = ({ pagination, onPageChange, open, handleClose }) => {
     >
       <DialogTitle id="pagination-dialog-title">Đi đến trang?</DialogTitle>
       <DialogContent>
-        <Box display="flex" justifyContent="center">
+        <Box display="flex" justifyContent="center" minWidth={220}>
           <StyledInput
             required
             id="page"
@@ -58,6 +67,7 @@ const JumpPagination = ({ pagination, onPageChange, open, handleClose }) => {
             type="number"
             value={page}
             onChange={(e) => handleChange(e.target.value)}
+            onBlur={handleBlur}
             slotProps={{
               input: {
                 min: 1,
@@ -80,7 +90,7 @@ const JumpPagination = ({ pagination, onPageChange, open, handleClose }) => {
           variant="outlined"
           color="error"
           size="large"
-          autoFocus
+          fullWidth
           sx={{ mb: 1 }}
           onClick={handleClose}
           startIcon={<Close />}
@@ -90,7 +100,7 @@ const JumpPagination = ({ pagination, onPageChange, open, handleClose }) => {
         <Button
           variant="contained"
           size="large"
-          autoFocus
+          fullWidth
           sx={{ mb: 1 }}
           onClick={handleConfirm}
           startIcon={<Check />}
