@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { currencyFormat } from "@ring/shared";
+import { currencyFormat, getImageSize } from "@ring/shared";
 import useCart from "../../../hooks/useCart";
 import AmountInput from "../../custom/AmountInput";
 import useOffset from "../../../hooks/useOffset";
@@ -110,6 +110,7 @@ const Discount = styled(Price)`
 `;
 //#endregion
 
+const ImageSize = getImageSize();
 const MIN_VALUE = 1;
 const MAX_VALUE = 199;
 
@@ -212,7 +213,7 @@ const ProductAction = ({ book }) => {
           >
             <ProductDetailContainer>
               <StyledImage
-                src={book?.image}
+                src={book?.image?.srcSet[ImageSize?.MEDIUM?.value]}
                 alt={`${book?.title} preview image`}
                 sizes="250px"
               />
@@ -238,6 +239,7 @@ const ProductAction = ({ book }) => {
               alignItems="center"
               justifyContent={"space-between"}
               padding={"0 10px"}
+              mb={1}
             >
               <DetailTitle>Số lượng:</DetailTitle>
               <AmountInput
