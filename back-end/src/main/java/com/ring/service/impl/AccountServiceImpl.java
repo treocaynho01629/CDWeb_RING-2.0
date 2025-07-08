@@ -114,7 +114,7 @@ public class AccountServiceImpl implements AccountService {
                         throw new ResourceNotFoundException("Roles not found!",
                                         "Không tìm thấy các chức vụ yêu cầu!");
 
-                // Create account
+                // Create an account
                 var acc = Account.builder()
                                 .username(request.getUsername())
                                 .pass(passwordEncoder.encode(request.getPass()))
@@ -154,7 +154,7 @@ public class AccountServiceImpl implements AccountService {
                                 .orElseThrow(() -> new ResourceNotFoundException("User not found!",
                                                 "Không tìm thấy người dùng yêu cầu!"));
 
-                // Check if Account with these username and email has exists >> throw exception
+                // Check if Account with these username and email has existed >> throw exception
                 if (!request.getUsername().equals(changeUser.getUsername())
                                 && !request.getEmail().equals(changeUser.getEmail())
                                 && accountRepo.existsByUsernameOrEmail(request.getUsername(), request.getEmail())) {

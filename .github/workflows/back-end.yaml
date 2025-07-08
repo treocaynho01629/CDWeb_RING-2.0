@@ -1,0 +1,93 @@
+name: Project RING! - Spring Boot CI/CD flow
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "back-end/**"
+      - ".github/workflows/main.yaml"
+      - "docker-compose.yml"
+      - "docker/**"
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup jdk 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Run tests
+        run: |
+          cd back-end
+          mvn -B test
+
+  build:
+    name: Build and Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup jdk 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Build with Maven
+        run: |
+          cd back-end
+          mvn -B clean package -DskipTests
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ring-app
+          path: back-end/target/*.jar
+
+  build-image:
+    name: Build and push Docker image
+    needs: [test, build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ring-app
+          path: back-end/target/
+
+      - name: Publish to Docker Hub
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: treocaynho01629/ringbookstore-api
+          tags: latest
+          registry: docker.io
+          dockerfile: docker/back-end/Dockerfile
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+  deploy:
+    name: Deploy Render
+    needs: [build-image]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to render
+        run: curl ${{ secrets.RENDER_HOOK }}

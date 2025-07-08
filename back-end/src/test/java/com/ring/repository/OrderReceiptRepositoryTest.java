@@ -127,6 +127,7 @@ class OrderReceiptRepositoryTest extends AbstractRepositoryTest {
                                 .totalPrice(90000.0)
                                 .discount(10000.0)
                                 .build();
+                detail.setCreatedDate(LocalDateTime.now().minusMonths(1));
                 OrderDetail detail2 = OrderDetail.builder()
                                 .order(receipt2)
                                 .status(OrderStatus.COMPLETED)
@@ -134,6 +135,7 @@ class OrderReceiptRepositoryTest extends AbstractRepositoryTest {
                                 .totalPrice(30000.0)
                                 .discount(0.0)
                                 .build();
+                detail2.setCreatedDate(LocalDateTime.now().minusMonths(1));
                 OrderDetail detail3 = OrderDetail.builder()
                                 .order(receipt3)
                                 .status(OrderStatus.COMPLETED)
@@ -141,6 +143,7 @@ class OrderReceiptRepositoryTest extends AbstractRepositoryTest {
                                 .totalPrice(240000.0)
                                 .discount(20000.0)
                                 .build();
+                detail3.setCreatedDate(LocalDateTime.now());
                 List<OrderDetail> details = new ArrayList<>(List.of(detail, detail2, detail3));
                 detailRepo.saveAll(details);
 

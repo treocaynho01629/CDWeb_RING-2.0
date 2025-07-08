@@ -838,7 +838,6 @@ public class OrderServiceTest extends AbstractServiceTest {
         public void whenConfirmInvalidPaymentStatus_ThenThrowsException() {
 
                 // Given
-                setupSecurityContext(account);
                 orderDetail.setStatus(OrderStatus.SHIPPING);
                 paymentInfo.setStatus(PaymentStatus.PENDING);
 

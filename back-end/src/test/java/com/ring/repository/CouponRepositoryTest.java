@@ -124,6 +124,7 @@ class CouponRepositoryTest extends AbstractRepositoryTest {
                 .order(receipt)
                 .status(OrderStatus.PENDING)
                 .build();
+        orderDetail.setCreatedDate(LocalDateTime.now());
         orderDetailRepo.save(orderDetail);
 
         entityManager.flush();

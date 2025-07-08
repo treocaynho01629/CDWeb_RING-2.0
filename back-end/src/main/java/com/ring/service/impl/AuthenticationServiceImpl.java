@@ -34,7 +34,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 * @return The authed user entity.
 	 */
 	public Account authenticate(AuthenticationRequest authRequest, HttpServletRequest request) {
-		//Recaptcha (only after x amount of failed attempts)
+		//Recaptcha (only after x number of failed attempts)
 		if (loginProtectionService.isSuspicious()) {
 			final String recaptchaToken = request.getHeader("response");
 			final String source = request.getHeader("source");

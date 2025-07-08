@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * {@link OnCheckoutCompletedEvent} is an event that is triggered when a user successfully completes a checkout.
+ * {@link OnCheckoutCompletedEvent} is an event triggered when a user successfully completes a checkout.
  */
 @Getter
 public class OnCheckoutCompletedEvent extends ApplicationEvent {

@@ -168,6 +168,7 @@ class ShopRepositoryTest extends AbstractRepositoryTest {
                 .status(OrderStatus.PENDING)
                 .shop(shop)
                 .build();
+        detail.setCreatedDate(LocalDateTime.now());
         orderDetailRepo.save(detail);
 
         Coupon coupon = Coupon.builder()

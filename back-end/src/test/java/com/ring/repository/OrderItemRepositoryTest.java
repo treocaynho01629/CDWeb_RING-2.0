@@ -100,11 +100,13 @@ class OrderItemRepositoryTest extends AbstractRepositoryTest {
                                 .status(OrderStatus.PENDING)
                                 .shop(shop)
                                 .build();
+                detail.setCreatedDate(LocalDateTime.now());
                 OrderDetail detail2 = OrderDetail.builder()
                                 .order(receipt)
                                 .status(OrderStatus.COMPLETED)
                                 .shop(shop)
                                 .build();
+                detail2.setCreatedDate(LocalDateTime.now());
                 List<OrderDetail> details = new ArrayList<>(List.of(detail, detail2));
                 detailRepo.saveAll(details);
 

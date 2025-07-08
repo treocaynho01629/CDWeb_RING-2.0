@@ -2,13 +2,18 @@ package com.ring.repository;
 
 import com.ring.base.AbstractRepositoryTest;
 import com.ring.dto.projection.orders.IOrder;
+import com.ring.dto.projection.orders.IOrderDetail;
 import com.ring.model.entity.*;
 import com.ring.model.enums.OrderStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -120,6 +125,9 @@ class OrderDetailRepositoryTest extends AbstractRepositoryTest {
                                 .status(OrderStatus.COMPLETED)
                                 .shop(shop)
                                 .build();
+                detail.setCreatedDate(LocalDateTime.now());
+                detail2.setCreatedDate(LocalDateTime.now());
+                detail3.setCreatedDate(LocalDateTime.now());
                 List<OrderDetail> details = new ArrayList<>(List.of(detail, detail2, detail3));
                 detailRepo.saveAll(details);
 
@@ -210,7 +218,7 @@ class OrderDetailRepositoryTest extends AbstractRepositoryTest {
         }
 
         @Test
-        public void whenFindDetailById_ThenReturnOrderDetail() {
+        public void whenFindDetailById_ThenReturnDetail() {
 
                 // When
                 OrderDetail foundDetail = detailRepo.findDetailById(detail.getId()).orElse(null);
@@ -220,33 +228,54 @@ class OrderDetailRepositoryTest extends AbstractRepositoryTest {
                 assertEquals(detail.getId(), foundDetail.getId());
         }
 
-        // @Test
-        // public void whenFindAllIdsByUserId_ThenReturnIds() {
-        //
-        // // When
-        // Pageable pageable = PageRequest.of(0, 10);
-        // Page<Long> foundIds = detailRepo.findAllIdsByUserId(
-        // account.getId(),
-        // OrderStatus.COMPLETED,
-        // "",
-        // pageable);
-        //
-        // // Then
-        // assertNotNull(foundIds);
-        // assertEquals(2, foundIds.getTotalElements());
-        // }
-        //
-        // @Test
-        // public void whenFindAllIdsByBookId_ThenReturnIds() {
-        //
-        // // When
-        // Pageable pageable = PageRequest.of(0, 10);
-        // Page<Long> foundIds = detailRepo.findAllIdsByBookId(book.getId(), pageable);
-        //
-        // // Then
-        // assertNotNull(foundIds);
-        // assertEquals(2, foundIds.getTotalElements());
-        // }
+        @Test
+        public void whenFindOrderDetailById_ThenReturnOrderDetail() {
+
+                // When
+                IOrderDetail foundDetail = detailRepo.findOrderDetail(detail.getId(), null).orElse(null);
+
+                // Then
+                assertNotNull(foundDetail);
+                assertEquals(detail.getId(), foundDetail.getId());
+        }
+
+        @Test
+        public void whenFindAllByUserId_ThenReturnPagedResult() {
+
+                // When
+                Pageable pageable = PageRequest.of(0, 10);
+                Page<IOrder> foundOrders = detailRepo.findAllByUserId(account.getId(),
+                                OrderStatus.COMPLETED,
+                                "",
+                                pageable);
+
+                // Then
+                assertNotNull(foundOrders);
+                assertEquals(2, foundOrders.getTotalElements());
+        }
+
+        @Test
+        public void whenFindAllByBookId_ThenReturnPagedResult() {
+
+                // When
+                Pageable pageable = PageRequest.of(0, 10);
+                Page<IOrder> foundOrders = detailRepo.findAllByBookId(book.getId(), pageable);
+
+                // Then
+                assertNotNull(foundOrders);
+                assertEquals(2, foundOrders.getTotalElements());
+        }
+
+        @Test
+        public void whenFindAllByReceiptId_ThenReturnOrders() {
+
+                // When
+                List<IOrder> foundOrders = detailRepo.findAllByReceiptId(receipt.getId());
+
+                // Then
+                assertNotNull(foundOrders);
+                assertEquals(2, foundOrders.size());
+        }
 
         @Test
         public void whenFindAllByReceiptIds_ThenReturnOrderDetails() {

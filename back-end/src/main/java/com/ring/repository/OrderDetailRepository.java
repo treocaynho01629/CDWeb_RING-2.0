@@ -123,8 +123,8 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
                 from OrderDetail od
                 join od.items oi
                 join od.order o
-                join o.payment p
-                join o.address a
+                left join o.payment p
+                left join o.address a
                 left join od.shop s
                 left join oi.book b
                 left join b.image i

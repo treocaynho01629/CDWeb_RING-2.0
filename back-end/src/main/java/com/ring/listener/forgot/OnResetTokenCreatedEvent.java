@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * {@link OnResetTokenCreatedEvent} is an event that is triggered when a user request a reset token.
+ * {@link OnResetTokenCreatedEvent} is an event triggered when a user requests a reset token.
  */
 @Getter
 public class OnResetTokenCreatedEvent extends ApplicationEvent {
