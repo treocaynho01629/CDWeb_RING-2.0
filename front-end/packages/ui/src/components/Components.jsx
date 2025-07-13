@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 export const Instruction = styled.p`
   font-size: 14px;
   font-style: italic;
-  color: ${({ theme }) => theme.palette.error.main};
+  color: ${({ theme }) => theme.vars.palette.error.main};
   display: ${({ display }) => display};
 `;
 
@@ -17,15 +17,15 @@ export const LogoTitle = styled.span`
   font-size: 27px;
   text-transform: uppercase;
   font-weight: 500;
-  color: ${({ theme }) => theme.palette.primary.main};
-  text-shadow: 1.5px 1.5px ${({ theme }) => theme.palette.background.paper};
+  color: ${({ theme }) => theme.vars.palette.primary.main};
+  text-shadow: 1.5px 1.5px ${({ theme }) => theme.vars.palette.background.paper};
   margin-left: 10px;
   white-space: nowrap;
   transition: width 0.25s ease;
 `;
 
 export const LogoSubtitle = styled(LogoTitle)`
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   margin-left: 0;
 `;
 
@@ -44,7 +44,9 @@ export const MobileExtendButton = styled.div`
   font-size: 14px;
   cursor: pointer;
   color: ${({ theme, disabled }) =>
-    disabled ? theme.palette.text.disabled : theme.palette.text.secondary};
+    disabled
+      ? theme.vars.palette.text.disabled
+      : theme.vars.palette.text.secondary};
   pointer-events: ${({ theme, disabled }) => (disabled ? "none" : "all")};
   overflow: hidden;
   z-index: 1;
@@ -58,8 +60,8 @@ export const MobileExtendButton = styled.div`
     height: 104%;
     background-image: linear-gradient(
       to left,
-      ${({ theme }) => theme.palette.background.paper},
-      ${({ theme }) => theme.palette.background.paper} 5%,
+      ${({ theme }) => theme.vars.palette.background.paper},
+      ${({ theme }) => theme.vars.palette.background.paper} 5%,
       transparent 15%,
       transparent 100%
     );
@@ -81,17 +83,18 @@ export const Title = styled.h3`
   margin: 0 0 20px;
   padding: 15px 0;
   border-bottom: 0.5px solid
-    ${({ theme, color }) => theme.palette[color]?.main || theme.palette.divider};
+    ${({ theme, color }) =>
+      theme.vars.palette[color]?.main || theme.vars.palette.divider};
   color: ${({ theme, color }) =>
-    theme.palette[color]?.main || theme.palette.text.primary};
+    theme.vars.palette[color]?.main || theme.vars.palette.text.primary};
   border-color: ${({ theme, color }) =>
-    theme.palette[color]?.main || theme.palette.primary.main};
+    theme.vars.palette[color]?.main || theme.vars.palette.primary.main};
   width: 100%;
 
   a {
     display: none;
     align-items: center;
-    color: ${({ theme }) => theme.palette.text.primary};
+    color: ${({ theme }) => theme.vars.palette.text.primary};
   }
 
   ${({ theme }) => theme.breakpoints.down("md")} {
@@ -114,7 +117,7 @@ export const Showmore = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.palette.info.main};
+  color: ${({ theme }) => theme.vars.palette.info.main};
   cursor: pointer;
 
   &::after {
@@ -126,12 +129,12 @@ export const Showmore = styled.div`
     height: 100%;
     width: 100%;
     pointer-events: none;
-    border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
+    border-bottom: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
     background-image: linear-gradient(
       180deg,
       transparent,
       transparent 60%,
-      ${({ theme }) => theme.palette.background.paper} 100%
+      ${({ theme }) => theme.vars.palette.background.paper} 100%
     );
   }
 
@@ -157,5 +160,5 @@ export const Message = styled.span`
   text-align: center;
   white-space: wrap;
   color: ${({ theme, color }) =>
-    theme.palette[color]?.main || theme.palette.text.primary};
+    theme.vars.palette[color]?.main || theme.vars.palette.text.primary};
 `;

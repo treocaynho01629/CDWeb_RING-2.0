@@ -28,14 +28,14 @@ const NotificationContent = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 0.5px solid ${({ theme }) => theme.palette.primary.main};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.primary.main};
   padding: ${({ theme }) => theme.spacing(1)};
   animation: ${expand} 0.5s ease;
   overflow: hidden;
 
   svg {
     font-size: 80px;
-    color: ${({ theme }) => theme.palette.primary.main};
+    color: ${({ theme }) => theme.vars.palette.primary.main};
   }
 
   b {
@@ -45,7 +45,7 @@ const NotificationContent = styled.div`
   p {
     margin: 0;
     margin-bottom: ${({ theme }) => theme.spacing(1)};
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
     font-size: 14px;
   }
 `;

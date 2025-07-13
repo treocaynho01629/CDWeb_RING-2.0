@@ -1,4 +1,4 @@
-import { createTheme } from "@mui/material";
+import { createTheme } from "@mui/material/styles";
 import { outlinedInputClasses } from "@mui/material/OutlinedInput";
 import darkScrollbar from "@mui/material/darkScrollbar";
 
@@ -71,11 +71,11 @@ export const theme = createTheme({
       styleOverrides: (theme) => ({
         html: {
           ...darkScrollbar(
-            theme.palette.mode === "light"
+            theme.vars.palette.mode === "light"
               ? {
-                  track: theme.palette.background.paper,
-                  thumb: theme.palette.action.disabled,
-                  active: theme.palette.text.primary,
+                  track: theme.vars.palette.background.paper,
+                  thumb: theme.vars.palette.action.disabled,
+                  active: theme.vars.palette.text.primary,
                 }
               : undefined
           ),
@@ -92,12 +92,12 @@ export const theme = createTheme({
 
           "&.MuiButton-contained": {
             "&:hover": {
-              backgroundColor: theme.palette.grey[300],
+              backgroundColor: theme.vars.palette.grey[300],
             },
 
             "&:disabled": {
-              backgroundColor: theme.palette.grey[500],
-              color: theme.palette.text.disabled,
+              backgroundColor: theme.vars.palette.grey[500],
+              color: theme.vars.palette.text.disabled,
             },
           },
         }),
@@ -118,11 +118,12 @@ export const theme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: ({ theme }) => ({
-          "--TextField-brandBorderColor": theme.palette.divider,
-          "--TextField-brandBorderHoverColor": theme.palette.action.hover,
-          "--TextField-brandBorderFocusedColor": theme.palette.primary.main,
+          "--TextField-brandBorderColor": theme.vars.palette.divider,
+          "--TextField-brandBorderHoverColor": theme.vars.palette.action.hover,
+          "--TextField-brandBorderFocusedColor":
+            theme.vars.palette.primary.main,
           "& label.Mui-focused": {
-            color: theme.palette.primary.dark,
+            color: theme.vars.palette.primary.dark,
           },
           "& .MuiFormHelperText-root": {
             whiteSpace: "nowrap",
@@ -165,7 +166,7 @@ export const theme = createTheme({
               transitionDelay: "9999s",
               transitionProperty: "all",
               WebkitBoxShadow: "0 0 0 100px #0000000 inset",
-              WebkitTextFillColor: theme.palette.info.main,
+              WebkitTextFillColor: theme.vars.palette.info.main,
             },
           },
         }),

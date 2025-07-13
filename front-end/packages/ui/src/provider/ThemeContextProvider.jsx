@@ -1,8 +1,8 @@
 import {
   ThemeProvider as MUIThemeProvider,
   StyledEngineProvider,
-  CssBaseline,
-} from "@mui/material";
+} from "@mui/material/styles";
+import { CssBaseline } from "@mui/material";
 import { theme } from "@ring/shared";
 
 export default function ThemeContextProvider({ children }) {

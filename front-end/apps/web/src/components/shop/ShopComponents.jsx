@@ -2,8 +2,8 @@ import styled from "@emotion/styled";
 
 export const ShopContainer = styled.div`
   padding: 20px;
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
   display: flex;
   flex-wrap: wrap;
 
@@ -15,7 +15,7 @@ export const ShopContainer = styled.div`
 export const ShopInfo = styled.div`
   display: flex;
   align-items: center;
-  border-right: 0.5px solid ${({ theme }) => theme.palette.divider};
+  border-right: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   padding-right: 15px;
 
   ${({ theme }) => theme.breakpoints.down("md")} {
@@ -37,7 +37,7 @@ export const Verified = styled.p`
   font-size: 13px;
   margin: 0;
   display: flex;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 `;
 
 export const ShopDetail = styled.span`
@@ -50,12 +50,12 @@ export const ShopDetail = styled.span`
   svg {
     font-size: 15px;
     margin-right: 3px;
-    color: ${({ theme }) => theme.palette.warning.main};
+    color: ${({ theme }) => theme.vars.palette.warning.main};
   }
 
   b {
     margin-left: 10px;
-    color: ${({ theme }) => theme.palette.warning.main};
+    color: ${({ theme }) => theme.vars.palette.warning.main};
   }
 
   ${({ theme }) => theme.breakpoints.down("md")} {

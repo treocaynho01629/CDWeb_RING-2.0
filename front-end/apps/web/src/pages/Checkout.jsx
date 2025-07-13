@@ -26,7 +26,7 @@ import {
   StepContent,
   Typography,
   Box,
-  Grid2 as Grid,
+  Grid,
 } from "@mui/material";
 import { Navigate, NavLink, useLocation, useNavigate } from "react-router";
 import { useGetMyAddressQuery } from "../features/addresses/addressesApiSlice";
@@ -114,18 +114,18 @@ const StyledStepper = styled(Stepper)(({ theme }) => ({
     },
   },
   "& .MuiStepLabel-root .Mui-completed": {
-    color: theme.palette.success.main,
+    color: theme.vars.palette.success.main,
   },
   "& .MuiStepLabel-root .Mui-active": {
-    color: theme.palette.primary.main,
+    color: theme.vars.palette.primary.main,
     textDecoration: "underline",
   },
   "& .MuiStepLabel-root .Mui-error": {
-    color: theme.palette.error.main,
+    color: theme.vars.palette.error.main,
     textDecoration: "underline",
   },
   "& .MuiStepLabel-root .Mui-active .MuiStepIcon-text": {
-    fill: theme.palette.text.main,
+    fill: theme.vars.palette.text.main,
     fontWeight: "bold",
   },
 }));

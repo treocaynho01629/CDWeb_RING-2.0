@@ -36,17 +36,17 @@ const RateSelect = styled.div`
 
 const SuggestText = styled.b`
   font-size: 16px;
-  color: ${({ theme }) => theme.palette.text.primary};
+  color: ${({ theme }) => theme.vars.palette.text.primary};
 
   &.error {
-    color: ${({ theme }) => theme.palette.error.main};
+    color: ${({ theme }) => theme.vars.palette.error.main};
   }
 
   &.label {
     font-size: 18px;
     font-weight: 400;
     margin: 5px 0;
-    color: ${({ theme }) => theme.palette.warning.main};
+    color: ${({ theme }) => theme.vars.palette.warning.main};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {

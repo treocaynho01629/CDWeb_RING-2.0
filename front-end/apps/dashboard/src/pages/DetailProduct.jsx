@@ -5,8 +5,8 @@ import {
   Card,
   IconButton,
   Typography,
-  Grid2 as Grid,
   Stack,
+  Grid,
 } from "@mui/material";
 import { NavLink, useParams } from "react-router";
 import { useGetBookQuery } from "../features/books/booksApiSlice";

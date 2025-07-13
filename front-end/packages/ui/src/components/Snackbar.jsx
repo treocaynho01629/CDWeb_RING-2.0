@@ -15,7 +15,10 @@ const Snackbar = forwardRef(({ id, ...props }, ref) => {
         onClose={handleCloseSnackbar}
         severity={props.variant ?? "success"}
         variant="filled"
-        sx={{ width: "100%", color: "white" }}
+        sx={{
+          width: "100%",
+          color: "white",
+        }}
       >
         {props.message}
       </Alert>

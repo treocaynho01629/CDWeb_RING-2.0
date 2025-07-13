@@ -28,7 +28,7 @@ const Wrapper = styled.div`
 const StyledEmptyIcon = styled(EmptyIcon)`
   height: 250px;
   width: 250px;
-  fill: ${({ theme }) => theme.palette.text.icon};
+  fill: ${({ theme }) => theme.vars.palette.text.icon};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     width: 200px;

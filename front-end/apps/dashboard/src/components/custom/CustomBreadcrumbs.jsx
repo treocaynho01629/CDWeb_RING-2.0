@@ -8,7 +8,7 @@ const BreadcrumbsContainer = styled.div`
   a.active {
     font-weight: 450;
     text-decoration: underline;
-    color: ${({ theme }) => theme.palette.primary.dark};
+    color: ${({ theme }) => theme.vars.palette.primary.dark};
     pointer-events: none;
   }
 

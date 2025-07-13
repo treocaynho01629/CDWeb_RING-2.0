@@ -6,7 +6,7 @@ const InputContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   height: 30px;
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -37,11 +37,13 @@ const StyledButton = styled.span`
   justify-content: center;
   padding: 0 5px;
   color: ${({ theme, disabled }) =>
-    disabled ? theme.palette.text.disabled : theme.palette.text.secondary};
+    disabled
+      ? theme.vars.palette.text.disabled
+      : theme.vars.palette.text.secondary};
   pointer-events: ${({ disabled }) => (disabled ? "none" : "all")};
 
   &:hover {
-    color: ${({ theme }) => theme.palette.text.primary};
+    color: ${({ theme }) => theme.vars.palette.text.primary};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {

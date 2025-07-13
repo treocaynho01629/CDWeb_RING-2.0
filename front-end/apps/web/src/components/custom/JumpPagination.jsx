@@ -28,10 +28,10 @@ const StyledInput = styled(TextField)`
 `;
 
 const JumpPagination = ({ pagination, onPageChange, open, handleClose }) => {
-  const [page, setPage] = useState(pagination?.number + 1 ?? 1);
+  const [page, setPage] = useState(pagination?.number + 1);
 
   useEffect(() => {
-    setPage(pagination?.number + 1 ?? 1);
+    setPage(pagination?.number + 1);
   }, [pagination]);
 
   const handleChange = (value) => {

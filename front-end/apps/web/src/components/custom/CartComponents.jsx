@@ -12,17 +12,17 @@ export const CheckoutContainer = styled.div`
     max-height: 100px;
     width: 100%;
     z-index: ${({ theme }) => theme.zIndex.appBar};
-    border-top: 0.5px solid ${({ theme }) => theme.palette.divider};
+    border-top: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
     box-shadow: ${({ theme }) => theme.shadows[12]};
-    background-color: ${({ theme }) => theme.palette.background.paper};
+    background-color: ${({ theme }) => theme.vars.palette.background.paper};
   }
 `;
 
 export const CheckoutBox = styled.div`
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
   padding: 20px 16px;
   margin-bottom: ${({ theme }) => theme.spacing(2)};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
 
   &.sticky {
     margin-bottom: -0.5px;
@@ -45,7 +45,7 @@ export const CheckoutStack = styled.div`
   justify-content: space-between;
 
   &:first-of-type {
-    border-bottom: 0.5px dashed ${({ theme }) => theme.palette.divider};
+    border-bottom: 0.5px dashed ${({ theme }) => theme.vars.palette.divider};
     margin-bottom: ${({ theme }) => theme.spacing(1)};
     padding-bottom: ${({ theme }) => theme.spacing(1)};
   }
@@ -84,7 +84,7 @@ export const CheckoutTitle = styled.span`
 
   span {
     font-size: 12px;
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
     font-style: italic;
   }
 `;
@@ -101,7 +101,7 @@ export const CheckoutText = styled.span`
   font-weight: 400;
   white-space: nowrap;
   color: ${({ theme, color }) =>
-    theme.palette[color]?.main || theme.palette.text.primary};
+    theme.vars.palette[color]?.main || theme.vars.palette.text.primary};
 `;
 
 export const PriceContainer = styled.div`
@@ -128,12 +128,12 @@ export const CheckoutPrice = styled.span`
   font-weight: bold;
   display: flex;
   justify-content: space-between;
-  color: ${({ theme }) => theme.palette.error.main};
+  color: ${({ theme }) => theme.vars.palette.error.main};
   cursor: pointer;
 
   b {
     font-size: 14px;
-    color: ${({ theme }) => theme.palette.text.primary};
+    color: ${({ theme }) => theme.vars.palette.text.primary};
   }
 
   ${({ theme }) => theme.breakpoints.down("md_lg")} {
@@ -146,20 +146,20 @@ export const SavePrice = styled.span`
   font-weight: 450;
   width: 100%;
   text-align: right;
-  color: ${({ theme }) => theme.palette.success.dark};
+  color: ${({ theme }) => theme.vars.palette.success.dark};
 `;
 
 export const SubText = styled.span`
   font-size: 12px;
   width: 100%;
   text-align: right;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 `;
 
 export const DetailContainer = styled.div`
   padding: 10px 0;
   margin-bottom: 10px;
-  border-bottom: 0.5px dashed ${({ theme }) => theme.palette.divider};
+  border-bottom: 0.5px dashed ${({ theme }) => theme.vars.palette.divider};
 `;
 
 export const CouponButton = styled.b`

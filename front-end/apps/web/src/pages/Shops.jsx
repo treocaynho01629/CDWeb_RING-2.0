@@ -15,7 +15,7 @@ import {
   useSearchParams,
 } from "react-router";
 import { Close, TipsAndUpdatesOutlined } from "@mui/icons-material";
-import { Box, Grid2 as Grid, useMediaQuery } from "@mui/material";
+import { Box, useMediaQuery, Grid } from "@mui/material";
 import {
   useFollowShopMutation,
   useGetDisplayShopsQuery,
@@ -62,7 +62,7 @@ const ClearButton = styled.div`
   height: 24px;
 
   &:hover {
-    color: ${({ theme }) => theme.palette.error.main};
+    color: ${({ theme }) => theme.vars.palette.error.main};
   }
 `;
 
@@ -78,7 +78,7 @@ const Keyword = styled.div`
     align-items: center;
 
     b {
-      color: ${({ theme }) => theme.palette.warning.main};
+      color: ${({ theme }) => theme.vars.palette.warning.main};
     }
   }
 `;

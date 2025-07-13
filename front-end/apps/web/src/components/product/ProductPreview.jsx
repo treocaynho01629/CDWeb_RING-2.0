@@ -16,11 +16,11 @@ const Container = styled.div`
   align-items: center;
   position: relative;
   overflow: hidden;
-  border: 0.5px solid ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.background.paper};
   margin: ${({ theme }) => theme.spacing(0.1)} 0;
 
   &:hover {
-    border-color: ${({ theme }) => theme.palette.action.focus};
+    border-color: ${({ theme }) => theme.vars.palette.action.focus};
     box-shadow: ${({ theme }) => theme.shadows[1]};
   }
 
@@ -71,7 +71,7 @@ const Title = styled("h5")`
 const Price = styled.span`
   font-size: 16px;
   font-weight: 400;
-  color: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.main};
   display: flex;
   align-items: center;
 
@@ -84,8 +84,8 @@ const Percentage = styled.span`
   padding: 1px 5px;
   margin-left: 10px;
   font-size: 14px;
-  color: ${({ theme }) => theme.palette.text.primary};
-  background-color: ${({ theme }) => theme.palette.action.focus};
+  color: ${({ theme }) => theme.vars.palette.text.primary};
+  background-color: ${({ theme }) => theme.vars.palette.action.focus};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     margin-left: 5px;

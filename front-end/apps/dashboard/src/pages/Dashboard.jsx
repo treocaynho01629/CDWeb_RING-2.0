@@ -6,7 +6,7 @@ import {
   Storefront,
   LocalFireDepartment,
 } from "@mui/icons-material";
-import { Grid2 as Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import { useTitle } from "@ring/shared";
 import { useAuth } from "@ring/auth";
 import {

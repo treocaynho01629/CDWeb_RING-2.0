@@ -21,8 +21,8 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   position: relative;
-  border: 0.5px solid ${({ theme }) => theme.palette.action.hover};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.hover};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
   padding: ${({ theme }) => theme.spacing(1)};
 `;
 
@@ -48,7 +48,7 @@ const Verified = styled.p`
   font-size: 14px;
   margin: 0;
   display: flex;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 `;
 
 const DateText = styled.span`
@@ -77,7 +77,7 @@ const DetailsContainer = styled.div`
   width: 100%;
   padding-top: ${({ theme }) => theme.spacing(1)};
   margin-top: ${({ theme }) => theme.spacing(1)};
-  border-top: 0.5px dashed ${({ theme }) => theme.palette.divider};
+  border-top: 0.5px dashed ${({ theme }) => theme.vars.palette.divider};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     border: none;
@@ -104,7 +104,7 @@ const ShopDetail = styled.span`
 const Stats = styled.span`
   display: flex;
   align-items: flex-start;
-  color: ${({ theme }) => theme.palette.warning.main};
+  color: ${({ theme }) => theme.vars.palette.warning.main};
 
   svg {
     font-size: 18px;

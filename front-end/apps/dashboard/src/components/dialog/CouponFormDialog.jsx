@@ -5,10 +5,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid2 as Grid,
   MenuItem,
   useMediaQuery,
   Button,
+  Grid,
 } from "@mui/material";
 import { Check, Close as CloseIcon, Loyalty } from "@mui/icons-material";
 import { getCouponType } from "@ring/shared";

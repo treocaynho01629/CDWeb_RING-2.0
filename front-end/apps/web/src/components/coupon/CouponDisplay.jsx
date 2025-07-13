@@ -8,8 +8,8 @@ const CouponContainer = styled.div`
   border-radius: 5px;
   height: 100%;
   width: 100%;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   box-shadow: ${({ theme }) => theme.shadows[1]};
   display: flex;
   align-items: center;
@@ -19,8 +19,8 @@ const CouponContainer = styled.div`
   &::after {
     content: "";
     position: absolute;
-    background-color: ${({ theme }) => theme.palette.background.paper};
-    border: 0.5px solid ${({ theme }) => theme.palette.divider};
+    background-color: ${({ theme }) => theme.vars.palette.background.paper};
+    border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
     background-image: ${({ theme }) => theme.shadows[3]};
     border-left: none;
     border-bottom: none;
@@ -66,10 +66,11 @@ const CouponIcon = styled.div`
   height: 50px;
   aspect-ratio: 1/1;
   background-color: ${({ theme, color }) =>
-    theme.palette[color]?.light || theme.palette.primary.light};
+    theme.vars.palette[color]?.light || theme.vars.palette.primary.light};
   color: ${({ theme, color }) =>
-    theme.palette[color]?.contrastText || theme.palette.primary.contrastText};
-  border-right: 5px dotted ${({ theme }) => theme.palette.background.paper};
+    theme.vars.palette[color]?.contrastText ||
+    theme.vars.palette.primary.contrastText};
+  border-right: 5px dotted ${({ theme }) => theme.vars.palette.background.paper};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -102,9 +103,9 @@ const CouponIcon = styled.div`
     margin: 0;
     border-right: none;
     border-radius: 6px;
-    border: 0.5px solid ${({ theme }) => theme.palette.divider};
+    border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
     color: ${({ theme, color }) =>
-      theme.palette[color]?.dark || theme.palette.primary.dark};
+      theme.vars.palette[color]?.dark || theme.vars.palette.primary.dark};
 
     svg {
       font-size: 15px;
@@ -140,7 +141,7 @@ const CouponDesc = styled.b`
     border-radius: 6px;
     padding: 0 10px;
     height: 22px;
-    border: 0.5px solid ${({ theme }) => theme.palette.divider};
+    border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
     border-left: none;
   }
 `;

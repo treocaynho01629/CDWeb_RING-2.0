@@ -54,7 +54,7 @@ const ItemContainer = styled.div`
 
   &:hover {
     transform: translateY(-1px);
-    border-color: ${({ theme }) => theme.palette.action.focus};
+    border-color: ${({ theme }) => theme.vars.palette.action.focus};
     box-shadow: ${({ theme }) => theme.shadows[1]};
     ${StyledLazyImage} {
       filter: saturate(120%);
@@ -80,7 +80,7 @@ const CateContainer = styled.div`
   display: flex;
   justify-content: space-between;
   overflow: hidden;
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
 
   &:hover {
     .button-container {
@@ -137,8 +137,8 @@ const ButtonContainer = styled.div`
   height: 100%;
   background-image: linear-gradient(
     to left,
-    ${({ theme }) => theme.palette.background.paper},
-    ${({ theme }) => theme.palette.background.paper} 80%,
+    ${({ theme }) => theme.vars.palette.background.paper},
+    ${({ theme }) => theme.vars.palette.background.paper} 80%,
     transparent 100%
   );
   display: flex;

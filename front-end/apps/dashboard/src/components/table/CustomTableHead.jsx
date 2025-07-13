@@ -64,7 +64,7 @@ const CountLabel = styled.span`
   margin: auto;
   z-index: 1;
   visibility: visible;
-  color: ${({ theme }) => theme.palette.text.primary} !important;
+  color: ${({ theme }) => theme.vars.palette.text.primary} !important;
   transition: all 0.2s ease;
 
   &.hidden {

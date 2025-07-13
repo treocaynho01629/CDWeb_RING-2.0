@@ -21,7 +21,7 @@ const InfoWrapper = styled(Paper)`
     height: 110%;
     aspect-ratio: 1/1;
     background-color: ${({ theme, color }) =>
-      theme.palette[color]?.light || theme.palette.primary.light};
+      theme.vars.palette[color]?.light || theme.vars.palette.primary.light};
     opacity: 0.3;
     transform: rotate(45deg);
     z-index: -1;
@@ -53,7 +53,7 @@ const Diff = styled.span`
   display: flex;
   justify-content: flex-end;
   font-size: 14px;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   width: 0;
   overflow: visible;
 

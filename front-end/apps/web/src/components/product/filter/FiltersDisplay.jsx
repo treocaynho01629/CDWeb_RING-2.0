@@ -6,7 +6,6 @@ import {
 } from "@mui/icons-material";
 import { isEqual } from "lodash-es";
 import { memo, useMemo } from "react";
-import { alpha } from "@mui/material";
 import { currencyFormat } from "@ring/shared";
 
 //#region styled
@@ -37,9 +36,9 @@ const FilterChip = styled.span`
   margin-right: ${({ theme }) => theme.spacing(1)};
   border: 1px solid
     ${({ theme, color }) =>
-      theme.palette[color]?.main || theme.palette.warning.main};
+      theme.vars.palette[color]?.main || theme.vars.palette.warning.main};
   color: ${({ theme, color }) =>
-    theme.palette[color]?.light || theme.palette.warning.light};
+    theme.vars.palette[color]?.light || theme.vars.palette.warning.light};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -49,9 +48,10 @@ const FilterChip = styled.span`
 
   &:hover {
     border-color: ${({ theme, color }) =>
-      theme.palette[color]?.light || theme.palette.warning.light};
+      theme.vars.palette[color]?.light || theme.vars.palette.warning.light};
     background-color: ${({ theme, color }) =>
-      alpha(theme.palette[color]?.light || theme.palette.warning.light, 0.1)};
+      `color-mix(in srgb, ${theme.vars.palette[color]?.light || theme.vars.palette.warning.light}, 
+      transparent 90%)`};
   }
 
   svg {
@@ -65,7 +65,7 @@ const ClearButton = styled.div`
   height: 24px;
 
   &:hover {
-    color: ${({ theme }) => theme.palette.error.main};
+    color: ${({ theme }) => theme.vars.palette.error.main};
   }
 `;
 
@@ -81,7 +81,7 @@ const Keyword = styled.div`
     align-items: center;
 
     b {
-      color: ${({ theme }) => theme.palette.warning.main};
+      color: ${({ theme }) => theme.vars.palette.warning.main};
     }
   }
 `;

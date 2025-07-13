@@ -19,11 +19,11 @@ import useOffset from "../../../hooks/useOffset";
 const AmountCount = styled.span`
   font-size: 14px;
   margin-left: 20px;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   white-space: nowrap;
 
   &.error {
-    color: ${({ theme }) => theme.palette.error.main};
+    color: ${({ theme }) => theme.vars.palette.error.main};
     text-decoration: underline;
     font-weight: bold;
   }
@@ -43,11 +43,11 @@ const FilterContainer = styled.div`
 const AltFilterContainer = styled.div`
   position: fixed;
   bottom: 0;
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
   border-bottom: none;
   padding: ${({ theme }) => `${theme.spacing(2.5)} ${theme.spacing(2)}`};
   margin-left: ${({ theme }) => `calc(${theme.spacing(-1.5)} - 0.5px)`};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
   display: flex;
   width: 100%;
   z-index: 2;
@@ -87,7 +87,7 @@ const StyledImage = styled.img`
   object-fit: contain;
   width: 115px;
   height: 115px;
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
 `;
 
 const ProductDetailContainer = styled.div`
@@ -98,13 +98,13 @@ const ProductDetailContainer = styled.div`
 `;
 
 const Price = styled.span`
-  color: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.main};
   margin: 10px 20px;
   margin-right: 0;
 `;
 
 const Discount = styled(Price)`
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   text-decoration: line-through;
   margin-left: 10px;
 `;

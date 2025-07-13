@@ -10,13 +10,13 @@ const BreadcrumbsContainer = styled.div`
   a.active {
     font-weight: 450;
     text-decoration: underline;
-    color: ${({ theme }) => theme.palette.primary.dark};
+    color: ${({ theme }) => theme.vars.palette.primary.dark};
     pointer-events: none;
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     content-visibility: hidden;
-    background-color: ${({ theme }) => theme.palette.background.paper};
+    background-color: ${({ theme }) => theme.vars.palette.background.paper};
     position: fixed;
     top: 0;
     width: 100%;
@@ -36,8 +36,8 @@ const BreadcrumbsContainer = styled.div`
 `;
 
 const StyledMainCrumb = styled(Link)`
-  background-color: ${({ theme }) => theme.palette.primary.main};
-  color: ${({ theme }) => theme.palette.primary.contrastText};
+  background-color: ${({ theme }) => theme.vars.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.contrastText};
   padding: 5px 15px;
 `;
 

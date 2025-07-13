@@ -24,17 +24,17 @@ const StyledProgress = styled(LinearProgress)(({ theme }) => ({
   zIndex: theme.zIndex.modal,
   height: 3,
   [`&.${linearProgressClasses.colorPrimary}`]: {
-    backgroundColor: theme.palette.grey[200],
+    backgroundColor: theme.vars.palette.grey[200],
     ...theme.applyStyles("dark", {
-      backgroundColor: theme.palette.grey[900],
+      backgroundColor: theme.vars.palette.grey[900],
     }),
   },
   [`& .${linearProgressClasses.bar}`]: {
     backgroundColor: "transparent",
     backgroundImage: `linear-gradient(to right, 
-        ${theme.palette.primary.main}, 
-        ${theme.palette.primary.main} 80%, 
-        ${theme.palette.success.main})`,
+        ${theme.vars.palette.primary.main}, 
+        ${theme.vars.palette.primary.main} 80%, 
+        ${theme.vars.palette.success.main})`,
   },
 }));
 //#endregion

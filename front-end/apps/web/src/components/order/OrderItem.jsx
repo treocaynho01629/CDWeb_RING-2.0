@@ -26,10 +26,10 @@ const Amount = styled.span`
   font-size: 14px;
   font-weight: 450;
   margin-right: ${({ theme }) => theme.spacing(2)};
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 
   b {
-    color: ${({ theme }) => theme.palette.warning.main};
+    color: ${({ theme }) => theme.vars.palette.warning.main};
   }
 `;
 
@@ -52,17 +52,17 @@ const Price = styled.p`
   font-size: 16px;
   font-weight: 450;
   text-align: left;
-  color: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.main};
   margin: 0;
 
   &.total {
-    color: ${({ theme }) => theme.palette.warning.light};
+    color: ${({ theme }) => theme.vars.palette.warning.light};
   }
 `;
 
 const Discount = styled.p`
   font-size: 12px;
-  color: ${({ theme }) => theme.palette.text.disabled};
+  color: ${({ theme }) => theme.vars.palette.text.disabled};
   margin: 0;
   display: flex;
   flex-wrap: wrap;
@@ -73,7 +73,7 @@ const Discount = styled.p`
 
 const OrderItemContainer = styled.div`
   border: 0.5px solid;
-  border-color: ${({ theme }) => theme.palette.action.focus};
+  border-color: ${({ theme }) => theme.vars.palette.action.focus};
   margin-bottom: ${({ theme }) => theme.spacing(2)};
 `;
 
@@ -83,7 +83,7 @@ const BotContainer = styled.div`
   align-items: center;
   padding: ${({ theme }) => theme.spacing(2)};
   border-top: 0.5px solid;
-  border-color: ${({ theme }) => theme.palette.action.focus};
+  border-color: ${({ theme }) => theme.vars.palette.action.focus};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: ${({ theme }) => theme.spacing(1)};

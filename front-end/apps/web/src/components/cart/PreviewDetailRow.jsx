@@ -52,7 +52,7 @@ const ItemTitle = styled.p`
   }
 
   &.error {
-    color: ${({ theme }) => theme.palette.error.light};
+    color: ${({ theme }) => theme.vars.palette.error.light};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -74,7 +74,7 @@ const Shop = styled.span`
   white-space: nowrap;
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.palette.primary.dark};
+  color: ${({ theme }) => theme.vars.palette.primary.dark};
 
   svg {
     font-size: 18px;
@@ -154,25 +154,25 @@ const PriceContainer = styled.div`
 `;
 
 const ShippingInfo = styled.p`
-  color: ${({ theme }) => theme.palette.info.main};
+  color: ${({ theme }) => theme.vars.palette.info.main};
 `;
 
 const Price = styled.p`
   font-size: 14px;
   font-weight: 400;
   text-align: left;
-  color: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.main};
   margin: 0;
   margin-right: ${({ theme }) => theme.spacing(1)};
 
   &.total {
-    color: ${({ theme }) => theme.palette.warning.light};
+    color: ${({ theme }) => theme.vars.palette.warning.light};
     text-align: right;
     margin: 0;
   }
 
   &.final {
-    color: ${({ theme }) => theme.palette.error.light};
+    color: ${({ theme }) => theme.vars.palette.error.light};
     font-weight: 450;
     font-size: 16px;
     text-align: right;
@@ -185,13 +185,13 @@ const Price = styled.p`
     font-weight: 450;
     margin: 0;
     margin-left: ${({ theme }) => theme.spacing(1)};
-    color: ${({ theme }) => theme.palette.text.primary};
+    color: ${({ theme }) => theme.vars.palette.text.primary};
   }
 `;
 
 const Discount = styled.p`
   font-size: 12px;
-  color: ${({ theme }) => theme.palette.text.disabled};
+  color: ${({ theme }) => theme.vars.palette.text.disabled};
   margin: 0;
   display: flex;
   flex-wrap: wrap;
@@ -210,7 +210,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
   display: inline-block;
   height: 50px;
   width: 50px;
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 45px;

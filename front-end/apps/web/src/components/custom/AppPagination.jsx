@@ -58,11 +58,11 @@ const StyledPagination = styled(Pagination)`
 `;
 
 const StyledPageItem = styled(PaginationItem)`
-  background-color: ${({ theme }) => theme.palette.action.focus};
+  background-color: ${({ theme }) => theme.vars.palette.action.focus};
 
   &:hover {
-    background-color: ${({ theme }) => theme.palette.primary.light};
-    color: ${({ theme }) => theme.palette.primary.contrastText};
+    background-color: ${({ theme }) => theme.vars.palette.primary.light};
+    color: ${({ theme }) => theme.vars.palette.primary.contrastText};
   }
 
   &.Mui-disabled {

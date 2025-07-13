@@ -10,7 +10,7 @@ export const TermText = styled.p`
   font-size: 12px;
   margin: ${({ theme }) => theme.spacing(1)} 0;
   text-align: center;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 `;
 
 export const AuthText = styled.p`
@@ -22,12 +22,12 @@ export const AuthText = styled.p`
 export const AuthHighlight = styled.span`
   text-decoration: underline;
   color: ${({ theme, color }) =>
-    theme.palette[color]?.main || theme.palette.primary.main};
+    theme.vars.palette[color]?.main || theme.vars.palette.primary.main};
   cursor: pointer;
 
   &:hover {
     color: ${({ theme, color }) =>
-      theme.palette[color]?.dark || theme.palette.primary.dark};
+      theme.vars.palette[color]?.dark || theme.vars.palette.primary.dark};
   }
 `;
 

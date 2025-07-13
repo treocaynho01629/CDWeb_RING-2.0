@@ -14,12 +14,12 @@ const AddressDisplayContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
   padding: 20px;
 
   &.error {
-    border-color: ${({ theme }) => theme.palette.error.main};
+    border-color: ${({ theme }) => theme.vars.palette.error.main};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -50,7 +50,7 @@ const Address = styled.span`
   font-size: 16px;
   line-height: 1.75em;
   margin-top: ${({ theme }) => theme.spacing(1)};
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 `;
 
 const AddressTag = styled.span`
@@ -58,12 +58,12 @@ const AddressTag = styled.span`
   font-weight: bold;
   margin-right: ${({ theme }) => theme.spacing(0.5)};
   padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(1)}`};
-  border: 0.5px solid ${({ theme }) => theme.palette.primary.main};
-  color: ${({ theme }) => theme.palette.primary.main};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.main};
 
   &.info {
-    color: ${({ theme }) => theme.palette.info.main};
-    border-color: ${({ theme }) => theme.palette.info.main};
+    color: ${({ theme }) => theme.vars.palette.info.main};
+    border-color: ${({ theme }) => theme.vars.palette.info.main};
   }
 `;
 //#endregion

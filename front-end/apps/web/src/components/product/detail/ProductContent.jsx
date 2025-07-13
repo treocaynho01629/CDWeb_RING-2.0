@@ -5,15 +5,7 @@ import {
   Star as StarIcon,
   StarBorder as StarBorderIcon,
 } from "@mui/icons-material";
-import {
-  Skeleton,
-  Rating,
-  Box,
-  Grid2 as Grid,
-  alpha,
-  Divider,
-  Stack,
-} from "@mui/material";
+import { Skeleton, Rating, Box, Divider, Stack, Grid } from "@mui/material";
 import { Link } from "react-router";
 import {
   currencyFormat,
@@ -40,11 +32,11 @@ const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
 
   a {
-    color: ${({ theme }) => theme.palette.info.main};
+    color: ${({ theme }) => theme.vars.palette.info.main};
   }
 
   ${({ theme }) => theme.breakpoints.down("md")} {
@@ -58,7 +50,7 @@ const ImageContainer = styled.div`
   border: none;
 
   ${({ theme }) => theme.breakpoints.up("md")} {
-    border: 0.5px solid ${({ theme }) => theme.palette.divider};
+    border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   }
 `;
 
@@ -107,19 +99,19 @@ const UserInfoContainer = styled.div`
   position: relative;
   height: 100%;
   align-items: center;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   cursor: pointer;
 
   &.active {
-    color: ${({ theme }) => theme.palette.warning.light};
+    color: ${({ theme }) => theme.vars.palette.warning.light};
   }
 `;
 
 const StyledRating = muiStyled(Rating)(({ theme }) => ({
-  color: theme.palette.warning.main,
+  color: theme.vars.palette.warning.main,
   fontSize: 18,
   "& .MuiRating-iconFilled": {
-    color: theme.palette.warning.light,
+    color: theme.vars.palette.warning.light,
   },
 
   [theme.breakpoints.down("md_lg")]: {
@@ -128,7 +120,7 @@ const StyledRating = muiStyled(Rating)(({ theme }) => ({
 }));
 
 const UserInfoText = styled.strong`
-  color: ${({ theme }) => theme.palette.text.primary};
+  color: ${({ theme }) => theme.vars.palette.text.primary};
   font-size: 15px;
 
   &.rate {
@@ -138,7 +130,7 @@ const UserInfoText = styled.strong`
   &.end {
     flex: 1;
     text-align: end;
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
   }
 
   ${({ theme }) => theme.breakpoints.down("md")} {
@@ -168,7 +160,7 @@ const PriceContainer = styled.div`
 const Price = styled.h2`
   margin: 0;
   font-size: 24px;
-  color: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.main};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 21px;
@@ -180,7 +172,7 @@ const Discount = styled.p`
   margin-left: 10px;
   font-size: 18px;
   font-weight: 400;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   text-decoration: line-through;
 
   ${({ theme }) => theme.breakpoints.down("md")} {
@@ -194,8 +186,10 @@ const Percentage = styled.span`
   padding: 2px 5px;
   margin-left: 10px;
   font-weight: bold;
-  color: ${({ theme }) => theme.palette.primary.contrastText};
-  background-color: ${({ theme }) => alpha(theme.palette.primary.light, 0.8)};
+  color: ${({ theme }) => theme.vars.palette.primary.contrastText};
+  background-color: ${({ theme }) =>
+    `color-mix(in srgb, ${theme.vars.palette.primary.light}, 
+  transparent 20%)`};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 13px;

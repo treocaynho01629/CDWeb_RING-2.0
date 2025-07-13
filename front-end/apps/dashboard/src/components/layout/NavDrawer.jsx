@@ -25,7 +25,7 @@ const openedMixin = (theme) => ({
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
   }),
-  backgroundColor: theme.palette.background.default,
+  backgroundColor: theme.vars.palette.background.default,
   overflowX: "hidden",
 });
 
@@ -34,7 +34,7 @@ const closedMixin = (theme) => ({
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  backgroundColor: theme.palette.background.default,
+  backgroundColor: theme.vars.palette.background.default,
   overflowX: "hidden",
   width: `calc(${theme.spacing(7)} + 1px)`,
 });
@@ -95,10 +95,10 @@ const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
   }),
 
   "&.Mui-selected": {
-    color: theme.palette.primary.main,
+    color: theme.vars.palette.primary.main,
 
     ".MuiListItemIcon-root": {
-      color: theme.palette.primary.main,
+      color: theme.vars.palette.primary.main,
     },
   },
 

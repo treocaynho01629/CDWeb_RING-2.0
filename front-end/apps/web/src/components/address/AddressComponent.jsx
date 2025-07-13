@@ -61,14 +61,14 @@ const StyledEmptyIcon = styled(EmptyIcon)`
   height: 70px;
   width: 70px;
   margin: ${({ theme }) => theme.spacing(1)} 0;
-  fill: ${({ theme }) => theme.palette.text.icon};
+  fill: ${({ theme }) => theme.vars.palette.text.icon};
 `;
 
 const StyledAddButton = styled.span`
   font-size: 12px;
   display: flex;
   align-items: flex-start;
-  color: ${({ theme }) => theme.palette.success.main};
+  color: ${({ theme }) => theme.vars.palette.success.main};
   cursor: pointer;
 
   svg {

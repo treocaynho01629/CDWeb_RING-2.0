@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from "react";
-import { Box, Button, Grid2 as Grid } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { Add, Group } from "@mui/icons-material";
 import {
   useGetUserAnalyticsQuery,
@@ -13,7 +13,7 @@ import TableUsers from "../components/table/TableUsers";
 import InfoCard from "../components/custom/InfoCard";
 
 const UserFormDialog = lazy(
-  () => import("../components/dialog/UserFormDialog"),
+  () => import("../components/dialog/UserFormDialog")
 );
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 

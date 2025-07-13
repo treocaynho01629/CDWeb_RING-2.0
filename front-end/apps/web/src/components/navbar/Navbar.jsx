@@ -29,11 +29,10 @@ import {
   IconButton,
   Avatar,
   Box,
-  Grid2 as Grid,
   AppBar,
   useMediaQuery,
   useColorScheme,
-  alpha,
+  Grid,
 } from "@mui/material";
 import { Link, useLocation, useMatch } from "react-router";
 import { LogoImage } from "@ring/ui/Components";
@@ -69,7 +68,7 @@ const Wrapper = styled.div`
 
 const TopHeader = styled.div`
   padding: 0 30px;
-  background-color: ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.divider};
   justify-content: space-between;
   font-size: 15px;
   font-weight: bold;
@@ -113,11 +112,11 @@ const Contact = styled.p`
   align-items: center;
   text-align: center;
   justify-content: center;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 `;
 
 const Social = styled.p`
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   background-color: "transparent";
   font-size: 14px;
   display: flex;
@@ -170,7 +169,7 @@ const StyledIconButton = styled(IconButton)`
 
   &:hover {
     background-color: transparent;
-    color: ${({ theme }) => theme.palette.primary.main};
+    color: ${({ theme }) => theme.vars.palette.primary.main};
   }
 
   &.nav {
@@ -193,8 +192,8 @@ const StyledAppBar = styled(AppBar)`
   top: -0.5px;
   margin-bottom: 2px;
   border-bottom: 0.5px solid;
-  border-color: ${({ theme }) => theme.palette.action.focus};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  border-color: ${({ theme }) => theme.vars.palette.action.focus};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
   box-shadow: none;
 
   svg {
@@ -204,29 +203,27 @@ const StyledAppBar = styled(AppBar)`
   ${({ theme }) => theme.breakpoints.down("md")} {
     margin-bottom: 0;
     border-color: ${({ theme }) =>
-      `rgb(from ${theme.palette.action.focus} r g b / calc(var(--scroll-progress) * ${theme.palette.action.focusOpacity}))`};
+      `rgb(from ${theme.vars.palette.action.focus} r g b / calc(var(--scroll-progress) * ${theme.vars.palette.action.focusOpacity}))`};
     background-color: ${({ theme }) =>
-      `rgb(from ${theme.palette.background.paper} r g b / var(--scroll-progress))`};
+      `rgb(from ${theme.vars.palette.background.paper} r g b / var(--scroll-progress))`};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     ${Logo} {
       filter: ${({ theme }) =>
-        `drop-shadow(0px -1000px 0 rgb(from ${theme.palette.grey[800]} r g b / calc(1 - var(--scroll-progress))))`};
+        `drop-shadow(0px -1000px 0 rgb(from ${theme.vars.palette.grey[800]} r g b / calc(1 - var(--scroll-progress))))`};
       transform: translateY(calc((1 - round(var(--scroll-progress))) * 1000px));
 
       ${({ theme }) =>
-        theme.palette.mode === "dark" &&
-        ` filter: drop-shadow(0px -1000px 0 rgb(from ${theme.palette.text.primary} r g b / calc(1 - var(--scroll-progress))))`}
+        theme.vars.palette.mode === "dark" &&
+        ` filter: drop-shadow(0px -1000px 0 rgb(from ${theme.vars.palette.text.primary} r g b / calc(1 - var(--scroll-progress))))`}
     }
 
     ${StyledIconButton} {
       border-radius: 50%;
       background-color: ${({ theme }) =>
-        alpha(
-          theme.palette.background.paper,
-          theme.palette.action.activatedOpacity
-        )};
+        `color-mix(in srgb, ${theme.vars.palette.text.primary}, 
+        transparent calc((1 - ${theme.vars.palette.action.focusOpacity}) * 100%))`};
 
       svg {
         font-size: 22px;

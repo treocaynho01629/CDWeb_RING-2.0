@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useMediaQuery, Grid2 as Grid, Skeleton } from "@mui/material";
+import { useMediaQuery, Skeleton, Grid } from "@mui/material";
 import { NavLink, useNavigate, useParams, useSearchParams } from "react-router";
 import { useGetCategoryQuery } from "../features/categories/categoriesApiSlice";
 import { useGetBooksQuery } from "../features/books/booksApiSlice";

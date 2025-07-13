@@ -62,7 +62,7 @@ const Address = styled.span`
   font-size: 14px;
   line-height: 1.75em;
   margin-top: ${({ theme }) => theme.spacing(1)};
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 `;
 
 const AddressTag = styled.span`
@@ -70,18 +70,18 @@ const AddressTag = styled.span`
   font-weight: bold;
   margin-right: ${({ theme }) => theme.spacing(0.5)};
   padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(1)}`};
-  border: 0.5px solid ${({ theme }) => theme.palette.primary.main};
-  color: ${({ theme }) => theme.palette.primary.main};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.main};
 
   &.info {
-    color: ${({ theme }) => theme.palette.info.main};
-    border-color: ${({ theme }) => theme.palette.info.main};
+    color: ${({ theme }) => theme.vars.palette.info.main};
+    border-color: ${({ theme }) => theme.vars.palette.info.main};
   }
 `;
 
 const EditButton = styled.div`
   font-size: 12px;
-  color: ${({ theme }) => theme.palette.info.main};
+  color: ${({ theme }) => theme.vars.palette.info.main};
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -92,14 +92,14 @@ const EditButton = styled.div`
   }
 
   &:hover {
-    color: ${({ theme }) => theme.palette.info.light};
+    color: ${({ theme }) => theme.vars.palette.info.light};
   }
 `;
 
 const AddressDivider = styled.div`
   width: 100%;
   margin: ${({ theme }) => theme.spacing(1)} 0;
-  border-bottom: 0.5px dashed ${({ theme }) => theme.palette.divider};
+  border-bottom: 0.5px dashed ${({ theme }) => theme.vars.palette.divider};
 `;
 //#endregion
 

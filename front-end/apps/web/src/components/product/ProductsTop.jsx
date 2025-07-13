@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { alpha, Rating, Skeleton, Stack } from "@mui/material";
+import { Rating, Skeleton, Stack } from "@mui/material";
 import {
   LazyLoadImage,
   trackWindowScroll,
@@ -39,24 +39,24 @@ const Rank = styled.span`
     display: flex;
     align-items: center;
     justify-content: center;
-    color: ${({ theme }) => theme.palette.grey[900]};
+    color: ${({ theme }) => theme.vars.palette.grey[900]};
     z-index: 1;
   }
 
   svg {
     font-size: 40px;
-    color: ${({ theme }) => theme.palette.grey[400]};
+    color: ${({ theme }) => theme.vars.palette.grey[400]};
   }
 
   &.first {
     svg {
-      color: ${({ theme }) => theme.palette.success.light};
+      color: ${({ theme }) => theme.vars.palette.success.light};
     }
   }
 
   &.second {
     svg {
-      color: ${({ theme }) => theme.palette.warning.light};
+      color: ${({ theme }) => theme.vars.palette.warning.light};
     }
   }
 
@@ -77,7 +77,7 @@ const ProductContainer = styled.div`
 
   ${({ theme }) => theme.breakpoints.up("md_lg")} {
     &.selected {
-      border-right: 3px solid ${({ theme }) => theme.palette.primary.main};
+      border-right: 3px solid ${({ theme }) => theme.vars.palette.primary.main};
     }
   }
 `;
@@ -85,7 +85,7 @@ const ProductContainer = styled.div`
 const DisplayContainer = styled.div`
   width: 110%;
   padding: ${({ theme }) => theme.spacing(1)};
-  border-left: 0.5px solid ${({ theme }) => theme.palette.divider};
+  border-left: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
 
   ${({ theme }) => theme.breakpoints.down("md_lg")} {
     display: none;
@@ -95,7 +95,7 @@ const DisplayContainer = styled.div`
 const Display = styled.div`
   position: relative;
   display: flex;
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
 `;
 
 const InfoWrapper = styled.div`
@@ -104,7 +104,8 @@ const InfoWrapper = styled.div`
   width: 100%;
   padding: ${({ theme }) => theme.spacing(1)};
   background-color: ${({ theme }) =>
-    alpha(theme.palette.background.default, 0.5)};
+    `color-mix(in srgb, ${theme.vars.palette.background.default}, 
+      transparent 50%)`};
 `;
 
 const ProductTitle = styled.span`
@@ -138,7 +139,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
   display: inline-block;
   height: 90px;
   width: 90px;
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 80px;
@@ -177,7 +178,7 @@ const StyledDisplaySkeleton = styled(Skeleton)`
 const Price = styled.span`
   font-size: 18px;
   font-weight: 420;
-  color: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.main};
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -187,7 +188,7 @@ const Price = styled.span`
 
 const DiscountContainer = styled.span`
   font-size: 14px;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   display: flex;
   align-items: center;
 `;
@@ -203,7 +204,9 @@ const Percentage = styled.span`
   margin-left: 10px;
   font-size: 14px;
   font-weight: bold;
-  background-color: ${({ theme }) => alpha(theme.palette.success.light, 0.8)};
+  background-color: ${({ theme }) =>
+    `color-mix(in srgb, ${theme.vars.palette.success.light}, 
+      transparent 20%)`};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     margin-left: 5px;
@@ -215,7 +218,8 @@ const Description = styled.div`
   height: 200px;
   font-size: 15px;
   overflow-y: scroll;
-  scrollbar-color: ${({ theme }) => theme.palette.action.disabled} transparent;
+  scrollbar-color: ${({ theme }) => theme.vars.palette.action.disabled}
+    transparent;
   scrollbar-width: thin;
 `;
 
@@ -243,8 +247,8 @@ const TextMore = styled.b`
   margin-left: 5px;
   padding-left: 5px;
   font-size: 12px;
-  border-left: 0.5px solid ${({ theme }) => theme.palette.action.focus};
-  color: ${({ theme }) => theme.palette.info.main};
+  border-left: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
+  color: ${({ theme }) => theme.vars.palette.info.main};
 `;
 
 const StyledRating = styled(Rating)`
@@ -255,7 +259,7 @@ const StyledRating = styled(Rating)`
 
 const ProductShop = styled.span`
   font-size: 14px;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;

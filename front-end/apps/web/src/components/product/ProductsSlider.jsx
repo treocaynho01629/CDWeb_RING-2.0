@@ -44,8 +44,8 @@ const CustomArrowButton = styled.div`
   top: 0;
   bottom: 0;
   margin: auto;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   border-radius: 50%;
   height: 30px;
   width: 30px;
@@ -61,7 +61,7 @@ const CustomArrowButton = styled.div`
   &:hover {
     opacity: 1;
     transform: scale(1.1);
-    background-color: ${({ theme }) => theme.palette.background.default};
+    background-color: ${({ theme }) => theme.vars.palette.background.default};
   }
 
   &.left {

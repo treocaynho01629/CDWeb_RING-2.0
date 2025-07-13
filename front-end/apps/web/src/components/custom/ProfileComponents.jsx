@@ -11,15 +11,15 @@ export const StyledDialogTitle = styled(DialogTitle)`
   font-size: 18px;
   margin-bottom: ${({ theme }) => theme.spacing(2)};
   padding: ${({ theme }) => theme.spacing(1.5)} 0px;
-  border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
-  color: ${({ theme }) => theme.palette.primary.main};
-  border-color: ${({ theme }) => theme.palette.primary.main};
+  border-bottom: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
+  color: ${({ theme }) => theme.vars.palette.primary.main};
+  border-color: ${({ theme }) => theme.vars.palette.primary.main};
   width: 100%;
 
   a {
     display: none;
     align-items: center;
-    color: ${({ theme }) => theme.palette.text.primary};
+    color: ${({ theme }) => theme.vars.palette.text.primary};
   }
 
   ${({ theme }) => theme.breakpoints.down("md_lg")} {
@@ -39,8 +39,8 @@ export const StyledDialogTitle = styled(DialogTitle)`
 export const TabContentContainer = styled.div`
   position: relative;
   padding: 0 ${({ theme }) => theme.spacing(2)};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
   min-height: 60dvh;
 
   ${({ theme }) => theme.breakpoints.down("md")} {
@@ -63,8 +63,8 @@ export const MainContainer = styled.div`
 
 export const ToggleGroupContainer = styled.div`
   width: 100%;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
+  border-bottom: 1px solid ${({ theme }) => theme.vars.palette.divider};
   white-space: nowrap;
   position: sticky;
   top: ${({ theme }) => theme.mixins.toolbar.minHeight + 16.5}px;
@@ -86,7 +86,7 @@ export const ToggleGroupContainer = styled.div`
     top: -16px;
     width: 100%;
     height: calc(100% + 16px);
-    background-color: ${({ theme }) => theme.palette.background.paper};
+    background-color: ${({ theme }) => theme.vars.palette.background.paper};
     z-index: -1;
   }
 
@@ -97,7 +97,7 @@ export const ToggleGroupContainer = styled.div`
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: ${({ theme }) => theme.palette.action.hover};
+    background-color: ${({ theme }) => theme.vars.palette.action.hover};
     z-index: -1;
   }
 `;
@@ -106,7 +106,7 @@ export const StyledEmptyIcon = styled(EmptyIcon)`
   height: 70px;
   width: 70px;
   margin: ${({ theme }) => theme.spacing(1)} 0;
-  fill: ${({ theme }) => theme.palette.text.icon};
+  fill: ${({ theme }) => theme.vars.palette.text.icon};
 `;
 
 export const PlaceholderContainer = styled.div`

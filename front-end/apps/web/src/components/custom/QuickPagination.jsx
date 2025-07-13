@@ -11,15 +11,15 @@ const Container = styled.div`
 const StyledButton = styled(IconButton)`
   border-radius: 0;
   padding: ${({ theme }) => theme.spacing(0.8)};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
 
   &:last-child {
     border-left: none;
   }
 
   &.Mui-disabled {
-    background-color: ${({ theme }) => theme.palette.background.default};
+    background-color: ${({ theme }) => theme.vars.palette.background.default};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -34,12 +34,12 @@ const Count = styled.span`
   cursor: pointer;
 
   b {
-    color: ${({ theme }) => theme.palette.warning.light};
+    color: ${({ theme }) => theme.vars.palette.warning.light};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;
-    background-color: ${({ theme }) => theme.palette.background.paper};
+    background-color: ${({ theme }) => theme.vars.palette.background.paper};
     border-radius: 50%;
     width: 45px;
     height: 45px;

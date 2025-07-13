@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
 import { useState, useEffect, lazy, Suspense, useRef } from "react";
-import { alpha, Button } from "@mui/material";
 import { Link, useNavigate } from "react-router";
 import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice";
 import {
@@ -25,6 +24,7 @@ import { CustomTab, CustomTabs } from "../components/custom/CustomTabs";
 import { useGetPublishersQuery } from "../features/publishers/publishersApiSlice";
 import { useTitle } from "@ring/shared";
 import { orderTabs } from "../utils/suggest";
+import Button from "@mui/material/Button";
 import Placeholder from "@ring/ui/Placeholder";
 import Suggest from "../components/other/Suggest";
 import CustomDivider from "../components/custom/CustomDivider";
@@ -51,8 +51,8 @@ const Wrapper = styled.div`
 
 const ToggleGroupContainer = styled.div`
   width: 100%;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
+  border-bottom: 1px solid ${({ theme }) => theme.vars.palette.divider};
   white-space: nowrap;
   padding: 0 10px;
   position: sticky;
@@ -61,7 +61,7 @@ const ToggleGroupContainer = styled.div`
 
   &.border {
     &::after {
-      border-top: 0.5px solid ${({ theme }) => theme.palette.divider};
+      border-top: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
     }
   }
 
@@ -76,7 +76,7 @@ const ToggleGroupContainer = styled.div`
     top: -16px;
     width: 100%;
     height: calc(100% + 16px);
-    background-color: ${({ theme }) => theme.palette.background.default};
+    background-color: ${({ theme }) => theme.vars.palette.background.default};
     z-index: -1;
   }
 
@@ -87,7 +87,7 @@ const ToggleGroupContainer = styled.div`
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: ${({ theme }) => theme.palette.action.hover};
+    background-color: ${({ theme }) => theme.vars.palette.action.hover};
     z-index: -1;
 
     ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -103,8 +103,8 @@ const TitleContainer = styled.div`
   width: 100%;
   font-size: 18px;
   font-weight: 450;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -129,13 +129,13 @@ const ButtonContainer = styled.div`
 const MoreButton = styled.span`
   font-size: 12px;
   font-weight: 450;
-  color: ${({ theme }) => theme.palette.info.light};
+  color: ${({ theme }) => theme.vars.palette.info.light};
   cursor: pointer;
   display: flex;
   align-items: center;
 
   &.error {
-    color: ${({ theme }) => theme.palette.error.main};
+    color: ${({ theme }) => theme.vars.palette.error.main};
   }
 `;
 
@@ -145,7 +145,7 @@ const ContainerTitle = styled.span`
   display: flex;
   align-items: center;
   color: ${({ theme, color }) =>
-    theme.palette[color]?.main || theme.palette.text.primary};
+    theme.vars.palette[color]?.main || theme.vars.palette.text.primary};
 
   svg {
     color: inherit;
@@ -158,8 +158,8 @@ const ContainerTitle = styled.span`
 
 const Container = styled.div`
   margin: ${({ theme }) => theme.spacing(2)} 0;
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
 
   ${TitleContainer} {
     border: none;
@@ -198,16 +198,24 @@ const SaleContainer = styled.div`
     width: 99vw;
     height: 100%;
     transform: translateX(-50%);
-    border: 1px solid ${({ theme }) => theme.palette.success.light};
+    border: 1px solid ${({ theme }) => theme.vars.palette.success.light};
     background-image: repeating-linear-gradient(
       45deg,
-      ${({ theme }) => alpha(theme.palette.primary.main, 0.2)} 0,
-      ${({ theme }) => alpha(theme.palette.primary.main, 0.2)} 10px,
+      ${({ theme }) =>
+          `color-mix(in srgb, ${theme.vars.palette.primary.main}, transparent 80%)`}
+        0,
+      ${({ theme }) =>
+          `color-mix(in srgb, ${theme.vars.palette.primary.main}, transparent 80%)`}
+        10px,
       transparent 0,
       transparent 50%
     );
     background-size: 4em 4em;
-    background-color: ${({ theme }) => alpha(theme.palette.success.light, 0.1)};
+    background-color: color-mix(
+      in srgb,
+      ${({ theme }) => theme.vars.palette.success.light},
+      transparent 90%
+    );
     border-left: none;
     border-right: none;
   }

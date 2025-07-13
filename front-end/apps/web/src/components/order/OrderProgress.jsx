@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
 import {
-  alpha,
   Box,
   Collapse,
   Paper,
@@ -33,7 +32,7 @@ import PropTypes from "prop-types";
 //#region styled
 const DateText = styled.div`
   font-size: 14px;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   margin: ${({ theme }) => theme.spacing(0.5)} 0 0;
 
   p {
@@ -47,17 +46,18 @@ const DateText = styled.div`
 
 const StepperContainer = styled.div`
   background-color: ${({ theme, color }) =>
-    alpha(theme.palette[color]?.light ?? theme.palette.primary.light, 0.3)};
+    `color-mix(in srgb, ${theme.vars.palette[color]?.light || theme.vars.palette.primary.light}, 
+      transparent 70%)`};
   border: 0.5px solid
     ${({ theme, color }) =>
-      theme.palette[color]?.light ?? theme.palette.primary.light};
+      theme.vars.palette[color]?.light ?? theme.vars.palette.primary.light};
   padding: ${({ theme }) => theme.spacing(2)} 0;
   margin-bottom: ${({ theme }) => theme.spacing(1)};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     background-color: transparent;
     border-top: none;
-    border-color: ${({ theme }) => theme.palette.divider};
+    border-color: ${({ theme }) => theme.vars.palette.divider};
     padding: ${({ theme }) => `${theme.spacing(1.5)} ${theme.spacing(2.5)}`};
     margin: 0;
   }
@@ -70,26 +70,26 @@ const StyledStepConnector = styled(StepConnector)(({ theme, color }) => ({
   [`&.${stepConnectorClasses.active}`]: {
     [`& .${stepConnectorClasses.line}`]: {
       backgroundImage: `linear-gradient(to right, 
-        hsl(from ${theme.palette[color]?.main ?? theme.palette.primary.main} calc(h - 30) s l),
-        ${theme.palette[color]?.main ?? theme.palette.primary.main} 80%, 
-        ${theme.palette[color]?.main ?? theme.palette.primary.main})`,
+        hsl(from ${theme.vars.palette[color]?.main ?? theme.vars.palette.primary.main} calc(h - 30) s l),
+        ${theme.vars.palette[color]?.main ?? theme.vars.palette.primary.main} 80%, 
+        ${theme.vars.palette[color]?.main ?? theme.vars.palette.primary.main})`,
     },
   },
   [`&.${stepConnectorClasses.completed}`]: {
     [`& .${stepConnectorClasses.line}`]: {
       backgroundImage: `linear-gradient(to right, 
-          hsl(from ${theme.palette[color]?.main ?? theme.palette.primary.main} calc(h - 30) s l),
-        ${theme.palette[color]?.main ?? theme.palette.primary.main} 80%, 
-        ${theme.palette[color]?.main ?? theme.palette.primary.main})`,
+          hsl(from ${theme.vars.palette[color]?.main ?? theme.vars.palette.primary.main} calc(h - 30) s l),
+        ${theme.vars.palette[color]?.main ?? theme.vars.palette.primary.main} 80%, 
+        ${theme.vars.palette[color]?.main ?? theme.vars.palette.primary.main})`,
     },
   },
   [`& .${stepConnectorClasses.line}`]: {
     height: 3,
     border: 0,
-    backgroundColor: theme.palette.grey[300],
+    backgroundColor: theme.vars.palette.grey[300],
     borderRadius: 1,
     ...theme.applyStyles("dark", {
-      backgroundColor: theme.palette.grey[700],
+      backgroundColor: theme.vars.palette.grey[700],
     }),
   },
 
@@ -115,19 +115,19 @@ const StyledStepIconRoot = styled("div")(({ theme, color, ownerState }) => ({
   border: "3.5px solid",
   borderColor:
     ownerState.active || ownerState.completed
-      ? (theme.palette[color]?.main ?? theme.palette.primary.main)
-      : theme.palette.grey[300],
+      ? (theme.vars.palette[color]?.main ?? theme.vars.palette.primary.main)
+      : theme.vars.palette.grey[300],
   color:
     ownerState.active || ownerState.completed
-      ? (theme.palette[color]?.main ?? theme.palette.primary.main)
-      : theme.palette.text.disabled,
-  backgroundColor: theme.palette.background.default,
+      ? (theme.vars.palette[color]?.main ?? theme.vars.palette.primary.main)
+      : theme.vars.palette.text.disabled,
+  backgroundColor: theme.vars.palette.background.default,
   alignItems: "center",
   ...theme.applyStyles("dark", {
     borderColor:
       ownerState.active || ownerState.completed
-        ? (theme.palette[color]?.main ?? theme.palette.primary.main)
-        : theme.palette.grey[700],
+        ? (theme.vars.palette[color]?.main ?? theme.vars.palette.primary.main)
+        : theme.vars.palette.grey[700],
   }),
 
   [theme.breakpoints.down("md")]: {
@@ -155,9 +155,10 @@ const LabelCheck = styled.span`
   justify-content: center;
   border-radius: 50%;
   background-color: ${({ theme, color }) =>
-    alpha(theme.palette[color]?.light ?? theme.palette.primary.light, 0.3)};
+    `color-mix(in srgb, ${theme.vars.palette[color]?.light || theme.vars.palette.primary.light}, 
+      transparent 70%)`};
   color: ${({ theme, color }) =>
-    theme.palette[color]?.main ?? theme.palette.primary.main};
+    theme.vars.palette[color]?.main ?? theme.vars.palette.primary.main};
 
   svg {
     font-size: 16px;

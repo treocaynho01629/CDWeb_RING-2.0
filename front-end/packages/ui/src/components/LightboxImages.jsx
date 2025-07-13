@@ -44,7 +44,7 @@ const LightboxImages = ({ images, open, handleClose }) => {
         root: {
           "--yarl__thumbnails_thumbnail_border_color": "transparent",
           "--yarl__thumbnails_thumbnail_active_border_color":
-            theme.palette.primary.main,
+            theme.vars.palette.primary.main,
         },
       }}
     />

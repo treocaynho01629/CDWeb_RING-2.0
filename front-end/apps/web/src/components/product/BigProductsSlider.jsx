@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Grid2 as Grid, Button, Skeleton, alpha } from "@mui/material";
+import { Button, Skeleton, Grid } from "@mui/material";
 import { Link } from "react-router";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
@@ -26,7 +26,8 @@ const InfoWrapper = styled.div`
     position: absolute;
     bottom: 0;
     background-color: ${({ theme }) =>
-      alpha(theme.palette.background.default, 0.5)};
+      `color-mix(in srgb, ${theme.vars.palette.background.default}, 
+      transparent 50%)`};
   }
 `;
 
@@ -93,8 +94,8 @@ const CustomArrowButton = styled.div`
   top: 0;
   bottom: 0;
   margin: auto;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   border-radius: 50%;
   height: 30px;
   width: 30px;
@@ -110,7 +111,7 @@ const CustomArrowButton = styled.div`
   &:hover {
     opacity: 1;
     transform: scale(1.1);
-    background-color: ${({ theme }) => theme.palette.background.default};
+    background-color: ${({ theme }) => theme.vars.palette.background.default};
   }
 
   &.left {

@@ -23,6 +23,7 @@
 RING is an E-Commerce Web App built using Spring Boot, ViteJS, Turborepo, and PostgreSQL.
 
 #### Live Demo:
+
 <a href="https://ringdoraz.io.vn/" target="_blank">
   <img src="https://github.com/user-attachments/assets/c56ea83a-4d6b-4b14-8c7e-dddea6bde1e5" width="100" />
 </a>
@@ -59,7 +60,12 @@ DB_USERNAME= PostgreSQL user name
 DB_PASSWORD= PostgreSQL password
 DB_NAME= PostgreSQL database name
 
-# Email SMTP service
+# Redis
+REDIS_HOST= Redis host
+REDIS_PORT= Redis port
+
+# To enable email functionality, you must provide the appropriate SMTP configuration below. The active Spring profile will determine which SMTP service is used.
+# Email SMTP service <Optional>
 EMAIL_HOST=
 EMAIL_PORT=
 EMAIL_PASSWORD=
@@ -84,6 +90,11 @@ CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 CLOUDINARY_CLOUD_NAME=
 
+# PayOS
+PAYOS_API_KEY=
+PAYOS_CHECKSUM_KEY=
+PAYOS_CLIENT_ID=
+
 # Profile
 SPRING_PROFILES_ACTIVE= dev || prod
 ```
@@ -100,15 +111,16 @@ VITE_RECAPTCHA_V3_SITE_KEY=
 ```
 
 - [Mailtrap SMTP](https://mailtrap.io/blog/spring-send-email/t) or other SMTP services.
-- [Cloudinary SDK](https://cloudinary.com/documentation/java_quickstart)
+- [Cloudinary](https://cloudinary.com/documentation/java_quickstart)
 - [reCAPTCHA](https://developers.google.com/recaptcha)
+- [PayOS](https://payos.vn/docs/)
 
 ### Installation:
 
 #### Back-end
 
 - Navigate to back-end directory and run the following commands:
-  
+
 ```
 mvn clean install
 mvn spring-boot:run
@@ -135,7 +147,7 @@ Alternatively, you can use the `docker-compose` file in the root directory to st
 
 ```.env
 # =======================
-# Posgres
+# Postgres
 # =======================
 POSTGRES_USERNAME=
 POSTGRES_PASSWORD=
@@ -155,7 +167,12 @@ DB_USERNAME= PostgreSQL user name
 DB_PASSWORD= PostgreSQL password
 DB_NAME= PostgreSQL database name
 
-# Email SMTP service
+# Redis
+REDIS_HOST= Redis host
+REDIS_PORT= Redis port
+
+# To enable email functionality, you must provide the appropriate SMTP configuration below. The active Spring profile will determine which SMTP service is used.
+# Email SMTP service <Optional>
 EMAIL_HOST=
 EMAIL_PORT=
 EMAIL_PASSWORD=
@@ -179,6 +196,11 @@ RECAPTCHA_V3_SECRET_KEY=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 CLOUDINARY_CLOUD_NAME=
+
+# PayOS
+PAYOS_API_KEY=
+PAYOS_CHECKSUM_KEY=
+PAYOS_CLIENT_ID=
 
 # Profile
 SPRING_PROFILES_ACTIVE= dev || prod

@@ -1,8 +1,7 @@
-import Grid from "@mui/material/Grid2";
 import ProfileTabsList from "../profile/ProfileTabsList";
 import { Outlet, useMatch } from "react-router";
 import { useGetProfileQuery } from "../../features/users/usersApiSlice";
-import { useMediaQuery } from "@mui/material";
+import { useMediaQuery, Grid } from "@mui/material";
 import { Suspense, lazy, useState } from "react";
 
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));

@@ -25,24 +25,24 @@ const Wrapper = styled.div`
       radial-gradient(
         circle,
         transparent 25%,
-        ${({ theme }) => theme.palette.background.default} 26%
+        ${({ theme }) => theme.vars.palette.background.default} 26%
       ),
       linear-gradient(
         45deg,
         transparent 46%,
-        ${({ theme }) => theme.palette.primary.light} 47%,
-        ${({ theme }) => theme.palette.primary.light} 52%,
+        ${({ theme }) => theme.vars.palette.primary.light} 47%,
+        ${({ theme }) => theme.vars.palette.primary.light} 52%,
         transparent 53%
       ),
       linear-gradient(
         135deg,
         transparent 46%,
-        ${({ theme }) => theme.palette.primary.light} 47%,
-        ${({ theme }) => theme.palette.primary.light} 52%,
+        ${({ theme }) => theme.vars.palette.primary.light} 47%,
+        ${({ theme }) => theme.vars.palette.primary.light} 52%,
         transparent 53%
       );
     background-size: 4em 4em;
-    background-color: ${({ theme }) => theme.palette.background.default};
+    background-color: ${({ theme }) => theme.vars.palette.background.default};
     opacity: 0.3;
   }
 `;
@@ -67,7 +67,7 @@ const Content = styled.div`
 
   p {
     margin: 0;
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -84,21 +84,21 @@ const ErrorCode = styled.h1`
   display: flex;
   align-items: center;
   font-size: 13em;
-  color: ${({ theme }) => theme.palette.background.default};
+  color: ${({ theme }) => theme.vars.palette.background.default};
   margin: 0;
   text-shadow:
-    3px 3px 0 ${({ theme }) => theme.palette.warning.main},
-    -3px 3px 0 ${({ theme }) => theme.palette.warning.main},
-    -3px -3px 0 ${({ theme }) => theme.palette.warning.main},
-    3px -3px 0 ${({ theme }) => theme.palette.warning.main};
-  border-bottom: 0.02em solid ${({ theme }) => theme.palette.primary.main};
+    3px 3px 0 ${({ theme }) => theme.vars.palette.warning.main},
+    -3px 3px 0 ${({ theme }) => theme.vars.palette.warning.main},
+    -3px -3px 0 ${({ theme }) => theme.vars.palette.warning.main},
+    3px -3px 0 ${({ theme }) => theme.vars.palette.warning.main};
+  border-bottom: 0.02em solid ${({ theme }) => theme.vars.palette.primary.main};
 
   svg {
     font-size: 0.9em;
 
     path {
       fill: none;
-      stroke: ${({ theme }) => theme.palette.warning.main};
+      stroke: ${({ theme }) => theme.vars.palette.warning.main};
       stroke-width: 0.4px;
       stroke-linejoin: round;
     }

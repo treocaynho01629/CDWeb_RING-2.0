@@ -4,10 +4,10 @@ import {
   Box,
   IconButton,
   Typography,
-  Grid2 as Grid,
   Skeleton,
   Chip,
   Stack,
+  Grid,
 } from "@mui/material";
 import { NavLink, useParams } from "react-router";
 import { Launch, Edit as EditIcon } from "@mui/icons-material";

@@ -6,18 +6,16 @@ import {
   Twitter,
   QrCode,
   LocalAtm,
-  SystemSecurityUpdateGood,
-  CreditCard,
   ExpandLess,
   ExpandMore,
 } from "@mui/icons-material";
-import { Grid2 as Grid, Collapse } from "@mui/material";
+import { Collapse, Grid } from "@mui/material";
 import { useState } from "react";
 
 //#region styled
 const Wrapper = styled.div`
-  background-color: ${({ theme }) => theme.palette.divider};
-  border-top: 2px solid ${({ theme }) => theme.palette.primary.main};
+  background-color: ${({ theme }) => theme.vars.palette.divider};
+  border-top: 2px solid ${({ theme }) => theme.vars.palette.primary.main};
   margin-top: 15dvh;
   padding-top: 20px;
   width: 100%;
@@ -49,7 +47,7 @@ const Container = styled.div`
 const BotFooter = styled.div`
   height: 35px;
   padding: 0 30px;
-  background-color: ${({ theme }) => theme.palette.action.focus};
+  background-color: ${({ theme }) => theme.vars.palette.action.focus};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -96,7 +94,7 @@ const SocialIcon = styled.div`
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  color: ${({ theme }) => theme.palette.common.white};
+  color: ${({ theme }) => theme.vars.palette.common.white};
   background-color: #${({ color }) => color};
   display: flex;
   align-items: center;
@@ -129,7 +127,7 @@ const AddressContainer = styled.div`
   ${({ theme }) => theme.breakpoints.down("sm")} {
     padding-top: 0;
     margin-bottom: 5px;
-    border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
+    border-bottom: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   }
 `;
 
@@ -144,7 +142,7 @@ const Title = styled.h4`
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     margin: 5px 10px;
-    color: ${({ theme }) => theme.palette.primary.dark};
+    color: ${({ theme }) => theme.vars.palette.primary.dark};
 
     svg {
       display: block;
@@ -180,7 +178,7 @@ const ListItem = styled.li`
   transition: all 0.25s ease;
 
   &:hover {
-    color: ${({ theme }) => theme.palette.primary.dark};
+    color: ${({ theme }) => theme.vars.palette.primary.dark};
   }
 `;
 
@@ -200,11 +198,11 @@ const Payment = styled.div`
   font-size: 11px;
   margin-right: 3px;
   margin-bottom: 3px;
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
 
   &:hover {
-    background-color: ${({ theme }) => theme.palette.primary.light};
-    color: ${({ theme }) => theme.palette.primary.contrastText};
+    background-color: ${({ theme }) => theme.vars.palette.primary.light};
+    color: ${({ theme }) => theme.vars.palette.primary.contrastText};
     transform: translateX(5px);
   }
 `;

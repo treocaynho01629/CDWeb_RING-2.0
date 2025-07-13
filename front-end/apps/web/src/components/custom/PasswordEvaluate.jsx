@@ -10,8 +10,8 @@ const Indicator = styled.span`
   background-color: currentColor !important;
 
   &.empty {
-    background-color: ${({ theme }) => theme.palette.action.hover};
-    outline: 0.5px solid ${({ theme }) => theme.palette.divider};
+    background-color: ${({ theme }) => theme.vars.palette.action.hover};
+    outline: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   }
 `;
 
@@ -25,7 +25,7 @@ const EvaluateLabel = styled.p`
 const EvaluateHelperText = styled.span`
   font-size: 12px;
   line-height: 0.5;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 `;
 //#endregion
 

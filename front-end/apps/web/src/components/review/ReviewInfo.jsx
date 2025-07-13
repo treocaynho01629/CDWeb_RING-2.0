@@ -13,7 +13,7 @@ const ReviewsInfoContainer = styled.div`
   ${({ theme }) => theme.breakpoints.down("md")} {
     padding-bottom: 10px;
     justify-content: center;
-    border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
+    border-bottom: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   }
 `;
 
@@ -70,7 +70,7 @@ const Score = styled.h1`
 const TotalLabel = styled.span`
   margin: 5px 0;
   font-size: 14px;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 `;
 
 const ProgressLabel = styled.span`
@@ -92,7 +92,7 @@ const ProgressLabelContainer = styled.div`
 const ProgressBarContainer = styled.div`
   width: 100%;
   margin-right: 6px;
-  color: ${({ theme }) => theme.palette.warning.light};
+  color: ${({ theme }) => theme.vars.palette.warning.light};
 `;
 //#endregion
 

@@ -7,7 +7,6 @@ import {
   ListItemButton,
   Badge,
   Divider,
-  alpha,
   Skeleton,
 } from "@mui/material";
 import {
@@ -97,7 +96,7 @@ const Name = styled.p`
   margin-bottom: -2px;
   font-size: 16px;
   font-weight: 400;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -111,8 +110,8 @@ const Role = styled.span`
   border-radius: 15px;
   white-space: nowrap;
   border: 1px solid;
-  border-color: ${({ theme, color }) => theme.palette[color]?.main};
-  color: ${({ theme, color }) => theme.palette[color]?.main};
+  border-color: ${({ theme, color }) => theme.vars.palette[color]?.main};
+  color: ${({ theme, color }) => theme.vars.palette[color]?.main};
 `;
 
 const EditButton = styled.span`
@@ -125,9 +124,9 @@ const EditButton = styled.span`
   aspect-ratio: 1/1;
   font-size: 13px;
   justify-content: flex-end;
-  color: ${({ theme }) => theme.palette.common.black};
-  background-color: ${({ theme }) => theme.palette.grey[300]};
-  border: 2px solid ${({ theme }) => theme.palette.background.default};
+  color: ${({ theme }) => theme.vars.palette.common.black};
+  background-color: ${({ theme }) => theme.vars.palette.grey[300]};
+  border: 2px solid ${({ theme }) => theme.vars.palette.background.default};
   cursor: pointer;
 
   svg {
@@ -136,8 +135,8 @@ const EditButton = styled.span`
   }
 
   &:hover {
-    color: ${({ theme }) => theme.palette.primary.main};
-    background-color: ${({ theme }) => theme.palette.grey[200]};
+    color: ${({ theme }) => theme.vars.palette.primary.main};
+    background-color: ${({ theme }) => theme.vars.palette.grey[200]};
     transition: 0.25s ease;
   }
 
@@ -164,21 +163,21 @@ const StyledListItemButton = styled(ListItemButton)`
   &.secondary {
     padding: 0;
     padding-left: 48px;
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
   }
 
   &:hover {
-    color: ${({ theme }) => theme.palette.primary.main};
-    background-color: ${({ theme }) => theme.palette.background.default};
+    color: ${({ theme }) => theme.vars.palette.primary.main};
+    background-color: ${({ theme }) => theme.vars.palette.background.default};
   }
 
   &.Mui-selected {
-    color: ${({ theme }) => theme.palette.primary.light};
+    color: ${({ theme }) => theme.vars.palette.primary.light};
     background-color: transparent;
     text-decoration: underline;
 
     &:hover {
-      background-color: ${({ theme }) => theme.palette.action.hover};
+      background-color: ${({ theme }) => theme.vars.palette.action.hover};
     }
   }
 
@@ -211,7 +210,7 @@ const Additional = styled.span`
 
   b {
     margin-left: 5px;
-    color: ${({ theme }) => theme.palette.warning.main};
+    color: ${({ theme }) => theme.vars.palette.warning.main};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -245,8 +244,12 @@ const NavItem = styled(NavLink)`
     padding: 5px;
     border-radius: 5px;
     font-size: 2.6rem;
-    color: ${({ theme }) => theme.palette.primary.dark};
-    background-color: ${({ theme }) => alpha(theme.palette.primary.light, 0.3)};
+    color: ${({ theme }) => theme.vars.palette.primary.dark};
+    background-color: color-mix(
+      in srgb,
+      ${({ theme }) => theme.vars.palette.primary.light},
+      transparent 70%
+    );
   }
 `;
 //#endregion

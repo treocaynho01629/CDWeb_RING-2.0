@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Button, Skeleton, Paper, alpha } from "@mui/material";
+import { Button, Skeleton, Paper } from "@mui/material";
 import { dateFormatter, iconList } from "@ring/shared";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Storefront } from "@mui/icons-material";
@@ -21,7 +21,7 @@ const Wrapper = styled.div`
 
 const CouponEdge = styled(Paper)`
   position: absolute;
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   border-left: none;
   border-bottom: none;
   width: 30px;
@@ -62,7 +62,7 @@ const CouponContent = styled.div`
 
 const CouponAction = styled.div`
   height: 100%;
-  border: 0.5px dashed ${({ theme }) => theme.palette.primary.main};
+  border: 0.5px dashed ${({ theme }) => theme.vars.palette.primary.main};
   margin: 0 10px 5px;
   position: relative;
   display: flex;
@@ -70,7 +70,7 @@ const CouponAction = styled.div`
   align-items: center;
 
   &.saved {
-    border-color: ${({ theme }) => theme.palette.warning.main};
+    border-color: ${({ theme }) => theme.vars.palette.warning.main};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -114,7 +114,7 @@ const CouponMain = styled.div`
   p {
     font-size: 14px;
     margin: 5px 0;
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -152,7 +152,7 @@ const ExpText = styled.span`
   margin-right: ${({ theme }) => theme.spacing(1.25)};
   font-weight: 450;
   color: ${({ theme, color }) =>
-    theme.palette[color]?.main || theme.palette.text.primary};
+    theme.vars.palette[color]?.main || theme.vars.palette.text.primary};
   white-space: nowrap;
 
   &::before {
@@ -160,7 +160,7 @@ const ExpText = styled.span`
   }
 
   &.date {
-    color: ${({ theme }) => theme.palette.info.light};
+    color: ${({ theme }) => theme.vars.palette.info.light};
     font-weight: normal;
 
     &::before {
@@ -181,10 +181,12 @@ const CouponIcon = styled.div`
   height: 80px;
   aspect-ratio: 1/1;
   background-color: ${({ theme, color }) =>
-    theme.palette[color]?.light || theme.palette.primary.light};
+    theme.vars.palette[color]?.light || theme.vars.palette.primary.light};
   color: ${({ theme, color }) =>
-    theme.palette[color]?.contrastText || theme.palette.primary.contrastText};
-  border-right: 5px dotted ${({ theme }) => theme.palette.background.default};
+    theme.vars.palette[color]?.contrastText ||
+    theme.vars.palette.primary.contrastText};
+  border-right: 5px dotted
+    ${({ theme }) => theme.vars.palette.background.default};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -206,7 +208,7 @@ const ShopImage = styled(LazyLoadImage)`
   height: 45px;
   aspect-ratio: 1/1;
   border-radius: 50%;
-  border: 1px solid ${({ theme }) => theme.palette.success.main};
+  border: 1px solid ${({ theme }) => theme.vars.palette.success.main};
 `;
 
 const ShopName = styled.span`
@@ -242,17 +244,19 @@ const CouponContainer = styled.div`
   border-radius: 5px;
   padding: 5px;
   height: 100%;
-  background-color: ${({ theme }) => theme.palette.background.default};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.default};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   box-shadow: ${({ theme }) => theme.shadows[1]};
   transition: all 0.2s ease;
 
   &.active {
-    background-color: ${({ theme }) => alpha(theme.palette.primary.light, 0.1)};
-    border-color: ${({ theme }) => theme.palette.primary.main};
+    background-color: ${({ theme }) =>
+      `color-mix(in srgb, ${theme.vars.palette.primary.light}, 
+    transparent 90%)`};
+    border-color: ${({ theme }) => theme.vars.palette.primary.main};
 
     ${CouponEdge} {
-      border-color: ${({ theme }) => theme.palette.primary.main};
+      border-color: ${({ theme }) => theme.vars.palette.primary.main};
     }
 
     ${CouponIcon} {
@@ -274,9 +278,9 @@ const CouponContainer = styled.div`
       text-align: center;
       display: flex;
       align-items: center;
-      background-color: ${({ theme }) => theme.palette.background.default};
-      color: ${({ theme }) => theme.palette.text.disabled};
-      border: 1px solid ${({ theme }) => theme.palette.divider};
+      background-color: ${({ theme }) => theme.vars.palette.background.default};
+      color: ${({ theme }) => theme.vars.palette.text.disabled};
+      border: 1px solid ${({ theme }) => theme.vars.palette.divider};
       border-radius: 6px;
       transform: rotate(-10deg);
       pointer-events: none;

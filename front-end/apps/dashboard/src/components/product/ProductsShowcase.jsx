@@ -36,11 +36,11 @@ const Rank = styled.span`
   border: 0.5px solid currentColor;
 
   &.first {
-    color: ${({ theme }) => theme.palette.success.light};
+    color: ${({ theme }) => theme.vars.palette.success.light};
   }
 
   &.second {
-    color: ${({ theme }) => theme.palette.warning.light};
+    color: ${({ theme }) => theme.vars.palette.warning.light};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -56,7 +56,7 @@ const ProductContainer = styled.div`
 
   ${({ theme }) => theme.breakpoints.up("md_lg")} {
     &.selected {
-      border-right: 3px solid ${({ theme }) => theme.palette.primary.main};
+      border-right: 3px solid ${({ theme }) => theme.vars.palette.primary.main};
     }
   }
 `;
@@ -87,7 +87,7 @@ const StyledLazyImage = styled(LazyLoadImage)`
   display: inline-block;
   height: 45px;
   width: 45px;
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
 `;
 
 const StyledSkeleton = styled(Skeleton)`
@@ -126,10 +126,10 @@ const TextMore = styled.b`
   margin-left: 5px;
   padding-left: 5px;
   font-size: 12px;
-  color: ${({ theme }) => theme.palette.info.main};
+  color: ${({ theme }) => theme.vars.palette.info.main};
 
   &:last-of-type {
-    border-left: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+    border-left: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
   }
 `;
 
@@ -141,7 +141,7 @@ const StyledRating = styled(Rating)`
 
 const ProductShop = styled.span`
   font-size: 14px;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     font-size: 12px;

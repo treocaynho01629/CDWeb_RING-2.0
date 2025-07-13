@@ -9,7 +9,7 @@ const ReCaptcha = ({ onVerify, onExpire }) => {
   const recaptchaId = useRef(null);
   const containerRef = useRef(null);
   const theme = useTheme();
-  const mode = theme.palette.mode;
+  const mode = theme.vars.palette.mode;
   const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
   // Render the reCAPTCHA widget

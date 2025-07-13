@@ -17,7 +17,6 @@ import {
 } from "@mui/icons-material";
 import {
   Button,
-  Grid2 as Grid,
   Table,
   TableBody,
   TableRow,
@@ -25,6 +24,7 @@ import {
   MenuItem,
   ListItemText,
   ListItemIcon,
+  Grid,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router";
 import { booksApiSlice } from "../../features/books/booksApiSlice";

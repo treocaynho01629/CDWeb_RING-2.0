@@ -90,7 +90,7 @@ export const ActionTableCell = styled(TableCell)`
 export const StyledTableHead = styled(TableHead)`
   position: sticky;
   top: ${({ theme }) => theme.mixins.toolbar.minHeight + 16}px;
-  background-color: ${({ theme }) => theme.palette.background.default};
+  background-color: ${({ theme }) => theme.vars.palette.background.default};
   z-index: 2;
 
   &:before {
@@ -100,7 +100,7 @@ export const StyledTableHead = styled(TableHead)`
     top: -16px;
     width: calc(100% + 20px);
     height: calc(100% + 16px);
-    background-color: ${({ theme }) => theme.palette.background.default};
+    background-color: ${({ theme }) => theme.vars.palette.background.default};
     z-index: -1;
   }
 
@@ -111,7 +111,7 @@ export const StyledTableHead = styled(TableHead)`
     top: 0;
     width: calc(100% + 0.5px);
     height: 100%;
-    border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+    border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
 
     ${({ theme }) => theme.breakpoints.down("sm")} {
       border-left: none;
@@ -151,8 +151,8 @@ export const StyledTableRow = styled(TableRow)`
     top: 0;
     width: 100%;
     height: 100%;
-    border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
-    background-color: ${({ theme }) => theme.palette.background.paper};
+    border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
+    background-color: ${({ theme }) => theme.vars.palette.background.paper};
     z-index: -1;
 
     ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -191,10 +191,10 @@ export const StyledItemTableRow = styled(TableRow)`
     top: 0;
     width: 100%;
     height: 100%;
-    border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+    border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
     border-top: none;
     border-bottom: none;
-    background-color: ${({ theme }) => theme.palette.background.paper};
+    background-color: ${({ theme }) => theme.vars.palette.background.paper};
     z-index: -1;
 
     ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -204,7 +204,7 @@ export const StyledItemTableRow = styled(TableRow)`
 
   &.error {
     &:after {
-      border: 0.5px solid ${({ theme }) => theme.palette.error.light};
+      border: 0.5px solid ${({ theme }) => theme.vars.palette.error.light};
     }
   }
 `;

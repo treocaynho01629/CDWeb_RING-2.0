@@ -51,7 +51,7 @@ const StyledSimpleBar = styled(SimpleBar)`
     &.simplebar-vertical {
       .simplebar-scrollbar {
         &:before {
-          background-color: ${({ theme }) => theme.palette.divider};
+          background-color: ${({ theme }) => theme.vars.palette.divider};
         }
       }
     }
@@ -88,13 +88,13 @@ const LabelText = styled.span`
   overflow: hidden;
 
   svg {
-    color: ${({ theme }) => theme.palette.warning.light};
+    color: ${({ theme }) => theme.vars.palette.warning.light};
     font-size: 18px;
   }
 
   &.warning {
     padding: ${({ theme }) => theme.spacing(1)} 0;
-    color: ${({ theme }) => theme.palette.warning.main};
+    color: ${({ theme }) => theme.vars.palette.warning.main};
   }
 `;
 
@@ -105,15 +105,15 @@ const StyledListItemButton = styled(ListItemButton)`
   &.secondary {
     padding-left: 16px;
     font-size: 13px;
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
 
     &.Mui-selected {
-      color: ${({ theme }) => theme.palette.primary.main};
+      color: ${({ theme }) => theme.vars.palette.primary.main};
     }
   }
 
   &.Mui-selected {
-    color: ${({ theme }) => theme.palette.primary.main};
+    color: ${({ theme }) => theme.vars.palette.primary.main};
   }
 `;
 
@@ -129,7 +129,7 @@ const Showmore = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.palette.info.main};
+  color: ${({ theme }) => theme.vars.palette.info.main};
   cursor: pointer;
 
   ${({ theme }) => theme.breakpoints.down("md")} {
@@ -149,7 +149,7 @@ const ButtonContainer = styled.div`
     left: ${({ theme }) => theme.spacing(-0.5)};
     width: ${({ theme }) => `calc(100% + ${theme.spacing(0.5)})`};
     height: 100%;
-    background-color: ${({ theme }) => theme.palette.background.default};
+    background-color: ${({ theme }) => theme.vars.palette.background.default};
   }
 `;
 //#endregion

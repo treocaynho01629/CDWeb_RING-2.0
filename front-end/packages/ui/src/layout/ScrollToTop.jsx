@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { KeyboardArrowUp } from "@mui/icons-material";
 import { useLayoutEffect } from "yet-another-react-lightbox";
 import { useLocation } from "react-router";
+import KeyboardArrowUp from "@mui/icons-material/KeyboardArrowUp";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import styled from "@emotion/styled";
 
@@ -43,8 +43,8 @@ const StyledButton = styled.button`
   outline: none;
   width: 48px;
   height: 48px;
-  color: ${({ theme }) => theme.palette.primary.contrastText};
-  background-color: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.contrastText};
+  background-color: ${({ theme }) => theme.vars.palette.primary.main};
   text-align: center;
   display: flex;
   align-items: center;
@@ -52,8 +52,8 @@ const StyledButton = styled.button`
   cursor: pointer;
 
   &:hover {
-    background-color: ${({ theme }) => theme.palette.grey[300]};
-    color: ${({ theme }) => theme.palette.text.primary};
+    background-color: ${({ theme }) => theme.vars.palette.grey[300]};
+    color: ${({ theme }) => theme.vars.palette.text.primary};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {

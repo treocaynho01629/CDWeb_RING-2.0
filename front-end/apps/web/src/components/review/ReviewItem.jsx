@@ -24,7 +24,7 @@ const Profile = styled.div`
   padding: 15px 0 5px;
 
   &.active {
-    border-color: ${({ theme }) => theme.palette.primary.main};
+    border-color: ${({ theme }) => theme.vars.palette.primary.main};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -46,7 +46,7 @@ const RateContent = styled.div`
 const ActionButton = styled.span`
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   opacity: 0.9;
   font-size: 14px;
   cursor: pointer;
@@ -56,15 +56,15 @@ const ActionButton = styled.span`
   }
 
   svg {
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
     font-size: 20px;
   }
 
   &:hover {
-    color: ${({ theme }) => theme.palette.warning.main};
+    color: ${({ theme }) => theme.vars.palette.warning.main};
 
     svg {
-      color: ${({ theme }) => theme.palette.warning.main};
+      color: ${({ theme }) => theme.vars.palette.warning.main};
     }
   }
 
@@ -111,8 +111,8 @@ const ProductContent = styled.div`
   font-size: 14px;
   padding: ${({ theme }) => theme.spacing(1)};
   margin-bottom: ${({ theme }) => theme.spacing(2)};
-  color: ${({ theme }) => theme.palette.text.secondary};
-  border: 0.5px dashed ${({ theme }) => theme.palette.warning.main};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
+  border: 0.5px dashed ${({ theme }) => theme.vars.palette.warning.main};
 `;
 //#endregion
 

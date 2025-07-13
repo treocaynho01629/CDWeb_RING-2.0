@@ -46,7 +46,7 @@ const TitleContainer = styled.div`
 const SubTitle = styled.span`
   font-size: 16px;
   font-weight: 400;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     display: none;
@@ -55,13 +55,13 @@ const SubTitle = styled.span`
 
 const SubText = styled.p`
   font-size: 16px;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   margin: ${({ theme }) => theme.spacing(1)} 0;
 `;
 
 const SummaryContainer = styled.div`
-  border-top: 0.5px dashed ${({ theme }) => theme.palette.divider};
-  border-bottom: 0.5px dashed ${({ theme }) => theme.palette.divider};
+  border-top: 0.5px dashed ${({ theme }) => theme.vars.palette.divider};
+  border-bottom: 0.5px dashed ${({ theme }) => theme.vars.palette.divider};
   padding: ${({ theme }) => theme.spacing(2)} 0;
 
   ${({ theme }) => theme.breakpoints.down("md")} {
@@ -98,7 +98,7 @@ const ShippingTag = styled.span`
   align-items: center;
   font-weight: 450;
   color: ${({ theme, color }) =>
-    theme.palette[color]?.dark || theme.palette.primary.dark};
+    theme.vars.palette[color]?.dark || theme.vars.palette.primary.dark};
 `;
 
 const StuffContainer = styled.div`
@@ -120,7 +120,7 @@ const ContentWrapper = styled.div`
 
 const InfoContainer = styled.div`
   height: 100%;
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   padding: ${({ theme }) => theme.spacing(2)};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -133,7 +133,7 @@ const InfoText = styled.span`
   line-height: 1.75em;
   display: flex;
   margin-top: ${({ theme }) => theme.spacing(0.5)};
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 
   &.price {
     margin: 0;
@@ -172,7 +172,7 @@ const MainButton = styled(Button)`
 const ButtonContainer = styled.div`
   padding: 0 ${({ theme }) => theme.spacing(1)};
   margin: ${({ theme }) => `${theme.spacing(1)} 0 ${theme.spacing(2)}`};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   display: none;
 
   ${({ theme }) => theme.breakpoints.down("md")} {
@@ -206,9 +206,9 @@ const MobileButton = styled.div`
 const MainButtonContainer = styled.div`
   position: sticky;
   bottom: ${({ theme }) => `calc(${theme.spacing(-2.5)} - 1px)`};
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
   padding: ${({ theme }) => `${theme.spacing(2.5)} ${theme.spacing(2)}`};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
   display: flex;
   width: 100%;
   z-index: 2;

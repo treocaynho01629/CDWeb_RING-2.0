@@ -1,7 +1,6 @@
 import { trackWindowScroll } from "react-lazy-load-image-component";
-import { Box } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import Progress from "@ring/ui/Progress";
-import Grid from "@mui/material/Grid2";
 import Product from "./Product";
 
 const Products = ({ data, isError, isLoading, isSuccess, scrollPosition }) => {

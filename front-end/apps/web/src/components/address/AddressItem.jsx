@@ -16,16 +16,16 @@ const AddressItemContainer = styled.div`
   justify-content: space-between;
   width: 100%;
   padding: 20px;
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
 
   &.active {
-    border-color: ${({ theme }) => theme.palette.primary.main};
+    border-color: ${({ theme }) => theme.vars.palette.primary.main};
   }
   &.temp {
-    border-color: ${({ theme }) => theme.palette.info.dark};
+    border-color: ${({ theme }) => theme.vars.palette.info.dark};
   }
   &.error {
-    border-color: ${({ theme }) => theme.palette.error.main};
+    border-color: ${({ theme }) => theme.vars.palette.error.main};
   }
 `;
 
@@ -38,18 +38,18 @@ const AddressTag = styled.div`
   padding: 2px 10px;
   border-right: 0.5px solid;
   border-bottom: 0.5px solid;
-  border-color: ${({ theme }) => theme.palette.primary.main};
-  color: ${({ theme }) => theme.palette.primary.dark};
+  border-color: ${({ theme }) => theme.vars.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.dark};
   pointer-events: none;
 
   &.temp {
-    border-color: ${({ theme }) => theme.palette.info.dark};
-    color: ${({ theme }) => theme.palette.info.dark};
+    border-color: ${({ theme }) => theme.vars.palette.info.dark};
+    color: ${({ theme }) => theme.vars.palette.info.dark};
   }
 
   &.error {
-    border-color: ${({ theme }) => theme.palette.error.main};
-    color: ${({ theme }) => theme.palette.error.dark};
+    border-color: ${({ theme }) => theme.vars.palette.error.main};
+    color: ${({ theme }) => theme.vars.palette.error.dark};
   }
 `;
 
@@ -92,17 +92,17 @@ const UserAddress = styled.span`
 
 const StyledRadio = styled(Radio)(({ theme }) => ({
   borderRadius: 0,
-  backgroundColor: theme.palette.action.disabled,
+  backgroundColor: theme.vars.palette.action.disabled,
   transition: "all .25s ease",
 
   "&:hover": {
-    backgroundColor: theme.palette.primary.light,
-    color: theme.palette.primary.contrastText,
+    backgroundColor: theme.vars.palette.primary.light,
+    color: theme.vars.palette.primary.contrastText,
   },
 
   "&.Mui-checked": {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
+    backgroundColor: theme.vars.palette.primary.main,
+    color: theme.vars.palette.primary.contrastText,
   },
 }));
 //#endregion

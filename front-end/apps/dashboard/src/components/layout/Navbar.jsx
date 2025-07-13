@@ -5,7 +5,6 @@ import {
   Stack,
   Avatar,
   Box,
-  alpha,
   Chip,
   Typography,
   Button,
@@ -30,7 +29,7 @@ const ShopSelect = lazy(() => import("./ShopSelect"));
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
-  backgroundColor: `${alpha(theme.palette.background.default, 0.5)} !important`,
+  backgroundColor: `color-mix(in srgb, ${theme.vars.palette.background.default}, transparent 50%) !important`,
   backdropFilter: "blur(10px)",
 
   transition: theme.transitions.create(["width", "margin"], {

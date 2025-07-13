@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Box, Grid2 as Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import { trackWindowScroll } from "react-lazy-load-image-component";
 import Progress from "@ring/ui/Progress";
 import Product from "../Product";

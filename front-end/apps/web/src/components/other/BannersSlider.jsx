@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { Grid2 as Grid, Skeleton, useMediaQuery } from "@mui/material";
+import { Skeleton, useMediaQuery, Grid } from "@mui/material";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useGetBannersQuery } from "../../features/banners/bannersApiSlice";
@@ -17,10 +17,10 @@ const CustomDotButton = styled("span")(({ theme }) => ({
   border: ".5px solid",
   cursor: "pointer",
   transition: "width .1s ease",
-  borderColor: theme.palette.action.focus,
-  backgroundColor: theme.palette.grey[400],
+  borderColor: theme.vars.palette.action.focus,
+  backgroundColor: theme.vars.palette.grey[400],
   ...theme.applyStyles("dark", {
-    backgroundColor: theme.palette.grey[700],
+    backgroundColor: theme.vars.palette.grey[700],
   }),
 
   "&.active": {
@@ -29,8 +29,8 @@ const CustomDotButton = styled("span")(({ theme }) => ({
     marginTop: 2,
     opacity: 1,
     borderRadius: 5,
-    borderColor: theme.palette.primary.dark,
-    backgroundColor: theme.palette.primary.main,
+    borderColor: theme.vars.palette.primary.dark,
+    backgroundColor: theme.vars.palette.primary.main,
   },
 }));
 
@@ -39,8 +39,8 @@ const CustomArrowButton = styled.div`
   top: 0;
   bottom: 0;
   margin: auto;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   border-radius: 50%;
   height: 24px;
   width: 24px;
@@ -56,7 +56,7 @@ const CustomArrowButton = styled.div`
   &:hover {
     opacity: 1;
     transform: scale(1.1);
-    background-color: ${({ theme }) => theme.palette.background.default};
+    background-color: ${({ theme }) => theme.vars.palette.background.default};
   }
 
   &.left {
@@ -94,7 +94,8 @@ const BackdropImage = styled(LazyLoadImage)`
   width: 130%;
   height: 130%;
   object-fit: fill;
-  background-color: ${({ theme }) => theme.palette.action.disabledBackground};
+  background-color: ${({ theme }) =>
+    theme.vars.palette.action.disabledBackground};
 `;
 
 const BackdropPlaceholder = styled(Skeleton)`
@@ -123,11 +124,12 @@ const StyledLazyImage = styled(LazyLoadImage)`
   width: 100%;
   height: 100%;
   object-fit: fill;
-  background-color: ${({ theme }) => theme.palette.action.disabledBackground};
+  background-color: ${({ theme }) =>
+    theme.vars.palette.action.disabledBackground};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     width: 90%;
-    background-color: ${({ theme }) => theme.palette.grey[400]};
+    background-color: ${({ theme }) => theme.vars.palette.grey[400]};
   }
 `;
 
@@ -138,7 +140,7 @@ const StyledSkeleton = styled(Skeleton)`
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     width: 90%;
-    background-color: ${({ theme }) => theme.palette.grey[400]};
+    background-color: ${({ theme }) => theme.vars.palette.grey[400]};
   }
 `;
 

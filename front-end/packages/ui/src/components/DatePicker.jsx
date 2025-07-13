@@ -11,38 +11,38 @@ const StyledDatePicker = styled(MuiDatePicker)(({ theme }) => ({
     borderRadius: 0,
   },
   "& label.Mui-focused": {
-    color: theme.palette.action.focus,
+    color: theme.vars.palette.action.focus,
   },
   "& .MuiInput-underline:after": {
-    borderBottomColor: theme.palette.action.focus,
+    borderBottomColor: theme.vars.palette.action.focus,
   },
   "& .MuiOutlinedInput-root": {
     borderRadius: 0,
     "& fieldset": {
       borderRadius: 0,
-      borderColor: theme.palette.action.focus,
+      borderColor: theme.vars.palette.action.focus,
     },
     "&:hover fieldset": {
       borderRadius: 0,
-      borderColor: theme.palette.action.hover,
+      borderColor: theme.vars.palette.action.hover,
     },
     "&.Mui-focused fieldset": {
       borderRadius: 0,
-      borderColor: theme.palette.action.focus,
+      borderColor: theme.vars.palette.action.focus,
     },
   },
   "& input:valid + fieldset": {
-    borderColor: theme.palette.action.focus,
+    borderColor: theme.vars.palette.action.focus,
     borderRadius: 0,
     borderWidth: 1,
   },
   "& input:invalid + fieldset": {
-    borderColor: theme.palette.error.main,
+    borderColor: theme.vars.palette.error.main,
     borderRadius: 0,
     borderWidth: 1,
   },
   "& input:valid:focus + fieldset": {
-    borderColor: theme.palette.primary.main,
+    borderColor: theme.vars.palette.primary.main,
     borderLeftWidth: 4,
     borderRadius: 0,
     padding: "4px !important",

@@ -43,8 +43,8 @@ const DialogContent = lazy(() => import("@mui/material/DialogContent"));
 const ReviewsWrapper = styled.div`
   position: relative;
   padding: ${({ theme }) => `${theme.spacing(1)} ${theme.spacing(2.5)}`};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     padding: 0 ${({ theme }) => theme.spacing(1.5)};
@@ -79,11 +79,11 @@ const Label = styled.span`
   font-size: 14px;
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.palette.warning.light};
+  color: ${({ theme }) => theme.vars.palette.warning.light};
 
   &.secondary {
     font-size: 14px;
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
   }
 `;
 
@@ -91,7 +91,7 @@ const StyledEmptyIcon = styled(EmptyIcon)`
   height: 70px;
   width: 70px;
   margin: ${({ theme }) => theme.spacing(1)} 0;
-  fill: ${({ theme }) => theme.palette.text.icon};
+  fill: ${({ theme }) => theme.vars.palette.text.icon};
 `;
 //#endregion
 

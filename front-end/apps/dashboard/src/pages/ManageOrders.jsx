@@ -1,4 +1,4 @@
-import { Box, Breadcrumbs, Grid2 as Grid, Typography } from "@mui/material";
+import { Box, Breadcrumbs, Typography } from "@mui/material";
 import { Link } from "react-router";
 import { AttachMoney } from "@mui/icons-material";
 import { useTitle } from "@ring/shared";

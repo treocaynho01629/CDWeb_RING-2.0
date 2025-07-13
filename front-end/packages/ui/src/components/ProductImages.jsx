@@ -12,7 +12,7 @@ const LightboxImages = lazy(() => import("./LightboxImages"));
 const ImgContainer = styled.div`
   position: relative;
   text-align: center;
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
 
   .react-multi-carousel-list {
     position: unset !important;
@@ -57,8 +57,8 @@ const MoreImageContainer = styled.div`
 
 const CustomArrowButton = styled.div`
   position: absolute;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   border-radius: 50%;
   height: 30px;
   width: 30px;
@@ -121,7 +121,7 @@ const StyledSkeleton = styled(Skeleton)`
 
 const SmallImageSlide = styled.div`
   display: flex;
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   opacity: 0.5;
   aspect-ratio: 1/1;
   max-height: 85px;
@@ -130,12 +130,12 @@ const SmallImageSlide = styled.div`
   transition: opacity 0.25s ease;
 
   &.active {
-    border: 3px solid ${({ theme }) => theme.palette.primary.main};
+    border: 3px solid ${({ theme }) => theme.vars.palette.primary.main};
     opacity: 1;
   }
 
   &:hover {
-    border: 1px solid ${({ theme }) => theme.palette.primary.light};
+    border: 1px solid ${({ theme }) => theme.vars.palette.primary.light};
     opacity: 1;
   }
 `;
@@ -146,7 +146,8 @@ const StyledSmallLazyImage = styled(LazyLoadImage)`
   width: 100%;
   aspect-ratio: 1/1;
   max-height: 85px;
-  background-color: ${({ theme }) => theme.palette.action.disabledBackground};
+  background-color: ${({ theme }) =>
+    theme.vars.palette.action.disabledBackground};
 `;
 
 const StyledSmallSkeleton = styled(Skeleton)`

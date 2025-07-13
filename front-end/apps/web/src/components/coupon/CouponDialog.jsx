@@ -69,7 +69,7 @@ const Showmore = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.palette.info.main};
+  color: ${({ theme }) => theme.vars.palette.info.main};
   cursor: pointer;
 
   ${({ theme }) => theme.breakpoints.down("md")} {

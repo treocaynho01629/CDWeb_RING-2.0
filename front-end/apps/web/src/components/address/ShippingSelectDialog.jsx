@@ -1,7 +1,6 @@
 import styled from "@emotion/styled";
 import { AllInbox, Check, Close } from "@mui/icons-material";
 import {
-  alpha,
   Button,
   FormControlLabel,
   Radio,
@@ -23,7 +22,7 @@ const FormContent = styled.div`
 const StyledForm = styled(FormControlLabel)`
   padding: ${({ theme }) => `${theme.spacing(1.5)} ${theme.spacing(2)}`};
   padding-left: 0;
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   min-width: 50%;
   margin: ${({ theme }) => theme.spacing(0.5)} 0;
 
@@ -33,8 +32,10 @@ const StyledForm = styled(FormControlLabel)`
   }
 
   &:has(input[type="radio"]:checked) {
-    border-color: ${({ theme }) => theme.palette.primary.main};
-    background-color: ${({ theme }) => alpha(theme.palette.primary.light, 0.1)};
+    border-color: ${({ theme }) => theme.vars.palette.primary.main};
+    background-color: ${({ theme }) =>
+      `color-mix(in srgb, ${theme.vars.palette.primary.light}, 
+      transparent 90%)`};
   }
 `;
 
@@ -47,7 +48,7 @@ const ItemContent = styled.div`
 
 const Discount = styled.p`
   font-size: 12px;
-  color: ${({ theme }) => theme.palette.text.disabled};
+  color: ${({ theme }) => theme.vars.palette.text.disabled};
   margin: 0;
   display: flex;
   flex-wrap: wrap;
@@ -63,7 +64,7 @@ const PriceTag = styled.span`
   justify-content: flex-end;
   font-weight: 450;
   color: ${({ theme, color }) =>
-    theme.palette[color]?.dark || theme.palette.text.primary};
+    theme.vars.palette[color]?.dark || theme.vars.palette.text.primary};
 `;
 
 const ItemTitle = styled.div`
@@ -78,7 +79,7 @@ const ItemTitle = styled.div`
 
 const Estimate = styled.span`
   font-size: 12px;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 `;
 //#endregion
 

@@ -15,7 +15,7 @@ import {
   Label,
   Sector,
 } from "recharts";
-import { Avatar, Grid2 as Grid, Paper, useTheme } from "@mui/material";
+import { Avatar, Paper, useTheme, Grid } from "@mui/material";
 import {
   BarChart as BarChartIcon,
   PieChart as PieChartIcon,
@@ -28,8 +28,8 @@ import { useState } from "react";
 
 //#region styled
 const TooltipContainer = styled.div`
-  background-color: ${({ theme }) => theme.palette.background.default};
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  background-color: ${({ theme }) => theme.vars.palette.background.default};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
   padding: 10px;
 `;
 

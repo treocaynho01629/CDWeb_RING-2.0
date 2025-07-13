@@ -8,7 +8,7 @@ const Container = styled.div`
   position: relative;
   max-height: 100%;
   width: 200px;
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     width: auto;

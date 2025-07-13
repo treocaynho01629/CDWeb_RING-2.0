@@ -9,7 +9,6 @@ import {
   CategoryOutlined,
 } from "@mui/icons-material";
 import {
-  alpha,
   Button,
   createFilterOptions,
   IconButton,
@@ -76,7 +75,7 @@ const SearchInputContainer = styled.div`
     display: flex;
     align-items: center;
     padding: ${({ theme }) => `${theme.spacing(1.5)} ${theme.spacing(1.5)}`};
-    border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
+    border-bottom: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -87,7 +86,7 @@ const SearchInputContainer = styled.div`
 const StyledSearchInput = styled(TextField)`
   display: flex;
   color: inherit;
-  background: ${({ theme }) => theme.palette.background.paper};
+  background: ${({ theme }) => theme.vars.palette.background.paper};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     width: 100%;
@@ -95,7 +94,7 @@ const StyledSearchInput = styled(TextField)`
 
   .${inputBaseClasses.input} {
     width: 100%;
-    background: ${({ theme }) => theme.palette.background.paper};
+    background: ${({ theme }) => theme.vars.palette.background.paper};
   }
 
   .${inputBaseClasses.adornedEnd} {
@@ -145,8 +144,8 @@ const GroupHeader = styled.div`
   justify-content: space-between;
   text-transform: capitalize;
   font-weight: 450;
-  background-color: ${({ theme }) => theme.palette.divider};
-  border-bottom: 0.5px solid ${({ theme }) => theme.palette.primary.main};
+  background-color: ${({ theme }) => theme.vars.palette.divider};
+  border-bottom: 0.5px solid ${({ theme }) => theme.vars.palette.primary.main};
 `;
 
 const GroupListBox = styled.ul`
@@ -160,22 +159,24 @@ const ListItem = styled.li`
   height: 36px;
 
   &.alt {
-    background-color: ${({ theme }) => alpha(theme.palette.success.light, 0.1)};
+    background-color: ${({ theme }) =>
+      `color-mix(in srgb, ${theme.vars.palette.success.light}, 
+      transparent 90%)`};
   }
 
   &.Mui-focused {
-    background-color: ${({ theme }) => theme.palette.action.hover};
+    background-color: ${({ theme }) => theme.vars.palette.action.hover};
     cursor: pointer;
   }
 
   &:active {
-    background-color: ${({ theme }) => theme.palette.action.selected};
+    background-color: ${({ theme }) => theme.vars.palette.action.selected};
   }
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     padding: ${({ theme }) => `${theme.spacing(2.75)} ${theme.spacing(1.5)}`};
     padding-right: ${({ theme }) => theme.spacing(0.5)};
-    border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
+    border-bottom: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   }
 `;
 
@@ -206,7 +207,7 @@ const StyledIconButton = styled(IconButton)`
 
   &:hover {
     background-color: transparent;
-    color: ${({ theme }) => theme.palette.error.main};
+    color: ${({ theme }) => theme.vars.palette.error.main};
   }
 `;
 
@@ -220,7 +221,7 @@ const SearchButton = styled(Button)`
   width: 48px;
   min-width: auto;
   padding: ${({ theme }) => theme.spacing(0.5)};
-  border-left: 1px solid ${({ theme }) => theme.palette.divider};
+  border-left: 1px solid ${({ theme }) => theme.vars.palette.divider};
 
   svg {
     font-size: 22px;

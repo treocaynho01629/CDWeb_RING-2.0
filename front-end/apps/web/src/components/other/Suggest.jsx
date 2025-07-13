@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Grid2 as Grid } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import { Link } from "react-router";
 import { suggest } from "../../utils/suggest";
 
@@ -17,7 +17,7 @@ const ItemContainer = styled.div`
     padding: 5px;
     border-radius: 5px;
     font-size: 2.6rem;
-    color: ${({ theme }) => theme.palette.common.white};
+    color: ${({ theme }) => theme.vars.palette.common.white};
     background-color: ${({ color }) => color};
   }
 
@@ -47,7 +47,7 @@ const ItemContainer = styled.div`
 
 const ItemWrapper = styled.div`
   display: flex;
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
 `;
 
 const ItemName = styled.span`
@@ -62,8 +62,8 @@ const Wrapper = styled.div`
   position: relative;
   padding: ${({ theme }) => theme.spacing(1)} 0;
   margin-top: ${({ theme }) => theme.spacing(2)};
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     margin-top: 0;

@@ -1,10 +1,10 @@
 import styled from "@emotion/styled";
-import { alpha, Button, TextField } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 
 export const SortWrapper = styled.div`
   position: sticky;
   top: ${({ theme }) => theme.mixins.toolbar.minHeight + 16}px;
-  background-color: ${({ theme }) => theme.palette.background.default};
+  background-color: ${({ theme }) => theme.vars.palette.background.default};
   margin: 20px 0;
   z-index: 2;
 
@@ -15,7 +15,7 @@ export const SortWrapper = styled.div`
     top: -16px;
     width: calc(100% + 20px);
     height: calc(100% + 16px);
-    background-color: ${({ theme }) => theme.palette.background.default};
+    background-color: ${({ theme }) => theme.vars.palette.background.default};
     z-index: -1;
   }
 
@@ -28,7 +28,7 @@ export const SortWrapper = styled.div`
   ${({ theme }) => theme.breakpoints.down("sm")} {
     z-index: ${({ theme }) => theme.zIndex.appBar};
     top: ${({ theme }) => theme.mixins.toolbar.minHeight + 4}px;
-    border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
+    border-bottom: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
     margin: 0 0 20px;
 
     &:before {
@@ -76,7 +76,7 @@ export const FilterTitle = styled.span`
 
 export const StyledInput = styled(TextField)`
   margin-right: ${({ theme }) => theme.spacing(1)};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
 
   &.sort {
     .MuiSelect-select {
@@ -102,8 +102,8 @@ export const StyledSortButton = styled(Button)`
   padding-right: 0;
   display: none;
   max-width: 100px;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  color: ${({ theme }) => theme.palette.text.primary};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
+  color: ${({ theme }) => theme.vars.palette.text.primary};
 
   ${({ theme }) => theme.breakpoints.down("md_lg")} {
     display: flex;
@@ -139,23 +139,27 @@ export const StoreSuggest = styled.div`
   align-items: center;
   margin: 10px 0 20px;
   padding: ${({ theme }) => theme.spacing(1)};
-  border: 0.5px solid ${({ theme }) => theme.palette.success.main};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.success.main};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
   transition: all 0.2s ease;
 
   &:hover {
-    color: ${({ theme }) => theme.palette.success.main};
-    background-color: ${({ theme }) => alpha(theme.palette.success.light, 0.1)};
+    color: ${({ theme }) => theme.vars.palette.success.main};
+    background-color: ${({ theme }) =>
+      `color-mix(in srgb, ${theme.vars.palette.success.light}, 
+      transparent 90%)`};
   }
 
   span {
     b {
-      color: ${({ theme }) => theme.palette.success.main};
+      color: ${({ theme }) => theme.vars.palette.success.main};
     }
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     margin: ${({ theme }) => `10px ${theme.spacing(1)} 20px`};
-    background-color: ${({ theme }) => alpha(theme.palette.success.light, 0.1)};
+    background-color: ${({ theme }) =>
+      `color-mix(in srgb, ${theme.vars.palette.success.light}, 
+      transparent 90%)`};
   }
 `;

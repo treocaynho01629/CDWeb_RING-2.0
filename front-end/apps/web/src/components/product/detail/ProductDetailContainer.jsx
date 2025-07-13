@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { lazy, Suspense, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-import { Grid2 as Grid, Skeleton, Box } from "@mui/material";
+import { Skeleton, Box, Grid } from "@mui/material";
 import { useGetBooksQuery } from "../../../features/books/booksApiSlice";
 import { MobileExtendButton, Showmore, Title } from "@ring/ui/Components";
 import {
@@ -18,8 +18,8 @@ const SwipeableDrawer = lazy(() => import("@mui/material/SwipeableDrawer"));
 const DetailContainer = styled.div`
   height: 100%;
   padding: 10px 20px;
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     padding: 0 12px;
@@ -30,8 +30,8 @@ const ProductsContainer = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.paper};
 `;
 
 const DescriptionContainer = styled.div`
@@ -86,7 +86,7 @@ const InfoText = styled.p`
   font-size: 14px;
 
   &.secondary {
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
   }
 `;
 

@@ -46,12 +46,12 @@ const InfoText = styled.span`
     margin-left: 15px;
     text-decoration: underline;
     cursor: pointer;
-    color: ${({ theme }) => theme.palette.primary.main};
+    color: ${({ theme }) => theme.vars.palette.primary.main};
   }
 
   &.disabled {
     pointer-events: none;
-    color: ${({ theme }) => theme.palette.action.disabled};
+    color: ${({ theme }) => theme.vars.palette.action.disabled};
   }
 `;
 
@@ -103,9 +103,9 @@ const BadgeButton = styled.span`
   aspect-ratio: 1/1;
   font-size: 13px;
   justify-content: flex-end;
-  color: ${({ theme }) => theme.palette.common.black};
-  background-color: ${({ theme }) => theme.palette.grey[300]};
-  border: 2px solid ${({ theme }) => theme.palette.background.paper};
+  color: ${({ theme }) => theme.vars.palette.common.black};
+  background-color: ${({ theme }) => theme.vars.palette.grey[300]};
+  border: 2px solid ${({ theme }) => theme.vars.palette.background.paper};
   cursor: pointer;
 
   svg {
@@ -115,13 +115,13 @@ const BadgeButton = styled.span`
 
   &.edit {
     &:hover {
-      color: ${({ theme }) => theme.palette.primary.main};
+      color: ${({ theme }) => theme.vars.palette.primary.main};
     }
   }
 
   &:hover {
-    color: ${({ theme }) => theme.palette.error.main};
-    background-color: ${({ theme }) => theme.palette.grey[200]};
+    color: ${({ theme }) => theme.vars.palette.error.main};
+    background-color: ${({ theme }) => theme.vars.palette.grey[200]};
     transition: 0.25s ease;
   }
 `;

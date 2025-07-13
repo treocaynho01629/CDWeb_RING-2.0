@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Skeleton, Typography, alpha } from "@mui/material";
+import { Skeleton, Typography } from "@mui/material";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
 export const ItemTitle = styled.p`
@@ -19,7 +19,7 @@ export const ItemTitle = styled.p`
   }
 
   &:hover {
-    color: ${({ theme }) => theme.palette.info.main};
+    color: ${({ theme }) => theme.vars.palette.info.main};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -49,8 +49,8 @@ export const Shop = styled.b`
 `;
 
 export const ShopTag = styled.span`
-  background-color: ${({ theme }) => theme.palette.primary.main};
-  color: ${({ theme }) => theme.palette.primary.contrastText};
+  background-color: ${({ theme }) => theme.vars.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.contrastText};
   padding: 2px 10px;
   margin-right: 8px;
 
@@ -67,7 +67,7 @@ export const DetailText = styled.p`
   align-items: center;
   justify-content: flex-end;
   text-decoration: underline;
-  color: ${({ theme }) => theme.palette.primary.dark};
+  color: ${({ theme }) => theme.vars.palette.primary.dark};
 `;
 
 export const ContentContainer = styled.div`
@@ -82,7 +82,7 @@ export const HeadContainer = styled.div`
   align-items: center;
   padding: ${({ theme }) => theme.spacing(2)};
   border-bottom: 0.5px solid;
-  border-color: ${({ theme }) => theme.palette.action.focus};
+  border-color: ${({ theme }) => theme.vars.palette.action.focus};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     padding: ${({ theme }) => theme.spacing(1)};
@@ -109,7 +109,7 @@ export const StyledLazyImage = styled(LazyLoadImage)`
   display: inline-block;
   height: 90px;
   width: 90px;
-  border: 0.5px solid ${({ theme }) => theme.palette.action.focus};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.action.focus};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     height: 80px;
@@ -141,7 +141,7 @@ export const ToggleArrow = styled.span`
 
 export const OrderItemContainer = styled.div`
   border: 0.5px solid;
-  border-color: ${({ theme }) => theme.palette.action.focus};
+  border-color: ${({ theme }) => theme.vars.palette.action.focus};
   margin-bottom: ${({ theme }) => theme.spacing(2)};
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -163,7 +163,7 @@ export const BotContainer = styled.div`
   justify-content: flex-end;
   padding: ${({ theme }) => theme.spacing(2)};
   border-top: 0.5px solid;
-  border-color: ${({ theme }) => theme.palette.action.focus};
+  border-color: ${({ theme }) => theme.vars.palette.action.focus};
 
   &.alt {
     border: 0;
@@ -201,15 +201,15 @@ export const PriceText = styled.span`
   font-weight: 450;
   white-space: nowrap;
   color: ${({ theme, color }) =>
-    theme.palette[color]?.main || theme.palette.text.primary};
+    theme.vars.palette[color]?.main || theme.vars.palette.text.primary};
 
   &.secondary {
     font-weight: 400;
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
   }
 
   &.discount {
-    color: ${({ theme }) => theme.palette.success.dark};
+    color: ${({ theme }) => theme.vars.palette.success.dark};
   }
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
@@ -220,7 +220,7 @@ export const PriceText = styled.span`
 export const FinalPrice = styled.span`
   font-size: 18px;
   font-weight: bold;
-  color: ${({ theme }) => theme.palette.error.main};
+  color: ${({ theme }) => theme.vars.palette.error.main};
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -240,17 +240,17 @@ export const Price = styled.p`
   font-size: 15px;
   font-weight: 450;
   text-align: left;
-  color: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.vars.palette.primary.main};
   margin: 0;
 
   &.total {
-    color: ${({ theme }) => theme.palette.warning.light};
+    color: ${({ theme }) => theme.vars.palette.warning.light};
   }
 `;
 
 export const Discount = styled.p`
   font-size: 12px;
-  color: ${({ theme }) => theme.palette.text.disabled};
+  color: ${({ theme }) => theme.vars.palette.text.disabled};
   margin: 0;
   display: flex;
   flex-wrap: wrap;
@@ -266,10 +266,10 @@ export const Discount = styled.p`
 export const Amount = styled.span`
   font-size: 14px;
   font-weight: 350;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 
   b {
-    color: ${({ theme }) => theme.palette.warning.main};
+    color: ${({ theme }) => theme.vars.palette.warning.main};
   }
 
   &.mobile {
@@ -296,9 +296,10 @@ export const StatusTag = styled(Typography)`
 
 export const StatusContent = styled.div`
   background-color: ${({ theme, color }) =>
-    alpha(theme.palette[color]?.light ?? theme.palette.primary.light, 0.3)};
+    `color-mix(in srgb, ${theme.vars.palette[color]?.light || theme.vars.palette.primary.light}, 
+      transparent 70%)`};
   color: ${({ theme, color }) =>
-    theme.palette[color]?.main ?? theme.palette.primary.main};
+    theme.vars.palette[color]?.main ?? theme.vars.palette.primary.main};
   border: 0.5px solid;
   border-color: currentColor;
   padding: ${({ theme }) => `${theme.spacing(1)} ${theme.spacing(2)}`};

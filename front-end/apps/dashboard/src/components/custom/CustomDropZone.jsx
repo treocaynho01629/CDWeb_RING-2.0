@@ -7,15 +7,15 @@ import { Button, IconButton, Tooltip } from "@mui/material";
 //#region styled
 const getColor = (props) => {
   if (props.isDragAccept) {
-    return props.theme.palette.success.main;
+    return props.theme.vars.palette.success.main;
   }
   if (props.isDragReject || props.isMissing) {
-    return props.theme.palette.error.main;
+    return props.theme.vars.palette.error.main;
   }
   if (props.isFocused) {
-    return props.theme.palette.info.main;
+    return props.theme.vars.palette.info.main;
   }
-  return props.theme.palette.primary.main;
+  return props.theme.vars.palette.primary.main;
 };
 
 const DropZoneContainer = styled.div`
@@ -23,7 +23,7 @@ const DropZoneContainer = styled.div`
   justify-content: center;
   align-items: center;
   height: 250px;
-  background-color: ${({ theme }) => theme.palette.action.focus};
+  background-color: ${({ theme }) => theme.vars.palette.action.focus};
   border: 2.75px dashed;
   border-color: ${(props) => getColor(props)};
   cursor: pointer;
@@ -56,7 +56,7 @@ const ThumbContainer = styled.aside`
 
 const Thumb = styled.div`
   display: flex;
-  border: 0.5 solid ${({ theme }) => theme.palette.action.focus};
+  border: 0.5 solid ${({ theme }) => theme.vars.palette.action.focus};
   height: 80px;
   width: 80px;
   margin-right: 5px;
@@ -75,28 +75,28 @@ const Thumb = styled.div`
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    color: ${({ theme }) => theme.palette.grey[800]};
+    color: ${({ theme }) => theme.vars.palette.grey[800]};
   }
 
   &.file {
-    border: 3px solid ${({ theme }) => theme.palette.warning.main};
+    border: 3px solid ${({ theme }) => theme.vars.palette.warning.main};
 
     &:before {
       background-image: linear-gradient(
         0deg,
-        ${({ theme }) => theme.palette.warning.main},
+        ${({ theme }) => theme.vars.palette.warning.main},
         transparent 100%
       ) !important;
     }
   }
 
   &.remove {
-    border: 3px solid ${({ theme }) => theme.palette.error.main};
+    border: 3px solid ${({ theme }) => theme.vars.palette.error.main};
 
     &:before {
       background-image: linear-gradient(
         0deg,
-        ${({ theme }) => theme.palette.error.main},
+        ${({ theme }) => theme.vars.palette.error.main},
         transparent 100%
       ) !important;
     }
@@ -107,7 +107,7 @@ const Thumb = styled.div`
       content: "<Thumbnail>";
       background-image: linear-gradient(
         0deg,
-        ${({ theme }) => theme.palette.success.main},
+        ${({ theme }) => theme.vars.palette.success.main},
         transparent 100%
       );
     }
@@ -168,7 +168,7 @@ const Title = styled.h3`
 const ErrMsg = styled.b`
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.palette.error.main};
+  color: ${({ theme }) => theme.vars.palette.error.main};
 `;
 
 const ButtonContainer = styled.div`

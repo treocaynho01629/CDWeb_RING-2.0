@@ -6,7 +6,7 @@ import {
   memo,
   useCallback,
 } from "react";
-import { Box, Skeleton, Grid2 as Grid, useMediaQuery } from "@mui/material";
+import { Box, Skeleton, useMediaQuery, Grid } from "@mui/material";
 import {
   useParams,
   Navigate,

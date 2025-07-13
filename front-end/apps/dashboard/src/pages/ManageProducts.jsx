@@ -1,5 +1,5 @@
 import { useState, Suspense, lazy } from "react";
-import { Box, Button, Grid2 as Grid } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import { Add, AutoStories, LocalFireDepartment } from "@mui/icons-material";
 import { NavLink } from "react-router";
 import { HeaderContainer } from "../components/custom/Components";

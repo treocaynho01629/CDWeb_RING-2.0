@@ -10,7 +10,6 @@ import {
   SwipeableDrawer,
   Collapse,
   Badge,
-  alpha,
 } from "@mui/material";
 import {
   Check,
@@ -85,7 +84,7 @@ const SliderContainer = styled.div`
 const StyledButton = styled.span`
   width: ${({ theme }) => `calc(50% - ${theme.spacing(0.5)})`};
   padding: 6px;
-  background-color: ${({ theme }) => theme.palette.action.focus};
+  background-color: ${({ theme }) => theme.vars.palette.action.focus};
   border: 1px solid transparent;
   position: relative;
   display: flex;
@@ -95,7 +94,7 @@ const StyledButton = styled.span`
   transition: width 0.2s ease;
 
   &:hover {
-    background-color: ${({ theme }) => theme.palette.action.hover};
+    background-color: ${({ theme }) => theme.vars.palette.action.hover};
   }
 
   &.filled {
@@ -104,15 +103,17 @@ const StyledButton = styled.span`
 
   &.expanded {
     width: 100%;
-    border-color: ${({ theme }) => theme.palette.primary.main};
-    background-color: ${({ theme }) => theme.palette.action.hover};
+    border-color: ${({ theme }) => theme.vars.palette.primary.main};
+    background-color: ${({ theme }) => theme.vars.palette.action.hover};
   }
 
   &.checked,
   &.active {
-    color: ${({ theme }) => theme.palette.primary.dark};
-    background-color: ${({ theme }) => alpha(theme.palette.primary.light, 0.1)};
-    border-color: ${({ theme }) => theme.palette.primary.main};
+    color: ${({ theme }) => theme.vars.palette.primary.dark};
+    background-color: ${({ theme }) =>
+      `color-mix(in srgb, ${theme.vars.palette.primary.light}, 
+      transparent 90%)`};
+    border-color: ${({ theme }) => theme.vars.palette.primary.main};
     font-weight: 450;
   }
 
@@ -124,10 +125,10 @@ const StyledButton = styled.span`
 const StyledStack = styled(Stack)`
   margin-top: ${({ theme }) => theme.spacing(-0.5)};
   padding: 2px;
-  border: 0.5px dashed ${({ theme }) => theme.palette.divider};
+  border: 0.5px dashed ${({ theme }) => theme.vars.palette.divider};
 
   ${StyledButton} {
-    background-color: ${({ theme }) => theme.palette.action.hover};
+    background-color: ${({ theme }) => theme.vars.palette.action.hover};
     width: ${({ theme }) => `calc(50% - ${theme.spacing(0.5)} - 2px)`};
   }
 `;
@@ -138,7 +139,7 @@ const Message = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.palette.warning.main};
+  color: ${({ theme }) => theme.vars.palette.warning.main};
 `;
 
 const Showmore = styled.div`
@@ -149,7 +150,7 @@ const Showmore = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.palette.info.main};
+  color: ${({ theme }) => theme.vars.palette.info.main};
   cursor: pointer;
 
   ${({ theme }) => theme.breakpoints.down("md")} {

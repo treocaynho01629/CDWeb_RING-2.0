@@ -18,7 +18,7 @@ export const ItemTitle = styled.p`
   }
 
   &.secondary {
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
   }
 `;
 
@@ -67,7 +67,7 @@ export const Label = styled.p`
 
   span {
     font-weight: 350;
-    color: ${({ theme }) => theme.palette.text.secondary};
+    color: ${({ theme }) => theme.vars.palette.text.secondary};
   }
 `;
 
@@ -78,7 +78,7 @@ export const ButtonContainer = styled.div`
 `;
 
 export const LinkButton = styled.span`
-  color: ${({ theme }) => theme.palette.info.main};
+  color: ${({ theme }) => theme.vars.palette.info.main};
   font-size: 14px;
 `;
 

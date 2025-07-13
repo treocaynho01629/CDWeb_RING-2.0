@@ -54,7 +54,7 @@ const StyledEmptyIcon = styled(EmptyIcon)`
   height: 70px;
   width: 70px;
   margin: ${({ theme }) => theme.spacing(1)} 0;
-  fill: ${({ theme }) => theme.palette.text.icon};
+  fill: ${({ theme }) => theme.vars.palette.text.icon};
 `;
 //#endregion
 

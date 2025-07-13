@@ -9,7 +9,7 @@ const StyledTab = styled((props) => <Tab {...props} />)(({ theme }) => ({
     fontWeight: 550,
 
     ...theme.applyStyles("light", {
-      color: theme.palette.primary.dark,
+      color: theme.vars.palette.primary.dark,
     }),
   },
 
@@ -35,7 +35,7 @@ const StyledTabs = styled((props) => <Tabs {...props} />)(({ theme }) => ({
     height: "2.5px",
 
     ...theme.applyStyles("light", {
-      backgroundColor: theme.palette.primary.dark,
+      backgroundColor: theme.vars.palette.primary.dark,
     }),
   },
 

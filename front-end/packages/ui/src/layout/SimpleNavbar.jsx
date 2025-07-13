@@ -28,7 +28,7 @@ const SimpleButton = styled.span`
   height: 46px;
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
   float: right;
   cursor: pointer;
 
@@ -38,7 +38,7 @@ const SimpleButton = styled.span`
   }
 
   &:hover {
-    color: ${({ theme }) => theme.palette.text.primary};
+    color: ${({ theme }) => theme.vars.palette.text.primary};
   }
 
   ${({ theme }) => theme.breakpoints.down("md")} {
@@ -57,7 +57,7 @@ const Logo = styled.img`
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     filter: drop-shadow(
-      0px -2000px 0 ${({ theme }) => theme.palette.text.primary}
+      0px -2000px 0 ${({ theme }) => theme.vars.palette.text.primary}
     );
     transform: translateY(2000px);
   }

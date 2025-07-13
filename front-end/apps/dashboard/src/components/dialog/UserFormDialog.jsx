@@ -6,8 +6,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid2 as Grid,
   MenuItem,
+  Grid,
 } from "@mui/material";
 import {
   Check,

@@ -8,7 +8,7 @@ import {
   CircularProgress,
   DialogContent,
   TextField,
-  Grid2 as Grid,
+  Grid,
 } from "@mui/material";
 import {
   MessageContainer,

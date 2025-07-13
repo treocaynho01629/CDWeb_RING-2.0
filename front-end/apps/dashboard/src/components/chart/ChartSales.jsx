@@ -19,8 +19,8 @@ import { useState } from "react";
 
 //#region styled
 const TooltipContainer = styled.div`
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
-  background-color: ${({ theme }) => theme.palette.background.default};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
+  background-color: ${({ theme }) => theme.vars.palette.background.default};
   padding: ${({ theme }) => theme.spacing(1.5)};
 `;
 
@@ -50,7 +50,7 @@ const TitleContainer = styled.div`
 `;
 
 const LegendLabel = styled.span`
-  color: ${({ theme }) => theme.palette.text.primary};
+  color: ${({ theme }) => theme.vars.palette.text.primary};
   h3 {
     font-weight: 400;
     font-size: 18px;
@@ -103,7 +103,7 @@ const CustomTooltip = ({ active, payload, label, theme }) => {
         <TooltipValue color={discount.color}>
           Giảm giá:&emsp;<span>{currencyFormat.format(-discount.value)}</span>
         </TooltipValue>
-        <TooltipValue color={theme.palette.primary.main}>
+        <TooltipValue color={theme.vars.palette.primary.main}>
           Tổng:&emsp;
           <span>{currencyFormat.format(sales.value - discount.value)}</span>
         </TooltipValue>
@@ -154,24 +154,24 @@ const ChartSales = ({ shop }) => {
             <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
               <stop
                 offset="5%"
-                stopColor={theme.palette.warning.light}
+                stopColor={theme.vars.palette.warning.light}
                 stopOpacity={0.3}
               />
               <stop
                 offset="95%"
-                stopColor={theme.palette.warning.dark}
+                stopColor={theme.vars.palette.warning.dark}
                 stopOpacity={0}
               />
             </linearGradient>
             <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
               <stop
                 offset="5%"
-                stopColor={theme.palette.primary.light}
+                stopColor={theme.vars.palette.primary.light}
                 stopOpacity={0.3}
               />
               <stop
                 offset="95%"
-                stopColor={theme.palette.primary.dark}
+                stopColor={theme.vars.palette.primary.dark}
                 stopOpacity={0}
               />
             </linearGradient>
@@ -218,7 +218,7 @@ const ChartSales = ({ shop }) => {
             type="monotone"
             dataKey="data.discount"
             name="Giảm giá"
-            stroke={theme.palette.warning.main}
+            stroke={theme.vars.palette.warning.main}
             fill="url(#colorUv)"
           />
           <Area
@@ -226,7 +226,7 @@ const ChartSales = ({ shop }) => {
             type="monotone"
             dataKey="data.sales"
             name="Doanh thu"
-            stroke={theme.palette.primary.main}
+            stroke={theme.vars.palette.primary.main}
             fill="url(#colorPv)"
           />
         </AreaChart>

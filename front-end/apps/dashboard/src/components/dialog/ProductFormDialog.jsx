@@ -6,11 +6,11 @@ import {
   DialogContent,
   DialogTitle,
   Box,
-  Grid2 as Grid,
   MenuItem,
   useMediaQuery,
   Button,
   TextareaAutosize,
+  Grid,
 } from "@mui/material";
 import {
   Check,

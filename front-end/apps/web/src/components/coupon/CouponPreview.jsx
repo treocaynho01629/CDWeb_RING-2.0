@@ -78,17 +78,18 @@ const CouponIcon = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   border-right: none;
   background-color: ${({ theme, color }) =>
-    theme.palette[color]?.light || theme.palette.primary.light};
+    theme.vars.palette[color]?.light || theme.vars.palette.primary.light};
   color: ${({ theme, color }) =>
-    theme.palette[color]?.contrastText || theme.palette.primary.contrastText};
+    theme.vars.palette[color]?.contrastText ||
+    theme.vars.palette.primary.contrastText};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     height: 22px;
     color: ${({ theme, color }) =>
-      theme.palette[color]?.dark || theme.palette.primary.dark};
+      theme.vars.palette[color]?.dark || theme.vars.palette.primary.dark};
 
     svg {
       font-size: 15px;
@@ -105,15 +106,15 @@ const CouponContent = styled.div`
   align-items: center;
   border-radius: 6px;
   padding: 0 10px;
-  border: 0.5px solid ${({ theme }) => theme.palette.divider};
+  border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
   border-left: none;
 
   &::before,
   &::after {
     content: "";
     position: absolute;
-    background-color: ${({ theme }) => theme.palette.background.paper};
-    border: 0.5px solid ${({ theme }) => theme.palette.divider};
+    background-color: ${({ theme }) => theme.vars.palette.background.paper};
+    border: 0.5px solid ${({ theme }) => theme.vars.palette.divider};
     height: 10px;
     width: 10px;
     border-radius: 100%;
@@ -178,7 +179,7 @@ const MoreButton = styled.span`
   display: flex;
   align-items: end;
   color: ${({ theme, disabled }) =>
-    disabled ? theme.palette.text.disabled : theme.palette.info.main};
+    disabled ? theme.vars.palette.text.disabled : theme.vars.palette.info.main};
   pointer-events: ${({ disabled }) => (disabled ? "none" : "all")};
   cursor: pointer;
 `;
@@ -186,7 +187,7 @@ const MoreButton = styled.span`
 const CouponMessage = styled.span`
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.vars.palette.text.secondary};
 
   ${({ theme }) => theme.breakpoints.down("md")} {
     font-size: 14px;

@@ -15,11 +15,11 @@ import {
   DialogActions,
   DialogContent,
   FormControlLabel,
-  Grid2 as Grid,
   MenuItem,
   TextField,
   DialogTitle,
   TextareaAutosize,
+  Grid,
 } from "@mui/material";
 import { Instruction } from "@ring/ui/Components";
 import { PHONE_REGEX, getAddressType, location } from "@ring/shared";
