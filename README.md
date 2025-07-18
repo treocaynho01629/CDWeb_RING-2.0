@@ -7,7 +7,7 @@
 
 <div align="center">
   
-[![treocaynho01629 - RING-Bookstore](https://img.shields.io/static/v1?label=treocaynho01629&message=RING-Bookstore.0&color=blue&logo=github)](https://github.com/treocaynho01629/RING-Bookstore "Go to GitHub repo")
+[![treocaynho01629 - RING-Bookstore](https://img.shields.io/static/v1?label=treocaynho01629&message=RING-Bookstore&color=blue&logo=github)](https://github.com/treocaynho01629/RING-Bookstore "Go to GitHub repo")
 [![License](https://img.shields.io/badge/License-GNU_GPLv3-blue)](#license)
 
 </div>
