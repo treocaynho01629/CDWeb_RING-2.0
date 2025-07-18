@@ -24,28 +24,30 @@ jobs:
           cache-dependency-path: front-end/package-lock.json
 
       - name: Install Dependencies
-        run: |
-          cd front-end
-          npm ci
+        working-directory: front-end
+        run: npm ci
 
       - name: Run tests
-        run: |
-          cd front-end  
-          npm run test
+        working-directory: front-end
+        run: npm run test
 
       - name: Build
-        run: |
-          cd front-end
-          npm run build
+        working-directory: front-end
+        run: npm run build
 
   deploy:
     name: Deploy Cloudflare
     needs: [build-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
-      - name: Deploy Bookstore App
-        run: curl ${{ secrets.CLOUDFLARE_REDEPLOY_BOOKSTORE }}
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Deploy Aashboard
-        run: curl ${{ secrets.CLOUDFLARE_REDEPLOY_DASHBOARD }}
+      - name: Deploy Bookstore App
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy front-end/apps/web/dist --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }}
