@@ -35,6 +35,12 @@ jobs:
         working-directory: front-end
         run: npm run build
 
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: front-end/apps/web/dist
+
   deploy:
     name: Deploy Cloudflare
     needs: [build-test]
@@ -44,6 +50,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Download build output
+        uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: front-end/apps/web/dist
 
       - name: Deploy Bookstore App
         uses: cloudflare/wrangler-action@v3
