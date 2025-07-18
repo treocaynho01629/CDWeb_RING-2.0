@@ -29,10 +29,14 @@ jobs:
           npm ci
 
       - name: Run tests
-        run: npm run test
+        run: |
+          cd front-end  
+          npm run test
 
       - name: Build
-        run: npm run build
+        run: |
+          cd front-end
+          npm run build
 
   deploy:
     name: Deploy Cloudflare
