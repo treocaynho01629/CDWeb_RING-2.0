@@ -1,0 +1,47 @@
+name: Project RING! - Frontend CI/CD flow
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "front-end/**"
+      - ".github/workflows/front-end.yaml"
+
+jobs:
+  build-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run tests
+        run: |
+          cd front-end
+          npm ci
+          npm run test
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    name: Deploy Cloudflare
+    needs: [build-test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Bookstore App
+        run: curl ${{ secrets.CLOUDFLARE_REDEPLOY_BOOKSTORE }}
+
+      - name: Deploy Aashboard
+        run: curl ${{ secrets.CLOUDFLARE_REDEPLOY_DASHBOARD }}
