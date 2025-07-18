@@ -36,6 +36,7 @@ const RateContent = styled.div`
   margin: ${({ theme }) => theme.spacing(1)} 0
     ${({ theme }) => theme.spacing(2)};
   font-size: 15px;
+  overflow: hidden;
 
   ${({ theme }) => theme.breakpoints.down("sm")} {
     margin: ${({ theme }) => theme.spacing(0.5)} 0

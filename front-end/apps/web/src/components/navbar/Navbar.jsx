@@ -211,12 +211,15 @@ const StyledAppBar = styled(AppBar)`
   ${({ theme }) => theme.breakpoints.down("sm")} {
     ${Logo} {
       filter: ${({ theme }) =>
-        `drop-shadow(0px -1000px 0 rgb(from ${theme.vars.palette.grey[800]} r g b / calc(1 - var(--scroll-progress))))`};
+        `drop-shadow(0px -1000px 0 rgb(from ${theme.colorSchemes.light.palette.grey[800]} r g b / calc(1 - var(--scroll-progress))))`};
       transform: translateY(calc((1 - round(var(--scroll-progress))) * 1000px));
 
       ${({ theme }) =>
-        theme.vars.palette.mode === "dark" &&
-        ` filter: drop-shadow(0px -1000px 0 rgb(from ${theme.vars.palette.text.primary} r g b / calc(1 - var(--scroll-progress))))`}
+        theme.applyStyles &&
+        theme.applyStyles("dark", {
+          filter: `drop-shadow(0px -1000px 0 rgb(from ${theme.colorSchemes.dark.palette.text.primary} r g b / calc(1 - var(--scroll-progress))))`,
+          transform: `translateY(calc((1 - round(var(--scroll-progress))) * 1000px))`,
+        })}
     }
 
     ${StyledIconButton} {

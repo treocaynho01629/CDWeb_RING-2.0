@@ -1,15 +1,13 @@
-import { useTheme } from "@emotion/react";
-import { Box } from "@mui/material";
+import { Box, useColorScheme } from "@mui/material";
 import { useEffect, useRef } from "react";
 
 //ReCaptcha v2
 //Only usable after v3 script already loaded
 const ReCaptcha = ({ onVerify, onExpire }) => {
+  const { mode } = useColorScheme();
   const effectRan = useRef(false);
   const recaptchaId = useRef(null);
   const containerRef = useRef(null);
-  const theme = useTheme();
-  const mode = theme.vars.palette.mode;
   const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
   // Render the reCAPTCHA widget

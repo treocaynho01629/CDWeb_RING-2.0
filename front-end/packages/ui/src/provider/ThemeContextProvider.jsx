@@ -6,6 +6,8 @@ import { CssBaseline } from "@mui/material";
 import { theme } from "@ring/shared";
 
 export default function ThemeContextProvider({ children }) {
+  console.log(theme);
+
   return (
     <StyledEngineProvider injectFirst>
       <MUIThemeProvider
@@ -13,7 +15,7 @@ export default function ThemeContextProvider({ children }) {
         disableTransitionOnChange
         defaultMode="light"
       >
-        <CssBaseline />
+        <CssBaseline enableColorScheme />
         {children}
       </MUIThemeProvider>
     </StyledEngineProvider>

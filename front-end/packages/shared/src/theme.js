@@ -70,15 +70,11 @@ export const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: (theme) => ({
         html: {
-          ...darkScrollbar(
-            theme.vars.palette.mode === "light"
-              ? {
-                  track: theme.vars.palette.background.paper,
-                  thumb: theme.vars.palette.action.disabled,
-                  active: theme.vars.palette.text.primary,
-                }
-              : undefined
-          ),
+          ...darkScrollbar({
+            track: theme.vars.palette.background.paper,
+            thumb: theme.vars.palette.action.disabled,
+            active: theme.vars.palette.text.primary,
+          }),
           scrollbarWidth: "thin",
         },
       }),
