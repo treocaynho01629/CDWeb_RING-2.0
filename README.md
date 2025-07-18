@@ -7,7 +7,7 @@
 
 <div align="center">
   
-[![treocaynho01629 - CDWeb_RING-2.0](https://img.shields.io/static/v1?label=treocaynho01629&message=CDWeb_RING-2.0&color=blue&logo=github)](https://github.com/treocaynho01629/CDWeb_RING-2.0 "Go to GitHub repo")
+[![treocaynho01629 - RING-Bookstore](https://img.shields.io/static/v1?label=treocaynho01629&message=RING-Bookstore.0&color=blue&logo=github)](https://github.com/treocaynho01629/RING-Bookstore "Go to GitHub repo")
 [![License](https://img.shields.io/badge/License-GNU_GPLv3-blue)](#license)
 
 </div>
@@ -20,7 +20,7 @@
 
 ## Introduction
 
-RING is an E-Commerce Web App built using Spring Boot, ViteJS, Turborepo, and PostgreSQL.
+RING! is an E-Commerce Web App built using Spring Boot, ViteJS, Turborepo, designed with a highly responsive UI. It integrates the PayOS payment gateway, supports email notifications, order tracking, and more.
 
 #### Live Demo:
 
