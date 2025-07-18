@@ -75,12 +75,12 @@ jobs:
       - name: Publish to Docker Hub
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
-          image: treocaynho01629/ringbookstore-api
+          image: ${{ secrets.DOCKER_HUB_USERNAME }}/ringbookstore-api
           tags: latest
           registry: docker.io
           dockerfile: docker/back-end/Dockerfile
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
   deploy:
     name: Deploy Render
@@ -89,4 +89,4 @@ jobs:
 
     steps:
       - name: Deploy to render
-        run: curl ${{ secrets.RENDER_HOOK }}
+        run: curl ${{ secrets.RENDER_REDEPLOY_HOOK }}
