@@ -73,7 +73,7 @@ jobs:
       - name: Publish to Docker Hub
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
-          image: ${{ secrets.DOCKER_HUB_USERNAME }}/ringbookstore-api
+          image: ${{ vars.DOCKER_HUB_USERNAME }}/ringbookstore-api
           tags: latest
           registry: docker.io
           dockerfile: docker/back-end/Dockerfile

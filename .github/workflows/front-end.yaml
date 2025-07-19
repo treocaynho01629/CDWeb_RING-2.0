@@ -12,6 +12,12 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
 
+    # Enable Vercel remote caching
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      TURBO_REMOTE_ONLY: true
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,7 +51,6 @@ jobs:
     name: Deploy Cloudflare
     needs: [build-test]
     runs-on: ubuntu-latest
-    timeout-minutes: 60
 
     steps:
       - name: Checkout
@@ -62,4 +67,15 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy front-end/apps/web/dist --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+          command: pages deploy front-end/apps/web/dist --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --env production
+          secrets: |
+            VITE_API_URL
+            VITE_RECAPTCHA_SITE_KEY
+            VITE_RECAPTCHA_V3_SITE_KEY
+            VITE_NODE_ENV
+          environment: production
+        env:
+          VITE_API_URL: ${{ vars.API_URL }}
+          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.RECAPTCHA_SITE_KEY }}
+          VITE_RECAPTCHA_V3_SITE_KEY: ${{ secrets.RECAPTCHA_V3_SITE_KEY }}
+          VITE_NODE_ENV: prod
