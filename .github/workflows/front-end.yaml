@@ -51,6 +51,7 @@ jobs:
     name: Deploy Cloudflare
     needs: [build-test]
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
       - name: Checkout

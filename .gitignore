@@ -1,4 +1,5 @@
 .env
 .secrets
+.variables
 postgres-data
 tmp
