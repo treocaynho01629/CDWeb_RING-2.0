@@ -58,7 +58,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create .env.production
-        working-directory: front-end
+        working-directory: front-end/apps/web
         run: |
           echo "VITE_API_URL=${{ vars.API_URL }}" >> .env.production
           echo "VITE_RECAPTCHA_SITE_KEY=${{ secrets.RECAPTCHA_SITE_KEY }}" >> .env.production
