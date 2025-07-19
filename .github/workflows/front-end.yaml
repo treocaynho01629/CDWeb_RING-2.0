@@ -57,6 +57,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Create .env.production
+        working-directory: front-end
+        run: |
+          echo "VITE_API_URL=${{ vars.API_URL }}" >> .env.production
+          echo "VITE_RECAPTCHA_SITE_KEY=${{ secrets.RECAPTCHA_SITE_KEY }}" >> .env.production
+          echo "VITE_RECAPTCHA_V3_SITE_KEY=${{ secrets.RECAPTCHA_V3_SITE_KEY }}" >> .env.production
+          echo "VITE_NODE_ENV=prod" >> .env.production
+
       - name: Download build output
         uses: actions/download-artifact@v4
         with:
@@ -66,16 +74,7 @@ jobs:
       - name: Deploy Bookstore App
         uses: cloudflare/wrangler-action@v3
         with:
+          wranglerVersion: "4.23.0"
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy front-end/apps/web/dist --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
-        #   secrets: |
-        #     VITE_API_URL
-        #     VITE_RECAPTCHA_SITE_KEY
-        #     VITE_RECAPTCHA_V3_SITE_KEY
-        #     VITE_NODE_ENV
-        # env:
-        #   VITE_API_URL: ${{ vars.API_URL }}
-        #   VITE_RECAPTCHA_SITE_KEY: ${{ secrets.RECAPTCHA_SITE_KEY }}
-        #   VITE_RECAPTCHA_V3_SITE_KEY: ${{ secrets.RECAPTCHA_V3_SITE_KEY }}
-        #   VITE_NODE_ENV: prod
