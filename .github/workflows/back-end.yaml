@@ -77,7 +77,7 @@ jobs:
           tags: latest
           registry: docker.io
           dockerfile: docker/back-end/Dockerfile
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          username: ${{ vars.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
   deploy:

@@ -67,13 +67,12 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy front-end/apps/web/dist --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --env production
+          command: pages deploy front-end/apps/web/dist --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
           secrets: |
             VITE_API_URL
             VITE_RECAPTCHA_SITE_KEY
             VITE_RECAPTCHA_V3_SITE_KEY
             VITE_NODE_ENV
-          environment: production
         env:
           VITE_API_URL: ${{ vars.API_URL }}
           VITE_RECAPTCHA_SITE_KEY: ${{ secrets.RECAPTCHA_SITE_KEY }}
