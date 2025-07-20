@@ -1,26 +1,23 @@
-name: Project RING! - Front-end Web CI/CD flow
+name: Project RING! - Front-end Dashboard CI/CD flow
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_CLIENT_PROJECT_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_DASHBOARD_PROJECT_ID }}
+  TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  TURBO_TEAM: ${{ vars.VERCEL_TEAM }}
 
 on:
   push:
     branches: [main]
     paths:
       - "front-end/**"
-      - "!front-end/apps/dashboard/**"
-      - ".github/workflows/front-end.yaml"
+      - "!front-end/apps/web/**"
+      - ".github/workflows/front-end/dashboard.yaml"
 
 jobs:
   test:
-    name: Test
+    name: Test Dashboard
     runs-on: ubuntu-latest
-
-    # Enable Vercel remote caching
-    env:
-      TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      TURBO_TEAM: ${{ vars.VERCEL_TEAM }}
 
     steps:
       - name: Checkout
@@ -36,15 +33,15 @@ jobs:
           cache-dependency-path: front-end/package-lock.json
 
       - name: Install Dependencies
-        working-directory: front-end/apps/web
+        working-directory: front-end/apps/dashboard
         run: npm ci
 
       - name: Run tests
-        working-directory: front-end/apps/web
+        working-directory: front-end/apps/dashboard
         run: npx turbo run test
 
   deploy:
-    name: Deploy Cloudflare
+    name: Deploy Dashboard to Vercel
     needs: [test]
     runs-on: ubuntu-latest
     timeout-minutes: 60
