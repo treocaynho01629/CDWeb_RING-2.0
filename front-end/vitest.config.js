@@ -1,21 +1,23 @@
-/// <reference types="vitest" />
-/// <reference types="vite/client" />
-
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from "vitest/config";
+import { sharedConfig } from "@ring/vitest-config";
 
 export default defineConfig({
-  plugins: [react()],
-  test: {
-    globals: true,
-    environment: "jsdom",
-    setupFiles: "./packages/shared/src/utils/setupTests.js",
-    css: true,
-    testTimeout: 5000,
-    reporters: ["verbose"],
-    ...(process.env.CI && {
-      minThreads: 4,
-      maxThreads: 4,
-    }),
-  },
+  ...sharedConfig,
+  projects: [
+    {
+      name: "packages",
+      root: "./packages",
+      test: {
+        ...sharedConfig.test,
+      },
+    },
+    {
+      name: "apps",
+      root: "./apps",
+      test: {
+        ...sharedConfig.test,
+        environment: "jsdom",
+      },
+    },
+  ],
 });

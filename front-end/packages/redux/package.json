@@ -13,10 +13,8 @@
     "lint": "eslint \"**/*.{ts,tsx,js,jsx}\"",
     "update-dependencies": "npx npm-check-updates -u"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@ring/eslint-config": "*",
-    "eslint": "^9.31.0"
+    "@ring/eslint-config": "*"
   },
   "peerDependencies": {
     "@reduxjs/toolkit": "^2.8.2"

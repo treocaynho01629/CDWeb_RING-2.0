@@ -56,6 +56,37 @@ services:
     networks:
       - mynetwork
 
+  # web-server:
+  #   image: nginx:1.21.6-alpine
+  #   container_name: web-server
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   volumes:
+  #     - ./nginx/conf/:/etc/nginx/conf.d/:ro
+  #     - ./certbot/www/:/var/www/certbot/:ro
+  #     - ./certbot/conf/:/etc/letsencrypt/:ro
+  #   depends_on:
+  #     - back-end
+  # ssl-service:
+  #   image: certbot/certbot:v1.23.0
+  #   volumes:
+  #     - ./certbot/www/:/var/www/certbot/:rw
+  #     - ./certbot/conf/:/etc/letsencrypt/:rw
+  #   depends_on:
+  #     - web-server
+  #   command:
+  #     # - renew       Uncomment this and comment the rest to renew cert
+  #     - certonly
+  #     - --webroot
+  #     - -w
+  #     - /var/www/certbot/
+  #     - --email=<Your email address>
+  #     - --agree-tos
+  #     - --no-eff-email
+  #     - -d
+  #     - <Your domain>
+
 networks:
   mynetwork:
     driver: bridge

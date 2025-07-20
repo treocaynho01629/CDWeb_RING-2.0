@@ -29,3 +29,4 @@ server/dist
 public/dist
 *.local
 analyse.html
+.vercel

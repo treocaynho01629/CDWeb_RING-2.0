@@ -1,26 +1,32 @@
-name: Project RING! - Frontend CI/CD flow
+name: Project RING! - Front-end Web CI/CD flow
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_CLIENT_PROJECT_ID }}
 
 on:
   push:
     branches: [main]
     paths:
       - "front-end/**"
+      - "!front-end/apps/dashboard/**"
       - ".github/workflows/front-end.yaml"
 
 jobs:
-  build-test:
-    name: Build & Test
+  test:
+    name: Test
     runs-on: ubuntu-latest
 
     # Enable Vercel remote caching
     env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-      TURBO_REMOTE_ONLY: true
+      TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      TURBO_TEAM: ${{ vars.VERCEL_TEAM }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Setup Node.js 20
         uses: actions/setup-node@v4
@@ -30,26 +36,16 @@ jobs:
           cache-dependency-path: front-end/package-lock.json
 
       - name: Install Dependencies
-        working-directory: front-end
+        working-directory: front-end/apps/web
         run: npm ci
 
       - name: Run tests
-        working-directory: front-end
-        run: npm run test
-
-      - name: Build
-        working-directory: front-end
-        run: npm run build
-
-      - name: Upload build output
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-dist
-          path: front-end/apps/web/dist
+        working-directory: front-end/apps/web
+        run: npx turbo run test
 
   deploy:
     name: Deploy Cloudflare
-    needs: [build-test]
+    needs: [test]
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -57,24 +53,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create .env.production
-        working-directory: front-end/apps/web
-        run: |
-          echo "VITE_API_URL=${{ vars.API_URL }}" >> .env.production
-          echo "VITE_RECAPTCHA_SITE_KEY=${{ secrets.RECAPTCHA_SITE_KEY }}" >> .env.production
-          echo "VITE_RECAPTCHA_V3_SITE_KEY=${{ secrets.RECAPTCHA_V3_SITE_KEY }}" >> .env.production
-          echo "VITE_NODE_ENV=prod" >> .env.production
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
 
-      - name: Download build output
-        uses: actions/download-artifact@v4
-        with:
-          name: web-dist
-          path: front-end/apps/web/dist
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Deploy Bookstore App
-        uses: cloudflare/wrangler-action@v3
-        with:
-          wranglerVersion: "4.23.0"
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy front-end/apps/web/dist --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

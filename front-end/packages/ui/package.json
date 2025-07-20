@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@ring/eslint-config": "*",
-    "eslint": "^9.31.0"
+    "@ring/vitest-config": "*"
   },
   "peerDependencies": {
     "@emotion/react": "^11.14.0",

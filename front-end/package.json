@@ -5,29 +5,25 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "test": "vitest",
-    "test:watch": "vitest --watch",
-    "test:ui": "vitest --ui",
+    "test": "turbo test",
+    "test:projects": "vitest run",
+    "test:projects:ui": "vitest --ui",
+    "test:projects:watch": "vitest --watch",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md}\"",
     "update-dependencies": "turbo update-dependencies && npx npm-check-updates -u"
   },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.6.0"
+  },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "eslint": "^9.31.0",
-    "jsdom": "^26.1.0",
+    "@ring/vitest-config": "*",
     "prettier": "^3.6.2",
-    "turbo": "^2.5.4",
-    "vitest": "^3.2.4"
+    "turbo": "^2.5.4"
   },
   "packageManager": "npm@10.4.0",
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "dependencies": {
-    "@vitejs/plugin-react": "^4.6.0",
-    "@vitest/ui": "^3.2.4"
-  }
+  ]
 }
