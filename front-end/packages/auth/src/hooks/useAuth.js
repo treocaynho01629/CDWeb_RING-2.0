@@ -7,7 +7,7 @@ import {
   setPersist as setCurrPersist,
   setAuth as setCurrAuth,
   clearAuth as clearCurrAuth,
-} from "@ring/redux";
+} from "@ring/redux/authReducer";
 import { jwtDecode } from "jwt-decode";
 
 const useAuth = () => {

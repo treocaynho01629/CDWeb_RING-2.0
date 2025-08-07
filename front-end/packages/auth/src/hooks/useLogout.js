@@ -1,4 +1,4 @@
-import { useSignOutMutation } from "@ring/redux";
+import { useSignOutMutation } from "@ring/redux/authApiSlice";
 import { useNavigate } from "react-router";
 
 const useLogout = () => {

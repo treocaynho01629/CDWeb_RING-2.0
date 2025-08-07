@@ -1,15 +1,4 @@
 import styled from "@emotion/styled";
-import { Close, Edit, Star, StarBorder } from "@mui/icons-material";
-import {
-  Rating,
-  Button,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextareaAutosize,
-} from "@mui/material";
 import { Link, useLocation } from "react-router";
 import {
   useCreateReviewMutation,
@@ -17,6 +6,18 @@ import {
 } from "../../features/reviews/reviewsApiSlice";
 import { useEffect, useState } from "react";
 import { rateLabels } from "../../utils/filters";
+import Rating from "@mui/material/Rating";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
+import Close from "@mui/icons-material/Close";
+import Edit from "@mui/icons-material/Edit";
+import Star from "@mui/icons-material/Star";
+import StarBorder from "@mui/icons-material/StarBorder";
 
 //#region styled
 const RatingSelect = styled.div`

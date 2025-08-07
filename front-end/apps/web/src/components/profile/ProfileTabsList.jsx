@@ -1,35 +1,33 @@
 import styled from "@emotion/styled";
 import { useState } from "react";
-import {
-  List,
-  Collapse,
-  Avatar,
-  ListItemButton,
-  Badge,
-  Divider,
-  Skeleton,
-} from "@mui/material";
-import {
-  ExpandLess,
-  ExpandMore,
-  EditOutlined,
-  Person as PersonIcon,
-  RateReviewOutlined,
-  KeyboardArrowRight,
-  PersonAddAlt1,
-  LocalShippingOutlined,
-  Replay,
-  DomainVerification,
-  PendingOutlined,
-  ReceiptLongOutlined,
-  LocalActivityOutlined,
-  LocalActivity,
-  Today,
-} from "@mui/icons-material";
 import { NavLink } from "react-router";
 import { MobileExtendButton } from "@ring/ui/Components";
-import { useAuth } from "@ring/auth";
-import { numFormat, getOrderStatus, getUserRole } from "@ring/shared";
+import { numFormat } from "@ring/shared/utils/convert";
+import { getOrderStatus } from "@ring/shared/enums/order";
+import { getUserRole } from "@ring/shared/enums/user";
+import useAuth from "@ring/auth/useAuth";
+import List from "@mui/material/List";
+import Collapse from "@mui/material/Collapse";
+import Avatar from "@mui/material/Avatar";
+import ListItemButton from "@mui/material/ListItemButton";
+import Badge from "@mui/material/Badge";
+import Divider from "@mui/material/Divider";
+import Skeleton from "@mui/material/Skeleton";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import EditOutlined from "@mui/icons-material/EditOutlined";
+import PersonIcon from "@mui/icons-material/Person";
+import RateReviewOutlined from "@mui/icons-material/RateReviewOutlined";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import PersonAddAlt1 from "@mui/icons-material/PersonAddAlt1";
+import LocalShippingOutlined from "@mui/icons-material/LocalShippingOutlined";
+import Replay from "@mui/icons-material/Replay";
+import DomainVerification from "@mui/icons-material/DomainVerification";
+import PendingOutlined from "@mui/icons-material/PendingOutlined";
+import ReceiptLongOutlined from "@mui/icons-material/ReceiptLongOutlined";
+import LocalActivityOutlined from "@mui/icons-material/LocalActivityOutlined";
+import LocalActivity from "@mui/icons-material/LocalActivity";
+import Today from "@mui/icons-material/Today";
 
 //#region styled
 const ListContainer = styled.div`
@@ -254,9 +252,8 @@ const NavItem = styled(NavLink)`
 `;
 //#endregion
 
-const OrderStatus = getOrderStatus();
 const UserRole = getUserRole();
-
+const OrderStatus = getOrderStatus();
 const items = [
   {
     label: "Đang xử lý",

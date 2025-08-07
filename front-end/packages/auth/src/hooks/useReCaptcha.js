@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const useReCaptcha = () => {
+const useReCaptcha = (recaptchaSiteKey) => {
   const [reCaptchaLoaded, setReCaptchaLoaded] = useState(false);
   const effectRan = useRef(false); //Prevent React.StrictMode running useEffect twice
-  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY;
 
   // Load ReCaptcha script
   useEffect(() => {
@@ -19,7 +18,7 @@ const useReCaptcha = () => {
 
       const script = document.createElement("script");
       script.async = true;
-      script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}&badge=bottomleft&hl=vi`;
+      script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}&badge=bottomleft&hl=vi`;
       script.addEventListener("load", () => {
         setReCaptchaLoaded(true);
         showBadge();
@@ -64,9 +63,9 @@ const useReCaptcha = () => {
         return null;
       }
 
-      return await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action });
+      return await window.grecaptcha.execute(recaptchaSiteKey, { action });
     },
-    [reCaptchaLoaded],
+    [reCaptchaLoaded]
   );
 
   return { reCaptchaLoaded, generateReCaptchaToken, hideBadge, showBadge };

@@ -1,12 +1,6 @@
 import styled from "@emotion/styled";
-import { Box, Button, Typography } from "@mui/material";
-import {
-  DeliveryDiningOutlined,
-  KeyboardArrowRight,
-  Payment,
-  Storefront,
-} from "@mui/icons-material";
-import { currencyFormat, getOrderStatus } from "@ring/shared";
+import { currencyFormat } from "@ring/shared/utils/convert";
+import { getOrderStatus } from "@ring/shared/enums/order";
 import { Link } from "react-router";
 import {
   ItemTitle,
@@ -20,6 +14,13 @@ import {
   StyledSkeleton,
   StatusTag,
 } from "../custom/OrderComponents";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import DeliveryDiningOutlined from "@mui/icons-material/DeliveryDiningOutlined";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import Payment from "@mui/icons-material/Payment";
+import Storefront from "@mui/icons-material/Storefront";
 
 //#region styled
 const Amount = styled.span`

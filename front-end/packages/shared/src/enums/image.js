@@ -1,6 +1,7 @@
-import { store } from "@ring/redux";
+import { getStore } from "@ring/redux/storeRef";
 
 export const getImageSize = () => {
+  const store = getStore();
   const enums = store?.getState()?.enum?.enums;
 
   return (

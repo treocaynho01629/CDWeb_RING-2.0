@@ -21,7 +21,6 @@
     "@mui/material": "^7.2.0",
     "@number-flow/react": "^0.5.10",
     "@payos/payos-checkout": "^1.0.8",
-    "@reduxjs/toolkit": "^2.8.2",
     "@ring/auth": "*",
     "@ring/redux": "*",
     "@ring/shared": "*",
@@ -32,14 +31,13 @@
     "lodash-es": "^4.17.21",
     "notistack": "^3.0.2",
     "prop-types": "^15.8.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "react-lazy-load-image-component": "^1.6.3",
     "react-lazyload": "^3.2.1",
     "react-multi-carousel": "^2.8.6",
     "react-number-format": "^5.4.4",
-    "react-redux": "^9.2.0",
-    "react-router": "^7.6.3",
+    "react-router": "^7.7.1",
     "react-transition-group": "^4.4.5",
     "redux-persist": "^6.0.0",
     "simplebar-react": "^3.3.2"
@@ -47,12 +45,12 @@
   "devDependencies": {
     "@ring/eslint-config": "*",
     "@ring/vitest-config": "*",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "4.x",
     "eslint-plugin-react-compiler": "^19.1.0-rc.2",
     "rollup-plugin-visualizer": "^6.0.3",
-    "vite": "^7.0.4",
+    "vite": "^7.0.6",
     "vite-plugin-svgr": "^4.3.0"
   }
 }

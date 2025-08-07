@@ -1,10 +1,11 @@
 import styled from "@emotion/styled";
 import Carousel from "react-multi-carousel";
 import ProductSimple from "./ProductSimple";
-import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { trackWindowScroll } from "react-lazy-load-image-component";
 import { Message } from "@ring/ui/Components";
 import { Fragment } from "react";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import Progress from "@ring/ui/Progress";
 
 //#region styled

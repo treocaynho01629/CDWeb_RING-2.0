@@ -2,50 +2,123 @@
   "name": "@ring/ui",
   "version": "0.0.0",
   "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
-    "src"
+    "dist/**"
   ],
   "exports": {
-    ".": "./src/index.js",
-    "./Components": "./src/components/Components.jsx",
-    "./AuthComponents": "./src/components/AuthComponents.jsx",
-    "./DatePicker": "./src/components/DatePicker.jsx",
-    "./LightboxImages": "./src/components/LightboxImages.jsx",
-    "./ProductImages": "./src/components/ProductImages.jsx",
-    "./PasswordInput": "./src/components/PasswordInput.jsx",
-    "./Placeholder": "./src/components/Placeholder.jsx",
-    "./Progress": "./src/components/Progress.jsx",
-    "./Snackbar": "./src/components/Snackbar.jsx",
-    "./FallbackLogo": "./src/layout/FallbackLogo.jsx",
-    "./Layout": "./src/layout/Layout.jsx",
-    "./LoadingProgress": "./src/layout/LoadingProgress.jsx",
-    "./PendingModal": "./src/layout/PendingModal.jsx",
-    "./ScrollToTop": "./src/layout/ScrollToTop.jsx",
-    "./SimpleNavbar": "./src/layout/SimpleNavbar.jsx",
-    "./Missing": "./src/pages/Missing.jsx",
-    "./Unauthorized": "./src/pages/Unauthorized.jsx",
-    "./SnackbarProvider": "./src/provider/SnackbarProvider.jsx",
-    "./ThemeContextProvider": "./src/provider/ThemeContextProvider.jsx"
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./AuthComponents": {
+      "import": "./dist/src/components/AuthComponents.js",
+      "require": "./dist/src/components/AuthComponents.cjs"
+    },
+    "./Components": {
+      "import": "./dist/src/components/Components.js",
+      "require": "./dist/src/components/Components.cjs"
+    },
+    "./DatePicker": {
+      "import": "./dist/src/components/DatePicker.js",
+      "require": "./dist/src/components/DatePicker.cjs"
+    },
+    "./LightboxImages": {
+      "import": "./dist/src/components/LightboxImages.js",
+      "require": "./dist/src/components/LightboxImages.cjs"
+    },
+    "./PasswordInput": {
+      "import": "./dist/src/components/PasswordInput.js",
+      "require": "./dist/src/components/PasswordInput.cjs"
+    },
+    "./Placeholder": {
+      "import": "./dist/src/components/Placeholder.js",
+      "require": "./dist/src/components/Placeholder.cjs"
+    },
+    "./Progress": {
+      "import": "./dist/src/components/Progress.js",
+      "require": "./dist/src/components/Progress.cjs"
+    },
+    "./Snackbar": {
+      "import": "./dist/src/components/Snackbar.js",
+      "require": "./dist/src/components/Snackbar.cjs"
+    },
+    "./ProductImages": {
+      "import": "./dist/src/components/ProductImages.js",
+      "require": "./dist/src/components/ProductImages.cjs"
+    },
+    "./FallbackLogo": {
+      "import": "./dist/src/layout/FallbackLogo.js",
+      "require": "./dist/src/layout/FallbackLogo.cjs"
+    },
+    "./LoadingProgress": {
+      "import": "./dist/src/layout/LoadingProgress.js",
+      "require": "./dist/src/layout/LoadingProgress.cjs"
+    },
+    "./PendingModal": {
+      "import": "./dist/src/layout/PendingModal.js",
+      "require": "./dist/src/layout/PendingModal.cjs"
+    },
+    "./Layout": {
+      "import": "./dist/src/layout/Layout.js",
+      "require": "./dist/src/layout/Layout.cjs"
+    },
+    "./SimpleNavbar": {
+      "import": "./dist/src/layout/SimpleNavbar.js",
+      "require": "./dist/src/layout/SimpleNavbar.cjs"
+    },
+    "./ScrollToTop": {
+      "import": "./dist/src/layout/ScrollToTop.js",
+      "require": "./dist/src/layout/ScrollToTop.cjs"
+    },
+    "./theme": {
+      "import": "./dist/src/theme/theme.js",
+      "require": "./dist/src/theme/theme.cjs"
+    },
+    "./Missing": {
+      "import": "./dist/src/pages/Missing.js",
+      "require": "./dist/src/pages/Missing.cjs"
+    },
+    "./Unauthorized": {
+      "import": "./dist/src/pages/Unauthorized.js",
+      "require": "./dist/src/pages/Unauthorized.cjs"
+    },
+    "./SnackbarProvider": {
+      "import": "./dist/src/provider/SnackbarProvider.js",
+      "require": "./dist/src/provider/SnackbarProvider.cjs"
+    },
+    "./ThemeContextProvider": {
+      "import": "./dist/src/provider/ThemeContextProvider.js",
+      "require": "./dist/src/provider/ThemeContextProvider.cjs"
+    }
   },
   "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
     "lint": "eslint \"**/*.{ts,tsx,js,jsx}\"",
     "update-dependencies": "npx npm-check-updates -u"
   },
   "dependencies": {
-    "@mui/x-date-pickers": "^8.8.0",
     "@ring/shared": "*",
-    "yet-another-react-lightbox": "^3.24.0"
+    "@mui/x-date-pickers": "^8.8.0",
+    "yet-another-react-lightbox": "^3.24.0",
+    "react-lazy-load-image-component": "^1.6.3",
+    "dayjs": "^1.11.13"
   },
   "devDependencies": {
     "@ring/eslint-config": "*",
-    "@ring/vitest-config": "*"
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.2.0",
     "@mui/material": "^7.2.0",
-    "dayjs": "^1.11.13",
     "notistack": "^3.0.2",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",

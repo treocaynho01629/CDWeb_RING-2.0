@@ -6,30 +6,28 @@ import {
   useGetBooksQuery,
   useGetRandomBooksQuery,
 } from "../features/books/booksApiSlice";
-import {
-  BarChart,
-  Book,
-  Bookmarks,
-  Category,
-  ExpandMore,
-  GpsNotFixed,
-  ImportContacts,
-  KeyboardArrowRight,
-  Replay,
-  TableChart,
-  ThumbUpAlt,
-  TrendingUp,
-} from "@mui/icons-material";
 import { CustomTab, CustomTabs } from "../components/custom/CustomTabs";
 import { useGetPublishersQuery } from "../features/publishers/publishersApiSlice";
-import { useTitle } from "@ring/shared";
 import { orderTabs } from "../utils/suggest";
+import useTitle from "@ring/shared/useTitle";
 import Button from "@mui/material/Button";
 import Placeholder from "@ring/ui/Placeholder";
 import Suggest from "../components/other/Suggest";
 import CustomDivider from "../components/custom/CustomDivider";
 import BannersSlider from "../components/other/BannersSlider";
 import LazyLoad from "react-lazyload";
+import BarChart from "@mui/icons-material/BarChart";
+import Book from "@mui/icons-material/Book";
+import Bookmarks from "@mui/icons-material/Bookmarks";
+import Category from "@mui/icons-material/Category";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import GpsNotFixed from "@mui/icons-material/GpsNotFixed";
+import ImportContacts from "@mui/icons-material/ImportContacts";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import Replay from "@mui/icons-material/Replay";
+import TableChart from "@mui/icons-material/TableChart";
+import ThumbUpAlt from "@mui/icons-material/ThumbUpAlt";
+import TrendingUp from "@mui/icons-material/TrendingUp";
 
 const ProductsSlider = lazy(
   () => import("../components/product/ProductsSlider")
@@ -195,7 +193,7 @@ const SaleContainer = styled.div`
     position: absolute;
     top: 0;
     left: 50%;
-    width: 99vw;
+    width: 100dvw;
     height: 100%;
     transform: translateX(-50%);
     border: 1px solid ${({ theme }) => theme.vars.palette.success.light};

@@ -16,15 +16,14 @@ import {
   SavePrice,
   SubText,
 } from "../custom/CartComponents";
-import { useMediaQuery } from "@mui/material";
-import {
-  Edit,
-  KeyboardArrowRight,
-  KeyboardDoubleArrowDown,
-  LocalActivityOutlined,
-} from "@mui/icons-material";
 import { lazy, Suspense, useRef, useState } from "react";
-import { currencyFormat, getAddressType } from "@ring/shared";
+import { getAddressType } from "@ring/shared/enums/address";
+import { currencyFormat } from "@ring/shared/utils/convert";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import Edit from "@mui/icons-material/Edit";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardDoubleArrowDown from "@mui/icons-material/KeyboardDoubleArrowDown";
+import LocalActivityOutlined from "@mui/icons-material/LocalActivityOutlined";
 import CouponDisplay from "../coupon/CouponDisplay";
 import PriceDisplay from "./PriceDisplay";
 import NumberFlow from "@number-flow/react";

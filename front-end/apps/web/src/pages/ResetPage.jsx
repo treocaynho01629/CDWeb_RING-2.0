@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { useState, lazy, Suspense } from "react";
 import { useParams } from "react-router";
-import { useReCaptcha } from "@ring/auth";
+import useReCaptcha from "@ring/auth/useReCaptcha";
 import SimpleNavbar from "@ring/ui/SimpleNavbar";
 
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
@@ -44,7 +44,9 @@ function ResetPage() {
   const [pending, setPending] = useState(false);
 
   //Recaptcha
-  const { reCaptchaLoaded, generateReCaptchaToken } = useReCaptcha();
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY;
+  const { reCaptchaLoaded, generateReCaptchaToken } =
+    useReCaptcha(recaptchaSiteKey);
 
   return (
     <Wrapper>

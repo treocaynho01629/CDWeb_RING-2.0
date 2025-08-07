@@ -1,10 +1,13 @@
 import styled from "@emotion/styled";
-import { Button, Skeleton, Grid } from "@mui/material";
 import { Link } from "react-router";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useGetRandomBooksQuery } from "../../features/books/booksApiSlice";
-import { getImageSize } from "@ring/shared";
+import { getImageSize } from "@ring/shared/enums/image";
+import Button from "@mui/material/Button";
+import Skeleton from "@mui/material/Skeleton";
+import Grid from "@mui/material/Grid";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import Carousel from "react-multi-carousel";
 import useCart from "../../hooks/useCart";
 
@@ -139,7 +142,6 @@ const StyledLazyImage = styled(LazyLoadImage)`
 //#endregion
 
 const ImageSize = getImageSize();
-
 const responsive = {
   default: {
     breakpoint: {

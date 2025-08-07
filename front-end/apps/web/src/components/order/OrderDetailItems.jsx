@@ -1,23 +1,6 @@
-import {
-  Button,
-  Typography,
-  Divider,
-  Collapse,
-  Skeleton,
-  CircularProgress,
-} from "@mui/material";
-import {
-  KeyboardArrowDown,
-  KeyboardArrowRight,
-  KeyboardArrowUp,
-  Storefront,
-} from "@mui/icons-material";
-import {
-  currencyFormat,
-  idFormatter,
-  getOrderStatus,
-  getPaymentType,
-} from "@ring/shared";
+import { currencyFormat, idFormatter } from "@ring/shared/utils/convert";
+import { getOrderStatus } from "@ring/shared/enums/order";
+import { getPaymentType } from "@ring/shared/enums/payment";
 import { Link } from "react-router";
 import {
   ItemTitle,
@@ -46,6 +29,16 @@ import {
   LoadContainer,
   PlaceholderContainer,
 } from "../custom/ProfileComponents";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import Collapse from "@mui/material/Collapse";
+import Skeleton from "@mui/material/Skeleton";
+import CircularProgress from "@mui/material/CircularProgress";
+import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardArrowUp from "@mui/icons-material/KeyboardArrowUp";
+import Storefront from "@mui/icons-material/Storefront";
 
 const OrderStatus = getOrderStatus();
 const PaymentType = getPaymentType();

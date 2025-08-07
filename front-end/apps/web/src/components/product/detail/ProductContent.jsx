@@ -1,20 +1,20 @@
 import styled from "@emotion/styled";
 import { lazy, Suspense, useState } from "react";
-import { styled as muiStyled } from "@mui/material";
-import {
-  Star as StarIcon,
-  StarBorder as StarBorderIcon,
-} from "@mui/icons-material";
-import { Skeleton, Rating, Box, Divider, Stack, Grid } from "@mui/material";
 import { Link } from "react-router";
-import {
-  currencyFormat,
-  numFormat,
-  getBookType,
-  getImageSize,
-} from "@ring/shared";
+import { currencyFormat, numFormat } from "@ring/shared/utils/convert";
+import { getBookType } from "@ring/shared/enums/book";
+import { getImageSize } from "@ring/shared/enums/image";
 import { useGetMyAddressQuery } from "../../../features/addresses/addressesApiSlice";
-import { useAuth } from "@ring/auth";
+import useAuth from "@ring/auth/useAuth";
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import Skeleton from "@mui/material/Skeleton";
+import Rating from "@mui/material/Rating";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
+import Grid from "@mui/material/Grid";
+
 import ProductImages from "@ring/ui/ProductImages";
 import ProductAction from "./ProductAction";
 
@@ -107,7 +107,7 @@ const UserInfoContainer = styled.div`
   }
 `;
 
-const StyledRating = muiStyled(Rating)(({ theme }) => ({
+const StyledRating = styled(Rating)(({ theme }) => ({
   color: theme.vars.palette.warning.main,
   fontSize: 18,
   "& .MuiRating-iconFilled": {

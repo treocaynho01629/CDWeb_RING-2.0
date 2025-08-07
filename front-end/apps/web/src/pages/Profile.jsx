@@ -6,8 +6,11 @@ import {
   TabContentContainer,
 } from "../components/custom/ProfileComponents";
 import { useNavigate, useOutletContext, useParams } from "react-router";
-import { useTitle } from "@ring/shared";
-import { useRefreshMutation, useSignOutMutation } from "@ring/redux";
+import useTitle from "@ring/shared/useTitle";
+import {
+  useRefreshMutation,
+  useSignOutMutation,
+} from "@ring/redux/authApiSlice";
 import Placeholder from "@ring/ui/Placeholder";
 
 const ProfileDetail = lazy(() => import("../components/profile/ProfileDetail"));

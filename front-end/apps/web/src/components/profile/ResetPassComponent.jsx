@@ -1,10 +1,16 @@
 import { useEffect, useState, lazy, Suspense } from "react";
-import { Box, Stack, Button, DialogContent } from "@mui/material";
-import { Check, KeyboardArrowLeft, Password } from "@mui/icons-material";
 import { useChangePasswordMutation } from "../../features/users/usersApiSlice";
 import { Link } from "react-router";
 import { StyledDialogTitle } from "../custom/ProfileComponents";
 import { Instruction } from "@ring/ui/Components";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import DialogContent from "@mui/material/DialogContent";
+import Check from "@mui/icons-material/Check";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import Password from "@mui/icons-material/Password";
+
 import PasswordInput from "@ring/ui/PasswordInput";
 import PasswordEvaluate from "../custom/PasswordEvaluate";
 

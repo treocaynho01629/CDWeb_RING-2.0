@@ -1,5 +1,3 @@
-import { MenuItem, InputAdornment, IconButton, Badge } from "@mui/material";
-import { Sort, Straight } from "@mui/icons-material";
 import { booksAmount, sortBooksBy } from "../../../utils/filters";
 import {
   SortWrapper,
@@ -10,6 +8,12 @@ import {
   StyledInput,
   StyledSortButton,
 } from "../../custom/SortComponents";
+import MenuItem from "@mui/material/MenuItem";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Badge from "@mui/material/Badge";
+import Sort from "@mui/icons-material/Sort";
+import Straight from "@mui/icons-material/Straight";
 import QuickPagination from "../../custom/QuickPagination";
 
 const FilterSortList = ({

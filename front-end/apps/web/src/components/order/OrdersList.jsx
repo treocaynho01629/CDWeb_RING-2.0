@@ -8,14 +8,6 @@ import {
   lazy,
 } from "react";
 import { useGetOrdersByUserQuery } from "../../features/orders/ordersApiSlice";
-import { KeyboardArrowLeft, Receipt, Search } from "@mui/icons-material";
-import {
-  Box,
-  CircularProgress,
-  Dialog,
-  DialogContent,
-  TextField,
-} from "@mui/material";
 import {
   MainContainer,
   StyledDialogTitle,
@@ -30,7 +22,15 @@ import { booksApiSlice } from "../../features/books/booksApiSlice";
 import { CustomTab, CustomTabs } from "../custom/CustomTabs";
 import { debounce } from "lodash-es";
 import { Message } from "@ring/ui/Components";
-import { getOrderStatus } from "@ring/shared";
+import { getOrderStatus } from "@ring/shared/enums/order";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import TextField from "@mui/material/TextField";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import Receipt from "@mui/icons-material/Receipt";
+import Search from "@mui/icons-material/Search";
 import useCart from "../../hooks/useCart";
 import OrderItem from "./OrderItem";
 

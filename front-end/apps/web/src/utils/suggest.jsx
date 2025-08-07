@@ -1,15 +1,13 @@
-import {
-  InsertEmoticon,
-  LocalActivity,
-  LocalMall,
-  Loyalty,
-  MonetizationOn,
-  NewReleases,
-  ShoppingCartCheckout,
-  Store,
-  ThumbUp,
-  Whatshot,
-} from "@mui/icons-material";
+import InsertEmoticon from "@mui/icons-material/InsertEmoticon";
+import LocalActivity from "@mui/icons-material/LocalActivity";
+import LocalMall from "@mui/icons-material/LocalMall";
+import Loyalty from "@mui/icons-material/Loyalty";
+import MonetizationOn from "@mui/icons-material/MonetizationOn";
+import NewReleases from "@mui/icons-material/NewReleases";
+import ShoppingCartCheckout from "@mui/icons-material/ShoppingCartCheckout";
+import Store from "@mui/icons-material/Store";
+import ThumbUp from "@mui/icons-material/ThumbUp";
+import Whatshot from "@mui/icons-material/Whatshot";
 
 export const suggest = [
   {

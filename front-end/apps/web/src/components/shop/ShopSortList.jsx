@@ -1,5 +1,3 @@
-import { MenuItem, InputAdornment, IconButton } from "@mui/material";
-import { Straight, TipsAndUpdatesOutlined } from "@mui/icons-material";
 import { filterShopsBy, sortShopsBy } from "../../utils/filters";
 import {
   SortWrapper,
@@ -10,6 +8,11 @@ import {
   StyledInput,
   StyledSortButton,
 } from "../custom/SortComponents";
+import MenuItem from "@mui/material/MenuItem";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Straight from "@mui/icons-material/Straight";
+import TipsAndUpdatesOutlined from "@mui/icons-material/TipsAndUpdatesOutlined";
 import QuickPagination from "../custom/QuickPagination";
 
 const ShopSortList = ({

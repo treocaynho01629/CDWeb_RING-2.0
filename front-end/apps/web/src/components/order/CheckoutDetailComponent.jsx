@@ -1,35 +1,29 @@
 import styled from "@emotion/styled";
 import { Suspense, lazy, useState } from "react";
 import { StyledDialogTitle } from "../custom/ProfileComponents";
+import { getPaymentStatus, getPaymentType } from "@ring/shared/enums/payment";
 import {
-  Button,
-  Dialog,
-  DialogContent,
-  Box,
-  Typography,
-  Skeleton,
-  Paper,
-} from "@mui/material";
-import {
-  Close,
-  Inbox,
-  KeyboardArrowLeft,
-  KeyboardArrowRight,
-  Receipt,
-  Sell,
-  CurrencyExchange,
-} from "@mui/icons-material";
-import {
-  dateFormatter,
-  getOrderStatus,
-  getPaymentStatus,
-  getPaymentType,
   idFormatter,
   timeFormatter,
-} from "@ring/shared";
+  dateFormatter,
+} from "@ring/shared/utils/convert";
 import { Link } from "react-router";
 import { MobileExtendButton } from "@ring/ui/Components";
 import { StatusContent } from "../custom/OrderComponents";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Skeleton from "@mui/material/Skeleton";
+import Paper from "@mui/material/Paper";
+import Close from "@mui/icons-material/Close";
+import Inbox from "@mui/icons-material/Inbox";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import Receipt from "@mui/icons-material/Receipt";
+import Sell from "@mui/icons-material/Sell";
+import CurrencyExchange from "@mui/icons-material/CurrencyExchange";
 import OrderReceiptDetails from "./OrderReceiptDetails";
 
 const CancelAndUpdateOrderForm = lazy(

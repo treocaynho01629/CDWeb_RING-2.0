@@ -1,11 +1,9 @@
-import {
-  AssignmentReturn,
-  KeyboardArrowRight,
-  LocalShipping,
-  VerifiedUser,
-} from "@mui/icons-material";
 import { MobileExtendButton } from "@ring/ui/Components";
 import styled from "@emotion/styled";
+import AssignmentReturn from "@mui/icons-material/AssignmentReturn";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import LocalShipping from "@mui/icons-material/LocalShipping";
+import VerifiedUser from "@mui/icons-material/VerifiedUser";
 
 //#region styled
 const PoliciesWrapper = styled.div`

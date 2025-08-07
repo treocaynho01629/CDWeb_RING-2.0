@@ -23,10 +23,10 @@ import {
   LocationOn,
 } from "@mui/icons-material";
 import { StyledDialogTitle } from "../custom/ProfileComponents";
-import { useConfirm } from "@ring/shared";
 import { ReactComponent as EmptyIcon } from "@ring/shared/assets/empty";
 import { Link } from "react-router";
 import { Message } from "@ring/ui/Components";
+import useConfirm from "@ring/shared/useConfirm";
 import AddressItem from "./AddressItem";
 import useAddress from "../../hooks/useAddress";
 

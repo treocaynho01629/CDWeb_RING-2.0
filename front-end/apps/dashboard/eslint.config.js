@@ -1,4 +1,4 @@
-import { config } from "@ring/eslint-config/react-internal";
+import { nextJsConfig } from "@ring/eslint-config/next-js";
 
 /** @type {import("eslint").Linter.Config} */
-export default config;
+export default nextJsConfig;

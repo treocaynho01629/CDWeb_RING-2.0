@@ -1,11 +1,13 @@
 import styled from "@emotion/styled";
 import { lazy, Suspense, useState } from "react";
-import { KeyboardArrowRight, LabelOff } from "@mui/icons-material";
 import { useGetCouponsQuery } from "../../features/coupons/couponsApiSlice";
-import { Skeleton } from "@mui/material";
-import { getCouponType, iconList } from "@ring/shared";
+import { iconList } from "@ring/shared/utils/icon";
+import { getCouponType } from "@ring/shared/enums/coupon";
 import { MobileExtendButton } from "@ring/ui/Components";
 import { trackWindowScroll } from "react-lazy-load-image-component";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import LabelOff from "@mui/icons-material/LabelOff";
+import Skeleton from "@mui/material/Skeleton";
 import useCoupon from "../../hooks/useCoupon";
 
 const Popover = lazy(() => import("@mui/material/Popover"));

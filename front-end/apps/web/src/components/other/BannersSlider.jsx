@@ -1,11 +1,15 @@
 import styled from "@emotion/styled";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { Skeleton, useMediaQuery, Grid } from "@mui/material";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useGetBannersQuery } from "../../features/banners/bannersApiSlice";
 import { Link } from "react-router";
-import { getImageSize } from "@ring/shared";
+import { getImageSize } from "@ring/shared/enums/image";
+import Skeleton from "@mui/material/Skeleton";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import Grid from "@mui/material/Grid";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+
 import Carousel from "react-multi-carousel";
 
 //#region styled
@@ -176,6 +180,7 @@ const StyledLink = styled(Link)`
 `;
 //#endregion
 
+const ImageSize = getImageSize();
 const responsive = {
   default: {
     breakpoint: {
@@ -192,7 +197,6 @@ const responsive = {
     items: 1,
   },
 };
-const ImageSize = getImageSize();
 
 const CustomArrow = ({ onClick, className, direction }) => (
   <CustomArrowButton

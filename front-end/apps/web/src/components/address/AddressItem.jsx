@@ -1,7 +1,11 @@
 import styled from "@emotion/styled";
-import { KeyboardArrowRight, MoreHoriz } from "@mui/icons-material";
-import { Box, Button, IconButton, Radio } from "@mui/material";
 import { PHONE_REGEX } from "@ring/shared/utils/regex";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Radio from "@mui/material/Radio";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import MoreHoriz from "@mui/icons-material/MoreHoriz";
 
 //#region styled
 const Wrapper = styled.div`

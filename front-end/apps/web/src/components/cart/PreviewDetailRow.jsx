@@ -1,10 +1,4 @@
 import styled from "@emotion/styled";
-import {
-  KeyboardArrowRight,
-  LocalActivityOutlined,
-  Inventory,
-} from "@mui/icons-material";
-import { Box, Skeleton, TextField } from "@mui/material";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import {
   StyledItemTableRow,
@@ -12,12 +6,16 @@ import {
   SpaceTableRow,
   StyledTableCell,
 } from "../custom/TableComponents";
-import {
-  currencyFormat,
-  getImageSize,
-  iconList,
-  getShippingType,
-} from "@ring/shared";
+import { currencyFormat } from "@ring/shared/utils/convert";
+import { getImageSize } from "@ring/shared/enums/image";
+import { getShippingType } from "@ring/shared/enums/shipping";
+import { iconList } from "@ring/shared/utils/icon";
+import Box from "@mui/material/Box";
+import Skeleton from "@mui/material/Skeleton";
+import TextField from "@mui/material/TextField";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import LocalActivityOutlined from "@mui/icons-material/LocalActivityOutlined";
+import Inventory from "@mui/icons-material/Inventory";
 
 //#region styled
 const ItemContainer = styled.div`

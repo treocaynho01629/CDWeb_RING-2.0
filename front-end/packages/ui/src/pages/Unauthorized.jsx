@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { Link } from "react-router";
-import { Button } from "@mui/material";
-import { Block } from "@mui/icons-material";
+import Button from "@mui/material/Button";
+import Block from "@mui/icons-material/Block";
 import SimpleNavbar from "../layout/SimpleNavbar";
 
 //#region styled

@@ -14,22 +14,25 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router";
-import { Close, TipsAndUpdatesOutlined } from "@mui/icons-material";
-import { Box, useMediaQuery, Grid } from "@mui/material";
 import {
   useFollowShopMutation,
   useGetDisplayShopsQuery,
   useUnfollowShopMutation,
 } from "../features/shops/shopsApiSlice";
-import { useTitle } from "@ring/shared";
+import useTitle from "@ring/shared/useTitle";
 import {
   filterShopsBy,
   filterShopsValue,
   pageSizes,
   sortShopsBy,
 } from "../utils/filters";
-import { useAuth } from "@ring/auth";
 import { Wrapper } from "../components/custom/SortComponents";
+import useAuth from "@ring/auth/useAuth";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import Close from "@mui/icons-material/Close";
+import TipsAndUpdatesOutlined from "@mui/icons-material/TipsAndUpdatesOutlined";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 import AppPagination from "../components/custom/AppPagination";
 import CustomDivider from "../components/custom/CustomDivider";

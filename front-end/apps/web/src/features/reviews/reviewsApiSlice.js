@@ -1,6 +1,6 @@
 import { createEntityAdapter } from "@reduxjs/toolkit";
-import { apiSlice } from "@ring/redux";
 import { isEqual } from "lodash-es";
+import apiSlice from "@ring/redux/apiSlice";
 
 const reviewsAdapter = createEntityAdapter({});
 const reviewsSelector = reviewsAdapter.getSelectors();

@@ -1,12 +1,13 @@
-import { Stack, TextField } from "@mui/material";
 import { useEffect, useState, Suspense, lazy } from "react";
 import { useForgotMutation } from "../../features/auth/authApiSlice";
 import { EMAIL_REGEX } from "@ring/shared/utils/regex";
 import { Instruction } from "@ring/ui/Components";
 import { AuthTitle, ConfirmButton } from "@ring/ui/AuthComponents";
-import { MarkEmailReadOutlined } from "@mui/icons-material";
 import { keyframes } from "@emotion/react";
 import { Link } from "react-router";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import MarkEmailReadOutlined from "@mui/icons-material/MarkEmailReadOutlined";
 import styled from "@emotion/styled";
 
 const ReCaptcha = lazy(() => import("@ring/auth/ReCaptcha"));
@@ -63,6 +64,8 @@ const ForgotTab = ({
   reCaptchaLoaded,
   generateReCaptchaToken,
 }) => {
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
   //Initial value
   const [email, setEmail] = useState("");
   const [validEmail, setValidEmail] = useState(false);
@@ -176,7 +179,10 @@ const ForgotTab = ({
         />
         {reCaptchaLoaded && challenge && (
           <Suspense fallback={null}>
-            <ReCaptcha onVerify={(token) => setToken(token)} />
+            <ReCaptcha
+              onVerify={(token) => setToken(token)}
+              recaptchaSiteKey={recaptchaSiteKey}
+            />
           </Suspense>
         )}
         <ButtonContainer>

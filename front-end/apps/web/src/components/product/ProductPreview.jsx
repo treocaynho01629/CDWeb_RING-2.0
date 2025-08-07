@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
 import { Link } from "react-router";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { Skeleton } from "@mui/material";
-import { currencyFormat, getImageSize } from "@ring/shared";
+import { currencyFormat } from "@ring/shared/utils/convert";
+import { getImageSize } from "@ring/shared/enums/image";
+import Skeleton from "@mui/material/Skeleton";
 
 //#region styled
 const Container = styled.div`

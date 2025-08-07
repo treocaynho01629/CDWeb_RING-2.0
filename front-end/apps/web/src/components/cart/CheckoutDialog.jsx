@@ -16,16 +16,14 @@ import {
   SavePrice,
   SubText,
 } from "../custom/CartComponents";
-import {
-  ShoppingCartCheckout,
-  LocalActivityOutlined,
-  KeyboardArrowRight,
-} from "@mui/icons-material";
-import { useMediaQuery } from "@mui/material";
-import { currencyFormat } from "@ring/shared";
+import { currencyFormat } from "@ring/shared/utils/convert";
 import NumberFlow from "@number-flow/react";
 import PriceDisplay from "./PriceDisplay";
 import useOffset from "../../hooks/useOffset";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import ShoppingCartCheckout from "@mui/icons-material/ShoppingCartCheckout";
+import LocalActivityOutlined from "@mui/icons-material/LocalActivityOutlined";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 
 const SwipeableDrawer = lazy(() => import("@mui/material/SwipeableDrawer"));
 const CouponDisplay = lazy(() => import("../coupon/CouponDisplay"));

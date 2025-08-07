@@ -1,7 +1,7 @@
 import { Dialog } from "@mui/material";
 import { TabContentContainer } from "../components/custom/ProfileComponents";
 import { useNavigate, useOutletContext } from "react-router";
-import { useTitle } from "@ring/shared";
+import useTitle from "@ring/shared/useTitle";
 import ReviewsList from "../components/review/ReviewsList";
 
 const Orders = () => {

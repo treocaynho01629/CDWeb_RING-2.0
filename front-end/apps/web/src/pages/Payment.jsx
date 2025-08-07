@@ -1,14 +1,17 @@
 import styled from "@emotion/styled";
-import { useReCaptcha } from "@ring/auth";
+import useReCaptcha from "@ring/auth/useReCaptcha";
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { usePayOS } from "@payos/payos-checkout";
-import { AuthTitle, ConfirmButton, Instruction } from "@ring/ui";
 import { keyframes } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { Link, useNavigate, useSearchParams, useParams } from "react-router";
-import { HighlightOff, KeyboardArrowLeft, TaskAlt } from "@mui/icons-material";
 import { useCreatePaymentLinkMutation } from "../features/orders/ordersApiSlice";
+import { AuthTitle, ConfirmButton } from "@ring/ui/AuthComponents";
+import { Instruction } from "@ring/ui/Components";
 import SimpleNavbar from "@ring/ui/SimpleNavbar";
+import HighlightOff from "@mui/icons-material/HighlightOff";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import TaskAlt from "@mui/icons-material/TaskAlt";
 
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
 const ReCaptcha = lazy(() => import("@ring/auth/ReCaptcha"));
@@ -136,7 +139,10 @@ function Payment() {
   const { open, exit } = usePayOS(payOSConfig);
 
   //Recaptcha
-  const { reCaptchaLoaded, generateReCaptchaToken } = useReCaptcha();
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+  const recaptchaV3SiteKey = import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY;
+  const { reCaptchaLoaded, generateReCaptchaToken } =
+    useReCaptcha(recaptchaV3SiteKey);
   const [challenge, setChallenge] = useState(false); //Toggle if marked suspicious by v3
   const [token, setToken] = useState("");
 
@@ -261,7 +267,10 @@ function Payment() {
               </Instruction>
               {reCaptchaLoaded && challenge && (
                 <Suspense fallback={null}>
-                  <ReCaptcha onVerify={(token) => setToken(token)} />
+                  <ReCaptcha
+                    onVerify={(token) => setToken(token)}
+                    recaptchaSiteKey={recaptchaSiteKey}
+                  />
                 </Suspense>
               )}
               <Content>

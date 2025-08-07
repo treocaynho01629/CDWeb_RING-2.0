@@ -4,8 +4,8 @@ import { useParams } from "react-router";
 import { keyframes } from "@emotion/react";
 import { Grow } from "@mui/material";
 import { TransitionGroup } from "react-transition-group";
-import { useTitle } from "@ring/shared";
-import { useReCaptcha } from "@ring/auth";
+import useTitle from "@ring/shared/useTitle";
+import useReCaptcha from "@ring/auth/useReCaptcha";
 import SimpleNavbar from "@ring/ui/SimpleNavbar";
 
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));
@@ -137,7 +137,9 @@ function AuthPage() {
   const [pending, setPending] = useState(false);
 
   //Recaptcha
-  const { reCaptchaLoaded, generateReCaptchaToken } = useReCaptcha();
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY;
+  const { reCaptchaLoaded, generateReCaptchaToken } =
+    useReCaptcha(recaptchaSiteKey);
 
   //Set title
   useTitle("Chào mừng");

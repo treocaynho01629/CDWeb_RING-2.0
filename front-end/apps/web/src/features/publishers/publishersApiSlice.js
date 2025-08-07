@@ -1,11 +1,11 @@
 import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
+import { isEqual } from "lodash-es";
 import {
   publishersApiSlice as initialsApiSlice,
   pubsInitialState as initialState,
   pubsAdapter,
   pubsSelector,
-} from "@ring/redux";
-import { isEqual } from "lodash-es";
+} from "@ring/redux/publishersApiSlice";
 
 export const publishersApiSlice = initialsApiSlice.injectEndpoints({
   endpoints: (builder) => ({

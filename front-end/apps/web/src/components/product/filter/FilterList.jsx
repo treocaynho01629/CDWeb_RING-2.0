@@ -1,28 +1,6 @@
 import styled from "@emotion/styled";
 import { useState, useEffect, Fragment, memo, useRef } from "react";
-import {
-  Button,
-  Divider,
-  Checkbox,
-  FormGroup,
-  FormControlLabel,
-  List,
-  ListItemButton,
-  Collapse,
-  Skeleton,
-  Stack,
-  Badge,
-  Radio,
-} from "@mui/material";
-import {
-  ExpandLess,
-  ExpandMore,
-  FilterAltOff,
-  Star,
-  StarBorder,
-  CategoryOutlined,
-} from "@mui/icons-material";
-import { getBookType } from "@ring/shared";
+import { getBookType } from "@ring/shared/enums/book";
 import {
   useGetCategoriesQuery,
   useGetRelevantCategoriesQuery,
@@ -32,6 +10,24 @@ import {
   useGetRelevantPublishersQuery,
 } from "../../../features/publishers/publishersApiSlice";
 import { suggestPrices } from "../../../utils/filters";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Checkbox from "@mui/material/Checkbox";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import Collapse from "@mui/material/Collapse";
+import Skeleton from "@mui/material/Skeleton";
+import Stack from "@mui/material/Stack";
+import Badge from "@mui/material/Badge";
+import Radio from "@mui/material/Radio";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import FilterAltOff from "@mui/icons-material/FilterAltOff";
+import Star from "@mui/icons-material/Star";
+import StarBorder from "@mui/icons-material/StarBorder";
+import CategoryOutlined from "@mui/icons-material/CategoryOutlined";
 import PriceRangeSlider from "./PriceRangeSlider";
 import SimpleBar from "simplebar-react";
 
@@ -154,9 +150,9 @@ const ButtonContainer = styled.div`
 `;
 //#endregion
 
+const BookType = getBookType();
 const LIMIT_CATES = 10;
 const LIMIT_PUBS = 10;
-const BookType = getBookType();
 
 const CateFilter = memo(({ cateId, shopId, onChangeCate }) => {
   const childContainedRef = useRef(null);

@@ -1,9 +1,13 @@
 import styled from "@emotion/styled";
-import { RemoveShoppingCart as RemoveShoppingCartIcon } from "@mui/icons-material";
-import { Button, Skeleton, Popover, Paper } from "@mui/material";
 import { Link } from "react-router";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { currencyFormat, getImageSize } from "@ring/shared";
+import { currencyFormat } from "@ring/shared/utils/convert";
+import { getImageSize } from "@ring/shared/enums/image";
+import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
+import Button from "@mui/material/Button";
+import Skeleton from "@mui/material/Skeleton";
+import Popover from "@mui/material/Popover";
+import Paper from "@mui/material/Paper";
 
 //#region styled
 const MiniCartContainer = styled.div`

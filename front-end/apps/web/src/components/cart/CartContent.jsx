@@ -8,24 +8,6 @@ import {
   useCallback,
   useRef,
 } from "react";
-import {
-  Delete as DeleteIcon,
-  ShoppingCart as ShoppingCartIcon,
-  Search,
-  ChevronLeft,
-  Sell,
-} from "@mui/icons-material";
-import {
-  Button,
-  Table,
-  TableBody,
-  TableRow,
-  Box,
-  MenuItem,
-  ListItemText,
-  ListItemIcon,
-  Grid,
-} from "@mui/material";
 import { Link, useNavigate } from "react-router";
 import { booksApiSlice } from "../../features/books/booksApiSlice";
 import { useCalculateMutation } from "../../features/orders/ordersApiSlice";
@@ -37,8 +19,22 @@ import {
   StyledTableHead,
 } from "../custom/TableComponents";
 import { StyledCheckbox } from "../custom/CartComponents";
-import { useDeepEffect } from "@ring/shared";
-import { useAuth } from "@ring/auth";
+import useDeepEffect from "@ring/shared/useDeepEffect";
+import useAuth from "@ring/auth/useAuth";
+import Button from "@mui/material/Button";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import Box from "@mui/material/Box";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import Grid from "@mui/material/Grid";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import Search from "@mui/icons-material/Search";
+import ChevronLeft from "@mui/icons-material/ChevronLeft";
+import Sell from "@mui/icons-material/Sell";
 import useCart from "../../hooks/useCart";
 import CheckoutDialog from "./CheckoutDialog";
 import PropTypes from "prop-types";

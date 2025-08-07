@@ -1,4 +1,5 @@
-import { idFormatter, useTitle } from "@ring/shared";
+import useTitle from "@ring/shared/useTitle";
+import { idFormatter } from "@ring/shared/utils/convert";
 import {
   Navigate,
   useNavigate,

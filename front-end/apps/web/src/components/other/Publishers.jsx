@@ -1,10 +1,12 @@
 import styled from "@emotion/styled";
 import { useRef } from "react";
-import { IconButton, Skeleton } from "@mui/material";
-import { KeyboardArrowRight, KeyboardArrowLeft } from "@mui/icons-material";
 import { Link } from "react-router";
 import { useGetPublishersQuery } from "../../features/publishers/publishersApiSlice";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import IconButton from "@mui/material/IconButton";
+import Skeleton from "@mui/material/Skeleton";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 
 //#region styled
 const StyledLazyImage = styled(LazyLoadImage)`

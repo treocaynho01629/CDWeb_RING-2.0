@@ -1,8 +1,13 @@
 import styled from "@emotion/styled";
 import PropTypes from "prop-types";
-import { Button, LinearProgress, Rating, Skeleton } from "@mui/material";
-import { EditOutlined, Star, StarBorder } from "@mui/icons-material";
-import { numFormat } from "@ring/shared";
+import { numFormat } from "@ring/shared/utils/convert";
+import Button from "@mui/material/Button";
+import LinearProgress from "@mui/material/LinearProgress";
+import Rating from "@mui/material/Rating";
+import Skeleton from "@mui/material/Skeleton";
+import EditOutlined from "@mui/icons-material/EditOutlined";
+import Star from "@mui/icons-material/Star";
+import StarBorder from "@mui/icons-material/StarBorder";
 
 //#region styled
 const ReviewsInfoContainer = styled.div`

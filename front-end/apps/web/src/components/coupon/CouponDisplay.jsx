@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
-import { getCouponType, iconList } from "@ring/shared";
+import { getCouponType } from "@ring/shared/enums/coupon";
+import { iconList } from "@ring/shared/utils/icon";
 import { Suspense } from "react";
 
 //#region styled

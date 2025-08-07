@@ -8,41 +8,36 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import {
-  LocationOn,
-  CreditCard,
-  KeyboardDoubleArrowDown,
-  ShoppingCartCheckout,
-  ProductionQuantityLimits,
-} from "@mui/icons-material";
-import {
-  Button,
-  Table,
-  TableBody,
-  TableContainer,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
-  Typography,
-  Box,
-  Grid,
-} from "@mui/material";
 import { Navigate, NavLink, useLocation, useNavigate } from "react-router";
 import { useGetMyAddressQuery } from "../features/addresses/addressesApiSlice";
 import {
   useCalculateMutation,
   useCheckoutMutation,
 } from "../features/orders/ordersApiSlice";
-import {
-  PHONE_REGEX,
-  useTitle,
-  useDeepEffect,
-  getPaymentType,
-  getShippingType,
-} from "@ring/shared";
-import { useAuth, useReCaptcha } from "@ring/auth";
 import { isEqual } from "lodash-es";
+import { PHONE_REGEX } from "@ring/shared/utils/regex";
+import { getPaymentType } from "@ring/shared/enums/payment";
+import { getShippingType } from "@ring/shared/enums/shipping";
+import useTitle from "@ring/shared/useTitle";
+import useDeepEffect from "@ring/shared/useDeepEffect";
+import useAuth from "@ring/auth/useAuth";
+import useReCaptcha from "@ring/auth/useReCaptcha";
+import Button from "@mui/material/Button";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableContainer from "@mui/material/TableContainer";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import StepContent from "@mui/material/StepContent";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import LocationOn from "@mui/icons-material/LocationOn";
+import CreditCard from "@mui/icons-material/CreditCard";
+import KeyboardDoubleArrowDown from "@mui/icons-material/KeyboardDoubleArrowDown";
+import ShoppingCartCheckout from "@mui/icons-material/ShoppingCartCheckout";
+import ProductionQuantityLimits from "@mui/icons-material/ProductionQuantityLimits";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 import AddressDisplay from "../components/address/AddressDisplay";
 import AddressSelectDialog from "../components/address/AddressSelectDialog";
@@ -141,8 +136,8 @@ const StyledStepContent = styled(StepContent)(({ theme }) => ({
 }));
 //#endregion
 
-const PaymentType = getPaymentType();
 const ShippingType = getShippingType();
+const PaymentType = getPaymentType();
 
 const Checkout = () => {
   //#region construct
@@ -200,7 +195,10 @@ const Checkout = () => {
   const [token, setToken] = useState("");
 
   //Recaptcha
-  const { reCaptchaLoaded, generateReCaptchaToken, hideBadge } = useReCaptcha();
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+  const recaptchaV3SiteKey = import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY;
+  const { reCaptchaLoaded, generateReCaptchaToken, hideBadge } =
+    useReCaptcha(recaptchaV3SiteKey);
 
   //Checkout hook
   const [checkout, { isLoading }] = useCheckoutMutation();
@@ -751,7 +749,10 @@ const Checkout = () => {
                     </Suspense>
                     {reCaptchaLoaded && challenge && (
                       <Suspense fallback={null}>
-                        <ReCaptcha onVerify={(token) => setToken(token)} />
+                        <ReCaptcha
+                          onVerify={(token) => setToken(token)}
+                          recaptchaSiteKey={recaptchaSiteKey}
+                        />
                       </Suspense>
                     )}
                   </StyledStepContent>

@@ -16,6 +16,8 @@ const ResetTab = ({
   reCaptchaLoaded,
   generateReCaptchaToken,
 }) => {
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
   //Password validation
   const [password, setPassword] = useState("");
   const [validPass, setValidPass] = useState(false);
@@ -149,7 +151,10 @@ const ResetTab = ({
         />
         {reCaptchaLoaded && challenge && (
           <Suspense fallback={null}>
-            <ReCaptcha onVerify={(token) => setToken(token)} />
+            <ReCaptcha
+              onVerify={(token) => setToken(token)}
+              recaptchaSiteKey={recaptchaSiteKey}
+            />
           </Suspense>
         )}
         <div style={{ width: "100%" }}>

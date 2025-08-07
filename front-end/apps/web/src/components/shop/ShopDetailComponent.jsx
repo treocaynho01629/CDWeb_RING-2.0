@@ -1,24 +1,10 @@
-import styled from "@emotion/styled";
-import { Avatar, Box, Button, Skeleton, Stack, Grid } from "@mui/material";
-import {
-  Add,
-  AutoStories,
-  Block,
-  Check,
-  LocalActivity,
-  Person4,
-  PersonAddAlt1,
-  Store,
-  Today,
-  Verified as VerifiedIcon,
-} from "@mui/icons-material";
 import {
   useFollowShopMutation,
   useUnfollowShopMutation,
 } from "../../features/shops/shopsApiSlice";
 import { Link, useLocation, useNavigate } from "react-router";
-import { numFormat } from "@ring/shared";
-import { useAuth } from "@ring/auth";
+import { numFormat } from "@ring/shared/utils/convert";
+import useAuth from "@ring/auth/useAuth";
 import {
   ShopContainer,
   ShopInfo,
@@ -26,6 +12,23 @@ import {
   Verified,
   ShopDetail,
 } from "./ShopComponents";
+// Replace MUI imports with direct imports
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Skeleton from "@mui/material/Skeleton";
+import Stack from "@mui/material/Stack";
+import Grid from "@mui/material/Grid";
+import Add from "@mui/icons-material/Add";
+import AutoStories from "@mui/icons-material/AutoStories";
+import Block from "@mui/icons-material/Block";
+import Check from "@mui/icons-material/Check";
+import LocalActivity from "@mui/icons-material/LocalActivity";
+import Person4 from "@mui/icons-material/Person4";
+import PersonAddAlt1 from "@mui/icons-material/PersonAddAlt1";
+import Store from "@mui/icons-material/Store";
+import Today from "@mui/icons-material/Today";
+import VerifiedIcon from "@mui/icons-material/Verified";
 
 const ShopDetailComponent = ({ shop, name }) => {
   //Fetch reviews

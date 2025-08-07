@@ -1,32 +1,30 @@
 import styled from "@emotion/styled";
-import {
-  Box,
-  Collapse,
-  Paper,
-  Step,
-  StepConnector,
-  stepConnectorClasses,
-  StepLabel,
-  stepLabelClasses,
-  Stepper,
-} from "@mui/material";
-import {
-  AssignmentReturnOutlined,
-  Check,
-  Close,
-  KeyboardArrowDown,
-  KeyboardArrowUp,
-  KeyboardReturn,
-  LocalShippingOutlined,
-  PaymentsOutlined,
-  PublishedWithChanges,
-  ReceiptOutlined,
-  SaveAltOutlined,
-  StarBorder,
-} from "@mui/icons-material";
-import { dateFormatter, getOrderStatus, timeFormatter } from "@ring/shared";
+import { getOrderStatus } from "@ring/shared/enums/order";
+import { timeFormatter, dateFormatter } from "@ring/shared/utils/convert";
 import { useState } from "react";
 import { StatusContent, ToggleArrow } from "../custom/OrderComponents";
+import { stepConnectorClasses } from "@mui/material/StepConnector";
+import { stepLabelClasses } from "@mui/material/StepLabel";
+import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
+import Paper from "@mui/material/Paper";
+import Step from "@mui/material/Step";
+import StepConnector from "@mui/material/StepConnector";
+import StepLabel from "@mui/material/StepLabel";
+import Stepper from "@mui/material/Stepper";
+import AssignmentReturnOutlined from "@mui/icons-material/AssignmentReturnOutlined";
+import Check from "@mui/icons-material/Check";
+import Close from "@mui/icons-material/Close";
+import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUp from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardReturn from "@mui/icons-material/KeyboardReturn";
+import LocalShippingOutlined from "@mui/icons-material/LocalShippingOutlined";
+import PaymentsOutlined from "@mui/icons-material/PaymentsOutlined";
+import PublishedWithChanges from "@mui/icons-material/PublishedWithChanges";
+import ReceiptOutlined from "@mui/icons-material/ReceiptOutlined";
+import SaveAltOutlined from "@mui/icons-material/SaveAltOutlined";
+import StarBorder from "@mui/icons-material/StarBorder";
+
 import PropTypes from "prop-types";
 
 //#region styled

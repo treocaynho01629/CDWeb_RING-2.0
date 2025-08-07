@@ -10,24 +10,21 @@ import {
   Showmore,
   Title,
 } from "@ring/ui/Components";
-import {
-  Button,
-  DialogActions,
-  DialogTitle,
-  Rating,
-  Box,
-  Skeleton,
-} from "@mui/material";
-import {
-  KeyboardArrowRight,
-  KeyboardArrowLeft,
-  Star,
-  StarBorder,
-  EditOutlined,
-} from "@mui/icons-material";
-import { numFormat } from "@ring/shared";
+import { numFormat } from "@ring/shared/utils/convert";
 import { ReactComponent as EmptyIcon } from "@ring/shared/assets/empty";
-import { useAuth } from "@ring/auth";
+import useAuth from "@ring/auth/useAuth";
+import Button from "@mui/material/Button";
+import DialogActions from "@mui/material/DialogActions";
+import DialogTitle from "@mui/material/DialogTitle";
+import Rating from "@mui/material/Rating";
+import Box from "@mui/material/Box";
+import Skeleton from "@mui/material/Skeleton";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import Star from "@mui/icons-material/Star";
+import StarBorder from "@mui/icons-material/StarBorder";
+import EditOutlined from "@mui/icons-material/EditOutlined";
+
 import Progress from "@ring/ui/Progress";
 import Placeholder from "@ring/ui/Placeholder";
 import ReviewItem from "./ReviewItem";

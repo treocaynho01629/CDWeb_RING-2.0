@@ -1,7 +1,7 @@
 import { createEntityAdapter } from "@reduxjs/toolkit";
-import { apiSlice } from "@ring/redux";
-import { isEqual } from "lodash-es";
 import { defaultSerializeQueryArgs } from "@reduxjs/toolkit/query";
+import { isEqual } from "lodash-es";
+import apiSlice from "@ring/redux/apiSlice";
 
 const ordersAdapter = createEntityAdapter({});
 const ordersSelector = ordersAdapter.getSelectors();

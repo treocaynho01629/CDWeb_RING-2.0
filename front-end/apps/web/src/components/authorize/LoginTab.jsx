@@ -1,12 +1,4 @@
 import { useState, useRef, lazy, Suspense } from "react";
-import {
-  Stack,
-  Button,
-  FormControlLabel,
-  Checkbox,
-  TextField,
-} from "@mui/material";
-import { Logout } from "@mui/icons-material";
 import { useNavigate, useLocation, Link } from "react-router";
 import {
   AuthActionContainer,
@@ -15,9 +7,16 @@ import {
   AuthTitle,
   ConfirmButton,
 } from "@ring/ui/AuthComponents";
-import { useAuthenticateMutation } from "@ring/redux";
-import { useAuth, useLogout } from "@ring/auth";
+import { useAuthenticateMutation } from "@ring/redux/authApiSlice";
 import { Instruction } from "@ring/ui/Components";
+import useAuth from "@ring/auth/useAuth";
+import useLogout from "@ring/auth/useLogout";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import TextField from "@mui/material/TextField";
+import Logout from "@mui/icons-material/Logout";
 import PasswordInput from "@ring/ui/PasswordInput";
 
 const ReCaptcha = lazy(() => import("@ring/auth/ReCaptcha"));
@@ -28,6 +27,7 @@ const LoginTab = ({
   reCaptchaLoaded,
   generateReCaptchaToken,
 }) => {
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
   const { persist, username: loginedUser, setAuth, setPersist } = useAuth();
   const [authenticate, { isLoading, isSuccess, isUninitialized }] =
     useAuthenticateMutation();
@@ -156,7 +156,10 @@ const LoginTab = ({
         />
         {reCaptchaLoaded && challenge && (
           <Suspense fallback={null}>
-            <ReCaptcha onVerify={(token) => setToken(token)} />
+            <ReCaptcha
+              onVerify={(token) => setToken(token)}
+              recaptchaSiteKey={recaptchaSiteKey}
+            />
           </Suspense>
         )}
         <AuthActionContainer className="persistCheck">

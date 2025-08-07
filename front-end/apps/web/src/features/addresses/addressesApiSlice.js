@@ -1,5 +1,5 @@
 import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
-import { apiSlice } from "@ring/redux";
+import apiSlice from "@ring/redux/apiSlice";
 
 const addressesAdapter = createEntityAdapter({});
 const initialState = addressesAdapter.getInitialState();
@@ -86,7 +86,7 @@ export const selectAddressesResult =
 
 const selectAddressesData = createSelector(
   selectAddressesResult,
-  (addressesResult) => addressesResult.data,
+  (addressesResult) => addressesResult.data
 );
 
 export const {
@@ -95,5 +95,5 @@ export const {
   selectIds: selectAddressIds,
   selectEntities: selectAddressEntities,
 } = addressesAdapter.getSelectors(
-  (state) => selectAddressesData(state) ?? initialState,
+  (state) => selectAddressesData(state) ?? initialState
 );

@@ -1,16 +1,15 @@
 import styled from "@emotion/styled";
-import { AddShoppingCart } from "@mui/icons-material";
-import {
-  Button,
-  Box,
-  Divider,
-  useMediaQuery,
-  Skeleton,
-  SwipeableDrawer,
-} from "@mui/material";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { currencyFormat, getImageSize } from "@ring/shared";
+import { getImageSize } from "@ring/shared/enums/image";
+import { currencyFormat } from "@ring/shared/utils/convert";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import Skeleton from "@mui/material/Skeleton";
+import SwipeableDrawer from "@mui/material/SwipeableDrawer";
+import AddShoppingCart from "@mui/icons-material/AddShoppingCart";
 import useCart from "../../../hooks/useCart";
 import AmountInput from "../../custom/AmountInput";
 import useOffset from "../../../hooks/useOffset";

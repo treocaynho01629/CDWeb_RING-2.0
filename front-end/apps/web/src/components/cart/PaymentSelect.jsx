@@ -1,7 +1,10 @@
 import styled from "@emotion/styled";
-import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
-import { getPaymentContent, getPaymentType, iconList } from "@ring/shared";
 import { Suspense } from "react";
+import { getPaymentType } from "@ring/shared/enums/payment";
+import { iconList } from "@ring/shared/utils/icon";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
 
 //#region styled
 const StyledForm = styled(FormControlLabel)`

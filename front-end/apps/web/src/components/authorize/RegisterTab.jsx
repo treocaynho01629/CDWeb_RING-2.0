@@ -22,6 +22,7 @@ const RegisterTab = ({
   reCaptchaLoaded,
   generateReCaptchaToken,
 }) => {
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
   const userRef = useRef();
   const errRef = useRef();
 
@@ -258,7 +259,10 @@ const RegisterTab = ({
         </Stack>
         {reCaptchaLoaded && challenge && (
           <Suspense fallback={null}>
-            <ReCaptcha onVerify={(token) => setToken(token)} />
+            <ReCaptcha
+              onVerify={(token) => setToken(token)}
+              recaptchaSiteKey={recaptchaSiteKey}
+            />
           </Suspense>
         )}
         <TermText>

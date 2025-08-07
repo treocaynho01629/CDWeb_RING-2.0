@@ -1,7 +1,9 @@
-import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
-import { IconButton, InputAdornment } from "@mui/material";
 import { useState } from "react";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
+import VisibilityOffOutlined from "@mui/icons-material/VisibilityOffOutlined";
+import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 
 export default function PasswordInput(props) {
   const [showPassword, setShowPassword] = useState(false);

@@ -1,16 +1,16 @@
 import styled from "@emotion/styled";
-import {
-  Add,
-  AutoStories,
-  Check,
-  LocalActivity,
-  PersonAddAlt1,
-  Store,
-  Verified as VerifiedIcon,
-} from "@mui/icons-material";
-import { Avatar, Box, Button } from "@mui/material";
-import { numFormat } from "@ring/shared";
+import { numFormat } from "@ring/shared/utils/convert";
 import { Link } from "react-router";
+import Add from "@mui/icons-material/Add";
+import AutoStories from "@mui/icons-material/AutoStories";
+import Check from "@mui/icons-material/Check";
+import LocalActivity from "@mui/icons-material/LocalActivity";
+import PersonAddAlt1 from "@mui/icons-material/PersonAddAlt1";
+import Store from "@mui/icons-material/Store";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 
 //#region styled
 const Wrapper = styled.div`

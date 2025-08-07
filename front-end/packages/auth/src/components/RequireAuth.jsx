@@ -1,6 +1,8 @@
+"use client";
+
 import { useState, useEffect, Suspense, lazy } from "react";
 import { useLocation, Navigate, Outlet } from "react-router";
-import { useRefreshMutation } from "@ring/redux";
+import { useRefreshMutation } from "@ring/redux/authApiSlice";
 import useAuth from "../hooks/useAuth";
 
 const PendingModal = lazy(() => import("@ring/ui/PendingModal"));

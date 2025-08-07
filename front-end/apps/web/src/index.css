@@ -18,8 +18,10 @@ html {
   scroll-behavior: smooth;
 }
 
-.body {
+body {
   margin: 0px;
+  width: 100dvw;
+  overflow-x: hidden;
 }
 
 a {

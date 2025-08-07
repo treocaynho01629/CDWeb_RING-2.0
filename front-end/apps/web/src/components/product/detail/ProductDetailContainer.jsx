@@ -1,15 +1,16 @@
 import styled from "@emotion/styled";
 import { lazy, Suspense, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-import { Skeleton, Box, Grid } from "@mui/material";
 import { useGetBooksQuery } from "../../../features/books/booksApiSlice";
 import { MobileExtendButton, Showmore, Title } from "@ring/ui/Components";
-import {
-  KeyboardArrowDown,
-  KeyboardArrowRight,
-  KeyboardArrowUp,
-} from "@mui/icons-material";
-import { idFormatter, getBookType, getBookLanguage } from "@ring/shared";
+import { getBookType, getBookLanguage } from "@ring/shared/enums/book";
+import { idFormatter } from "@ring/shared/utils/convert";
+import Skeleton from "@mui/material/Skeleton";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardArrowUp from "@mui/icons-material/KeyboardArrowUp";
 import ProductsScroll from "../ProductsScroll";
 
 const SwipeableDrawer = lazy(() => import("@mui/material/SwipeableDrawer"));

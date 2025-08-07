@@ -1,23 +1,5 @@
 import styled from "@emotion/styled";
 import {
-  Search,
-  Close,
-  Storefront,
-  History,
-  KeyboardArrowLeft,
-  Delete,
-  CategoryOutlined,
-} from "@mui/icons-material";
-import {
-  Button,
-  createFilterOptions,
-  IconButton,
-  inputBaseClasses,
-  Paper,
-  TextField,
-  useAutocomplete,
-} from "@mui/material";
-import {
   useCallback,
   useEffect,
   useState,
@@ -28,6 +10,20 @@ import {
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { useGetBooksSuggestionQuery } from "../../features/books/booksApiSlice";
 import { debounce } from "lodash-es";
+import { createFilterOptions } from "@mui/material/useAutocomplete";
+import { inputBaseClasses } from "@mui/material/InputBase";
+import Search from "@mui/icons-material/Search";
+import Close from "@mui/icons-material/Close";
+import Storefront from "@mui/icons-material/Storefront";
+import History from "@mui/icons-material/History";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import Delete from "@mui/icons-material/Delete";
+import CategoryOutlined from "@mui/icons-material/CategoryOutlined";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import useAutocomplete from "@mui/material/useAutocomplete";
 import useApp from "../../hooks/useApp";
 
 const Dialog = lazy(() => import("@mui/material/Dialog"));

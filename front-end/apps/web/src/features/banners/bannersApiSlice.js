@@ -1,4 +1,4 @@
-import { bannersApiSlice as initialsApiSlice } from "@ring/redux";
+import { bannersApiSlice as initialsApiSlice } from "@ring/redux/bannersApiSlice";
 
 export const bannersApiSlice = initialsApiSlice;
 

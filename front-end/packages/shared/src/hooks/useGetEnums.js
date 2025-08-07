@@ -1,5 +1,6 @@
-import { enumsApiSlice, useEnums } from "@ring/redux";
 import { useEffect } from "react";
+import { enumsApiSlice } from "@ring/redux/enumsApiSlice";
+import useEnums from "@ring/redux/useEnums";
 
 const useGetEnums = () => {
   const { enums, importEnums } = useEnums();

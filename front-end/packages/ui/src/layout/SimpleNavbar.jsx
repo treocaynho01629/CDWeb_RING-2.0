@@ -1,12 +1,10 @@
 import styled from "@emotion/styled";
 import { Link } from "react-router";
-import {
-  ContactSupportOutlined,
-  ContrastOutlined,
-  LightModeOutlined,
-  NightlightOutlined,
-} from "@mui/icons-material";
 import { useColorScheme } from "@mui/material";
+import ContactSupportOutlined from "@mui/icons-material/ContactSupportOutlined";
+import ContrastOutlined from "@mui/icons-material/ContrastOutlined";
+import LightModeOutlined from "@mui/icons-material/LightModeOutlined";
+import NightlightOutlined from "@mui/icons-material/NightlightOutlined";
 
 //#region styled
 const Container = styled.div`

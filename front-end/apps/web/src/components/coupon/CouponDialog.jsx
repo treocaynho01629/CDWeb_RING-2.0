@@ -1,32 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  Check,
-  Close,
-  ExpandMore,
-  LocalActivityOutlined,
-  Loyalty,
-  SaveAlt,
-  KeyboardArrowLeft,
-} from "@mui/icons-material";
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Button,
-  useMediaQuery,
-  Box,
-  TextField,
-  CircularProgress,
-} from "@mui/material";
-import {
   useGetCouponQuery,
   useGetCouponsQuery,
 } from "../../features/coupons/couponsApiSlice";
-import { getCouponType } from "@ring/shared";
+import { getCouponType } from "@ring/shared/enums/coupon";
 import { Instruction, Message } from "@ring/ui/Components";
 import { trackWindowScroll } from "react-lazy-load-image-component";
 import { compact } from "lodash-es";
+import Check from "@mui/icons-material/Check";
+import Close from "@mui/icons-material/Close";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import LocalActivityOutlined from "@mui/icons-material/LocalActivityOutlined";
+import Loyalty from "@mui/icons-material/Loyalty";
+import SaveAlt from "@mui/icons-material/SaveAlt";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Button from "@mui/material/Button";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import CircularProgress from "@mui/material/CircularProgress";
 import CouponItem from "./CouponItem";
 import styled from "@emotion/styled";
 import useCoupon from "../../hooks/useCoupon";

@@ -1,29 +1,27 @@
 import { useEffect, useState } from "react";
-import {
-  LocationOn as LocationOnIcon,
-  Check,
-  Person as PersonIcon,
-  Phone as PhoneIcon,
-  Home as HomeIcon,
-  Close as CloseIcon,
-  Delete,
-  Apartment,
-} from "@mui/icons-material";
-import {
-  Checkbox,
-  Button,
-  DialogActions,
-  DialogContent,
-  FormControlLabel,
-  MenuItem,
-  TextField,
-  DialogTitle,
-  TextareaAutosize,
-  Grid,
-} from "@mui/material";
 import { Instruction } from "@ring/ui/Components";
-import { PHONE_REGEX, getAddressType, location } from "@ring/shared";
+import { PHONE_REGEX } from "@ring/shared/utils/regex";
+import { getAddressType } from "@ring/shared/enums/address";
+import { location } from "@ring/shared/utils/location";
 import { PatternFormat } from "react-number-format";
+import Checkbox from "@mui/material/Checkbox";
+import Button from "@mui/material/Button";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
+import DialogTitle from "@mui/material/DialogTitle";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
+import Grid from "@mui/material/Grid";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import Check from "@mui/icons-material/Check";
+import PersonIcon from "@mui/icons-material/Person";
+import PhoneIcon from "@mui/icons-material/Phone";
+import HomeIcon from "@mui/icons-material/Home";
+import CloseIcon from "@mui/icons-material/Close";
+import Delete from "@mui/icons-material/Delete";
+import Apartment from "@mui/icons-material/Apartment";
 
 const AddressType = getAddressType();
 

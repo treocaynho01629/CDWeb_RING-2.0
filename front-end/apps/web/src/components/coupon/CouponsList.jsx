@@ -1,16 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  KeyboardArrowLeft,
-  LocalActivityOutlined,
-  Loyalty,
-} from "@mui/icons-material";
-import {
-  CircularProgress,
-  DialogContent,
-  TextField,
-  Grid,
-} from "@mui/material";
-import {
   MessageContainer,
   StyledDialogTitle,
   LoadContainer,
@@ -23,9 +12,16 @@ import { Link, useSearchParams } from "react-router";
 import { CustomTab, CustomTabs } from "../custom/CustomTabs";
 import { debounce } from "lodash-es";
 import { Message } from "@ring/ui/Components";
-import { getCouponType } from "@ring/shared";
+import { getCouponType } from "@ring/shared/enums/coupon";
 import { useGetCouponsQuery } from "../../features/coupons/couponsApiSlice";
 import { trackWindowScroll } from "react-lazy-load-image-component";
+import CircularProgress from "@mui/material/CircularProgress";
+import DialogContent from "@mui/material/DialogContent";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import LocalActivityOutlined from "@mui/icons-material/LocalActivityOutlined";
+import Loyalty from "@mui/icons-material/Loyalty";
 import CouponItem from "./CouponItem";
 import useCoupon from "../../hooks/useCoupon";
 

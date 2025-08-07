@@ -4,7 +4,7 @@ import {
   catesInitialState as initialState,
   categoriesApiSlice as initialsApiSlice,
   catesSelector,
-} from "@ring/redux";
+} from "@ring/redux/categoriesApiSlice";
 import { isEqual } from "lodash-es";
 
 export const categoriesApiSlice = initialsApiSlice.injectEndpoints({

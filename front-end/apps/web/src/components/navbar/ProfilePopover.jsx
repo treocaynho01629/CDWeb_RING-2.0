@@ -1,19 +1,15 @@
-import {
-  NightlightOutlined,
-  LightModeOutlined,
-  DeliveryDiningOutlined,
-  LockOutlined,
-  ContrastOutlined,
-} from "@mui/icons-material";
-import {
-  Avatar,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  Divider,
-  Paper,
-} from "@mui/material";
 import { Link } from "react-router";
+import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import Divider from "@mui/material/Divider";
+import Paper from "@mui/material/Paper";
+import NightlightOutlined from "@mui/icons-material/NightlightOutlined";
+import LightModeOutlined from "@mui/icons-material/LightModeOutlined";
+import DeliveryDiningOutlined from "@mui/icons-material/DeliveryDiningOutlined";
+import LockOutlined from "@mui/icons-material/LockOutlined";
+import ContrastOutlined from "@mui/icons-material/ContrastOutlined";
 
 const ProfilePopover = ({
   open,

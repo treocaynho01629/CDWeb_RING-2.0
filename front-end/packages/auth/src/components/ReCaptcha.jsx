@@ -1,14 +1,15 @@
+"use client";
+
 import { Box, useColorScheme } from "@mui/material";
 import { useEffect, useRef } from "react";
 
 //ReCaptcha v2
 //Only usable after v3 script already loaded
-const ReCaptcha = ({ onVerify, onExpire }) => {
+const ReCaptcha = ({ onVerify, onExpire, recaptchaSiteKey }) => {
   const { mode } = useColorScheme();
   const effectRan = useRef(false);
   const recaptchaId = useRef(null);
   const containerRef = useRef(null);
-  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
   // Render the reCAPTCHA widget
   useEffect(() => {
@@ -21,7 +22,7 @@ const ReCaptcha = ({ onVerify, onExpire }) => {
 
   const render = () => {
     recaptchaId.current = window.grecaptcha.render(containerRef.current, {
-      sitekey: RECAPTCHA_SITE_KEY,
+      sitekey: recaptchaSiteKey,
       theme: mode,
       callback: onVerify,
       "expired-callback": onExpire,

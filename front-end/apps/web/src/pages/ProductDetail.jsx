@@ -5,7 +5,7 @@ import {
   useGetBookDetailQuery,
   useGetRandomBooksQuery,
 } from "../features/books/booksApiSlice";
-import { useTitle } from "@ring/shared";
+import useTitle from "@ring/shared/useTitle";
 import { useGetShopInfoQuery } from "../features/shops/shopsApiSlice";
 import Placeholder from "@ring/ui/Placeholder";
 import CustomDivider from "../components/custom/CustomDivider";

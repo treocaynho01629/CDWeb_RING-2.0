@@ -1,24 +1,6 @@
 import styled from "@emotion/styled";
 import { Fragment, useState, useEffect, memo, useRef } from "react";
-import {
-  Button,
-  Skeleton,
-  Stack,
-  DialogContent,
-  DialogActions,
-  DialogTitle,
-  SwipeableDrawer,
-  Collapse,
-  Badge,
-} from "@mui/material";
-import {
-  Check,
-  FilterAltOff,
-  CategoryOutlined,
-  ExpandLess,
-  ExpandMore,
-} from "@mui/icons-material";
-import { getBookType } from "@ring/shared";
+import { getBookType } from "@ring/shared/enums/book";
 import {
   useGetCategoriesQuery,
   useGetRelevantCategoriesQuery,
@@ -28,6 +10,20 @@ import {
   useGetRelevantPublishersQuery,
 } from "../../../features/publishers/publishersApiSlice";
 import { suggestPrices } from "../../../utils/filters";
+import Button from "@mui/material/Button";
+import Skeleton from "@mui/material/Skeleton";
+import Stack from "@mui/material/Stack";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import DialogTitle from "@mui/material/DialogTitle";
+import SwipeableDrawer from "@mui/material/SwipeableDrawer";
+import Collapse from "@mui/material/Collapse";
+import Badge from "@mui/material/Badge";
+import Check from "@mui/icons-material/Check";
+import FilterAltOff from "@mui/icons-material/FilterAltOff";
+import CategoryOutlined from "@mui/icons-material/CategoryOutlined";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 import PriceRangeSlider from "./PriceRangeSlider";
 
 //#region styled

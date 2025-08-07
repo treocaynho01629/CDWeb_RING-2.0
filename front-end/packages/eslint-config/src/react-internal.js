@@ -1,7 +1,9 @@
 import { config as baseConfig } from "./base.js";
-import reactEslint from "eslint-plugin-react";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
+import js from "@eslint/js";
+import eslintConfigPrettier from "eslint-config-prettier";
+import pluginReactHooks from "eslint-plugin-react-hooks";
+import pluginReact from "eslint-plugin-react";
+import tseslint from "typescript-eslint";
 import globals from "globals";
 
 /**
@@ -10,11 +12,13 @@ import globals from "globals";
  * @type {import("eslint").Linter.Config[]} */
 export const config = [
   ...baseConfig,
-  reactEslint.configs.flat.recommended,
-  reactRefresh.configs.vite,
+  js.configs.recommended,
+  eslintConfigPrettier,
+  ...tseslint.configs.recommended,
+  pluginReact.configs.flat.recommended,
   {
     languageOptions: {
-      ...reactEslint.configs.flat.recommended.languageOptions,
+      ...pluginReact.configs.flat.recommended.languageOptions,
       globals: {
         ...globals.serviceworker,
         ...globals.browser,
@@ -23,11 +27,11 @@ export const config = [
   },
   {
     plugins: {
-      "react-hooks": reactHooks,
+      "react-hooks": pluginReactHooks,
     },
     settings: { react: { version: "detect" } },
     rules: {
-      ...reactHooks.configs.recommended.rules,
+      ...pluginReactHooks.configs.recommended.rules,
       // React scope no longer necessary with new JSX transform.
       "react/react-in-jsx-scope": "off",
     },

@@ -1,7 +1,8 @@
 import styled from "@emotion/styled";
-import { KeyboardArrowRight } from "@mui/icons-material";
-import { Button, IconButton } from "@mui/material";
-import { getAddressType } from "@ring/shared";
+import { getAddressType } from "@ring/shared/enums/address";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 
 //#region styled
 const Title = styled.h4`

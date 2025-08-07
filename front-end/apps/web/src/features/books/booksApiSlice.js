@@ -2,7 +2,7 @@ import {
   booksAdapter,
   booksInitialState as initialState,
   booksApiSlice as initialsApiSlice,
-} from "@ring/redux";
+} from "@ring/redux/booksApiSlice";
 
 export const booksApiSlice = initialsApiSlice.injectEndpoints({
   endpoints: (builder) => ({

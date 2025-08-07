@@ -1,3 +1,5 @@
+"use client";
+
 import { createTheme } from "@mui/material/styles";
 import { outlinedInputClasses } from "@mui/material/OutlinedInput";
 import darkScrollbar from "@mui/material/darkScrollbar";

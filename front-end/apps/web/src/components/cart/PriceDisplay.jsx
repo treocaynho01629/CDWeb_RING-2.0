@@ -5,7 +5,7 @@ import {
   CheckoutText,
   DetailContainer,
 } from "../custom/CartComponents";
-import { currencyFormat } from "@ring/shared";
+import { currencyFormat } from "@ring/shared/utils/convert";
 
 const PriceDisplay = ({ displayInfo, loggedIn }) => {
   return (

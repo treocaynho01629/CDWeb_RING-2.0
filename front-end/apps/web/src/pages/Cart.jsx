@@ -1,9 +1,10 @@
 import { Suspense, lazy, useLayoutEffect } from "react";
 import { NavLink } from "react-router";
-import { ChevronLeft } from "@mui/icons-material";
 import { ReactComponent as EmptyIcon } from "@ring/shared/assets/empty";
-import { Button } from "@mui/material";
-import { useTitle, useConfirm } from "@ring/shared";
+import useTitle from "@ring/shared/useTitle";
+import useConfirm from "@ring/shared/useConfirm";
+import Button from "@mui/material/Button";
+import ChevronLeft from "@mui/icons-material/ChevronLeft";
 import Placeholder from "@ring/ui/Placeholder";
 import CustomBreadcrumbs from "../components/custom/CustomBreadcrumbs";
 import styled from "@emotion/styled";

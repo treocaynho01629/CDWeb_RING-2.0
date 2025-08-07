@@ -2,38 +2,34 @@ import styled from "@emotion/styled";
 import { Suspense, lazy, useState } from "react";
 import { StyledDialogTitle } from "../custom/ProfileComponents";
 import {
-  Button,
-  DialogContent,
-  Box,
-  Typography,
-  Skeleton,
-  Dialog,
-  Grid,
-} from "@mui/material";
-import {
-  Close,
-  Inbox,
-  KeyboardArrowLeft,
-  KeyboardArrowRight,
-  KeyboardReturn,
-  Receipt,
-  Sell,
-} from "@mui/icons-material";
-import {
   currencyFormat,
   dateFormatter,
-  getOrderStatus,
-  getPaymentStatus,
-  getShippingType,
-  iconList,
   idFormatter,
   timeFormatter,
-  useConfirm,
-} from "@ring/shared";
+} from "@ring/shared/utils/convert";
+import { getOrderStatus } from "@ring/shared/enums/order";
+import { getPaymentStatus } from "@ring/shared/enums/payment";
+import { getShippingType } from "@ring/shared/enums/shipping";
+import { iconList } from "@ring/shared/utils/icon";
 import { Link } from "react-router";
 import { booksApiSlice } from "../../features/books/booksApiSlice";
 import { MobileExtendButton } from "@ring/ui/Components";
 import { useConfirmOrderMutation } from "../../features/orders/ordersApiSlice";
+import useConfirm from "@ring/shared/useConfirm";
+import Button from "@mui/material/Button";
+import DialogContent from "@mui/material/DialogContent";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Skeleton from "@mui/material/Skeleton";
+import Dialog from "@mui/material/Dialog";
+import Grid from "@mui/material/Grid";
+import CloseIcon from "@mui/icons-material/Close";
+import InboxIcon from "@mui/icons-material/Inbox";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import SellIcon from "@mui/icons-material/Sell";
 import OrderDetailItems from "./OrderDetailItems";
 import useCart from "../../hooks/useCart";
 
@@ -234,8 +230,8 @@ const MainButtonContainer = styled.div`
 //#endregion
 
 const OrderStatus = getOrderStatus();
-const ShippingType = getShippingType();
 const PaymentStatus = getPaymentStatus();
+const ShippingType = getShippingType();
 
 function getStepContent(detail) {
   const date = new Date(detail?.date);

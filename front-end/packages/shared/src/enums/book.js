@@ -1,6 +1,7 @@
-import { store } from "@ring/redux";
+import { getStore } from "@ring/redux/storeRef";
 
 export const getBookLanguage = () => {
+  const store = getStore();
   const enums = store?.getState()?.enum?.enums;
 
   return (
@@ -27,6 +28,7 @@ export const getBookLanguage = () => {
 };
 
 export const getBookType = () => {
+  const store = getStore();
   const enums = store?.getState()?.enum?.enums;
 
   return (

@@ -1,4 +1,4 @@
-import { apiSlice } from "@ring/redux";
+import apiSlice from "@ring/redux/apiSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

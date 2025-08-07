@@ -1,14 +1,12 @@
 import styled from "@emotion/styled";
-import {
-  KeyboardArrowDown,
-  KeyboardArrowRight,
-  LocalShippingOutlined,
-} from "@mui/icons-material";
-import { Box } from "@mui/material";
 import { useLocation, useNavigate } from "react-router";
 import { MobileExtendButton } from "@ring/ui/Components";
-import { useAuth } from "@ring/auth";
-import { currencyFormat } from "@ring/shared";
+import { currencyFormat } from "@ring/shared/utils/convert";
+import useAuth from "@ring/auth/useAuth";
+import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import LocalShippingOutlined from "@mui/icons-material/LocalShippingOutlined";
+import Box from "@mui/material/Box";
 
 //#region styled
 const PreviewWrapper = styled.div`

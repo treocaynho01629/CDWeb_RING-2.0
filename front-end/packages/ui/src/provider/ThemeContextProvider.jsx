@@ -3,13 +3,13 @@ import {
   StyledEngineProvider,
 } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import { theme } from "@ring/shared";
+import { theme as baseTheme } from "../lib/theme";
 
-export default function ThemeContextProvider({ children }) {
+export default function ThemeContextProvider({ theme, children }) {
   return (
     <StyledEngineProvider injectFirst>
       <MUIThemeProvider
-        theme={theme}
+        theme={theme ?? baseTheme}
         disableTransitionOnChange
         defaultMode="light"
       >

@@ -1,4 +1,4 @@
-import { store } from "@ring/redux";
+import { getStore } from "@ring/redux/storeRef";
 
 export const getGenderType = () => {
   return Object.freeze({
@@ -9,6 +9,7 @@ export const getGenderType = () => {
 };
 
 export const getUserRole = () => {
+  const store = getStore();
   const enums = store?.getState()?.enum?.enums;
 
   return (

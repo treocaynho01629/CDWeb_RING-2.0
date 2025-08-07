@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { Link } from "react-router";
 import { Button } from "@mui/material";
-import { ReactComponent as EmptyIcon } from "@ring/shared/assets/empty";
+// import { ReactComponent as EmptyIcon } from "@ring/shared/assets/empty";
 import SimpleNavbar from "../layout/SimpleNavbar";
 
 //#region styled
@@ -93,14 +93,14 @@ const Content = styled.div`
   }
 `;
 
-const StyledEmptyIcon = styled(EmptyIcon)`
-  height: 0.75em;
-  width: 0.75em;
-  fill: ${({ theme }) => theme.vars.palette.background.default};
-  stroke: ${({ theme }) => theme.vars.palette.error.main};
-  stroke-width: 10px;
-  overflow: visible;
-`;
+// const StyledEmptyIcon = styled(EmptyIcon)`
+//   height: 0.75em;
+//   width: 0.75em;
+//   fill: ${({ theme }) => theme.vars.palette.background.default};
+//   stroke: ${({ theme }) => theme.vars.palette.error.main};
+//   stroke-width: 10px;
+//   overflow: visible;
+// `;
 
 const ErrorCode = styled.h1`
   font-size: 13em;
@@ -130,9 +130,7 @@ const Missing = () => {
       <Content>
         <h2>Ôi khônggggg!</h2>
         <ErrorContainer>
-          <ErrorCode>
-            4<StyledEmptyIcon />4
-          </ErrorCode>
+          <ErrorCode>{/* 4<StyledEmptyIcon />4 */}</ErrorCode>
         </ErrorContainer>
         <h3>Không thể tìm thấy trang bạn yêu cầu</h3>
         <p>Có thể đường dẫn này đã cũ, sai chính tả hoặc không còn tồn tại.</p>

@@ -1,32 +1,31 @@
 import styled from "@emotion/styled";
 import { useEffect, useState, lazy, Suspense, useRef } from "react";
-import {
-  Button,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-  MenuItem,
-  Skeleton,
-  TextField,
-  DialogContent,
-  Avatar,
-  Badge,
-} from "@mui/material";
-import {
-  Check,
-  Clear,
-  EditOutlined,
-  KeyboardArrowLeft,
-  KeyboardArrowRight,
-  Person,
-} from "@mui/icons-material";
 import { useUpdateProfileMutation } from "../../features/users/usersApiSlice";
 import { Instruction, MobileExtendButton } from "@ring/ui/Components";
 import { Link } from "react-router";
 import { StyledDialogTitle } from "../custom/ProfileComponents";
 import { PatternFormat } from "react-number-format";
-import { useAuth } from "@ring/auth";
-import { PHONE_REGEX, useConfirm, getGenderType } from "@ring/shared";
+import { PHONE_REGEX } from "@ring/shared/utils/regex";
+import { getGenderType } from "@ring/shared/enums/user";
+import useConfirm from "@ring/shared/useConfirm";
+import useAuth from "@ring/auth/useAuth";
+import Button from "@mui/material/Button";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import MenuItem from "@mui/material/MenuItem";
+import Skeleton from "@mui/material/Skeleton";
+import TextField from "@mui/material/TextField";
+import DialogContent from "@mui/material/DialogContent";
+import Avatar from "@mui/material/Avatar";
+import Badge from "@mui/material/Badge";
+import Check from "@mui/icons-material/Check";
+import Clear from "@mui/icons-material/Clear";
+import EditOutlined from "@mui/icons-material/EditOutlined";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import Person from "@mui/icons-material/Person";
+
 import dayjs from "dayjs";
 
 const DatePicker = lazy(() => import("@ring/ui/DatePicker"));

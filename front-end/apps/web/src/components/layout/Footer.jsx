@@ -1,16 +1,15 @@
 import styled from "@emotion/styled";
-import {
-  Facebook,
-  YouTube,
-  LinkedIn,
-  Twitter,
-  QrCode,
-  LocalAtm,
-  ExpandLess,
-  ExpandMore,
-} from "@mui/icons-material";
-import { Collapse, Grid } from "@mui/material";
 import { useState } from "react";
+import Facebook from "@mui/icons-material/Facebook";
+import YouTube from "@mui/icons-material/YouTube";
+import LinkedIn from "@mui/icons-material/LinkedIn";
+import Twitter from "@mui/icons-material/Twitter";
+import QrCode from "@mui/icons-material/QrCode";
+import LocalAtm from "@mui/icons-material/LocalAtm";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import Collapse from "@mui/material/Collapse";
+import Grid from "@mui/material/Grid";
 
 //#region styled
 const Wrapper = styled.div`

@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 
-const useReachable = () => {
+const useReachable = (baseUrl) => {
   //Fire a snack notification if it take too long to reach the server
   const connect = async () => {
     const timeout = new Promise((resolve, reject) => {
       setTimeout(reject, 5000, "Request timed out"); //5s
     });
-    const request = fetch(import.meta.env.VITE_API_URL + "/api/v1/ping");
+    const request = fetch(baseUrl + "/api/v1/ping");
     return Promise.race([timeout, request])
       .then(async (response) => {
         console.log("Connected");

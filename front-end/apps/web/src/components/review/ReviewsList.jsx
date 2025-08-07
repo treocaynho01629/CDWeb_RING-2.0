@@ -6,19 +6,21 @@ import {
   useEffect,
   lazy,
 } from "react";
-import { KeyboardArrowLeft, Try } from "@mui/icons-material";
 import { useGetMyReviewsQuery } from "../../features/reviews/reviewsApiSlice";
 import { Message, Title } from "@ring/ui/Components";
 import { Link } from "react-router";
-import { CircularProgress, DialogContent } from "@mui/material";
 import { debounce } from "lodash-es";
-import { useAuth } from "@ring/auth";
+import useAuth from "@ring/auth/useAuth";
 import {
   LoadContainer,
   MessageContainer,
   PlaceholderContainer,
   StyledEmptyIcon,
 } from "../custom/ProfileComponents";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import Try from "@mui/icons-material/Try";
+import CircularProgress from "@mui/material/CircularProgress";
+import DialogContent from "@mui/material/DialogContent";
 import ReviewItem from "./ReviewItem";
 import styled from "@emotion/styled";
 

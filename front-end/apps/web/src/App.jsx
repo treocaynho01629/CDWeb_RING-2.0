@@ -1,16 +1,18 @@
 import "./App.css";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
-import { useReachable, useGetEnums } from "@ring/shared";
-import { RequireAuth, PersistLogin } from "@ring/auth";
-import PageLayout from "./components/layout/PageLayout";
+import useReachable from "@ring/shared/useReachable";
+import useGetEnums from "@ring/shared/useGetEnums";
+import RequireAuth from "@ring/auth/RequireAuth";
+import PersistLogin from "@ring/auth/PersistLogin";
 import FallbackLogo from "@ring/ui/FallbackLogo";
 import Layout from "@ring/ui/Layout";
+import PageLayout from "./components/layout/PageLayout";
 import "react-multi-carousel/lib/styles.css";
 import "simplebar-react/dist/simplebar.min.css";
 
 function App() {
-  useReachable(); //Test connection to server
+  useReachable(import.meta.env.VITE_API_URL); //Test connection to server
   useGetEnums();
 
   const router = createBrowserRouter(

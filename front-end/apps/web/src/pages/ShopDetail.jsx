@@ -15,7 +15,7 @@ import {
   useNavigate,
 } from "react-router";
 import { useGetShopQuery } from "../features/shops/shopsApiSlice";
-import { useTitle } from "@ring/shared";
+import useTitle from "@ring/shared/useTitle";
 import { booksAmount, pageSizes, sortBooksBy } from "../utils/filters";
 import { useGetBooksQuery } from "../features/books/booksApiSlice";
 import { debounce, isEqual } from "lodash-es";

@@ -7,15 +7,17 @@ import {
   useRef,
   useState,
 } from "react";
-import { useMediaQuery, Skeleton, Grid } from "@mui/material";
 import { NavLink, useNavigate, useParams, useSearchParams } from "react-router";
 import { useGetCategoryQuery } from "../features/categories/categoriesApiSlice";
 import { useGetBooksQuery } from "../features/books/booksApiSlice";
 import { debounce, isEqual } from "lodash-es";
-import { useTitle } from "@ring/shared";
+import useTitle from "@ring/shared/useTitle";
 import { booksAmount, pageSizes, sortBooksBy } from "../utils/filters";
 import { StoreSuggest, Wrapper } from "../components/custom/SortComponents";
-import { StoreOutlined } from "@mui/icons-material";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import Skeleton from "@mui/material/Skeleton";
+import Grid from "@mui/material/Grid";
+import StoreOutlined from "@mui/icons-material/StoreOutlined";
 import AppPagination from "../components/custom/AppPagination";
 import CustomDivider from "../components/custom/CustomDivider";
 import FilteredProducts from "../components/product/filter/FilteredProducts";

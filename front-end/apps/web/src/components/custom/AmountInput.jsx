@@ -1,6 +1,7 @@
-import { Add, Remove } from "@mui/icons-material";
 import styled from "@emotion/styled";
 import InputBase from "@mui/material/InputBase";
+import Add from "@mui/icons-material/Add";
+import Remove from "@mui/icons-material/Remove";
 
 const InputContainer = styled.div`
   display: flex;

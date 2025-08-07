@@ -2,37 +2,115 @@
   "name": "@ring/shared",
   "version": "0.0.0",
   "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
-    "src",
-    "assets"
+    "dist/**",
+    "assets/**"
   ],
   "exports": {
-    ".": "./src/index.js",
-    "./ConfirmDialog": "./src/components/ConfirmDialog.jsx",
-    "./enums/address": "./src/enums/address.js",
-    "./enums/book": "./src/enums/book.js",
-    "./enums/coupon": "./src/enums/coupon.js",
-    "./enums/image": "./src/enums/image.js",
-    "./enums/order": "./src/enums/order.js",
-    "./enums/payment": "./src/enums/payment.js",
-    "./enums/shipping": "./src/enums/shipping.js",
-    "./enums/user": "./src/enums/user.js",
-    "./utils/convert": "./src/utils/convert.js",
-    "./utils/icon": "./src/utils/icon.jsx",
-    "./utils/location": "./src/utils/location.js",
-    "./utils/payment": "./src/utils/payment.jsx",
-    "./utils/regex": "./src/utils/regex.js",
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./theme": {
+      "import": "./dist/src/theme.js",
+      "require": "./dist/src/theme.cjs"
+    },
+    "./ConfirmDialog": {
+      "import": "./dist/src/components/ConfirmDialog.js",
+      "require": "./dist/src/components/ConfirmDialog.cjs"
+    },
+    "./enums/address": {
+      "import": "./dist/src/enums/address.js",
+      "require": "./dist/src/enums/address.cjs"
+    },
+    "./enums/book": {
+      "import": "./dist/src/enums/book.js",
+      "require": "./dist/src/enums/book.cjs"
+    },
+    "./enums/coupon": {
+      "import": "./dist/src/enums/coupon.js",
+      "require": "./dist/src/enums/coupon.cjs"
+    },
+    "./enums/order": {
+      "import": "./dist/src/enums/order.js",
+      "require": "./dist/src/enums/order.cjs"
+    },
+    "./enums/payment": {
+      "import": "./dist/src/enums/payment.js",
+      "require": "./dist/src/enums/payment.cjs"
+    },
+    "./enums/shipping": {
+      "import": "./dist/src/enums/shipping.js",
+      "require": "./dist/src/enums/shipping.cjs"
+    },
+    "./enums/image": {
+      "import": "./dist/src/enums/image.js",
+      "require": "./dist/src/enums/image.cjs"
+    },
+    "./enums/user": {
+      "import": "./dist/src/enums/user.js",
+      "require": "./dist/src/enums/user.cjs"
+    },
+    "./utils/icon": {
+      "import": "./dist/src/utils/icon.js",
+      "require": "./dist/src/utils/icon.cjs"
+    },
+    "./utils/convert": {
+      "import": "./dist/src/utils/convert.js",
+      "require": "./dist/src/utils/convert.cjs"
+    },
+    "./utils/location": {
+      "import": "./dist/src/utils/location.js",
+      "require": "./dist/src/utils/location.cjs"
+    },
+    "./utils/payment": {
+      "import": "./dist/src/utils/payment.js",
+      "require": "./dist/src/utils/payment.cjs"
+    },
+    "./utils/regex": {
+      "import": "./dist/src/utils/regex.js",
+      "require": "./dist/src/utils/regex.cjs"
+    },
+    "./useConfirm": {
+      "import": "./dist/src/hooks/useConfirm.js",
+      "require": "./dist/src/hooks/useConfirm.cjs"
+    },
+    "./useDeepEffect": {
+      "import": "./dist/src/hooks/useDeepEffect.js",
+      "require": "./dist/src/hooks/useDeepEffect.cjs"
+    },
+    "./useReachable": {
+      "import": "./dist/src/hooks/useReachable.js",
+      "require": "./dist/src/hooks/useReachable.cjs"
+    },
+    "./useGetEnums": {
+      "import": "./dist/src/hooks/useGetEnums.js",
+      "require": "./dist/src/hooks/useGetEnums.cjs"
+    },
+    "./useTitle": {
+      "import": "./dist/src/hooks/useTitle.js",
+      "require": "./dist/src/hooks/useTitle.cjs"
+    },
     "./assets/empty": "./assets/empty.svg"
   },
   "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
     "lint": "eslint \"**/*.{ts,tsx,js,jsx}\"",
     "update-dependencies": "npx npm-check-updates -u"
   },
   "devDependencies": {
     "@ring/eslint-config": "*",
-    "@ring/redux": "*"
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
+    "@ring/redux": "*",
     "@mui/icons-material": "^7.2.0",
     "@mui/material": "^7.2.0",
     "lodash-es": "^4.17.21",

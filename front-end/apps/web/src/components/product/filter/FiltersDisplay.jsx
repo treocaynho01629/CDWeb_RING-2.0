@@ -1,12 +1,10 @@
 import styled from "@emotion/styled";
-import {
-  Close,
-  FilterAltOff,
-  TipsAndUpdatesOutlined,
-} from "@mui/icons-material";
 import { isEqual } from "lodash-es";
 import { memo, useMemo } from "react";
-import { currencyFormat } from "@ring/shared";
+import { currencyFormat } from "@ring/shared/utils/convert";
+import Close from "@mui/icons-material/Close";
+import FilterAltOff from "@mui/icons-material/FilterAltOff";
+import TipsAndUpdatesOutlined from "@mui/icons-material/TipsAndUpdatesOutlined";
 
 //#region styled
 const DisplayContainer = styled.div`

@@ -2,16 +2,45 @@
   "name": "@ring/auth",
   "version": "0.0.0",
   "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
-    "src"
+    "dist/**"
   ],
   "exports": {
-    ".": "./src/index.js",
-    "./PersistLogin": "./src/components/PersistLogin.jsx",
-    "./RequireAuth": "./src/components/RequireAuth.jsx",
-    "./ReCaptcha": "./src/components/ReCaptcha.jsx"
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./PersistLogin": {
+      "import": "./dist/src/components/PersistLogin.js",
+      "require": "./dist/src/components/PersistLogin.cjs"
+    },
+    "./RequireAuth": {
+      "import": "./dist/src/components/RequireAuth.js",
+      "require": "./dist/src/components/RequireAuth.cjs"
+    },
+    "./ReCaptcha": {
+      "import": "./dist/src/components/ReCaptcha.js",
+      "require": "./dist/src/components/ReCaptcha.cjs"
+    },
+    "./useAuth": {
+      "import": "./dist/src/hooks/useAuth.js",
+      "require": "./dist/src/hooks/useAuth.cjs"
+    },
+    "./useLogout": {
+      "import": "./dist/src/hooks/useLogout.js",
+      "require": "./dist/src/hooks/useLogout.cjs"
+    },
+    "./useReCaptcha": {
+      "import": "./dist/src/hooks/useReCaptcha.js",
+      "require": "./dist/src/hooks/useReCaptcha.cjs"
+    }
   },
   "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
     "lint": "eslint \"**/*.{ts,tsx,js,jsx}\"",
     "update-dependencies": "npx npm-check-updates -u"
   },
@@ -21,13 +50,17 @@
     "jwt-decode": "^4.0.0"
   },
   "devDependencies": {
-    "@ring/eslint-config": "*"
+    "@ring/eslint-config": "*",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
+    "@mui/material": "^7.2.0",
+    "notistack": "^3.0.2",
     "react": "^18.0.0 || ^19.0.0",
     "react-router": "^7.6.3",
-    "react-redux": "^9.2.0",
-    "@mui/material": "^7.2.0",
-    "notistack": "^3.0.2"
+    "react-redux": "^9.2.0"
   }
 }

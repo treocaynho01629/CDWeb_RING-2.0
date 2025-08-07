@@ -1,12 +1,5 @@
 import styled from "@emotion/styled";
 import { useEffect } from "react";
-import {
-  MoreHoriz,
-  Storefront,
-  KeyboardArrowRight,
-  LocalActivityOutlined,
-} from "@mui/icons-material";
-import { IconButton, Box, Skeleton } from "@mui/material";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Link } from "react-router";
 import {
@@ -16,8 +9,16 @@ import {
   SpaceTableRow,
   StyledTableCell,
 } from "../custom/TableComponents";
-import { currencyFormat, getImageSize } from "@ring/shared";
+import { currencyFormat } from "@ring/shared/utils/convert";
+import { getImageSize } from "@ring/shared/enums/image";
 import { StyledCheckbox } from "../custom/CartComponents";
+import IconButton from "@mui/material/IconButton";
+import Box from "@mui/material/Box";
+import Skeleton from "@mui/material/Skeleton";
+import MoreHoriz from "@mui/icons-material/MoreHoriz";
+import Storefront from "@mui/icons-material/Storefront";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import LocalActivityOutlined from "@mui/icons-material/LocalActivityOutlined";
 import AmountInput from "../custom/AmountInput";
 
 //#region styled

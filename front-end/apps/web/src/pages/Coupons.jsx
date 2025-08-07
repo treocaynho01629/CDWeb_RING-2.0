@@ -1,4 +1,4 @@
-import { useTitle } from "@ring/shared";
+import useTitle from "@ring/shared/useTitle";
 import { Dialog } from "@mui/material";
 import { useNavigate, useOutletContext } from "react-router";
 import { TabContentContainer } from "../components/custom/ProfileComponents";
